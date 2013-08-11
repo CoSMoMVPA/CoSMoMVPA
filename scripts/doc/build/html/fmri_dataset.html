@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fmri_dataset &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fmri-dataset">
+<h1>fmri_dataset<a class="headerlink" href="#fmri-dataset" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>ds <span class="p">=</span><span class="w"> </span><span class="nf">cosmo_fmri_dataset</span><span class="p">(</span>filename, varargin<span class="p">)</span><span class="w"></span>
+<span class="c">% FMRI_DATASET load an fmri dataset to facilitate MVPA analyses. Fashioned after</span>
+<span class="c">%               the logic and semantics of PyMVPA.</span>
+<span class="c">%</span>
+<span class="c">%   DS = COSMO_FMRI_DATASET(nifti_filename)</span>
+<span class="c">%</span>
+<span class="c">%   returns struct (ds) that has the data</span>
+<span class="c">%   in 2-D matrix format. N-rows hold N-volumes (e.g., samples, observations, timepoints)</span>
+<span class="c">%   and M columns for M features (e.g., voxels).</span>
+<span class="c">%</span>
+<span class="c">% OPTIONAL ARGUMENTS:</span>
+<span class="c">%   &#39;mask&#39;  -- nifti filename for volume mask</span>
+<span class="c">%   &#39;targets&#39; -- a 1 x N array of numeric labels to be used as sample attributes</span>
+<span class="c">%   &#39;chunks&#39; -- a 1 x M array of numeric labels to be used as feature attributes</span>
+<span class="c">%</span>
+<span class="c">% RETURNS: DATASET &#39;DS&#39;:</span>
+<span class="c">%   ds is a struct with the following fields:</span>
+<span class="c">%       &#39;samples&#39; -- 2-D matrix containing the data loaded from nifti_filename</span>
+<span class="c">%                   If the original nifti file contained data with X,Y,Z,T</span>
+<span class="c">%                   dimensions, and no mask was applied, then &#39;data&#39; will have</span>
+<span class="c">%                   dimensions N x M, where N = T, and M = X*Y*Z. If a mask was</span>
+<span class="c">%                   applied then M = the number of non-zero voxels in the mask</span>
+<span class="c">%                   input dataset.</span>
+<span class="c">%       &#39;a&#39; -- Dataset attributes. A struct containing Dataset relevent data.</span>
+<span class="c">%</span>
+<span class="c">%       &#39;a.imghdr&#39; -- A struct that contains all of the information in the nifti</span>
+<span class="c">%                   header. This struct is nearly the same as the output from</span>
+<span class="c">%                   load_nii, with the exception that hdr.img is not kept (to</span>
+<span class="c">%                   save memory).</span>
+<span class="c">%                   load_nii comes from:</span>
+<span class="c">%                 http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image</span>
+<span class="c">%       &#39;a.mapper&#39; -- An array of indices into the original flattened volume</span>
+<span class="c">%                   before masking, for use in mapping data back into original space.</span>
+<span class="c">%       &#39;sa&#39; -- A struct for holding Sample Attributes (e.g.,sa.targets,sa.chunks)</span>
+<span class="c">%       &#39;fa&#39;  -- Feature attributes</span>
+<span class="c">%       &#39;fa.voxel_indices&#39; -- M * 3 indices of voxels</span>
+<span class="c">%</span>
+<span class="c">%</span>
+
+
+    <span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    <span class="c">% Input parsing stuff</span>
+    <span class="n">parser</span> <span class="p">=</span> <span class="n">inputParser</span><span class="p">;</span>
+    <span class="n">addRequired</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;filename&#39;</span><span class="p">);</span>
+    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;mask&#39;</span><span class="p">,[]);</span>
+    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;targets&#39;</span><span class="p">,[]);</span>
+    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;chunks&#39;</span><span class="p">,[]);</span>
+    <span class="n">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span><span class="n">varargin</span><span class="p">{:})</span>
+    <span class="n">p</span> <span class="p">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">Results</span><span class="p">;</span>
+
+    <span class="c">% End input parsing stuff</span>
+    <span class="c">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    <span class="c">%NNO modifications</span>
+    <span class="c">% - switch statement</span>
+    <span class="c">% - preallocation of memory for samples</span>
+    <span class="c">% - remove img data from hdr</span>
+    <span class="c">% - check for size of targets and chunks</span>
+    <span class="c">% - keep voxels in mask with negative values</span>
+    <span class="c">% - use load_nii (not load_nifti)</span>
+
+    <span class="n">ni</span> <span class="p">=</span> <span class="n">load_nii</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">filename</span><span class="p">);</span>
+
+    <span class="n">dims</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">ni</span><span class="p">.</span><span class="n">img</span><span class="p">);</span>
+    <span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span><span class="o">&gt;</span>4<span class="p">,</span>
+        <span class="n">error</span><span class="p">(</span><span class="s">&#39;Found more than 4 dimensions&#39;</span><span class="p">);</span>
+    <span class="k">end</span>
+    <span class="n">x</span> <span class="p">=</span> <span class="n">dims</span><span class="p">(</span>1<span class="p">);</span> <span class="n">y</span> <span class="p">=</span> <span class="n">dims</span><span class="p">(</span>2<span class="p">);</span> <span class="n">z</span> <span class="p">=</span> <span class="n">dims</span><span class="p">(</span>3<span class="p">);</span> <span class="n">t</span> <span class="p">=</span> <span class="n">dims</span><span class="p">(</span>4<span class="p">);</span>
+
+    <span class="c">% if a mask was supplied, load it</span>
+    <span class="k">if</span> <span class="nb">length</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">&gt;</span> 0
+        <span class="n">m</span> <span class="p">=</span> <span class="n">load_nii</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">mask</span><span class="p">);</span>
+        <span class="n">m</span> <span class="p">=</span> <span class="n">m</span><span class="p">.</span><span class="n">img</span><span class="p">;</span>
+        <span class="n">mdim</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+
+        <span class="k">switch</span> <span class="nb">length</span><span class="p">(</span><span class="n">mdim</span><span class="p">)</span>
+            <span class="k">case</span> 3
+            <span class="k">case</span> 4
+                <span class="n">m</span><span class="p">=</span><span class="n">m</span><span class="p">(:,:,:,</span>1<span class="p">);</span>
+            <span class="k">otherwise</span>
+                <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal mask&#39;</span><span class="p">);</span>
+        <span class="k">end</span>
+        <span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span> <span class="p">=</span> <span class="nb">find</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span> <span class="p">=</span> <span class="p">[</span>1<span class="p">:(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="p">)];</span>
+    <span class="k">end</span>
+
+    <span class="c">% compute the voxel indices</span>
+    <span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">,</span> <span class="n">iz</span><span class="p">]</span> <span class="p">=</span> <span class="nb">ind2sub</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">],</span> <span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span><span class="p">);</span>
+    <span class="n">ds</span><span class="p">.</span><span class="n">fa</span><span class="p">.</span><span class="n">voxel_indices</span><span class="p">=[</span><span class="n">ix</span> <span class="n">iy</span> <span class="n">iz</span><span class="p">];</span>
+
+    <span class="c">% store the volume data</span>
+    <span class="n">nfeatures</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span><span class="p">);</span>
+    <span class="n">ds</span><span class="p">.</span><span class="n">samples</span> <span class="p">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="n">v</span><span class="p">=</span>1<span class="p">:</span><span class="n">t</span>
+        <span class="n">vol</span> <span class="p">=</span> <span class="n">ni</span><span class="p">.</span><span class="n">img</span><span class="p">(:,:,:,</span><span class="n">v</span><span class="p">);</span>
+        <span class="n">ds</span><span class="p">.</span><span class="n">samples</span><span class="p">(</span><span class="n">v</span><span class="p">,:)=</span><span class="n">vol</span><span class="p">(</span><span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span><span class="p">);</span>
+    <span class="k">end</span>
+
+    <span class="n">ni</span><span class="p">=</span><span class="n">rmfield</span><span class="p">(</span><span class="n">ni</span><span class="p">,</span><span class="s">&#39;img&#39;</span><span class="p">);</span> <span class="c">% remove data from header</span>
+    <span class="n">ds</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">imghdr</span> <span class="p">=</span> <span class="n">ni</span><span class="p">;</span> <span class="c">% store header</span>
+
+    <span class="n">ds</span><span class="p">=</span><span class="n">set_sa</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="s">&#39;targets&#39;</span><span class="p">);</span>
+    <span class="n">ds</span><span class="p">=</span><span class="n">set_sa</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="s">&#39;chunks&#39;</span><span class="p">);</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="w"> </span>ds<span class="p">=</span><span class="nf">set_sa</span><span class="p">(</span>ds,p,fieldname<span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">nsamples</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">ds</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span>1<span class="p">);</span>
+    <span class="n">v</span><span class="p">=</span><span class="n">p</span><span class="p">.(</span><span class="n">fieldname</span><span class="p">);</span>
+    <span class="n">n</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+    <span class="k">if</span> <span class="n">not</span> <span class="p">(</span><span class="n">n</span><span class="o">==</span>0 <span class="o">||</span> <span class="n">n</span><span class="o">==</span><span class="n">nsamples</span><span class="p">)</span>
+        <span class="n">error</span><span class="p">(</span><span class="s">&#39;size mismatch for %s: expected %d values, found %d&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="p">,</span> <span class="n">nsamples</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+    <span class="k">end</span>
+    <span class="n">ds</span><span class="p">.</span><span class="n">sa</span><span class="p">.(</span><span class="n">fieldname</span><span class="p">)=</span><span class="n">v</span><span class="p">;</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/fmri_dataset.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

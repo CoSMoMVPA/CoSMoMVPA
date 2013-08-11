@@ -1,0 +1,20 @@
+.. exercise2
+
+Exercise 2: Classification with Naive Bayes classifier
+=====================================================
+
+Load a dataset with subject s01 and the VT mask. Slice it using your sample
+attributes slicer so that there are only two categories: monkeys and
+ladybugs. Then split the samples again into training and testing data. Use
+these two plits of the data as input into the Naive Bayes classifier given
+below.
+
+
+Naive Bayes Classifier
+
+.. code-block::
+.. literalinclude:: /home/andy/cosmo/doc/source/code/cosmo_classify_naive_baysian.m 
+   :language: matlab
+
+
+    

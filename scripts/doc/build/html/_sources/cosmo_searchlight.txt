@@ -1,0 +1,54 @@
+.. cosmo_searchlight
+
+cosmo_searchlight.m
+===================
+
+Code ::
+
+    function res_map = cosmo_searchlight(ds,measure,varargin)
+       
+        %%
+        %  Parse the input
+        p = inputParser;
+        p.addOptional('measure_opt',struct());
+        p.addOptional('radius',3);
+        p.parse(varargin{:});
+        args = p.Results;
+
+
+        nfeatures=size(ds.samples,2);
+        center_ids=1:nfeatures; % for now, consider all voxels
+
+        % use voxel selection function
+        center2neighbors=cosmo_spherical_voxel_selection(ds, args.radius, center_ids);
+
+        % space for output
+        ncenters=numel(center_ids);
+        accs=zeros(1,ncenters);
+        
+        %%
+        % go over all features
+        for k=1:ncenters
+            center_id=center_ids(k);
+            sphere_feature_ids=center2neighbors{center_id};
+            
+            sphere_ds=cosmo_dataset_select_features(ds, sphere_feature_ids);
+            
+            % run cross validation
+            acc = measure(sphere_ds,args.measure_opt);
+
+            % for now, just store the accuracy (not the predictions)
+            accs(k)=acc;
+            
+            % show progress every 1000 steps
+            if k==1 || mod(k,1000)==0 || k==nfeatures
+                fprintf('%d / %d features: average accuracy %.3f\n', k, nfeatures, mean(accs(1:k)));
+            end
+        end
+
+        %%
+        % store the output
+        res_map=ds;
+        res_map.samples=accs;
+
+    end
