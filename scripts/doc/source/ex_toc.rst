@@ -15,5 +15,5 @@ Contents:
     ex_write_classify_nn
     ex_nfold_partitioner
     ex_cross_validate
-
+    ex_classify_svm
 
