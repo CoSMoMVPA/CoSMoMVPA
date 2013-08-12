@@ -15,7 +15,7 @@ for k=1:n
     if iscell(v)
         w={v{features_to_select}};
     else
-        dataset.sa.(fn)=v(:,features_to_select);
+        dataset.fa.(fn)=v(features_to_select,:);
     end
 end
 

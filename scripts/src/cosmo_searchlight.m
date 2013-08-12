@@ -1,8 +1,8 @@
-function results_map = cosmo_searchlight(dataset, measure, args)
+function results_map = cosmo_searchlight(dataset, measure, varargin)
 %  Generic searchlight function returns a map of results computed at each
 %  searchlight location 
 %   
-%   results_map=cosmo_searchlight(dataset, measure, args)
+%   results_map=cosmo_searchlight(dataset, measure, [args, radius])
 %
 %   Inputs
 %       dataset: an instance of a cosmo_fmri_dataset
@@ -29,12 +29,21 @@ function results_map = cosmo_searchlight(dataset, measure, args)
 %       
 % ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
 
+    parser = inputParser;
+    addOptional(parser,'radius',3);
+    addOptional(parser,'args',struct());
+    parse(parser,varargin{:});
+    p = parser.Results;
+    radius = p.radius;
+    args = p.args;
+
+    
     % 
-    nfeatures=size(ds.samples,2);
+    nfeatures=size(dataset.samples,2);
     center_ids=1:nfeatures; % for now, consider all voxels
 
     % use voxel selection function
-    center2neighbors=cosmo_spherical_voxel_selection(ds, radius, center_ids);
+    center2neighbors=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
 
     % space for output, we will leave res empty for now because we can't know
     % yet the size of the array returned by our dtaset measure.
@@ -48,7 +57,7 @@ function results_map = cosmo_searchlight(dataset, measure, args)
         center_id=center_ids(k);
         sphere_feature_ids=center2neighbors{center_id};
         
-        sphere_ds=cosmo_dataset_select_features(ds, sphere_feature_ids);
+        sphere_ds=cosmo_dataset_slice_features(dataset, sphere_feature_ids);
         
         % Call the dataset measure
         m = measure(sphere_ds, args);
@@ -65,14 +74,14 @@ function results_map = cosmo_searchlight(dataset, measure, args)
         % Store the results
         res(:,k)=m;
         
-        % show progress every 100 steps
-        if k==1 || mod(k,100)==0 || k==nfeatures
-            fprintf('%d / %d features: average accuracy %.3f\n', k, nfeatures, mean(accs(1:k)));
+        % show progress every 1000 steps
+        if k==1 || mod(k,1000)==0 || k==nfeatures
+            fprintf('%d / %d features completed\n', k, nfeatures);
         end
     end
     % <<
 
     % store the output
-    res_map=ds;
-    res_map.samples=res;
+    results_map=dataset;
+    results_map.samples=res;
 
