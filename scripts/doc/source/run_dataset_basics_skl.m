@@ -13,3 +13,8 @@ data_path=cosmo_get_data_path('s01');
 
 % Add labels as sample attributes
 % [your code here]
+=======
+labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
+ds.sa.labels = repmat(labels,10,1)
+% <<
+>>>>>>> 868ef13bd03f668a468b65de5258afe8d4bddfc9:scripts/src/run_dataset_basics.m

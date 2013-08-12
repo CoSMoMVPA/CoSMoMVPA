@@ -23,4 +23,3 @@ run dataset basics
     % Add labels as sample attributes
     labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
     ds.sa.labels = repmat(labels,1,10)
-    
