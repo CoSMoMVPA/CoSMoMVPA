@@ -87,7 +87,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     
     % compute the voxel indices
     [ix, iy, iz] = ind2sub([x,y,z], ds.a.mapper);
-    ds.fa.voxel_indices=[ix iy iz];
+    ds.fa.voxel_indices=[ix iy iz]';
     
     % store the volume data
     nfeatures=numel(ds.a.mapper);
@@ -113,7 +113,7 @@ function ds=set_sa(ds,p,fieldname)
     if not (n==0 || n==nsamples)
         error('size mismatch for %s: expected %d values, found %d', fieldname, nsamples, n);
     end
-    ds.sa.(fieldname)=v;
+    ds.sa.(fieldname)=v(:);
 end
     
 
