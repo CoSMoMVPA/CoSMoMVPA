@@ -16,6 +16,7 @@ Contents:
     cosmo_nfold_partitioner_hdr
     run_splithalf_correlations_hdr
     cosmo_dataset_slice_samples_hdr
+    cosmo_searchlight_hdr
     cosmo_classify_nn_hdr
     run_classify_naive_bayes_hdr
     cosmo_dataset_slice_features_hdr

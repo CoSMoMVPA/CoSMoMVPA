@@ -16,4 +16,4 @@ Contents:
     ex_nfold_partitioner
     ex_cross_validate
     ex_classify_svm
-
+    ex_searchlight

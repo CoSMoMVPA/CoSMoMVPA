@@ -16,6 +16,7 @@ Contents:
     cosmo_nfold_partitioner_skl
     run_splithalf_correlations_skl
     cosmo_dataset_slice_samples_skl
+    cosmo_searchlight_skl
     cosmo_classify_nn_skl
     run_classify_naive_bayes_skl
     cosmo_dataset_slice_features_skl
