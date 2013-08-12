@@ -22,11 +22,11 @@ Contents:
     cosmo_randomize_targets_hdr
     cosmo_sphere_offsets_hdr
     cosmo_spherical_voxel_selection_hdr
-    exercise_dataset_basics_hdr
-    exercise_permutation_test_hdr
-    exercise_sphere_offsets_searchlight_hdr
-    exercise_splithalf_correlations_hdr
-    exercise_voxel_selection_searchlight_hdr
     fa_slicer_hdr
+    run_dataset_basics_hdr
+    run_permutation_test_hdr
+    run_sphere_offsets_searchlight_hdr
+    run_splithalf_correlations_hdr
+    run_voxel_selection_searchlight_hdr
     sa_slicer_hdr
 

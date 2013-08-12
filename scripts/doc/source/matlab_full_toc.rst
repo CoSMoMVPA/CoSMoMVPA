@@ -22,11 +22,11 @@ Contents:
     cosmo_randomize_targets
     cosmo_sphere_offsets
     cosmo_spherical_voxel_selection
-    exercise_dataset_basics
-    exercise_permutation_test
-    exercise_sphere_offsets_searchlight
-    exercise_splithalf_correlations
-    exercise_voxel_selection_searchlight
     fa_slicer
+    run_dataset_basics
+    run_permutation_test
+    run_sphere_offsets_searchlight
+    run_splithalf_correlations
+    run_voxel_selection_searchlight
     sa_slicer
 
