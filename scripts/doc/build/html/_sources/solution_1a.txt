@@ -7,7 +7,7 @@ Dataset Basics
 .. code-block:: matlab
     
     % Load the dataset with VT mask
-    ds = fmri_dataset('../data/s01/glm_T_stats_allruns.nii.gz', ...
+    ds = fmri_dataset('../data/s01/glm_T_stats_perrun.nii.gz', ...
                         'mask', '../data/s01/vt_mask.nii.gz')
     
     % set the targets and the chunks

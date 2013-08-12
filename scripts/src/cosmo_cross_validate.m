@@ -20,7 +20,8 @@ if ~isfield(args,'classifier') error('Missing input args.classifier'); end
 if ~isfield(args,'partitions') error('Missing input args.partitions'); end
 
 
-train_indices = args.artitions.train_indices;
+train_indices = args.p
+artitions.train_indices;
 test_indices = args.partitions.test_indices;
 
 npartitions=numel(train_indices);

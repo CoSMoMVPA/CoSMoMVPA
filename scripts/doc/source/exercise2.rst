@@ -1,7 +1,7 @@
 .. exercise2
 
 Exercise 2: Classification with Naive Bayes classifier
-=====================================================
+======================================================
 
 Load a dataset using subject s01's T-statistics for every run
 ('glm_T_stats_perrun.nii.gz') runs and the VT mask. Slice the datset using your sample

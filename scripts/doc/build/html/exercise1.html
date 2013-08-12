@@ -10,7 +10,7 @@
     
     <title>Exercise 1: Dataset basics &mdash; Cosmo 0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -46,52 +46,7 @@
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="exercise_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
       </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
-            
-  <div class="section" id="exercise-1-dataset-basics">
-<h1>Exercise 1: Dataset basics<a class="headerlink" href="#exercise-1-dataset-basics" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="a-load-dataset-and-set-fields">
-<h2>A. Load dataset and set fields<a class="headerlink" href="#a-load-dataset-and-set-fields" title="Permalink to this headline">¶</a></h2>
-<p>Load a dataset from the example data folder using the <a class="reference external" href="fmri_dataset.html">fmri_dataset</a>,
-applying one of the 3 masks provided (brain, early vision &#8216;ev&#8217; or ventral
-temporal &#8216;vt&#8217;. Add numeric chunks and targets. The stimulus labels for each run
-of the fMRI study were monkey, lemur, mallard, warbler, ladybug, and lunamoth.
-Add a sample attribute that stores this information in the orginal (full)
-dataset (<a class="reference external" href="solution_1a.html">Solution_1a</a>).</p>
-</div>
-<div class="section" id="b-slice-by-samples">
-<h2>B. Slice by samples<a class="headerlink" href="#b-slice-by-samples" title="Permalink to this headline">¶</a></h2>
-<p>Write a function with the following signature.</p>
-<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>ds <span class="p">=</span><span class="w">  </span><span class="nf">sa_slicer</span><span class="p">(</span>dataset, sample_indices<span class="p">)</span><span class="w"></span>
-
-<span class="c">% This function returns a dataset that is a copy of the original dataset</span>
-<span class="c">% but contains just the rows indictated in sample_indices</span>
-</pre></div>
-</div>
-<p><a class="reference external" href="solution_1b.html">Solution_1b</a></p>
-</div>
-<div class="section" id="c-slice-by-features">
-<h2>C. Slice by features<a class="headerlink" href="#c-slice-by-features" title="Permalink to this headline">¶</a></h2>
-<p>Write another function with the signature.</p>
-<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>ds <span class="p">=</span><span class="w"> </span><span class="nf">fa_slicer</span><span class="p">(</span>dataset, feature_indices<span class="p">)</span><span class="w"></span>
-
-<span class="c">% Thhis function return a dataset that is a copy of the original dataset</span>
-<span class="c">% but contains just the columns indictated in feature_indices</span>
-</pre></div>
-</div>
-<p><a class="reference external" href="solution_1c.html">Solution_1c</a></p>
-</div>
-</div>
-
-
-          </div>
-        </div>
-      </div>
+    </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
@@ -128,6 +83,52 @@ dataset (<a class="reference external" href="solution_1a.html">Solution_1a</a>).
     </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="exercise-1-dataset-basics">
+<h1>Exercise 1: Dataset basics<a class="headerlink" href="#exercise-1-dataset-basics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="a-load-dataset-and-set-fields">
+<h2>A. Load dataset and set fields<a class="headerlink" href="#a-load-dataset-and-set-fields" title="Permalink to this headline">¶</a></h2>
+<p>Copy and paste the function in <a class="reference external" href="fmri_dataset.html">fmri_dataset</a> into a new file called
+<em>cosmo_fmri_dataset.m</em>. Load a dataset from the example data folder using the
+<a class="reference external" href="fmri_dataset.html">fmri_dataset</a> function, applying one of the 3 masks provided (brain, early
+vision &#8216;ev&#8217; or ventral temporal &#8216;vt&#8217;. Add numeric chunks and targets. The
+stimulus labels for each run of the fMRI study were monkey, lemur, mallard,
+warbler, ladybug, and lunamoth &#8211; in that order.  Add a sample attribute that
+stores these stimulus labels for the samples for all 10 runs (<a class="reference external" href="solution_1a.html">Solution_1a</a>).</p>
+</div>
+<div class="section" id="b-slice-by-samples">
+<h2>B. Slice by samples<a class="headerlink" href="#b-slice-by-samples" title="Permalink to this headline">¶</a></h2>
+<p>Write a function with the following signature.</p>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>ds <span class="p">=</span><span class="w">  </span><span class="nf">sa_slicer</span><span class="p">(</span>dataset, sample_indices<span class="p">)</span><span class="w"></span>
+
+<span class="c">% This function returns a dataset that is a copy of the original dataset</span>
+<span class="c">% but contains just the rows indictated in sample_indices</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="solution_1b.html">Solution_1b</a></p>
+</div>
+<div class="section" id="c-slice-by-features">
+<h2>C. Slice by features<a class="headerlink" href="#c-slice-by-features" title="Permalink to this headline">¶</a></h2>
+<p>Write another function with the signature.</p>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>ds <span class="p">=</span><span class="w"> </span><span class="nf">fa_slicer</span><span class="p">(</span>dataset, feature_indices<span class="p">)</span><span class="w"></span>
+
+<span class="c">% Thhis function return a dataset that is a copy of the original dataset</span>
+<span class="c">% but contains just the columns indictated in feature_indices</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="solution_1c.html">Solution_1c</a></p>
+</div>
+</div>
+
+
+          </div>
         </div>
       </div>
       <div class="clearer"></div>
