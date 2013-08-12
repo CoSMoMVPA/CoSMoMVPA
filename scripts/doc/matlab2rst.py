@@ -48,7 +48,7 @@ def matlab2rst(data, output=None):
 
 fns=glob.glob(join(matlab_dir,'*.m'))
 
-for output in ('hdr','skl',None):
+for output in ('skl',None):
     labels=[]
     for fn in fns:
         with open(fn) as f:
@@ -69,7 +69,7 @@ for output in ('hdr','skl',None):
             f.write('.. %s\n\n' % label)
             f.write('%s\n%s\n' % (label.replace('_',' '),'='*len(label))) 
             f.write(rst)
-            print ">>>", rst, "<<<"
+            #print ">>>", rst, "<<<"
             print '%s -> %s' % (fn_short, fn_out)
 
         labels.append(label) # keep track of all rst files

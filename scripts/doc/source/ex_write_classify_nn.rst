@@ -12,10 +12,10 @@ correlation distance.  Test your classifers on pairwise or multi-class datasets.
 .. literalinclude:: cosmo_classify_nn_hdr.m
     :language: matlab
 
-Skeleton_
+Hint: cosmo_classify_nn_skl_
 
-.. _Skeleton: cosmo_classify_nn_skl.html
+.. _cosmo_classify_nn_skl: cosmo_classify_nn_skl.html
 
-Full solution: here_
+Full solution: cosmo_classify_nn_
 
-.. _here: cosmo_classify_nn.html
+.. _cosmo_classify_nn: cosmo_classify_nn.html

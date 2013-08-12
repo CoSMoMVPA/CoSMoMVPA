@@ -12,9 +12,10 @@ Contents:
     :maxdepth: 2
     
     
-    exercise_toc
-    code_toc
+    ex_toc
     
+.. toctree::
+    :maxdepth: 1
 
     matlab_full_toc
     matlab_hdr_toc

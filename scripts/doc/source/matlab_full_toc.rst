@@ -6,27 +6,26 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    cosmo_anova_feature_selector
-    cosmo_classify_meta_multiclass
-    cosmo_classify_naive_baysian
-    cosmo_classify_nn
-    cosmo_classify_svm
-    cosmo_cross_validate
-    cosmo_dataset_slice_features
-    cosmo_dataset_slice_samples
-    cosmo_fmri_dataset
-    cosmo_generate_synthetic_dataset
-    cosmo_get_data_path
-    cosmo_map2nifti
-    cosmo_nfold_partition
     cosmo_randomize_targets
+    cosmo_classify_naive_bayes
+    cosmo_fmri_dataset
+    run_voxel_selection_searchlight
+    cosmo_get_data_path
+    run_sphere_offsets_searchlight
+    run_dataset_basics
+    cosmo_nfold_partition
+    run_splithalf_correlations
+    cosmo_dataset_slice_samples
+    cosmo_classify_nn
+    run_classify_naive_bayes
+    cosmo_dataset_slice_features
+    cosmo_cross_validate
     cosmo_sphere_offsets
+    cosmo_map2nifti
+    cosmo_classify_meta_multiclass
+    cosmo_anova_feature_selector
     cosmo_spherical_voxel_selection
-    exercise_dataset_basics
-    exercise_permutation_test
-    exercise_sphere_offsets_searchlight
-    exercise_splithalf_correlations
-    exercise_voxel_selection_searchlight
-    fa_slicer
-    sa_slicer
+    run_permutation_test
+    cosmo_generate_synthetic_dataset
+    cosmo_classify_svm
 
