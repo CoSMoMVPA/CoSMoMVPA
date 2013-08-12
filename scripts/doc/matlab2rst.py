@@ -48,7 +48,8 @@ def matlab2rst(data, output=None):
 
 fns=glob.glob(join(matlab_dir,'*.m'))
 
-for output in ('skl',None):
+for output in ('hdr','skl',None):
+    print '@#$====> Converting matlab_%s.m files to *_%s.rst' % (output,output)
     labels=[]
     for fn in fns:
         with open(fn) as f:
@@ -69,11 +70,8 @@ for output in ('skl',None):
             f.write('.. %s\n\n' % label)
             f.write('%s\n%s\n' % (label.replace('_',' '),'='*len(label))) 
             f.write(rst)
-<<<<<<< HEAD
             #print ">>>", rst, "<<<"
-=======
->>>>>>> 868ef13bd03f668a468b65de5258afe8d4bddfc9
-            print '%s -> %s' % (fn_short, fn_out)
+            #print '%s -> %s' % (fn_short, fn_out)
 
         labels.append(label) # keep track of all rst files
 

@@ -51,6 +51,7 @@ def matlab_2_hdr_skl(data, output=None):
 fns=glob.glob(join(matlab_dir,'*.m'))
 
 for output in ('hdr','skl'):
+    print "@#$*(====> Making matlab_%s.m files" % output 
     labels=[]
     for fn in fns:
         with open(fn) as f:
@@ -72,7 +73,7 @@ for output in ('hdr','skl'):
             #f.write('%s\n%s\n' % (label.replace('_',' '),'='*len(label))) 
             f.write(m)
             #print ">>>", m, "<<<"
-            print '%s -> %s' % (fn_short, fn_out)
+            #print '%s -> %s' % (fn_short, fn_out)
 """
 
         labels.append(label) # keep track of all m files
