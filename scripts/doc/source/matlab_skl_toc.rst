@@ -25,7 +25,17 @@ Contents:
     cosmo_classify_meta_multiclass_skl
     cosmo_anova_feature_selector_skl
     cosmo_spherical_voxel_selection_skl
+<<<<<<< HEAD
     run_permutation_test_skl
     cosmo_generate_synthetic_dataset_skl
     cosmo_classify_svm_skl
+=======
+    fa_slicer_skl
+    run_dataset_basics_skl
+    run_permutation_test_skl
+    run_sphere_offsets_searchlight_skl
+    run_splithalf_correlations_skl
+    run_voxel_selection_searchlight_skl
+    sa_slicer_skl
+>>>>>>> 868ef13bd03f668a468b65de5258afe8d4bddfc9
 

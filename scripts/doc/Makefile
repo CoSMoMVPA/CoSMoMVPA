@@ -40,6 +40,8 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm source/run_*.rst
+	-rm source/cosmo_*.rst
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

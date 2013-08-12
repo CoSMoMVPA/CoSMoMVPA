@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cosmo spherical voxel selection skl &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
+    <link rel="next" title="run permutation test skl" href="run_permutation_test_skl.html" />
+    <link rel="prev" title="cosmo anova feature selector skl" href="cosmo_anova_feature_selector_skl.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cosmo_anova_feature_selector_skl.html"
+                        title="previous chapter">cosmo anova feature selector skl</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="run_permutation_test_skl.html"
+                        title="next chapter">run permutation test skl</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cosmo_spherical_voxel_selection_skl.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cosmo-spherical-voxel-selection-skl">
+<h1>cosmo spherical voxel selection skl<a class="headerlink" href="#cosmo-spherical-voxel-selection-skl" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>center2neighbors<span class="p">=</span><span class="nf">cosmo_spherical_voxel_selection</span><span class="p">(</span>dataset, radius, center_ids<span class="p">)</span><span class="w"></span>
+<span class="c">% computes neighbors for a spherical searchlight</span>
+<span class="c">%</span>
+<span class="c">% center2neighbors=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])</span>
+<span class="c">%</span>
+<span class="c">% Inputs</span>
+<span class="c">%  - dataset       a dataset struct (from fmri_dataset)</span>
+<span class="c">%  - radius        sphere radius (in voxel units)</span>
+<span class="c">%  - center_ids    Px1 vector with feature ids to consider. If omitted it</span>
+<span class="c">%                  will consider all features in dataset</span>
+<span class="c">%</span>
+<span class="c">% Output</span>
+<span class="c">%  - center2neighbors  Px1 cell so that center2neighbors{k}==nbrs contains</span>
+<span class="c">%                      the feature ids of the neighbors of feature k</span>
+<span class="c">%</span>
+<span class="c">% NNO Aug 2013</span>
+
+<span class="p">[</span><span class="n">nsamples</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span>3
+    <span class="n">center_ids</span><span class="p">=</span>1<span class="p">:</span><span class="n">nfeatures</span><span class="p">;</span>
+<span class="k">end</span>
+
+<span class="c">% get size of original volume</span>
+<span class="n">orig_dim</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">imghdr</span><span class="p">.</span><span class="n">hdr</span><span class="p">.</span><span class="n">dime</span><span class="p">.</span><span class="n">dim</span><span class="p">(</span>2<span class="p">:</span>4<span class="p">);</span>
+<span class="n">orig_nvoxels</span><span class="p">=</span><span class="n">prod</span><span class="p">(</span><span class="n">orig_dim</span><span class="p">);</span>
+
+<span class="c">% mapping from all linear voxel indices to those in the dataset</span>
+<span class="n">map2full</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">orig_nvoxels</span><span class="p">,</span>1<span class="p">);</span>
+<span class="n">map2full</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">mapper</span><span class="p">)=</span>1<span class="p">:</span><span class="n">nfeatures</span><span class="p">;</span>
+
+<span class="c">% offsets in i,j,k direction for searchlight sphere</span>
+<span class="n">sphere_offsets</span><span class="p">=</span><span class="n">cosmo_sphere_offsets</span><span class="p">(</span><span class="n">radius</span><span class="p">);</span>
+
+<span class="c">% space for output</span>
+<span class="n">accs</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span>1<span class="p">,</span><span class="n">nfeatures</span><span class="p">);</span>
+
+<span class="n">ncenters</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">center_ids</span><span class="p">);</span>
+<span class="n">center2neighbors</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="n">ncenters</span><span class="p">,</span>1<span class="p">);</span>
+
+<span class="c">% go over all features</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">ncenters</span>
+    <span class="n">center_id</span><span class="p">=</span><span class="n">center_ids</span><span class="p">(</span><span class="n">k</span><span class="p">);</span>
+    <span class="n">center_ijk</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">fa</span><span class="p">.</span><span class="n">voxel_indices</span><span class="p">(</span><span class="n">center_id</span><span class="p">,:);</span>
+
+    <span class="c">% add offsets to center</span>
+    <span class="n">around_ijk</span><span class="p">=</span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">plus</span><span class="p">,</span> <span class="n">center_ijk</span><span class="p">,</span> <span class="n">sphere_offsets</span><span class="p">);</span>
+
+    <span class="c">% see which ones are outside the volume</span>
+    <span class="n">outside_msk</span><span class="p">=</span><span class="n">around_ijk</span><span class="o">&lt;</span><span class="p">=</span>0 <span class="o">|</span> <span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span><span class="n">orig_dim</span><span class="p">,</span><span class="n">around_ijk</span><span class="p">)</span><span class="o">&lt;</span>0<span class="p">;</span>
+
+    <span class="c">% collapse over 3 dimensions</span>
+    <span class="n">feature_outside_msk</span><span class="p">=</span><span class="n">sum</span><span class="p">(</span><span class="n">outside_msk</span><span class="p">,</span>2<span class="p">)</span><span class="o">&gt;</span>0<span class="p">;</span>
+
+    <span class="c">% get rid of those outside the volume</span>
+    <span class="n">around_ijk</span><span class="p">=</span><span class="n">around_ijk</span><span class="p">(</span><span class="o">~</span><span class="n">feature_outside_msk</span><span class="p">,:);</span>
+
+    <span class="c">% convert to linear indices</span>
+    <span class="n">around_lin</span><span class="p">=</span><span class="nb">sub2ind</span><span class="p">(</span><span class="n">orig_dim</span><span class="p">,</span><span class="n">around_ijk</span><span class="p">(:,</span>1<span class="p">),</span> <span class="n">around_ijk</span><span class="p">(:,</span>2<span class="p">),</span> <span class="n">around_ijk</span><span class="p">(:,</span>3<span class="p">));</span>
+
+    <span class="c">% convert linear to feature ids</span>
+    <span class="n">around_feature_ids</span><span class="p">=</span><span class="n">map2full</span><span class="p">(</span><span class="n">around_lin</span><span class="p">);</span>
+
+    <span class="c">% also exclude those that were not mapped (outside the mask)</span>
+    <span class="n">around_feature_ids</span><span class="p">=</span><span class="n">around_feature_ids</span><span class="p">(</span><span class="n">around_feature_ids</span><span class="o">&gt;</span>0<span class="p">);</span>
+
+    <span class="c">% store results</span>
+    <span class="n">center2neighbors</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="n">around_feature_ids</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="n">k</span><span class="o">==</span>1 <span class="o">||</span> <span class="n">k</span><span class="o">==</span><span class="n">ncenters</span> <span class="o">||</span> <span class="nb">mod</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>100<span class="p">)</span><span class="o">==</span>0
+        <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;completed %d / %d centers\n&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">ncenters</span><span class="p">);</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
