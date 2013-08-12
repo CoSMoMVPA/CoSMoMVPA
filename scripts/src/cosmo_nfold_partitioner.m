@@ -1,7 +1,7 @@
-function partitions=cosmo_nfold_partition(chunks)
+function partitions = cosmo_nfold_partitioner(chunks)
 % generates an n-fold partition scheme
 %
-% partitions=cosmo_nfold_partition(chunks)
+% partitions=cosmo_nfold_partitioner(chunks)
 %
 % Input
 %  - chunks          Px1 chunk indices for P samples. It can also be a
@@ -14,7 +14,7 @@ function partitions=cosmo_nfold_partition(chunks)
 %                    sample indices for the k-th fold.
 %                    
 % Example:
-% p=cosmo_nfold_partition([1 1 2 2 3 3 3])
+% p=cosmo_nfold_partitioner([1 1 2 2 3 3 3])
 % > p = train_indices: {1x3 cell}
 % >     test_indices: {1x3 cell}  
 % p.train_indices{1}'

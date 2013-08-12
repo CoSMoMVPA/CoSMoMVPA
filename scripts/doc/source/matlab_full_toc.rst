@@ -13,7 +13,7 @@ Contents:
     cosmo_get_data_path
     run_sphere_offsets_searchlight
     run_dataset_basics
-    cosmo_nfold_partition
+    cosmo_nfold_partitioner
     run_splithalf_correlations
     cosmo_dataset_slice_samples
     cosmo_classify_nn

@@ -1,7 +1,7 @@
-.. exercise4
+.. ex_nfold_partitioner
 
-Exercise 4. Cross-validation part 1: N-Fold Partitioner
-=======================================================
+Cross-validation part 1: N-Fold Partitioner
+===========================================
 
 Before we can do cross validation, we need to partition the data into different
 sets of training and testing folds. In the standard leave-one-run-out
@@ -12,58 +12,13 @@ training and another for testing. Below is a an incomplete function that compute
 partitions for a given set of chunks sample attributes.  Your task is to
 complete the function by writing the missing for-loop.
 
-.. code-block:: matlab
+.. literalinclude:: cosmo_nfold_partitioner_hdr.m
+   :language: matlab
 
-    function partitions=cosmo_nfold_partition(chunks)
-    % generates an n-fold partition scheme
-    %
-    % partitions=cosmo_nfold_partition(chunks)
-    %
-    % Input
-    %  - chunks          Px1 chunk indices for P samples. It can also be a
-    %                    dataset with field .sa.chunks
-    %
-    % Output:
-    %  - partitions      A struct with fields .train_indices and .test_indices.
-    %                    Each of these is an 1xQ cell for Q partitions, where
-    %                    .train_indices{k} and .test_indices{k} contain the
-    %                    sample indices for the k-th fold.
-    %                    
-    % Example:
-    % p=cosmo_nfold_partition([1 1 2 2 3 3 3])
-    % > p = train_indices: {1x3 cell}
-    % >     test_indices: {1x3 cell}  
-    % p.train_indices{1}'
-    % >     [3 4 5 6 7]
-    % p.test_indices{1}
-    % >     [1 2]
-    %
-    % NNO Aug 2013
+Hint: cosmo_nfold_partitioner_skl_
 
-    if isstruct(chunks)
-        if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
-            chunks=chunks.sa.chunks;
-        else
-            error('illegal input')
-        end
-    end
+.. _cosmo_nfold_partitioner_skl: cosmo_nfold_partitioner_skl.html
 
-    unq=unique(chunks);
-    nchunks=numel(unq);
+Solution: cosmo_nfold_partitioner_
 
-    % allocate space for output
-    train_indices=cell(1,nchunks);
-    test_indices=cell(1,nchunks);
-
-    % >>
-
-    %%%% Please supply the missing For-loop!!
-
-    % <<
-
-    partitions.train_indices=train_indices;
-    partitions.test_indices=test_indices;
-
-Solution_4_
-
-.. _Solution_4: solution_4.html
+.. _cosmo_nfold_partitioner: cosmo_nfold_partitioner.html
