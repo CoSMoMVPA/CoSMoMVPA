@@ -33,9 +33,9 @@ Write another function with the signature.
 .. literalinclude:: cosmo_dataset_slice_features_hdr.m
     :language: matlab      
 
-.. _cosmo_datset_slice_features: cosmo_dataset_slice_features.html
-Solution: cosmo_dataset_slice_features_
+.. _cosmo_dataset_slice_features: cosmo_dataset_slice_features.html
 
+Solution: cosmo_dataset_slice_features_
 
 .. _cosmo_fmri_dataset: cosmo_fmri_dataset.html
 
