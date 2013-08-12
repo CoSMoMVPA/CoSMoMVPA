@@ -5,10 +5,10 @@
 % Set the data path (change cosmo_get_data_path if necessary)
 data_path=cosmo_get_data_path('s01');
 
-% Load dataset
+% Load dataset (and supply a mask file for 'vt')
 % >>
-ds = fmri_dataset([data_path '/glm_T_stats_perrun.nii.gz'], ...
-                    'mask', [data_path '/vt_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii.gz'], ...
+                         'mask', [data_path '/vt_mask.nii.gz']);
 % <<
 
 % Set the targets and the chunks
