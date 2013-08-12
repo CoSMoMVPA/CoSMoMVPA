@@ -16,6 +16,9 @@ Contents:
     code_toc
     
 
+    matlab_full_toc
+    matlab_hdr_toc
+    matlab_skl_toc
 
 
 Indices and tables
