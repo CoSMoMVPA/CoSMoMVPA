@@ -13,7 +13,6 @@ Contents:
     
     
     exercise_toc
-    solutions_toc
     code_toc
     
 

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Exercises &mdash; Cosmo 0.1 documentation</title>
+    <title>For-loop for N-fold partioner &mdash; Cosmo 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,9 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
-    <link rel="next" title="Exercise 1: Dataset basics" href="exercise1.html" />
-    <link rel="prev" title="Welcome to Cosmo’s documentation!" href="index.html" /> 
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,12 +34,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="exercise1.html" title="Exercise 1: Dataset basics"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to Cosmo’s documentation!"
-             accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,22 +43,16 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="exercises">
-<h1>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="exercise1.html">Exercise 1: Dataset basics</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="exercise1.html#a-load-dataset-and-set-fields">A. Load dataset and set fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exercise1.html#b-slice-by-samples">B. Slice by samples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exercise1.html#c-slice-by-features">C. Slice by features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="exercise2.html">Exercise 2: Classification with Naive Bayes classifier</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercise3.html">Exercise 3: Write your own Nearest-neighbor classifier</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercise4.html">Exercise 4. Cross-validation part 1: N-Fold Partitioner</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercise5.html">Exercise 5. Cross-validation part 2</a></li>
-</ul>
+  <div class="section" id="for-loop-for-n-fold-partioner">
+<h1>For-loop for N-fold partioner<a class="headerlink" href="#for-loop-for-n-fold-partioner" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="c">% &gt;&gt;</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">nchunks</span>
+    <span class="n">test_msk</span><span class="p">=</span><span class="n">unq</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">==</span><span class="n">chunks</span><span class="p">;</span>
+     <span class="n">train_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="o">~</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
+     <span class="n">test_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
+<span class="k">end</span>
+<span class="c">% &lt;&lt;</span>
+</pre></div>
 </div>
 </div>
 
@@ -76,15 +62,9 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to Cosmo&#8217;s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="exercise1.html"
-                        title="next chapter">Exercise 1: Dataset basics</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/exercise_toc.txt"
+    <li><a href="_sources/solution_4.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -110,12 +90,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="exercise1.html" title="Exercise 1: Dataset basics"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to Cosmo’s documentation!"
-             >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
