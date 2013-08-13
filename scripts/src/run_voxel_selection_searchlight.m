@@ -1,4 +1,9 @@
-datadir='../data/small/s01/stats/';
+%% Spherical searchlight
+% this example implements a spherical searchlight using
+% cosmo_spherical_voxel_selection and performs crossvalidation
+% with a nearest neighbor classifier
+
+datadir=cosmo_get_data_path('s01');
 fn=[datadir 'glm_T_stats_perrun.nii.gz'];
 maskfn=[datadir 'brain_mask.nii.gz'];
 radius=3;
