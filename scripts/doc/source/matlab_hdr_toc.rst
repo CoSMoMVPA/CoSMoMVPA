@@ -10,19 +10,22 @@ Contents:
     run_classify_naive_bayes_hdr
     run_splithalf_correlations_hdr
     cosmo_generate_synthetic_dataset_hdr
+    run_load_datasets_hdr
     cosmo_searchlight_hdr
     run_voxel_selection_searchlight_hdr
     cosmo_spherical_voxel_selection_hdr
     cosmo_sphere_offsets_hdr
     run_permutation_test_hdr
     cosmo_dataset_slice_features_hdr
+    cosmo_dataset_slice_fa_hdr
     cosmo_dataset_slice_samples_hdr
     cosmo_map2nifti_hdr
+    run_setting_sample_attr_hdr
     cosmo_dissimilarity_matrix_measure_hdr
     cosmo_classify_nn_hdr
-    run_dataset_basics_hdr
     cosmo_randomize_targets_hdr
     run_sphere_offsets_searchlight_hdr
+    cosmo_dataset_slice_sa_hdr
     cosmo_fmri_dataset_hdr
     cosmo_classify_naive_bayes_hdr
     cosmo_nfold_partitioner_hdr

@@ -1,5 +1,7 @@
 function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
-% Slice a dataset by samples
+% Slice a dataset by samples, aka rows
+%   
+%   dataset = cosmo_dataset_slice_sa(dataset, samples_to_select)
 %   
 %   Input
 %       dataset: an instance of cosmo_fmri_dataset
@@ -12,11 +14,11 @@ function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
 %                   corresponding values in sample attributes.
 
 %%
-% First slice the samples
+% First slice the samples array by rows
 
-%>>
+% >>
 dataset.samples=dataset.samples(samples_to_select,:);
-%<<
+% <<
 
 %%
 %   Then go through each of the sample attributes and slice each one.
@@ -25,7 +27,7 @@ dataset.samples=dataset.samples(samples_to_select,:);
 %   dataset.sa in case it is missing either targets or chunk, or in case there
 %   may be extra unknown sample attributes
 
-%>>
+% >>
 fns = fieldnames(dataset.sa); 
 n = numel(fns);
 
@@ -34,4 +36,4 @@ for k=1:n
     sa = dataset.sa.(fn);
     dataset.sa.(fn)=sa(samples_to_select,:);
 end
-%<<
+% <<
