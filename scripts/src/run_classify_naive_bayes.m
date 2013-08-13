@@ -1,7 +1,8 @@
+data_dir=cosmo_get_data_path('s01');
 
 % Load the dataset with VT mask
-ds = cosmo_fmri_dataset('../data/s01/glm_T_stats_perrun.nii.gz', ...
-                     'mask', '../data/s01/vt_mask.nii.gz');
+ds = cosmo_fmri_dataset([data_dir '/glm_T_stats_perrun.nii.gz'], ...
+                     'mask', [data_dir '/vt_mask.nii.gz']);
 
 
 % set the targets and chunks
@@ -17,23 +18,25 @@ ds.sa.labels = repmat(labels,1,10);
 idx = strcmp(ds.sa.labels,'monkey') | strcmp(ds.sa.labels,'mallard');
 
 % Use sample attrubutes slicer to slice dataset
-ds2 = sa_slicer(ds,idx);
+ds2 = cosmo_dataset_slice_samples(ds,idx);
 
 % Now slice into odd and even runs using chunks attribute
 even_idx = boolean(repmat([0 0 1 1],1,5));
 odd_idx = boolean(repmat([1 1 0 0], 1,5));
 
-evens = sa_slicer(ds2,even_idx);
-odds = sa_slicer(ds2,odd_idx);
+evens = cosmo_dataset_slice_samples(ds2,even_idx);
+odds = cosmo_dataset_slice_samples(ds2, odd_idx);
 
-pred = cosmo_classify_naive_baysian(evens.samples, evens.sa.targets, odds.samples);
-accuracy = mean(odds.sa.targets == pred');
-
+% train on even, test on odd
+pred = cosmo_classify_naive_bayes(evens.samples, evens.sa.targets, odds.samples);
+accuracy = mean(odds.sa.targets == pred);
+fprintf('Train on even, test on odd: accuracy %.3f\n', accuracy);
 % Answer: accuracy should be .70 
 
-pred = cosmo_classify_naive_baysian(odds.samples, odds.sa.targets,evens.samples);
-accuracy = mean(odds.sa.targets == pred');
-
+% train on odd, test on even
+pred = cosmo_classify_naive_bayes(odds.samples, odds.sa.targets,evens.samples);
+accuracy = mean(evens.sa.targets == pred);
+fprintf('Train on odd, test on even: accuracy %.3f\n', accuracy);
 % Answer: accuracy = .50
 
  
