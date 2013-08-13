@@ -9,6 +9,7 @@ Contents:
     cosmo_classify_meta_multiclass_hdr
     run_classify_naive_bayes_hdr
     run_splithalf_correlations_hdr
+    run_operations_on_datasets_hdr
     cosmo_generate_synthetic_dataset_hdr
     run_load_datasets_hdr
     cosmo_searchlight_hdr

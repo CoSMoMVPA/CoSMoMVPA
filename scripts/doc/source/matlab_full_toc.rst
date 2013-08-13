@@ -9,6 +9,7 @@ Contents:
     cosmo_classify_meta_multiclass
     run_classify_naive_bayes
     run_splithalf_correlations
+    run_operations_on_datasets
     cosmo_generate_synthetic_dataset
     run_load_datasets
     cosmo_searchlight
