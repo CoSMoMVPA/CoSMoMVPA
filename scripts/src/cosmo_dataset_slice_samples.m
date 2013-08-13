@@ -5,7 +5,7 @@ function dataset=cosmo_dataset_slice_samples(dataset, samples_to_select)
 % but contains just the rows indictated in sample_indices, and the 
 % corresponding values in sample attributes.
 
-nsamples_orig=size(dataset.samples,1)
+nsamples_orig=size(dataset.samples,1);
 dataset.samples=dataset.samples(samples_to_select,:);
 
 fns=fieldnames(dataset.sa);
