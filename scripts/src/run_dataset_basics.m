@@ -20,12 +20,7 @@ ds.chunks = chunks;
 
 % Add labels as sample attributes
 % >>
-<<<<<<< HEAD:scripts/src/run_dataset_basics.m
-labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
-ds.sa.labels = repmat(labels,1,10)
-% <<
-=======
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 ds.sa.labels = repmat(labels,10,1)
 % <<
->>>>>>> 868ef13bd03f668a468b65de5258afe8d4bddfc9:scripts/src/run_dataset_basics.m
+
