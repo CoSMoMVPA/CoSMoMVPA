@@ -6,13 +6,13 @@ Dataset basics
 Load dataset and set fields
 +++++++++++++++++++++++++++
 Copy and paste the function in cosmo_fmri_dataset_ into a new file called
-*cosmo_fmri_dataset.m*. Load a dataset from the example data folder using the
+*cosmo_fmri_dataset.m*. Load a dataset from the data folder using the
 cosmo_fmri_dataset_ function, applying one of the 3 masks provided (brain, early
 vision 'ev' or ventral temporal 'vt'. Add numeric chunks and targets. The
 stimulus labels for each run of the fMRI study were monkey, lemur, mallard,
-warbler, ladybug, and lunamoth -- in that order.  Add a sample attribute that
-stores these stimulus labels for the samples for all 10 runs (Solution:
-run_dataset_basics_).
+warbler, ladybug, and lunamoth -- in that order.  
+
+Solution: run_dataset_basics_
 
 .. _run_dataset_basics: run_dataset_basics.html
 
