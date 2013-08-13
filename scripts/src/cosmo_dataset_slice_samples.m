@@ -8,6 +8,7 @@ function dataset=cosmo_dataset_slice_samples(dataset, samples_to_select)
 nsamples_orig=size(dataset.samples,1);
 dataset.samples=dataset.samples(samples_to_select,:);
 
+
 fns=fieldnames(dataset.sa);
 n=numel(fns);
 for k=1:n

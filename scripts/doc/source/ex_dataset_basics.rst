@@ -12,9 +12,13 @@ vision 'ev' or ventral temporal 'vt'. Add numeric chunks and targets. The
 stimulus labels for each run of the fMRI study were monkey, lemur, mallard,
 warbler, ladybug, and lunamoth -- in that order.  
 
+Hint: run_dataset_basics_skl_
+
 Solution: run_dataset_basics_
 
+.. _run_dataset_basics_skl: run_dataset_basics_skl.html
 .. _run_dataset_basics: run_dataset_basics.html
+
 
 Slice by samples
 ++++++++++++++++
