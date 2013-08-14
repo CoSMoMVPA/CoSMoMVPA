@@ -78,9 +78,9 @@ Hint: run_operations_on_datasets_skl_
 
 Solution: run_operations_on_datasets_
 
-.. _run_operations_on_datasets_skl: operations_on_datsets_skl.html
-.. _run_operations_on_datasets: operations_on_datsets.html
-.. _cosmo_map2nifti: cosmo_map2nifti.html
+.. _run_operations_on_datasets_skl: run_operations_on_datasets_skl.html
+.. _run_operations_on_datasets: run_operations_on_datasets.html
+.. _cosmo_map2nifti: cosmo_map2nifti_hdr.html
 .. _cosmo_fmri_dataset: cosmo_fmri_dataset.html
 .. _run_load_datasets_skl: run_load_datasets_skl.html
 .. _run_load_datasets: run_load_datasets.html
