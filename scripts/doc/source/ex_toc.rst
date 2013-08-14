@@ -17,3 +17,4 @@ Contents:
     ex_cross_validate
     ex_classify_svm
     ex_searchlight
+    ex_rsa_tutorial

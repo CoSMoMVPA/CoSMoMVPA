@@ -6,6 +6,7 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    run_rsa_visualize_hdr
     cosmo_classify_meta_multiclass_hdr
     run_classify_naive_bayes_hdr
     run_splithalf_correlations_hdr
@@ -14,6 +15,7 @@ Contents:
     run_load_datasets_hdr
     cosmo_searchlight_hdr
     run_voxel_selection_searchlight_hdr
+    run_compare_dsm_hdr
     cosmo_spherical_voxel_selection_hdr
     cosmo_sphere_offsets_hdr
     run_permutation_test_hdr
@@ -27,6 +29,7 @@ Contents:
     cosmo_randomize_targets_hdr
     run_sphere_offsets_searchlight_hdr
     cosmo_dataset_slice_sa_hdr
+    run_demean_hdr
     cosmo_fmri_dataset_hdr
     cosmo_classify_naive_bayes_hdr
     cosmo_nfold_partitioner_hdr

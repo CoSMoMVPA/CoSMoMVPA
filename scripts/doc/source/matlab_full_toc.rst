@@ -6,6 +6,7 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
+    run_rsa_visualize
     cosmo_classify_meta_multiclass
     run_classify_naive_bayes
     run_splithalf_correlations
@@ -14,6 +15,7 @@ Contents:
     run_load_datasets
     cosmo_searchlight
     run_voxel_selection_searchlight
+    run_compare_dsm
     cosmo_spherical_voxel_selection
     cosmo_sphere_offsets
     run_permutation_test
@@ -27,6 +29,7 @@ Contents:
     cosmo_randomize_targets
     run_sphere_offsets_searchlight
     cosmo_dataset_slice_sa
+    run_demean
     cosmo_fmri_dataset
     cosmo_classify_naive_bayes
     cosmo_nfold_partitioner
