@@ -20,8 +20,8 @@ ds.sa.chunks = chunks;
 % select the sample indices that correspond to primates and bugs
 
 % >>
-primate_idx = repmat([1 1 0 0 0 0]',10,1);
-bug_idx = repmat([0 0 0 0 1 1]',10,1);
+primate_idx = boolean(repmat([1 1 0 0 0 0]',10,1));
+bug_idx = boolean(repmat([0 0 0 0 1 1]',10,1));
 % <<
 
 % use the indices as input to the dataset samples slicer
