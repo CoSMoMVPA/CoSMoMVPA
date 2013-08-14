@@ -19,7 +19,7 @@ for m = 1:length(masks)
     for s = 1:length(subjects)
         sub = subjects{s};
         % load dataset
-        data_dir=cosmo_get_data_path(subjects{s});
+        data_path=cosmo_get_data_path(subjects{s});
         ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
                                 'mask',[data_path '/' msk]);
         % demean
@@ -34,9 +34,9 @@ end
 
 %%
 % Then add the v1 model and behavioral DSMs
-
+load('target_sims.mat')
 % >>
-dsms = [dsms; squareform(v1_model); squareform(behav)];
+dsms = [dsms; v1_model'; behav'];
 % <<
 
 %%
