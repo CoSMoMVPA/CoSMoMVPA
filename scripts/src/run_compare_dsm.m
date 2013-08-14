@@ -2,10 +2,9 @@
 % Compare DSMs
 
 
-subjects = {'s01','s02','s03','s04','s05','s06','s07','s00'};
-masks = {'MO_top_300.nii.gz','VT_top_400.nii.gz'};
+subjects = {'s01','s02','s03','s04','s05','s06','s07','s08'};
+masks = {'ev_mask.nii.gz','vt_mask.nii.gz'};
 
-data_path='/home/andy/cosmo/data/'
 
 dsms = [];
 
@@ -20,10 +19,11 @@ for m = 1:length(masks)
     for s = 1:length(subjects)
         sub = subjects{s};
         % load dataset
-        %data_dir=cosmo_get_data_path(subjects{s});
-        ds = cosmo_fmri_dataset([data_path sub '/glm_betas_allruns.nii.gz'], ...
-                                'mask',[data_path sub '/' msk]);
+        data_dir=cosmo_get_data_path(subjects{s});
+        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
+                                'mask',[data_path '/' msk]);
         % demean
+        % Comment this out to see the effects of demeaning vs. not
         ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples, 1));
 
         % add to stack
