@@ -12,7 +12,7 @@ Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - wh
 Display a saggital, axial and coronal slice.
 
 Hint: run_nifti_basics_skl_
-
+    
 Solution: run_nifti_basics_ / run_nifti_basics_pb_
 
 .. _run_nifti_basics_skl: run_nifti_basics_skl.html

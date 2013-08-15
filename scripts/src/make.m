@@ -44,6 +44,7 @@ for k=1:nsrc
             update=false;
             fprintf('%s%s already exists and newer than %s%s\n',...
                         trgnm,trgext,srcnm,srcext);
+            outputs{end+1}=srcnm;
             break;
         end
     end
@@ -86,16 +87,16 @@ end
 outputfn=fullfile(trgdir, summaryfn);
 fid=fopen(outputfn,'w');
 fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
-        '"http://www.w3.org/TR/html4/strict.dtd">\n']);
+        '>\n']);
 fprintf(fid,'<HTML><HEAD><TITLE>Index of matlab outputs</TITLE></HEAD>\n');
-fprintf(fid,'<BODY><UL>\n');
+fprintf(fid,'<BODY>Matlab output<UL>\n');
 
 n=numel(outputs);
 for k=1:n
     nm=outputs{k};
-    fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,srcext,nm);
+    fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
 end
-fprintf(fid,'</UL></BODY></HTML>\n');
+fprintf(fid,'</UL>Back to <A HREF="../index.html">index</A>.</BODY></HTML>\n');
 fclose(fid);
     
 fprintf('Index written to %s\n', outputfn); 

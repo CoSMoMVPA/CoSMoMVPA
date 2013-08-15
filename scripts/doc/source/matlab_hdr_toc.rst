@@ -26,6 +26,7 @@ Contents:
     cosmo_searchlight_hdr
     cosmo_sphere_offsets_hdr
     cosmo_spherical_voxel_selection_hdr
+    cosmo_splithalf_partitioner_hdr
     make_hdr
     run_classify_naive_bayes_hdr
     run_compare_dsm_hdr

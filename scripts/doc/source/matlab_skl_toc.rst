@@ -26,6 +26,7 @@ Contents:
     cosmo_searchlight_skl
     cosmo_sphere_offsets_skl
     cosmo_spherical_voxel_selection_skl
+    cosmo_splithalf_partitioner_skl
     make_skl
     run_classify_naive_bayes_skl
     run_compare_dsm_skl

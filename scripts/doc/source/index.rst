@@ -21,7 +21,7 @@ Contents:
     matlab_hdr_toc
     matlab_skl_toc
 
-    matlab_pb_toc
+Matlab outputs: matlab_pb_toc_
 
 
 Indices and tables
