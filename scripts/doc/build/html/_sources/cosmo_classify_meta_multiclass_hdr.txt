@@ -14,15 +14,9 @@ cosmo classify meta multiclass hdr
     %   samples_train      PxR training data for P samples and R features
     %   targets_train      Px1 training data classes
     %   samples_test       QxR test data
-<<<<<<< HEAD
-    %   opt                struct with a field .classifier, which should 
-    %                      be a function handle to another classifier
-    %                      (for example opt.classifier=@cosmo_classify_svm)
-=======
     %   opt                struct with a field .base_classifier, which should 
     %                      be a function handle to another classifier
     %                      (for example opt.base_classifier=@cosmo_classify_svm)
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     %
     % Output
     %   predicted          Qx1 predicted data classes for samples_test

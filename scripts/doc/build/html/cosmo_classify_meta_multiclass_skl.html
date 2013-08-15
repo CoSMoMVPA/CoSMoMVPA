@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
-    <link rel="next" title="cosmo map2nifti skl" href="cosmo_map2nifti_skl.html" />
-    <link rel="prev" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" /> 
+    <link rel="next" title="cosmo anova feature selector skl" href="cosmo_anova_feature_selector_skl.html" />
+    <link rel="prev" title="run load datasets skl" href="run_load_datasets_skl.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_map2nifti_skl.html" title="cosmo map2nifti skl"
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="matlab_skl_toc.html" title="Cosmo matlab files - skeletons files"
+          <a href="run_load_datasets_skl.html" title="run load datasets skl"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="matlab_skl_toc.html"
-                        title="previous chapter">Cosmo matlab files - skeletons files</a></p>
+  <p class="topless"><a href="run_load_datasets_skl.html"
+                        title="previous chapter">run load datasets skl</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_map2nifti_skl.html"
-                        title="next chapter">cosmo map2nifti skl</a></p>
+  <p class="topless"><a href="cosmo_anova_feature_selector_skl.html"
+                        title="next chapter">cosmo anova feature selector skl</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_classify_meta_multiclass_skl.txt"
@@ -103,7 +103,7 @@
 <span class="c">% NNO Aug 2013</span>
 
 
-<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span><span class="mi">4</span> <span class="o">||</span> <span class="o">~</span><span class="n">isfield</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="s">&#39;classifier&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span>4 <span class="o">||</span> <span class="o">~</span><span class="n">isfield</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="s">&#39;classifier&#39;</span><span class="p">)</span>
     <span class="n">error</span><span class="p">(</span><span class="s">&#39;need opt.classifier=some_function&#39;</span><span class="p">)</span>
 <span class="k">end</span>
 
@@ -120,7 +120,7 @@
 <span class="n">nclasses</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">classes</span><span class="p">);</span>
 
 <span class="c">% number of pair-wise comparisons</span>
-<span class="n">ncombi</span><span class="p">=</span><span class="n">nclasses</span><span class="o">*</span><span class="p">(</span><span class="n">nclasses</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+<span class="n">ncombi</span><span class="p">=</span><span class="n">nclasses</span><span class="o">*</span><span class="p">(</span><span class="n">nclasses</span><span class="o">-</span>1<span class="p">)</span><span class="o">/</span>2<span class="p">;</span>
 
 <span class="c">% allocate space for all predictions</span>
 <span class="n">all_predicted</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntest</span><span class="p">,</span> <span class="n">ncombi</span><span class="p">);</span>
@@ -150,10 +150,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_map2nifti_skl.html" title="cosmo map2nifti skl"
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
              >next</a> |</li>
         <li class="right" >
-          <a href="matlab_skl_toc.html" title="Cosmo matlab files - skeletons files"
+          <a href="run_load_datasets_skl.html" title="run load datasets skl"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 

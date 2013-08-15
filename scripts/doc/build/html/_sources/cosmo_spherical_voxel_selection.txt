@@ -47,17 +47,10 @@ cosmo spherical voxel selection
     % go over all features
     for k=1:ncenters
         center_id=center_ids(k);
-<<<<<<< HEAD
-        center_ijk=dataset.fa.voxel_indices(center_id,:);
-        
-        % add offsets to center
-        around_ijk=bsxfun(@plus, center_ijk, sphere_offsets);
-=======
         center_ijk=dataset.fa.voxel_indices(:,center_id);
         
         % add offsets to center
         around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
         
         % see which ones are outside the volume
         outside_msk=around_ijk<=0 | bsxfun(@minus,orig_dim,around_ijk)<0;

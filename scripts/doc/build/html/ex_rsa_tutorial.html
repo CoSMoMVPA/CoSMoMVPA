@@ -106,8 +106,8 @@ animals.</p>
 symmetric about the diagonal. Use matlabs <strong>imagesc</strong> to view each DSM:</p>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="n">load</span> <span class="n">v1_model</span><span class="p">;</span>
 <span class="n">load</span> <span class="n">behav_sim</span><span class="p">;</span>
-<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">v1_model</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;V1 Model DSM&#39;</span><span class="p">);</span>
-<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM&#39;</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span>1<span class="p">,</span>2<span class="p">,</span>1<span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">v1_model</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;V1 Model DSM&#39;</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span>1<span class="p">,</span>2<span class="p">,</span>2<span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The categorical structure is obvious in the categorical dissimilarity, but not
@@ -131,7 +131,7 @@ dimension and stimulus. To view the first 2 dimensions we can use matlab&#8217;s
 <strong>text</strong> function:</p>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="n">F</span> <span class="p">=</span> <span class="n">cmdscale</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span>
 <span class="n">figure</span><span class="p">();</span>
-<span class="n">text</span><span class="p">(</span><span class="n">F</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(:,</span><span class="mi">2</span><span class="p">),</span> <span class="n">labels</span><span class="p">);</span>
+<span class="n">text</span><span class="p">(</span><span class="n">F</span><span class="p">(:,</span>1<span class="p">),</span> <span class="n">F</span><span class="p">(:,</span>2<span class="p">),</span> <span class="n">labels</span><span class="p">);</span>
 <span class="c">%</span>
 <span class="c">% We will also need to set the axes so we can see all of the points</span>
 <span class="c">% Let&#39;s use the maximum absolute magnitude</span>

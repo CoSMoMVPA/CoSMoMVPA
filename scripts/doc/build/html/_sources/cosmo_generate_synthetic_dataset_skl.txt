@@ -57,11 +57,7 @@ cosmo generate synthetic dataset skl
         pat=randn(nsamples_per_class,nfeatures); % random gaussian patterns
         if different_on_all_dimensions
             error('not implemented');
-<<<<<<< HEAD
-            % [your code here]
-=======
             %%%% >>> YOUR CODE HERE <<< %%%%
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
         else
             pat(:,k)=pat(:,k)+class_distance;  % add pat_dist in the k-th dimension
         end

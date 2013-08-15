@@ -11,10 +11,7 @@ cosmo dataset slice features skl
     % but contains just the rows indictated in features_to_select, and the 
     % corresponding values in feature attributes.
     
-<<<<<<< HEAD
-=======
     nfeatures_orig=size(dataset.samples,2);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     dataset.samples=dataset.samples(:,features_to_select);
     
     fns=fieldnames(dataset.fa);
@@ -25,9 +22,6 @@ cosmo dataset slice features skl
         if iscell(v)
             w={v{features_to_select}};
         else
-<<<<<<< HEAD
-            dataset.fa.(fn)=v(features_to_select,:);
-=======
             if numel(v)==nfeatures_orig
                 v=v(:)'; % ensure row vector
             elseif size(v,2)~=nfeatures_orig
@@ -35,7 +29,6 @@ cosmo dataset slice features skl
             end
             
             dataset.fa.(fn)=v(:,features_to_select);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
         end
     end
     

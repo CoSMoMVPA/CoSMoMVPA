@@ -14,17 +14,10 @@ run sphere offsets searchlight skl
     % NNO Aug 2013
     
     %% Define input files and searchlight radius
-<<<<<<< HEAD
-    datadir='../data/small/s01/stats/';
-    fn1=[datadir 'glm_T_stats_evens.nii.gz'];
-    fn2=[datadir 'glm_T_stats_odds.nii.gz'];
-    maskfn=[datadir 'brain_mask.nii.gz'];
-=======
     datadir=cosmo_get_data_path('s01');
     fn1=[datadir 'glm_T_stats_evens.nii'];
     fn2=[datadir 'glm_T_stats_odds.nii'];
     maskfn=[datadir 'brain_mask.nii'];
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     radius=3;
     
     %% Load the data and extract the data in the mask
@@ -72,11 +65,7 @@ run sphere offsets searchlight skl
             for kk=1:voldim(3)
                 
                 % if outside the mask, continue with next voxel
-<<<<<<< HEAD
-                % [your code here]
-=======
                 %%%% >>> YOUR CODE HERE <<< %%%%
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
                 
                 % fill up the sphere_data matrix with data from the sphere
                 % centered around location (ii, jj, kk). 
@@ -86,19 +75,11 @@ run sphere offsets searchlight skl
                 % m=1, 2 and 3, and is not outside the mask).
                 row_pos=0;
                 sphere_data(:)=NaN; % not necessary, but used to check validity of data
-<<<<<<< HEAD
-                % [your code here]
-                % Compute correlations, fisher transform, then weight them.
-                % Store the sum of the weighted transformed correlations in the
-                % 'output' array.
-                % [your code here]
-=======
                 %%%% >>> YOUR CODE HERE <<< %%%%
                 % Compute correlations, fisher transform, then weight them.
                 % Store the sum of the weighted transformed correlations in the
                 % 'output' array.
                 %%%% >>> YOUR CODE HERE <<< %%%%
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
                 
                 % set this voxel as visited
                 visited(ii,jj,kk)=true;

@@ -15,30 +15,6 @@ cosmo get data path
     %
     % Returns
     %  data_path      path where data is stored
-<<<<<<< HEAD
-    if isunix()
-        [p, n]=unix('uname -n'); % get the hostname
-        n=strtrim(n);
-        if p~=0
-            error('Could not find hostname');
-        end
-        switch n
-            case 'nicks-MacBook-Pro.local'
-                data_path='/Users/nick/organized/_datasets/cosmo/data/small';
-            
-            % add more cases here for other machines
-            
-            
-            otherwise
-                error('do not know %s', n);
-        end
-        
-        % optionally add an else statement for windows machines
-    end
-    
-    if nargin>=1
-        data_path=fullfile(data_path, subject_id, 'stats', '');
-=======
     
     % change the following depending on where your data resides
     data_path='../../data';
@@ -57,18 +33,13 @@ cosmo get data path
             subject_id=sprintf('s%02d', subject_id);
         end
         data_path=fullfile(data_path, subject_id);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     end
     
     if ~exist(data_path,'file')
         error('%s does not exist. Did you adjust %s?', data_path, mfilename());
-<<<<<<< HEAD
-    end
-=======
     end
     
     if ~isempty(data_path)
         data_path=[data_path '/'];
     end
     
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

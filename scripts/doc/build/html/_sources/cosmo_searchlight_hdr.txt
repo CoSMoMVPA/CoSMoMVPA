@@ -8,11 +8,7 @@ cosmo searchlight hdr
     %  Generic searchlight function returns a map of results computed at each
     %  searchlight location 
     %   
-<<<<<<< HEAD
-    %   results_map=cosmo_searchlight(dataset, measure, [args, radius])
-=======
     %   results_map=cosmo_searchlight(dataset, measure, ['args',args]['radius',radius],['center_ids',center_ids])
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     %
     %   Inputs
     %       dataset: an instance of a cosmo_fmri_dataset
@@ -20,13 +16,10 @@ cosmo searchlight hdr
     %               the function signature: output = measure(dataset, args)
     %       args:   a struct that contains all the fields necessary to the dataset
     %               measure. args get passed directly to the dataset measure.
-<<<<<<< HEAD
-=======
     %       center_ids: vector indicating center ids to be used as a 
     %                        searchlight center. By default all feature ids are
     %                        used
     %       radius: searchlight radius in voxels (default: 3)
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     %
     %   Returns
     %       results_map:    an instance of a cosmo_fmri_dataset where the samples

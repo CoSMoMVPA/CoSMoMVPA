@@ -3,20 +3,6 @@
 Dataset basics
 ==============
 
-<<<<<<< HEAD
-Load dataset and set fields
-+++++++++++++++++++++++++++
-Copy and paste the function in cosmo_fmri_dataset_ into a new file called
-*cosmo_fmri_dataset.m*. Load a dataset from the example data folder using the
-cosmo_fmri_dataset_ function, applying one of the 3 masks provided (brain, early
-vision 'ev' or ventral temporal 'vt'. Add numeric chunks and targets. The
-stimulus labels for each run of the fMRI study were monkey, lemur, mallard,
-warbler, ladybug, and lunamoth -- in that order.  Add a sample attribute that
-stores these stimulus labels for the samples for all 10 runs (Solution:
-run_dataset_basics_).
-
-.. _run_dataset_basics: run_dataset_basics.html
-=======
 Loading datasets with different masks
 +++++++++++++++++++++++++++++++++++++
 Using the function in cosmo_fmri_dataset_ load the dataset for subject s01
@@ -48,19 +34,11 @@ dataset.sa.chunks.
 Hint: run_setting_sample_attr_skl_
 
 Solution: run_setting_sample_attr_ / run_setting_sample_attr_pb_
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
 
 Slice by samples
 ++++++++++++++++
 Write a function with the following signature.
 
-<<<<<<< HEAD
-.. literalinclude:: cosmo_dataset_slice_samples_hdr.m
-   :language: matlab
-
-.. _cosmo_dataset_slice_samples: cosmo_dataset_slice_samples.html
-Solution: cosmo_dataset_slice_samples_
-=======
 .. literalinclude:: cosmo_dataset_slice_sa_hdr.m
    :language: matlab
 
@@ -70,22 +48,11 @@ Solution: cosmo_dataset_slice_sa_
 
 For a more *robust* solution that can handle samples attributes that use string
 labels instead of numbers see Solution 2: cosmo_dataset_slice_samples_
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
 
 Slice by features
 +++++++++++++++++
 Write another function with the signature.
 
-<<<<<<< HEAD
-.. literalinclude:: cosmo_dataset_slice_features_hdr.m
-    :language: matlab      
-
-.. _cosmo_dataset_slice_features: cosmo_dataset_slice_features.html
-
-Solution: cosmo_dataset_slice_features_
-
-.. _cosmo_fmri_dataset: cosmo_fmri_dataset.html
-=======
 .. literalinclude:: cosmo_dataset_slice_fa_hdr.m
     :language: matlab      
 
@@ -128,6 +95,5 @@ Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 .. _cosmo_dataset_slice_fa_skl: cosmo_dataset_slice_fa_skl.html
 .. _cosmo_dataset_slice_features: cosmo_dataset_slice_features.html
 .. _cosmo_dataset_slice_samples: cosmo_dataset_slice_samples.html
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
 
 

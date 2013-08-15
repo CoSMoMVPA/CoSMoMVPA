@@ -4,15 +4,6 @@ run classify naive bayes skl
 ============================
 .. code-block:: matlab
 
-<<<<<<< HEAD
-    
-    % Load the dataset with VT mask
-    ds = cosmo_fmri_dataset('../data/s01/glm_T_stats_perrun.nii.gz', ...
-                         'mask', '../data/s01/vt_mask.nii.gz');
-    
-    
-    % set the targets and chunks
-=======
     %% Two-class classification with naive baysian classifier
     
     %% Define data
@@ -24,7 +15,6 @@ run classify naive bayes skl
     
     
     %% set the targets and chunks
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     ds.sa.targets = repmat([1:6],1,10);
     chunks = []; for i = 1:10 chunks = [chunks repmat([i],1,6)]; end
     ds.sa.chunks = chunks;
@@ -36,26 +26,6 @@ run classify naive bayes skl
     % get indices for monkeys and mallards
     idx = strcmp(ds.sa.labels,'monkey') | strcmp(ds.sa.labels,'mallard');
     
-<<<<<<< HEAD
-    % Use sample attrubutes slicer to slice dataset
-    ds2 = sa_slicer(ds,idx);
-    
-    % Now slice into odd and even runs using chunks attribute
-    even_idx = boolean(repmat([0 0 1 1],1,5));
-    odd_idx = boolean(repmat([1 1 0 0], 1,5));
-    
-    evens = sa_slicer(ds2,even_idx);
-    odds = sa_slicer(ds2,odd_idx);
-    
-    pred = cosmo_classify_naive_baysian(evens.samples, evens.sa.targets, odds.samples);
-    accuracy = mean(odds.sa.targets == pred');
-    
-    % Answer: accuracy should be .70 
-    
-    pred = cosmo_classify_naive_baysian(odds.samples, odds.sa.targets,evens.samples);
-    accuracy = mean(odds.sa.targets == pred');
-    
-=======
     %% Slice the dataset
     % Use sample attrubutes slicer to slice dataset
     ds2 = cosmo_dataset_slice_samples(ds,idx);
@@ -77,7 +47,6 @@ run classify naive bayes skl
     pred = cosmo_classify_naive_bayes(odds.samples, odds.sa.targets,evens.samples);
     accuracy = mean(evens.sa.targets == pred);
     fprintf('Train on odd, test on even: accuracy %.3f\n', accuracy);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     % Answer: accuracy = .50
     
      

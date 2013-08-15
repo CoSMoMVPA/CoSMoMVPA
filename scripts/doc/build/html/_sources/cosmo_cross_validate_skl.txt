@@ -4,40 +4,14 @@ cosmo cross validate skl
 ========================
 .. code-block:: matlab
 
-<<<<<<< HEAD
-    function accuracy = cosmo_cross_validate(dataset, args)
-    % performs cross-validation using a classifier
-    %
-    % accuracy = cosmo_cross_validate(dataset, args)
-=======
     function [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions, opt)
     % performs cross-validation using a classifier
     %
     % [pred, accuracy] = cosmo_cross_validate(dataset, args)
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     % 
     % Inputs
     %   dataset             struct with fields .samples (PxQ for P samples and 
     %                       Q features) and .sa.targets (Px1 labels of samples)
-<<<<<<< HEAD
-    %   args                struct containing classifier, partitions, and opt (which
-    %                           is optional)
-    %   args.classifier     function handle to classifier, e.g.
-    %                       @classify_naive_baysian
-    %   args.partitions          For example the output from nfold_partition
-    %   
-    % NNO Aug 2013, 
-    % modified by ACC. Modified to conform to signature of generic datset 'measure'
-    
-    if ~isfield(args,'opt') args.opt = struct(); end
-    if ~isfield(args,'classifier') error('Missing input args.classifier'); end
-    if ~isfield(args,'partitions') error('Missing input args.partitions'); end
-    
-    
-    train_indices = args.p
-    artitions.train_indices;
-    test_indices = args.partitions.test_indices;
-=======
     %   classifier          function handle to classifier, e.g.
     %                       @classify_naive_baysian
     %   partitions          For example the output from nfold_partition
@@ -53,7 +27,6 @@ cosmo cross validate skl
     
     train_indices = partitions.train_indices;
     test_indices = partitions.test_indices;
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
     npartitions=numel(train_indices);
     
@@ -63,16 +36,9 @@ cosmo cross validate skl
     ncorrect=0; % how many samples were correctly classified
     ntotal=0; % how many samples were classified (correctly or not)
     
-<<<<<<< HEAD
-    % [your code here]
-    
-    accuracy = ncorrect/ntotal;
-    
-=======
     for k=1:npartitions
         %%%% >>> YOUR CODE HERE <<< %%%%
     end
     
     
     accuracy = ncorrect/ntotal;
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

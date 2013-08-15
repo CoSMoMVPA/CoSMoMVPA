@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo dataset slice samples" href="cosmo_dataset_slice_samples.html" />
-    <link rel="prev" title="cosmo classify meta multiclass" href="cosmo_classify_meta_multiclass.html" /> 
+    <link rel="next" title="run load datasets" href="run_load_datasets.html" />
+    <link rel="prev" title="cosmo sphere offsets" href="cosmo_sphere_offsets.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_samples.html" title="cosmo dataset slice samples"
+          <a href="run_load_datasets.html" title="run load datasets"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_classify_meta_multiclass.html" title="cosmo classify meta multiclass"
+          <a href="cosmo_sphere_offsets.html" title="cosmo sphere offsets"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_classify_meta_multiclass.html"
-                        title="previous chapter">cosmo classify meta multiclass</a></p>
+  <p class="topless"><a href="cosmo_sphere_offsets.html"
+                        title="previous chapter">cosmo sphere offsets</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_dataset_slice_samples.html"
-                        title="next chapter">cosmo dataset slice samples</a></p>
+  <p class="topless"><a href="run_load_datasets.html"
+                        title="next chapter">run load datasets</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_map2nifti.txt"
@@ -95,10 +95,10 @@
 <span class="p">[</span><span class="n">nsamples</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
 
 <span class="n">ni</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">a</span><span class="p">.</span><span class="n">imghdr</span><span class="p">;</span>
-<span class="n">ni</span><span class="p">.</span><span class="n">hdr</span><span class="p">.</span><span class="n">dime</span><span class="p">.</span><span class="n">dim</span><span class="p">(</span><span class="mi">5</span><span class="p">)=</span><span class="n">nsamples</span><span class="p">;</span>
+<span class="n">ni</span><span class="p">.</span><span class="n">hdr</span><span class="p">.</span><span class="n">dime</span><span class="p">.</span><span class="n">dim</span><span class="p">(</span>5<span class="p">)=</span><span class="n">nsamples</span><span class="p">;</span>
 <span class="n">dime</span><span class="p">=</span><span class="n">ni</span><span class="p">.</span><span class="n">hdr</span><span class="p">.</span><span class="n">dime</span><span class="p">.</span><span class="n">dim</span><span class="p">;</span>
-<span class="n">dime3</span><span class="p">=</span><span class="n">dime</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">);</span>
-<span class="n">dime4</span><span class="p">=</span><span class="n">dime</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">dime3</span><span class="p">=</span><span class="n">dime</span><span class="p">(</span>2<span class="p">:</span>4<span class="p">);</span>
+<span class="n">dime4</span><span class="p">=</span><span class="n">dime</span><span class="p">(</span>2<span class="p">:</span>5<span class="p">);</span>
 
 <span class="k">if</span> <span class="o">~</span><span class="n">isfield</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">fa</span><span class="p">,</span><span class="s">&#39;voxel_indices&#39;</span><span class="p">)</span>
     <span class="n">error</span><span class="p">(</span><span class="s">&#39;missing voxel indices&#39;</span><span class="p">);</span>
@@ -106,19 +106,19 @@
 
 <span class="c">% convert voxel indices to linear indices</span>
 <span class="n">ijk</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">fa</span><span class="p">.</span><span class="n">voxel_indices</span><span class="p">;</span>
-<span class="n">lin</span><span class="p">=</span><span class="nb">sub2ind</span><span class="p">(</span><span class="n">dime3</span><span class="p">,</span> <span class="n">ijk</span><span class="p">(</span><span class="mi">1</span><span class="p">,:),</span> <span class="n">ijk</span><span class="p">(</span><span class="mi">2</span><span class="p">,:),</span> <span class="n">ijk</span><span class="p">(</span><span class="mi">3</span><span class="p">,:));</span>
+<span class="n">lin</span><span class="p">=</span><span class="nb">sub2ind</span><span class="p">(</span><span class="n">dime3</span><span class="p">,</span> <span class="n">ijk</span><span class="p">(</span>1<span class="p">,:),</span> <span class="n">ijk</span><span class="p">(</span>2<span class="p">,:),</span> <span class="n">ijk</span><span class="p">(</span>3<span class="p">,:));</span>
 
 <span class="n">vol</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">dime3</span><span class="p">);</span>
 <span class="n">vols</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">dime4</span><span class="p">);</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">nsamples</span>
-    <span class="n">vol</span><span class="p">(:)=</span><span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">nsamples</span>
+    <span class="n">vol</span><span class="p">(:)=</span>0<span class="p">;</span>
     <span class="n">vol</span><span class="p">(</span><span class="n">lin</span><span class="p">)=</span><span class="n">samples</span><span class="p">(</span><span class="n">k</span><span class="p">,:);</span>
     <span class="n">vols</span><span class="p">(:,:,:,</span><span class="n">k</span><span class="p">)=</span><span class="n">vol</span><span class="p">;</span>
 <span class="k">end</span>
 
 <span class="n">ni</span><span class="p">.</span><span class="n">img</span><span class="p">=</span><span class="n">vols</span><span class="p">;</span>
 
-<span class="k">if</span> <span class="n">nargin</span><span class="o">&gt;</span><span class="mi">1</span>
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&gt;</span>1
     <span class="n">save_nii</span><span class="p">(</span><span class="n">ni</span><span class="p">,</span> <span class="n">fn</span><span class="p">);</span>
 <span class="k">end</span>
 </pre></div>
@@ -138,10 +138,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_samples.html" title="cosmo dataset slice samples"
+          <a href="run_load_datasets.html" title="run load datasets"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_classify_meta_multiclass.html" title="cosmo classify meta multiclass"
+          <a href="cosmo_sphere_offsets.html" title="cosmo sphere offsets"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

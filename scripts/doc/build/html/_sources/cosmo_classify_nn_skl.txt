@@ -32,9 +32,5 @@ cosmo classify nn skl
     % allocate space for output
     predicted=zeros(ntest,1);
     
-<<<<<<< HEAD
-    % [your code here]
-=======
     %%%% >>> YOUR CODE HERE <<< %%%%
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     

@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="Cosmo matlab files - headers only files" href="matlab_hdr_toc.html" />
-    <link rel="prev" title="run splithalf correlations" href="run_splithalf_correlations.html" /> 
+    <link rel="next" title="run setting sample attr" href="run_setting_sample_attr.html" />
+    <link rel="prev" title="run measure searchlight" href="run_measure_searchlight.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="matlab_hdr_toc.html" title="Cosmo matlab files - headers only files"
+          <a href="run_setting_sample_attr.html" title="run setting sample attr"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
+          <a href="run_measure_searchlight.html" title="run measure searchlight"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="run_splithalf_correlations.html"
-                        title="previous chapter">run splithalf correlations</a></p>
+  <p class="topless"><a href="run_measure_searchlight.html"
+                        title="previous chapter">run measure searchlight</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="matlab_hdr_toc.html"
-                        title="next chapter">Cosmo matlab files - headers only files</a></p>
+  <p class="topless"><a href="run_setting_sample_attr.html"
+                        title="next chapter">run setting sample attr</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_classify_svm.txt"
@@ -102,7 +102,7 @@
 <span class="c">%</span>
 <span class="c">% NNO Aug 2013</span>
 
-<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span>4<span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
 
 <span class="p">[</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_train</span><span class="p">);</span>
 <span class="p">[</span><span class="n">ntest</span><span class="p">,</span> <span class="n">nfeatures_</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_test</span><span class="p">);</span>
@@ -111,7 +111,7 @@
 <span class="k">if</span> <span class="n">nfeatures</span><span class="o">~=</span><span class="n">nfeatures</span> <span class="o">||</span> <span class="n">ntrain_</span><span class="o">~=</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal input size&#39;</span><span class="p">);</span> <span class="k">end</span>
 
 <span class="n">classes</span><span class="p">=</span><span class="n">unique</span><span class="p">(</span><span class="n">targets_train</span><span class="p">);</span>
-<span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span><span class="o">~=</span><span class="mi">2</span>
+<span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span><span class="o">~=</span>2
     <span class="n">me</span><span class="p">=</span><span class="n">mfilename</span><span class="p">();</span>
     <span class="n">error</span><span class="p">(</span><span class="s">&#39;%s requires 2 classes. Use cosmo_classify_meta_multiclass with opt.classifier=@%s&#39;</span><span class="p">,</span> <span class="n">me</span><span class="p">,</span> <span class="n">me</span><span class="p">);</span>
 <span class="k">end</span>
@@ -125,11 +125,11 @@
 
 <span class="n">fns</span><span class="p">=</span><span class="n">fieldnames</span><span class="p">(</span><span class="n">opt</span><span class="p">);</span>
 <span class="n">n</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">fns</span><span class="p">);</span>
-<span class="n">opt_cell</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">);</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span>
+<span class="n">opt_cell</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span>1<span class="p">,</span>2<span class="o">*</span><span class="n">n</span><span class="p">);</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">n</span>
     <span class="n">fn</span><span class="p">=</span><span class="n">fns</span><span class="p">{</span><span class="n">k</span><span class="p">};</span>
-    <span class="n">opt_cell</span><span class="p">{</span><span class="n">k</span><span class="o">*</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">}=</span><span class="n">fn</span><span class="p">;</span>
-    <span class="n">opt_cell</span><span class="p">{</span><span class="n">k</span><span class="o">*</span><span class="mi">2</span><span class="p">}=</span><span class="n">opt</span><span class="p">.(</span><span class="n">fn</span><span class="p">);</span>
+    <span class="n">opt_cell</span><span class="p">{</span><span class="n">k</span><span class="o">*</span>2<span class="o">-</span>1<span class="p">}=</span><span class="n">fn</span><span class="p">;</span>
+    <span class="n">opt_cell</span><span class="p">{</span><span class="n">k</span><span class="o">*</span>2<span class="p">}=</span><span class="n">opt</span><span class="p">.(</span><span class="n">fn</span><span class="p">);</span>
 <span class="k">end</span>
 </pre></div>
 </div>
@@ -148,10 +148,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="matlab_hdr_toc.html" title="Cosmo matlab files - headers only files"
+          <a href="run_setting_sample_attr.html" title="run setting sample attr"
              >next</a> |</li>
         <li class="right" >
-          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
+          <a href="run_measure_searchlight.html" title="run measure searchlight"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

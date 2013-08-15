@@ -3,8 +3,5 @@
 run classify naive bayes hdr
 ============================
 .. code-block:: matlab
-<<<<<<< HEAD
-=======
 
     %% Two-class classification with naive baysian classifier
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

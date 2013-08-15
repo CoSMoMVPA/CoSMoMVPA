@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo generate synthetic dataset" href="cosmo_generate_synthetic_dataset.html" />
-    <link rel="prev" title="cosmo get data path" href="cosmo_get_data_path.html" /> 
+    <link rel="next" title="run splithalf correlations" href="run_splithalf_correlations.html" />
+    <link rel="prev" title="cosmo dataset slice sa" href="cosmo_dataset_slice_sa.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_generate_synthetic_dataset.html" title="cosmo generate synthetic dataset"
+          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_get_data_path.html" title="cosmo get data path"
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_get_data_path.html"
-                        title="previous chapter">cosmo get data path</a></p>
+  <p class="topless"><a href="cosmo_dataset_slice_sa.html"
+                        title="previous chapter">cosmo dataset slice sa</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_generate_synthetic_dataset.html"
-                        title="next chapter">cosmo generate synthetic dataset</a></p>
+  <p class="topless"><a href="run_splithalf_correlations.html"
+                        title="next chapter">run splithalf correlations</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_nfold_partitioner.txt"
@@ -121,10 +121,10 @@
 <span class="n">nchunks</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">unq</span><span class="p">);</span>
 
 <span class="c">% allocate space for output</span>
-<span class="n">train_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
-<span class="n">test_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
+<span class="n">train_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span>1<span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
+<span class="n">test_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span>1<span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
 
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">nchunks</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">nchunks</span>
     <span class="n">test_msk</span><span class="p">=</span><span class="n">unq</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">==</span><span class="n">chunks</span><span class="p">;</span>
     <span class="n">train_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="o">~</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
     <span class="n">test_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
@@ -149,10 +149,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_generate_synthetic_dataset.html" title="cosmo generate synthetic dataset"
+          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_get_data_path.html" title="cosmo get data path"
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

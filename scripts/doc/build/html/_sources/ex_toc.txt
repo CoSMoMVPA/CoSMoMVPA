@@ -10,20 +10,13 @@ Contents:
     :numbered:
     :titlesonly:
 
-<<<<<<< HEAD
-=======
     ex_nifti_basics
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     ex_dataset_basics
     ex_classify_naive_bayes
     ex_write_classify_nn
     ex_nfold_partitioner
     ex_cross_validate
     ex_classify_svm
-<<<<<<< HEAD
-    ex_searchlight
-=======
     ex_splithalf_correlations
     ex_searchlight
     ex_rsa_tutorial
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

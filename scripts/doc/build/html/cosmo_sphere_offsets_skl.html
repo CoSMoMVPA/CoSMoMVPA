@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
-    <link rel="next" title="run nifti basics skl" href="run_nifti_basics_skl.html" />
-    <link rel="prev" title="run permutation test skl" href="run_permutation_test_skl.html" /> 
+    <link rel="next" title="cosmo map2nifti skl" href="cosmo_map2nifti_skl.html" />
+    <link rel="prev" title="cosmo cross validate skl" href="cosmo_cross_validate_skl.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="run_nifti_basics_skl.html" title="run nifti basics skl"
+          <a href="cosmo_map2nifti_skl.html" title="cosmo map2nifti skl"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+          <a href="cosmo_cross_validate_skl.html" title="cosmo cross validate skl"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="run_permutation_test_skl.html"
-                        title="previous chapter">run permutation test skl</a></p>
+  <p class="topless"><a href="cosmo_cross_validate_skl.html"
+                        title="previous chapter">cosmo cross validate skl</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="run_nifti_basics_skl.html"
-                        title="next chapter">run nifti basics skl</a></p>
+  <p class="topless"><a href="cosmo_map2nifti_skl.html"
+                        title="next chapter">cosmo map2nifti skl</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_sphere_offsets_skl.txt"
@@ -112,15 +112,15 @@
 <span class="c">% NNO Aug 2013</span>
 
 <span class="c">% how big a box should be to contain all voxels with the given radius</span>
-<span class="n">side</span><span class="p">=</span><span class="nb">ceil</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">side</span><span class="p">=</span><span class="nb">ceil</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span><span class="o">*</span>2<span class="o">+</span>1<span class="p">;</span>
 
 <span class="c">% make an array that is sufficienly large (actually too big)</span>
-<span class="n">offsets</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">side</span>^<span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">offsets</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">side</span>^3<span class="p">,</span>3<span class="p">);</span>
 
 <span class="c">% keep track of where we store indices in offsets:</span>
 <span class="c">% for every location within the sphere (in the code below),</span>
 <span class="c">% add one to row_pos and then store the locations</span>
-<span class="n">row_pos</span><span class="p">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="n">row_pos</span><span class="p">=</span>0<span class="p">;</span>
 
 <span class="c">% the grid positions (relative to the origin) to consider</span>
 <span class="n">single_dimension_candidates</span><span class="p">=</span><span class="nb">floor</span><span class="p">(</span><span class="o">-</span><span class="n">radius</span><span class="p">):</span><span class="nb">ceil</span><span class="p">(</span><span class="n">radius</span><span class="p">);</span>
@@ -130,7 +130,7 @@
 <span class="c">%%%% &gt;&gt;&gt; YOUR CODE HERE &lt;&lt;&lt; %%%%</span>
 
 <span class="c">% cut off empty values at the end</span>
-<span class="n">offsets</span><span class="p">=</span><span class="n">offsets</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">row_pos</span><span class="p">,:);</span>
+<span class="n">offsets</span><span class="p">=</span><span class="n">offsets</span><span class="p">(</span>1<span class="p">:</span><span class="n">row_pos</span><span class="p">,:);</span>
 </pre></div>
 </div>
 </div>
@@ -148,10 +148,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="run_nifti_basics_skl.html" title="run nifti basics skl"
+          <a href="cosmo_map2nifti_skl.html" title="cosmo map2nifti skl"
              >next</a> |</li>
         <li class="right" >
-          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+          <a href="cosmo_cross_validate_skl.html" title="cosmo cross validate skl"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 

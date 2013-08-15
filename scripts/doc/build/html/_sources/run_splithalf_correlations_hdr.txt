@@ -6,12 +6,6 @@ run splithalf correlations hdr
 
     %% roi-based MVPA with group-analysis
     %
-<<<<<<< HEAD
-    % Load t-stat data from all subjects, apply 'ev' mask, compute difference
-    % of (fisher-transformed) between on- and off diagonal split-half
-    % correlation values, and perform a random effects analysis
-=======
     % Load t-stat data from all subjects, apply 'vt' mask, compute difference
     % of (fisher-transformed) between on- and off diagonal split-half
     % correlation values, and perform a random effects analysis.
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

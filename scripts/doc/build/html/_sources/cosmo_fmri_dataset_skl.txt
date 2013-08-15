@@ -57,21 +57,9 @@ cosmo fmri dataset skl
         % End input parsing stuff
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-<<<<<<< HEAD
-        %NNO modifications
-        % - switch statement
-        % - preallocation of memory for samples
-        % - remove img data from hdr
-        % - check for size of targets and chunks
-        % - keep voxels in mask with negative values
-        % - use load_nii (not load_nifti)
-    
-        ni = load_nii(p.filename);
-=======
         extensions={'.nii','.nii.gz'};
         fn=find_file(p.filename, extensions); 
         ni = load_nii(fn);
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
         dims = size(ni.img);
         if numel(dims)>4, 
@@ -80,11 +68,6 @@ cosmo fmri dataset skl
         x = dims(1); y = dims(2); z = dims(3); t = dims(4);
         
         % if a mask was supplied, load it
-<<<<<<< HEAD
-        if length(p.mask) > 0
-            m = load_nii(p.mask);
-            m = m.img;
-=======
         if ~isempty(p.mask)
             if ischar(p.mask)
                 m = load_nii(p.mask);
@@ -92,7 +75,6 @@ cosmo fmri dataset skl
             else
                 m = p.mask;
             end
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
             mdim = size(m);
     
             switch length(mdim)
@@ -101,16 +83,12 @@ cosmo fmri dataset skl
                     m=m(:,:,:,1);
                 otherwise
                     error('illegal mask');
-<<<<<<< HEAD
-            end    
-=======
             end
             
             if ~isequal(dims(1:3), mdim(1:3))
                 error('mask size is different from data size');
             end
             
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
             ds.a.mapper = find(m);
         else
             ds.a.mapper = [1:(x*y*z)]; 
@@ -132,19 +110,11 @@ cosmo fmri dataset skl
         ni=rmfield(ni,'img'); % remove data from header
         ds.a.imghdr = ni; % store header
         
-<<<<<<< HEAD
-        ds=set_sa(ds,p,'targets');
-        ds=set_sa(ds,p,'chunks');
-    end
-    
-    function ds=set_sa(ds,p,fieldname)
-=======
         ds=set_sa_vec(ds,p,'targets');
         ds=set_sa_vec(ds,p,'chunks');
     end
     
     function ds=set_sa_vec(ds,p,fieldname)
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
         nsamples=size(ds.samples,1);
         v=p.(fieldname);
@@ -156,8 +126,6 @@ cosmo fmri dataset skl
     end
         
     
-<<<<<<< HEAD
-=======
     function fn=find_file(fn, exts)
     
     if exist(fn,'file')
@@ -184,6 +152,5 @@ cosmo fmri dataset skl
     end
         
     
->>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
     
