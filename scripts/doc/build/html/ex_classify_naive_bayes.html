@@ -1,0 +1,126 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. Classification with Naive Bayes classifier &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Exercises" href="ex_toc.html" />
+    <link rel="next" title="4. Write your own Nearest-neighbor classifier" href="ex_write_classify_nn.html" />
+    <link rel="prev" title="2. Dataset basics" href="ex_dataset_basics.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ex_write_classify_nn.html" title="4. Write your own Nearest-neighbor classifier"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ex_dataset_basics.html" title="2. Dataset basics"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="ex_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ex_dataset_basics.html"
+                        title="previous chapter">2. Dataset basics</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ex_write_classify_nn.html"
+                        title="next chapter">4. Write your own Nearest-neighbor classifier</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ex_classify_naive_bayes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="classification-with-naive-bayes-classifier">
+<h1>3. Classification with Naive Bayes classifier<a class="headerlink" href="#classification-with-naive-bayes-classifier" title="Permalink to this headline">¶</a></h1>
+<p>Load a dataset using subject s01&#8217;s T-statistics for every run
+(&#8216;glm_T_stats_perrun.nii.gz&#8217;) runs and the VT mask. Slice the datset using your sample
+attributes slicer so that there are only two categories: monkeys and mallards.
+Then slice the datasdet again into odd and even runs.  Train and test a
+Naive bayes classifier (<a class="reference external" href="cosmo_classify_naive_bayes.html">cosmo_classify_naive_bayes</a>) first training on the even-runs data and testing on the
+odds, then train on the odds and test on the evens.</p>
+<p>Check your answers here: <a class="reference external" href="run_classify_naive_bayes.html">run_classify_naive_bayes</a></p>
+<p>What is the accuracy for monkey versus ladybug? Monkey versus lemur?</p>
+<p>Do the accuracies change if you use betas (&#8216;glm_betas_perrun.nii.gz&#8217;) instead of
+T-stats?</p>
+<p>What if you use a different mask?</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ex_write_classify_nn.html" title="4. Write your own Nearest-neighbor classifier"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ex_dataset_basics.html" title="2. Dataset basics"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="ex_toc.html" >Exercises</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

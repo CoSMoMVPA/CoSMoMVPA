@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10. Representational similarity analysis &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Exercises" href="ex_toc.html" />
+    <link rel="next" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
+    <link rel="prev" title="9. Write a searchlight function that computes a generic dataset measure" href="ex_searchlight.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="matlab_full_toc.html" title="Cosmo matlab files - full solutions files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ex_searchlight.html" title="9. Write a searchlight function that computes a generic dataset measure"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="ex_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10. Representational similarity analysis</a><ul>
+<li><a class="reference internal" href="#visualizing-dissimilarity-matrices">10.1. Visualizing dissimilarity matrices</a></li>
+<li><a class="reference internal" href="#centering-the-data">10.2. Centering the data</a></li>
+<li><a class="reference internal" href="#comparing-dissimilarity-matrices">10.3. Comparing dissimilarity matrices</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ex_searchlight.html"
+                        title="previous chapter">9. Write a searchlight function that computes a generic dataset measure</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="matlab_full_toc.html"
+                        title="next chapter">Cosmo matlab files - full solutions files</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ex_rsa_tutorial.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="representational-similarity-analysis">
+<h1>10. Representational similarity analysis<a class="headerlink" href="#representational-similarity-analysis" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="visualizing-dissimilarity-matrices">
+<h2>10.1. Visualizing dissimilarity matrices<a class="headerlink" href="#visualizing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
+<p>Load the saved variables in the files <em>v1_model.mat</em> and <em>behav_sim.mat</em>. These
+should be in your scripts folder. These are dissimilarity matrices (DSMs) for
+our six animals. The v1 model DSM was made by modeling each stimulus image
+(jpeg) with a simple v1 cortical model, and then calculating the vector
+distances between the stimuli using the features of the model.  The behavioral
+DSM was made by having human subjects judge the similarity between every pair of
+animals.</p>
+<p>Note that these are ordinary DSMs that have zeros on the diagonal and are
+symmetric about the diagonal. Use matlabs <strong>imagesc</strong> to view each DSM:</p>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="n">load</span> <span class="n">v1_model</span><span class="p">;</span>
+<span class="n">load</span> <span class="n">behav_sim</span><span class="p">;</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">v1_model</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;V1 Model DSM&#39;</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The categorical structure is obvious in the categorical dissimilarity, but not
+in the v1 model DSM.</p>
+<p>Now use matlab&#8217;s <strong>linkage</strong> function to do hierarchical clustering on the DSMs.
+<strong>linkage</strong> takes input in the form of the flattered upper triangle of the DSM
+(as is output by <strong>pdist</strong>). So first flatten each DSM using <strong>squareform</strong>. In
+order to view the dendrogram, we need to use matlab&#8217;s <strong>dendrogram</strong> function.</p>
+<p>Here is how to do this with the behavioral similarity:</p>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="n">hclus</span> <span class="p">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">squareform</span><span class="p">(</span><span class="n">behav</span><span class="p">));</span>
+<span class="c">% We also want to have labels on our dendrogram</span>
+<span class="n">labels</span> <span class="p">=</span> <span class="p">{</span><span class="s">&#39;monkey&#39;</span><span class="p">,</span><span class="s">&#39;lemur&#39;</span><span class="p">,</span><span class="s">&#39;mallard&#39;</span><span class="p">,</span><span class="s">&#39;warbler&#39;</span><span class="p">,</span><span class="s">&#39;ladybug&#39;</span><span class="p">,</span><span class="s">&#39;lunamoth&#39;</span><span class="p">};</span>
+<span class="n">figure</span><span class="p">();</span>
+<span class="n">dendrogram</span><span class="p">(</span><span class="n">hclus</span><span class="p">,</span> <span class="s">&#39;labels&#39;</span><span class="p">,</span><span class="n">labels</span><span class="p">);</span>
+<span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM - linkage&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now let&#8217;s use Matlab&#8217;s classic multidimensional scaling (<strong>cmdscale</strong>) to look at
+the DSMs in another way. <strong>cmdscale</strong> returns a set of factor scores for
+dimension and stimulus. To view the first 2 dimensions we can use matlab&#8217;s
+<strong>text</strong> function:</p>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="n">F</span> <span class="p">=</span> <span class="n">cmdscale</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span>
+<span class="n">figure</span><span class="p">();</span>
+<span class="n">text</span><span class="p">(</span><span class="n">F</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(:,</span><span class="mi">2</span><span class="p">),</span> <span class="n">labels</span><span class="p">);</span>
+<span class="c">%</span>
+<span class="c">% We will also need to set the axes so we can see all of the points</span>
+<span class="c">% Let&#39;s use the maximum absolute magnitude</span>
+<span class="n">mx</span> <span class="p">=</span> <span class="n">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">F</span><span class="p">(:)));</span>
+<span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="n">mx</span> <span class="n">mx</span><span class="p">]);</span> <span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="n">mx</span> <span class="n">mx</span><span class="p">]);</span>
+<span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM, cmdscale, dims 1 and 2&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Do this also for the V1 model DSM.</p>
+<p>Now using the data from the &#8220;allruns&#8221; datasets, load one subject at a time,
+compute the DSMs for VT and EV. Visualize them side-by-side using the three
+methods above so that the output looks like the image below (subject 4).  You
+will need to use matlab&#8217;s subplot function for this.</p>
+<img alt="_images/visualize.png" src="_images/visualize.png" />
+<p>Hint: <a class="reference external" href="run_rsa_visualize_skl.html">run_rsa_visualize_skl</a></p>
+<p>Solution: <a class="reference external" href="run_rsa_visualize.html">run_rsa_visualize</a></p>
+<p>Now using the script you wrote to visualize EV and LV, go through the set of
+subjects and see how the patterns change for different subjects. What trends do
+you notice?</p>
+</div>
+<div class="section" id="centering-the-data">
+<h2>10.2. Centering the data<a class="headerlink" href="#centering-the-data" title="Permalink to this headline">¶</a></h2>
+<p>A dataset can be thought of as a set of points in N-dimensional vector space.
+This is easy to visualize with 2 or three dimensions (voxels), but it is
+difficult to do with several hundred dimensions. Nevertheless, the math stays
+the same whether you are dealing with 3 voxels or 3 hundred. Remember that our
+fMRI data comes from a time-course analysis that included some estimation of the
+<em>baseline</em> activity for each voxel. The statistics we have for our categories
+are estimations of the differences from that baseline.  This means that the
+origin of our vector space corresponds to that <em>arbitrary</em> baseline.</p>
+<p>Because correlation distance is a measure of the angles between vectors, it is
+sensitive to where the data cloud resides with respect to the origin. Ideally,
+the origin of the vector space has a non-arbitray location so that it is
+maximally informative about the relationships between our stimuli. We can
+accomplish this by centering the data cloud on the origin of the space by
+removing the mean value across conditions at each voxel.</p>
+<p>See what happens to the correlation between two vectors marked with blue X and a
+red cross in the figure below. On the left the data cloud has an arbitray
+origin, and the vectors are almost perfectly correlated. After demeaning, they
+are negatively correlated.</p>
+<img alt="_images/demean.png" src="_images/demean.png" style="width: 600px;" />
+<p>Thus before calculating a neural DSM, it is good to center the data first by
+demeaning. Rerun your visualization script above by centering the data first.
+How does this change the results?</p>
+<p>Solution: <a class="reference external" href="run_demean.html">run_demean</a></p>
+</div>
+<div class="section" id="comparing-dissimilarity-matrices">
+<h2>10.3. Comparing dissimilarity matrices<a class="headerlink" href="#comparing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
+<p>It is easy to compare dissimilarity matrices by computing the
+Pearson correlation between two flattened upper triangle DSMs using matlab&#8217;s
+<strong>corrcoef</strong> function. For the next exercise, stack flattened DSMs vertically
+into a single matrix starting with all of the EV DSMs from every subject then
+all of the VT DSM. You should have a 10x15 matrix. Then add the v1 model and the
+behavioral DSMs to make it a 12x15 matrix. Now compute the cross-correlation
+matrix using <strong>corrcoef</strong>. Visualize the cross-correlation matrix with
+<strong>imagesc</strong>. Try this with demeaning and without demeaning to compare the
+results. Finally, use matlabs <strong>boxplot</strong> function to view the distributions of
+correlations between neural simiilarities and model/behavioral DSMs.</p>
+<p>Hint: <a class="reference external" href="run_compare_dsm_skl.html">run_compare_dsm_skl</a></p>
+<p>Solution: <a class="reference external" href="run_compare_dsm.html">run_compare_dsm</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="matlab_full_toc.html" title="Cosmo matlab files - full solutions files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ex_searchlight.html" title="9. Write a searchlight function that computes a generic dataset measure"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="ex_toc.html" >Exercises</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

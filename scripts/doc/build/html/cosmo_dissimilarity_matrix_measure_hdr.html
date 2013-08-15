@@ -1,0 +1,141 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cosmo dissimilarity matrix measure hdr &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Cosmo matlab files - headers only files" href="matlab_hdr_toc.html" />
+    <link rel="next" title="run rsa visualize hdr" href="run_rsa_visualize_hdr.html" />
+    <link rel="prev" title="cosmo dataset slice features hdr" href="cosmo_dataset_slice_features_hdr.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="run_rsa_visualize_hdr.html" title="run rsa visualize hdr"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_dataset_slice_features_hdr.html" title="cosmo dataset slice features hdr"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_hdr_toc.html" accesskey="U">Cosmo matlab files - headers only files</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cosmo_dataset_slice_features_hdr.html"
+                        title="previous chapter">cosmo dataset slice features hdr</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="run_rsa_visualize_hdr.html"
+                        title="next chapter">run rsa visualize hdr</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cosmo_dissimilarity_matrix_measure_hdr.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cosmo-dissimilarity-matrix-measure-hdr">
+<h1>cosmo dissimilarity matrix measure hdr<a class="headerlink" href="#cosmo-dissimilarity-matrix-measure-hdr" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>dsm <span class="p">=</span><span class="w"> </span><span class="nf">cosmo_dissimilarity_matrix</span><span class="p">(</span>dataset, args<span class="p">)</span><span class="w"></span>
+<span class="c">%   A wrapper function for Matlab&#39;s pdist function that conform to the</span>
+<span class="c">%   definition of a **dataset measure**</span>
+<span class="c">%</span>
+<span class="c">%   Inputs</span>
+<span class="c">%       dataset:    an instance of a cosmo_fmri_dataset</span>
+<span class="c">%       args:       an optional struct:</span>
+<span class="c">%           args.metric: a **cell array** containing the name of the distance</span>
+<span class="c">%                       metric to be used by pdist (default: &#39;correlation&#39;)</span>
+<span class="c">%</span>
+<span class="c">%   Returns</span>
+<span class="c">%       dsm:    the flattened upper triangle of a dissimilarity matrix as</span>
+<span class="c">%               returned by pdist, but conforming to the output for a dataset</span>
+<span class="c">%               measure (i.e., N x 1 array, where N is the number of pairwise</span>
+<span class="c">%               distances between all samples in the dataset).</span>
+<span class="c">%</span>
+<span class="c">%   NB. pdist defaults to &#39;euclidean&#39; distance, but correlation distance is</span>
+<span class="c">%       preferable for neural dissimilarity matrices</span>
+<span class="c">%</span>
+<span class="c">%       Also, args.metric is a cell array, because, for some reason matlab</span>
+<span class="c">%       doesn&#39;t like struct fields to be strings</span>
+<span class="c">%</span>
+<span class="c">%</span>
+<span class="c">% ACC August 2013</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="run_rsa_visualize_hdr.html" title="run rsa visualize hdr"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_dataset_slice_features_hdr.html" title="cosmo dataset slice features hdr"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_hdr_toc.html" >Cosmo matlab files - headers only files</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
