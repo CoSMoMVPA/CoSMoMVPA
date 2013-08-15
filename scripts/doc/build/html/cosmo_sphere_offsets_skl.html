@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cosmo sphere offsets skl &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
+    <link rel="next" title="run nifti basics skl" href="run_nifti_basics_skl.html" />
+    <link rel="prev" title="run permutation test skl" href="run_permutation_test_skl.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="run_nifti_basics_skl.html" title="run nifti basics skl"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="run_permutation_test_skl.html"
+                        title="previous chapter">run permutation test skl</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="run_nifti_basics_skl.html"
+                        title="next chapter">run nifti basics skl</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cosmo_sphere_offsets_skl.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cosmo-sphere-offsets-skl">
+<h1>cosmo sphere offsets skl<a class="headerlink" href="#cosmo-sphere-offsets-skl" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>offsets<span class="p">=</span><span class="nf">cosmo_sphere_offsets</span><span class="p">(</span>radius<span class="p">)</span><span class="w"></span>
+<span class="c">% computes sub index offsets for voxels in a sphere</span>
+<span class="c">%</span>
+<span class="c">% offsets=cosmo_sphere_offsets(radius)</span>
+<span class="c">%</span>
+<span class="c">% Input</span>
+<span class="c">%  - radius    radius of the sphere (in voxel units)</span>
+<span class="c">%</span>
+<span class="c">% Output</span>
+<span class="c">%  - offsets   Px3 sub indices relative to the origin (0,0,0).</span>
+<span class="c">%              offsets(p,:)=[i, j, k] means that the euclidian distance</span>
+<span class="c">%              between points at (i,j,k) and the origin is less than or</span>
+<span class="c">%              or equal to radius</span>
+<span class="c">%</span>
+<span class="c">% Example</span>
+<span class="c">% cosmo_sphere_offsets(1)</span>
+<span class="c">% &gt;   [-1     0     0</span>
+<span class="c">% &gt;     0    -1     0</span>
+<span class="c">% &gt;     0     0    -1</span>
+<span class="c">% &gt;     0     0     0</span>
+<span class="c">% &gt;     0     0     1</span>
+<span class="c">% &gt;     0     1     0</span>
+<span class="c">% &gt;     1     0     0]</span>
+<span class="c">%</span>
+<span class="c">% See also sub2ind, ind2sub</span>
+<span class="c">%</span>
+<span class="c">% NNO Aug 2013</span>
+
+<span class="c">% how big a box should be to contain all voxels with the given radius</span>
+<span class="n">side</span><span class="p">=</span><span class="nb">ceil</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+
+<span class="c">% make an array that is sufficienly large (actually too big)</span>
+<span class="n">offsets</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">side</span>^<span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+
+<span class="c">% keep track of where we store indices in offsets:</span>
+<span class="c">% for every location within the sphere (in the code below),</span>
+<span class="c">% add one to row_pos and then store the locations</span>
+<span class="n">row_pos</span><span class="p">=</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c">% the grid positions (relative to the origin) to consider</span>
+<span class="n">single_dimension_candidates</span><span class="p">=</span><span class="nb">floor</span><span class="p">(</span><span class="o">-</span><span class="n">radius</span><span class="p">):</span><span class="nb">ceil</span><span class="p">(</span><span class="n">radius</span><span class="p">);</span>
+
+<span class="c">% consider the candidates in all three spatial dimensions using</span>
+<span class="c">% nested for loops and an if statement</span>
+<span class="c">%%%% &gt;&gt;&gt; YOUR CODE HERE &lt;&lt;&lt; %%%%</span>
+
+<span class="c">% cut off empty values at the end</span>
+<span class="n">offsets</span><span class="p">=</span><span class="n">offsets</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">row_pos</span><span class="p">,:);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="run_nifti_basics_skl.html" title="run nifti basics skl"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="run_permutation_test_skl.html" title="run permutation test skl"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

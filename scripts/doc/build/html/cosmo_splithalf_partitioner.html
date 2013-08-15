@@ -1,0 +1,167 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cosmo splithalf partitioner &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
+    <link rel="next" title="cosmo anova feature selector" href="cosmo_anova_feature_selector.html" />
+    <link rel="prev" title="cosmo dataset slice sa" href="cosmo_dataset_slice_sa.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cosmo_anova_feature_selector.html" title="cosmo anova feature selector"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cosmo_dataset_slice_sa.html"
+                        title="previous chapter">cosmo dataset slice sa</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cosmo_anova_feature_selector.html"
+                        title="next chapter">cosmo anova feature selector</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cosmo_splithalf_partitioner.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cosmo-splithalf-partitioner">
+<h1>cosmo splithalf partitioner<a class="headerlink" href="#cosmo-splithalf-partitioner" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>partitions <span class="p">=</span><span class="w"> </span><span class="nf">cosmo_splithalf_partitioner</span><span class="p">(</span>chunks<span class="p">)</span><span class="w"></span>
+<span class="c">% generates an n-fold partition scheme</span>
+<span class="c">%</span>
+<span class="c">% partitions=cosmo_splithalf_partitioner(chunks)</span>
+<span class="c">%</span>
+<span class="c">% Input</span>
+<span class="c">%  - chunks          Px1 chunk indices for P samples. It can also be a</span>
+<span class="c">%                    dataset with field .sa.chunks</span>
+<span class="c">%</span>
+<span class="c">% Output:</span>
+<span class="c">%  - partitions      A struct with fields .train_indices and .test_indices.</span>
+<span class="c">%                    Each of these is an 1x2 cell for 2 partitions, where</span>
+<span class="c">%                    .train_indices{k} and .test_indices{k} contain the</span>
+<span class="c">%                    sample indices for the odd and even chunks</span>
+<span class="c">%</span>
+<span class="c">% Example:</span>
+<span class="c">% p=cosmo_nfold_partitioner([1 1 2 2 3 3 3])</span>
+<span class="c">% &gt; p = train_indices: {[5x1 double]  [2x1 double]}</span>
+<span class="c">% &gt;     test_indices: {[2x1 double]  [5x1 double]}</span>
+<span class="c">% p.train_indices{1}&#39;</span>
+<span class="c">% &gt;     [1 2 5 6 7]</span>
+<span class="c">% p.test_indices{1}&#39;</span>
+<span class="c">% &gt;     [3 4]</span>
+<span class="c">%</span>
+<span class="c">% NNO Aug 2013</span>
+
+<span class="k">if</span> <span class="n">isstruct</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">isfield</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span><span class="s">&#39;sa&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isfield</span><span class="p">(</span><span class="n">chunks</span><span class="p">.</span><span class="n">sa</span><span class="p">,</span><span class="s">&#39;chunks&#39;</span><span class="p">)</span>
+        <span class="n">chunks</span><span class="p">=</span><span class="n">chunks</span><span class="p">.</span><span class="n">sa</span><span class="p">.</span><span class="n">chunks</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal input&#39;</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">unq</span><span class="p">=</span><span class="n">unique</span><span class="p">(</span><span class="n">chunks</span><span class="p">);</span>
+<span class="n">nchunks</span><span class="p">=</span><span class="mi">2</span><span class="p">;</span>
+
+<span class="c">% allocate space for output</span>
+<span class="n">train_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
+<span class="n">test_indices</span><span class="p">=</span><span class="n">cell</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nchunks</span><span class="p">);</span>
+
+<span class="c">% Make partitions using even and odd chunks</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">nchunks</span>
+    <span class="n">test_msk</span><span class="p">=</span><span class="nb">mod</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">train_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="o">~</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
+    <span class="n">test_indices</span><span class="p">{</span><span class="n">k</span><span class="p">}=</span><span class="nb">find</span><span class="p">(</span><span class="n">test_msk</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span>
+<span class="k">end</span>
+
+<span class="n">partitions</span><span class="p">.</span><span class="n">train_indices</span><span class="p">=</span><span class="n">train_indices</span><span class="p">;</span>
+<span class="n">partitions</span><span class="p">.</span><span class="n">test_indices</span><span class="p">=</span><span class="n">test_indices</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cosmo_anova_feature_selector.html" title="cosmo anova feature selector"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

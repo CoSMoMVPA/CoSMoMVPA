@@ -45,7 +45,11 @@ cosmo nfold partitioner skl
     train_indices=cell(1,nchunks);
     test_indices=cell(1,nchunks);
     
+<<<<<<< HEAD
     % [your code here]
+=======
+    %%%% >>> YOUR CODE HERE <<< %%%%
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;

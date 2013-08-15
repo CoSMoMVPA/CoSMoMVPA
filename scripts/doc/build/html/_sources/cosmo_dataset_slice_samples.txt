@@ -11,8 +11,15 @@ cosmo dataset slice samples
     % but contains just the rows indictated in sample_indices, and the 
     % corresponding values in sample attributes.
     
+<<<<<<< HEAD
     dataset.samples=dataset.samples(samples_to_select,:);
     
+=======
+    nsamples_orig=size(dataset.samples,1);
+    dataset.samples=dataset.samples(samples_to_select,:);
+    
+    
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     fns=fieldnames(dataset.sa);
     n=numel(fns);
     for k=1:n
@@ -21,6 +28,14 @@ cosmo dataset slice samples
         if iscell(v)
             w={v{samples_to_select}};
         else
+<<<<<<< HEAD
+=======
+            if numel(v)==nsamples_orig
+                v=v(:); % ensure column vector
+            elseif size(v,1)~=nsamples_orig
+                error('illegal size for %s - expect Nx%d', fn, nsamples_orig);
+            end
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
             dataset.sa.(fn)=v(samples_to_select,:);
         end
     end

@@ -11,7 +11,11 @@
  * Copyright 2011, The Dojo Foundation
  * Released under the MIT, BSD, and GPL Licenses.
  *
+<<<<<<< HEAD
  * Date: Thu Nov 15 18:28:24 BRST 2012
+=======
+ * Date: Thu Aug  1 23:20:30 BRT 2013
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
  */
 (function( window, undefined ) {
 

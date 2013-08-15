@@ -12,6 +12,7 @@ run dataset basics skl
     data_path=cosmo_get_data_path('s01');
     
     % Load dataset (and supply a mask file for 'vt')
+<<<<<<< HEAD
     % [your code here]
     
     % Set the targets and the chunks
@@ -25,3 +26,30 @@ run dataset basics skl
     % <<
     >>>>>>> 868ef13bd03f668a468b65de5258afe8d4bddfc9:scripts/src/run_dataset_basics.m
     
+=======
+    %%%% >>> YOUR CODE HERE <<< %%%%
+    
+    % Set the targets and the chunks
+    %%%% >>> YOUR CODE HERE <<< %%%%
+    
+    % Add labels as sample attributes
+    %%%% >>> YOUR CODE HERE <<< %%%%
+    
+    %% Overview of the dataset
+    ds
+    
+    %% Overview of sample attributes
+    ds.sa
+    
+    % print targets and chunks
+    [ds.sa.targets ds.sa.chunks]
+    
+    % print labels
+    ds.sa.labels
+    
+    %% Overview of feature attributes
+    ds.fa
+    
+    % print a few voxel indices
+    ds.fa.voxel_indices(:,1:10)
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26

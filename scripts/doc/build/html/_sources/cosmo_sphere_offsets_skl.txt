@@ -48,7 +48,11 @@ cosmo sphere offsets skl
     
     % consider the candidates in all three spatial dimensions using
     % nested for loops and an if statement
+<<<<<<< HEAD
     % [your code here]
+=======
+    %%%% >>> YOUR CODE HERE <<< %%%%
+>>>>>>> c4b519d40110aed8222949935d9bb74bb8c5de26
     
     % cut off empty values at the end
     offsets=offsets(1:row_pos,:);
