@@ -21,6 +21,8 @@ Contents:
     matlab_hdr_toc
     matlab_skl_toc
 
+    matlab_pb_toc
+
 
 Indices and tables
 ==================
@@ -29,3 +31,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. _matlab_pb_toc: publish/index.html
