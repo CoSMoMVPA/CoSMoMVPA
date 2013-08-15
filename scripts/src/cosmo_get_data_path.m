@@ -9,30 +9,30 @@ function data_path=cosmo_get_data_path(subject_id)
 %
 % Returns
 %  data_path      path where data is stored
-if isunix()
-    [p, n]=unix('uname -n'); % get the hostname
-    n=strtrim(n);
-    if p~=0
-        error('Could not find hostname');
+
+% change the following depending on where your data resides
+data_path='../../data';
+
+if ismac()
+    % specific code for NNO
+    [p,q]=unix('uname -n');
+    if p==0 && ~isempty(findstr(q,'nicks-MacBook-Pro.local'))
+        data_path='/Users/nick/git/cosmo_repo2/data/';
     end
-    switch n
-        case 'nicks-MacBook-Pro.local'
-            data_path='/Users/nick/organized/_datasets/cosmo/data/small';
-        
-        % add more cases here for other machines
-        
-        
-        otherwise
-            error('do not know %s', n);
-    end
-    
-    % optionally add an else statement for windows machines
 end
 
+
 if nargin>=1
-    data_path=fullfile(data_path, subject_id, 'stats', '');
+    if isnumeric(subject_id)
+        subject_id=sprintf('s%02d', subject_id);
+    end
+    data_path=fullfile(data_path, subject_id);
 end
 
 if ~exist(data_path,'file')
     error('%s does not exist. Did you adjust %s?', data_path, mfilename());
+end
+
+if ~isempty(data_path)
+    data_path=[data_path '/'];
 end

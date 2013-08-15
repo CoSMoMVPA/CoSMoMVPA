@@ -13,7 +13,7 @@ with the early visual mask (*ev_mask.nii.gz*) and then with the ventral temporal
 
 Hint: run_load_datasets_skl_
 
-Solution: run_load_datasets_
+Solution: run_load_datasets_ / run_load_datasets_pb_
 
 Setting sample attributes: targets and chunks
 +++++++++++++++++++++++++++++++++++++++++++++
@@ -33,7 +33,7 @@ dataset.sa.chunks.
 
 Hint: run_setting_sample_attr_skl_
 
-Solution: run_setting_sample_attr_
+Solution: run_setting_sample_attr_ / run_setting_sample_attr_pb_
 
 Slice by samples
 ++++++++++++++++
@@ -76,16 +76,19 @@ nifti as a file and use some other software like AFNI, or FSL's viewer.
 
 Hint: run_operations_on_datasets_skl_
 
-Solution: run_operations_on_datasets_
+Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 
 .. _run_operations_on_datasets_skl: run_operations_on_datasets_skl.html
 .. _run_operations_on_datasets: run_operations_on_datasets.html
+.. _run_operations_on_datasets_pb: publish/run_operations_on_datasets.html
 .. _cosmo_map2nifti: cosmo_map2nifti_hdr.html
 .. _cosmo_fmri_dataset: cosmo_fmri_dataset.html
 .. _run_load_datasets_skl: run_load_datasets_skl.html
 .. _run_load_datasets: run_load_datasets.html
+.. _run_load_datasets_pb: publish/run_load_datasets.html
 .. _run_setting_sample_attr_skl: run_setting_sample_attr_skl.html
 .. _run_setting_sample_attr: run_setting_sample_attr.html
+.. _run_setting_sample_attr_pb: publish/run_setting_sample_attr.html
 .. _cosmo_dataset_slice_sa: cosmo_dataset_slice_sa.html
 .. _cosmo_dataset_slice_fa: cosmo_dataset_slice_fa.html
 .. _cosmo_dataset_slice_sa_skl: cosmo_dataset_slice_sa_skl.html

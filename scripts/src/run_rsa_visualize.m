@@ -1,13 +1,17 @@
 %% RSA Visualize
 %
 
+%% Load data in EV and VT mask
 % load datasets cosmo_fmri_dataset
-% >>
-ev_ds = cosmo_fmri_dataset([data_path 'glm_T_stats_allruns.nii.gz'], ...
-                            'mask',[data_path 'MO_top_300.nii.gz']);
 
-vt_ds = cosmo_fmri_dataset([data_path 'glm_T_stats_allruns.nii.gz'], ...
-                            'mask',[data_path 'VT_top_400.nii.gz']);
+data_path=cosmo_get_data_path('s01');
+
+% >>
+ev_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
+                            'mask',[data_path 'MO_top_300.nii']);
+
+vt_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
+                            'mask',[data_path 'VT_top_400.nii']);
 % <<
 
 % Use pdist with correlation distance to get DSMs

@@ -3,7 +3,7 @@
 
 
 subjects = {'s01','s02','s03','s04','s05','s06','s07','s08'};
-masks = {'ev_mask.nii.gz','vt_mask.nii.gz'};
+masks = {'ev_mask.nii','vt_mask.nii'};
 
 
 dsms = [];
@@ -19,8 +19,8 @@ for m = 1:length(masks)
     for s = 1:length(subjects)
         sub = subjects{s};
         % load dataset
-        data_dir=cosmo_get_data_path(subjects{s});
-        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
+        data_path=cosmo_get_data_path(subjects{s});
+        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
                                 'mask',[data_path '/' msk]);
         % demean
         % Comment this out to see the effects of demeaning vs. not
@@ -34,9 +34,9 @@ end
 
 %%
 % Then add the v1 model and behavioral DSMs
-
+load('target_sims.mat')
 % >>
-dsms = [dsms; squareform(v1_model); squareform(behav)];
+dsms = [dsms; v1_model'; behav'];
 % <<
 
 %%

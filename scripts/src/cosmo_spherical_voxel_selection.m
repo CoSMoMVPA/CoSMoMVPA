@@ -41,10 +41,10 @@ center2neighbors=cell(ncenters,1);
 % go over all features
 for k=1:ncenters
     center_id=center_ids(k);
-    center_ijk=dataset.fa.voxel_indices(center_id,:);
+    center_ijk=dataset.fa.voxel_indices(:,center_id);
     
     % add offsets to center
-    around_ijk=bsxfun(@plus, center_ijk, sphere_offsets);
+    around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
     
     % see which ones are outside the volume
     outside_msk=around_ijk<=0 | bsxfun(@minus,orig_dim,around_ijk)<0;
