@@ -8,7 +8,7 @@
 % NNO Aug 2013
 
 %% Define input files and searchlight radius
-datadir='../data/small/s01/stats/';
+datadir=cosmo_get_data_path('s01');
 fn1=[datadir 'glm_T_stats_evens.nii.gz'];
 fn2=[datadir 'glm_T_stats_odds.nii.gz'];
 maskfn=[datadir 'brain_mask.nii.gz'];

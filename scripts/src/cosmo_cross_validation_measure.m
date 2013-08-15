@@ -20,5 +20,5 @@ if ~isfield(args,'classifier') error('Missing input args.classifier'); end
 if ~isfield(args,'partitions') error('Missing input args.partitions'); end
 
 % >>
-accuracy=cosmo_cross_validate(dataset, args.classifier, args.partitons, args.opt);
+accuracy=cosmo_cross_validate(dataset, args.classifier, args.partitions, args.opt);
 % <<

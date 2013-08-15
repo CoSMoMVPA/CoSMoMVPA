@@ -15,11 +15,19 @@ dime=ni.hdr.dime.dim;
 dime3=dime(2:4);
 dime4=dime(2:5);
 
+if ~isfield(dataset.fa,'voxel_indices')
+    error('missing voxel indices');
+end
+
+% convert voxel indices to linear indices
+ijk=dataset.fa.voxel_indices;
+lin=sub2ind(dime3, ijk(1,:), ijk(2,:), ijk(3,:));
+
 vol=zeros(dime3);
 vols=zeros(dime4);
 for k=1:nsamples
     vol(:)=0;
-    vol(dataset.a.mapper)=samples(k,:);
+    vol(lin)=samples(k,:);
     vols(:,:,:,k)=vol;
 end
 

@@ -68,9 +68,11 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     x = dims(1); y = dims(2); z = dims(3); t = dims(4);
     
     % if a mask was supplied, load it
-    if length(p.mask) > 0
-        m = load_nii(p.mask);
-        m = m.img;
+    if ~isempty(p.mask)
+        if ischar(p.mask)
+            m = load_nii(p.mask);
+            m = m.img;
+        end
         mdim = size(m);
 
         switch length(mdim)
@@ -79,7 +81,12 @@ function ds = cosmo_fmri_dataset(filename, varargin)
                 m=m(:,:,:,1);
             otherwise
                 error('illegal mask');
-        end    
+        end
+        
+        if ~isequal(dims(1:3), mdim(1:3))
+            error('mask size is different from data size');
+        end
+        
         ds.a.mapper = find(m);
     else
         ds.a.mapper = [1:(x*y*z)]; 

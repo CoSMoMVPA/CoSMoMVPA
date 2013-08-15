@@ -24,3 +24,7 @@ end
 if ~exist(data_path,'file')
     error('%s does not exist. Did you adjust %s?', data_path, mfilename());
 end
+
+if ~isempty(data_path)
+    data_path=[data_path '/'];
+end

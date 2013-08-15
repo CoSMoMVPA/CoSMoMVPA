@@ -18,14 +18,15 @@ center_ids=1:nfeatures; % for now, consider all voxels
 
 % use voxel selection function
 center2neighbors=cosmo_spherical_voxel_selection(ds, radius, center_ids);
-%%
-% for cross validation
+%% set up cross validation
+% 
 partitions=cosmo_nfold_partition(ds.sa.chunks);
 
-% space for output
+%% Allocate space for output
 ncenters=numel(center_ids);
 accs=zeros(1,ncenters);
 
+%% Run the searchlight
 % go over all features, run cross-validation and store the classiifcation
 % accuracies.
 % >>
@@ -48,7 +49,7 @@ for k=1:ncenters
 end
 % <<
 
-% store the output
+%% store the output
 res_map=ds;
 res_map.samples=accs;
 
