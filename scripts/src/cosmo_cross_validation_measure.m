@@ -19,6 +19,8 @@ if ~isfield(args,'opt') args.opt = struct(); end
 if ~isfield(args,'classifier') error('Missing input args.classifier'); end
 if ~isfield(args,'partitions') error('Missing input args.partitions'); end
 
+% Run cross validation to get the accuracy (see the help of
+% cosmo_cross_validate)
 % >>
-accuracy=cosmo_cross_validate(dataset, args.classifier, args.partitions, args.opt);
+[pred, accuracy]=cosmo_cross_validate(dataset, args.classifier, args.partitions, args.opt);
 % <<

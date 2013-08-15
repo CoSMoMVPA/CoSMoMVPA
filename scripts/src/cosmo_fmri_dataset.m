@@ -51,15 +51,9 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     % End input parsing stuff
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %NNO modifications
-    % - switch statement
-    % - preallocation of memory for samples
-    % - remove img data from hdr
-    % - check for size of targets and chunks
-    % - keep voxels in mask with negative values
-    % - use load_nii (not load_nifti)
-
-    ni = load_nii(p.filename);
+    extensions={'.nii','.nii.gz'};
+    fn=find_file(p.filename, extensions); 
+    ni = load_nii(fn);
 
     dims = size(ni.img);
     if numel(dims)>4, 
@@ -72,6 +66,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         if ischar(p.mask)
             m = load_nii(p.mask);
             m = m.img;
+        else
+            m = p.mask;
         end
         mdim = size(m);
 
@@ -108,11 +104,11 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     ni=rmfield(ni,'img'); % remove data from header
     ds.a.imghdr = ni; % store header
     
-    ds=set_sa(ds,p,'targets');
-    ds=set_sa(ds,p,'chunks');
+    ds=set_sa_vec(ds,p,'targets');
+    ds=set_sa_vec(ds,p,'chunks');
 end
 
-function ds=set_sa(ds,p,fieldname)
+function ds=set_sa_vec(ds,p,fieldname)
 
     nsamples=size(ds.samples,1);
     v=p.(fieldname);
@@ -121,6 +117,32 @@ function ds=set_sa(ds,p,fieldname)
         error('size mismatch for %s: expected %d values, found %d', fieldname, nsamples, n);
     end
     ds.sa.(fieldname)=v(:);
+end
+    
+
+function fn=find_file(fn, exts)
+
+if exist(fn,'file')
+    return;
+end
+nf=numel(fn);
+n=numel(exts);
+for k=1:n
+    ext=exts{k};
+    ne=numel(ext);
+    d=nf-ne+1;
+    if isempty(findstr(fn,ext)) || ~strcmp(fn(d:end), ext)
+        continue
+    end
+    for j=1:n
+        fne=[fn(1:(d-1)) exts{j}];
+        if exist(fne,'file')
+            fn=fne;
+            disp('found')
+            return
+        end
+    end
+end
 end
     
 

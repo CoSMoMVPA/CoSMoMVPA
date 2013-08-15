@@ -26,10 +26,14 @@ Contents:
     cosmo_searchlight_hdr
     cosmo_sphere_offsets_hdr
     cosmo_spherical_voxel_selection_hdr
+    make_hdr
     run_classify_naive_bayes_hdr
     run_compare_dsm_hdr
+    run_dataset_basics_hdr
     run_demean_hdr
     run_load_datasets_hdr
+    run_measure_searchlight_hdr
+    run_nifti_basics_hdr
     run_operations_on_datasets_hdr
     run_permutation_test_hdr
     run_rsa_visualize_hdr

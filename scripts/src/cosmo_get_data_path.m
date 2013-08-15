@@ -13,6 +13,14 @@ function data_path=cosmo_get_data_path(subject_id)
 % change the following depending on where your data resides
 data_path='../../data';
 
+if ismac()
+    % specific code for NNO
+    [p,q]=unix('uname -n');
+    if p==0 && ~isempty(findstr(q,'nicks-MacBook-Pro.local'))
+        data_path='/Users/nick/git/cosmo_repo2/data/';
+    end
+end
+
 
 if nargin>=1
     if isnumeric(subject_id)

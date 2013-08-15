@@ -7,11 +7,11 @@
 data_path=cosmo_get_data_path('s01');
 
 % >>
-ev_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii.gz'], ...
-                            'mask',[data_path 'MO_top_300.nii.gz']);
+ev_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
+                            'mask',[data_path 'MO_top_300.nii']);
 
-vt_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii.gz'], ...
-                            'mask',[data_path 'VT_top_400.nii.gz']);
+vt_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
+                            'mask',[data_path 'VT_top_400.nii']);
 % <<
 
 % Use pdist with correlation distance to get DSMs

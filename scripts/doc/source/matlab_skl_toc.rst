@@ -26,10 +26,14 @@ Contents:
     cosmo_searchlight_skl
     cosmo_sphere_offsets_skl
     cosmo_spherical_voxel_selection_skl
+    make_skl
     run_classify_naive_bayes_skl
     run_compare_dsm_skl
+    run_dataset_basics_skl
     run_demean_skl
     run_load_datasets_skl
+    run_measure_searchlight_skl
+    run_nifti_basics_skl
     run_operations_on_datasets_skl
     run_permutation_test_skl
     run_rsa_visualize_skl

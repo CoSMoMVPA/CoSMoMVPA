@@ -7,8 +7,8 @@
 
 data_path=cosmo_get_data_path('s01');
 % >>
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii.gz'], ...
-                        'mask', [data_path '/vt_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
+                        'mask', [data_path '/vt_mask.nii']);
 
 % set targets
 ds.sa.targets = repmat([1:6]',10,1);
@@ -50,7 +50,7 @@ primates_minus_bugs = primates_mean - bugs_mean;
 
 % >>
 ds.samples = primates_minus_bugs;
-ni = cosmo_map2nifti(ds, [data_path '/primates_minus_bugs.nii.gz'])
+ni = cosmo_map2nifti(ds, [data_path '/primates_minus_bugs.nii']);
 
 % View the result using AFNI, FSL, or Matlab's imagesc
 

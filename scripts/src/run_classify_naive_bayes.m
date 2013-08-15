@@ -4,8 +4,8 @@
 data_dir=cosmo_get_data_path('s01');
 
 % Load the dataset with VT mask
-ds = cosmo_fmri_dataset([data_dir '/glm_T_stats_perrun.nii.gz'], ...
-                     'mask', [data_dir '/vt_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_dir '/glm_T_stats_perrun.nii'], ...
+                     'mask', [data_dir '/vt_mask.nii']);
 
 
 %% set the targets and chunks

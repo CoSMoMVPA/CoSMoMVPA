@@ -18,9 +18,9 @@ for j=1:nsubjects
     subject_id=subject_ids{j};
 
     datadir=cosmo_get_data_path(subject_id);
-    fn1=sprintf('%s/glm_%s_evens.nii.gz', datadir, data_type);
-    fn2=sprintf('%s/glm_%s_odds.nii.gz', datadir, data_type);
-    fn_mask=sprintf('%s/%s_mask.nii.gz', datadir, roi);
+    fn1=sprintf('%s/glm_%s_evens.nii', datadir, data_type);
+    fn2=sprintf('%s/glm_%s_odds.nii', datadir, data_type);
+    fn_mask=sprintf('%s/%s_mask.nii', datadir, roi);
 
     ni_mask=load_nii(fn_mask);
     ni_samples1=load_nii(fn1);
@@ -51,7 +51,6 @@ for j=1:nsubjects
         
         half2_sample_3D=half2_samples_4D(:,:,:,k);
         half2_samples_masked(k,:)=half2_sample_3D(feature_mask);
-        
     end
     % <<
     

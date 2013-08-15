@@ -26,10 +26,14 @@ Contents:
     cosmo_searchlight
     cosmo_sphere_offsets
     cosmo_spherical_voxel_selection
+    make
     run_classify_naive_bayes
     run_compare_dsm
+    run_dataset_basics
     run_demean
     run_load_datasets
+    run_measure_searchlight
+    run_nifti_basics
     run_operations_on_datasets
     run_permutation_test
     run_rsa_visualize

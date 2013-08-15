@@ -3,7 +3,7 @@
 
 
 subjects = {'s01','s02','s03','s04','s05','s06','s07','s08'};
-masks = {'ev_mask.nii.gz','vt_mask.nii.gz'};
+masks = {'ev_mask.nii','vt_mask.nii'};
 
 
 dsms = [];
@@ -20,7 +20,7 @@ for m = 1:length(masks)
         sub = subjects{s};
         % load dataset
         data_path=cosmo_get_data_path(subjects{s});
-        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
+        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
                                 'mask',[data_path '/' msk]);
         % demean
         % Comment this out to see the effects of demeaning vs. not

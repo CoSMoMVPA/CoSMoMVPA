@@ -9,17 +9,17 @@ niter=1000;
 %% Define dataset, classifier, partitioner
 data_path=cosmo_get_data_path('s01');
 
-data_fn=fullfile(data_path,'glm_betas_perrun.nii.gz');
-mask_fn=fullfile(data_path,'vt_mask.nii.gz');
+data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+mask_fn=fullfile(data_path,'vt_mask.nii');
 ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
 % select only a few samples - otherwise we have too much power (!)
-ds=cosmo_dataset_select_samples(ds,ds.sa.chunks<=4);
+ds=cosmo_dataset_slice_samples(ds,ds.sa.chunks<=4);
                     
 classifier=@cosmo_classify_nn;
-partitions=cosmo_nfold_partition(ds);
+partitions=cosmo_nfold_partitioner(ds);
 
 %% compute classification accuracy of the original data
 [pred, acc]=cosmo_cross_validate(ds, classifier, partitions);

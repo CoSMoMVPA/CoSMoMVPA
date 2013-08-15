@@ -8,18 +8,34 @@
 % 2 corresponds to 'lemur', etc. Then add numeric chunks (another samples
 % attribute) so that 1 corresponds to run1, 2 corresponds to run2, etc.
 
+%% Load the dataset
 % >>
 
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii.gz'], ...
-                        'mask', [data_path '/brain_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
+                        'mask', [data_path '/brain_mask.nii']);
 
-% set targets
+%% set targets
 ds.sa.targets = repmat([1:6]',10,1); 
 
-% set chunks
+%% set chunks
 chunks = []; 
 for i=1:10 chunks = [chunks; repmat(i,6,1)]; end 
 ds.sa.chunks = chunks;
 % <<
+
+%% Show the results
+
+% print the dataset
+ds
+
+% print the sample attributes
+ds.sa
+
+% print the chunks
+ds.sa.chunks
+
+% print the targets
+ds.sa.targets
+
 
 

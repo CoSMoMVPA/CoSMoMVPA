@@ -9,9 +9,9 @@
 
 %% Define input files and searchlight radius
 datadir=cosmo_get_data_path('s01');
-fn1=[datadir 'glm_T_stats_evens.nii.gz'];
-fn2=[datadir 'glm_T_stats_odds.nii.gz'];
-maskfn=[datadir 'brain_mask.nii.gz'];
+fn1=[datadir 'glm_T_stats_evens.nii'];
+fn2=[datadir 'glm_T_stats_odds.nii'];
+maskfn=[datadir 'brain_mask.nii'];
 radius=3;
 
 %% Load the data and extract the data in the mask

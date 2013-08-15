@@ -19,8 +19,8 @@ data_path=cosmo_get_data_path('s01');
 % First load data with full brain mask
 
 % >>
-ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
-                        'mask', [data_path '/brain_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
+                        'mask', [data_path '/brain_mask.nii']);
 [nsamples, nfeatures] = size(ds.samples);
 % <<
 
@@ -29,14 +29,14 @@ fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
 % Now do the same with the EV and VT masks.
 
 % >>
-ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
-                        'mask', [data_path '/ev_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
+                        'mask', [data_path '/ev_mask.nii']);
 [nsamples, nfeatures] = size(ds.samples);
 
 fprintf('There are %d voxels in the EV mask\n', nfeatures);
 
-ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii.gz'], ...
-                        'mask', [data_path '/vt_mask.nii.gz']);
+ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
+                        'mask', [data_path '/vt_mask.nii']);
 [nsamples, nfeatures] = size(ds.samples);
 
 fprintf('There are %d voxels in the VT mask\n', nfeatures);
