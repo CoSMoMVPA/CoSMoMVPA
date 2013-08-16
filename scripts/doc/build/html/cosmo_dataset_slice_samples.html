@@ -1,0 +1,144 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cosmo dataset slice samples &mdash; Cosmo 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
+    <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
+    <link rel="next" title="cosmo dissimilarity matrix measure" href="cosmo_dissimilarity_matrix_measure.html" />
+    <link rel="prev" title="run splithalf correlations" href="run_splithalf_correlations.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="cosmo_dissimilarity_matrix_measure.html" title="cosmo dissimilarity matrix measure"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="run_splithalf_correlations.html"
+                        title="previous chapter">run splithalf correlations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cosmo_dissimilarity_matrix_measure.html"
+                        title="next chapter">cosmo dissimilarity matrix measure</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cosmo_dataset_slice_samples.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cosmo-dataset-slice-samples">
+<h1>cosmo dataset slice samples<a class="headerlink" href="#cosmo-dataset-slice-samples" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>dataset<span class="p">=</span><span class="nf">cosmo_dataset_slice_samples</span><span class="p">(</span>dataset, samples_to_select<span class="p">)</span><span class="w"></span>
+<span class="c">% Slice a dataset by samples</span>
+<span class="c">%</span>
+<span class="c">% This function returns a dataset that is a copy of the original dataset</span>
+<span class="c">% but contains just the rows indictated in sample_indices, and the</span>
+<span class="c">% corresponding values in sample attributes.</span>
+
+<span class="n">nsamples_orig</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span>1<span class="p">);</span>
+<span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">(</span><span class="n">samples_to_select</span><span class="p">,:);</span>
+
+
+<span class="n">fns</span><span class="p">=</span><span class="n">fieldnames</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">);</span>
+<span class="n">n</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">fns</span><span class="p">);</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">n</span>
+    <span class="n">fn</span><span class="p">=</span><span class="n">fns</span><span class="p">{</span><span class="n">k</span><span class="p">};</span>
+    <span class="n">v</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">.(</span><span class="n">fn</span><span class="p">);</span>
+    <span class="k">if</span> <span class="n">iscell</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">w</span><span class="p">={</span><span class="n">v</span><span class="p">{</span><span class="n">samples_to_select</span><span class="p">}};</span>
+    <span class="k">else</span>
+        <span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="n">nsamples_orig</span>
+            <span class="n">v</span><span class="p">=</span><span class="n">v</span><span class="p">(:);</span> <span class="c">% ensure column vector</span>
+        <span class="k">elseif</span> <span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>1<span class="p">)</span><span class="o">~=</span><span class="n">nsamples_orig</span>
+            <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal size for %s - expect Nx%d&#39;</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">nsamples_orig</span><span class="p">);</span>
+        <span class="k">end</span>
+        <span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">.(</span><span class="n">fn</span><span class="p">)=</span><span class="n">v</span><span class="p">(</span><span class="n">samples_to_select</span><span class="p">,:);</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="cosmo_dissimilarity_matrix_measure.html" title="cosmo dissimilarity matrix measure"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="run_splithalf_correlations.html" title="run splithalf correlations"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
+          <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Andy Connolly, Nick Oosterhof.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

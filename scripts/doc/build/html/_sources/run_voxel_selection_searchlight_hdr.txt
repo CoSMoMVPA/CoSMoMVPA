@@ -1,0 +1,10 @@
+.. run_voxel_selection_searchlight_hdr
+
+run voxel selection searchlight hdr
+===================================
+.. code-block:: matlab
+
+    %% Spherical searchlight
+    % this example implements a spherical searchlight using
+    % cosmo_spherical_voxel_selection and performs crossvalidation
+    % with a nearest neighbor classifier
