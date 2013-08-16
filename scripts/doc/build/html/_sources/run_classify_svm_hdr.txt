@@ -1,0 +1,8 @@
+.. run_classify_svm_hdr
+
+run classify svm hdr
+--------------------
+.. code-block:: matlab
+
+    %% Classification using svm
+    %
