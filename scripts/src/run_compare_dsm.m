@@ -34,9 +34,12 @@ end
 
 %%
 % Then add the v1 model and behavioral DSMs
-load('target_sims.mat')
+models_path=cosmo_get_data_path('models');
+load([models_path 'v1_model.mat']);
+load([models_path 'behav_sim.mat']);
+% add to dsms (hint: use squareform)
 % >>
-dsms = [dsms; v1_model'; behav'];
+dsms = [dsms; squareform(v1_model); squareform(behav)];
 % <<
 
 %%
