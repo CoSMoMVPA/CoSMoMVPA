@@ -72,7 +72,7 @@ case $targets in
         zip -r ${pf}_scripts.zip $matdir
 
         rm -f ${p}/${matdir}/*.m
-        rm -f ${p}/${matdir}
+        rmdir -f ${p}/${matdir}
 
         mv ${pf}_scripts.zip $outputdir
         ls $outputdir
