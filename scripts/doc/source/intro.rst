@@ -82,3 +82,19 @@ Code for the workshop
 +++++++++++++++++++++
 
 `Get the code for the workshop here. <http://discovery.dartmouth.edu/~aconnoll/cosmo_mvpa/_static/cosmo_mvpa_scripts.zip>`_
+
+Sample Dataset
+++++++++++++++
+
+We have preprocessed data for 8 subjects from Connolly et al., 2012.
+A slow event-related design with six different types of animals. Details published `here <http://www.jneurosci.org/content/32/8/2608>`_.
+
+.. image:: _static/fmri_design.png
+    :width: 400px
+
+The six categories included 2 primates: monkeys and lemurs; 2 birds: mallard ducks and yellow-throated warblers; and 2 bugs: ladybugs and luna moths.
+
+We also have model similarity structures, which you can see here:
+
+.. image:: _static/sim_sl.png
+    :width: 400px
