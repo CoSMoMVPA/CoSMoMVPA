@@ -1,4 +1,5 @@
-function dsm = cosmo_dissimilarity_matrix(dataset, args)
+function dsm = cosmo_dissimilarity_matrix_measure(dataset, args)
+%   dsm = cosmo_dissimilarity_matrix_measure(dataset, args)
 %   A wrapper function for Matlab's pdist function that conform to the
 %   definition of a **dataset measure**
 %
@@ -17,15 +18,13 @@ function dsm = cosmo_dissimilarity_matrix(dataset, args)
 %   NB. pdist defaults to 'euclidean' distance, but correlation distance is
 %       preferable for neural dissimilarity matrices
 %
-%       Also, args.metric is a cell array, because, for some reason matlab
-%       doesn't like struct fields to be strings
-%   
 %   
 % ACC August 2013
 
-    if nargin<2 args.metric={'correlation'}; end
-    if ~isfield(args,'metric') args.metric = {'correlation'}; end
+% >>
+    if nargin<2 args.metric='correlation'; end
+    if ~isfield(args,'metric') args.metric = 'correlation'; end
     dsm = pdist(dataset.samples, args.metric{1})';
-
+% <<
 
 end
