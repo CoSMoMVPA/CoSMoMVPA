@@ -1,7 +1,7 @@
 .. cosmo_dataset_slice_features_hdr
 
 cosmo dataset slice features hdr
-================================
+--------------------------------
 .. code-block:: matlab
 
     function dataset=cosmo_dataset_slice_features(dataset, features_to_select)

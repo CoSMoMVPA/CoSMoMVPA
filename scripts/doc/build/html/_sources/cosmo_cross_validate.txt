@@ -1,7 +1,7 @@
 .. cosmo_cross_validate
 
 cosmo cross validate
-====================
+--------------------
 .. code-block:: matlab
 
     function [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions, opt)

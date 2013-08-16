@@ -1,7 +1,7 @@
 .. cosmo_sphere_offsets
 
 cosmo sphere offsets
-====================
+--------------------
 .. code-block:: matlab
 
     function offsets=cosmo_sphere_offsets(radius)

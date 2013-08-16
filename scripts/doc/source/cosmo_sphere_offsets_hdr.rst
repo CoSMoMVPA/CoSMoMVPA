@@ -1,7 +1,7 @@
 .. cosmo_sphere_offsets_hdr
 
 cosmo sphere offsets hdr
-========================
+------------------------
 .. code-block:: matlab
 
     function offsets=cosmo_sphere_offsets(radius)

@@ -1,7 +1,7 @@
 .. run_permutation_test_skl
 
 run permutation test skl
-========================
+------------------------
 .. code-block:: matlab
 
     %% Permutation test example

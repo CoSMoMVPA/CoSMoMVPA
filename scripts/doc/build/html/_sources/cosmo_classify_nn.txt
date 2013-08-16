@@ -1,7 +1,7 @@
 .. cosmo_classify_nn
 
 cosmo classify nn
-=================
+-----------------
 .. code-block:: matlab
 
     function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test, opt)

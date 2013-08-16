@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>12. Representational similarity analysis &mdash; Cosmo 0.1 documentation</title>
+    <title>11. Representational similarity analysis &mdash; Cosmo 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -28,7 +28,7 @@
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Exercises" href="ex_toc.html" />
     <link rel="next" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="prev" title="11. Write a searchlight function that computes a generic dataset measure" href="ex_searchlight.html" /> 
+    <link rel="prev" title="10. Write a searchlight function that computes a generic dataset measure" href="ex_searchlight.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,7 +41,7 @@
           <a href="matlab_full_toc.html" title="Cosmo matlab files - full solutions files"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ex_searchlight.html" title="11. Write a searchlight function that computes a generic dataset measure"
+          <a href="ex_searchlight.html" title="10. Write a searchlight function that computes a generic dataset measure"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
@@ -51,17 +51,17 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">12. Representational similarity analysis</a><ul>
-<li><a class="reference internal" href="#visualizing-dissimilarity-matrices">12.1. Visualizing dissimilarity matrices</a></li>
-<li><a class="reference internal" href="#centering-the-data">12.2. Centering the data</a></li>
-<li><a class="reference internal" href="#comparing-dissimilarity-matrices">12.3. Comparing dissimilarity matrices</a></li>
+<li><a class="reference internal" href="#">11. Representational similarity analysis</a><ul>
+<li><a class="reference internal" href="#visualizing-dissimilarity-matrices">11.1. Visualizing dissimilarity matrices</a></li>
+<li><a class="reference internal" href="#centering-the-data">11.2. Centering the data</a></li>
+<li><a class="reference internal" href="#comparing-dissimilarity-matrices">11.3. Comparing dissimilarity matrices</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="ex_searchlight.html"
-                        title="previous chapter">11. Write a searchlight function that computes a generic dataset measure</a></p>
+                        title="previous chapter">10. Write a searchlight function that computes a generic dataset measure</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="matlab_full_toc.html"
                         title="next chapter">Cosmo matlab files - full solutions files</a></p>
@@ -92,9 +92,9 @@
           <div class="body">
             
   <div class="section" id="representational-similarity-analysis">
-<h1>12. Representational similarity analysis<a class="headerlink" href="#representational-similarity-analysis" title="Permalink to this headline">¶</a></h1>
+<h1>11. Representational similarity analysis<a class="headerlink" href="#representational-similarity-analysis" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="visualizing-dissimilarity-matrices">
-<h2>12.1. Visualizing dissimilarity matrices<a class="headerlink" href="#visualizing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
+<h2>11.1. Visualizing dissimilarity matrices<a class="headerlink" href="#visualizing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
 <p>Load the saved variables in the files <em>v1_model.mat</em> and <em>behav_sim.mat</em>. These
 should be in your scripts folder. These are dissimilarity matrices (DSMs) for
 our six animals. The v1 model DSM was made by modeling each stimulus image
@@ -106,8 +106,8 @@ animals.</p>
 symmetric about the diagonal. Use matlabs <strong>imagesc</strong> to view each DSM:</p>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="n">load</span> <span class="n">v1_model</span><span class="p">;</span>
 <span class="n">load</span> <span class="n">behav_sim</span><span class="p">;</span>
-<span class="n">subplot</span><span class="p">(</span>1<span class="p">,</span>2<span class="p">,</span>1<span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">v1_model</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;V1 Model DSM&#39;</span><span class="p">);</span>
-<span class="n">subplot</span><span class="p">(</span>1<span class="p">,</span>2<span class="p">,</span>2<span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM&#39;</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">v1_model</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;V1 Model DSM&#39;</span><span class="p">);</span>
+<span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span> <span class="n">imagesc</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span> <span class="n">title</span><span class="p">(</span><span class="s">&#39;Behavioral DSM&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The categorical structure is obvious in the categorical dissimilarity, but not
@@ -131,7 +131,7 @@ dimension and stimulus. To view the first 2 dimensions we can use matlab&#8217;s
 <strong>text</strong> function:</p>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="n">F</span> <span class="p">=</span> <span class="n">cmdscale</span><span class="p">(</span><span class="n">behav</span><span class="p">);</span>
 <span class="n">figure</span><span class="p">();</span>
-<span class="n">text</span><span class="p">(</span><span class="n">F</span><span class="p">(:,</span>1<span class="p">),</span> <span class="n">F</span><span class="p">(:,</span>2<span class="p">),</span> <span class="n">labels</span><span class="p">);</span>
+<span class="n">text</span><span class="p">(</span><span class="n">F</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(:,</span><span class="mi">2</span><span class="p">),</span> <span class="n">labels</span><span class="p">);</span>
 <span class="c">%</span>
 <span class="c">% We will also need to set the axes so we can see all of the points</span>
 <span class="c">% Let&#39;s use the maximum absolute magnitude</span>
@@ -153,7 +153,7 @@ subjects and see how the patterns change for different subjects. What trends do
 you notice?</p>
 </div>
 <div class="section" id="centering-the-data">
-<h2>12.2. Centering the data<a class="headerlink" href="#centering-the-data" title="Permalink to this headline">¶</a></h2>
+<h2>11.2. Centering the data<a class="headerlink" href="#centering-the-data" title="Permalink to this headline">¶</a></h2>
 <p>A dataset can be thought of as a set of points in N-dimensional vector space.
 This is easy to visualize with 2 or three dimensions (voxels), but it is
 difficult to do with several hundred dimensions. Nevertheless, the math stays
@@ -179,7 +179,7 @@ How does this change the results?</p>
 <p>Solution: <a class="reference external" href="run_demean.html">run_demean</a></p>
 </div>
 <div class="section" id="comparing-dissimilarity-matrices">
-<h2>12.3. Comparing dissimilarity matrices<a class="headerlink" href="#comparing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
+<h2>11.3. Comparing dissimilarity matrices<a class="headerlink" href="#comparing-dissimilarity-matrices" title="Permalink to this headline">¶</a></h2>
 <p>It is easy to compare dissimilarity matrices by computing the
 Pearson correlation between two flattened upper triangle DSMs using matlab&#8217;s
 <strong>corrcoef</strong> function. For the next exercise, stack flattened DSMs vertically
@@ -211,7 +211,7 @@ correlations between neural simiilarities and model/behavioral DSMs.</p>
           <a href="matlab_full_toc.html" title="Cosmo matlab files - full solutions files"
              >next</a> |</li>
         <li class="right" >
-          <a href="ex_searchlight.html" title="11. Write a searchlight function that computes a generic dataset measure"
+          <a href="ex_searchlight.html" title="10. Write a searchlight function that computes a generic dataset measure"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" >Exercises</a> &raquo;</li> 

@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo searchlight" href="cosmo_searchlight.html" />
-    <link rel="prev" title="cosmo nfold partitioner" href="cosmo_nfold_partitioner.html" /> 
+    <link rel="next" title="cosmo dataset slice sa" href="cosmo_dataset_slice_sa.html" />
+    <link rel="prev" title="run rsa visualize" href="run_rsa_visualize.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_searchlight.html" title="cosmo searchlight"
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_nfold_partitioner.html" title="cosmo nfold partitioner"
+          <a href="run_rsa_visualize.html" title="run rsa visualize"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_nfold_partitioner.html"
-                        title="previous chapter">cosmo nfold partitioner</a></p>
+  <p class="topless"><a href="run_rsa_visualize.html"
+                        title="previous chapter">run rsa visualize</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_searchlight.html"
-                        title="next chapter">cosmo searchlight</a></p>
+  <p class="topless"><a href="cosmo_dataset_slice_sa.html"
+                        title="next chapter">cosmo dataset slice sa</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_randomize_targets.txt"
@@ -100,7 +100,7 @@
 
 <span class="k">if</span> <span class="n">isstruct</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">isfield</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span><span class="s">&#39;sa&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isfield</span><span class="p">(</span><span class="n">targets</span><span class="p">.</span><span class="n">sa</span><span class="p">,</span><span class="s">&#39;targets&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">isfield</span><span class="p">(</span><span class="n">targets</span><span class="p">.</span><span class="n">sa</span><span class="p">,</span><span class="s">&#39;chunks&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">nargin</span><span class="o">&lt;</span>3
+        <span class="k">if</span> <span class="n">isfield</span><span class="p">(</span><span class="n">targets</span><span class="p">.</span><span class="n">sa</span><span class="p">,</span><span class="s">&#39;chunks&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">nargin</span><span class="o">&lt;</span><span class="mi">3</span>
             <span class="n">chunks</span><span class="p">=</span><span class="n">targets</span><span class="p">.</span><span class="n">sa</span><span class="p">.</span><span class="n">chunks</span><span class="p">;</span>
         <span class="k">end</span>
         <span class="n">targets</span><span class="p">=</span><span class="n">targets</span><span class="p">.</span><span class="n">sa</span><span class="p">.</span><span class="n">targets</span><span class="p">;</span>
@@ -110,13 +110,13 @@
 <span class="k">end</span>
 
 <span class="n">ntargets</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">targets</span><span class="p">);</span>
-<span class="n">randomized_targets</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntargets</span><span class="p">,</span> 1<span class="p">);</span> <span class="c">%space for output</span>
+<span class="n">randomized_targets</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntargets</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c">%space for output</span>
 
 <span class="n">unq</span><span class="p">=</span><span class="n">unique</span><span class="p">(</span><span class="n">chunks</span><span class="p">);</span>
 <span class="n">nchunks</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">unq</span><span class="p">);</span>
 
 <span class="c">% &lt;&lt; permute the target labels randomly, seperately for each chunk</span>
-<span class="k">for</span> <span class="nb">j</span><span class="p">=</span>1<span class="p">:</span><span class="n">nchunks</span>
+<span class="k">for</span> <span class="nb">j</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">nchunks</span>
     <span class="n">msk</span><span class="p">=</span><span class="n">chunks</span><span class="o">==</span><span class="n">unq</span><span class="p">(</span><span class="nb">j</span><span class="p">);</span>
     <span class="n">rp</span><span class="p">=</span><span class="n">randperm</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">msk</span><span class="p">));</span>
     <span class="n">masked_targets</span><span class="p">=</span><span class="n">targets</span><span class="p">(</span><span class="n">msk</span><span class="p">);</span>
@@ -140,10 +140,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_searchlight.html" title="cosmo searchlight"
+          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_nfold_partitioner.html" title="cosmo nfold partitioner"
+          <a href="run_rsa_visualize.html" title="run rsa visualize"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

@@ -1,7 +1,7 @@
 .. make
 
 make
-====
+----
 .. code-block:: matlab
 
     function make(force)

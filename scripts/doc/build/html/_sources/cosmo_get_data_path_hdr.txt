@@ -1,7 +1,7 @@
 .. cosmo_get_data_path_hdr
 
 cosmo get data path hdr
-=======================
+-----------------------
 .. code-block:: matlab
 
     function data_path=cosmo_get_data_path(subject_id)

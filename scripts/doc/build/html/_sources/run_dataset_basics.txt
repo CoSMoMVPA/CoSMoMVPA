@@ -1,7 +1,7 @@
 .. run_dataset_basics
 
 run dataset basics
-==================
+------------------
 .. code-block:: matlab
 
     %% Dataset basics

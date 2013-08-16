@@ -27,8 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
-    <link rel="next" title="cosmo classify svm 2class skl" href="cosmo_classify_svm_2class_skl.html" />
-    <link rel="prev" title="cosmo classify nn skl" href="cosmo_classify_nn_skl.html" /> 
+    <link rel="prev" title="run splithalf correlations skl" href="run_splithalf_correlations_skl.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_classify_svm_2class_skl.html" title="cosmo classify svm 2class skl"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="cosmo_classify_nn_skl.html" title="cosmo classify nn skl"
+          <a href="run_splithalf_correlations_skl.html" title="run splithalf correlations skl"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
@@ -50,11 +46,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_classify_nn_skl.html"
-                        title="previous chapter">cosmo classify nn skl</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_classify_svm_2class_skl.html"
-                        title="next chapter">cosmo classify svm 2class skl</a></p>
+  <p class="topless"><a href="run_splithalf_correlations_skl.html"
+                        title="previous chapter">run splithalf correlations skl</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_classify_svm_skl.txt"
@@ -102,7 +95,7 @@
 <span class="c">%</span>
 <span class="c">% NNO Aug 2013</span>
 
-<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span>4<span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
 
 <span class="p">[</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_train</span><span class="p">);</span>
 <span class="p">[</span><span class="n">ntest</span><span class="p">,</span> <span class="n">nfeatures_</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_test</span><span class="p">);</span>
@@ -114,17 +107,17 @@
 <span class="n">nclasses</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">classes</span><span class="p">);</span>
 
 <span class="c">% number of pair-wise comparisons</span>
-<span class="n">ncombi</span><span class="p">=</span><span class="n">nclasses</span><span class="o">*</span><span class="p">(</span><span class="n">nclasses</span><span class="o">-</span>1<span class="p">)</span><span class="o">/</span>2<span class="p">;</span>
+<span class="n">ncombi</span><span class="p">=</span><span class="n">nclasses</span><span class="o">*</span><span class="p">(</span><span class="n">nclasses</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
 
 <span class="c">% allocate space for all predictions</span>
 <span class="n">all_predicted</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntest</span><span class="p">,</span> <span class="n">ncombi</span><span class="p">);</span>
 
 <span class="c">% Consider all pairwise comparisons (over classes)</span>
 <span class="c">% and store the predictions in all_predicted</span>
-<span class="n">pos</span><span class="p">=</span>0<span class="p">;</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">nclasses</span>
-    <span class="k">for</span> <span class="nb">j</span><span class="p">=(</span><span class="n">k</span><span class="o">+</span>1<span class="p">):</span><span class="n">nclasses</span>
-        <span class="n">pos</span><span class="p">=</span><span class="n">pos</span><span class="o">+</span>1<span class="p">;</span>
+<span class="n">pos</span><span class="p">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">nclasses</span>
+    <span class="k">for</span> <span class="nb">j</span><span class="p">=(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">nclasses</span>
+        <span class="n">pos</span><span class="p">=</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
         <span class="c">% classify between 2 classes only (from classes(k) and classes(j)).</span>
         <span class="c">%%%% &gt;&gt;&gt; YOUR CODE HERE &lt;&lt;&lt; %%%%</span>
         <span class="n">all_predicted</span><span class="p">(:,</span><span class="n">pos</span><span class="p">)=</span><span class="n">pred</span><span class="p">;</span>
@@ -140,15 +133,15 @@
 <span class="c">% do this efficiently using matlab</span>
 <span class="n">counts</span><span class="p">=</span><span class="n">histc</span><span class="p">(</span><span class="n">all_predicted</span><span class="o">&#39;</span><span class="p">,</span><span class="n">classes</span><span class="p">);</span>
 <span class="p">[</span><span class="n">mx</span><span class="p">,</span><span class="nb">i</span><span class="p">]=</span><span class="n">max</span><span class="p">(</span><span class="n">counts</span><span class="p">);</span>
-<span class="n">msk</span><span class="p">=</span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span><span class="n">mx</span><span class="p">,</span><span class="n">counts</span><span class="p">)</span><span class="o">==</span>0<span class="p">;</span>
+<span class="n">msk</span><span class="p">=</span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span><span class="n">mx</span><span class="p">,</span><span class="n">counts</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">;</span>
 
-<span class="n">counts</span><span class="p">(</span><span class="o">~</span><span class="n">msk</span><span class="p">)=</span>0<span class="p">;</span>          <span class="c">% only keep winners</span>
-<span class="n">mxcount</span><span class="p">=</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="o">&gt;</span>0<span class="p">,</span>1<span class="p">);</span> <span class="c">% number of winners</span>
-<span class="n">mxpos</span><span class="p">=</span><span class="nb">floor</span><span class="p">(</span><span class="n">mxcount</span><span class="o">.*</span><span class="nb">rand</span><span class="p">(</span>1<span class="p">,</span><span class="n">ntest</span><span class="p">))</span><span class="o">+</span>1<span class="p">;</span>
+<span class="n">counts</span><span class="p">(</span><span class="o">~</span><span class="n">msk</span><span class="p">)=</span><span class="mi">0</span><span class="p">;</span>          <span class="c">% only keep winners</span>
+<span class="n">mxcount</span><span class="p">=</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="c">% number of winners</span>
+<span class="n">mxpos</span><span class="p">=</span><span class="nb">floor</span><span class="p">(</span><span class="n">mxcount</span><span class="o">.*</span><span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ntest</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
 
-<span class="n">idx</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span>1<span class="p">,</span><span class="n">ntest</span><span class="p">);</span>
+<span class="n">idx</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ntest</span><span class="p">);</span>
 
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">ntest</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">ntest</span>
     <span class="n">mxi</span><span class="p">=</span><span class="nb">find</span><span class="p">(</span><span class="n">counts</span><span class="p">(:,</span><span class="n">k</span><span class="p">));</span>
     <span class="n">idx</span><span class="p">(</span><span class="n">k</span><span class="p">)=</span><span class="n">mxi</span><span class="p">(</span><span class="n">mxpos</span><span class="p">(</span><span class="n">k</span><span class="p">));</span>
 <span class="k">end</span>
@@ -171,10 +164,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_classify_svm_2class_skl.html" title="cosmo classify svm 2class skl"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="cosmo_classify_nn_skl.html" title="cosmo classify nn skl"
+          <a href="run_splithalf_correlations_skl.html" title="run splithalf correlations skl"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 

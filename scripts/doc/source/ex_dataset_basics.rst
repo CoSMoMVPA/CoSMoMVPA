@@ -3,6 +3,28 @@
 Dataset basics
 ==============
 
+.. ex_nifti_basics
+
+Nifti basics
+++++++++++++
+
+Load and view anatomical dataset
+--------------------------------
+Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
+
+Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
+
+Display a saggital, axial and coronal slice.
+
+Hint: run_nifti_basics_skl_
+    
+Solution: run_nifti_basics_ / run_nifti_basics_pb_
+
+.. _run_nifti_basics_skl: run_nifti_basics_skl.html
+.. _run_nifti_basics: run_nifti_basics.html
+.. _run_nifti_basics_pb: publish/run_nifti_basics.html
+
+
 Loading datasets with different masks
 +++++++++++++++++++++++++++++++++++++
 Using the function in cosmo_fmri_dataset_ load the dataset for subject s01
@@ -94,4 +116,25 @@ Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 .. _cosmo_dataset_slice_features: cosmo_dataset_slice_features.html
 .. _cosmo_dataset_slice_samples: cosmo_dataset_slice_samples.html
 
+
+.. ex_nifti_basics
+
+Nifti basics
+============
+
+Load and view anatomical dataset
+++++++++++++++++++++++++++++++++
+Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
+
+Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
+
+Display a saggital, axial and coronal slice.
+
+Hint: run_nifti_basics_skl_
+    
+Solution: run_nifti_basics_ / run_nifti_basics_pb_
+
+.. _run_nifti_basics_skl: run_nifti_basics_skl.html
+.. _run_nifti_basics: run_nifti_basics.html
+.. _run_nifti_basics_pb: publish/run_nifti_basics.html
 

@@ -1,7 +1,7 @@
 .. cosmo_classify_svm_skl
 
 cosmo classify svm skl
-======================
+----------------------
 .. code-block:: matlab
 
     function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)

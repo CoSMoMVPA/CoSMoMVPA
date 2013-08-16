@@ -1,7 +1,7 @@
 .. run_compare_dsm_skl
 
 run compare dsm skl
-===================
+-------------------
 .. code-block:: matlab
 
     % RSA Tutorial

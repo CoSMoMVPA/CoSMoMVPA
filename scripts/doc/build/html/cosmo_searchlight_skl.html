@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - skeletons files" href="matlab_skl_toc.html" />
-    <link rel="next" title="cosmo sphere offsets skl" href="cosmo_sphere_offsets_skl.html" />
-    <link rel="prev" title="cosmo randomize targets skl" href="cosmo_randomize_targets_skl.html" /> 
+    <link rel="next" title="run splithalf correlations skl" href="run_splithalf_correlations_skl.html" />
+    <link rel="prev" title="run sphere offsets searchlight skl" href="run_sphere_offsets_searchlight_skl.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_sphere_offsets_skl.html" title="cosmo sphere offsets skl"
+          <a href="run_splithalf_correlations_skl.html" title="run splithalf correlations skl"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_randomize_targets_skl.html" title="cosmo randomize targets skl"
+          <a href="run_sphere_offsets_searchlight_skl.html" title="run sphere offsets searchlight skl"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" accesskey="U">Cosmo matlab files - skeletons files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_randomize_targets_skl.html"
-                        title="previous chapter">cosmo randomize targets skl</a></p>
+  <p class="topless"><a href="run_sphere_offsets_searchlight_skl.html"
+                        title="previous chapter">run sphere offsets searchlight skl</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_sphere_offsets_skl.html"
-                        title="next chapter">cosmo sphere offsets skl</a></p>
+  <p class="topless"><a href="run_splithalf_correlations_skl.html"
+                        title="next chapter">run splithalf correlations skl</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_searchlight_skl.txt"
@@ -118,11 +118,11 @@
 <span class="c">%</span>
 <span class="c">% ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0</span>
 
-    <span class="n">nfeatures</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span>2<span class="p">);</span>
+    <span class="n">nfeatures</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
 
     <span class="n">parser</span> <span class="p">=</span> <span class="n">inputParser</span><span class="p">;</span>
-    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;radius&#39;</span><span class="p">,</span>3<span class="p">);</span>
-    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;center_ids&#39;</span><span class="p">,</span>1<span class="p">:</span><span class="n">nfeatures</span><span class="p">);</span>
+    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;radius&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+    <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;center_ids&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nfeatures</span><span class="p">);</span>
     <span class="n">addOptional</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="s">&#39;args&#39;</span><span class="p">,</span><span class="n">struct</span><span class="p">());</span>
     <span class="n">parse</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span><span class="n">varargin</span><span class="p">{:});</span>
     <span class="n">p</span> <span class="p">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">Results</span><span class="p">;</span>
@@ -163,10 +163,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_sphere_offsets_skl.html" title="cosmo sphere offsets skl"
+          <a href="run_splithalf_correlations_skl.html" title="run splithalf correlations skl"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_randomize_targets_skl.html" title="cosmo randomize targets skl"
+          <a href="run_sphere_offsets_searchlight_skl.html" title="run sphere offsets searchlight skl"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_skl_toc.html" >Cosmo matlab files - skeletons files</a> &raquo;</li> 

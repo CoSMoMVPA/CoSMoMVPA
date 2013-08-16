@@ -1,7 +1,7 @@
 .. run_nifti_basics_hdr
 
 run nifti basics hdr
-====================
+--------------------
 .. code-block:: matlab
 
     %% NIFTI basics

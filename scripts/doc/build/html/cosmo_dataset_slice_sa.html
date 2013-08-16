@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo dataset slice samples" href="cosmo_dataset_slice_samples.html" />
-    <link rel="prev" title="cosmo dataset slice features" href="cosmo_dataset_slice_features.html" /> 
+    <link rel="next" title="run classify svm" href="run_classify_svm.html" />
+    <link rel="prev" title="cosmo randomize targets" href="cosmo_randomize_targets.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_samples.html" title="cosmo dataset slice samples"
+          <a href="run_classify_svm.html" title="run classify svm"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_features.html" title="cosmo dataset slice features"
+          <a href="cosmo_randomize_targets.html" title="cosmo randomize targets"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_dataset_slice_features.html"
-                        title="previous chapter">cosmo dataset slice features</a></p>
+  <p class="topless"><a href="cosmo_randomize_targets.html"
+                        title="previous chapter">cosmo randomize targets</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_dataset_slice_samples.html"
-                        title="next chapter">cosmo dataset slice samples</a></p>
+  <p class="topless"><a href="run_classify_svm.html"
+                        title="next chapter">run classify svm</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_dataset_slice_sa.txt"
@@ -113,7 +113,7 @@
 <span class="n">fns</span> <span class="p">=</span> <span class="n">fieldnames</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">);</span>
 <span class="n">n</span> <span class="p">=</span> <span class="nb">numel</span><span class="p">(</span><span class="n">fns</span><span class="p">);</span>
 
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">n</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span>
     <span class="n">fn</span> <span class="p">=</span> <span class="n">fns</span><span class="p">{</span><span class="n">k</span><span class="p">};</span>
     <span class="n">sa</span> <span class="p">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">.(</span><span class="n">fn</span><span class="p">);</span>
     <span class="n">dataset</span><span class="p">.</span><span class="n">sa</span><span class="p">.(</span><span class="n">fn</span><span class="p">)=</span><span class="n">sa</span><span class="p">(</span><span class="n">samples_to_select</span><span class="p">,:);</span>
@@ -135,10 +135,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_samples.html" title="cosmo dataset slice samples"
+          <a href="run_classify_svm.html" title="run classify svm"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_features.html" title="cosmo dataset slice features"
+          <a href="cosmo_randomize_targets.html" title="cosmo randomize targets"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

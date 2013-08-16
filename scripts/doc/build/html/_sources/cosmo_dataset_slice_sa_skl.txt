@@ -1,7 +1,7 @@
 .. cosmo_dataset_slice_sa_skl
 
 cosmo dataset slice sa skl
-==========================
+--------------------------
 .. code-block:: matlab
 
     function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)

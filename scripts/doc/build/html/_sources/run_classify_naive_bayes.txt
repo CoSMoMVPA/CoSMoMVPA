@@ -1,7 +1,7 @@
 .. run_classify_naive_bayes
 
 run classify naive bayes
-========================
+------------------------
 .. code-block:: matlab
 
     %% Two-class classification with naive baysian classifier

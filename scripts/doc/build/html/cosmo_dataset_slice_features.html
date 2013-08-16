@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo dataset slice sa" href="cosmo_dataset_slice_sa.html" />
-    <link rel="prev" title="cosmo dataset slice fa" href="cosmo_dataset_slice_fa.html" /> 
+    <link rel="next" title="cosmo dissimilarity matrix measure" href="cosmo_dissimilarity_matrix_measure.html" />
+    <link rel="prev" title="run measure searchlight" href="run_measure_searchlight.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
+          <a href="cosmo_dissimilarity_matrix_measure.html" title="cosmo dissimilarity matrix measure"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_fa.html" title="cosmo dataset slice fa"
+          <a href="run_measure_searchlight.html" title="run measure searchlight"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_dataset_slice_fa.html"
-                        title="previous chapter">cosmo dataset slice fa</a></p>
+  <p class="topless"><a href="run_measure_searchlight.html"
+                        title="previous chapter">run measure searchlight</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_dataset_slice_sa.html"
-                        title="next chapter">cosmo dataset slice sa</a></p>
+  <p class="topless"><a href="cosmo_dissimilarity_matrix_measure.html"
+                        title="next chapter">cosmo dissimilarity matrix measure</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_dataset_slice_features.txt"
@@ -90,12 +90,12 @@
 <span class="c">% but contains just the rows indictated in features_to_select, and the</span>
 <span class="c">% corresponding values in feature attributes.</span>
 
-<span class="n">nfeatures_orig</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span>2<span class="p">);</span>
+<span class="n">nfeatures_orig</span><span class="p">=</span><span class="nb">size</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
 <span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">samples</span><span class="p">(:,</span><span class="n">features_to_select</span><span class="p">);</span>
 
 <span class="n">fns</span><span class="p">=</span><span class="n">fieldnames</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">fa</span><span class="p">);</span>
 <span class="n">n</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">fns</span><span class="p">);</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">n</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span>
     <span class="n">fn</span><span class="p">=</span><span class="n">fns</span><span class="p">{</span><span class="n">k</span><span class="p">};</span>
     <span class="n">v</span><span class="p">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">fa</span><span class="p">.(</span><span class="n">fn</span><span class="p">);</span>
     <span class="k">if</span> <span class="n">iscell</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -103,7 +103,7 @@
     <span class="k">else</span>
         <span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="n">nfeatures_orig</span>
             <span class="n">v</span><span class="p">=</span><span class="n">v</span><span class="p">(:)</span><span class="o">&#39;</span><span class="p">;</span> <span class="c">% ensure row vector</span>
-        <span class="k">elseif</span> <span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>2<span class="p">)</span><span class="o">~=</span><span class="n">nfeatures_orig</span>
+        <span class="k">elseif</span> <span class="nb">size</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">~=</span><span class="n">nfeatures_orig</span>
             <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal size for %s - expect Nx%d&#39;</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">nfeatures_orig</span><span class="p">);</span>
         <span class="k">end</span>
 
@@ -127,10 +127,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_sa.html" title="cosmo dataset slice sa"
+          <a href="cosmo_dissimilarity_matrix_measure.html" title="cosmo dissimilarity matrix measure"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_dataset_slice_fa.html" title="cosmo dataset slice fa"
+          <a href="run_measure_searchlight.html" title="run measure searchlight"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

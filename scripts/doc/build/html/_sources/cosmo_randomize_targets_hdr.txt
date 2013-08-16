@@ -1,7 +1,7 @@
 .. cosmo_randomize_targets_hdr
 
 cosmo randomize targets hdr
-===========================
+---------------------------
 .. code-block:: matlab
 
     function randomized_targets=cosmo_randmize_targets(targets, chunks)

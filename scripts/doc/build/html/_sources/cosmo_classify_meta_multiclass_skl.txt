@@ -1,7 +1,7 @@
 .. cosmo_classify_meta_multiclass_skl
 
 cosmo classify meta multiclass skl
-==================================
+----------------------------------
 .. code-block:: matlab
 
     function predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, samples_test, opt)

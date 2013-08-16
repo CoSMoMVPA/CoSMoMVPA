@@ -20,17 +20,17 @@ def matlab2rst(data, output=None):
     in_skeleton=False
 
     res=[]
-    for i, line in enumerate(lines):      
+    for i, line in enumerate(lines):
         if in_skeleton and '% <<' in line.strip():
             in_skeleton=False
             continue
-        
+
         if not in_skeleton and '% >>' in line.strip():
             if output=='skl':
                 res.append(line.replace('% >>','%%%% >>> YOUR CODE HERE <<< %%%%'))
             in_skeleton=True
             continue
-        
+
         if not after_header:
             if not ((i==0 and 'function' in line) or line.startswith('%')):
                 after_header=True
@@ -68,7 +68,7 @@ for output in ('hdr','skl',None):
 
         with open(fn_out,'w') as f:
             f.write('.. %s\n\n' % label)
-            f.write('%s\n%s\n' % (label.replace('_',' '),'='*len(label))) 
+            f.write('%s\n%s\n' % (label.replace('_',' '),'-'*len(label)))
             f.write(rst)
             #print ">>>", rst, "<<<"
             #print '%s -> %s' % (fn_short, fn_out)
@@ -100,10 +100,10 @@ for output in ('hdr','skl',None):
         print "Written toc to %s" % full_toc_fn
 
 
-        
 
 
-    
+
+
 
 
 

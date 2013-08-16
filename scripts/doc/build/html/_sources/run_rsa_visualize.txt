@@ -1,7 +1,7 @@
 .. run_rsa_visualize
 
 run rsa visualize
-=================
+-----------------
 .. code-block:: matlab
 
     %% RSA Visualize

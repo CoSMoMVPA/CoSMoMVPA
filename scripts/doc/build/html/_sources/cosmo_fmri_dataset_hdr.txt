@@ -1,7 +1,7 @@
 .. cosmo_fmri_dataset_hdr
 
 cosmo fmri dataset hdr
-======================
+----------------------
 .. code-block:: matlab
 
     function ds = cosmo_fmri_dataset(filename, varargin)

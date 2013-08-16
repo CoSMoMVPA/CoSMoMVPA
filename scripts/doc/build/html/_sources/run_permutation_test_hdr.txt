@@ -1,7 +1,7 @@
 .. run_permutation_test_hdr
 
 run permutation test hdr
-========================
+------------------------
 .. code-block:: matlab
 
     %% Permutation test example

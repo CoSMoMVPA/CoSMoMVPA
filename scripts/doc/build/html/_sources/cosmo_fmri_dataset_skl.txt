@@ -1,7 +1,7 @@
 .. cosmo_fmri_dataset_skl
 
 cosmo fmri dataset skl
-======================
+----------------------
 .. code-block:: matlab
 
     function ds = cosmo_fmri_dataset(filename, varargin)

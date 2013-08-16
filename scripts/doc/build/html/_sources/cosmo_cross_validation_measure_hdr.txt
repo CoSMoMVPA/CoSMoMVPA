@@ -1,7 +1,7 @@
 .. cosmo_cross_validation_measure_hdr
 
 cosmo cross validation measure hdr
-==================================
+----------------------------------
 .. code-block:: matlab
 
     function accuracy = cosmo_cross_validation_measure(dataset, args)

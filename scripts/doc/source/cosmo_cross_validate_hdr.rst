@@ -1,7 +1,7 @@
 .. cosmo_cross_validate_hdr
 
 cosmo cross validate hdr
-========================
+------------------------
 .. code-block:: matlab
 
     function [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions, opt)

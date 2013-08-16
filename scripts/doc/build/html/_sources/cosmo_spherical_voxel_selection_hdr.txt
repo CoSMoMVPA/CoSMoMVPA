@@ -1,7 +1,7 @@
 .. cosmo_spherical_voxel_selection_hdr
 
 cosmo spherical voxel selection hdr
-===================================
+-----------------------------------
 .. code-block:: matlab
 
     function center2neighbors=cosmo_spherical_voxel_selection(dataset, radius, center_ids)

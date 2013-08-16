@@ -1,7 +1,7 @@
 .. cosmo_dataset_slice_features
 
 cosmo dataset slice features
-============================
+----------------------------
 .. code-block:: matlab
 
     function dataset=cosmo_dataset_slice_features(dataset, features_to_select)

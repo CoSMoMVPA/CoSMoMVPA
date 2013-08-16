@@ -1,7 +1,7 @@
 .. cosmo_cross_validation_measure
 
 cosmo cross validation measure
-==============================
+------------------------------
 .. code-block:: matlab
 
     function accuracy = cosmo_cross_validation_measure(dataset, args)

@@ -1,7 +1,7 @@
 .. run_splithalf_correlations_skl
 
 run splithalf correlations skl
-==============================
+------------------------------
 .. code-block:: matlab
 
     %% roi-based MVPA with group-analysis

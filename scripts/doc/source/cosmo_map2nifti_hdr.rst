@@ -1,7 +1,7 @@
 .. cosmo_map2nifti_hdr
 
 cosmo map2nifti hdr
-===================
+-------------------
 .. code-block:: matlab
 
     function ni=cosmo_map2nifti(dataset, fn)
