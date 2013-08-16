@@ -1,0 +1,8 @@
+.. run_nifti_basics_hdr
+
+run nifti basics hdr
+====================
+.. code-block:: matlab
+
+    %% NIFTI basics
+    % In this example, load a brain and visualize it in matlab
