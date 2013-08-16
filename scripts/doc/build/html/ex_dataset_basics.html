@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>2. Dataset basics &mdash; CoSMo Multivariate Pattern Analysis Workshop  documentation</title>
+    <title>1. Dataset basics &mdash; CoSMo Multivariate Pattern Analysis Workshop  documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="CoSMo Multivariate Pattern Analysis Workshop  documentation" href="index.html" />
     <link rel="up" title="Exercises" href="ex_toc.html" />
-    <link rel="next" title="4. Classification with Naive Bayes classifier" href="ex_classify_naive_bayes.html" />
-    <link rel="prev" title="1. Nifti basics" href="ex_nifti_basics.html" /> 
+    <link rel="next" title="2. Classification with Naive Bayes classifier" href="ex_classify_naive_bayes.html" />
+    <link rel="prev" title="Exercises" href="ex_toc.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="ex_classify_naive_bayes.html" title="4. Classification with Naive Bayes classifier"
+          <a href="ex_classify_naive_bayes.html" title="2. Classification with Naive Bayes classifier"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ex_nifti_basics.html" title="1. Nifti basics"
+          <a href="ex_toc.html" title="Exercises"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">CoSMo Multivariate Pattern Analysis Workshop  documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
@@ -51,33 +51,29 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">2. Dataset basics</a><ul>
-<li><a class="reference internal" href="#nifti-basics">2.1. Nifti basics</a><ul>
-<li><a class="reference internal" href="#load-and-view-anatomical-dataset">2.1.1. Load and view anatomical dataset</a></li>
+<li><a class="reference internal" href="#">1. Dataset basics</a><ul>
+<li><a class="reference internal" href="#nifti-basics">1.1. Nifti basics</a><ul>
+<li><a class="reference internal" href="#load-and-view-anatomical-dataset">1.1.1. Load and view anatomical dataset</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#loading-datasets-with-different-masks">2.2. Loading datasets with different masks</a></li>
-<li><a class="reference internal" href="#setting-sample-attributes-targets-and-chunks">2.3. Setting sample attributes: targets and chunks</a></li>
-<li><a class="reference internal" href="#slice-by-samples">2.4. Slice by samples</a><ul>
-<li><a class="reference internal" href="#cosmo-dataset-slice-sa-hdr">2.4.1. cosmo dataset slice sa hdr</a></li>
+<li><a class="reference internal" href="#loading-datasets-with-different-masks">1.2. Loading datasets with different masks</a></li>
+<li><a class="reference internal" href="#setting-sample-attributes-targets-and-chunks">1.3. Setting sample attributes: targets and chunks</a></li>
+<li><a class="reference internal" href="#slice-by-samples">1.4. Slice by samples</a><ul>
+<li><a class="reference internal" href="#cosmo-dataset-slice-sa-hdr">1.4.1. cosmo dataset slice sa hdr</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#slice-by-features">2.5. Slice by features</a></li>
-<li><a class="reference internal" href="#operations-on-datasets">2.6. Operations on datasets</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id1">3. Nifti basics</a><ul>
-<li><a class="reference internal" href="#id2">3.1. Load and view anatomical dataset</a></li>
+<li><a class="reference internal" href="#slice-by-features">1.5. Slice by features</a></li>
+<li><a class="reference internal" href="#operations-on-datasets">1.6. Operations on datasets</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="ex_nifti_basics.html"
-                        title="previous chapter">1. Nifti basics</a></p>
+  <p class="topless"><a href="ex_toc.html"
+                        title="previous chapter">Exercises</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="ex_classify_naive_bayes.html"
-                        title="next chapter">4. Classification with Naive Bayes classifier</a></p>
+                        title="next chapter">2. Classification with Naive Bayes classifier</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/ex_dataset_basics.txt"
@@ -105,11 +101,11 @@
           <div class="body">
             
   <div class="section" id="dataset-basics">
-<h1>2. Dataset basics<a class="headerlink" href="#dataset-basics" title="Permalink to this headline">¶</a></h1>
+<h1>1. Dataset basics<a class="headerlink" href="#dataset-basics" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="nifti-basics">
-<h2>2.1. Nifti basics<a class="headerlink" href="#nifti-basics" title="Permalink to this headline">¶</a></h2>
+<h2>1.1. Nifti basics<a class="headerlink" href="#nifti-basics" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="load-and-view-anatomical-dataset">
-<h3>2.1.1. Load and view anatomical dataset<a class="headerlink" href="#load-and-view-anatomical-dataset" title="Permalink to this headline">¶</a></h3>
+<h3>1.1.1. Load and view anatomical dataset<a class="headerlink" href="#load-and-view-anatomical-dataset" title="Permalink to this headline">¶</a></h3>
 <p>Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct &#8216;ni&#8217;. What is contained in this struct?</p>
 <p>Make a histogram of the non-zero voxels of the brain. There are two &#8216;bumps&#8217; - what do they represent?</p>
 <p>Display a saggital, axial and coronal slice.</p>
@@ -118,7 +114,7 @@
 </div>
 </div>
 <div class="section" id="loading-datasets-with-different-masks">
-<h2>2.2. Loading datasets with different masks<a class="headerlink" href="#loading-datasets-with-different-masks" title="Permalink to this headline">¶</a></h2>
+<h2>1.2. Loading datasets with different masks<a class="headerlink" href="#loading-datasets-with-different-masks" title="Permalink to this headline">¶</a></h2>
 <p>Using the function in <a class="reference external" href="cosmo_fmri_dataset.html">cosmo_fmri_dataset</a> load the dataset for subject s01
 (<em>glm_T_stats_allruns.nii.gz</em>) and applying whole brain mask (<em>brain_mask.nii.gz</em>). How
 many voxels are included in the whole brain mask?  Now load the same data
@@ -128,7 +124,7 @@ with the early visual mask (<em>ev_mask.nii.gz</em>) and then with the ventral t
 <p>Solution: <a class="reference external" href="run_load_datasets.html">run_load_datasets</a> / <a class="reference external" href="publish/run_load_datasets.html">run_load_datasets_pb</a></p>
 </div>
 <div class="section" id="setting-sample-attributes-targets-and-chunks">
-<h2>2.3. Setting sample attributes: targets and chunks<a class="headerlink" href="#setting-sample-attributes-targets-and-chunks" title="Permalink to this headline">¶</a></h2>
+<h2>1.3. Setting sample attributes: targets and chunks<a class="headerlink" href="#setting-sample-attributes-targets-and-chunks" title="Permalink to this headline">¶</a></h2>
 <p>Now load the dataset that has data for each run (<em>glm_T_stats_perrun.nii.gz</em>)
 using any mask you like. The stimulus labels for each run of the fMRI study were
 monkey, lemur, mallard, warbler, ladybug, and lunamoth &#8211; in that order. This
@@ -145,10 +141,10 @@ dataset.sa.chunks.</p>
 <p>Solution: <a class="reference external" href="run_setting_sample_attr.html">run_setting_sample_attr</a> / <a class="reference external" href="publish/run_setting_sample_attr.html">run_setting_sample_attr_pb</a></p>
 </div>
 <div class="section" id="slice-by-samples">
-<h2>2.4. Slice by samples<a class="headerlink" href="#slice-by-samples" title="Permalink to this headline">¶</a></h2>
+<h2>1.4. Slice by samples<a class="headerlink" href="#slice-by-samples" title="Permalink to this headline">¶</a></h2>
 <p>Write a function with the following signature.</p>
 <div class="section" id="cosmo-dataset-slice-sa-hdr">
-<h3>2.4.1. cosmo dataset slice sa hdr<a class="headerlink" href="#cosmo-dataset-slice-sa-hdr" title="Permalink to this headline">¶</a></h3>
+<h3>1.4.1. cosmo dataset slice sa hdr<a class="headerlink" href="#cosmo-dataset-slice-sa-hdr" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>dataset<span class="p">=</span><span class="nf">cosmo_dataset_slice_sa</span><span class="p">(</span>dataset, samples_to_select<span class="p">)</span><span class="w"></span>
 <span class="c">% Slice a dataset by samples, aka rows</span>
 <span class="c">%</span>
@@ -172,14 +168,14 @@ labels instead of numbers see Solution 2: <a class="reference external" href="co
 </div>
 </div>
 <div class="section" id="slice-by-features">
-<h2>2.5. Slice by features<a class="headerlink" href="#slice-by-features" title="Permalink to this headline">¶</a></h2>
+<h2>1.5. Slice by features<a class="headerlink" href="#slice-by-features" title="Permalink to this headline">¶</a></h2>
 <p>Write another function with the signature.</p>
 <p>Hint: <a class="reference external" href="cosmo_dataset_slice_fa_skl.html">cosmo_dataset_slice_fa_skl</a></p>
 <p>Solution: <a class="reference external" href="cosmo_dataset_slice_fa.html">cosmo_dataset_slice_fa</a></p>
 <p><em>Robust</em> Solution 2: <a class="reference external" href="cosmo_dataset_slice_features.html">cosmo_dataset_slice_features</a></p>
 </div>
 <div class="section" id="operations-on-datasets">
-<h2>2.6. Operations on datasets<a class="headerlink" href="#operations-on-datasets" title="Permalink to this headline">¶</a></h2>
+<h2>1.6. Operations on datasets<a class="headerlink" href="#operations-on-datasets" title="Permalink to this headline">¶</a></h2>
 <p>Now that you are familiar with the dataset, let&#8217;s play around a little. Load the
 &#8220;perrun&#8221; data with the VT mask for any subject. Now slice the dataset into
 datasets: one that has all the primates restuls (monkey and lemur) and on that
@@ -190,17 +186,6 @@ function <a class="reference external" href="cosmo_map2nifti_hdr.html">cosmo_map
 nifti as a file and use some other software like AFNI, or FSL&#8217;s viewer.</p>
 <p>Hint: <a class="reference external" href="run_operations_on_datasets_skl.html">run_operations_on_datasets_skl</a></p>
 <p>Solution: <a class="reference external" href="run_operations_on_datasets.html">run_operations_on_datasets</a> / <a class="reference external" href="publish/run_operations_on_datasets.html">run_operations_on_datasets_pb</a></p>
-</div>
-</div>
-<div class="section" id="id1">
-<h1>3. Nifti basics<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id2">
-<h2>3.1. Load and view anatomical dataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct &#8216;ni&#8217;. What is contained in this struct?</p>
-<p>Make a histogram of the non-zero voxels of the brain. There are two &#8216;bumps&#8217; - what do they represent?</p>
-<p>Display a saggital, axial and coronal slice.</p>
-<p>Hint: <a class="reference external" href="run_nifti_basics_skl.html">run_nifti_basics_skl</a></p>
-<p>Solution: <a class="reference external" href="run_nifti_basics.html">run_nifti_basics</a> / <a class="reference external" href="publish/run_nifti_basics.html">run_nifti_basics_pb</a></p>
 </div>
 </div>
 
@@ -217,10 +202,10 @@ nifti as a file and use some other software like AFNI, or FSL&#8217;s viewer.</p
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="ex_classify_naive_bayes.html" title="4. Classification with Naive Bayes classifier"
+          <a href="ex_classify_naive_bayes.html" title="2. Classification with Naive Bayes classifier"
              >next</a> |</li>
         <li class="right" >
-          <a href="ex_nifti_basics.html" title="1. Nifti basics"
+          <a href="ex_toc.html" title="Exercises"
              >previous</a> |</li>
         <li><a href="index.html">CoSMo Multivariate Pattern Analysis Workshop  documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" >Exercises</a> &raquo;</li> 

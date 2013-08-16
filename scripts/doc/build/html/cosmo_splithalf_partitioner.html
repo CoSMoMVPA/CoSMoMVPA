@@ -126,7 +126,7 @@
 
 <span class="c">% Make partitions using even and odd chunks</span>
 
-<span class="n">nsamples</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">targets</span><span class="p">);</span>
+<span class="n">nsamples</span><span class="p">=</span><span class="nb">numel</span><span class="p">(</span><span class="n">chunks</span><span class="p">);</span>
 <span class="n">halfmask</span><span class="p">=</span><span class="n">false</span><span class="p">(</span><span class="n">nsamples</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">:</span><span class="n">nchunks</span>
     <span class="n">halfmask</span><span class="p">=</span><span class="n">halfmask</span> <span class="o">|</span> <span class="n">chunks</span><span class="o">==</span><span class="n">unq</span><span class="p">(</span><span class="n">k</span><span class="p">);</span>

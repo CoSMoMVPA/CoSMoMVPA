@@ -10,7 +10,6 @@ Contents:
     :numbered:
     :titlesonly:
 
-    ex_nifti_basics
     ex_dataset_basics
     ex_classify_naive_bayes
     ex_write_classify_nn
