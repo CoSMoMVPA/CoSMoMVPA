@@ -1,7 +1,7 @@
 function make(force)
 pdir=pwd();
 srcdir=fullfile(pdir,'.');
-trgdir=fullfile(pdir,'..//doc/build/html/publish');
+trgdir=fullfile(pdir,'..//doc/source/_static/');
 tmpdir='/tmp';
 srcpat='run_*';
 srcext='.m';

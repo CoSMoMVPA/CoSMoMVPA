@@ -47,7 +47,7 @@ cosmo splithalf partitioner
     
     % Make partitions using even and odd chunks
     
-    nsamples=numel(targets);
+    nsamples=numel(chunks);
     halfmask=false(nsamples,1);
     for k=1:2:nchunks
         halfmask=halfmask | chunks==unq(k);
