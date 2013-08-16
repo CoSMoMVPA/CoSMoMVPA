@@ -3,14 +3,13 @@
 Dataset basics
 ==============
 
-.. ex_nifti_basics
 
 Nifti basics
 ++++++++++++
 
 Load and view anatomical dataset
 --------------------------------
-Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
+First, update the cosmo_get_data_path function so that it returns the directory where the example data is stored. Then, using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
 
 Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
 
@@ -22,7 +21,7 @@ Solution: run_nifti_basics_ / run_nifti_basics_pb_
 
 .. _run_nifti_basics_skl: run_nifti_basics_skl.html
 .. _run_nifti_basics: run_nifti_basics.html
-.. _run_nifti_basics_pb: publish/run_nifti_basics.html
+.. _run_nifti_basics_pb: _static/publish/run_nifti_basics.html
 
 
 Loading datasets with different masks
@@ -100,15 +99,15 @@ Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 
 .. _run_operations_on_datasets_skl: run_operations_on_datasets_skl.html
 .. _run_operations_on_datasets: run_operations_on_datasets.html
-.. _run_operations_on_datasets_pb: publish/run_operations_on_datasets.html
+.. _run_operations_on_datasets_pb: _static/publish/run_operations_on_datasets.html
 .. _cosmo_map2nifti: cosmo_map2nifti_hdr.html
 .. _cosmo_fmri_dataset: cosmo_fmri_dataset.html
 .. _run_load_datasets_skl: run_load_datasets_skl.html
 .. _run_load_datasets: run_load_datasets.html
-.. _run_load_datasets_pb: publish/run_load_datasets.html
+.. _run_load_datasets_pb: _static/publish/run_load_datasets.html
 .. _run_setting_sample_attr_skl: run_setting_sample_attr_skl.html
 .. _run_setting_sample_attr: run_setting_sample_attr.html
-.. _run_setting_sample_attr_pb: publish/run_setting_sample_attr.html
+.. _run_setting_sample_attr_pb: _static/publish/run_setting_sample_attr.html
 .. _cosmo_dataset_slice_sa: cosmo_dataset_slice_sa.html
 .. _cosmo_dataset_slice_fa: cosmo_dataset_slice_fa.html
 .. _cosmo_dataset_slice_sa_skl: cosmo_dataset_slice_sa_skl.html
@@ -117,24 +116,4 @@ Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 .. _cosmo_dataset_slice_samples: cosmo_dataset_slice_samples.html
 
 
-.. ex_nifti_basics
-
-Nifti basics
-============
-
-Load and view anatomical dataset
-++++++++++++++++++++++++++++++++
-Using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
-
-Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
-
-Display a saggital, axial and coronal slice.
-
-Hint: run_nifti_basics_skl_
-    
-Solution: run_nifti_basics_ / run_nifti_basics_pb_
-
-.. _run_nifti_basics_skl: run_nifti_basics_skl.html
-.. _run_nifti_basics: run_nifti_basics.html
-.. _run_nifti_basics_pb: publish/run_nifti_basics.html
 
