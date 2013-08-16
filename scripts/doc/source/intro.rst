@@ -72,4 +72,13 @@ semantics of the `PyMVPA <http://www.pymvpa.org/>`_ Python library which you are
 encouraged to learn more about especially if you interesting in learning to
 program in `Python <http://www.python.org/>`_.
 
+Other useful resources:
 
+    * `NeuroDebian <http://neuro.debian.net>`_ : One stop shopping for all Neuroscience related computing needs
+    * `Numpy for MATLAB users <http://mathesaurus.sourceforge.net/matlab-numpy.html>`_
+
+
+Code for the workshop
++++++++++++++++++++++
+
+`Get the code for the workshop here. <http://discovery.dartmouth.edu/~aconnoll/cosmo_mvpa/_static/cosmo_mvpa_scripts.zip>`_
