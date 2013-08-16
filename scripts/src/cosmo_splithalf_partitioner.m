@@ -48,19 +48,15 @@ for k=1:2:nchunks
     halfmask=halfmask | chunks==unq(k);
 end
 
-half1=find(halfmask)
+half1=find(halfmask);
+half2=find(~halfmask);
 
-train_indices{1}=find(half_mask);
+train_indices{1}=half1;
+train_indices{2}=half2;
 
-for k=1:nchunks
-    msk=chunks==unq(k);
-    kmod2=mod(k,2)+1;
-    if kmod2==1
-        train_indices{kmod2}=[train_indices{k};find(msk)'];
-    else
-        test_indices{kmod2}=[test_indices{k};find(msk)'];
-    end
-end
+test_indices{1}=half2;
+test_indices{2}=half1;
+
 % <<
 
 partitions.train_indices=train_indices;
