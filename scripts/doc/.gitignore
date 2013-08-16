@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+build
+=======
 build/*
+>>>>>>> d00f2b189421497f147bc4cd9245e142e5e846c5
 *doctree
 *.gif
 *.pickle
