@@ -18,4 +18,8 @@ Hint: cosmo_classify_nn_skl_
 
 Full solution: cosmo_classify_nn_
 
+Extra exercise: write a nearest-mean classifier
+
+Advanced exercise: write a k-nearest neighbor classifier that considers the nearest k neighbors for each test sample. Bonus points if this classifier takes a random class in case of a tie.
+
 .. _cosmo_classify_nn: cosmo_classify_nn.html
