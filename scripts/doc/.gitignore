@@ -1,4 +1,5 @@
-
+*doctree
+*.pickle
 run*rst
 cosmo*rst
 make*rst
