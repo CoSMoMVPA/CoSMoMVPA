@@ -22,50 +22,21 @@ for j=1:nsubjects
     
     % load the mask
     fn_mask=sprintf('%s/%s_mask.nii', datadir, roi);
-    ni_mask=load_nii(fn_mask);
     
-    % load data from one half and store it in a 4D array.
+    % load data from the halves
     fn1=sprintf('%s/glm_%s_evens.nii', datadir, data_type);
-    ni_samples1=load_nii(fn1);
-    half1_samples_4D=ni_samples1.img;
-    
-    % do the same for data in the other half
-    % >>
     fn2=sprintf('%s/glm_%s_odds.nii', datadir, data_type);
-    ni_samples2=load_nii(fn2);
-    half2_samples_4D=ni_samples2.img;
-    % <<
-
-    % define the feature (voxel) mask
-    feature_mask=logical(ni_mask.img);
-    nfeatures=sum(feature_mask(:));
+    half1_ds=cosmo_fmri_dataset(fn1,'mask',fn_mask);
+    half2_ds=cosmo_fmri_dataset(fn2,'mask',fn_mask);
     
-    nsamples_per_half=size(half1_samples_4D,4);
-    if nsamples_per_half~=size(half2_samples_4D,4)
-        error('sample size mismatch');
-    end
+    half1_samples=half1_ds.samples;
+    half2_samples=half2_ds.samples;
     
-    % allocate space for data of the two halves in the ROI
-    half1_samples_masked=zeros(nsamples_per_half, nfeatures);
-    half2_samples_masked=zeros(nsamples_per_half, nfeatures);
-
-    % store the values in the mask (use a 'for' loop to
-    % go from 1 to nsamples_per_half, extract one volume
-    % per iterations, then use 'feature_mask')
-    % >> 
-    for k=1:nsamples_per_half
-        half1_sample_3D=half1_samples_4D(:,:,:,k);
-        half1_samples_masked(k,:)=half1_sample_3D(feature_mask);
-        
-        half2_sample_3D=half2_samples_4D(:,:,:,k);
-        half2_samples_masked(k,:)=half2_sample_3D(feature_mask);
-    end
-    % <<
     
     % compute all correlation values between the two halves, resulting
     % in a 6x6 matrix. Store this matrix in a variable 'rho'.
     % >>
-    rho=corr(half1_samples_masked',half2_samples_masked');
+    rho=corr(half1_samples',half2_samples');
     % <<
     
     % To make these correlations more 'normal', apply a Fisher
@@ -73,11 +44,27 @@ for j=1:nsubjects
     % >>
     z=atanh(rho);
     % <<
+    
+    % visualize the matrix
+    subplot(3,3,j);
+    % >>
+    imagesc(z);
+    colorbar()
+    % <<
+    title(subject_id)
+    
+    
+    % <<
 
     % define how correlations values are going to be weighted
-    % mean zero, positive on diagonal, negative elsewhere
+    % mean zero, positive on diagonal, negative elsewhere.
+    % The matrix should have a mean of zero
     contrast_matrix=eye(6)-1/6; 
 
+    if abs(mean(contrast_matrix(:)))>1e-14
+        error('illegal contrast matrix');
+    end
+    
     % Weigh the values in the matrix 'z' by those in the contrast_matrix
     % and then average them (hint: use the '.*' operator for element-wise 
     % multiplication). Store the results in a variable 'mean_weighted_z'.
