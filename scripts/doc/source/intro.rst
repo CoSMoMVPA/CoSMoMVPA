@@ -14,7 +14,7 @@ Goals of the workshop
 **Why study brain imaging?**
 
 
-Organization of Human Brain Mapping (OHBM) throws great parties.
+`Organization of Human Brain Mapping (OHBM) <http://www.humanbrainmapping.org/>`_ throws great parties.
 
 .. figure:: _static/hbm.jpg
 
