@@ -22,3 +22,7 @@ Hint: cosmo_nfold_partitioner_skl_
 Solution: cosmo_nfold_partitioner_
 
 .. _cosmo_nfold_partitioner: cosmo_nfold_partitioner.html
+
+Extra exercise: write a split half partitioner where there are two partitions only of approximately equal size (for example, using odd and even chunks). 
+
+Extra advanced exercise: write a (K,N)-fold partitioner that returns all partitions for N chunks so that there are K chunks in the test set and (N-K) chunks in the training set.  
