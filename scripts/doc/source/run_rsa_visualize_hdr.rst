@@ -1,8 +1,0 @@
-.. run_rsa_visualize_hdr
-
-run rsa visualize hdr
-=====================
-.. code-block:: matlab
-
-    %% RSA Visualize
-    %
