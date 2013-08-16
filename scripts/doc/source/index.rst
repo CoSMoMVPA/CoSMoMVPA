@@ -31,4 +31,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. _matlab_pb_toc: publish/index.html
+.. _matlab_pb_toc: _static/publish/index.html

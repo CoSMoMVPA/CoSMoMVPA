@@ -7,7 +7,7 @@ make
     function make(force)
     pdir=pwd();
     srcdir=fullfile(pdir,'.');
-    trgdir=fullfile(pdir,'..//doc/build/html/publish');
+    trgdir=fullfile(pdir,'..//doc/source/_static/publish/');
     tmpdir='/tmp';
     srcpat='run_*';
     srcext='.m';
@@ -102,7 +102,7 @@ make
         nm=outputs{k};
         fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
     end
-    fprintf(fid,'</UL>Back to <A HREF="../index.html">index</A>.</BODY></HTML>\n');
+    fprintf(fid,'</UL>Back to <A HREF="../../index.html">index</A>.</BODY></HTML>\n');
     fclose(fid);
         
     fprintf('Index written to %s\n', outputfn); 
