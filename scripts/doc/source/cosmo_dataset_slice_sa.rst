@@ -10,10 +10,9 @@ cosmo dataset slice sa
     %   dataset = cosmo_dataset_slice_sa(dataset, samples_to_select)
     %   
     %   Input
-    %       dataset: an instance of cosmo_fmri_dataset
-    %       samples_to_select:  An N x 1 array of ones and zeros, where N is the
-    %                           number of samples in the dataset, ones correspond to
-    %                           samples indices to keep
+    %       dataset: an instance of cosmo_fmri_dataset with N samples
+    %       samples_to_select:  Either an Nx1 boolean mask, or a vector with 
+    %                           indices.
     %   Returns
     %       dataset:    an instance of an fmri_dataset that is a copy of the input dataset
     %                   but contains just the rows indictated in sample_indices, and the 

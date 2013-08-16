@@ -15,6 +15,7 @@ Contents:
     cosmo_confusion_matrix_hdr
     cosmo_cross_validate_hdr
     cosmo_cross_validation_measure_hdr
+    cosmo_dataset_slice_fa_hdr
     cosmo_dataset_slice_features_hdr
     cosmo_dataset_slice_sa_hdr
     cosmo_dataset_slice_samples_hdr

@@ -15,6 +15,7 @@ Contents:
     cosmo_confusion_matrix
     cosmo_cross_validate
     cosmo_cross_validation_measure
+    cosmo_dataset_slice_fa
     cosmo_dataset_slice_features
     cosmo_dataset_slice_sa
     cosmo_dataset_slice_samples
