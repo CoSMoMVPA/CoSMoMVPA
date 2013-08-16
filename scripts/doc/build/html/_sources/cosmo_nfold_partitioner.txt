@@ -1,7 +1,7 @@
 .. cosmo_nfold_partitioner
 
 cosmo nfold partitioner
-=======================
+-----------------------
 .. code-block:: matlab
 
     function partitions = cosmo_nfold_partitioner(chunks)

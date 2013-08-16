@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
-    <link rel="next" title="cosmo anova feature selector hdr" href="cosmo_anova_feature_selector_hdr.html" />
-    <link rel="prev" title="run voxel selection searchlight" href="run_voxel_selection_searchlight.html" /> 
+    <link rel="next" title="cosmo classify meta multiclass hdr" href="cosmo_classify_meta_multiclass_hdr.html" />
+    <link rel="prev" title="cosmo classify svm" href="cosmo_classify_svm.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,10 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_anova_feature_selector_hdr.html" title="cosmo anova feature selector hdr"
+          <a href="cosmo_classify_meta_multiclass_hdr.html" title="cosmo classify meta multiclass hdr"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="run_voxel_selection_searchlight.html" title="run voxel selection searchlight"
+          <a href="cosmo_classify_svm.html" title="cosmo classify svm"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -48,11 +48,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="run_voxel_selection_searchlight.html"
-                        title="previous chapter">run voxel selection searchlight</a></p>
+  <p class="topless"><a href="cosmo_classify_svm.html"
+                        title="previous chapter">cosmo classify svm</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_anova_feature_selector_hdr.html"
-                        title="next chapter">cosmo anova feature selector hdr</a></p>
+  <p class="topless"><a href="cosmo_classify_meta_multiclass_hdr.html"
+                        title="next chapter">cosmo classify meta multiclass hdr</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/matlab_hdr_toc.txt"
@@ -84,47 +84,45 @@
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_anova_feature_selector_hdr.html">cosmo anova feature selector hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_classify_meta_multiclass_hdr.html">cosmo classify meta multiclass hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_naive_bayes_hdr.html">cosmo classify naive bayes hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_nn_hdr.html">cosmo classify nn hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_hdr.html">cosmo classify svm hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_2class_hdr.html">cosmo classify svm 2class hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_confusion_matrix_hdr.html">cosmo confusion matrix hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validate_hdr.html">cosmo cross validate hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validation_measure_hdr.html">cosmo cross validation measure hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_fa_hdr.html">cosmo dataset slice fa hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_features_hdr.html">cosmo dataset slice features hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_sa_hdr.html">cosmo dataset slice sa hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_samples_hdr.html">cosmo dataset slice samples hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dissimilarity_matrix_measure_hdr.html">cosmo dissimilarity matrix measure hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_fmri_dataset_hdr.html">cosmo fmri dataset hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_generate_synthetic_dataset_hdr.html">cosmo generate synthetic dataset hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_get_data_path_hdr.html">cosmo get data path hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_map2nifti_hdr.html">cosmo map2nifti hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_nfold_partitioner_hdr.html">cosmo nfold partitioner hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_randomize_targets_hdr.html">cosmo randomize targets hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_searchlight_hdr.html">cosmo searchlight hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_sphere_offsets_hdr.html">cosmo sphere offsets hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_spherical_voxel_selection_hdr.html">cosmo spherical voxel selection hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_splithalf_partitioner_hdr.html">cosmo splithalf partitioner hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="foo_hdr.html">foo hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="make_hdr.html">make hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_classify_naive_bayes_hdr.html">run classify naive bayes hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_classify_svm_hdr.html">run classify svm hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_compare_dsm_hdr.html">run compare dsm hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_samples_hdr.html">cosmo dataset slice samples hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_dataset_basics_hdr.html">run dataset basics hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_demean_hdr.html">run demean hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_load_datasets_hdr.html">run load datasets hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_setting_sample_attr_hdr.html">run setting sample attr hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_measure_searchlight_hdr.html">run measure searchlight hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_nifti_basics_hdr.html">run nifti basics hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_features_hdr.html">cosmo dataset slice features hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dissimilarity_matrix_measure_hdr.html">cosmo dissimilarity matrix measure hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_rsa_visualize_hdr.html">run rsa visualize hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_randomize_targets_hdr.html">cosmo randomize targets hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_sa_hdr.html">cosmo dataset slice sa hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_classify_svm_hdr.html">run classify svm hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_splithalf_partitioner_hdr.html">cosmo splithalf partitioner hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_anova_feature_selector_hdr.html">cosmo anova feature selector hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validate_hdr.html">cosmo cross validate hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_demean_hdr.html">run demean hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_voxel_selection_searchlight_hdr.html">run voxel selection searchlight hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="make_hdr.html">make hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_operations_on_datasets_hdr.html">run operations on datasets hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_permutation_test_hdr.html">run permutation test hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_rsa_visualize_hdr.html">run rsa visualize hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_setting_sample_attr_hdr.html">run setting sample attr hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_sphere_offsets_hdr.html">cosmo sphere offsets hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_nifti_basics_hdr.html">run nifti basics hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_fmri_dataset_hdr.html">cosmo fmri dataset hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_naive_bayes_hdr.html">cosmo classify naive bayes hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validation_measure_hdr.html">cosmo cross validation measure hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_2class_hdr.html">cosmo classify svm 2class hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_compare_dsm_hdr.html">run compare dsm hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_load_datasets_hdr.html">run load datasets hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_nn_hdr.html">cosmo classify nn hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_spherical_voxel_selection_hdr.html">cosmo spherical voxel selection hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_get_data_path_hdr.html">cosmo get data path hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_nfold_partitioner_hdr.html">cosmo nfold partitioner hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_generate_synthetic_dataset_hdr.html">cosmo generate synthetic dataset hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_classify_naive_bayes_hdr.html">run classify naive bayes hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_sphere_offsets_searchlight_hdr.html">run sphere offsets searchlight hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_searchlight_hdr.html">cosmo searchlight hdr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_splithalf_correlations_hdr.html">run splithalf correlations hdr</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_voxel_selection_searchlight_hdr.html">run voxel selection searchlight hdr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_hdr.html">cosmo classify svm hdr</a></li>
 </ul>
 </div>
 </div>
@@ -142,10 +140,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_anova_feature_selector_hdr.html" title="cosmo anova feature selector hdr"
+          <a href="cosmo_classify_meta_multiclass_hdr.html" title="cosmo classify meta multiclass hdr"
              >next</a> |</li>
         <li class="right" >
-          <a href="run_voxel_selection_searchlight.html" title="run voxel selection searchlight"
+          <a href="cosmo_classify_svm.html" title="cosmo classify svm"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>

@@ -1,7 +1,7 @@
 .. cosmo_classify_naive_bayes_hdr
 
 cosmo classify naive bayes hdr
-==============================
+------------------------------
 .. code-block:: matlab
 
     function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test, opt)

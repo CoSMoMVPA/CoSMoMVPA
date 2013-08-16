@@ -1,7 +1,7 @@
 .. cosmo_dissimilarity_matrix_measure
 
 cosmo dissimilarity matrix measure
-==================================
+----------------------------------
 .. code-block:: matlab
 
     function dsm = cosmo_dissimilarity_matrix(dataset, args)

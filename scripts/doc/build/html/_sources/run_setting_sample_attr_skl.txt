@@ -1,7 +1,7 @@
 .. run_setting_sample_attr_skl
 
 run setting sample attr skl
-===========================
+---------------------------
 .. code-block:: matlab
 
     %% Dataset Basics

@@ -1,7 +1,7 @@
 .. make_skl
 
 make skl
-========
+--------
 .. code-block:: matlab
 
     function make(force)

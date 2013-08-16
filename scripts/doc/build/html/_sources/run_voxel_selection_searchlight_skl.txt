@@ -1,7 +1,7 @@
 .. run_voxel_selection_searchlight_skl
 
 run voxel selection searchlight skl
-===================================
+-----------------------------------
 .. code-block:: matlab
 
     %% Spherical searchlight

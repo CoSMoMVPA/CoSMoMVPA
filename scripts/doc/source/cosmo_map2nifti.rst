@@ -1,7 +1,7 @@
 .. cosmo_map2nifti
 
 cosmo map2nifti
-===============
+---------------
 .. code-block:: matlab
 
     function ni=cosmo_map2nifti(dataset, fn)

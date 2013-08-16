@@ -1,7 +1,7 @@
 .. run_sphere_offsets_searchlight_skl
 
 run sphere offsets searchlight skl
-==================================
+----------------------------------
 .. code-block:: matlab
 
     %% Searchlight analysis in the volume

@@ -1,7 +1,7 @@
 .. cosmo_nfold_partitioner_hdr
 
 cosmo nfold partitioner hdr
-===========================
+---------------------------
 .. code-block:: matlab
 
     function partitions = cosmo_nfold_partitioner(chunks)

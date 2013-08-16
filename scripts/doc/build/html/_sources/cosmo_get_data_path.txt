@@ -1,7 +1,7 @@
 .. cosmo_get_data_path
 
 cosmo get data path
-===================
+-------------------
 .. code-block:: matlab
 
     function data_path=cosmo_get_data_path(subject_id)

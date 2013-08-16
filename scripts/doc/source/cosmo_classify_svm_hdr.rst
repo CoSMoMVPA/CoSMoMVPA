@@ -1,7 +1,7 @@
 .. cosmo_classify_svm_hdr
 
 cosmo classify svm hdr
-======================
+----------------------
 .. code-block:: matlab
 
     function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)

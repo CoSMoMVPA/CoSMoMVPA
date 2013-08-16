@@ -1,7 +1,7 @@
 .. run_demean_skl
 
 run demean skl
-==============
+--------------
 .. code-block:: matlab
 
     %% Example of de-meaning

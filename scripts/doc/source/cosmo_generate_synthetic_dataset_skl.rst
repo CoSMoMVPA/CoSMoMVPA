@@ -1,7 +1,7 @@
 .. cosmo_generate_synthetic_dataset_skl
 
 cosmo generate synthetic dataset skl
-====================================
+------------------------------------
 .. code-block:: matlab
 
     function ds=cosmo_generate_synthetic_dataset(class_distance, nclasses, nsamples_per_class, nfeatures, nchunks, different_on_all_dimensions)

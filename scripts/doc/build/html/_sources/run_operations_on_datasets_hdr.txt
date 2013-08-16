@@ -1,7 +1,7 @@
 .. run_operations_on_datasets_hdr
 
 run operations on datasets hdr
-==============================
+------------------------------
 .. code-block:: matlab
 
     %% Dataset Basics

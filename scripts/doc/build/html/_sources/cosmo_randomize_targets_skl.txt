@@ -1,7 +1,7 @@
 .. cosmo_randomize_targets_skl
 
 cosmo randomize targets skl
-===========================
+---------------------------
 .. code-block:: matlab
 
     function randomized_targets=cosmo_randmize_targets(targets, chunks)

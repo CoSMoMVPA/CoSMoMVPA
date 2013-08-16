@@ -1,7 +1,7 @@
 .. run_setting_sample_attr_hdr
 
 run setting sample attr hdr
-===========================
+---------------------------
 .. code-block:: matlab
 
     %% Dataset Basics

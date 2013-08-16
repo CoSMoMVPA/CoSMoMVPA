@@ -1,7 +1,7 @@
 .. run_nifti_basics
 
 run nifti basics
-================
+----------------
 .. code-block:: matlab
 
     %% NIFTI basics

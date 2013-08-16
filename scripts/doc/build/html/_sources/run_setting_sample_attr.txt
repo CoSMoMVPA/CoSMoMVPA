@@ -1,7 +1,7 @@
 .. run_setting_sample_attr
 
 run setting sample attr
-=======================
+-----------------------
 .. code-block:: matlab
 
     %% Dataset Basics

@@ -1,7 +1,7 @@
 .. cosmo_dissimilarity_matrix_measure_hdr
 
 cosmo dissimilarity matrix measure hdr
-======================================
+--------------------------------------
 .. code-block:: matlab
 
     function dsm = cosmo_dissimilarity_matrix(dataset, args)

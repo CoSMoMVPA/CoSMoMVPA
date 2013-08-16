@@ -1,7 +1,7 @@
 .. run_measure_searchlight
 
 run measure searchlight
-=======================
+-----------------------
 .. code-block:: matlab
 
     %% Searchlight using a data measure

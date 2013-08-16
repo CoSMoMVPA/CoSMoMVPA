@@ -1,7 +1,7 @@
 .. run_permutation_test
 
 run permutation test
-====================
+--------------------
 .. code-block:: matlab
 
     %% Permutation test example

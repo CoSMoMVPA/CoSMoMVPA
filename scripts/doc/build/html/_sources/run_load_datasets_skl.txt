@@ -1,7 +1,7 @@
 .. run_load_datasets_skl
 
 run load datasets skl
-=====================
+---------------------
 .. code-block:: matlab
 
     %% Dataset Basics

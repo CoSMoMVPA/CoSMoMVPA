@@ -1,7 +1,7 @@
 .. run_operations_on_datasets
 
 run operations on datasets
-==========================
+--------------------------
 .. code-block:: matlab
 
     %% Dataset Basics

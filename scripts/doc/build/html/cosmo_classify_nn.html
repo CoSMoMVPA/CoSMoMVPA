@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - full solutions files" href="matlab_full_toc.html" />
-    <link rel="next" title="cosmo classify svm" href="cosmo_classify_svm.html" />
-    <link rel="prev" title="cosmo classify naive bayes" href="cosmo_classify_naive_bayes.html" /> 
+    <link rel="next" title="cosmo spherical voxel selection" href="cosmo_spherical_voxel_selection.html" />
+    <link rel="prev" title="run load datasets" href="run_load_datasets.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_classify_svm.html" title="cosmo classify svm"
+          <a href="cosmo_spherical_voxel_selection.html" title="cosmo spherical voxel selection"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cosmo_classify_naive_bayes.html" title="cosmo classify naive bayes"
+          <a href="run_load_datasets.html" title="run load datasets"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" accesskey="U">Cosmo matlab files - full solutions files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cosmo_classify_naive_bayes.html"
-                        title="previous chapter">cosmo classify naive bayes</a></p>
+  <p class="topless"><a href="run_load_datasets.html"
+                        title="previous chapter">run load datasets</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_classify_svm.html"
-                        title="next chapter">cosmo classify svm</a></p>
+  <p class="topless"><a href="cosmo_spherical_voxel_selection.html"
+                        title="next chapter">cosmo spherical voxel selection</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_classify_nn.txt"
@@ -100,7 +100,7 @@
 <span class="c">% NNO Aug 2013</span>
 
 
-<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span>4<span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
+<span class="k">if</span> <span class="n">nargin</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">,</span> <span class="n">opt</span><span class="p">=</span><span class="n">struct</span><span class="p">();</span> <span class="k">end</span>
 
 <span class="p">[</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">nfeatures</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_train</span><span class="p">);</span>
 <span class="p">[</span><span class="n">ntest</span><span class="p">,</span> <span class="n">nfeatures_</span><span class="p">]=</span><span class="nb">size</span><span class="p">(</span><span class="n">samples_test</span><span class="p">);</span>
@@ -109,11 +109,11 @@
 <span class="k">if</span> <span class="n">nfeatures</span><span class="o">~=</span><span class="n">nfeatures_</span> <span class="o">||</span> <span class="n">ntrain_</span><span class="o">~=</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;illegal input size&#39;</span><span class="p">);</span> <span class="k">end</span>
 
 <span class="c">% allocate space for output</span>
-<span class="n">predicted</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntest</span><span class="p">,</span>1<span class="p">);</span>
+<span class="n">predicted</span><span class="p">=</span><span class="nb">zeros</span><span class="p">(</span><span class="n">ntest</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
 
-<span class="k">for</span> <span class="n">k</span><span class="p">=</span>1<span class="p">:</span><span class="n">ntest</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="n">ntest</span>
     <span class="n">delta</span><span class="p">=</span><span class="nb">bsxfun</span><span class="p">(@</span><span class="n">minus</span><span class="p">,</span> <span class="n">samples_train</span><span class="p">,</span> <span class="n">samples_test</span><span class="p">(</span><span class="n">k</span><span class="p">,:));</span>
-    <span class="n">dst</span><span class="p">=</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">delta</span><span class="o">.^</span>2<span class="p">,</span>2<span class="p">));</span>
+    <span class="n">dst</span><span class="p">=</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">delta</span><span class="o">.^</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">));</span>
     <span class="k">if</span> <span class="nb">numel</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span><span class="o">~=</span><span class="n">ntrain</span><span class="p">,</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;wrng&#39;</span><span class="p">);</span> <span class="k">end</span>
     <span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="nb">i</span><span class="p">]=</span><span class="n">min</span><span class="p">(</span><span class="n">dst</span><span class="p">);</span>
     <span class="n">predicted</span><span class="p">(</span><span class="n">k</span><span class="p">)=</span><span class="n">targets_train</span><span class="p">(</span><span class="nb">i</span><span class="p">);</span>
@@ -135,10 +135,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_classify_svm.html" title="cosmo classify svm"
+          <a href="cosmo_spherical_voxel_selection.html" title="cosmo spherical voxel selection"
              >next</a> |</li>
         <li class="right" >
-          <a href="cosmo_classify_naive_bayes.html" title="cosmo classify naive bayes"
+          <a href="run_load_datasets.html" title="run load datasets"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_full_toc.html" >Cosmo matlab files - full solutions files</a> &raquo;</li> 

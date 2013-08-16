@@ -1,7 +1,7 @@
 .. cosmo_searchlight
 
 cosmo searchlight
-=================
+-----------------
 .. code-block:: matlab
 
     function results_map = cosmo_searchlight(dataset, measure, varargin)

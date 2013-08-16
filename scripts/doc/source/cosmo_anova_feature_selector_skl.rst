@@ -1,7 +1,7 @@
 .. cosmo_anova_feature_selector_skl
 
 cosmo anova feature selector skl
-================================
+--------------------------------
 .. code-block:: matlab
 
     function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
