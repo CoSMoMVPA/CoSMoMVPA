@@ -45,5 +45,6 @@ Contents:
     run_sphere_offsets_searchlight_hdr
     cosmo_searchlight_hdr
     run_splithalf_correlations_hdr
+    cosmo_target_dsm_corr_measure_hdr
     cosmo_classify_svm_hdr
 

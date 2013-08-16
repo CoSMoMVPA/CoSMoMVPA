@@ -45,5 +45,6 @@ Contents:
     run_sphere_offsets_searchlight
     cosmo_searchlight
     run_splithalf_correlations
+    cosmo_target_dsm_corr_measure
     cosmo_classify_svm
 
