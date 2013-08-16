@@ -1,7 +1,0 @@
-.. cosmo_confusion_matrix_hdr
-
-cosmo confusion matrix hdr
---------------------------
-.. code-block:: matlab
-
-    function confusion_matrix=cosmo_confusion_matrix(targets, predicted)
