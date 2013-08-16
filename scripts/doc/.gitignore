@@ -1,4 +1,4 @@
-build
+build/*
 *doctree
 *.gif
 *.pickle
@@ -10,3 +10,4 @@ make*rst
 *.js
 *.txt
 *.inv
+
