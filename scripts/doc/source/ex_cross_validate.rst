@@ -1,44 +1,18 @@
 .. ex_cross_validate
 
-Cross-validation part 2
-=======================
+Cross-validation part 2: Cross validation with multiple classifiers
+===================================================================
 
-This function is what we refer to as a "dataset measure". A dataset measure
-is a function with the following signature: 
+Using the cross-validation just implemented in ex_nfold_partitioner_, run cross validation on our favourite dataset (s01 with t-stats per run). Run this with three classifiers: SVM, neareast neighbor, and naive bayesian and print the classification accuracies.
 
-.. code-block:: matlab
+As an additional exercise, implement cosmo_confusion_matrix and show the confusion between predicted and actual classes and show the confusion matrix for each classifier.
 
-    output = dataset_measure(dataset, args)
+Hint: run_cosmo_cross_validation_skl_
 
-Thus any function you write can be used as a dataset measure as long as it can
-use this same input scheme. In a similar way, our classifiers all have the same
-signature:
+Solution: run_cosmo_cross_validation_ / run_cosmo_cross_validation_pb_
 
-.. code-block:: matlab
-
-     predictions = classifier(train_data, train_targets, test_data, opt)
-
-This is useful for writing code that can be reused for different purposes. The
-cross-validation dataset measure function is written to work with any generic
-classifer. This is done by passing a function handle to a classifer in the args struct
-input. For example, the function handle for the nearest neighbor classifer can
-be passed by the args struct by using the @function syntax:
-
-.. code-block:: matlab
-    
-    args.classifier = @cosmo_classify_nn
-
-In the code for cross validation below, your job is to write the missing for
-loop. This for loop must iterate over each data fold in args.partitions, call a
-generic classifier, and keep track of the number of correct classifications.
-
-.. literalinclude:: cosmo_cross_validate_hdr.m
-   :language: matlab
-
-Hint: cosmo_cross_validate_skl_
-
-.. _cosmo_cross_validate_skl: cosmo_cross_validate_skl.html
-
-Solution: cosmo_cross_validate_
-
-.. _cosmo_cross_validate: cosmo_cross_validate.html
+.. _ex_nfold_partitioner: ex_nfold_partitioner.html
+.. _run_cosmo_cross_validation_skl: run_cosmo_cross_validation_skl
+.. _run_cosmo_cross_validation: run_cosmo_cross_validation
+.. _run_cosmo_cross_validation_pb: _static/publish/run_cosmo_cross_validation.html
+.. _ex_nfold_partitioner: ex_nfold_partitioner.html

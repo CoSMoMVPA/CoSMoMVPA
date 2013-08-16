@@ -12,17 +12,23 @@ training and another for testing. Below is a an incomplete function that compute
 partitions for a given set of chunks sample attributes.  Your task is to
 complete the function by writing the missing for-loop.
 
-.. literalinclude:: cosmo_nfold_partitioner_hdr.m
-   :language: matlab
+.. include:: cosmo_nfold_partitioner_hdr.rst
 
 Hint: cosmo_nfold_partitioner_skl_
 
-.. _cosmo_nfold_partitioner_skl: cosmo_nfold_partitioner_skl.html
-
 Solution: cosmo_nfold_partitioner_
-
-.. _cosmo_nfold_partitioner: cosmo_nfold_partitioner.html
 
 Extra exercise: write a split half partitioner where there are two partitions only of approximately equal size (for example, using odd and even chunks). 
 
+Hint: cosmo_splithalf_partitioner_hdr_
+
+Solution: cosmo_splithalf_partitioner_
+
 Extra advanced exercise: write a (K,N)-fold partitioner that returns all partitions for N chunks so that there are K chunks in the test set and (N-K) chunks in the training set.  
+
+.. _cosmo_nfold_partitioner_skl: cosmo_nfold_partitioner_skl.html
+.. _cosmo_nfold_partitioner: cosmo_nfold_partitioner.html
+
+.. _cosmo_splithalf_partitioner_hdr: cosmo_splithalf_partitioner_hdr.html
+.. _cosmo_splithalf_partitioner: cosmo_splithalf_partitioner.html
+

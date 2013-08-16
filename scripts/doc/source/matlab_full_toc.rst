@@ -6,44 +6,45 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    cosmo_classify_meta_multiclass
-    cosmo_confusion_matrix
-    cosmo_map2nifti
-    cosmo_dataset_slice_samples
-    run_dataset_basics
-    run_setting_sample_attr
-    run_measure_searchlight
-    cosmo_dataset_slice_features
-    cosmo_dissimilarity_matrix_measure
-    run_rsa_visualize
-    cosmo_randomize_targets
-    cosmo_dataset_slice_sa
-    run_classify_svm
-    cosmo_splithalf_partitioner
     cosmo_anova_feature_selector
+    cosmo_classify_meta_multiclass
+    cosmo_classify_naive_bayes
+    cosmo_classify_nn
+    cosmo_classify_svm
+    cosmo_classify_svm_2class
+    cosmo_confusion_matrix
     cosmo_cross_validate
-    run_demean
-    run_voxel_selection_searchlight
+    cosmo_cross_validation_accuracy_measure
+    cosmo_dataset_slice_fa
+    cosmo_dataset_slice_features
+    cosmo_dataset_slice_sa
+    cosmo_dataset_slice_samples
+    cosmo_dissimilarity_matrix_measure
+    cosmo_fmri_dataset
+    cosmo_generate_synthetic_dataset
+    cosmo_get_data_path
+    cosmo_map2nifti
+    cosmo_nfold_partitioner
+    cosmo_randomize_targets
+    cosmo_searchlight
+    cosmo_sphere_offsets
+    cosmo_spherical_voxel_selection
+    cosmo_splithalf_partitioner
     make
+    run_classify_naive_bayes
+    run_classify_svm
+    run_compare_dsm
+    run_cross_validation
+    run_dataset_basics
+    run_demean
+    run_load_datasets
+    run_measure_searchlight
+    run_nifti_basics
     run_operations_on_datasets
     run_permutation_test
-    cosmo_sphere_offsets
-    run_nifti_basics
-    cosmo_fmri_dataset
-    cosmo_dataset_slice_fa
-    cosmo_classify_naive_bayes
-    cosmo_cross_validation_measure
-    cosmo_classify_svm_2class
-    run_compare_dsm
-    run_load_datasets
-    cosmo_classify_nn
-    cosmo_spherical_voxel_selection
-    cosmo_get_data_path
-    cosmo_nfold_partitioner
-    cosmo_generate_synthetic_dataset
-    run_classify_naive_bayes
+    run_rsa_visualize
+    run_setting_sample_attr
     run_sphere_offsets_searchlight
-    cosmo_searchlight
     run_splithalf_correlations
-    cosmo_classify_svm
+    run_voxel_selection_searchlight
 

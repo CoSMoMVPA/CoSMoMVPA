@@ -17,7 +17,7 @@ Contents:
     ex_classify_svm
     ex_nfold_partitioner
     ex_cross_validate
-    ex_classify_svm
+    ex_cross_validate_measure
     ex_searchlight
     ex_rsa_tutorial
 
