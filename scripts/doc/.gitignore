@@ -1,4 +1,4 @@
-source/matlab*
+scripts/doc/source/matlab*
 build/*
 *doctree
 *.gif
