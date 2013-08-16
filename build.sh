@@ -15,7 +15,7 @@ if [ "$targets" = "" ]; then
 fi
 
 if [ $targets = "all" ]; then
-    targets="doc matlab data"
+    targets="matlab data doc"
 fi
 
 if [ `echo $targets | wc -w` -gt 1 ]; then
@@ -70,8 +70,13 @@ case $targets in
         done
 
         zip -r ${pf}_scripts.zip $matdir
+
+        rm -f ${p}/${matdir}/*.m
+        rm -f ${p}/${matdir}
+
         mv ${pf}_scripts.zip $outputdir
         ls $outputdir
+
     ;;
 
     *)
