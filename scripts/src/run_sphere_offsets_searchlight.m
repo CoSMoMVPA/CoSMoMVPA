@@ -130,7 +130,7 @@ end
 ni_output=ni_samples1;
 ni_output.img=output;
 ni_output.hdr.dime.dim(5)=1;
-save_nii(ni_output,[datadir 'sphere_offsets_searchlight.nii.gz']);
+save_nii(ni_output,[datadir 'sphere_offsets_searchlight.nii']);
 
 
 %% Plot the results as axial slices
