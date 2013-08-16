@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Exercises" href="ex_toc.html" />
-    <link rel="next" title="3. Classification with Naive Bayes classifier" href="ex_classify_naive_bayes.html" />
+    <link rel="next" title="5. Classification with Naive Bayes classifier" href="ex_classify_naive_bayes.html" />
     <link rel="prev" title="1. Nifti basics" href="ex_nifti_basics.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="ex_classify_naive_bayes.html" title="3. Classification with Naive Bayes classifier"
+          <a href="ex_classify_naive_bayes.html" title="5. Classification with Naive Bayes classifier"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="ex_nifti_basics.html" title="1. Nifti basics"
@@ -55,8 +55,14 @@
 <li><a class="reference internal" href="#loading-datasets-with-different-masks">2.1. Loading datasets with different masks</a></li>
 <li><a class="reference internal" href="#setting-sample-attributes-targets-and-chunks">2.2. Setting sample attributes: targets and chunks</a></li>
 <li><a class="reference internal" href="#slice-by-samples">2.3. Slice by samples</a></li>
-<li><a class="reference internal" href="#slice-by-features">2.4. Slice by features</a></li>
-<li><a class="reference internal" href="#operations-on-datasets">2.5. Operations on datasets</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cosmo-dataset-slice-sa-hdr">3. cosmo dataset slice sa hdr</a><ul>
+<li><a class="reference internal" href="#slice-by-features">3.1. Slice by features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cosmo-dataset-slice-fa-hdr">4. cosmo dataset slice fa hdr</a><ul>
+<li><a class="reference internal" href="#operations-on-datasets">4.1. Operations on datasets</a></li>
 </ul>
 </li>
 </ul>
@@ -66,7 +72,7 @@
                         title="previous chapter">1. Nifti basics</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="ex_classify_naive_bayes.html"
-                        title="next chapter">3. Classification with Naive Bayes classifier</a></p>
+                        title="next chapter">5. Classification with Naive Bayes classifier</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/ex_dataset_basics.txt"
@@ -125,11 +131,15 @@ dataset.sa.chunks.</p>
 <div class="section" id="slice-by-samples">
 <h2>2.3. Slice by samples<a class="headerlink" href="#slice-by-samples" title="Permalink to this headline">¶</a></h2>
 <p>Write a function with the following signature.</p>
+</div>
+</div>
+<div class="section" id="cosmo-dataset-slice-sa-hdr">
+<h1>3. cosmo dataset slice sa hdr<a class="headerlink" href="#cosmo-dataset-slice-sa-hdr" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>dataset<span class="p">=</span><span class="nf">cosmo_dataset_slice_sa</span><span class="p">(</span>dataset, samples_to_select<span class="p">)</span><span class="w"></span>
 <span class="c">% Slice a dataset by samples, aka rows</span>
-<span class="c">%   </span>
+<span class="c">%</span>
 <span class="c">%   dataset = cosmo_dataset_slice_sa(dataset, samples_to_select)</span>
-<span class="c">%   </span>
+<span class="c">%</span>
 <span class="c">%   Input</span>
 <span class="c">%       dataset: an instance of cosmo_fmri_dataset</span>
 <span class="c">%       samples_to_select:  An N x 1 array of ones and zeros, where N is the</span>
@@ -137,7 +147,7 @@ dataset.sa.chunks.</p>
 <span class="c">%                           samples indices to keep</span>
 <span class="c">%   Returns</span>
 <span class="c">%       dataset:    an instance of an fmri_dataset that is a copy of the input dataset</span>
-<span class="c">%                   but contains just the rows indictated in sample_indices, and the </span>
+<span class="c">%                   but contains just the rows indictated in sample_indices, and the</span>
 <span class="c">%                   corresponding values in sample attributes.</span>
 </pre></div>
 </div>
@@ -145,16 +155,34 @@ dataset.sa.chunks.</p>
 <p>Solution: <a class="reference external" href="cosmo_dataset_slice_sa.html">cosmo_dataset_slice_sa</a></p>
 <p>For a more <em>robust</em> solution that can handle samples attributes that use string
 labels instead of numbers see Solution 2: <a class="reference external" href="cosmo_dataset_slice_samples.html">cosmo_dataset_slice_samples</a></p>
-</div>
 <div class="section" id="slice-by-features">
-<h2>2.4. Slice by features<a class="headerlink" href="#slice-by-features" title="Permalink to this headline">¶</a></h2>
+<h2>3.1. Slice by features<a class="headerlink" href="#slice-by-features" title="Permalink to this headline">¶</a></h2>
 <p>Write another function with the signature.</p>
+</div>
+</div>
+<div class="section" id="cosmo-dataset-slice-fa-hdr">
+<h1>4. cosmo dataset slice fa hdr<a class="headerlink" href="#cosmo-dataset-slice-fa-hdr" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>dataset<span class="p">=</span><span class="nf">cosmo_dataset_slice_fa</span><span class="p">(</span>dataset, features_to_select<span class="p">)</span><span class="w"></span>
+<span class="c">% Slice a dataset by samples, aka rows</span>
+<span class="c">%</span>
+<span class="c">%   dataset = cosmo_dataset_slice_sa(dataset, samples_to_select)</span>
+<span class="c">%</span>
+<span class="c">%   Input</span>
+<span class="c">%       dataset: an instance of cosmo_fmri_dataset</span>
+<span class="c">%       samples_to_select:  An N x 1 array of ones and zeros, where N is the</span>
+<span class="c">%                           number of samples in the dataset, ones correspond to</span>
+<span class="c">%                           samples indices to keep</span>
+<span class="c">%   Returns</span>
+<span class="c">%       dataset:    an instance of an fmri_dataset that is a copy of the input dataset</span>
+<span class="c">%                   but contains just the rows indictated in sample_indices, and the</span>
+<span class="c">%                   corresponding values in sample attributes.</span>
+</pre></div>
+</div>
 <p>Hint: <a class="reference external" href="cosmo_dataset_slice_fa_skl.html">cosmo_dataset_slice_fa_skl</a></p>
 <p>Solution: <a class="reference external" href="cosmo_dataset_slice_fa.html">cosmo_dataset_slice_fa</a></p>
 <p><em>Robust</em> Solution 2: <a class="reference external" href="cosmo_dataset_slice_features.html">cosmo_dataset_slice_features</a></p>
-</div>
 <div class="section" id="operations-on-datasets">
-<h2>2.5. Operations on datasets<a class="headerlink" href="#operations-on-datasets" title="Permalink to this headline">¶</a></h2>
+<h2>4.1. Operations on datasets<a class="headerlink" href="#operations-on-datasets" title="Permalink to this headline">¶</a></h2>
 <p>Now that you are familiar with the dataset, let&#8217;s play around a little. Load the
 &#8220;perrun&#8221; data with the VT mask for any subject. Now slice the dataset into
 datasets: one that has all the primates restuls (monkey and lemur) and on that
@@ -181,7 +209,7 @@ nifti as a file and use some other software like AFNI, or FSL&#8217;s viewer.</p
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="ex_classify_naive_bayes.html" title="3. Classification with Naive Bayes classifier"
+          <a href="ex_classify_naive_bayes.html" title="5. Classification with Naive Bayes classifier"
              >next</a> |</li>
         <li class="right" >
           <a href="ex_nifti_basics.html" title="1. Nifti basics"

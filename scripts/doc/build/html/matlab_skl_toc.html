@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
-    <link rel="next" title="cosmo randomize targets skl" href="cosmo_randomize_targets_skl.html" />
-    <link rel="prev" title="run nifti basics hdr" href="run_nifti_basics_hdr.html" /> 
+    <link rel="next" title="cosmo anova feature selector skl" href="cosmo_anova_feature_selector_skl.html" />
+    <link rel="prev" title="run voxel selection searchlight hdr" href="run_voxel_selection_searchlight_hdr.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,10 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cosmo_randomize_targets_skl.html" title="cosmo randomize targets skl"
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="run_nifti_basics_hdr.html" title="run nifti basics hdr"
+          <a href="run_voxel_selection_searchlight_hdr.html" title="run voxel selection searchlight hdr"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -48,11 +48,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="run_nifti_basics_hdr.html"
-                        title="previous chapter">run nifti basics hdr</a></p>
+  <p class="topless"><a href="run_voxel_selection_searchlight_hdr.html"
+                        title="previous chapter">run voxel selection searchlight hdr</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cosmo_randomize_targets_skl.html"
-                        title="next chapter">cosmo randomize targets skl</a></p>
+  <p class="topless"><a href="cosmo_anova_feature_selector_skl.html"
+                        title="next chapter">cosmo anova feature selector skl</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/matlab_skl_toc.txt"
@@ -84,42 +84,47 @@
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_randomize_targets_skl.html">cosmo randomize targets skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_anova_feature_selector_skl.html">cosmo anova feature selector skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_meta_multiclass_skl.html">cosmo classify meta multiclass skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_classify_naive_bayes_skl.html">cosmo classify naive bayes skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_fmri_dataset_skl.html">cosmo fmri dataset skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_voxel_selection_searchlight_skl.html">run voxel selection searchlight skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_get_data_path_skl.html">cosmo get data path skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_operations_on_datasets_skl.html">run operations on datasets skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_sphere_offsets_searchlight_skl.html">run sphere offsets searchlight skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_demean_skl.html">run demean skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_splithalf_partitioner_skl.html">cosmo splithalf partitioner skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_dataset_basics_skl.html">run dataset basics skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_nn_skl.html">cosmo classify nn skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_skl.html">cosmo classify svm skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_2class_skl.html">cosmo classify svm 2class skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_confusion_matrix_skl.html">cosmo confusion matrix skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validate_skl.html">cosmo cross validate skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validation_measure_skl.html">cosmo cross validation measure skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_fa_skl.html">cosmo dataset slice fa skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_features_skl.html">cosmo dataset slice features skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_sa_skl.html">cosmo dataset slice sa skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_nfold_partitioner_skl.html">cosmo nfold partitioner skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_splithalf_correlations_skl.html">run splithalf correlations skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_samples_skl.html">cosmo dataset slice samples skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_dissimilarity_matrix_measure_skl.html">cosmo dissimilarity matrix measure skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_searchlight_skl.html">cosmo searchlight skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="make_skl.html">make skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_nn_skl.html">cosmo classify nn skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_classify_naive_bayes_skl.html">run classify naive bayes skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_dataset_slice_features_skl.html">cosmo dataset slice features skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_compare_dsm_skl.html">run compare dsm skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_rsa_visualize_skl.html">run rsa visualize skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validate_skl.html">cosmo cross validate skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_sphere_offsets_skl.html">cosmo sphere offsets skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_map2nifti_skl.html">cosmo map2nifti skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_load_datasets_skl.html">run load datasets skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_meta_multiclass_skl.html">cosmo classify meta multiclass skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_anova_feature_selector_skl.html">cosmo anova feature selector skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_spherical_voxel_selection_skl.html">cosmo spherical voxel selection skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_cross_validation_measure_skl.html">cosmo cross validation measure skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_permutation_test_skl.html">run permutation test skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_fmri_dataset_skl.html">cosmo fmri dataset skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cosmo_generate_synthetic_dataset_skl.html">cosmo generate synthetic dataset skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_get_data_path_skl.html">cosmo get data path skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_map2nifti_skl.html">cosmo map2nifti skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_nfold_partitioner_skl.html">cosmo nfold partitioner skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_randomize_targets_skl.html">cosmo randomize targets skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_searchlight_skl.html">cosmo searchlight skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_sphere_offsets_skl.html">cosmo sphere offsets skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_spherical_voxel_selection_skl.html">cosmo spherical voxel selection skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cosmo_splithalf_partitioner_skl.html">cosmo splithalf partitioner skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="foo_skl.html">foo skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="make_skl.html">make skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_classify_naive_bayes_skl.html">run classify naive bayes skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_classify_svm_skl.html">run classify svm skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_compare_dsm_skl.html">run compare dsm skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_dataset_basics_skl.html">run dataset basics skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_demean_skl.html">run demean skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_load_datasets_skl.html">run load datasets skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_measure_searchlight_skl.html">run measure searchlight skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cosmo_classify_svm_skl.html">cosmo classify svm skl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run_setting_sample_attr_skl.html">run setting sample attr skl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_nifti_basics_skl.html">run nifti basics skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_operations_on_datasets_skl.html">run operations on datasets skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_permutation_test_skl.html">run permutation test skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_rsa_visualize_skl.html">run rsa visualize skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_setting_sample_attr_skl.html">run setting sample attr skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_sphere_offsets_searchlight_skl.html">run sphere offsets searchlight skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_splithalf_correlations_skl.html">run splithalf correlations skl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_voxel_selection_searchlight_skl.html">run voxel selection searchlight skl</a></li>
 </ul>
 </div>
 </div>
@@ -137,10 +142,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cosmo_randomize_targets_skl.html" title="cosmo randomize targets skl"
+          <a href="cosmo_anova_feature_selector_skl.html" title="cosmo anova feature selector skl"
              >next</a> |</li>
         <li class="right" >
-          <a href="run_nifti_basics_hdr.html" title="run nifti basics hdr"
+          <a href="run_voxel_selection_searchlight_hdr.html" title="run voxel selection searchlight hdr"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li> 
       </ul>

@@ -4,12 +4,13 @@ run splithalf correlations
 ==========================
 .. code-block:: matlab
 
-    %% A gentle start: roi-based MVPA with group-analysis
+    %% roi-based MVPA with group-analysis
     %
     % Load t-stat data from all subjects, apply 'vt' mask, compute difference
     % of (fisher-transformed) between on- and off diagonal split-half
     % correlation values, and perform a random effects analysis.
     
+    %% Set analysis parameters 
     subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};
     roi='vt'; % 'vt' or 'ev' or 'brain'
     data_type='T_stats'; % 'T_stats' or 'betas'
@@ -19,7 +20,7 @@ run splithalf correlations
     % allocate space for output
     mean_weighted_zs=zeros(nsubjects,1);
     
-    % do compututation for each subject 
+    %% Compututations for each subject 
     for j=1:nsubjects
         subject_id=subject_ids{j};
     
@@ -86,7 +87,7 @@ run splithalf correlations
         mean_weighted_zs(j)=mean_weighted_z;
     end
     
-    % compute t statistic and print the result
+    %% compute t statistic and print the result
     [h,p,ci,stats]=ttest(mean_weighted_zs);
     fprintf('ROI %s: mean %.3f, t_%d=%.3f, p=%.4f\n', roi, mean(mean_weighted_zs), stats.df, stats.tstat, p);
     

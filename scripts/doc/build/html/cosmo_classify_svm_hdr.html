@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Cosmo matlab files - headers only files" href="matlab_hdr_toc.html" />
-    <link rel="next" title="run setting sample attr hdr" href="run_setting_sample_attr_hdr.html" />
-    <link rel="prev" title="run measure searchlight hdr" href="run_measure_searchlight_hdr.html" /> 
+    <link rel="next" title="cosmo classify svm 2class hdr" href="cosmo_classify_svm_2class_hdr.html" />
+    <link rel="prev" title="cosmo classify nn hdr" href="cosmo_classify_nn_hdr.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="run_setting_sample_attr_hdr.html" title="run setting sample attr hdr"
+          <a href="cosmo_classify_svm_2class_hdr.html" title="cosmo classify svm 2class hdr"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="run_measure_searchlight_hdr.html" title="run measure searchlight hdr"
+          <a href="cosmo_classify_nn_hdr.html" title="cosmo classify nn hdr"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_hdr_toc.html" accesskey="U">Cosmo matlab files - headers only files</a> &raquo;</li> 
@@ -50,11 +50,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="run_measure_searchlight_hdr.html"
-                        title="previous chapter">run measure searchlight hdr</a></p>
+  <p class="topless"><a href="cosmo_classify_nn_hdr.html"
+                        title="previous chapter">cosmo classify nn hdr</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="run_setting_sample_attr_hdr.html"
-                        title="next chapter">run setting sample attr hdr</a></p>
+  <p class="topless"><a href="cosmo_classify_svm_2class_hdr.html"
+                        title="next chapter">cosmo classify svm 2class hdr</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cosmo_classify_svm_hdr.txt"
@@ -84,21 +84,21 @@
   <div class="section" id="cosmo-classify-svm-hdr">
 <h1>cosmo classify svm hdr<a class="headerlink" href="#cosmo-classify-svm-hdr" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-matlab"><div class="highlight"><pre><span class="k">function</span><span class="w"> </span>predicted<span class="p">=</span><span class="nf">cosmo_classify_svm</span><span class="p">(</span>samples_train, targets_train, samples_test, opt<span class="p">)</span><span class="w"></span>
-<span class="c">% svm classifier wrapper (around svmtrain/svmclassify)</span>
+<span class="c">% SVM classifier that uses classify_svm_2class to provide</span>
+<span class="c">% multi-class classification with SVM.</span>
 <span class="c">%</span>
-<span class="c">% predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)</span>
+<span class="c">% predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, samples_test, opt)</span>
 <span class="c">%</span>
 <span class="c">% Inputs</span>
-<span class="c">% - samples_train      PxR training data for P samples and R features</span>
-<span class="c">% - targets_train      Px1 training data classes</span>
-<span class="c">% - samples_test       QxR test data</span>
-<span class="c">%-  opt                struct with options. supports any option that</span>
-<span class="c">%                      svmtrain supports</span>
+<span class="c">%   samples_train      PxR training data for P samples and R features</span>
+<span class="c">%   targets_train      Px1 training data classes</span>
+<span class="c">%   samples_test       QxR test data</span>
+<span class="c">%   opt                struct with a field .base_classifier, which should</span>
+<span class="c">%                      be a function handle to another classifier</span>
+<span class="c">%                      (for example opt.base_classifier=@cosmo_classify_svm)</span>
 <span class="c">%</span>
 <span class="c">% Output</span>
-<span class="c">% - predicted          Qx1 predicted data classes for samples_test</span>
-<span class="c">%</span>
-<span class="c">% See also svmtrain, svmclassify</span>
+<span class="c">%   predicted          Qx1 predicted data classes for samples_test</span>
 <span class="c">%</span>
 <span class="c">% NNO Aug 2013</span>
 </pre></div>
@@ -118,10 +118,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="run_setting_sample_attr_hdr.html" title="run setting sample attr hdr"
+          <a href="cosmo_classify_svm_2class_hdr.html" title="cosmo classify svm 2class hdr"
              >next</a> |</li>
         <li class="right" >
-          <a href="run_measure_searchlight_hdr.html" title="run measure searchlight hdr"
+          <a href="cosmo_classify_nn_hdr.html" title="cosmo classify nn hdr"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="matlab_hdr_toc.html" >Cosmo matlab files - headers only files</a> &raquo;</li> 

@@ -39,8 +39,7 @@ Slice by samples
 ++++++++++++++++
 Write a function with the following signature.
 
-.. literalinclude:: cosmo_dataset_slice_sa_hdr.m
-   :language: matlab
+.. include:: cosmo_dataset_slice_sa_hdr.rst
 
 Hint: cosmo_dataset_slice_sa_skl_
 
@@ -53,8 +52,7 @@ Slice by features
 +++++++++++++++++
 Write another function with the signature.
 
-.. literalinclude:: cosmo_dataset_slice_fa_hdr.m
-    :language: matlab      
+.. include::  cosmo_dataset_slice_fa_hdr.rst
 
 Hint: cosmo_dataset_slice_fa_skl_
 

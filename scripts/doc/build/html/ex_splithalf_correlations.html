@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8. Split-half correlation-based MVPA with group analysis &mdash; Cosmo 0.1 documentation</title>
+    <title>10. Split-half correlation-based MVPA with group analysis &mdash; Cosmo 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Cosmo 0.1 documentation" href="index.html" />
     <link rel="up" title="Exercises" href="ex_toc.html" />
-    <link rel="next" title="9. Write a searchlight function that computes a generic dataset measure" href="ex_searchlight.html" />
-    <link rel="prev" title="7. Build wrapper for Matlab’s SVM classifier" href="ex_classify_svm.html" /> 
+    <link rel="next" title="11. Write a searchlight function that computes a generic dataset measure" href="ex_searchlight.html" />
+    <link rel="prev" title="9. Build wrapper for Matlab’s SVM classifier" href="ex_classify_svm.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="ex_searchlight.html" title="9. Write a searchlight function that computes a generic dataset measure"
+          <a href="ex_searchlight.html" title="11. Write a searchlight function that computes a generic dataset measure"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ex_classify_svm.html" title="7. Build wrapper for Matlab’s SVM classifier"
+          <a href="ex_classify_svm.html" title="9. Build wrapper for Matlab’s SVM classifier"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" accesskey="U">Exercises</a> &raquo;</li> 
@@ -51,19 +51,19 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">8. Split-half correlation-based MVPA with group analysis</a><ul>
-<li><a class="reference internal" href="#background">8.1. Background</a></li>
-<li><a class="reference internal" href="#exercise">8.2. Exercise</a></li>
+<li><a class="reference internal" href="#">10. Split-half correlation-based MVPA with group analysis</a><ul>
+<li><a class="reference internal" href="#background">10.1. Background</a></li>
+<li><a class="reference internal" href="#exercise">10.2. Exercise</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="ex_classify_svm.html"
-                        title="previous chapter">7. Build wrapper for Matlab&#8217;s SVM classifier</a></p>
+                        title="previous chapter">9. Build wrapper for Matlab&#8217;s SVM classifier</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="ex_searchlight.html"
-                        title="next chapter">9. Write a searchlight function that computes a generic dataset measure</a></p>
+                        title="next chapter">11. Write a searchlight function that computes a generic dataset measure</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/ex_splithalf_correlations.txt"
@@ -91,14 +91,14 @@
           <div class="body">
             
   <div class="section" id="split-half-correlation-based-mvpa-with-group-analysis">
-<h1>8. Split-half correlation-based MVPA with group analysis<a class="headerlink" href="#split-half-correlation-based-mvpa-with-group-analysis" title="Permalink to this headline">¶</a></h1>
+<h1>10. Split-half correlation-based MVPA with group analysis<a class="headerlink" href="#split-half-correlation-based-mvpa-with-group-analysis" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="background">
-<h2>8.1. Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<h2>10.1. Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
 <p>This exercise the most simple and most popular type of MVPA, that was first reported in Haxby et al 2001.
 The intuition is to split the data in two halves (e.g. odd and even runs) and estimate the response for each category, voxel and half seperately. If an area represents categories in a distributed manner (over voxels), then correlations (over voxels) of matching categories may be higher than correlations of non-matching categories. If categories are not represented in such a way, one would expect no differences between correlations of matching and non-matching categories.</p>
 </div>
 <div class="section" id="exercise">
-<h2>8.2. Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h2>
+<h2>10.2. Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h2>
 <p>In this exercise data we forget about the handy functionality that <a class="reference external" href="cosmo_fmri_dataset.html">cosmo_fmri_dataset</a> provided us with. Rather the goal is to use nifti data directly and practice a bit with applying a mask.</p>
 <p>Using the function load_nii, load, for each participant seperately, the VT mask. Then load the t stats for &#8216;odd&#8217; and &#8216;even&#8217; runs seperately. The stimulus labels for each run of the fMRI study were
 monkey, lemur, mallard, warbler, ladybug, and lunamoth &#8211; in that order. These
@@ -127,10 +127,10 @@ values on the diagonal and those off the diagonal. If there is no category infor
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="ex_searchlight.html" title="9. Write a searchlight function that computes a generic dataset measure"
+          <a href="ex_searchlight.html" title="11. Write a searchlight function that computes a generic dataset measure"
              >next</a> |</li>
         <li class="right" >
-          <a href="ex_classify_svm.html" title="7. Build wrapper for Matlab’s SVM classifier"
+          <a href="ex_classify_svm.html" title="9. Build wrapper for Matlab’s SVM classifier"
              >previous</a> |</li>
         <li><a href="index.html">Cosmo 0.1 documentation</a> &raquo;</li>
           <li><a href="ex_toc.html" >Exercises</a> &raquo;</li> 

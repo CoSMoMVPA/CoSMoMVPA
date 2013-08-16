@@ -4,7 +4,7 @@ run splithalf correlations hdr
 ==============================
 .. code-block:: matlab
 
-    %% A gentle start: roi-based MVPA with group-analysis
+    %% roi-based MVPA with group-analysis
     %
     % Load t-stat data from all subjects, apply 'vt' mask, compute difference
     % of (fisher-transformed) between on- and off diagonal split-half
