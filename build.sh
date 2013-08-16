@@ -15,7 +15,7 @@ if [ "$targets" = "" ]; then
 fi
 
 if [ $targets = "all" ]; then
-    targets = "doc matlab data"
+    targets="doc matlab data"
 fi
 
 if [ `echo $targets | wc -w` -gt 1 ]; then

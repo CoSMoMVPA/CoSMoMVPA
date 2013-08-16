@@ -1,22 +1,22 @@
-function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
+function dataset=cosmo_dataset_slice_fa(dataset, features_to_select)
 % Slice a dataset by samples, aka rows
 %   
-%   dataset = cosmo_dataset_slice_sa(dataset, samples_to_select)
+%   dataset = cosmo_dataset_slice_sa(dataset, features_to_select)
 %   
 %   Input
 %       dataset: an instance of cosmo_fmri_dataset with N samples
-%       samples_to_select:  Either an Nx1 boolean mask, or a vector with 
+%       features_to_select:  Either an Nx1 boolean mask, or a vector with 
 %                           indices.
 %   Returns
 %       dataset:    an instance of an fmri_dataset that is a copy of the input dataset
-%                   but contains just the rows indictated in sample_indices, and the 
-%                   corresponding values in sample attributes.
+%                   but contains just the rows indictated in features_to_select, and the 
+%                   corresponding values in feature attributes.
 
 %%
 % First slice the samples array by rows
 
 % >>
-dataset.samples=dataset.samples(samples_to_select,:);
+dataset.samples=dataset.samples(:,features_to_select);
 % <<
 
 %%
@@ -33,6 +33,6 @@ n = numel(fns);
 for k=1:n
     fn = fns{k};
     sa = dataset.sa.(fn);
-    dataset.sa.(fn)=sa(samples_to_select,:);
+    dataset.sa.(fn)=sa(:,features_to_select);
 end
 % <<
