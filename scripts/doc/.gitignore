@@ -1,4 +1,11 @@
-
+*doctree
+*.gif
+*.pickle
 run*rst
 cosmo*rst
 make*rst
+*.zip
+.buildinfo
+*.js
+*.txt
+*.inv

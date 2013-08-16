@@ -8,10 +8,10 @@ data_path=cosmo_get_data_path('s01');
 
 % >>
 ev_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
-                            'mask',[data_path 'MO_top_300.nii']);
+                            'mask',[data_path 'ev_mask.nii']);
 
 vt_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
-                            'mask',[data_path 'VT_top_400.nii']);
+                            'mask',[data_path 'vt_mask.nii']);
 % <<
 
 % Use pdist with correlation distance to get DSMs
@@ -28,7 +28,10 @@ figure(); subplot(3,2,1); imagesc(squareform(ev_dsm)); title('EV');
 subplot(3,2,2); imagesc(squareform(vt_dsm)); title('VT');
 % <<
 
+
+
 % Now add the dendrograms for EV and LV in the middle row of the subplot figure 
+labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 %
 % >>
 ev_hclus = linkage(ev_dsm);
