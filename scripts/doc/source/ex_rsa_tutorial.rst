@@ -134,5 +134,18 @@ Hint: run_compare_dsm_skl_
 
 Solution: run_compare_dsm_
 
+Target dissimilarity correlation measure
+++++++++++++++++++++++++++++++++++++++++
+
+Now write a function that calculates the correlation between a target
+dissimilarity and the dissimilarity matrix calculated from a dataset. This
+function should conform to the function signature of a dataset measure.
+
+.. include:: cosmo_dsm_corr_measure_skl.html
+
+Solution: cosmo_dsm_corr_measure_
+
+.. _cosmo_dsm_corr_measure: cosmo_dsm_corr_measure.html
+
 .. _run_compare_dsm_skl: run_compare_dsm_skl.html
 .. _run_compare_dsm: run_compare_dsm.html
