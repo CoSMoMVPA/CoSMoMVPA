@@ -30,6 +30,7 @@ Contents:
     cosmo_sphere_offsets_skl
     cosmo_spherical_voxel_selection_skl
     cosmo_splithalf_partitioner_skl
+    cosmo_target_dsm_corr_measure_skl
     make_skl
     run_classify_naive_bayes_skl
     run_classify_svm_skl
@@ -44,6 +45,7 @@ Contents:
     run_permutation_test_skl
     run_rsa_visualize_skl
     run_setting_sample_attr_skl
+    run_sphere_offsets_skl
     run_sphere_offsets_searchlight_skl
     run_splithalf_correlations_skl
     run_voxel_selection_searchlight_skl

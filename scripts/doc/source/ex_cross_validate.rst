@@ -1,7 +1,7 @@
 .. ex_cross_validate
 
-Cross-validation part 2: Cross validation with multiple classifiers
-===================================================================
+Cross-validation part 2: using multiple classifiers
+===================================================
 
 Using the cross-validation just implemented in ex_nfold_partitioner_, run cross validation on our favourite dataset (s01 with t-stats per run). Run this with three classifiers: SVM, neareast neighbor, and naive bayesian and print the classification accuracies.
 

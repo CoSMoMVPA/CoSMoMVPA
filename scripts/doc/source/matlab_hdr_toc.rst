@@ -30,6 +30,7 @@ Contents:
     cosmo_sphere_offsets_hdr
     cosmo_spherical_voxel_selection_hdr
     cosmo_splithalf_partitioner_hdr
+    cosmo_target_dsm_corr_measure_hdr
     make_hdr
     run_classify_naive_bayes_hdr
     run_classify_svm_hdr
@@ -44,6 +45,7 @@ Contents:
     run_permutation_test_hdr
     run_rsa_visualize_hdr
     run_setting_sample_attr_hdr
+    run_sphere_offsets_hdr
     run_sphere_offsets_searchlight_hdr
     run_splithalf_correlations_hdr
     run_voxel_selection_searchlight_hdr

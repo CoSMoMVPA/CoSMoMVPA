@@ -19,8 +19,7 @@ cosmo_spherical_voxel_selection_.
 With the help of these functions, write a generic searchlight function that
 satisfies the following definition:
 
-.. literalinclude:: cosmo_searchlight_hdr.m
-   :language: matlab
+.. include:: cosmo_searchlight_hdr.rst
 
 Hint: cosmo_searchlight_skl_
 

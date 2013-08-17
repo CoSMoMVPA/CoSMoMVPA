@@ -13,15 +13,14 @@ function offsets=cosmo_sphere_offsets(radius)
 %              or equal to radius
 %
 % Example
-% cosmo_sphere_offsets(1)
-% >   [-1     0     0
-% >     0    -1     0
-% >     0     0    -1
-% >     0     0     0
-% >     0     0     1
-% >     0     1     0
-% >     1     0     0]
+% cosmo_sphere_offsets(1.5)'
+% > [ -1    -1    -1    -1    -1     0     0     0     0     0 ...
+% > [ -1     0     0     0     1    -1    -1    -1     0     0 ...
+% > [  0    -1     0     1     0    -1     0     1    -1     0 ...
 %
+% ...    0     0     0     0     1     1     1     1     1 ]
+% ...    0     1     1     1    -1     0     0     0     1 ]
+% ...    1    -1     0     1     0    -1     0     1     0 ]
 % See also sub2ind, ind2sub
 %
 % NNO Aug 2013
