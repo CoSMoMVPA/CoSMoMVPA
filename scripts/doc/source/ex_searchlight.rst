@@ -12,9 +12,8 @@ measure** that we specify. This allows us to reuse code, and run searchlights
 for different purposes. 
 
 We have provided a couple of helper functions that do some of the heavy lifting
-involved defining the sets of *neighborhood voxels*. Before trying the next
-exercise, Have a look at these functions: cosmo_sphere_offsets_, and
-cosmo_spherical_voxel_selection_.
+involved defining the sets of *neighborhood voxels*. For this, use
+cosmo_spherical_voxel_selection_ that was presented in the previous exercise.
 
 With the help of these functions, write a generic searchlight function that
 satisfies the following definition:
@@ -25,8 +24,11 @@ Hint: cosmo_searchlight_skl_
 
 Solution: cosmo_searchlight_
 
+
+
 .. _cosmo_searchlight_skl: cosmo_searchlight_skl.html
 .. _cosmo_searchlight: cosmo_searchlight.html
 .. _cosmo_sphere_offsets: cosmo_sphere_offsets.html
 .. _cosmo_spherical_voxel_selection: cosmo_spherical_voxel_selection.html
+
 
