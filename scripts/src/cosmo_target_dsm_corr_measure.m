@@ -13,10 +13,6 @@ function rho = cosmo_target_dsm_corr_measure(dataset, args)
 %                               triangle, must be same size as dsm for dataset
 %           args.type:  [Optional] Type of correlation can be any 'type' that matlab's
 %                       corr function can take. Default: 'pearson'
-%           args.return_p: [Optional] boolean if this is set to true then the measure
-%                           returns a 2 x 1 array with the rho in the first
-%                           position and the p-value in the second position,
-%                           Default: false
 %
 %   Returns rho: Correlation value 
 %
@@ -24,14 +20,15 @@ function rho = cosmo_target_dsm_corr_measure(dataset, args)
 % ACC August 2013
 
 % >>
-    if nargin<2 error("Must supply args."); end        
+    if nargin<2 error('Must supply args.'); end        
     if ~isfield(args,'target_dsm') error('Must supply args.target_dsm.'); end
-    if ~isfield(args,'type') args.type = 'pearson'; end
     if ~isfield(args,'return_p') args.return_p = false; end
-    [rho p]  = pdist(dataset.samples, args.type);
-    if args.return_p:
-        rho = [rho; p];
-    end
+    pd = pdist(dataset.samples);
+    
+    sf=squareform(args.target_dsm);
+    
+    rho=corr(pd(:),sf(:));
+    
 % <<
 
 end
