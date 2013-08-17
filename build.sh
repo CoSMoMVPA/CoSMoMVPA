@@ -56,10 +56,12 @@ case $targets in
         mkdir $extdir
 
         niifiles="load_nii.m save_nii.m"
-        for niifile in $niifiles; do 
-            cp ${niftidir}/${niifile} $extdir
-        done
 
+        #for niifile in $niifiles; do 
+        #    cp ${niftidir}/${niifile} $extdir
+        #done
+        echo $niftidir
+        cp ${niftidir}/* $extdir
         ls $extdir
 
         for f in `find $srcdir -name '*.m'`; do
