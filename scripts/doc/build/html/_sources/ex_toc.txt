@@ -18,7 +18,8 @@ Contents:
     ex_nfold_partitioner
     ex_cross_validate
     ex_cross_validate_measure
-    ex_searchlight
     ex_rsa_tutorial
+    ex_searchlight
+
 
 
