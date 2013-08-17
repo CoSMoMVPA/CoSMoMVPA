@@ -7,7 +7,7 @@ Visualizing dissimilarity matrices
 ++++++++++++++++++++++++++++++++++
 
 Load the saved variables in the files *v1_model.mat* and *behav_sim.mat*. These
-should be in your scripts folder. These are dissimilarity matrices (DSMs) for
+should be in your data folder. These are dissimilarity matrices (DSMs) for
 our six animals. The v1 model DSM was made by modeling each stimulus image
 (jpeg) with a simple v1 cortical model, and then calculating the vector
 distances between the stimuli using the features of the model.  The behavioral
@@ -134,18 +134,18 @@ Hint: run_compare_dsm_skl_
 
 Solution: run_compare_dsm_
 
-Target dissimilarity correlation measure
-++++++++++++++++++++++++++++++++++++++++
+Target dissimilarity matrix correlation measure
++++++++++++++++++++++++++++++++++++++++++++++++
 
 Now write a function that calculates the correlation between a target
 dissimilarity and the dissimilarity matrix calculated from a dataset. This
 function should conform to the function signature of a dataset measure.
 
-.. include:: cosmo_dsm_corr_measure_skl.html
+.. include:: cosmo_target_dsm_corr_measure_skl.rst
 
-Solution: cosmo_dsm_corr_measure_
+Solution: cosmo_target_dsm_corr_measure_
 
-.. _cosmo_dsm_corr_measure: cosmo_dsm_corr_measure.html
+.. _cosmo_target_dsm_corr_measure: cosmo_target_dsm_corr_measure.html
 
 .. _run_compare_dsm_skl: run_compare_dsm_skl.html
 .. _run_compare_dsm: run_compare_dsm.html
