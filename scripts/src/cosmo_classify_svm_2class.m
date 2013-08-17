@@ -1,7 +1,7 @@
-function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
+function predicted=cosmo_classify_svm_2class(samples_train, targets_train, samples_test, opt)
 % svm classifier wrapper (around svmtrain/svmclassify)
 %
-% predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
+% predicted=cosmo_classify_svm_2class(samples_train, targets_train, samples_test, opt)
 %
 % Inputs
 % - samples_train      PxR training data for P samples and R features
