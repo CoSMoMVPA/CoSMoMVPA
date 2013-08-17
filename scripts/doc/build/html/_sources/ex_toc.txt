@@ -18,15 +18,10 @@ Contents:
     ex_nfold_partitioner
     ex_cross_validate
     ex_cross_validate_measure
-<<<<<<< HEAD
-=======
     ex_sphere_offsets
     ex_searchlight
     ex_searchlight_measure
->>>>>>> 125ea0416c9a4478801c743d7aee6f630cd1416a
     ex_rsa_tutorial
-    ex_searchlight
-
 
 
 
