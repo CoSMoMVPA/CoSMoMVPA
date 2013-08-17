@@ -149,3 +149,15 @@ Solution: cosmo_target_dsm_corr_measure_
 
 .. _run_compare_dsm_skl: run_compare_dsm_skl.html
 .. _run_compare_dsm: run_compare_dsm.html
+
+Target dissimilarity matrix searchlight
++++++++++++++++++++++++++++++++++++++++
+Now use this measure to map where the neural similarity is similar to the behavioural similarity.
+
+Hint: run_rsm_measure_searchlight_skl_
+
+Solution: run_rsm_measure_searchlight_ / run_rsm_measure_searchlight_pb_
+
+.. _run_rsm_measure_searchlight_skl: run_rsm_measure_searchlight_skl.html
+.. _run_rsm_measure_searchlight: run_rsm_measure_searchlight.html
+.. _run_rsm_measure_searchlight_pb: _static/publish/run_rsm_measure_searchlight.html

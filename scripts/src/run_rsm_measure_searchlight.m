@@ -14,8 +14,8 @@ load([models_path 'v1_model.mat']);
 load([models_path 'behav_sim.mat']);                            
                             
 %% Set measure 
-% Use the cosmo_cross_validation_measure and set its parameters
-% (classifier and partitions) in a measure_args struct.
+% Use the rsm measure and set its parameters
+% behav similarity in the measure_args struct.
 % >>
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
