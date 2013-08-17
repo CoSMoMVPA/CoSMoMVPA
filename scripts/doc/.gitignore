@@ -11,4 +11,10 @@ make*rst
 *.js
 *.txt
 *.inv
-
+matlab_full_toc.rst
+matlab_hdr_toc.rst
+matlab_skl_toc.rst
+*.swo
+*.swm
+*.swn
+*.swo

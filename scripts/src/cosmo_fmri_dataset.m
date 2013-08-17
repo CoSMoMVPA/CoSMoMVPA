@@ -59,7 +59,14 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     if numel(dims)>4, 
         error('Found more than 4 dimensions'); 
     end
-    x = dims(1); y = dims(2); z = dims(3); t = dims(4);
+    x = dims(1); y = dims(2); z = dims(3); 
+    
+    is_4d=numel(size(ni.img))>=4;
+    if is_4d
+        t = dims(4);
+    else
+        t=1;
+    end
     
     % if a mask was supplied, load it
     if ~isempty(p.mask)
@@ -85,7 +92,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         
         ds.a.mapper = find(m);
     else
-        ds.a.mapper = [1:(x*y*z)]; 
+        ds.a.mapper = [1:(x*y*z)]'; 
     end
     
     % compute the voxel indices
@@ -96,8 +103,13 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     nfeatures=numel(ds.a.mapper);
     ds.samples = zeros(t, nfeatures);
     
+    
     for v=1:t
-        vol = ni.img(:,:,:,v);
+        if is_4d
+            vol = ni.img(:,:,:,v);
+        else
+            vol = ni.img(:,:,:);
+        end
         ds.samples(v,:)=vol(ds.a.mapper);
     end
     
