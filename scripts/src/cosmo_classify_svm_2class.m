@@ -13,7 +13,7 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
 % Output
 % - predicted          Qx1 predicted data classes for samples_test
 %
-% See also svmtrain, svmclassify
+% See also svmtrain, svmclassify, cosmo_classify_svm
 %
 % NNO Aug 2013
 

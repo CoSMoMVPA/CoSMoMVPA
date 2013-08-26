@@ -11,7 +11,7 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'chunks',floor(((1:60)-1)/6)+1);
 
 %% Two class classification
-ds_2class=cosmo_dataset_slice_samples(ds, ds.sa.targets==1 | ds.sa.targets==4);
+ds_2class=cosmo_dataset_slice_samples(ds, ds.sa.targets==2 | ds.sa.targets==5);
 ds_2class_train=cosmo_dataset_slice_samples(ds_2class,ds_2class.sa.chunks<=5);
 ds_2class_test=cosmo_dataset_slice_samples(ds_2class,ds_2class.sa.chunks>5);
 
@@ -27,7 +27,7 @@ colorbar();
                             
    
 %% Four class classification
-ds_4class=cosmo_dataset_slice_samples(ds, ds.sa.targets<=4);
+ds_4class=cosmo_dataset_slice_samples(ds, ds.sa.targets>=2 & ds.sa.targets<=5);
 ds_4class_train=cosmo_dataset_slice_samples(ds_4class,ds_4class.sa.chunks<=5);
 ds_4class_test=cosmo_dataset_slice_samples(ds_4class,ds_4class.sa.chunks>5);
 

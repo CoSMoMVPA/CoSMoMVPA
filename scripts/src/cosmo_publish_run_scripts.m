@@ -1,8 +1,41 @@
-function make(force)
+function cosmo_publish_build_html(force)
+% helper function to publish the run_* scripts of cosmo. Intended for
+% developers only.
+%
+% cosmo_publish_build_html([force])
+% 
+% Inputs:
+%   force        boolean; indicates whether to always rebuild the output 
+%                even if it already exists. If false (the default), then
+%                only run_* scripts that are newer than the output are
+%                published again. If true, all run_* scripts are published
+%                (rebuilt)
+%
+% Notes to developers: 
+% - for this function to function properly, it is required that 
+%   comso_get_data_path returns an absolute path. This is because this 
+%   function makes copies of the run_* scripts in a temporary directory 
+%   with lines containing '% >>' or '% <<' removed, and scripts are run 
+%   from that directory. When cosmo_get_data_path does not return an
+%   absolute path then it may be unable to find the comso example data.
+% - this function should be run from the cosmo root directory.
+
+
 pdir=pwd();
+medir=fileparts(which(mfilename()));
+if ~strcmpi(pdir, medir)
+    error('The function %s should be run from its root directory (%s)',...
+            mfilename(), medir)
+end
 srcdir=fullfile(pdir,'.');
 trgdir=fullfile(pdir,'..//doc/source/_static/publish/');
-tmpdir='/tmp';
+
+if isunix()
+    tmpdir='/tmp';
+else
+    error('Not implemented: temporary directory on non-unix platforms');
+end
+
 srcpat='run_*';
 srcext='.m';
 trgext='.html';
@@ -42,7 +75,7 @@ for k=1:nsrc
         if ~force && strcmp(srcnm, trgnm) && ...
                     srcfns(k).datenum < trgfns(j).datenum
             update=false;
-            fprintf('%s%s already exists and newer than %s%s\n',...
+            fprintf('skipping %s%s (%s%s)\n',...
                         trgnm,trgext,srcnm,srcext);
             outputs{end+1}=srcnm;
             break;
@@ -53,7 +86,7 @@ for k=1:nsrc
         continue;
     end
     
-    fprintf('no output from %s or has changed - building it...', srcnm);
+    fprintf('building: %s ...', srcnm);
     tmpfn=fullfile(tmpdir,srcfns(k).name);
     remove_annotation(srcfn, tmpfn);
     cd(tmpdir);

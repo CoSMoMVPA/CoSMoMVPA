@@ -16,7 +16,7 @@ data_path='../../data';
 if ismac()
     % specific code for NNO
     [p,q]=unix('uname -n');
-    if p==0 && ~isempty(findstr(q,'nicks-MacBook-Pro.local'))
+    if p==0 && isempty(strmatch(lower(q),'nicks-macBook-pro'))
         data_path='/Users/nick/git/cosmo_repo2/data/';
     end
 end
@@ -30,6 +30,7 @@ if nargin>=1
 end
 
 if ~exist(data_path,'file')
+    exist(data_path,'file')
     error('%s does not exist. Did you adjust %s?', data_path, mfilename());
 end
 

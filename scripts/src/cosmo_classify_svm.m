@@ -37,7 +37,7 @@ all_predicted=zeros(ntest, ncombi);
 % Consider all pairwise comparisons (over classes)
 % and store the predictions in all_predicted
 pos=0;
-for k=1:nclasses
+for k=1:(nclasses-1)
     for j=(k+1):nclasses
         pos=pos+1;
         % classify between 2 classes only (from classes(k) and classes(j)).
@@ -51,7 +51,6 @@ for k=1:nclasses
         all_predicted(:,pos)=pred;
     end
 end
-% <<
 
 % find the classes that were predicted most often
 % the tricky part is to handle ties: there we take
@@ -59,19 +58,7 @@ end
 % any particular bias
 % XXX this is not very efficient - no idea how to
 % do this efficiently using matlab
-counts=histc(all_predicted',classes);
-[mx,i]=max(counts);
-msk=bsxfun(@minus,mx,counts)==0;
 
-counts(~msk)=0;          % only keep winners
-mxcount=sum(counts>0,1); % number of winners
-mxpos=floor(mxcount.*rand(1,ntest))+1;
+[winners, test_classes]=cosmo_winner_indices(all_predicted);
 
-idx=zeros(1,ntest);
-
-for k=1:ntest
-    mxi=find(counts(:,k));
-    idx(k)=mxi(mxpos(k));
-end
-
-predicted=classes(idx);
+predicted=test_classes(winners);
