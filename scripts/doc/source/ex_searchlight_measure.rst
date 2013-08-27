@@ -1,7 +1,7 @@
 .. ex_searchlight_measure
 
 Use the searchlight with a classifier and a cross-validation measure
-==========================================================
+====================================================================
 
 In this exercise we bring the generic cosmo_cross_validation_accuracy_measure_
 and cosmo_searchlight_ functions together, by applying the measure to each searchlight location.
