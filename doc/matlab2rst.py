@@ -1,13 +1,24 @@
 #!/usr/bin/env python
-
 # converts matlab to rst files
+#
+# This code reads all matlab .m files and then generates three versions:
+# 1) the full file, but with lines '% >>' and '<<' removed
+# 2) the file with code in between '% >>' and '<<' replaced by
+#    a comment saying 'your code here' (postfix '_skl' for skeleton)
+# 3) the file with only the header (first line plus all lines up to
+#    the first line without comment (postfix '_hdr' for header)
+# It also generates seperate toc files for each version
+# 
+# NNO Aug 2013
+#
+#
 
 
 
 import os
 import glob
 from os.path import join, split
-matlab_dir='../src'
+matlab_dir='../mvpa'
 rst_dir='source'
 
 add_indent=lambda x:' '*4+x
@@ -98,16 +109,4 @@ for output in ('hdr','skl',None):
             f.write(add_indent(label) + '\n')
         f.write('\n'.join(appendix))
         print "Written toc to %s" % full_toc_fn
-
-
-
-
-
-
-
-
-
-
-
-
 
