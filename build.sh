@@ -45,7 +45,21 @@ case $targets in
         matdir=mvpa
         extdir=external
 
-        zip -r ${pf}_scripts.zip $matdir $extdir
+        seldir=cosmo_mvpa_basic
+        if [ ! -e $seldir ]; then
+            mkdir $seldir
+        else
+            rm $seldir *
+        fi
+
+        for i in `find $matdir -name '*.m'`; do
+            if [ `cat $i | grep '% >>' | wc -l` -eq 0 ]; then
+                cp $i ${seldir}/
+                echo "Adding $i"
+            fi
+        done
+
+        zip -r ${pf}_scripts.zip $seldir $extdir
 
         #rm -f ${p}/${matdir}/*.m
         #rm -f ${p}/${extdir}/*.m
@@ -53,6 +67,9 @@ case $targets in
         #rmdir ${p}/${matdir}
 
         mv ${pf}_scripts.zip $outputdir
+        rm ${seldir}/*.m
+        rmdir $seldir
+
         ls $outputdir
 
     ;;
