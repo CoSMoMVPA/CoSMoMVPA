@@ -3,7 +3,7 @@
 targets=$1
 p=`pwd`
 pf=cosmo_mvpa
-outputdir=${p}/scripts/doc/source/_static/
+outputdir=${p}/doc/source/_static/
 
 set -e
 
@@ -28,7 +28,7 @@ fi
 case $targets in 
     doc)
         # build with sphinx 
-        cd scripts/doc
+        cd doc
         make html
     ;;
 
@@ -42,36 +42,10 @@ case $targets in
 
     matlab)
         # zip matlab stuff
-        matdir=cosmo_mvpa_basic
-        extdir=${matdir}/external
+        matdir=mvpa
+        extdir=external
 
-        niftidir=`cd external/NIFTI* && pwd`
-        srcdir=${p}/scripts/src
-
-        if [ -e $matdir ]; then
-            rm -rf $matdir
-        fi
-
-        mkdir $matdir
-        mkdir $extdir
-
-        niifiles="load_nii.m save_nii.m"
-
-        #for niifile in $niifiles; do 
-        #    cp ${niftidir}/${niifile} $extdir
-        #done
-        echo $niftidir
-        cp ${niftidir}/* $extdir
-        ls $extdir
-
-        for f in `find $srcdir -name '*.m'`; do
-            c=`grep '% >>' $f | wc -w`
-            if [ $c -eq 0 ]; then
-                cp ${f} ${matdir}/
-            fi
-        done
-
-        zip -r ${pf}_scripts.zip $matdir
+        zip -r ${pf}_scripts.zip $matdir $extdir
 
         #rm -f ${p}/${matdir}/*.m
         #rm -f ${p}/${extdir}/*.m
