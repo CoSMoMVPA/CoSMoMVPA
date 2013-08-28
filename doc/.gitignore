@@ -19,3 +19,5 @@ matlab_skl_toc.rst
 *.swn
 *.swo
 NIFTI
+*.m
+*.m~
