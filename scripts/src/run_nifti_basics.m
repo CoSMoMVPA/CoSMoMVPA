@@ -42,11 +42,11 @@ imagesc(squeeze(ni.img(:,end:-1:1,kk)))
 
 %% Plot slice in all three dimensions
 % This uses the cosmo_splot_slices helper function
-slice_step=10;
+slice_step=15;
 % >>
 for dim=1:3
     
-    %figure
+    figure
     cla
     cosmo_plot_slices(ni,dim,slice_step);
 end

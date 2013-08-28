@@ -9,7 +9,8 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %               data from a single volume (sample) only.
 %  dim          dimension according to which slices are plotted 
 %               (default: 1).
-%  slice_step   step between slices (default: 1).
+%  slice_step   step between slices (default: 1). If negative then 
+%               -slice_step indicates the number of slices
 %  slice_start  the index of the first slice to plot (default: 1).
 %  slice_stop   the index of the last slice to plot (default: the number of 
 %               slices in the dim-th dimension).
@@ -43,10 +44,16 @@ mx=max(data_lin);
 % shift it so that we can walk over the first dimension
 data_sh=shiftdim(data, dim-1);
 
-% determine which slices to show
 if isempty(slice_stop)
     slice_stop=size(data_sh,1);
 end
+
+if slice_step<0
+    nslices=-slice_step;
+    slice_step=ceil((slice_stop-slice_start+1)/nslices);
+end
+
+% determine which slices to show
 slice_idxs=slice_start:slice_step:slice_stop;
 nslices=numel(slice_idxs);
 
@@ -57,9 +64,25 @@ ncols=ceil(nslices/nrows);
 % use header depending on dim
 header_labels={'i','j','k'};
 
+% order of slices and whether the slice should be transposes
+xorder=[-1,1,1];
+yorder=[-1,1,-1];
+do_transpose=[true true false];
+
 for k=1:nslices
     slice_idx=slice_idxs(k);
     slice=squeeze(data_sh(slice_idx,:,:));
+    
+    if xorder(dim)<0
+        slice=slice(end:-1:1,:);
+    end
+    if yorder(dim)<0
+        slice=slice(:,end:-1:1);
+    end
+    if do_transpose(dim)
+        slice=slice';
+    end
+    
     subplot(nrows, ncols, k);
     imagesc(slice, [mn, mx]);
     title(sprintf('%s = %d', header_labels{dim}, slice_idx));
