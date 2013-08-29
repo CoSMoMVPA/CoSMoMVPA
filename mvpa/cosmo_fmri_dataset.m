@@ -52,8 +52,16 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     extensions={'.nii','.nii.gz'};
-    fn=find_file(p.filename, extensions); 
-    ni = load_nii(fn);
+    
+    if isstruct(p.filename)
+        ni = p.filename;
+        if ~isfield(ni,'hdr') || ~isfield(ni,'img')
+            error('illegal nifti struct');
+        end
+    else
+        fn=find_file(p.filename, extensions); 
+        ni = load_nii(fn);
+    end
 
     dims = size(ni.img);
     if numel(dims)>4, 
