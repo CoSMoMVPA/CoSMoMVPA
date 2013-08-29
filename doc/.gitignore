@@ -21,3 +21,5 @@ matlab_skl_toc.rst
 NIFTI
 *.m
 *.m~
+run*.html
+run*.png
