@@ -1,5 +1,5 @@
 function data_path=cosmo_get_data_path(subject_id)
-% helper function to get the data path.
+% helper function to get the path for example data.
 % this function is to be extended to work on your machine, depending on
 % where you stored the test data
 % 
@@ -11,7 +11,7 @@ function data_path=cosmo_get_data_path(subject_id)
 %  data_path      path where data is stored
 
 % change the following depending on where your data resides
-data_path='../../data';
+data_path='../data';
 
 if ismac()
     % specific code for NNO
