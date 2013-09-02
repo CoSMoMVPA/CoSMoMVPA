@@ -22,7 +22,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %   Example: Using the searchlight to compute a full-brain nearest neighbor
 %               classification searchlight with n-fold cross validation:
 %
-%       ds = cosmo_fmri_dataset('data.nii.gz','mask','brain_mask.nii.gz', ...
+%       ds = cosmo_fmri_dataset('data.nii','mask','brain_mask.nii', ...
 %                                'targets',targets,'chunks',chunks);
 %       cv = @cosmo_cross_validate;
 %       cv_args = struct();
