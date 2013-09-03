@@ -46,11 +46,11 @@ primates_minus_bugs = primates_mean - bugs_mean;
 %% Store and visualize the results
 % Finally save the result as a dataset with the original header
 % Just replace ds.samples with the result. Convert back to nifti and save it
-% using cosmo_map2nifti function.
+% using cosmo_map2fmri function.
 
 % >>
 ds.samples = primates_minus_bugs;
-ni = cosmo_map2nifti(ds, [data_path '/primates_minus_bugs.nii']);
+ni = cosmo_map2fmri(ds, [data_path '/primates_minus_bugs.nii']);
 
 % View the result using AFNI, FSL, or Matlab's imagesc
 

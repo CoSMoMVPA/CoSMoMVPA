@@ -25,7 +25,7 @@ measure_args.partitions = cosmo_nfold_partitioner(ds.sa.chunks);
 %% Run the searchlight
 results = cosmo_searchlight(ds,measure,'args',measure_args); 
 
-cosmo_map2nifti(results, [data_path 'measure_searchlight.nii']);
+cosmo_map2fmri(results, [data_path 'measure_searchlight.nii']);
 
 %% Make a histogram of classification accuracies
 hist(results.samples,47)

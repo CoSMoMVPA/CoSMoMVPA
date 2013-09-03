@@ -22,12 +22,14 @@ if nargin<3
 end
 
 % get size of original volume
-orig_dim=dataset.a.imghdr.hdr.dime.dim(2:4);
+orig_dim=dataset.a.voldim;
 orig_nvoxels=prod(orig_dim);
 
 % mapping from all linear voxel indices to those in the dataset
 map2full=zeros(orig_nvoxels,1);
-map2full(dataset.a.mapper)=1:nfeatures;
+sub=dataset.fa.voxel_indices;
+lin=sub2ind(orig_dim, sub(1,:), sub(2,:), sub(3,:));
+map2full(lin)=1:nfeatures;
 
 % offsets in i,j,k direction for searchlight sphere
 sphere_offsets=cosmo_sphere_offsets(radius);

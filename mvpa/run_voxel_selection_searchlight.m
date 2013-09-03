@@ -54,4 +54,4 @@ end
 res_map=ds;
 res_map.samples=accs;
 
-cosmo_map2nifti(res_map,[datadir  'voxel_selection_searchlight.nii']);
+cosmo_map2fmri(res_map,[datadir  'voxel_selection_searchlight.nii']);

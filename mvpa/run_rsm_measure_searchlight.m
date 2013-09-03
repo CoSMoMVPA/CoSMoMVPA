@@ -23,7 +23,7 @@ measure_args.target_dsm = behav;
 
 results = cosmo_searchlight(ds,measure,'args',measure_args); 
 
-cosmo_map2nifti(results, [data_path 'rsm_measure_searchlight.nii']);
+cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);
 
 %% Make a histogram of classification accuracies
 hist(results.samples,47)
