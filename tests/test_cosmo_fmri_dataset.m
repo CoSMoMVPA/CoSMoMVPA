@@ -20,3 +20,13 @@ assertTrue(numel(setxor(fieldnames(ds),...
            fieldnames(g)))==0);
 
 assertElementsAlmostEqual(ds.samples, g.samples);
+
+function test_io()
+ds=generate_test_dataset();
+tmpfn='__tmp_.nii';
+cosmo_map2fmri(ds,tmpfn);
+es=cosmo_fmri_dataset(tmpfn);
+delete(tmpfn)
+assertElementsAlmostEqual(ds.samples, es.samples);
+assertElementsAlmostEqual(ds.a.voldim, es.a.voldim);
+

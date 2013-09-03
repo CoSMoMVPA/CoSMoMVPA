@@ -3,11 +3,11 @@ function ni=generate_test_nifti_struct()
 %
 % NNO Aug 2013
 
-voldim=[30 30 10];
+voldim=[7 11 13];
 voxdim=[3 3 3];
-nsamples=4;
+nsamples=20;
 
-imgshape=[nsamples voldim];
+imgshape=[voldim nsamples];
 
 ni=struct();
 
