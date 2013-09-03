@@ -53,7 +53,13 @@ end
 if count~=1
     error('Found %d image formats, expected 1', count)
 end
-    
+
+function check_endswith(fn,ext)
+b=numel(fn)>=numel(ext) && strcmpi(fn(end+((1-numel(ext)):0)),ext);
+if ~b
+    error('%s should end with %s', fn, ext);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,11 +81,11 @@ save_nii(hdr, fn);
 
 
 %% Brainvoyager VMP
-function hdr=build_vmp(dataset)
+function hdr=build_bv_vmp(dataset)
 samples=dataset.samples;
 nsamples=size(samples,1);
 
-hdr=dataset.a.hdr_vmp;
+hdr=dataset.a.hdr_bv_vmp;
 
 samples_cell=cell(1,nsamples);
 vols=cosmo_map2array(dataset);
@@ -111,8 +117,19 @@ end
 
 hdr.Map=struct(args{:});
 
-function write_vmp(fn, hdr)
+function write_bv(fn, hdr)
+check_endswith(fn,'.vmp');
 hdr.SaveAs(fn);
+
+
+%% Brainvoyager GLM
+function hdr=build_bv_glm(dataset)
+
+warning('cosmo:save','Output in BV .glm format not supported - storing as VMP instead');
+
+dataset.a.hdr_bv_vmp=xff('new:vmp');
+dataset.a=rmfield(dataset.a,'hdr_bv_glm');
+hdr=build_bv_vmp(dataset);
 
 
 
