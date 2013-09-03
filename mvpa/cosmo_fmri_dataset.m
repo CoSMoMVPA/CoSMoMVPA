@@ -225,7 +225,7 @@ end
 error('Could not find image format for "%s"', filename)
  
 
-function [data,hdr,img_format]=read_img(fn, img_formats)
+function [data,hdr,img_format,a,fa,sa]=read_img(fn, img_formats)
 % helper: returns data (3D or 4D), header, and a string indicating the
 % image format. It matches the filename extension with what is stored
 % in img_formats
@@ -233,8 +233,8 @@ function [data,hdr,img_format]=read_img(fn, img_formats)
 img_format=find_img_format(fn, img_formats);
 
 reader=img_formats.(img_format).reader;
-[data,hdr]=reader(fn);
-    
+[data,hdr,a,fa,sa]=reader(fn);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -246,7 +246,7 @@ b=isstruct(hdr) && isfield(hdr,'img') && isnumeric(hdr.img) && ...
         isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
         isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
  
-function [data,hdr]=read_nii(fn)
+function [data,hdr,a,fa,sa]=read_nii(fn)
 if ischar(fn)
     hdr=load_nii(fn);  
 elseif isa_nii(fn)
@@ -258,17 +258,21 @@ end
 data=hdr.img;
 hdr=rmfield(hdr,'img');
 
+a=struct();
+fa=struct();
+sa=struct();
+
 %% Brainvoyager VMP (vmp)
 
-function b=isa_vmp(hdr)
+function b=isa_bv_vmp(hdr)
 
 b=isa(hdr,'xff') && isfield(hdr,'Map') && isstruct(vmp.Map) && ... 
         isfield(hdr,'VMRDimX') && isfield(hdr,'NrOfMaps');
     
-function [data,hdr]=read_vmp(fn)
+function [data,hdr,a,fa,sa]=read_bv_vmp(fn)
 if ischar(fn)
     hdr=xff(fn);
-elseif isa_vmp(fn)
+elseif isa_bv_vmp(fn)
     hdr=fn;
 else
     error('illegal input');
