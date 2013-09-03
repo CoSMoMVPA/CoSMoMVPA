@@ -17,6 +17,9 @@ for k=1:n
     if iscell(v)
         w={v{samples_to_select}};
     else
+        if isempty(v)
+            continue
+        end
         if numel(v)==nsamples_orig
             v=v(:); % ensure column vector
         elseif size(v,1)~=nsamples_orig
