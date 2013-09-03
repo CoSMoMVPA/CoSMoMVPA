@@ -22,15 +22,9 @@ if nargin<3 || isempty(slice_step), slice_step=1; end
 if nargin<4 || isempty(slice_start), slice_start=1; end
 if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
 
-if isstruct(data) && isfield(data,'saamples')
-    data=cosmo_map2nifti(data);
+if isstruct(data) && isfield(data,'samples')
+    data=cosmo_map2array(data);
 end
-
-if isstruct(data) && isfield(data, 'img')
-    data=data.img;
-end
-
-data=squeeze(data);
 
 if numel(size(data))~=3
     error('expected 3D image - did you select a single volume?');
