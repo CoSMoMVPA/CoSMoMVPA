@@ -4,3 +4,4 @@
 *.m~
 data
 .git.bfg-report
+*.md.swo
