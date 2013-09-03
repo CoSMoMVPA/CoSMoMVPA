@@ -9,14 +9,7 @@ function hdr=cosmo_map2fmri(dataset, fn)
 samples=dataset.samples;
 [nsamples, nfeatures]=size(samples);
 
-img_formats=struct();
-
-img_formats.nii.builder=@build_nii;
-img_formats.nii.writer=@write_nii;
-
-img_formats.vmp.builder=@build_vmp;
-img_formats.vmp.writer=@write_vmp;
-
+img_formats=get_img_formats();
 img_format=get_img_format(dataset, img_formats);
 
 builder=img_formats.(img_format).builder;
@@ -30,6 +23,18 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function img_formats=get_img_formats()
+img_formats=struct();
+
+img_formats.nii.builder=@build_nii;
+img_formats.nii.writer=@write_nii;
+
+img_formats.bv_vmp.builder=@build_bv_vmp;
+img_formats.bv_vmp.writer=@write_bv;
+
+img_formats.bv_glm.builder=@build_bv_glm;
+img_formats.bv_glm.writer=@write_bv;
+
 
 function img_format=get_img_format(dataset, img_formats)
 
