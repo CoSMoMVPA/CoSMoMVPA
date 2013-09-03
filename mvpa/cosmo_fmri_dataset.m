@@ -285,16 +285,48 @@ data=zeros([voldim nsamples]);
 
 for k=1:nsamples
     data(:,:,:,k)=hdr.Map(k).VMPData;
-    
 end
+
+bless(hdr); % avoid GC doing unwanted stuff
+
+a=struct();
+fa=struct();
+sa=struct();
+
+
+function b=isa_bv_glm(hdr)
+
+b=isa(hdr,'xff') && isfield(hdr,'Predictor') &&  ... 
+        isfield(hdr,'GLMData') && isfield(hdr,'DesignMatrix');
+
+function [data,hdr,a,fa,sa]=read_bv_glm(fn)
+if ischar(fn)
+    hdr=xff(fn);
+elseif isa_bv_glm(fn)
+    hdr=fn;
+else
+    error('illegal input');
+end
+
+nsamples=hdr.NrOfPredictors;
+data=hdr.GLMData.BetaMaps(:,:,:,:);
 
 bless(hdr);
 
+name1=cell(nsamples,1);
+name2=cell(nsamples,1);
+rgb=zeros(nsamples,3);
+for k=1:nsamples
+    p=hdr.Predictor(k);
+    name1{k}=p.Name1;
+    name2{k}=p.Name2;
+    rgb(k,:)=p.RGB(1,:);
+end
 
-
-
-
-
-    
-    
+a=struct();
+fa=struct();
+sa=struct();
+sa.Name1=name1;
+sa.Name2=name2;
+sa.RGB=rgb;
 
