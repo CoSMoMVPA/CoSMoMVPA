@@ -54,24 +54,14 @@ if isstruct(p.filename) && isfield(p.filename,'samples')
     return
 end
 
+% allocate space for output
+ds=struct(); 
 
-% define which formats are supports
-% .exts indicates the extensions
-% .matcher says whether a struct is of the type
-% .reader should read a filaname and return a struct
-img_formats=struct();
+% get the supported image formats use the helper defined below
+img_formats=get_img_formats(); 
 
-img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
-img_formats.nii.matcher=@isa_nii;
-img_formats.nii.reader=@read_nii; % this is a wrapper defined below
-
-img_formats.vmp.exts={'.vmp'};
-img_formats.vmp.matcher=@isa_vmp;
-img_formats.vmp.reader=@read_vmp;
-
-
-% read the image (using a helper function defined below
-[data,hdr,img_format]=read_img(p.filename, img_formats);
+% read the image
+[data,hdr,img_format,ds.a,ds.fa,ds.sa]=read_img(p.filename, img_formats);
  
 dims = size(data);
 if sum(numel(dims)==[3 4])~=1, 
@@ -92,9 +82,26 @@ else
 end
  
 % if a mask was supplied, load it
-if ~isempty(p.mask)
+if isempty(p.mask)
+    nzero=sum(data(:)==0 | ~isfinite(data(:)));
+    ntotal=prod(nxyz)*nt;
+    thr=.1;
+    if nzero/ntotal > thr
+        warning('comso:msk',['No mask supplied but %.0f%% of the data is',...
+                ' either zero or non-finite. To use a mask derived ',...
+                ' from the input mask, use: %s(...,''mask'',true)'],...
+                100*nzero/ntotal,mfilename());
+    end 
+    mask_indices = [1:prod(nxyz)]'; % use all voxel indices
+else
     if ischar(p.mask)
         m = read_img(p.mask, img_formats);
+    elseif islogical(p.mask) && numel(p.mask)==1 && p.mask
+        % mask==true
+        m = data~=0 & isfinite(data);
+        if is_4d
+            m=~sum(~m,4); % nonzero everywhere
+        end
     else
         m = p.mask;
     end
@@ -115,10 +122,8 @@ if ~isempty(p.mask)
     if ~isequal(dims(1:3), mdim(1:3))
         error('mask size is different from data size');
     end
- 
-    mask_indices = find(m);
-else
-    mask_indices = [1:prod(nxyz)]'; % use all voxel indices
+    
+    mask_indices=find(m);
 end
  
 % compute the voxel indices
@@ -140,7 +145,7 @@ end
  
 header_name=['hdr_' img_format];
 ds.a.(header_name) = hdr; % store header
-ds.a.voldim=nxyz;
+ds.a.voldim=nxyz; % set the volume dimensions
  
 ds=set_sa_vec(ds,p,'targets');
 ds=set_sa_vec(ds,p,'chunks');
@@ -149,13 +154,37 @@ ds=set_sa_vec(ds,p,'chunks');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+function img_formats=get_img_formats()
+
+% define which formats are supports
+% .exts indicates the extensions
+% .matcher says whether a struct is of the type
+% .reader should read a filaname and return a struct
+img_formats=struct();
+
+img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
+img_formats.nii.matcher=@isa_nii;
+img_formats.nii.reader=@read_nii; % this is a wrapper defined below
+
+img_formats.bv_vmp.exts={'.vmp'};
+img_formats.bv_vmp.matcher=@isa_bv_vmp;
+img_formats.bv_vmp.reader=@read_bv_vmp;
+
+img_formats.bv_glm.exts={'.glm'};
+img_formats.bv_glm.matcher=@isa_bv_glm;
+img_formats.bv_glm.reader=@read_bv_glm;
+
+
 function ds=set_sa_vec(ds,p,fieldname)
 % helper: sets a sample attribute as a vector
 % throws an error if it has the from size
 nsamples=size(ds.samples,1);
 v=p.(fieldname);
 n=numel(v);
+if n==1
+    v=repmat(v,nsamples,1);
+    n=nsamples;
+end
 if not (n==0 || n==nsamples)
     error('size mismatch for %s: expected %d values, found %d', ...
                     fieldname, nsamples, n);
