@@ -32,7 +32,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %       
 %       
 % ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
-
+    
     nfeatures=size(dataset.samples,2);
 
     parser = inputParser;
@@ -60,12 +60,12 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     for k=1:ncenters
         center_id=center_ids(k);
         sphere_feature_ids=center2neighbors{center_id};
-        
+
         sphere_ds=cosmo_dataset_slice_features(dataset, sphere_feature_ids);
-        
+
         % Call the dataset measure
         m = measure(sphere_ds, args);
-        
+
         % Since a dataset measure may return an array of any length, we can
         % check the measures length on the first iteration and allocated the
         % appropriate amount of space for the results.
@@ -83,7 +83,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 
         % Store the results
         res(:,k)=m;
-        
+
         % show progress every 1000 steps
         if k==1 || mod(k,1000)==0 || k==nfeatures
             fprintf('%d / %d features completed\n', k, nfeatures);
@@ -94,4 +94,5 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % store the output in a dataset
     results_map=cosmo_dataset_slice_features(dataset, center_ids);
     results_map.samples=res;
-
+    
+    

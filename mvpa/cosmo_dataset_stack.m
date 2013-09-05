@@ -24,74 +24,75 @@ function ds_stacked=cosmo_dataset_stack(datasets,dim)
 %  ds=cosmo_dataset_stack({half1,half2}); % output has 10 samples
 %
 % NNO Sep 2013
-
-
-if nargin<2,
-    dim=1;
-end
-
-if ~iscell(datasets)
-    error('expected cell input');
-end
-
-n=numel(datasets);
-if n==0
-    error('empty cell input')
-end
-
-ds_stacked=datasets{1}; % take first dataset as starting point for output
-
-% determine across which dimension data is stacked; it's merged on the
-% other one
-switch dim
-    case 1
-        stackfn='sa';
-        mergefn='fa';
-    case 2
-        stackfn='fa';
-        mergefn='sa';
-    otherwise
-        error('dim should be 1 or 2')
-end
-        
-otherdim=3-dim; % the other dimension       
-
-% stack attributes over dim
-fns=fieldnames(ds_stacked.(stackfn));
-nfn=numel(fns);
-for k=1:nfn
-    fn=fns{k};
+    
+    
+    if nargin<2,
+        dim=1;
+    end
+    
+    if ~iscell(datasets)
+        error('expected cell input');
+    end
+    
+    n=numel(datasets);
+    if n==0
+        error('empty cell input')
+    end
+    
+    ds_stacked=datasets{1}; % take first dataset as starting point for output
+    
+    % determine across which dimension data is stacked; it's merged on the
+    % other one
+    switch dim
+        case 1
+            stackfn='sa';
+            mergefn='fa';
+        case 2
+            stackfn='fa';
+            mergefn='sa';
+        otherwise
+            error('dim should be 1 or 2')
+    end
+            
+    otherdim=3-dim; % the other dimension       
+    
+    % stack attributes over dim
+    fns=fieldnames(ds_stacked.(stackfn));
+    nfn=numel(fns);
+    for k=1:nfn
+        fn=fns{k};
+        vs=cell(n,1);
+        for j=1:n
+            ds=datasets{j};
+            if ~isfield(ds.(stackfn),fn)
+                error('field name not found: %s', fn);
+            end
+            vs{j}=ds.(stackfn).(fn);
+        end
+        ds_stacked.(stackfn).(fn)=cat(dim,vs{:});
+    end
+    
+    % for the otherdim, just make sure that the attributes are identical
+    fns=fieldnames(ds_stacked.(mergefn));
+    nfn=numel(fns);
+    
+    for k=1:nfn
+        fn=fns{k};
+        for j=1:n
+            ds=datasets{j};
+            if ~isfield(ds.(mergefn),fn)
+                error('field name not found: %s', fn);
+            end
+            if ~isequal(ds.(mergefn).(fn), ds_stacked.(mergefn).(fn))
+                error('value mismatch: %s', fn);
+            end 
+        end
+    end
+    
+    % stack the sample data
     vs=cell(n,1);
-    for j=1:n
-        ds=datasets{j};
-        if ~isfield(ds.(stackfn),fn)
-            error('field name not found: %s', fn);
-        end
-        vs{j}=ds.(stackfn).(fn);
+    for k=1:n
+        vs{k}=datasets{k}.samples;
     end
-    ds_stacked.(stackfn).(fn)=cat(dim,vs{:});
-end
-
-% for the otherdim, just make sure that the attributes are identical
-fns=fieldnames(ds_stacked.(mergefn));
-nfn=numel(fns);
-
-for k=1:nfn
-    fn=fns{k};
-    for j=1:n
-        ds=datasets{j};
-        if ~isfield(ds.(mergefn),fn)
-            error('field name not found: %s', fn);
-        end
-        if ~isequal(ds.(mergefn).(fn), ds_stacked.(mergefn).(fn))
-            error('value mismatch: %s', fn);
-        end 
-    end
-end
-
-% stack the sample data
-vs=cell(n,1);
-for k=1:n
-    vs{k}=datasets{k}.samples;
-end
-ds_stacked.samples=cat(dim,vs{:});
+    ds_stacked.samples=cat(dim,vs{:});
+    

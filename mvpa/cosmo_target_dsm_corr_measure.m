@@ -18,17 +18,17 @@ function rho = cosmo_target_dsm_corr_measure(dataset, args)
 %
 %   
 % ACC August 2013
-
+    
 % >>
     if nargin<2 error('Must supply args.'); end        
     if ~isfield(args,'target_dsm') error('Must supply args.target_dsm.'); end
     if ~isfield(args,'return_p') args.return_p = false; end
     pd = pdist(dataset.samples);
-    
+
     sf=squareform(args.target_dsm);
-    
+
     rho=corr(pd(:),sf(:));
-    
+
 % <<
 
-end
+    

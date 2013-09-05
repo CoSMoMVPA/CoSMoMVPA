@@ -23,31 +23,32 @@ function partitions = cosmo_nfold_partitioner(chunks)
 % >     [1 2]
 %
 % NNO Aug 2013
-
-if isstruct(chunks)
-    if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
-        chunks=chunks.sa.chunks;
-    else
-        error('illegal input')
+    
+    if isstruct(chunks)
+        if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
+            chunks=chunks.sa.chunks;
+        else
+            error('illegal input')
+        end
     end
-end
-
-unq=unique(chunks);
-nchunks=numel(unq);
-
-% allocate space for output
-train_indices=cell(1,nchunks);
-test_indices=cell(1,nchunks);
-
-% >>
-for k=1:nchunks
-    test_msk=unq(k)==chunks;
-    train_indices{k}=find(~test_msk)';
-    test_indices{k}=find(test_msk)';
-end
-% <<
-
-partitions.train_indices=train_indices;
-partitions.test_indices=test_indices;
-
+    
+    unq=unique(chunks);
+    nchunks=numel(unq);
+    
+    % allocate space for output
+    train_indices=cell(1,nchunks);
+    test_indices=cell(1,nchunks);
+    
+    % >>
+    for k=1:nchunks
+        test_msk=unq(k)==chunks;
+        train_indices{k}=find(~test_msk)';
+        test_indices{k}=find(test_msk)';
+    end
+    % <<
+    
+    partitions.train_indices=train_indices;
+    partitions.test_indices=test_indices;
+    
+        
     

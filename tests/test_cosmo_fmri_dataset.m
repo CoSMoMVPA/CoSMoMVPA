@@ -1,32 +1,32 @@
 function test_suite = test_cosmo_fmri_dataset
-initTestSuite;
+    initTestSuite;
 
 function test_init()
-ds=generate_test_dataset();
+    ds=generate_test_dataset();
 
-assertTrue(numel(setxor(fieldnames(ds),...
-           {'samples','a','sa','fa'}))==0);
-       
+    assertTrue(numel(setxor(fieldnames(ds),...
+               {'samples','a','sa','fa'}))==0);
+
 
 function test_nifti()
-ni=generate_test_nifti_struct();
-tmpfn='__tmp_.nii';
-save_nii(ni,tmpfn);
-ds=cosmo_fmri_dataset(tmpfn);
-delete(tmpfn)
+    ni=generate_test_nifti_struct();
+    tmpfn='__tmp_.nii';
+    save_nii(ni,tmpfn);
+    ds=cosmo_fmri_dataset(tmpfn);
+    delete(tmpfn)
 
-g=generate_test_dataset();
-assertTrue(numel(setxor(fieldnames(ds),...
-           fieldnames(g)))==0);
+    g=generate_test_dataset();
+    assertTrue(numel(setxor(fieldnames(ds),...
+               fieldnames(g)))==0);
 
-assertElementsAlmostEqual(ds.samples, g.samples);
+    assertElementsAlmostEqual(ds.samples, g.samples);
 
 function test_io()
-ds=generate_test_dataset();
-tmpfn='__tmp_.nii';
-cosmo_map2fmri(ds,tmpfn);
-es=cosmo_fmri_dataset(tmpfn);
-delete(tmpfn)
-assertElementsAlmostEqual(ds.samples, es.samples);
-assertElementsAlmostEqual(ds.a.voldim, es.a.voldim);
+    ds=generate_test_dataset();
+    tmpfn='__tmp_.nii';
+    cosmo_map2fmri(ds,tmpfn);
+    es=cosmo_fmri_dataset(tmpfn);
+    delete(tmpfn)
+    assertElementsAlmostEqual(ds.samples, es.samples);
+    assertElementsAlmostEqual(ds.a.voldim, es.a.voldim);
 

@@ -14,7 +14,7 @@ function accuracy = cosmo_cross_validation_accuracy_measure(dataset, args)
 %   
 % ACC. Modified to conform to signature of generic datset 'measure'
 % NNO made this a wrapper function
-
+    
 if ~isfield(args,'opt') args.opt = struct(); end
 if ~isfield(args,'classifier') error('Missing input args.classifier'); end
 if ~isfield(args,'partitions') error('Missing input args.partitions'); end
@@ -24,3 +24,4 @@ if ~isfield(args,'partitions') error('Missing input args.partitions'); end
 % >>
 [pred, accuracy]=cosmo_cross_validate(dataset, args.classifier, args.partitions, args.opt);
 % <<
+    

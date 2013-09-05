@@ -39,75 +39,75 @@ function d=cosmo_splithalf_correlation_measure(ds, args)
 %   searchlight_results=cosmo_searchlight(ds,measure,'radius',4); 
 %
 % NNO Sep 2013
-
- 
-
-if nargin<2
-    args=struct();
-end
-if ~isfield(args,'opt') args.opt = struct(); end
-
-if ~isfield(args,'partitions') 
-    unq=unique(ds.sa.chunks);
-    if numel(unq)==2
-        partitions=struct();
-        partitions.train_indices={find(ds.sa.chunks==unq(1))};
-        partitions.test_indices={find(ds.sa.chunks==unq(2))};
-    else
-        error('Partitions not specified, and did not find two unique chunks');
+    
+     
+    
+    if nargin<2
+        args=struct();
     end
-end
-
-npartitions=numel(partitions.train_indices);
-npartitions_=numel(partitions.test_indices);
-
-if npartitions~=npartitions_
-    error('partition size mismatch for training (%d) and testing (%d)',...
-                npartitions,npartitions_);
-end
-
-sh_corrs=zeros(npartitions,1); % allocate space for each partition
-
-for k=1:npartitions
-    half1_idxs=partitions.train_indices{1};
-    half2_idxs=partitions.test_indices{1};
-
-    half1=cosmo_dataset_slice_samples(ds, half1_idxs);
-    half2=cosmo_dataset_slice_samples(ds, half2_idxs);
+    if ~isfield(args,'opt') args.opt = struct(); end
     
-    nclasses=size(half1.samples,1); 
-    
-    half1_targets=half1.sa.targets;
-    half2_targets=half2.sa.targets;
-    
-    % TODO: allow arbitrary order and possibly repeats of chunks
-    if ~isequal(half1_targets, half2_targets) || ...
-                ~isequal(half1_targets', 1:nclasses)
-        error('non-matching targets or not 1..nclasses')
-    end
-
-    if k==1
-        % set up template
-        if isfield(args, 'template')
-            template=args.template;
-            if ~isequal(size(template),[nclasses,nclasses])
-                error('template size mismatch: expect %dx%d',...
-                        nclasses, nclasses);
-            end
-            if abs(mean(template(:))) > 1e-8
-                error('template should have mean of zero');
-            end
+    if ~isfield(args,'partitions') 
+        unq=unique(ds.sa.chunks);
+        if numel(unq)==2
+            partitions=struct();
+            partitions.train_indices={find(ds.sa.chunks==unq(1))};
+            partitions.test_indices={find(ds.sa.chunks==unq(2))};
         else
-            template=eye(nclasses)-1/nclasses;
+            error('Partitions not specified, and did not find two unique chunks');
         end
     end
     
-    c=corr(half1.samples', half2.samples'); % Pearson correlation
-    ct=atanh(c); % fisher transformation
-    ctw=ct .* template; % weigh each correlation by the template values
-
-    sh_corr=mean(ctw(:)); % compute mean
-    sh_corrs(k)=sh_corr; % store results
-end
-
-d=mean(sh_corrs);
+    npartitions=numel(partitions.train_indices);
+    npartitions_=numel(partitions.test_indices);
+    
+    if npartitions~=npartitions_
+        error('partition size mismatch for training (%d) and testing (%d)',...
+                    npartitions,npartitions_);
+    end
+    
+    sh_corrs=zeros(npartitions,1); % allocate space for each partition
+    
+    for k=1:npartitions
+        half1_idxs=partitions.train_indices{1};
+        half2_idxs=partitions.test_indices{1};
+    
+        half1=cosmo_dataset_slice_samples(ds, half1_idxs);
+        half2=cosmo_dataset_slice_samples(ds, half2_idxs);
+        
+        nclasses=size(half1.samples,1); 
+        
+        half1_targets=half1.sa.targets;
+        half2_targets=half2.sa.targets;
+        
+        % TODO: allow arbitrary order and possibly repeats of chunks
+        if ~isequal(half1_targets, half2_targets) || ...
+                    ~isequal(half1_targets', 1:nclasses)
+            error('non-matching targets or not 1..nclasses')
+        end
+    
+        if k==1
+            % set up template
+            if isfield(args, 'template')
+                template=args.template;
+                if ~isequal(size(template),[nclasses,nclasses])
+                    error('template size mismatch: expect %dx%d',...
+                            nclasses, nclasses);
+                end
+                if abs(mean(template(:))) > 1e-8
+                    error('template should have mean of zero');
+                end
+            else
+                template=eye(nclasses)-1/nclasses;
+            end
+        end
+        
+        c=corr(half1.samples', half2.samples'); % Pearson correlation
+        ct=atanh(c); % fisher transformation
+        ctw=ct .* template; % weigh each correlation by the template values
+    
+        sh_corr=mean(ctw(:)); % compute mean
+        sh_corrs(k)=sh_corr; % store results
+    end
+    
+    d=mean(sh_corrs);

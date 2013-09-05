@@ -20,11 +20,10 @@ function dsm = cosmo_dissimilarity_matrix_measure(dataset, args)
 %
 %   
 % ACC August 2013
-
+    
 % >>
     if nargin<2 args.metric='correlation'; end
     if ~isfield(args,'metric') args.metric = 'correlation'; end
     dsm = pdist(dataset.samples, args.metric{1})';
 % <<
 
-end

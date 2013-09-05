@@ -16,68 +16,68 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %               slices in the dim-th dimension).
 %
 % NNO Aug 2013
-
-if nargin<2 || isempty(dim), dim=1; end
-if nargin<3 || isempty(slice_step), slice_step=1; end
-if nargin<4 || isempty(slice_start), slice_start=1; end
-if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
-
-if isstruct(data) && isfield(data,'samples')
-    data=cosmo_map2array(data);
-end
-
-if numel(size(data))~=3
-    error('expected 3D image - did you select a single volume?');
-end
-
-% get min and max values across the entire volume
-data_lin=data(:);
-mn=min(data_lin);
-mx=max(data_lin);
-
-% shift it so that we can walk over the first dimension
-data_sh=shiftdim(data, dim-1);
-
-if isempty(slice_stop)
-    slice_stop=size(data_sh,1);
-end
-
-if slice_step<0
-    nslices=-slice_step;
-    slice_step=ceil((slice_stop-slice_start+1)/nslices);
-end
-
-% determine which slices to show
-slice_idxs=slice_start:slice_step:slice_stop;
-nslices=numel(slice_idxs);
-
-plot_ratio=.8; % ratio between number of rows and colums
-nrows=ceil(sqrt(nslices)*plot_ratio);
-ncols=ceil(nslices/nrows);
-
-% use header depending on dim
-header_labels={'i','j','k'};
-
-% order of slices and whether the slice should be transposes
-xorder=[-1,1,1];
-yorder=[-1,1,-1];
-do_transpose=[true true false];
-
-for k=1:nslices
-    slice_idx=slice_idxs(k);
-    slice=squeeze(data_sh(slice_idx,:,:));
     
-    if xorder(dim)<0
-        slice=slice(end:-1:1,:);
-    end
-    if yorder(dim)<0
-        slice=slice(:,end:-1:1);
-    end
-    if do_transpose(dim)
-        slice=slice';
+    if nargin<2 || isempty(dim), dim=1; end
+    if nargin<3 || isempty(slice_step), slice_step=1; end
+    if nargin<4 || isempty(slice_start), slice_start=1; end
+    if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
+    
+    if isstruct(data) && isfield(data,'samples')
+        data=cosmo_map2array(data);
     end
     
-    subplot(nrows, ncols, k);
-    imagesc(slice, [mn, mx]);
-    title(sprintf('%s = %d', header_labels{dim}, slice_idx));
-end
+    if numel(size(data))~=3
+        error('expected 3D image - did you select a single volume?');
+    end
+    
+    % get min and max values across the entire volume
+    data_lin=data(:);
+    mn=min(data_lin);
+    mx=max(data_lin);
+    
+    % shift it so that we can walk over the first dimension
+    data_sh=shiftdim(data, dim-1);
+    
+    if isempty(slice_stop)
+        slice_stop=size(data_sh,1);
+    end
+    
+    if slice_step<0
+        nslices=-slice_step;
+        slice_step=ceil((slice_stop-slice_start+1)/nslices);
+    end
+    
+    % determine which slices to show
+    slice_idxs=slice_start:slice_step:slice_stop;
+    nslices=numel(slice_idxs);
+    
+    plot_ratio=.8; % ratio between number of rows and colums
+    nrows=ceil(sqrt(nslices)*plot_ratio);
+    ncols=ceil(nslices/nrows);
+    
+    % use header depending on dim
+    header_labels={'i','j','k'};
+    
+    % order of slices and whether the slice should be transposes
+    xorder=[-1,1,1];
+    yorder=[-1,1,-1];
+    do_transpose=[true true false];
+    
+    for k=1:nslices
+        slice_idx=slice_idxs(k);
+        slice=squeeze(data_sh(slice_idx,:,:));
+        
+        if xorder(dim)<0
+            slice=slice(end:-1:1,:);
+        end
+        if yorder(dim)<0
+            slice=slice(:,end:-1:1);
+        end
+        if do_transpose(dim)
+            slice=slice';
+        end
+        
+        subplot(nrows, ncols, k);
+        imagesc(slice, [mn, mx]);
+        title(sprintf('%s = %d', header_labels{dim}, slice_idx));
+    end
