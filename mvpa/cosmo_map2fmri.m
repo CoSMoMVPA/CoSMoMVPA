@@ -4,6 +4,14 @@ function hdr=cosmo_map2fmri(dataset, fn)
 % Usage 1: hdr=cosmo_map2fmri(dataset) returns a header structure
 % Usage 2: cosmo_map2fmri(dataset, fn) saves dataset to a volumetric file.
 %
+% - for NIFTI files, it requires the following toolbox:
+%   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
+%   (note that his toolbox is included in CoSMoMVPA in /externals)
+% - for Brainvoyager files (.vmp and .vtc), it requires the NeuroElf
+%   toolbox, available from: http://neuroelf.net
+% - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
+%   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%
 % NNO Aug 2013
     
     samples=dataset.samples;
@@ -34,6 +42,9 @@ function img_formats=get_img_formats()
     
     img_formats.bv_glm.builder=@build_bv_glm;
     img_formats.bv_glm.writer=@write_bv;
+    
+    img_formats.afni.builder=@build_afni;
+    img_formats.afni.writer=@write_afni;
     
     
 function img_format=get_img_format(dataset, img_formats)
@@ -131,9 +142,40 @@ function hdr=build_bv_glm(dataset)
     dataset.a=rmfield(dataset.a,'hdr_bv_glm');
     hdr=build_bv_vmp(dataset);
     
+
+function hdr=build_afni(dataset)
+    nsamples=size(dataset.samples,1);
+    hdr=dataset.a.hdr_afni; 
     
+    hdr.BRICK_TYPES=repmat(3,1,nsamples);
+    hdr.DATASET_RANK(2)=nsamples;
+    hdr.SCENE_DATA(2)=11; %brik
+    hdr.SCALE=0;
     
+    set_empty={'BRICK_LABS','BRICK_KEYWORDS','BRICK_STATS','BRICK_FLOAT_FACS'};
+    for k=1:numel(set_empty)
+        fn=set_empty{k};
+        hdr.(fn)=[];
+    end
     
+    % store data in this non-afni field
+    hdr.img=cosmo_map2array(dataset);
+    
+function write_afni(fn, hdr)    
+    
+    hdr.RootName=fn;
+    data=hdr.img; % get the data
+    hdr=rmfield(hdr,'img'); % remove the field
+
+    afniopt=struct();
+    afniopt.Prefix=fn; %the second input argument
+    afniopt.OverWrite='y';
+    afniopt.NoCheck=0;
+    
+    [err, ErrMessage]=WriteBrik(data, hdr, afniopt);
+    if err
+        error(ErrMessage);
+    end
     
     
     

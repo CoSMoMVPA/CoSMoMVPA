@@ -36,6 +36,10 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 % - for NIFTI files, it requires the following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 %   (note that his toolbox is included in CoSMoMVPA in /externals)
+% - for Brainvoyager files (.vmp and .vtc), it requires the NeuroElf
+%   toolbox, available from: http://neuroelf.net
+% - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
+%   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
 % ACC, NNO Aug, Sep 2013
      
@@ -174,6 +178,11 @@ function img_formats=get_img_formats()
     img_formats.bv_glm.matcher=@isa_bv_glm;
     img_formats.bv_glm.reader=@read_bv_glm;
     
+    img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
+                           '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
+                           '+tlrc.BRIK','+tlrc.BRIK.gz'};
+    img_formats.afni.matcher=@isa_afni;
+    img_formats.afni.reader=@read_afni;
     
 function ds=set_sa_vec(ds,p,fieldname)
     % helper: sets a sample attribute as a vector
@@ -262,7 +271,7 @@ function b=isa_nii(hdr)
     fa=struct();
     sa=struct();
     
-    %% Brainvoyager VMP (vmp)
+%% Brainvoyager VMP (vmp)
     
 function b=isa_bv_vmp(hdr)
     
@@ -329,5 +338,31 @@ function [data,hdr,a,fa,sa]=read_bv_glm(fn)
     sa.Name1=name1;
     sa.Name2=name2;
     sa.RGB=rgb;
+
+%% AFNI     
+function b=isa_afni(hdr)
+    b=iscell(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
+            isfield(hdr,'DATASET_RANK');
+
+function [data,hdr,a,fa,sa]=read_afni(fn)  
+    [err,data,hdr,err_msg]=BrikLoad(fn);
+    if err
+        error('Error reading afni file: %s', err_msg);
+    end
     
+    a=struct();
+    fa=struct();
+    sa=struct();
     
+    if isfield(hdr,'BRICK_LABS')
+        labs=['~' hdr.BRICK_LABS '~'];
+        pos=find(labs=='~');
+        ntilde=numel(pos-1);
+        nsamples=hdr.DATASET_RANK(2);
+        if ntilde >= nsamples
+            sa.labels=cell(nsamples,1);
+            for k=1:nsamples
+                sa.BRICK_LABS{k}=labs((pos(k)+1):(pos(k+1)-1));
+            end
+        end
+    end
