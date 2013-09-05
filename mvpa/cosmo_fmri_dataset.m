@@ -68,7 +68,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     [data,hdr,img_format,ds.a,ds.fa,ds.sa]=read_img(p.filename, img_formats);
      
     dims = size(data);
-    if sum(numel(dims)==[3 4])~=1, 
+    if all(numel(dims)~=[3 4])
         error('Need 3 or 4 dimensions'); 
     end
      
@@ -79,15 +79,21 @@ function ds = cosmo_fmri_dataset(filename, varargin)
      
     % is the volume 4D?
     is_4d=numel(size(data))==4;
+    
+    % define a potential mask
     if is_4d
         nt = dims(4);
     else
         nt=1;
     end
-     
-    % if a mask was supplied, load it
+    
+    auto_mask=data~=0 & isfinite(data);
+    if numel(size(auto_mask))==4
+        auto_mask=prod(~auto_mask,4)==0;
+    end
+        
     if isempty(p.mask)
-        nzero=sum(data(:)==0 | ~isfinite(data(:)));
+        nzero=sum(auto_mask(:));
         ntotal=prod(nxyz)*nt;
         thr=.1;
         if nzero/ntotal > thr
@@ -98,16 +104,17 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         end 
         mask_indices = [1:prod(nxyz)]'; % use all voxel indices
     else
+        % if a mask was supplied, load it
         if ischar(p.mask)
             m = read_img(p.mask, img_formats);
-        elseif islogical(p.mask) && numel(p.mask)==1 && p.mask
-            % mask==true
-            m = data~=0 & isfinite(data);
-            if is_4d
-                m=~sum(~m,4); % nonzero everywhere
+        elseif islogical(p.mask) && numel(p.mask)==1
+            if p.mask
+                m = auto_mask;
             end
-        else
+        elseif isnumeric(mask) || islogical(mask)
             m = p.mask;
+        else
+            error('Cannot deal with mask');
         end
      
         mdim = size(m);
@@ -119,7 +126,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
                 m=m(:,:,:,1);
                 warning('Found mask with %d volumes - using first', mdim(4));
             otherwise
-                error('illegal mask');
+                error('illegal mask: %d dimensions', mdim);
         end
      
         % sanity check to ensure the mask is properly shaped
@@ -127,7 +134,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
             error('mask size is different from data size');
         end
         
-        mask_indices=find(m);
+        mask_indices=find(m(:));
     end
      
     % compute the voxel indices
