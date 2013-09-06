@@ -84,7 +84,7 @@ function hdr=build_nii(dataset)
     hdr=dataset.a.hdr_nii;
     
     hdr.hdr.dime.dim(5)=nsamples;
-    hdr.hdr.dime.dim(2:4)=dataset.a.voldim;
+    hdr.hdr.dime.dim(2:4)=dataset.a.vol.dim;
     hdr.img=cosmo_map2array(dataset);
     
     function write_nii(fn, hdr)

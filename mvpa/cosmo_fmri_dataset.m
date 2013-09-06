@@ -26,7 +26,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     .a.hdr_{F} header information for this dataset, required to map the data
 %                back to a volumetric data file. Currently {F} can be 
 %                'nii'.
-%     .a.voldim  1x3 vector indicating the number of voxels in the 3
+%     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
 %     .sa        struct for holding sample attributes (e.g.,sa.targets,sa.chunks) 
 %     .fa        struct for holding sample attributes 
@@ -156,7 +156,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
      
     header_name=['hdr_' img_format];
     ds.a.(header_name) = hdr; % store header
-    ds.a.voldim=nxyz; % set the volume dimensions
+    ds.a.vol.dim=nxyz; % set the volume dimensions
      
     ds=set_sa_vec(ds,p,'targets');
     ds=set_sa_vec(ds,p,'chunks');

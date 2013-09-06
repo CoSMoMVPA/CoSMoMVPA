@@ -4,7 +4,7 @@ function vols=cosmo_map2array(dataset)
 % vols=cosmo_unflatten_fmri_dataset(dataset)
 %
 % Input
-%   dataset     dataset structure with fields a.voldim and
+%   dataset     dataset structure with fields a.vol.dim and
 %               .fa.voxel_indices (e.g. from cosmo_fmri_dataset)
 % 
 % Ouput
@@ -14,7 +14,7 @@ function vols=cosmo_map2array(dataset)
 % NNO Sep 2013
     
     
-    dime3=dataset.a.voldim;
+    dime3=dataset.a.vol.dim;
     samples=dataset.samples;
     nsamples=size(samples,1);
     
