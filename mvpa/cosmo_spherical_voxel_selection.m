@@ -7,7 +7,12 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
 %  - dataset       a dataset struct (from fmri_dataset)
 %  - radius        if positive, it indicates sphere radius (in voxel
 %                  units). If negative then (-radius) indicates the 
-%                  (minimum) number of voxels in each searchlight
+%                  (minimum) number of voxels that should be selected 
+%                  in each searchlight. 'minimum' means that at least 
+%                  (-radius) voxels are selected, and that the voxels that 
+%                  are not selected are all further away from the center
+%                  than those are not selected.
+%                  is vari
 %  - center_ids    Px1 vector with feature ids to consider. If omitted it
 %                  will consider all features in dataset
 % 
