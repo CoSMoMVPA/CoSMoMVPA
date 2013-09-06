@@ -1,27 +1,32 @@
-function offsets=cosmo_sphere_offsets(radius)
+function [offsets,distances]=cosmo_sphere_offsets(radius)
 % computes sub index offsets for voxels in a sphere
 %
 % offsets=cosmo_sphere_offsets(radius)
 %
 % Input
-%  - radius    radius of the sphere (in voxel units)
+%  radius      radius of the sphere (in voxel units)
 % 
 % Output
-%  - offsets   Px3 sub indices relative to the origin (0,0,0).
+%  offsets     Px3 sub indices relative to the origin (0,0,0).
 %              offsets(p,:)=[i, j, k] means that the euclidian distance 
 %              between points at (i,j,k) and the origin is less than or 
 %              or equal to radius
+%  distances   Px1 distances from the origin (in voxels)
+%
+% Note
+%  offsets and distances are sorted by distance
+%  
 %
 % Example
 % cosmo_sphere_offsets(1.5)'
-% > [ -1    -1    -1    -1    -1     0     0     0     0     0 ...
-% > [ -1     0     0     0     1    -1    -1    -1     0     0 ...
-% > [  0    -1     0     1     0    -1     0     1    -1     0 ...
+% >   [  0    -1     0     0     0     0     1    -1    -1    -1    -1 ...
+% >   [  0     0    -1     0     0     1     0    -1     0     0     1 ...
+% >   [  0     0     0    -1     1     0     0     0    -1     1     0 ...
+%      ...    0     0     0     0     1     1     1     1 ]
+%      ...   -1    -1     1     1    -1     0     0     1 ]
+%      ...   -1     1    -1     1     0    -1     1     0 ]
 %
-% ...    0     0     0     0     1     1     1     1     1 ]
-% ...    0     1     1     1    -1     0     0     0     1 ]
-% ...    1    -1     0     1     0    -1     0     1     0 ]
-% See also sub2ind, ind2sub
+% See also sub2ind, ind2sub, cosmo_spherical_voxel_selection
 %
 % NNO Aug 2013
     
@@ -56,4 +61,12 @@ function offsets=cosmo_sphere_offsets(radius)
     
     % cut off empty values at the end
     offsets=offsets(1:row_pos,:);
+    
+    % compute distances
+    distances=sqrt(sum(offsets.^2,2));
+    
+    % sort distances and apply to offsets
+    [distances,idxs]=sort(distances);
+    offsets=offsets(idxs,:);
+    
                 
