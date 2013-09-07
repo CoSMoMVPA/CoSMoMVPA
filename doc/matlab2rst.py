@@ -19,6 +19,7 @@ import os
 import glob
 from os.path import join, split
 matlab_dir='../mvpa'
+example_dir='../examples'
 rst_dir='source'
 
 add_indent=lambda x:' '*4+x
@@ -57,7 +58,9 @@ def matlab2rst(data, output=None):
     header=['.. code-block:: matlab','']
     return '\n'.join(header + map(add_indent, res))
 
-fns=glob.glob(join(matlab_dir,'*.m'))
+
+fns=sum([glob.glob(join(d,'*.m')) for d in [matlab_dir, example_dir]],[])
+fns.sort()
 
 for output in ('hdr','skl',None):
     print '@#$====> Converting matlab_%s.m files to *_%s.rst' % (output,output)
