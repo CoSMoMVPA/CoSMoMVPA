@@ -10,10 +10,17 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %               the function signature: output = measure(dataset, args)
 %       args:   a struct that contains all the fields necessary to the dataset
 %               measure. args get passed directly to the dataset measure.
-%       center_ids: vector indicating center ids to be used as a 
+%       radius: searchlight radius in voxels. If provided, the mapping from
+%               center2neighbors is computed using this radius and the
+%               cosmo_spherical_voxel_selection function
+%       center_ids:      vector indicating center ids to be used as a 
 %                        searchlight center. By default all feature ids are
 %                        used
-%       radius: searchlight radius in voxels (default: 3)
+%       center2neighbors: Px1 cell, if the dataset has P features, so that 
+%                         center2neighbors{K} contains the features that 
+%                         are in the neighborhood of the k-th feature.
+%                         This option is mutually exclusive with radius.
+%       
 %
 %   Returns
 %       results_map:    an instance of a cosmo_fmri_dataset where the samples
@@ -24,29 +31,38 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %
 %       ds = cosmo_fmri_dataset('data.nii','mask','brain_mask.nii', ...
 %                                'targets',targets,'chunks',chunks);
-%       cv = @cosmo_cross_validate;
-%       cv_args = struct();
-%       cv_args.classifier = @cosmo_classify_nn;
-%       cv_args.partitions = cosmo_nfold_partitioner(ds.sa.chunks);
-%       results = cosmo_searchlight(ds,cv,cv_args);     
-%       
-%       
+%       m = @cosmo_cross_validation_accuracy_measure;
+%       m_args = struct();
+%       m_args.classifier = @cosmo_classify_nn;
+%       m_args.partitions = cosmo_nfold_partitioner(ds);
+%       results = cosmo_searchlight(ds,m,'args',m_args,'radius',3);
+% See also: cosmo_spherical_voxel_selection       
+%
 % ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
     
     nfeatures=size(dataset.samples,2);
 
     parser = inputParser;
-    addOptional(parser,'radius',3);
+    addOptional(parser,'radius',[]);
     addOptional(parser,'center_ids',1:nfeatures);
     addOptional(parser,'args',struct());
+    addOptional(parser,'center2neighbors',[]);
+    addOptional(parser,'progress',1/50);
     parse(parser,varargin{:});
     p = parser.Results;
     radius = p.radius;
     args = p.args;
     center_ids=p.center_ids;
+    center2neighbors=p.center2neighbors;
 
     % use voxel selection function
-    center2neighbors=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
+    if ~xor(isempty(radius), isempty(center2neighbors))
+        error('need either radius or center2neighbors, exclusively');
+    elseif isempty(center2neighbors)
+        center2neighbors=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
+    else
+        center2neighbors={center2neighbors{center_ids}};
+    end
 
     % space for output, we will leave res empty for now because we can't know
     % yet the size of the array returned by our dtaset measure. Instead 
