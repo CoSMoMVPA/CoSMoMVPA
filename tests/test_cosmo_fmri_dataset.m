@@ -28,5 +28,5 @@ function test_io()
     es=cosmo_fmri_dataset(tmpfn);
     delete(tmpfn)
     assertElementsAlmostEqual(ds.samples, es.samples);
-    assertElementsAlmostEqual(ds.a.voldim, es.a.voldim);
+    assertElementsAlmostEqual(ds.a.vol.dim, es.a.vol.dim);
 
