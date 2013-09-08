@@ -1,4 +1,4 @@
-function partitions = cosmo_splithalf_partitioner(chunks)
+function partitions = cosmo_evenodd_partitioner(chunks)
 % generates an n-fold partition scheme
 %
 % partitions=cosmo_splithalf_partitioner(chunks)
@@ -14,13 +14,20 @@ function partitions = cosmo_splithalf_partitioner(chunks)
 %                    sample indices for the odd and even chunks
 %                    
 % Example:
-% p=cosmo_splithalf_partitioner([1 1 2 2 3 3 3])
-% > p = train_indices: {[5x1 double]  [2x1 double]}
-% >     test_indices: {[2x1 double]  [5x1 double]}
-% p.train_indices{1}'
-% >     [1 2 5 6 7]
-% p.test_indices{1}'
-% >     [3 4]
+% cosmo_oddeven_partitioner([1 1 2 2 3 3 3])
+% >    train_indices: {[3 4]  [1 2 5 6 7]}
+% >    test_indices: {[1 2 5 6 7]  [3 4]}
+%
+% Notes: 
+% - For splithalf correlation measures it is recommended to use 
+%   cosmo_nchoosek_partitioner(chunks,'half'). 
+% - More generally, this function is intended as an exercise. If
+%   chunks is different from 1:K for some K, then it may yield non-optimal
+%   partitions. In particular, if all chunks are either even or odd,
+%   then either train_indices or test_indices is empty for each partition.
+%   Is is thus advised to use cosmo_nchoosek_partitioner(chunks,.5);
+%
+% See also cosmo_nchoosek_partitioner
 %
 % NNO Aug 2013
     
@@ -32,30 +39,29 @@ function partitions = cosmo_splithalf_partitioner(chunks)
         end
     end
     
-    unq=unique(chunks);
-    nchunks=numel(unq);
+    % there are two partitions
+    npartitions=2;
     
     % allocate space for output
-    train_indices=cell(1,nchunks);
-    test_indices=cell(1,nchunks);
+    train_indices=cell(npartitions,1);
+    test_indices=cell(npartitions,1);
     
     % Make partitions using even and odd chunks
     % >>
     
-    nsamples=numel(chunks);
-    halfmask=false(nsamples,1);
-    for k=1:2:nchunks
-        halfmask=halfmask | chunks==unq(k);
-    end
+    % generate a mask with even indices
+    even_mask=mod(chunks,2)==0;
     
-    half1=find(halfmask);
-    half2=find(~halfmask);
+    % find the indices of even and odd chunks
+    even_indices=find(even_mask);
+    odd_indices=find(~even_mask);
     
-    train_indices{1}=half1;
-    train_indices{2}=half2;
+    % set the train and test indices
+    train_indices{1}=even_indices;
+    train_indices{2}=odd_indices;
     
-    test_indices{1}=half2;
-    test_indices{2}=half1;
+    test_indices{1}=odd_indices;
+    test_indices{2}=even_indices;
     
     % <<
     
