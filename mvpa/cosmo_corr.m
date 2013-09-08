@@ -1,14 +1,15 @@
 function c=cosmo_corr(x,y)
-% Computes pearson correlation - a lot quicker than matlab's "corr"
-% function
+% Computes pearson correlation - faster than than matlab's "corr".
 %
-% Syntax: C=PHOEBE_CORR(X,Y)
+% c=comso_corr(x[,y])
 %
 % Inputs:
-%   X: PxM matrix
-%   Y: PxN matrix
+%   x      PxM matrix
+%   y      PxN matrix (optional). If omitted then y=x.
 % Output:
-%   C: MxN matrix with C(i,j)=corr(X(:,i),Y(:,j))
+%   c      MxN matrix with c(i,j)=corr(x(:,i),y(:,j))
+%
+% See also: corr
 %
 % NNO Sep 2013 (from phoebe_corr, July 2010)
 
@@ -27,4 +28,5 @@ n=1/(size(x,1)-1);
 xs=bsxfun(@power,n*sum(xd .* xd),-0.5);
 ys=bsxfun(@power,n*sum(yd .* yd),-0.5);
 
+% compute correlations
 c=n * (xd' * yd) .* (xs' * ys);
