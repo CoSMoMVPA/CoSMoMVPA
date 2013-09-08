@@ -43,9 +43,9 @@ function [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions
         % <<
     end
     
-    pred=cosmo_winner_indices(all_pred);
-    test_targets = dataset.sa.targets(test_indices{k});
-    ncorrect = sum(p(:) == test_targets(:));
-    ntotal = numel(test_targets);
+    [pred,classes]=cosmo_winner_indices(all_pred);
+    correct_mask=dataset.sa.targets(test_mask)==classes(pred);
+    ncorrect = sum(correct_mask);
+    ntotal = numel(correct_mask);
     
     accuracy = ncorrect/ntotal;
