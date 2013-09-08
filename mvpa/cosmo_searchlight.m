@@ -70,6 +70,18 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     ncenters=numel(center_ids);
     res=[];
 
+    % see if progress is to be reported
+    show_progress=~isempty(p.progress);
+    if show_progress
+        progress_step=p.progress;
+        if progress_step<1
+            progress_step=ceil(ncenters*progress_step);
+        end
+        prev_progress_msg='';
+        clock_start=clock();
+    end
+    
+    
     % go over all features; for each feature, apply the measure and 
     % store its output.
     % >>
@@ -100,9 +112,10 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
         % Store the results
         res(:,k)=m;
 
-        % show progress every 1000 steps
-        if k==1 || mod(k,1000)==0 || k==nfeatures
-            fprintf('%d / %d features completed\n', k, nfeatures);
+        if show_progress && (k==1 || mod(k,progress_step)==0 || k==nfeatures)
+            msg=sprintf('mean %.3f',mean(mean(res(:,1:k))));
+            prev_progress_msg=cosmo_show_progress(clock_start, ...
+                            k/ncenters, msg, prev_progress_msg);
         end
     end
     % <<

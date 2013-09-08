@@ -1,4 +1,4 @@
-function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(dataset, radius, center_ids)
+function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(dataset, radius, center_ids, opt)
 % computes neighbors for a spherical searchlight
 %
 % center2neighbors=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])
@@ -31,6 +31,16 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
         center_ids=1:nfeatures;
     end
     
+    if nargin<4 || isempty(opt);
+        opt=struct;
+    end
+    
+    if ~isfield(opt,'progress')
+        opt.progress=1000;
+    end
+    
+    show_progress=opt.progress>0;
+    
     % get size of original volume
     orig_dim=dataset.a.vol.dim;
     orig_nvoxels=prod(orig_dim);
@@ -53,6 +63,15 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
     ncenters=numel(center_ids);
     center2neighbors=cell(ncenters,1);
     neighborhood_size=zeros(ncenters,1);
+    
+    if show_progress
+        if opt.progress<1
+            opt.progress=ceil(ncenters/opt.progress);
+        end
+        clock_start=clock();
+        prev_progress_msg='';
+    end
+    
     
     % go over all features
     for k=1:ncenters
@@ -131,9 +150,10 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
             neighborhood_size(k)=variable_radius;
         end
         
-        if k==1 || k==ncenters || mod(k,100)==0
+        if show_progress && (k==1 || k==ncenters || mod(k,opt.progress)==0)
             mean_size=mean(neighborhood_size(1:k));
-            fprintf('completed %d / %d centers (mean size %.1f)\n', k, ncenters, mean_size);
+            msg=sprintf('mean size %.1f', mean_size);
+            prev_progress_msg=cosmo_show_progress(clock_start, k/ncenters, msg, prev_progress_msg);
         end
     end
     
