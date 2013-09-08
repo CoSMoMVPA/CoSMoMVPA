@@ -8,7 +8,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %               load_nii), or a 3D array with data. data should contain 
 %               data from a single volume (sample) only.
 %  dim          dimension according to which slices are plotted 
-%               (default: 1).
+%               (default: 3).
 %  slice_step   step between slices (default: 1). If negative then 
 %               -slice_step indicates the number of slices
 %  slice_start  the index of the first slice to plot (default: 1).
@@ -17,8 +17,8 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %
 % NNO Aug 2013
     
-    if nargin<2 || isempty(dim), dim=1; end
-    if nargin<3 || isempty(slice_step), slice_step=1; end
+    if nargin<2 || isempty(dim), dim=3; end
+    if nargin<3 || isempty(slice_step), slice_step=-20; end
     if nargin<4 || isempty(slice_start), slice_start=1; end
     if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
     
@@ -59,9 +59,13 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     header_labels={'i','j','k'};
     
     % order of slices and whether the slice should be transposes
-    xorder=[-1,1,1];
-    yorder=[-1,1,-1];
-    do_transpose=[true true false];
+    %xorder=[-1,1,1];
+    %yorder=[-1,1,-1];
+    %do_transpose=[true true false];
+    xorder=[-1 -1 1];
+    yorder=[-1 1 -1];
+    do_transpose=[true false true];
+    
     
     for k=1:nslices
         slice_idx=slice_idxs(k);
