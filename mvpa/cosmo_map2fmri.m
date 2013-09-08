@@ -20,6 +20,9 @@ function hdr=cosmo_map2fmri(dataset, fn)
     img_formats=get_img_formats();
     img_format=get_img_format(dataset, img_formats);
     
+    externals=img_formats.(img_format).externals;
+    cosmo_check_external(externals);
+    
     builder=img_formats.(img_format).builder;
     hdr=builder(dataset);
     
@@ -36,15 +39,19 @@ function img_formats=get_img_formats()
     
     img_formats.nii.builder=@build_nii;
     img_formats.nii.writer=@write_nii;
+    img_formats.nii.externals={'nifti'};
     
     img_formats.bv_vmp.builder=@build_bv_vmp;
     img_formats.bv_vmp.writer=@write_bv;
+    img_formats.bv_vmp.externals={'neuroelf'};
     
     img_formats.bv_glm.builder=@build_bv_glm;
     img_formats.bv_glm.writer=@write_bv;
+    img_formats.bv_glm.externals={'neuroelf'};
     
     img_formats.afni.builder=@build_afni;
     img_formats.afni.writer=@write_afni;
+    img_formats.afni.externals={'afni'};
     
     
 function img_format=get_img_format(dataset, img_formats)

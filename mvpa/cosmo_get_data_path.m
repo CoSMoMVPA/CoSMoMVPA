@@ -17,16 +17,24 @@ function data_path=cosmo_get_data_path(subject_id)
         % specific code for NNO
         [p,q]=unix('uname -n');
         if p==0 && isempty(strmatch(lower(q),'nicks-macBook-pro'))
-            data_path='/Users/nick/git/cosmo_repo2/data/';
+            data_path='/Users/nick/organized/_datasets/CoSMoMVPA';
         end
     end
     
     
     if nargin>=1
-        if isnumeric(subject_id)
-            subject_id=sprintf('s%02d', subject_id);
+        switch subject_id
+            case {'finger','5cat'}
+                subdir=subject_id;
+            otherwise
+                %ak6, use subdir of subject
+    
+                if isnumeric(subject_id)
+                    subject_id=sprintf('s%02d', subject_id);
+                end
+                subdir=fullfile('ak6',subject_id);
         end
-        data_path=fullfile(data_path, subject_id);
+        data_path=fullfile(data_path, subdir);
     end
     
     if ~exist(data_path,'file')

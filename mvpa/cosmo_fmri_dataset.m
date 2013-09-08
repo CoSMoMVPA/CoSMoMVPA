@@ -107,10 +107,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         % if a mask was supplied, load it
         if ischar(p.mask)
             m = read_img(p.mask, img_formats);
-        elseif islogical(p.mask) && numel(p.mask)==1
-            if p.mask
-                m = auto_mask;
-            end
+        elseif islogical(p.mask) && numel(p.mask)==1 && p.mask
+            m = auto_mask;
         elseif isnumeric(mask) || islogical(mask)
             m = p.mask;
         else
@@ -171,37 +169,43 @@ function img_formats=get_img_formats()
     % .exts indicates the extensions
     % .matcher says whether a struct is of the type
     % .reader should read a filaname and return a struct
+    % .externals are fed to cosmo_check_externals
     img_formats=struct();
     
     img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
     img_formats.nii.matcher=@isa_nii;
     img_formats.nii.reader=@read_nii; % this is a wrapper defined below
+    img_formats.nii.externals={'nifti'};
     
     img_formats.bv_vmp.exts={'.vmp'};
     img_formats.bv_vmp.matcher=@isa_bv_vmp;
     img_formats.bv_vmp.reader=@read_bv_vmp;
+    img_formats.bv_vmp.externals={'neuroelf'};
     
     img_formats.bv_glm.exts={'.glm'};
     img_formats.bv_glm.matcher=@isa_bv_glm;
     img_formats.bv_glm.reader=@read_bv_glm;
+    img_formats.bv_glm.externals={'neuroelf'};
     
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
                            '+tlrc.BRIK','+tlrc.BRIK.gz'};
     img_formats.afni.matcher=@isa_afni;
     img_formats.afni.reader=@read_afni;
+    img_formats.afni.externals={'afni'};
     
 function ds=set_sa_vec(ds,p,fieldname)
     % helper: sets a sample attribute as a vector
-    % throws an error if it has the from size
+    % throws an error if it has the wrong size
     nsamples=size(ds.samples,1);
     v=p.(fieldname);
     n=numel(v);
     if n==1
+        % singleton element - repeat nsamples times.
         v=repmat(v,nsamples,1);
         n=nsamples;
     end
-    if not (n==0 || n==nsamples)
+    if ~(n==0 || n==nsamples)
         error('size mismatch for %s: expected %d values, found %d', ...
                         fieldname, nsamples, n);
     end
@@ -248,6 +252,11 @@ function [data,hdr,img_format,a,fa,sa]=read_img(fn, img_formats)
     
     img_format=find_img_format(fn, img_formats);
     
+    % make sure the required externals exist
+    externals=img_formats.(img_format).externals;
+    cosmo_check_external(externals);
+    
+    % read the data
     reader=img_formats.(img_format).reader;
     [data,hdr,a,fa,sa]=reader(fn);
     
