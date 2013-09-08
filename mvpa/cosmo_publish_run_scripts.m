@@ -27,7 +27,7 @@ function cosmo_publish_build_html(force)
         error('The function %s should be run from its root directory (%s)',...
                 mfilename(), medir)
     end
-    srcdir=fullfile(pdir,'.');
+    srcdir=fullfile(pdir,'../examples/');
     trgdir=fullfile(pdir,'..//doc/source/_static/publish/');
     
     if isunix()
