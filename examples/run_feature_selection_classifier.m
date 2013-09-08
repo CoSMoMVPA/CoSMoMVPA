@@ -4,7 +4,7 @@
 data_path=cosmo_get_data_path('s01');
 
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
-mask_fn=fullfile(data_path,'ev_mask.nii');
+mask_fn=fullfile(data_path,'vt_mask.nii');
 ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);

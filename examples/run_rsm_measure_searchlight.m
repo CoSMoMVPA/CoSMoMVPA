@@ -20,12 +20,16 @@ load([models_path 'behav_sim.mat']);
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
 measure_args.target_dsm = behav;
+% <<
 
-results = cosmo_searchlight(ds,measure,'args',measure_args); 
+% Run the searchlight
+results = cosmo_searchlight(ds,measure,'args',measure_args,'radius',3); 
 
+% Savethe results to disc
 cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);
 
 %% Make a histogram of classification accuracies
 hist(results.samples,47)
 
-
+%% Show some slices
+cosmo_plot_slices(results);

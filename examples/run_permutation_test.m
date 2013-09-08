@@ -15,8 +15,13 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
-classifier=@cosmo_classify_naive_bayes;
-partitions=cosmo_splithalf_partitioner(ds);
+% Only consider four classes (otherwise the classifier does extremily well)                    
+ds=cosmo_dataset_slice_samples(ds,ds.sa.targets<=4);                    
+                    
+classifier=@cosmo_classify_nn;
+
+% for more speed, just do odd-even partitioning
+partitions=cosmo_oddeven_partitioner(ds);
 
 %% compute classification accuracy of the original data
 [pred, acc]=cosmo_cross_validate(ds, classifier, partitions);
@@ -42,5 +47,5 @@ bar(bins,h)
 hold on
 line([acc acc],[0,max(h)])
 hold off
-title(sprintf('acc=%.3f',acc))
+title(sprintf('acc=%.3f',acc)) 
 

@@ -48,7 +48,7 @@ for dim=1:3
     figure
     % >>
     % make a new figure
-    cosmo_plot_slices(ni,dim,slice_step);
+    cosmo_plot_slices(ni.img,dim,slice_step);
     % <<
 end
 

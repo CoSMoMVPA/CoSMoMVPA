@@ -57,3 +57,6 @@ ni = cosmo_map2fmri(ds, [data_path '/primates_minus_bugs.nii']);
 imagesc(ni.img(:,:,4));
 
 % <<
+
+%% Plot slices using cosmo_plot_slices
+cosmo_plot_slices(ni.img)
