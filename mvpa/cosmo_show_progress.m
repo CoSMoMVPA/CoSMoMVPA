@@ -1,5 +1,5 @@
 function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_progress_line)
-% Shows a progress bar and time elapsed and expected to complete.
+% Shows a progress bar, and time elapsed and expected to complete.
 %
 % progress_line=cosmo_show_progress(clock_start, progress[, msg[, prev_progress_line]])
 %
@@ -24,11 +24,13 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
 %                       (using linear extrapolation). 
 %
 % Notes:
-%   As a side effect of this function, progress_msg is written to standard
-%   out (the console).
+%   - As a side effect of this function, progress_msg is written to standard
+%     out (the console). 
+%   - The use of prev_progress_line may not work properly if output is
+%     written to standard out without using this function.
 %
 % Example:
-%   % this code takes 3 seconds to run and fill the progress bar
+%   % this code takes just over 3 seconds to run, and fills a progress bar.
 %   prev_msg=''; 
 %   clock_start=clock(); 
 %   for k=0:100
@@ -41,35 +43,34 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
 %
 % NNO Sep 2013 
 
-
-    if nargin<4
-        delete_count=0;
+    if nargin<4 || isempty(prev_progress_line)
+        delete_count=0; % nothing to delete
     elseif ischar(prev_progress_line)
-        delete_count=numel(prev_progress_line);
-    end
+        delete_count=numel(prev_progress_line); % count the characters
+    end % if not a string, die ungracefully
     
     if nargin<3 || isempty(msg)
         msg='';
     end
     if progress<0 || progress>1
-        error('illegal progress: should be between 0 and 1');
+        error('illegal progress %d: should be between 0 and 1', progress);
     end
     
     took=etime(clock, clock_start);
-    
-    eta=(1-progress)/progress*took;
+    eta=(1-progress)/progress*took; % 'estimated time of arrival'
    
+    % set number of backspace characters
     delete_str=repmat('\b',1,delete_count);
     
+    % define the bar
     bar_width=20;
     bar_done=round(progress*bar_width);
     bar_eta=bar_width-bar_done;
     bar_str=[repmat('#',1,bar_done) repmat('-',1,bar_eta)];
     
-    % because msg may contain the '%' character (which is not interpolated)
-    % care is needed to ensure that neither building the progress line nor
-    % printing it to standard out applies interpolation
-    
+    % because msg may contain the '%' character (which is not to be 
+    % interpolated) care is needed to ensure that neither building the 
+    % progress line nor printing it to standard out applies interpolation. 
     progress_line=[sprintf('+%s [%s] -%s  ', secs2str(took), bar_str, ...
                                         secs2str(-eta)),...
                    msg,...           % avoid pattern replacement of '%'
@@ -79,29 +80,30 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
     fprintf([delete_str strrep(progress_line,'%','%%')]);
     
     function [m,d]=moddiv(x,y)
-        % helper function that does mod and div together
+        % helper function that does mod and div together so that m+d*y==x
         m=mod(x,y);
-        d=(x-m)/y;
+        d=(x-m)/y; 
 
     function str=secs2str(secs)
-        % helper function that formats the number of seconds as a string
-        is_neg=secs<0;
-        if is_neg
-            secs=-secs;
-        end
+        % helper function that formats the number of seconds as 
+        % human-readable string
+        
+        % make secs positive (calling function should add '+' or '-')
+        secs=abs(secs);
         
         if ~isfinite(secs)
-            str='oo';
+            str='oo'; % attempt to look like 'infinity' symbol
             return
         end
         
-        secs=round(secs);
+        secs=round(secs); % do not provide sub-second precision
         
+        % compute number of seconds, minutes, hours, and days
         [s,secs]=moddiv(secs,60);
         [m,secs]=moddiv(secs,60);
         [h,d]=moddiv(secs,24);
         
-        % add prefix for day and sign, if necessary
+        % add prefix for day, if secs represents at least one day
         if d>0, daypf='%d+'; else daypf=''; end
         
         str=sprintf('%s%02d:%02d:%02d', daypf, h, m, s);
