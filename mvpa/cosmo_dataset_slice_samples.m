@@ -7,7 +7,7 @@ function dataset=cosmo_dataset_slice_samples(dataset, samples_to_select)
     
     nsamples_orig=size(dataset.samples,1);
     dataset.samples=dataset.samples(samples_to_select,:);
-    
+    nsamples=size(dataset.samples,1);
     
     fns=fieldnames(dataset.sa);
     n=numel(fns);
@@ -15,7 +15,7 @@ function dataset=cosmo_dataset_slice_samples(dataset, samples_to_select)
         fn=fns{k};
         v=dataset.sa.(fn);
         if iscell(v)
-            w={v{samples_to_select}};
+            dataset.sa.(fn)=reshape({v{samples_to_select,:}},nsamples,[]);
         else
             if isempty(v)
                 continue

@@ -7,6 +7,7 @@ function dataset=cosmo_dataset_slice_features(dataset, features_to_select)
     
     nfeatures_orig=size(dataset.samples,2);
     dataset.samples=dataset.samples(:,features_to_select);
+    nfeatures=size(dataset.samples,2);
     
     fns=fieldnames(dataset.fa);
     n=numel(fns);
@@ -14,7 +15,7 @@ function dataset=cosmo_dataset_slice_features(dataset, features_to_select)
         fn=fns{k};
         v=dataset.fa.(fn);
         if iscell(v)
-            w={v{features_to_select}};
+            dataset.fa.(fn)=reshape({v{:,features_to_select}},[],nfeatures);
         else
             if numel(v)==nfeatures_orig
                 v=v(:)'; % ensure row vector
