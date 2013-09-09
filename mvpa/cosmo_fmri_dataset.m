@@ -187,6 +187,12 @@ function img_formats=get_img_formats()
     img_formats.bv_glm.reader=@read_bv_glm;
     img_formats.bv_glm.externals={'neuroelf'};
     
+    img_formats.bv_msk.exts={'.msk'};
+    img_formats.bv_msk.matcher=@isa_bv_msk;
+    img_formats.bv_msk.reader=@read_bv_msk;
+    img_formats.bv_msk.externals={'neuroelf'};
+    
+    
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
                            '+tlrc.BRIK','+tlrc.BRIK.gz'};
@@ -354,7 +360,21 @@ function [data,hdr,a,fa,sa]=read_bv_glm(fn)
     sa.Name1=name1;
     sa.Name2=name2;
     sa.RGB=rgb;
+    
+function b=isa_bv_msk(hdr)    
+    
+    b=isa(hdr,'xff') && isfield(hdr, 'Mask');
 
+    
+function [data,hdr,a,fa,sa]=read_bv_msk(fn)
+    hdr=xff(fn);
+    a=[];
+    fa=[];
+    sa=[];
+    
+    data=hdr.Mask>0;
+    hdr=[]; % set to empty - may crash (as it should) when used as dataset
+    
 %% AFNI     
 function b=isa_afni(hdr)
     b=iscell(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
