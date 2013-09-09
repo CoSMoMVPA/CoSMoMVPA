@@ -16,14 +16,17 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
 %                 (Note: this can be used to test for representational
 %                 similarity matching)
 %    .merge_func  A function handle used to merge data from matching
-%                 targets in the same chunk. Default
+%                 targets in the same chunk. Default is @(x) mean(x,1),
+%                 meaning that values are averaged over the same samples.
+%                 It is assumed that isequal(args.merge_func(y),y) if y 
+%                 is a row vector.
+%    .corr_type   Type of correlation: 'Pearson','Spearman','Kendall'.
+%                 The default is 'Pearson'.
 %
 % Output:
 %    delta        Measure indicating how well the template matrix 
 %                 correlates with the correlation matrix from the two
 %                 halves (averaged over partitions).
-%
-% Notes: currently supports only cases 
 %
 % Example:
 %   % assumes 5 classes per half, for example from GLM
@@ -41,20 +44,27 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
 % NNO Sep 2013
     
      
-    
+    % process input arguments
     if nargin<2
         args=struct();
     end
+    
     if ~isfield(args,'opt') args=struct(); end
     
     if ~isfield(args,'partitions') 
-        partitions=cosmo_nchoosek_partitioner(ds,'half');
+        args.partitions=cosmo_nchoosek_partitioner(ds,'half');
     end
     
     if ~isfield(args,'merge_func')
-        args.merge_func=@mean;
+        args.merge_func=@(x) mean(x,1);
     end
     
+    if ~isfield(args,'corr_type')
+        args.corr_type='Pearson';
+    end
+    
+    % check partitions
+    partitions=args.partitions;
     npartitions=numel(partitions.train_indices);
     npartitions_=numel(partitions.test_indices);
     
@@ -63,23 +73,30 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
                     npartitions,npartitions_);
     end
     
-    sh_corrs=zeros(npartitions,1); % allocate space for each partition
+    % allocate space for each partition
+    sh_corrs=zeros(npartitions,1);
     
-    nfeatures=size(ds.samples,2);
+    % compute the measure
+    [nsamples,nfeatures]=size(ds.samples);
+    
     for k=1:npartitions
         halves_indices={partitions.train_indices{k},...
                         partitions.test_indices{k}};
         % allocate space for data of two halves
         halves_data=cell(2,1);
         
+        sample_use_count=zeros(1,nsamples); % keep track of how often each
+                                         % sample was used
+        
         % process each half seperately 
         for j=1:2
             sample_idxs=halves_indices{j};
+            sample_use_count(sample_idxs)=sample_use_count(sample_idxs)+1;
             half_samples=ds.samples(sample_idxs,:);
             half_targets=ds.sa.targets(sample_idxs);
             if isequal(1:max(half_targets),half_targets')
                 % common case: just take the data (this reduces the 
-                % compution to a third)
+                % compution time by up to a third)
                 nclasses=numel(half_targets);
                 merged_half_data=half_samples;
             else
@@ -98,17 +115,19 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
                     if size(half_data,1)==1
                         merged_half_data=half_data;
                     else
-                        merged_half_data(m,:)=args.merge_func(half_data,1);
+                        merged_half_data(m,:)=args.merge_func(half_data);
                     end
                 end
             
             end
             halves_data{j}=merged_half_data;
         end
-            
         
-        
-               
+        if any(sample_use_count>1)
+            % prevent double dipping
+            error('Same sample used in two halves - double dipping');
+        end
+              
         if k==1
             % set up template
             if isfield(args, 'template')
