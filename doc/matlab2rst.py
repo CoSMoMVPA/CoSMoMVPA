@@ -54,6 +54,8 @@ def matlab2rst(data, output=None):
         if add_line:
             res.append(line)
 
+    if in_skeleton:
+        raise ValueError('%s\n\n: no end of skeleton', data)
 
     header=['.. code-block:: matlab','']
     return '\n'.join(header + map(add_indent, res))
