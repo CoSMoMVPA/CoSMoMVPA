@@ -21,19 +21,14 @@ function ds=cosmo_dataset_slice(ds, elements_to_select, dim)
 % NNO Sep 2013
 
     if nargin<3 || isempty(dim), dim=1; end
-    if ~any(dim==1:2), error('dim should be 1 or 2'); end
     
-    shift=dim-1; % how much to shift
+    % slice the samples
+    full_data=ds.samples;
+    nfull=size(full_data,dim);
+    ds.samples=slice_array(full_data,elements_to_select,dim);
+    nsliced=size(ds.samples,dim);
     
-    % Deal tith .samples
-    % Shift first so that slicing is done along the first dimension
-    % irrespectective of value of dim, then shift back.
-    full_data=shiftdim(ds.samples,shift); % shift forward
-    nfull=size(full_data,1); % how many values along dim and other
-    data=full_data(elements_to_select,:); % select data
-    nsliced=size(data,1);
-    ds.samples=shiftdim(data, shift); % shift back (data is 2D)
-    
+    % now deal with either feature or sample attributes
     attr_fns={'sa','fa'};
     attr_fn=attr_fns{dim}; % fieldname of attribute to slice
     
@@ -48,24 +43,53 @@ function ds=cosmo_dataset_slice(ds, elements_to_select, dim)
         fn=fns{k};
         
         v=attrs.(fn);
-        v_shift=shiftdim(v,shift); % shift forward
         
-        % check the size
-        if size(v_shift,1)~=nfull
-            error(['Expected %d values for field %s.%s in %-th ',...
-                    'dimension, found %d'],...
-                    nvalues, attr_fn, fn, dim, size(v_shift,1));
+        if isempty(v)
+            continue;
         end
         
-        if iscell(v_shift)
-            % cells are tricky - they become linear after slicing, and have
-            % to be put back in shape
-            v_shift=reshape({v_shift{elements_to_select,:}},nsliced,[]);
+        if size(v,dim)~=nfull
+            error('%d elements in %s.%s, expected %d',...
+                    size(v,dim),attr_fn,fn,nfull);
+        end
+        
+        if iscell(v)
+            v_sliced=slice_cell(v, elements_to_select,dim);
         else
-            v_shift=v_shift(elements_to_select,:);
+            v_sliced=slice_array(v, elements_to_select,dim);
         end
         
-        attrs.(fn)=shiftdim(v_shift,shift); % shift back
+        if size(v_sliced,dim)~=nsliced
+            error('%d elements in sliced %s.%s, expected %d',...
+                    size(v,dim),attr_fn,fn,nsliced);
+        end
+        
+        attrs.(fn)=v_sliced; % set the sliced values
     end
     ds.(attr_fn)=attrs;
+    
+    
+    function y=slice_array(x, to_select, dim)
+        % slices the array x along dim with indices, where dim in [1,2]
+        if dim==1
+            y=x(to_select,:);
+        elseif dim==2
+            y=x(:,to_select);
+        else
+            error('dim should be 1 or 2');
+        end
+        
+    function y=slice_cell(x, to_select, dim)
+        % slices the cell x along dim with indices, where dim in [1,2]
+        if dim==1
+            % cells are tricky - they become linear after slicing, and have
+            % to be put back in shape
+            n_other_dim=size(x,2);
+            y=reshape({x{to_select,:}},[],n_other_dim);
+        elseif dim==2
+            n_other_dim=size(x,1);
+            y=reshape({x{:, to_select}},n_other_dim,[]);
+        else
+            error('dim should be 1 or 2');
+        end
     
