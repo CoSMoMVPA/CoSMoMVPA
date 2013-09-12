@@ -20,6 +20,12 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %                         center2neighbors{K} contains the features that 
 %                         are in the neighborhood of the k-th feature.
 %                         This option is mutually exclusive with radius.
+%       ds_a_fa           dataset-like structure but without .sa and
+%                         .samples. Required only if center2neighbors is
+%                         not provided. This forms the template for the
+%                         output dataset. It should have the fields:
+%         .a              struct with dataset attributes
+%         .fa             struct with feature attributes
 %       
 %
 %   Returns
@@ -47,6 +53,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     addOptional(parser,'center_ids',1:nfeatures);
     addOptional(parser,'args',struct());
     addOptional(parser,'center2neighbors',[]);
+    addOptional(parser,'ds_a_fa',[]);
     addOptional(parser,'progress',1/50);
     parse(parser,varargin{:});
     p = parser.Results;
@@ -54,14 +61,22 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     args = p.args;
     center_ids=p.center_ids;
     center2neighbors=p.center2neighbors;
+    ds_a_fa=p.ds_a_fa;
 
     % use voxel selection function
     if ~xor(isempty(radius), isempty(center2neighbors))
         error('need either radius or center2neighbors, exclusively');
     elseif isempty(center2neighbors)
-        center2neighbors=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
+        if ~isempty(ds_a_fa)
+            error('center2neighbors not specified but ds_a_fa is?');
+        end
+        [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
     else
+        if isempty(ds_a_fa)
+            error('center2neighbors specified but ds_a_fa is not?');
+        end
         center2neighbors={center2neighbors{center_ids}};
+        ds_a_fa=cosmo_dataset_slice(ds, center_ids);
     end
 
     % space for output, we will leave res empty for now because we can't know
@@ -69,7 +84,8 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % space will be allocated after the first times the measure is used. 
     ncenters=numel(center_ids);
     res=[];
-
+    
+    
     % see if progress is to be reported
     show_progress=~isempty(p.progress);
     if show_progress
@@ -121,7 +137,13 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % <<
 
     % store the output in a dataset
-    results_map=cosmo_dataset_slice(dataset, center_ids, 2);
+    results_map=ds_a_fa;
+    
+    % set center_ids for the output dataset
+    all_feature_ids=1:size(dataset.samples,2);
+    results_map.fa.center_ids=reshape(all_feature_ids(center_ids),1,[]);
+    
+    % store the result from the measure
     results_map.samples=res;
     
     

@@ -1,27 +1,28 @@
-function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(dataset, radius, center_ids, opt)
+function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius, center_ids, opt)
 % computes neighbors for a spherical searchlight
 %
 % center2neighbors=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])
 %
 % Inputs
-%  - dataset       a dataset struct (from fmri_dataset)
-%  - radius        if positive, it indicates sphere radius (in voxel
-%                  units). If negative then (-radius) indicates the 
-%                  (minimum) number of voxels that should be selected 
-%                  in each searchlight. 'minimum' means that at least 
-%                  (-radius) voxels are selected, and that the voxels that 
-%                  are not selected are all further away from the center
-%                  than those are not selected.
-%  - center_ids    Px1 vector with feature ids to consider. If omitted it
-%                  will consider all features in dataset
+%   dataset       a dataset struct (from fmri_dataset)
+%   radius        if positive, it indicates sphere radius (in voxel
+%                 units). If negative then (-radius) indicates the 
+%                 (minimum) number of voxels that should be selected 
+%                 in each searchlight. 'minimum' means that at least 
+%                 (-radius) voxels are selected, and that the voxels that 
+%                 are not selected are all further away from the center
+%                 than those are not selected.
+%   center_ids    Px1 vector with feature ids to consider. If omitted it
+%                 will consider all features in dataset
 % 
 % Outputs
-%  - center2neighbors  Px1 cell so that center2neighbors{k}==nbrs contains
-%                      the feature ids of the neighbors of feature k
-%  - neighborhood_size Px1 size of each searchlight. If radius>0 then it
-%                      contains the number of voxels in each searchlight. 
-%                      If radius<0 then it contains the sphere radius 
-%                      in voxel units.
+%   center2neighbors  Px1 cell so that center2neighbors{k}==nbrs contains
+%                     the feature ids of the neighbors of feature k
+%   ds_a_fa           dataset-like struct but without .sa. It has fields:
+%     .a              dataset attributes, from dataset.a
+%     .fa             feature attributes with fields:
+%       .nvoxels      1xP number of voxels in each searchlight
+%       .radius       1xP radius in voxel units
 %                      
 % NNO Aug 2013
     
@@ -62,7 +63,8 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
     
     ncenters=numel(center_ids);
     center2neighbors=cell(ncenters,1);
-    neighborhood_size=zeros(ncenters,1);
+    nvoxels=zeros(1,ncenters);
+    final_radius=zeros(1,ncenters);
     
     if show_progress
         if opt.progress<1
@@ -144,16 +146,22 @@ function [center2neighbors,neighborhood_size]=cosmo_spherical_voxel_selection(da
         
         % store results
         center2neighbors{k}=around_feature_ids;
+        nvoxels(k)=numel(around_feature_ids);
         if use_fixed_radius
-            neighborhood_size(k)=numel(around_feature_ids);
+            final_radius(k)=radius;
         else
-            neighborhood_size(k)=variable_radius;
+            final_radius(k)=variable_radius;
         end
         
         if show_progress && (k==1 || k==ncenters || mod(k,opt.progress)==0)
-            mean_size=mean(neighborhood_size(1:k));
+            mean_size=mean(nvoxels(1:k));
             msg=sprintf('mean size %.1f', mean_size);
             prev_progress_msg=cosmo_show_progress(clock_start, k/ncenters, msg, prev_progress_msg);
         end
     end
+    
+    % set the dataset and feature attributes
+    ds_a_fa=cosmo_dataset_slice(dataset, center_ids, 2);
+    ds_a_fa.fa.nvoxels=nvoxels;
+    ds_a_fa.fa.radius=final_radius;
     
