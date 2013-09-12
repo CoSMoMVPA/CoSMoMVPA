@@ -1,26 +1,35 @@
-function [winners,classes]=comso_winner_indices(pred)
-% Get indices of sample values that occur most often
+function [winners,classes]=cosmo_winner_indices(pred)
+% With multiple predictions, return indices that were predicted most often.
 %
-% [winners,classes]=comso_winner_indices(pred)
+% [winners,classes]=cosmo_winner_indices(pred)
 %
 % Input:
-%   pred              PxQ prediction values for Q features. Values <= 0
-%                     are ignored, i.e. can never be a winner
+%   pred              PxQ prediction values for Q features and P 
+%                     predictions per feature. Values <= 0 are ignored, 
+%                     i.e. can never be a winner.
 %
 % Output:
-%   winners           1xQ indices of classes that occur most often.
+%   winners           Qx1 indices of classes that occur most often.
 %                     winners(k)==w means that no value in pred(:,k) 
 %                     occurs more often than classes(w)
-%   classes           The sorted list of unique predicted values.
+%   classes           The sorted list of unique predicted values, across 
+%                     all non-ignored values in pred.
 %
 % Example:
-% .. cosmo_winner_indices([1 1 1; 1 2 3; 1 2 2; 3 0 0]')
-% > [ 1 3 2 3]
+%   - % given three predictions each for four samples, compute
+%     % which predictions occur most often.
+%     cosmo_winner_indices([1 1 1; 1 2 3; 1 2 3; 1 2 3; 3 0 0; 1 2 2])'
+%     > [ 1 1 2 3 3 2]
 %
-% Note: the current implementaiton selects a winner pseudo-randomly in
-% case of a tie between multiple winners. In this implementation,
-% repeatedly calling this function with identical input yields identical
-% output.
+% Notes: 
+% - The current implementation selects a winner pseudo-randomly (but 
+%   determinestically) and, presumably, unbiased in case of a tie between 
+%   multiple winners. That is, using the present implementation, repeatedly 
+%   calling this function with identical input yields identical output.
+% - A typical use case is combining results from multiple predictions,
+%   such as in cosmo_classify_svm and cosmo_cross_validate.
+%
+% See also: cosmo_classify_svm, cosmo_cross_validate.
 %
 % NNO Aug 2013
     
@@ -38,14 +47,19 @@ function [winners,classes]=comso_winner_indices(pred)
         counts=histc(pred',classes)'; % how often each class was predicted
     end
     
-    [mx,mxi]=max(counts,[],2); % the first class in each feature that was predicted most often
+    % get the first class in each feature that was predicted most often
+    [mx,mxi]=max(counts,[],2); 
     
-    winners_msk=bsxfun(@eq,counts,mx); % mask with classes that are the winners
-    nwinners=sum(winners_msk,2); % for each feature the number of winners
+    % mask with classes that are the winners
+    winners_msk=bsxfun(@eq,counts,mx); 
     
-    winners=zeros(nsamples,1); % allocate space for output
+    % for each feature the number of winners
+    nwinners=sum(winners_msk,2); 
     
-    % little optimization: first take features with just one winner
+    % allocate space for output
+    winners=zeros(nsamples,1); 
+    
+    % optimization: first take features with just one winner
     one_winner=nwinners==1;
     winners(one_winner)=mxi(one_winner);
     
@@ -55,8 +69,8 @@ function [winners,classes]=comso_winner_indices(pred)
             
     seed=sum(winners_msk(:)); % get some semi-random number to start with
     
-    % get the rows (which correspond to indices of class winners) and columns
-    % (corresponding to each feature)
+    % get the rows (which correspond to indices of class winners) and 
+    % columns (corresponding to each feature)
     [wrows,wcols]=ind2sub(size(winners_msk),find(winners_msk));
     
     colpos=0; % referring to wcols
