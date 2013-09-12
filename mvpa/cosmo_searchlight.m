@@ -89,7 +89,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
         center_id=center_ids(k);
         sphere_feature_ids=center2neighbors{center_id};
 
-        sphere_ds=cosmo_dataset_slice_features(dataset, sphere_feature_ids);
+        sphere_ds=cosmo_dataset_slice(dataset, sphere_feature_ids, 2);
 
         % Call the dataset measure
         m = measure(sphere_ds, args);
@@ -121,7 +121,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % <<
 
     % store the output in a dataset
-    results_map=cosmo_dataset_slice_features(dataset, center_ids);
+    results_map=cosmo_dataset_slice(dataset, center_ids, 2);
     results_map.samples=res;
     
     

@@ -25,26 +25,33 @@ function test_test_dataset
 function test_slicing
     ds=generate_test_dataset();
 
-    es=cosmo_dataset_slice_features(ds,[2 4]);
+    % test features
+    es=cosmo_dataset_slice(ds,[2 4],2);
     assertEqual(es.samples,ds.samples(:,[2 4]))
     assertEqual(es.sa,ds.sa);
     assertEqual(es.a,ds.a);
 
-    fs=cosmo_dataset_slice_features(ds,(1:1001)==2|(1:1001)==4);
+    fs=cosmo_dataset_slice(ds,(1:1001)==2|(1:1001)==4,2);
     assertEqual(es.samples,fs.samples);
+    assertEqual(es.fa.voxel_indices, [2 4; 1 1;1 1]);
 
-    f=@() cosmo_dataset_slice_features(ds,-1);
+    f=@() cosmo_dataset_slice(ds,-1,2);
     assertExceptionThrown(f,'MATLAB:badsubscript')
+    
+    f=@() cosmo_dataset_slice(ds,[2 4], 3);
+    assertExceptionThrown(f,'')
 
-    es=cosmo_dataset_slice_samples(ds,[2 4]);
+    % test samples
+    es=cosmo_dataset_slice(ds,[2 4]);
     assertEqual(es.samples,ds.samples([2 4],:))
     assertEqual(es.fa,ds.fa);
     assertEqual(es.a,ds.a);
+    assertEqual(es.sa.labels,{'bb','bb';'d','d'});
 
-    fs=cosmo_dataset_slice_samples(ds,(1:20)==2|(1:20)==4);
+    fs=cosmo_dataset_slice(ds,(1:20)==2|(1:20)==4);
     assertEqual(es.samples,fs.samples);
 
-    f=@() cosmo_dataset_slice_samples(ds,-1);
+    f=@() cosmo_dataset_slice(ds,-1);
     assertExceptionThrown(f,'MATLAB:badsubscript')
 
 function test_stacking
