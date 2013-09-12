@@ -92,7 +92,7 @@ for output in ('hdr','skl',None):
         labels.append(label) # keep track of all rst files
 
 
-    output2name={'hdr':'headers only','skl':'skeletons',None:'full solutions'}
+    output2name={'hdr':'header only','skl':'skeleton',None:'full solution'}
     header='Cosmo matlab files - %s files' % output2name[output]
     header=[header, '='*len(header),'','Contents:', '',
             '.. toctree::','    :maxdepth: 2','','']
