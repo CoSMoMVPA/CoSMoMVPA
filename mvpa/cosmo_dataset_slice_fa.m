@@ -11,6 +11,13 @@ function dataset=cosmo_dataset_slice_fa(dataset, features_to_select)
 %       dataset:    an instance of an fmri_dataset that is a copy of the input dataset
 %                   but contains just the rows indictated in features_to_select, and the 
 %                   corresponding values in feature attributes.
+%
+%   Note
+%    - this function is intended as an exercise. For a more powerful 
+%      implementation that deals with cell inputs correctly,
+%      consider using comso_dataset_slice(dataset, features_to_select, 2).
+%      
+% See also: cosmo_dataset_slice
     
     %%
     % First slice the samples array by rows
