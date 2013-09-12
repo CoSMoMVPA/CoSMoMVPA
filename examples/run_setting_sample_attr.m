@@ -11,16 +11,17 @@
 %% Load the dataset
 % >>
 
+data_path=cosmo_get_data_path('s01');
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
                         'mask', [data_path '/brain_mask.nii']);
-
+% <<
 %% set targets
+% >>
 ds.sa.targets = repmat([1:6]',10,1); 
-
+% <<
 %% set chunks
-chunks = []; 
-for i=1:10 chunks = [chunks; repmat(i,6,1)]; end 
-ds.sa.chunks = chunks;
+% >>
+ds.sa.chunks = floor(((1:60)-1)/6)'+1;
 % <<
 
 %% Show the results
