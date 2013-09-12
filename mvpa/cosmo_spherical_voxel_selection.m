@@ -1,7 +1,7 @@
 function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius, center_ids, opt)
 % computes neighbors for a spherical searchlight
 %
-% center2neighbors=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])
+% [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])
 %
 % Inputs
 %   dataset       a dataset struct (from fmri_dataset)
