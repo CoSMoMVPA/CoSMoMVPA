@@ -39,7 +39,7 @@ def matlab2rst(data, output=None):
 
         if not in_skeleton and '% >>' in line.strip():
             if output=='skl':
-                res.append(line.replace('% >>','%%%% >>> YOUR CODE HERE <<< %%%%'))
+                res.append(line.replace('% >>','%%%% >>> Your code here <<< %%%%'))
             in_skeleton=True
             continue
 
