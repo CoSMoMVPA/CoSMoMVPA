@@ -10,7 +10,7 @@ ds = cosmo_fmri_dataset([data_dir '/glm_T_stats_perrun.nii'], ...
 
 %% set the targets and chunks
 ds.sa.targets = repmat((1:6)',10,1);
-ds.sa.chunks = floor(((1:60)-1)/6)+1)';
+ds.sa.chunks = floor(((1:60)-1)/6)'+1;
 
 % Add labels as sample attributes
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
