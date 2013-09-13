@@ -43,8 +43,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'CoSMo Multivariate Pattern Analysis Workshop'
-copyright = u'2013, Andy Connolly, Nick Oosterhof'
+project = u'CoSMo Multivariate Pattern Analysis toolbox'
+copyright = u'2013, Andrew C. Connolly, Nikolaas N. Oosterhof'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -113,10 +113,14 @@ html_theme = 'sphinxdoc'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
+# NNO edited
+html_short_title = "CoSMoMVPA"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #html_logo = None
+# NNO set the logo here
+html_logo = "_static/cosmomvpa_logo.png"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -219,7 +223,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'cosmo', u'CoSMo Multivariate Pattern Analysis Workshop',
+    ('index', 'cosmo', u'CoSMo Multivariate Pattern Analysis toolbox',
      [u'Andy Connolly, Nick Oosterhof'], 1)
 ]
 
