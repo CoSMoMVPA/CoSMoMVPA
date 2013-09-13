@@ -14,7 +14,7 @@ ds.sa.chunks = floor(((1:60)-1)/6)'+1;
 
 % Add labels as sample attributes
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
-ds.sa.labels = repmat(labels,1,10);
+ds.sa.labels = repmat(labels,1,10)';
 
 % get indices for monkeys and mallards
 idx = strcmp(ds.sa.labels,'monkey') | strcmp(ds.sa.labels,'mallard');
