@@ -1,0 +1,27 @@
+.. _contact: Contact information
+
+===================
+Contact information
+===================
+
+General
+^^^^^^^
+- For general questions, comments, etc. please see the `CoSMoMVPA Google group`_.
+- For contributions, issues and bugs, see the `GitHub` page.
+- To contact us personally, see the FAQ_.
+
+
+Bugs and other issues
+^^^^^^^^^^^^^^^^^^^^^
+- Preferably raise the issue on the GitHub `CoSMoMVPA issues` pages.
+- Alternatively post on a message on the  `CoSMoMVPA Google group`_.
+
+
+Contributions
+^^^^^^^^^^^^^^^^^^
+- Preferably use `GitHub`
+- Alternatively post on a message on the  `CoSMoMVPA Google group`_ or contact us personally (see the FAQ_).
+
+There are more details on how to contribute_.
+
+.. include:: links.rst
