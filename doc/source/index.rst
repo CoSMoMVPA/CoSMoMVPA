@@ -3,26 +3,47 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-CoSMo Multivariate Pattern Analysis Workshop
-============================================
+.. figure:: _static/cosmomvpa_banner.png
 
-Contents:
+A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab for cognitive neuroscientists.
 
-.. toctree::
-    :maxdepth: 2
-    
-    intro    
-    ex_toc
-    
-.. toctree::
-    :maxdepth: 1
+CoSMoMVPA
+---------
+- Provides Matlab implementations of common types of MVPA of functional magnetic resonance imaging (fMRI) data, including correlation analysis, several classifiers, partitioning, cross-validation, representational similarity analysis, and searchlights.
+- Supports various fMRI file formats, including NIFTI, ANALYZE, BrainVoyager, and AFNI (MEEG support is future work).
+- Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
+- Is Free/Open Source Software (MIT License).
 
-    matlab_full_toc
-    matlab_hdr_toc
-    matlab_skl_toc
+**Note: CoSMoMVPA is currently in a pre-first-release state. Code, features and documentation may change rapidly.**
 
-Matlab outputs: matlab_pb_toc_
+.. toctree:: 
+   :hidden:
 
+   get_started
+   download
+   documentation
+   cosmo2013
+   faq
+   contact
+   contribute
+   thanks
+
+.. image:: _static/icon_get_started.png
+   :target: get_started.html
+.. image:: _static/icon_download.png
+   :target: download.html
+.. image:: _static/icon_documentation.png
+   :target: documentation.html
+.. image:: _static/icon_exercises.png
+   :target: cosmo2013.html
+.. image:: _static/icon_faq.png
+   :target: faq.html
+.. image:: _static/icon_contact.png
+   :target: contact.html
+.. image:: _static/icon_develop.png
+   :target: contribute.html
+.. image:: _static/icon_thanks.png
+   :target: thanks.html
 
 Indices and tables
 ==================
