@@ -1,5 +1,5 @@
 function [winners,classes]=cosmo_winner_indices(pred)
-% With multiple predictions, return indices that were predicted most often.
+% Given multiple predictions, get indices that were predicted most often.
 %
 % [winners,classes]=cosmo_winner_indices(pred)
 %
@@ -16,16 +16,20 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %                     all non-ignored values in pred.
 %
 % Example:
-%   - % given three predictions each for four samples, compute
+%   - % given three predictions each for five samples, compute
 %     % which predictions occur most often.
-%     cosmo_winner_indices([1 1 1; 1 2 3; 1 2 3; 1 2 3; 3 0 0; 1 2 2])'
-%     > [ 1 1 2 3 3 2]
+%     [p, c]=cosmo_winner_indices([4 4 4; 4 5 6; 4 5 6; 4 5 6 ; 6 0 0]);
+%     p'
+%     > [ 1 1 2 3 3]
+%     c'
+%     > [4 5 6]
 %
 % Notes: 
 % - The current implementation selects a winner pseudo-randomly (but 
-%   determinestically) and, presumably, unbiased in case of a tie between 
+%   deterministically) and, presumably, unbiased in case of a tie between 
 %   multiple winners. That is, using the present implementation, repeatedly 
-%   calling this function with identical input yields identical output.
+%   calling this function with identical input yields identical output,
+%   but unbiased with respect to which class is the 'winner' sample-wise.
 % - A typical use case is combining results from multiple predictions,
 %   such as in cosmo_classify_svm and cosmo_cross_validate.
 %
