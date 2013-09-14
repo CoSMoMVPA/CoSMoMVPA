@@ -14,14 +14,19 @@ function partitions = cosmo_nchoosek_partitioner(chunks, k)
 %                    correlations, is when k=='half'; this sets k to .5,
 %                    and if k is even, it treats train_indices and 
 %                    test_indices as symmetrical, meaning it returns only 
-%                    half the number of partitions (avoiding duplicates).
+%                    half the number of partitions (avoiding duplicates). 
+%                    (If k is odd then train and test indices have 
+%                    (k+1)/nchunks and (k-1)/nchunks elements, 
+%                    respectively, or vice versa).
 %
 % Output:
-%  - partitions      A struct with fields .train_indices and .test_indices.
-%                    Each of these is an 1xQ cell for Q partitions, where 
-%                    Q=nchoosek(nchunks,k)). 
-%                    .train_indices{k} and .test_indices{k} contain the
-%                    sample indices for the k-th fold.
+%  - partitions      A struct with fields:
+%     .train_indices } Each of these is an 1xQ cell for Q partitions, where 
+%     .test_indices  } Q=nchoosek(nchunks,k)). When joined they contain
+%                      all chunks.
+%                    Thus, it contains all possible combinations with
+%                    k test indices and (nchunks-k) training indices
+%                    (except for a special case, see above).
 %
 % Notes:
 %  - when k=1 this is equivalent to cosmo_nfold_partitioner
@@ -85,10 +90,11 @@ if is_symmetric && mod(nclasses,2)==0
     % the current implementation of nchoosek results is that
     % combis(k,:) and combis(npartitions+1-k) are complementary
     % (i.e. together they make up 1:nchunks). In principle this could
-    % change in the future leading to wrong results, so to be sure we check 
-    % that the output matches what is expected.
+    % change in the future leading to wrong results (if Mathworks, in its
+    % infinite wisdom, decides to change the implementation of nchoosek), 
+    % so to be sure we check that the output matches what is expected.
     % The rationale is that this reduces computation time of subsequent
-    % analyses by half, in particular for the widely-used split half
+    % analyses by half, in particular for commonly used split half
     % correlations.
     nhalf=npartitions/2;
     
@@ -100,7 +106,7 @@ if is_symmetric && mod(nclasses,2)==0
         error('Unexpected result from nchoosek');
     end
     
-    % we're good - just take the first half
+    % we're good - just take the first half and update npartitions
     combis=combis(1:nhalf,:);
     npartitions=nhalf;
 end
@@ -110,14 +116,24 @@ train_indices=cell(1,npartitions);
 test_indices=cell(1,npartitions);
 
 % fancy helper function. Given a list of class indices in the range 
-% 1:nclasses, it returns indices where the class indices match chunks.
-chunk_idx2mask=@(idx) sum(bsxfun(@eq,idx',chunk_indices'),1);
+% 1:nclasses, it returns postive values where the class indices match 
+% chunks.
+%
+% The following function is equivalent (assuming chunk_indices is given):
+%   function any_matching_mat_column=alt(idx, chunk_indices)
+%       nidx=numel(idx);
+%       nchunk_indices=numel(chunk_indices);
+%       idx_mat=repmat(idx',1,nchunk_indices);
+%       chunk_indices_mat=repmat(chunk_indices',nidx,1);
+%       matching_mat=idx_mat==chunk_indices_mat;
+%       any_matching_mat_column=sum(matching_mat,1);
+chunk_idx2count=@(idx) sum(bsxfun(@eq,idx',chunk_indices'),1);
 
 for j=1:npartitions
     combi=combis(j,:);
-    sample_mask=chunk_idx2mask(combi);
-    test_indices{j}=find(sample_mask);
-    train_indices{j}=find(~sample_mask);
+    sample_count=chunk_idx2count(combi);
+    test_indices{j}=find(sample_count);
+    train_indices{j}=find(~sample_count);
 end
 
 partitions=struct();
