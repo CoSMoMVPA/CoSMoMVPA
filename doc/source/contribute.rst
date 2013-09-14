@@ -437,10 +437,98 @@ The following are guidelines, intended to improve:
         for k=1:n
             data_result(k)=f(data(k,:));
 
+- Do not use global variables: these can have nasty and unpredictable side effects. In other functions, use functions really as *functions*: the output should depend on the input only (with the exception of the state of the random number generator).
+
+- Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
+
+    **borderline acceptable:**
+
+    .. code-block:: matlab 
+
+        for j=1:npartitions
+            test_indices{j}=find(chunk_idx2count(combis(j,:)));
+        end
+
+    **good:**
+
+    .. code-block:: matlab 
+    
+        for j=1:npartitions
+            combi=combis(j,:);
+            sample_count=chunk_idx2count(combi);
+            test_indices{j}=find(sample_count);
+        end
+
+- When formatting strings use ``sprintf`` or ``fprintf``, rather than ``num2str`` and string concatenation. Avoid using disp when printing strings; use ``fprintf`` instead.
+    
+    **bad:**
+    
+    .. code-block:: matlab 
+
+        disp(['Accuracy for ' label ' is ' num2str(mean_value) ' +/-' ...
+                    num2str(std_value)]);
+
+    **acceptable:**
+    
+    .. code-block:: matlab 
+
+        nlabels=numel(labels);
+        joined_labels=[];
+        for k=1:nlabels
+            joined_labels=[joined_labels labels{k}];
+            if k<nlabels
+                joined_labels=[joined_labels ';' ]; % dont add ';' after last label
+            end
+        end
+
+    **good:**
+
+    .. code-block:: matlab 
+
+        fprintf(Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
+
+    .. code-block:: matlab 
+
+        nlabels=numel(labels);
+        labels_with_sep=cell(1,nlabels*2-1);
+        for k=1:n
+            labels_with_sep{k*2-1}=labels{k};
+            if k<n
+                labels_with_sep{k*2}=';';
+            end
+        end
+        joined_labels=[labels_with_spec{:}]
+
+    or:
+
+    .. code-block:: matlab 
+        
+        joined_labels=sprintf('%s;' labels{:});
+        if ~isempty(joined_labels)
+            joined_labels=joined_labels(1:(end-1));
+        end
+    
+    *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons this function is not used in CoSMoMVPA.
+
+    
+- Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval.
+
+    **bad:**
+        
+    .. code-block:: matlab 
+
+    for k=1:n
+        
+    
+    **good:**
+        
+    .. code-block:: matlab 
+
 
 - Note on the use of exceptions [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. (Currently the only exception is ``cosmo_publish_run_scripts``, that builds the Matlab_ output from the scripts in ``examples/``).
 
 - Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using ``cosmo_splithalf_correlation_measure``. Similarly, ``cosmo_dataset_slice`` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
+
 
 
 
