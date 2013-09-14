@@ -22,7 +22,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
 % - For splithalf correlation measures it is recommended to use 
 %   cosmo_nchoosek_partitioner(chunks,'half'). 
 % - More generally, this function is intended as an exercise. If
-%   chunks is different from 1:K for some K, then it may yield non-optimal
+%   chunks is different from 1:K for all K, then it may yield non-optimal
 %   partitions. In particular, if all chunks are either even or odd,
 %   then either train_indices or test_indices is empty for each partition.
 %   Is is thus advised to use cosmo_nchoosek_partitioner(chunks,.5);
