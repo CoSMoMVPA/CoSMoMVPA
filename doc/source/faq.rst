@@ -3,12 +3,12 @@
 Frequently Asked/Anticipated Questions
 --------------------------------------
 **What, yet another MVPA toolbox? How is this toolbox different from others?**
-    Indeed, another MVPA toolbox, but with some features that may be attractive:
+    Indeed, another MVPA toolbox, it has features that may be attractive:
 
-    + Simple, light-weight matlab code with extensive documentation.
-    + Straight-forward implementations of various measures (correlations, representational similarity, classification accuracies) supporting both ROI and searchlight analyses.
-    + Support for several popular fMRI data formats: AFNI, BrainVoyager, ANALYZE and NIFTI.
-    + Various runnable examples and exerices, describing both on how to perform certain types of analyses (i.e., a user perspective), and on how typical MVP analyses can be implemented (a contributer persective).
+    + *Simple*, *light-weight*, and *modular* Matlab_ functions .
+    + Provides implementations of *all common MVPA analyses* for fMRI (correlations, representational similarity, classifiers, crossvalidation, searchlight analysis).
+    + Support for most *fMRI data formats*: AFNI, BrainVoyager, ANALYZE and NIFTI.
+    + Various runnable *example scripts* and *exerices*, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer persective).
 
     For comparison, here is a list of other MVPA toolboxes: 
 
@@ -31,21 +31,22 @@ Frequently Asked/Anticipated Questions
     Also, it does not make coffee for you.
 
 **How fast does it run?**
-CoSMoMVPA_ is not a speed monster, but a searchlight takes one minute to run for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation).
+CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). Analyses on regions of interest are typically completed in seconds.
 
 **What should I use as input for MVPA**
 Unless you know exactly what you are doing, in fMRI land we would recommend to either:
-- Apply the GLM for each run seperately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics. 
-- Split the data in halves (even and odd) and apply the GLM to each of these (i.e. treat the experiment as consisting of two 'runs'). In this case there are two chunks, and the same number of targets as there are experimental conditions.
 
-**Who wrote CoSMoMVPA?**
+- Apply the GLM for each run seperately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics. 
+- Split the data in halves (even and odd) and apply the GLM to each of these (i.e. treat the experiment as consisting of two 'runs'). In this case there are two chunks, and the same number of unique targets as there are experimental conditions.
+
+**Who are the developers of CoSMoMVPA?**
     Currently the developers are Nikolaas N. Oosterhof and Andrew C. Connolly. In the code you may find their initials (``NNO``, ``ACC``) in commented header sections.
 
 **Which file-formats are supported?**
     At present only fMRI formats are supported:
 
     + AFNI (``+{orig,trlc}.{HEAD,BRIK[.gz]}``), through the `AFNI Matlab`_ library.
-    + BrainVoyager (``.vmp``,``.glm``), through the NeuroElf_ Matlab toolbox.
+    + BrainVoyager (``.vmp``, ``.glm``), through the NeuroElf_ Matlab toolbox.
     + NIFTI (``.nii``; ``.nii.gz`` on Unix-like_ platforms).
     + ANALYZE (``.hdr``/``.img``).
 
@@ -71,7 +72,7 @@ Unless you know exactly what you are doing, in fMRI land we would recommend to e
 
 **How can I contact the developers?**
     Please send an email to a@c or b@c, where a=andrew.c.connolly, b=nikolaas.n.oosterhof, c=dartmouth.edu.
-
+`
 **Is there a mailinglist?**
     There is the `CoSMoMVPA Google group`_.
 
