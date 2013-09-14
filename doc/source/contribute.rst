@@ -77,33 +77,36 @@ There are many great resources on using git_ on the web; a detailed explanation 
 Notes on committing
 +++++++++++++++++++
 - Review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
-- Do not add all changes at once; in other words do not use ``git -a``. Rather manually add the (changes to) files of interest (``git add ${filename}`` or ``git add -i``) for each meaningful 'atomic' change, and commit these seperately.
-- To view the history of commits, ``gitk`` is very useful.
+- Do not add all changes at once; in other words do not use ``git -a``. Rather manually add the (changes to) files of interest (``git add ${filename}`` or ``git add -i``, the later usually with the 'patch' ('p') option) for each meaningful 'atomic' change, and commit these seperately.
+- To view the history of commits, ``gitk`` is useful.
 - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``BF``: bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
-    + ``BK``: breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
-    + ``BLD``: changes in the build system.
-    + ``BIG``: major change.
-    + ``CLN``: code cleanup. ``SML`` can be omitted.
-    + ``STD``: change to adhere better to coding standards. ``SML`` can be omitted.
-    + ``DOC``: change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
-    + ``EXC``: change in exercises. This could go together with ``WEB`` or ``DOC``.
-    + ``LZY``: 'Apologies for being lazy here but cannot be bothered to describe the changes in detail'. Acceptable in exceptional cases, including after *n* hours of continuous coding, where *n* is large; or when presenting a workshop on CoSMoMVPA_ on this very day. If you know what your are doing this can go together with the ``-a`` option in ``git``.
-    + ``MSC``: miscellaneous changes, not covered by any of the other tags.     
-    + ``NF``: new feature.
-    + ``OPT``: optimalization. It should be used when the new code runs faster or uses less memory.
-    + ``RF``: refactoring (changes in functions that do not affect their external behaviour).
-    + ``RUN``: change in runnable example scripts (``examples/``).
-    + ``SML``: minor change.
-    + ``TST``: change in test functions (in ``test/``).
-    + ``WEB``: changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
+    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
+    + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
+    + ``BLD``: Changes in the build system.
+    + ``BIG``: Major change. Please use together with another tag.
+    + ``CLN``: Code cleanup. ``SML`` can be omitted.
+    + ``CTB``: Contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
+    + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
+    + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
+    + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
+    + ``LNC``: Indicates that the contributor permits distribution of his changes using the applicable license(s) of CoSMoMVPA. Only needed for a person's first contribution; after the first contribution this permission is assumed. If you made several commits but the first did not contain this tag, just make a new commit containing the text '``LNC: applies to previous commits``'.
+    + ``LZY``: 'Apologies for being lazy here but cannot be bothered to describe the changes in detail'. Acceptable in exceptional cases, including after *n* hours of continuous coding, when *n* is large; or when presenting a workshop on CoSMoMVPA_ the very next day (these are not mutually exclusive). If you know what your are doing this can go together with the ``-a`` option in ``git``.
+    + ``MSC``: Miscellaneous changes, not covered by any of the other tags.     
+    + ``NF``: New feature.
+    + ``OPT``: Optimalization. It should be used when the new code runs faster or uses less memory.
+    + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
+    + ``RUN``: Change in runnable example scripts (in ``examples/``).
+    + ``SML``: Minor change. Can be without an explanation of what was changed.  Please use together with another tag.
+
+    + ``TST``: Change in test functions (in ``test/``).
+    + ``WEB``: Changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
 
     Using these tags allows others to quickly see what *kind of* changes were made, and to generate summary reports on the kind of changes.
 
-    The tags don't have to name which files were changed, as git_ takes care of that.
+    Please describe what changes you made; however, the tags don't have to name which files were changed, as git_ takes care of that.
 
-    Tags can be combined, as it may occur that multiple tags apply at the same time; use the ``+``-character to concatenate them.
+    Tags can be combined, as it may occur that multiple tags apply; use the ``+``-character to concatenate them.
 
     Examples:
     
@@ -111,7 +114,7 @@ Notes on committing
     + ``git commit -m 'RF: build a lookup table mapping all voxels to those in the dataset``
     + ``git commit -m 'BF+TST: throw an error if partitions are not balanced; added unit test'``
     + ``git commit -m 'DOC+SML: fixed a typo'``
-    + ``git commit -am LZY`` [*to be used in special circumstances only*]
+    + ``git commit -am LZY`` [others can see you were lazy; *to be used in special circumstances only*]
 
 
 Build system
