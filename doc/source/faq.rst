@@ -3,19 +3,21 @@
 Frequently Asked/Anticipated Questions
 --------------------------------------
 **What, yet another MVPA toolbox? How is this toolbox different from others?**
-    Indeed, another MVPA toolbox, but with some features:
+    Indeed, another MVPA toolbox, but with some features that may be attractive:
 
     + Simple, light-weight matlab code with extensive documentation.
     + Straight-forward implementations of various measures (correlations, representational similarity, classification accuracies) supporting both ROI and searchlight analyses.
     + Support for several popular fMRI data formats: AFNI, BrainVoyager, ANALYZE and NIFTI.
-    + Various runnable examples and exerices, about both on how to perform certain types of analyses (i.e., a user perspective), and on how typical MVP analyses are implemented (a contributer persective).
+    + Various runnable examples and exerices, describing both on how to perform certain types of analyses (i.e., a user perspective), and on how typical MVP analyses can be implemented (a contributer persective).
 
     For comparison, here is a list of other MVPA toolboxes: 
 
-    + PyMVPA_ is implemented in Python (it provided inspiration for the dataset structure and semantics). Our toolbox implements a subset (the most commonly used of its functionality in Matlab.
-    + PRoNTo_ is another Matlab MVPA toolbox, much wider in scope and provies a Graphical User Interface. In contrast, our toolbox is more minimalistic and bare-bones, which we hope makes it easier to understand and modify.
-    + Searchmight_ is aimed at searchlight analyses, and does these very fast. Our toolbox does support such analyses (albeit slower), yet also supports other types of analyses not covered by Searchmight.
-    + `Princeton MVPA`_ toolbox is a sophisticated toolbox but (we think) harder to use, and is currently not under active development.
+    + PyMVPA_ is implemented in Python (it provided inspiration for the dataset structure and semantics). Our toolbox implements the most commonly used MVP analyses, but not all of them, in Matlab. Some labs only use Matlab for data analsis, so CoSMoMVPA may be easier for those to use. 
+    + PRoNTo_ is another Matlab MVPA toolbox, that is much wider in scope and provies a Graphical User Interface. In contrast, our toolbox is more minimalistic and bare-bones, meaning it has much fewer lines of code and is simpler in design. This may make it easier to understand its functions, and to modify.
+    + Searchmight_ is aimed at searchlight analyses (and does these very fast). Although our toolbox does support such analyses (albeit slower), it also supports other types of analyses not covered by Searchmight.
+    + `Princeton MVPA`_ toolbox is a sophisticated toolbox but (we think) harder to use, and is currently not under active development. 
+
+    To our knowledge, the other MVPA toolboxes support fewer data formats; we are neither aware of another toolbox that supports BrainVoyager datasets, nor of one that supports both NIFTI or ANALYZE, and AFNI, natively.
 
 
 **What does CoSMoMVPA *not* provide?**
@@ -23,7 +25,7 @@ Frequently Asked/Anticipated Questions
 
     + Preprocessing of data. For fMRI data it assumed that the data has been preprocessed and, in most use-case scenarios, has been analyzed using the General Linear Model.
     + Implementations of complicated analyses (such as hyperalignment, nested cross validation, recursive feature elimination). If you want to do these, consider using PyMVPA_.
-    + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing your analyses yourself is more instructive as it requires you to actually *think* about your analysis. 
+    + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing the code to perform the analyses could be considered as more instructive: it requires one to actually *think* about the analysis, rather than just clicking on buttons. 
     + Pretty visualization of fMRI data. Although there is basic functionality for showing slices of fMRI data (through ``cosmo_plot_slices``, for better visualization we suggest to use either your preferred fMRI analysis package, or MRIcron_.
 
     Also, it does not make coffee for you.
@@ -42,7 +44,7 @@ Unless you know exactly what you are doing, in fMRI land we would recommend to e
 **Which file-formats are supported?**
     At present only fMRI formats are supported:
 
-    + AFNI (``+{orig,trlc}+{HEAD,BRIK[.gz]}``), through the `AFNI Matlab`_ library.
+    + AFNI (``+{orig,trlc}.{HEAD,BRIK[.gz]}``), through the `AFNI Matlab`_ library.
     + BrainVoyager (``.vmp``,``.glm``), through the NeuroElf_ Matlab toolbox.
     + NIFTI (``.nii``; ``.nii.gz`` on Unix-like_ platforms).
     + ANALYZE (``.hdr``/``.img``).
@@ -58,7 +60,7 @@ Unless you know exactly what you are doing, in fMRI land we would recommend to e
     It has been tested with Windows, Mac and Linux.
 
 **What future features can be expected?**
-    Time permitting, there are some features that we may add:
+    Time permitting, there are some features that may be added in the future:
 
     + Support for MEEG datasets (first in line are FieldTrip and EEGLab).
     + Spatial clustering.
