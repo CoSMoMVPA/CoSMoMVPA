@@ -43,16 +43,7 @@ Contact information is presented on our webpages.
 
 Contribution guidelines
 -----------------------
-The preferred way to contribute is through github: clone the CoSMoMVPA repository using git, make your contributions (preferably in a new branch), then send us a pull request. Alternatively contact us by email.
-
-(TODO: add more details on preferred matlab coding guidelines.)
-
-Relation to other projects
---------------------------
-- [PyMVPA](http://www.pymvpa.org) provided inspiration for the dataset structure and semantics. Our toolbox implements a small part of its functionality.
-- [PRoNTo](http://www.mlnl.cs.ucl.ac.uk/pronto) is another Matlab MVPA toolbox, much wider in scope and provides a GUI. In contrast, our toolbox is more minimal and bare-bones, which we hope makes it easier to understand and modify. We also provide a range of examples and exerices for those who want to learn how typical MVP analyses are implemented.
-- [Searchmight](http://minerva.csbmb.princeton.edu/searchmight) is aimed at searchlight analyses. Our toolbox does support such analyses, but also other types of analyses not covered by Searchmight.
-- [Princeton MVPA toolbox](http://code.google.com/p/princeton-mvpa-toolbox/) is a sophisticated toolbox but (we think) harder to use, and is currently not under active development.
+The preferred way to contribute is through github. More information will be added later.
 
 Acknowledgements
 ----------------
@@ -61,7 +52,6 @@ Acknowledgements
 
 License
 -------
-The CoSMoMVPA Matlab code is available under the MIT License. See the LICENSE file for details.
+The CoSMoMVPA Matlab code is available under the MIT License; documentation is available under the Creative Commons Attribution-ShareAlike 3.0 Unported license. . See the LICENSE file for details.
 For licenses of external toolboxes, see the respective license files under _/externals/.
 
-TODO: decide about documentation license.
