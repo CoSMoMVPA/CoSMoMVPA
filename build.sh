@@ -32,6 +32,12 @@ case $targets in
         make html
     ;;
 
+    cleandoc)
+        cd doc
+        make clean
+        make html
+    ;;
+
     data)
         # zip the data
         cd $p
@@ -72,6 +78,27 @@ case $targets in
 
         ls $outputdir
 
+    ;;
+
+    website)
+        case $USER in
+            nick)
+                host=db  # hostname for scp
+            ;;
+            *)
+                echo "Unsupported user $USER"
+                exit 1
+            ;;
+        esac 
+        webdir=doc/build/html/
+        scp -r ${webdir}/* ${host}:~/web/
+    ;;
+
+    wb)
+        # hidden option: build and push
+        for i in cleandoc website; do
+            $0 $i || exit 1
+        done
     ;;
 
     *)
