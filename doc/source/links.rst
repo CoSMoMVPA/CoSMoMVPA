@@ -24,5 +24,4 @@
 .. _xUnit: http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework
 .. _`zip archive`: https://github.com/CoSMoMVPA/CoSMoMVPA/archive/master.zip
 
-.. _FAQ: faq.html
 
