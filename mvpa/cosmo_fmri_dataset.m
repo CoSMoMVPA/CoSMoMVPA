@@ -400,7 +400,7 @@ function [data,hdr,a,fa,sa]=read_afni(fn)
         if ntilde >= nsamples
             sa.labels=cell(nsamples,1);
             for k=1:nsamples
-                sa.BRICK_LABS{k}=labs((pos(k)+1):(pos(k+1)-1));
+                sa.labels{k}=labs((pos(k)+1):(pos(k+1)-1));
             end
         end
     end
