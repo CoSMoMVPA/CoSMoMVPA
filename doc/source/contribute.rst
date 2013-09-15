@@ -511,19 +511,45 @@ The following are guidelines, intended to improve:
     *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons this function is not used in CoSMoMVPA.
 
     
-- Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval.
+- Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+
+    **very bad:**
+
+    .. code-block:: matlab 
+
+        % for even samples apply f_even, for odd ones f_odd
+        results=[];
+        for k=1:nsamples
+            if mod(k,2)==0
+                eval(['results=[results; f_even(data(' num2str(k) '))];']);
+            else
+                eval(['results=[results; f_odd(data(' num2str(k) '))];']);
+            end
+        end
 
     **bad:**
         
     .. code-block:: matlab 
 
-    for k=1:n
-        
-    
+        % for even samples apply f_even, for odd ones f_odd
+        results=zeros(nsamples,1);
+        f_names={'f_odd','f_even'};
+        for k=1:nsamples
+            f_name=names(mod(k+1,2)+1);
+            eval(sprintf('results(%d)=%s(data(%d));', k, name, k));
+        end
+            
     **good:**
         
     .. code-block:: matlab 
 
+        % for even samples apply f_even, for odd ones f_odd
+        results=zeros(nsamples,1);
+        f_handles={@f_odd, @f_even};
+        for k=1:nsamples
+            f_handle=f_handles{mod(k+1,2)+1};
+            f_data=handle(data(k));
+        end
 
 - Note on the use of exceptions [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. (Currently the only exception is ``cosmo_publish_run_scripts``, that builds the Matlab_ output from the scripts in ``examples/``).
 
