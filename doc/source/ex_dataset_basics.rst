@@ -67,7 +67,7 @@ Hint: cosmo_dataset_slice_sa_skl_
 Solution: cosmo_dataset_slice_sa_
 
 For a more *robust* solution that can handle samples attributes that use string
-labels instead of numbers see Solution 2: cosmo_dataset_slice_samples_
+labels instead of numbers see Solution 2: cosmo_slice_
 
 Slice by features
 +++++++++++++++++
@@ -79,7 +79,7 @@ Hint: cosmo_dataset_slice_fa_skl_
 
 Solution: cosmo_dataset_slice_fa_
 
-*Robust* Solution 2: cosmo_dataset_slice_features_
+*Robust* Solution 2: cosmo_slice_ (note that third argument must be set to ``2`` in order to slice the features).
 
 Operations on datasets
 ++++++++++++++++++++++
@@ -112,8 +112,7 @@ Solution: run_operations_on_datasets_ / run_operations_on_datasets_pb_
 .. _cosmo_dataset_slice_fa: cosmo_dataset_slice_fa.html
 .. _cosmo_dataset_slice_sa_skl: cosmo_dataset_slice_sa_skl.html
 .. _cosmo_dataset_slice_fa_skl: cosmo_dataset_slice_fa_skl.html
-.. _cosmo_dataset_slice_features: cosmo_dataset_slice_features.html
-.. _cosmo_dataset_slice_samples: cosmo_dataset_slice_samples.html
+.. _cosmo_slice: cosmo_slice.html
 
 
 
