@@ -26,6 +26,7 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
 %                      
 % NNO Aug 2013
     
+    cosmo_check_dataset(dataset,'fmri');
     [nsamples, nfeatures]=size(dataset.samples);
     
     if nargin<3 || isempty(center_ids)
@@ -42,7 +43,6 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
     
     show_progress=opt.progress>0;
     
-    % get size of original volume
     orig_dim=dataset.a.vol.dim;
     orig_nvoxels=prod(orig_dim);
     

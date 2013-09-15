@@ -22,6 +22,8 @@ function ds=cosmo_dataset_slice(ds, elements_to_select, dim)
 
     if nargin<3 || isempty(dim), dim=1; end
     
+    cosmo_check_dataset(ds);
+    
     % slice the samples
     full_data=ds.samples;
     nfull=size(full_data,dim);
@@ -48,25 +50,17 @@ function ds=cosmo_dataset_slice(ds, elements_to_select, dim)
             continue;
         end
         
-        if size(v,dim)~=nfull
-            error('%d elements in %s.%s, expected %d',...
-                    size(v,dim),attr_fn,fn,nfull);
-        end
-        
         if iscell(v)
             v_sliced=slice_cell(v, elements_to_select,dim);
         else
             v_sliced=slice_array(v, elements_to_select,dim);
         end
         
-        if size(v_sliced,dim)~=nsliced
-            error('%d elements in sliced %s.%s, expected %d',...
-                    size(v,dim),attr_fn,fn,nsliced);
-        end
-        
         attrs.(fn)=v_sliced; % set the sliced values
     end
     ds.(attr_fn)=attrs;
+    
+    cosmo_check_dataset(ds);
     
     
     function y=slice_array(x, to_select, dim)

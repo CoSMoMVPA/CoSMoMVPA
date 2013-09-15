@@ -13,7 +13,8 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
 % NNO Aug 2013
-    
+    cosmo_check_dataset(dataset, 'fmri');
+
     samples=dataset.samples;
     [nsamples, nfeatures]=size(samples);
     

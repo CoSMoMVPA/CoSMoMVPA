@@ -158,6 +158,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
      
     ds=set_sa_vec(ds,p,'targets');
     ds=set_sa_vec(ds,p,'chunks');
+    
+    cosmo_check_dataset(ds, 'fmri'); % ensure all kosher
      
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

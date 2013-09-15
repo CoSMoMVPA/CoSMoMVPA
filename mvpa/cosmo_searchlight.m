@@ -46,6 +46,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %
 % ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
     
+    cosmo_check_dataset(dataset);
     nfeatures=size(dataset.samples,2);
 
     parser = inputParser;
