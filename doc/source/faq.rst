@@ -1,4 +1,4 @@
-.. _faq: Frequently Asked/Anticipated Questions
+.. faq
 
 Frequently Asked/Anticipated Questions
 --------------------------------------
@@ -72,7 +72,7 @@ Unless you know exactly what you are doing, in fMRI land we would recommend to e
 
 **How can I contact the developers?**
     Please send an email to a@c or b@c, where a=andrew.c.connolly, b=nikolaas.n.oosterhof, c=dartmouth.edu.
-`
+
 **Is there a mailinglist?**
     There is the `CoSMoMVPA Google group`_.
 
