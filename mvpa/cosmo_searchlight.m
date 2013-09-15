@@ -77,7 +77,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
             error('center2neighbors specified but ds_a_fa is not?');
         end
         center2neighbors={center2neighbors{center_ids}};
-        ds_a_fa=cosmo_dataset_slice(ds, center_ids);
+        ds_a_fa=cosmo_slice(ds, center_ids);
     end
 
     % space for output, we will leave res empty for now because we can't know
@@ -106,7 +106,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
         center_id=center_ids(k);
         sphere_feature_ids=center2neighbors{center_id};
 
-        sphere_ds=cosmo_dataset_slice(dataset, sphere_feature_ids, 2);
+        sphere_ds=cosmo_slice(dataset, sphere_feature_ids, 2);
 
         % Call the dataset measure
         m = measure(sphere_ds, args);

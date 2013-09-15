@@ -30,8 +30,8 @@ bug_idx = ds.sa.targets > 4;
 % use the indices as input to the dataset slicer
 
 % >>
-primate_ds = cosmo_dataset_slice(ds, primate_idx);
-bug_ds = cosmo_dataset_slice(ds, bug_idx);
+primate_ds = cosmo_slice(ds, primate_idx);
+bug_ds = cosmo_slice(ds, bug_idx);
 % <<                    
 
 %% Subtract mean pattern

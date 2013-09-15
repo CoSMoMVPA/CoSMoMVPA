@@ -15,9 +15,9 @@ function dataset=cosmo_dataset_slice_fa(dataset, features_to_select)
 %   Note
 %    - this function is intended as an exercise. For a more powerful 
 %      implementation that deals with cell inputs correctly,
-%      consider using comso_dataset_slice(dataset, features_to_select, 2).
+%      consider using comso_slice(dataset, features_to_select, 2).
 %      
-% See also: cosmo_dataset_slice
+% See also: cosmo_slice
     
     %%
     % First slice the samples array by rows

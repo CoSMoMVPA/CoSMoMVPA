@@ -16,7 +16,7 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'chunks',floor(((1:60)-1)/6)+1);
 
 % Only consider four classes (otherwise the classifier does extremily well)                    
-ds=cosmo_dataset_slice(ds,ds.sa.targets<=4);                    
+ds=cosmo_slice(ds,ds.sa.targets<=4);                    
                     
 classifier=@cosmo_classify_nn;
 

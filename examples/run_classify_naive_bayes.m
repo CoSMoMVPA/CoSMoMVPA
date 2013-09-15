@@ -21,14 +21,14 @@ idx = strcmp(ds.sa.labels,'monkey') | strcmp(ds.sa.labels,'mallard');
 
 %% Slice the dataset
 % Use sample attrubutes slicer to slice dataset
-ds2 = cosmo_dataset_slice(ds,idx);
+ds2 = cosmo_slice(ds,idx);
 
 % slice into odd and even runs using chunks attribute
 even_idx = mod(ds2.sa.chunks,2)==0;
 odd_idx = mod(ds2.sa.chunks,2)==1;
 
-evens = cosmo_dataset_slice(ds2,even_idx);
-odds = cosmo_dataset_slice(ds2, odd_idx);
+evens = cosmo_slice(ds2,even_idx);
+odds = cosmo_slice(ds2, odd_idx);
 
 %% train on even, test on odd
 pred = cosmo_classify_naive_bayes(evens.samples, evens.sa.targets, odds.samples);

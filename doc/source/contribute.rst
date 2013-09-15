@@ -429,7 +429,7 @@ The following are guidelines, intended to improve:
 
     .. code-block:: matlab 
 
-        sliced_ds=cosmo_dataset_slice(ds, mask_indices);
+        sliced_ds=cosmo_dataset(ds, mask_indices);
     
     .. code-block:: matlab 
 

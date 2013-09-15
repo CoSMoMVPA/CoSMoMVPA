@@ -161,7 +161,7 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
     end
     
     % set the dataset and feature attributes
-    ds_a_fa=cosmo_dataset_slice(dataset, center_ids, 2);
+    ds_a_fa=cosmo_slice(dataset, center_ids, 2);
     ds_a_fa.fa.nvoxels=nvoxels;
     ds_a_fa.fa.radius=final_radius;
     

@@ -44,7 +44,7 @@ for k=1:ncenters
     center_id=center_ids(k);
     sphere_feature_ids=center2neighbors{center_id};
     
-    sphere_ds=cosmo_dataset_slice(ds, sphere_feature_ids, 2);
+    sphere_ds=cosmo_slice(ds, sphere_feature_ids, 2);
     
     % run cross validation
     [pred_cv,acc]=cosmo_cross_validate(sphere_ds, classifier, partitions, classifier_opt);

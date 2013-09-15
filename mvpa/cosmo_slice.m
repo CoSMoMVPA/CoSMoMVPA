@@ -1,7 +1,7 @@
-function ds=cosmo_dataset_slice(ds, elements_to_select, dim)
+function ds=cosmo_slice(ds, elements_to_select, dim)
 % Slice a dataset by samples (the default) or features
 %
-% sliced_ds=cosmo_dataset_slice(ds, elements_to_select[, dim])
+% sliced_ds=cosmo_slice(ds, elements_to_select[, dim])
 %
 % Inputs:
 %   ds                    dataset struct to be sliced, with PxQ field 
