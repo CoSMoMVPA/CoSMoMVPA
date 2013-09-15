@@ -25,7 +25,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     .a         struct intended to contain dataset-relevent data.
 %     .a.hdr_{F} header information for this dataset, required to map the data
 %                back to a volumetric data file. Currently {F} can be 
-%                'nii'.
+%                'nii', 'bv_vmp', 'bv_glm', or 'afni'.
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
 %     .sa        struct for holding sample attributes (e.g.,sa.targets,sa.chunks) 
