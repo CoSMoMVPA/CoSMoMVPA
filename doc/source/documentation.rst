@@ -18,9 +18,23 @@ Overview
    contribute
    thanks
 
+Detailed
+--------
 
-All documentation
------------------
+.. toctree:: 
+   :maxdepth: 2
+
+   get_started
+   download
+   cosmo2013 
+   faq
+   contact
+   contribute
+   thanks
+   links
+
+Full documentation
+------------------
 
 .. toctree:: 
 
@@ -31,4 +45,5 @@ All documentation
    contact
    contribute
    thanks
+   links
 
