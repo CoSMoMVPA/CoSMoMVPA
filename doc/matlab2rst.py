@@ -25,7 +25,11 @@ rst_dir='source'
 add_indent=lambda x:' '*4+x
 
 def matlab2rst(data, output=None):
-    '''where output in ('hdr','skl',None), None means full'''
+    '''where output in ('hdr','sgn','skl',None)
+    hdr: header excluding a link at the top (to allow .. include)
+    skl: skeleton
+    None: full
+    (note: 'sgn' was once present but removed)'''
 
     lines=data.split('\n')
     after_header=False
@@ -49,7 +53,7 @@ def matlab2rst(data, output=None):
 
         add_line=(output is None) or \
                  (output=='skl' and not in_skeleton)  or \
-                 (output=='hdr' and not after_header)
+                 (output in ('hdr','sgn') and not after_header)
 
         if add_line:
             res.append(line)
@@ -63,6 +67,7 @@ def matlab2rst(data, output=None):
 
 fns=sum([glob.glob(join(d,'*.m')) for d in [matlab_dir, example_dir]],[])
 fns.sort()
+
 
 for output in ('hdr','skl',None):
     print '@#$====> Converting matlab_%s.m files to *_%s.rst' % (output,output)
@@ -83,7 +88,8 @@ for output in ('hdr','skl',None):
         fn_out+='.rst'
 
         with open(fn_out,'w') as f:
-            f.write('.. %s\n\n' % label)
+            if output != 'hdr':
+                f.write('.. _%s:\n\n' % label)
             f.write('%s\n%s\n' % (label.replace('_',' '),'-'*len(label)))
             f.write(rst)
             #print ">>>", rst, "<<<"
@@ -91,12 +97,11 @@ for output in ('hdr','skl',None):
 
         labels.append(label) # keep track of all rst files
 
-
-    output2name={'hdr':'header only','skl':'skeleton',None:'full solution'}
+    output2name={'hdr':'header','sgn':'header only','skl':'skeleton',None:'full solution'}
     header='Cosmo matlab files - %s files' % output2name[output]
     header=[header, '='*len(header),'','Contents:', '',
             '.. toctree::','    :maxdepth: 2','','']
-    toc_fn='matlab_%s_toc' % (output or 'full')
+    toc_fn='modindex%s' % ('' if output is None else ('_' + output))
 
     appendix=['','']
     '''
