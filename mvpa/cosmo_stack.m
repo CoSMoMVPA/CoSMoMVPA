@@ -1,7 +1,7 @@
-function ds_stacked=cosmo_dataset_stack(datasets,dim)
+function ds_stacked=cosmo_stack(datasets,dim)
 % stacks multiple datasets to yield a single dataset
 %
-% ds_stacked=cosmo_dataset_stack(datasets[,dim])
+% ds_stacked=cosmo_stack(datasets[,dim])
 %
 % Inputs
 %   datasets     Nx1 cell with input datasets
@@ -21,7 +21,7 @@ function ds_stacked=cosmo_dataset_stack(datasets,dim)
 %  % Inputs have 5 samples each
 %  half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',ones(1,5));
 %  half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2*ones(1,5));
-%  ds=cosmo_dataset_stack({half1,half2}); % output has 10 samples
+%  ds=cosmo_stack({half1,half2}); % output has 10 samples
 %
 % NNO Sep 2013
     

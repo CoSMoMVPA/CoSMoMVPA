@@ -57,18 +57,18 @@ function test_slicing
 function test_stacking
     ds=generate_test_dataset();
 
-    es=cosmo_dataset_stack({ds,ds});
+    es=cosmo_stack({ds,ds});
     assertEqual(es.samples,[ds.samples;ds.samples])
     assertEqual(es.sa.targets,repmat(ds.sa.targets,2,1));
     assertEqual(es.fa,ds.fa);
 
-    fs=cosmo_dataset_stack({ds,ds},1);
+    fs=cosmo_stack({ds,ds},1);
     assertEqual(es,fs)
     fs.fa.voxel_indices(1)=0;
-    assertExceptionThrown(@()cosmo_dataset_stack({es,fs}),'');
+    assertExceptionThrown(@()cosmo_stack({es,fs}),'');
 
-    es=cosmo_dataset_stack({ds,ds},2);
+    es=cosmo_stack({ds,ds},2);
     assertEqual(es.samples,[ds.samples ds.samples])
     es.sa.targets(1)=0;
-    assertExceptionThrown(@()cosmo_dataset_stack({es,ds}),'');
+    assertExceptionThrown(@()cosmo_stack({es,ds}),'');
 

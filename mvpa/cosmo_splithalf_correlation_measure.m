@@ -32,7 +32,7 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
 %   % assumes 5 classes per half, for example from GLM
 %   half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',1);
 %   half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2);
-%   ds=cosmo_dataset_stack({half1,half2});
+%   ds=cosmo_stack({half1,half2});
 %   measure=@cosmo_splithalf_correlation_measure;
 %
 %   % compute one measure for the whole brain
