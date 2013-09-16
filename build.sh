@@ -94,7 +94,7 @@ case $targets in
         scp -r ${webdir}/* ${host}:~/web/
     ;;
 
-    wb)
+    xx)
         # hidden option: build and push
         for i in cleandoc website; do
             $0 $i || exit 1
