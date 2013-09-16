@@ -75,7 +75,7 @@ nsplits=numel(split_values);
 
 ds_splits=cell(1,nsplits);
 for k=1:nsplits
-    ds_splits{k}=cosmo_slice(ds, values==split_values(k));
+    ds_splits{k}=cosmo_slice(ds, values==split_values(k), dim);
 end
 
 
