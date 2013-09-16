@@ -70,12 +70,9 @@ will need to use matlab's subplot function for this.
 
 .. image:: _static/visualize.png
 
-Hint: run_rsa_visualize_skl_
+Hint: :ref:`run_rsa_visualize_skl`.
 
-Solution: run_rsa_visualize_
-
-.. _run_rsa_visualize_skl: run_rsa_visualize_skl.html
-.. _run_rsa_visualize: run_rsa_visualize.html
+Solution: ref:`run_rsa_visualize`.
 
 Now using the script you wrote to visualize EV and LV, go through the set of
 subjects and see how the patterns change for different subjects. What trends do
@@ -112,9 +109,7 @@ Thus before calculating a neural DSM, it is good to center the data first by
 demeaning. Rerun your visualization script above by centering the data first.
 How does this change the results?
 
-Solution: run_demean_
-
-.. _run_demean: run_demean.html
+Solution: :ref:`run_demean`
 
 Comparing dissimilarity matrices
 ++++++++++++++++++++++++++++++++
@@ -130,9 +125,9 @@ matrix using **corrcoef**. Visualize the cross-correlation matrix with
 results. Finally, use matlabs **boxplot** function to view the distributions of
 correlations between neural simiilarities and model/behavioral DSMs. 
 
-Hint: run_compare_dsm_skl_
+Hint: :ref:`run_compare_dsm_skl`.
 
-Solution: run_compare_dsm_
+Solution: :ref:`run_compare_dsm`.
 
 Target dissimilarity matrix correlation measure
 +++++++++++++++++++++++++++++++++++++++++++++++
@@ -140,24 +135,17 @@ Target dissimilarity matrix correlation measure
 Now write a function that calculates the correlation between a target
 dissimilarity and the dissimilarity matrix calculated from a dataset. This
 function should conform to the function signature of a dataset measure.
+Use this as a starting point: :ref:`cosmo_target_dsm_corr_measure_skl`
 
-.. include:: cosmo_target_dsm_corr_measure_skl.rst
-
-Solution: cosmo_target_dsm_corr_measure_
-
-.. _cosmo_target_dsm_corr_measure: cosmo_target_dsm_corr_measure.html
-
-.. _run_compare_dsm_skl: run_compare_dsm_skl.html
-.. _run_compare_dsm: run_compare_dsm.html
+Solution: :ref:`cosmo_target_dsm_corr_measure`
 
 Target dissimilarity matrix searchlight
 +++++++++++++++++++++++++++++++++++++++
 Now use this measure to map where the neural similarity is similar to the behavioural similarity.
 
-Hint: run_rsm_measure_searchlight_skl_
+Hint: :ref:`run_rsm_measure_searchlight_skl`
 
-Solution: run_rsm_measure_searchlight_ / run_rsm_measure_searchlight_pb_
+Solution: :ref:`run_rsm_measure_searchlight` / run_rsm_measure_searchlight_pb_
 
-.. _run_rsm_measure_searchlight_skl: run_rsm_measure_searchlight_skl.html
-.. _run_rsm_measure_searchlight: run_rsm_measure_searchlight.html
-.. _run_rsm_measure_searchlight_pb: _static/publish/run_rsm_measure_searchlight.html
+.. _run_rsm_measure_searchlight_pb: _static/publish/run_rmm_measure_searchlight.html
+
