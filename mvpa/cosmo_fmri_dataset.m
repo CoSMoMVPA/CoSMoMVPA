@@ -89,7 +89,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     
     auto_mask=data~=0 & isfinite(data);
     if numel(size(auto_mask))==4
-        auto_mask=prod(~auto_mask,4)==0;
+        % convert boolean to numeric for older matlab versions
+        auto_mask=prod((~auto_mask)+0,4)==0; 
     end
         
     if isempty(p.mask)
