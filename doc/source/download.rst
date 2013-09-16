@@ -1,4 +1,4 @@
-.. _download: Download instructions
+.. _download:
 
 =====================
 Download instructions
@@ -27,7 +27,7 @@ Tutorual data is currently not ready for public release yet. Once it is ready we
 
 Developers
 ++++++++++
-If you want to contribute, please see contribute_. 
+If you want to contribute, please see :ref:`contribute`. 
 
 Our current build system only supports `Unix-like`_ systems. Some of the programs requires are Sphinx_ and Python_, but this list is not complete. 
 

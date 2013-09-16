@@ -1,5 +1,6 @@
-.. faq
+.. _faq: 
 
+--------------------------------------
 Frequently Asked/Anticipated Questions
 --------------------------------------
 **What, yet another MVPA toolbox? How is this toolbox different from others?**

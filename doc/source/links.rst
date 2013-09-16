@@ -8,6 +8,7 @@
 .. _git: http://gitscm.com
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
 .. _Matlab: http://www.mathworks.com/products/matlab/
+.. |Matlab(TM)| unicode:: MATLAB U+00AE
 .. _Matlab statistics: http://www.mathworks.it/products/statistics/
 .. _MRIcron: http://www.nitrc.org/projects/mricron
 .. _NeuroElf: http://neuroelf.net

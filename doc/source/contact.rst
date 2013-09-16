@@ -20,8 +20,8 @@ Bugs and other issues
 Contributions
 ^^^^^^^^^^^^^^^^^^
 - Preferably use `GitHub`
-- Alternatively post on a message on the  `CoSMoMVPA Google group`_ or contact us personally (see the FAQ_).
+- Alternatively post on a message on the  `CoSMoMVPA Google group`_ or contact us personally (see the :ref:`faq`).
 
-There are more details on how to contribute_.
+There are more details on how to :ref:`contribute`.
 
 .. include:: links.rst

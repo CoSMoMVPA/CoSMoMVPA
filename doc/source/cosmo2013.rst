@@ -18,11 +18,12 @@ Contents:
 .. toctree::
     :maxdepth: 1
 
-    matlab_full_toc
-    matlab_hdr_toc
-    matlab_skl_toc
+    modindex
+    modindex_hdr
+    modindex_skl
 
 Matlab outputs: matlab_pb_toc_
+
 
 
 Indices and tables

@@ -31,7 +31,6 @@ Detailed
    contact
    contribute
    thanks
-   links
 
 Full documentation
 ------------------
@@ -46,4 +45,4 @@ Full documentation
    contribute
    thanks
    links
-
+   
