@@ -99,12 +99,13 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
                 % compution time by up to a third)
                 nclasses=numel(half_targets);
                 merged_half_data=half_samples;
+                half1_classes=half_targets;
             else
                 classes=unique(half_targets);
                 
                 if j==1
                     half1_classes=classes; % store for first half
-                elseif half1_classes~=classes; % compare with second half
+                elseif ~isequal(half1_classes,classes) % compare with second half
                     error('class mismatch');
                 end
 
