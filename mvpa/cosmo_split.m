@@ -67,8 +67,8 @@ end
 
 % attribute values
 values=ds.(attrs_fn).(split_by);
-if ~isnumeric(values),
-    error('field .%s.%s must be numeric', attrs_fn, split_by);
+if ~isnumeric(values) || size(values,3-dim)~=1
+    error('field .%s.%s must be numeric vector', attrs_fn, split_by);
 end
 split_values=unique(values);
 nsplits=numel(split_values);
