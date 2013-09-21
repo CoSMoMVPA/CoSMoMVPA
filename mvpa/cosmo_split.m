@@ -1,7 +1,7 @@
 function ds_splits=cosmo_split(ds, split_by, dim)
-% splits a dataset by unique values in a sample or feature attribute
+% splits a dataset by unique values in (a) sample or feature attribute(s).
 %
-% cosmo_split(ds, split_by, dim)
+% cosmo_split(ds, split_by[, dim])
 %
 % Inputs:
 %   ds          dataset struct
@@ -13,8 +13,19 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %   dim         1 (split by samples; default) or 2 (split by features).
 %
 % Returns:
-%   ds_splits   1xP cell, if there are P unique values for the attribute
-%               indicated by split_by and dim.
+%   ds_splits   1xP cell, if there are P unique values for the (set of
+%               attribute(s) indicated by split_by and dim.
+%
+% Note:
+%   this function is like the inverse of cosmo_stack, in the sense that if
+%       ds_splits=cosmo_split(ds, split_by, dim),
+%   produces output (i.e., does not throw an error), then using
+%       ds_humpty_dumpty=cosmo_stack(ds_splits,dim)
+%   means that ds and ds_humpty_dumpty contain the same data, except that 
+%   the order of the data (in the rows [columns] of .samples, or .sa [.fa])  
+%   may be different if dim==1 [dim==2].
+%
+% See also: cosmo_stack
 %
 % NNO Sep 2013
 
