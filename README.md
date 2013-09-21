@@ -9,9 +9,11 @@ Features
 - Comes with extended documentation and a variety of exercises showing how parts of common MVPA functions can be implemented.
 - Free/Open Source Software (MIT License).
 
+Note: CoSMoMVPA is currently in a pre-first-release state. Code, features and documentation may change rapidly.
+
 Requirements
 ------------
-A working installation of Matlab
+A working installation of Matlab.
 
 History
 -----------
