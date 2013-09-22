@@ -140,6 +140,11 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % store the output in a dataset
     results_map=ds_a_fa;
     
+    % make sure it has no sample attributes
+    if isfield(results_map, 'sa')
+        results_map=rmfield(results_map,'sa');
+    end
+    
     % set center_ids for the output dataset
     all_feature_ids=1:size(dataset.samples,2);
     results_map.fa.center_ids=reshape(all_feature_ids(center_ids),1,[]);
