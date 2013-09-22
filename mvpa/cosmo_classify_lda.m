@@ -1,17 +1,22 @@
 function predicted = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
-% naive bayes classifier
+% linear discriminant analysis classifier - without prior
 %
 % predicted=cosmo_classify_lda(samples_train, targets_train, samples_test[,opt])
 %
-% Inputs
+% Inputs:
 % - samples_train      PxR training data for P samples and R features
 % - targets_train      Px1 training data classes
 % - samples_test       QxR test data
 %-  opt                Optional struct with optional field:
 %   regularization     Used to regularize covariance matrix. Default .01
 %
-% Output
+% Output:
 % - predicted          Qx1 predicted data classes for samples_test
+%
+% Note:
+% - this classifier does not support a prior, that is it assumes that all
+%   classes have the same number of samples. If that is not the case an
+%   error is thrown.
 %
 % Joern Diedrichsen, Tobias Wiestler, NNO Nov 2008; NNO updated Aug 2013
 
