@@ -11,14 +11,14 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
 %                 in each searchlight. 'minimum' means that at least 
 %                 (-radius) voxels are selected, and that the voxels that 
 %                 are not selected are all further away from the center
-%                 than those are not selected.
+%                 than those that are selected.
 %   center_ids    Px1 vector with feature ids to consider. If omitted it
 %                 will consider all features in dataset
 % 
 % Outputs
 %   center2neighbors  Px1 cell so that center2neighbors{k}==nbrs contains
 %                     the feature ids of the neighbors of feature k
-%   ds_a_fa           dataset-like struct but without .sa. It has fields:
+%   ds_a_fa           dataset-like struct but without .sa or .samples; it has:
 %     .a              dataset attributes, from dataset.a
 %     .fa             feature attributes with fields:
 %       .nvoxels      1xP number of voxels in each searchlight
