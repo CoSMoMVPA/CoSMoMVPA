@@ -68,6 +68,17 @@ def matlab2rst(data, output=None):
 fns=sum([glob.glob(join(d,'*.m')) for d in [matlab_dir, example_dir]],[])
 fns.sort()
 
+# define filters + file name infix for toc
+filters={'run': lambda x: x.startswith('run'),
+         None: lambda x: x.startswith('cosmo')}
+
+pf='Runnable examples - '
+output2name={('hdr','run'):pf+'header files',
+             ('skl','run'):pf + 'skeleton files',
+             (None,'run'):pf + 'full solution files',
+             (None,None): 'Module index',
+             ('hdr',None): 'header files',
+             ('skl',None): 'skeleton files'}
 
 for output in ('hdr','skl',None):
     print '@#$====> Converting matlab_%s.m files to *_%s.rst' % (output,output)
@@ -97,26 +108,35 @@ for output in ('hdr','skl',None):
 
         labels.append(label) # keep track of all rst files
 
-    output2name={'hdr':'header','sgn':'header only','skl':'skeleton',None:'full solution'}
-    header='Cosmo matlab files - %s files' % output2name[output]
-    header=[header, '='*len(header),'','Contents:', '',
-            '.. toctree::','    :maxdepth: 2','','']
-    toc_fn='modindex%s' % ('' if output is None else ('_' + output))
+    for infix, filter_ in filters.iteritems():
 
-    appendix=['','']
-    '''
-              'Indices and tables',
-              '==================',
-              '',
-              '* :ref:`genindex`',
-              '* :ref:`modindex`',
-              '* :ref:`search`']
-    '''
-    full_toc_fn=join(rst_dir,toc_fn+'.rst')
-    with open(full_toc_fn,'w') as f:
-        f.write('\n'.join(header))
-        for label in labels:
-            f.write(add_indent(label) + '\n')
-        f.write('\n'.join(appendix))
-        print "Written toc to %s" % full_toc_fn
+        toc_fn='modindex%s' % ('' if output is None else ('_' + output))
+        fn=toc_fn
+        if not infix is None:
+            fn+='_'+infix
+
+        headername=output2name.get((output, infix),None)
+        if headername is None:
+            continue
+
+        header='%s' % headername
+        header=['.. _`%s`: ' % fn, '', header, '='*len(header),'',
+                'Contents:', '',
+                '.. toctree::','    :maxdepth: 2','','']
+
+        appendix=['','',
+                  'Indices and tables',
+                  '^^^^^^^^^^^^^^^^^^',
+                  '',
+                  '* :ref:`genindex`',
+                  '* :ref:`modindex`',
+                  '* :ref:`search`']
+   
+        full_toc_fn=join(rst_dir,fn+'.rst')
+        with open(full_toc_fn,'w') as f:
+            f.write('\n'.join(header))
+            for label in filter(filter_,labels):
+                f.write(add_indent(label) + '\n')
+            f.write('\n'.join(appendix))
+            print "Written toc to %s" % full_toc_fn
 

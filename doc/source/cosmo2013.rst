@@ -22,9 +22,11 @@ Contents:
     modindex_hdr
     modindex_skl
 
+    modindex_run
+    modindex_hdr_run
+    modindex_skl_run
+
 Matlab outputs: matlab_pb_toc_
-
-
 
 Indices and tables
 ==================

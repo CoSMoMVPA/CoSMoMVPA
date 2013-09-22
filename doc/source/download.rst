@@ -1,4 +1,4 @@
-.. _download:
+.. _download: 
 
 =====================
 Download instructions

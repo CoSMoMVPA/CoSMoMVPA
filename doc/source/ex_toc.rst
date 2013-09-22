@@ -1,4 +1,4 @@
-.. ex_toc
+.. _ex_toc:
 
 Exercises
 =========
@@ -7,7 +7,6 @@ Contents:
 
 .. toctree::
     :maxdepth: 1
-    :numbered:
     :titlesonly:
 
     ex_dataset_basics
