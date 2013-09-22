@@ -10,9 +10,8 @@ You don't have to be a Matlab_ programmer. Useful *code* contributions are very 
 
 If you are not a Matlab_ programmer but would to contribute or suggest improvements on the documentation or examples, please contact_ us (this assumes you are at least as uncomfortable using git_ as using Matlab_, which is a reasonable assumption if you are not a Matlab_ programmer).
 
-.. toctree::
-    :maxdepth: 1
-    :local:
+.. contents::
+    :depth: 2
 
 
 .. _`file_locations_and_naming_conventions`:
