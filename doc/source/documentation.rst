@@ -44,5 +44,4 @@ Full documentation
    contact
    contribute
    thanks
-   links
    

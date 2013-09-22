@@ -4,11 +4,18 @@
 Information for contributors
 ============================
 
-We would be very happy to receive useful contributions!
+We would be very happy to receive contributions!
 
-To contribute, you don't have to be a Matlab_ programmer. Useful *code* contributions are very much appreciated, but improved documentation, ideas on how our web site can be made prettier, or other useful ideas are also valued highly.
+You don't have to be a Matlab_ programmer. Useful *code* contributions are very much appreciated, but improved documentation, ideas on how our web site can be made prettier, or other ideas are also valued highly.
 
 If you are not a Matlab_ programmer but would to contribute or suggest improvements on the documentation or examples, please contact_ us (this assumes you are at least as uncomfortable using git_ as using Matlab_, which is a reasonable assumption if you are not a Matlab_ programmer).
+
+.. toctree::
+    :maxdepth: 1
+    :local:
+
+
+.. _`file_locations_and_naming_conventions`:
 
 Directory locations and naming conventions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -42,13 +49,16 @@ Organization of files and directories
     + Generated matlab output files, using the ``publish`` functionality in ``mvpa/cosmo_publish_run_scripts`` (for developers only), are stored in ``doc/source/_static/publish/``.
 - Datasets will be stored in ``doc/source/_static/datasets/`` [TODO].
 
-For contributing programmers
-============================
+==========================================
+Information for contributing *programmers*
+==========================================
 
 The remainder of this section is for those experienced in **programming**; it describes how others can make code contributions, explains how and where different parts of the toolbox are stored, and provides some developer guidelines. If in doubt, or if you have questions or comments, do not hesitate to contact_ us.
 
 .. _contact: contact.html
 
+
+.. _`code_development`:
 
 Code development
 ^^^^^^^^^^^^^^^^
@@ -117,6 +127,7 @@ Notes on committing
     + ``git commit -m 'DOC+SML: fixed a typo'``
     + ``git commit -am LZY`` [others can see you were lazy; *to be used in special circumstances only*]
 
+.. _`build_system`:
 
 Build system
 ^^^^^^^^^^^^
@@ -138,6 +149,8 @@ The build system is used to generate documentation for the web site (or local us
 
 - The  ``mvpa/cosmo_publish_run_scripts.m`` function generates the output from all the runnable examples in ``examples/`` as html files and puts them in ``doc/source/_static/publish/``. This function is used to produce output for the web site. Using it requires modification of ``cosmo_get_data_path`` to return an absolute path. Use of this function is, at the moment, not part of the automated build system. 
 
+
+.. _`matlab code guidelines`:
 
 Matlab code guidelines
 ^^^^^^^^^^^^^^^^^^^^^^
