@@ -172,7 +172,7 @@ The following are guidelines, intended to improve:
             d=1; end
         end
 
-     .. code-block:: matlab
+    .. code-block:: matlab
 
        function y=plus_two(x)
         y=x+2;
@@ -189,7 +189,7 @@ The following are guidelines, intended to improve:
             end
         end
 
-      .. code-block:: matlab
+    .. code-block:: matlab
 
       function y=plus_two(x)
             % this function adds two the input and returns the result.
@@ -331,7 +331,7 @@ The following are guidelines, intended to improve:
     **good:**
 
     .. include:: cosmo_winner_indices_hdr.rst
-        :start-line: 3
+        :start-line: 1
 
 - It is better to allocate space for the data beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance, as growing an array requires reallocating memory, which slows down code execution.
@@ -499,7 +499,7 @@ The following are guidelines, intended to improve:
 
     .. code-block:: matlab 
 
-        fprintf(Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
+        fprintf('Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
 
     .. code-block:: matlab 
 
