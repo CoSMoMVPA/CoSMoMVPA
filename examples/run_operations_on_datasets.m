@@ -14,9 +14,13 @@ ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
 ds.sa.targets = repmat([1:6]',10,1);
 
 % set chunks
-chunks = [];
-for i=1:10 chunks = [chunks; repmat(i,6,1)]; end
-ds.sa.chunks = chunks;
+% equivalent code would be:
+%   chunks=zeros(60,1);
+%   for k=1:10
+%       chunks((k-1)*6+(1:6))=k; 
+%   end
+ds.sa.chunks=floor(((1:60)-1)'/6)+1;
+
 % <<
 
 %% Set the sample indices that correspond to primates and bugs
@@ -45,11 +49,12 @@ primates_minus_bugs = primates_mean - bugs_mean;
 
 %% Store and visualize the results
 % Finally save the result as a dataset with the original header
-% Just replace ds.samples with the result. Convert back to nifti and save it
-% using cosmo_map2fmri function.
+% Just replace ds.samples with the result and remove the sample attributes.
+% Then convert back to nifti and save it using cosmo_map2fmri function.
 
 % >>
 ds.samples = primates_minus_bugs;
+ds.sa=struct();
 ni = cosmo_map2fmri(ds, [data_path '/primates_minus_bugs.nii']);
 
 % View the result using AFNI, FSL, or Matlab's imagesc
