@@ -1,7 +1,7 @@
 function [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions, opt)
 % performs cross-validation using a classifier
 %
-% [pred, accuracy] = cosmo_cross_validate(dataset, args)
+% [pred, accuracy] = cosmo_cross_validate(dataset, classifier, partitions, opt)
 % 
 % Inputs
 %   dataset             struct with fields .samples (PxQ for P samples and 
