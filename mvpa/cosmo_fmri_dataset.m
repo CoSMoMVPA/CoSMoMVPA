@@ -247,7 +247,7 @@ function img_format=find_img_format(filename, img_formats)
     error('Could not find image format for "%s"', filename)
      
     
-function [data,hdr,img_format,a,fa,sa]=read_img(fn, img_formats)
+function [data,hdr,img_format,sa]=read_img(fn, img_formats)
     % helper: returns data (3D or 4D), header, and a string indicating the
     % image format. It matches the filename extension with what is stored
     % in img_formats
@@ -260,7 +260,7 @@ function [data,hdr,img_format,a,fa,sa]=read_img(fn, img_formats)
     
     % read the data
     reader=img_formats.(img_format).reader;
-    [data,hdr,a,fa,sa]=reader(fn);
+    [data,hdr,sa]=reader(fn);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
@@ -273,7 +273,7 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
      
-    function [data,hdr,a,fa,sa]=read_nii(fn)
+function [data,hdr,sa]=read_nii(fn)
     if ischar(fn)
         hdr=load_nii(fn);  
     elseif isa_nii(fn)
@@ -284,9 +284,7 @@ function b=isa_nii(hdr)
     
     data=hdr.img;
     hdr=rmfield(hdr,'img');
-    
-    a=struct();
-    fa=struct();
+
     sa=struct();
     
 %% Brainvoyager VMP (vmp)
@@ -296,7 +294,7 @@ function b=isa_bv_vmp(hdr)
     b=isa(hdr,'xff') && isfield(hdr,'Map') && isstruct(vmp.Map) && ... 
             isfield(hdr,'VMRDimX') && isfield(hdr,'NrOfMaps');
         
-function [data,hdr,a,fa,sa]=read_bv_vmp(fn)
+function [data,hdr,sa]=read_bv_vmp(fn)
     if ischar(fn)
         hdr=xff(fn);
     elseif isa_bv_vmp(fn)
@@ -315,9 +313,7 @@ function [data,hdr,a,fa,sa]=read_bv_vmp(fn)
     end
     
     bless(hdr); % avoid GC doing unwanted stuff
-    
-    a=struct();
-    fa=struct();
+   
     sa=struct();
     
     
@@ -326,7 +322,7 @@ function b=isa_bv_glm(hdr)
     b=isa(hdr,'xff') && isfield(hdr,'Predictor') &&  ... 
             isfield(hdr,'GLMData') && isfield(hdr,'DesignMatrix');
     
-function [data,hdr,a,fa,sa]=read_bv_glm(fn)
+function [data,hdr,sa]=read_bv_glm(fn)
     if ischar(fn)
         hdr=xff(fn);
     elseif isa_bv_glm(fn)
@@ -350,8 +346,6 @@ function [data,hdr,a,fa,sa]=read_bv_glm(fn)
         rgb(k,:)=p.RGB(1,:);
     end
     
-    a=struct();
-    fa=struct();
     sa=struct();
     sa.Name1=name1;
     sa.Name2=name2;
@@ -362,7 +356,7 @@ function b=isa_bv_msk(hdr)
     b=isa(hdr,'xff') && isfield(hdr, 'Mask');
 
     
-function [data,hdr,a,fa,sa]=read_bv_msk(fn)
+function [data,hdr,sa]=read_bv_msk(fn)
     hdr=xff(fn);
     a=[];
     fa=[];
@@ -376,14 +370,12 @@ function b=isa_afni(hdr)
     b=iscell(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
             isfield(hdr,'DATASET_RANK');
 
-function [data,hdr,a,fa,sa]=read_afni(fn)  
+function [data,hdr,sa]=read_afni(fn)  
     [err,data,hdr,err_msg]=BrikLoad(fn);
     if err
         error('Error reading afni file: %s', err_msg);
     end
     
-    a=struct();
-    fa=struct();
     sa=struct();
     
     if isfield(hdr,'BRICK_LABS')
