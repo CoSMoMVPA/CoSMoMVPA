@@ -81,14 +81,19 @@ values=ds.(attrs_fn).(split_by);
 if ~isnumeric(values) || size(values,3-dim)~=1
     error('field .%s.%s must be numeric vector', attrs_fn, split_by);
 end
-split_values=unique(values);
-nsplits=numel(split_values);
 
-ds_splits=cell(1,nsplits);
-for k=1:nsplits
-    ds_splits{k}=cosmo_slice(ds, values==split_values(k), dim);
+if numel(values)==1
+    % singleton element - little optimization
+    ds_splits={ds};
+else
+    split_values=unique(values);
+    nsplits=numel(split_values);
+
+    ds_splits=cell(1,nsplits);
+    for k=1:nsplits
+        ds_splits{k}=cosmo_slice(ds, values==split_values(k), dim);
+    end
 end
-
 
 
 
