@@ -1,5 +1,5 @@
-function rho = cosmo_target_dsm_corr_measure(dataset, args)
-%   rho = cosmo_target_dsm_corr_measure  
+function ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
+%   ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %
 %   A **dataset measure** that computes the correlation between a target
 %   dissimilarity matrix and the dissimilarity matrix of the input dataset
@@ -14,7 +14,11 @@ function rho = cosmo_target_dsm_corr_measure(dataset, args)
 %           args.type:  [Optional] Type of correlation can be any 'type' that matlab's
 %                       corr function can take. Default: 'pearson'
 %
-%   Returns rho: Correlation value 
+%   Returns
+%    ds_sa           Struct with fields:
+%      .samples      Scalar correlation value 
+%      .sa           Struct with field:
+%        .labels     {'rho'}  
 %
 %   
 % ACC August 2013
@@ -31,4 +35,6 @@ function rho = cosmo_target_dsm_corr_measure(dataset, args)
 
 % <<
 
-    
+    ds_sa=struct();
+    ds_sa.samples=rho;
+    ds_sa.sa.labels={'rho'};

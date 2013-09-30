@@ -1,4 +1,4 @@
-function delta=cosmo_splithalf_correlation_measure(ds, args)
+function ds_sa=cosmo_splithalf_correlation_measure(ds, args)
 % Computes a split-half correlation measure
 %
 % d=cosmo_splithalf_correlation_measure(ds[, args])
@@ -24,9 +24,12 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
 %                 The default is 'Pearson'.
 %
 % Output:
-%    delta        Measure indicating how well the template matrix 
+%    ds_sa        Struct with fields:
+%      .samples   Scalar indicating how well the template matrix 
 %                 correlates with the correlation matrix from the two
 %                 halves (averaged over partitions).
+%      .sa        Struct with field:
+%        .labels  {'corr'}
 %
 % Example:
 %   % assumes 5 classes per half, for example from GLM
@@ -56,7 +59,7 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
     end
     
     if ~isfield(args,'merge_func')
-        args.merge_func=@(x) mean(x,1);
+        args.merge_func=@featurewise_mean;
     end
     
     if ~isfield(args,'corr_type')
@@ -110,7 +113,6 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
                 end
 
                 nclasses=numel(classes);
-                half_data=zeros(nclasses,nfeatures);
                 for m=1:nclasses
                     half_data=half_samples(classes(m)==half_targets);
                     if size(half_data,1)==1
@@ -145,7 +147,7 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
             end
         end
         
-        c=cosmo_corr(halves_data{1}', halves_data{2}'); % Pearson correlation
+        c=cosmo_corr(halves_data{1}', halves_data{2}', args.corr_type); 
         ct=atanh(c); % fisher transformation
         ctw=ct .* template; % weigh each correlation by the template values
     
@@ -154,3 +156,13 @@ function delta=cosmo_splithalf_correlation_measure(ds, args)
     end
     
     delta=mean(sh_corrs);
+    
+    ds_sa=struct();
+    ds_sa.samples=delta;
+    ds_sa.sa.labels={'corr_diff'};
+    
+    
+function y=featurewise_mean(x)
+    y=mean(x,1);
+
+        
