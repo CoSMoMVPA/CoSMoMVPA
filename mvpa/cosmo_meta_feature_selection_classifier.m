@@ -35,7 +35,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
     selected_samples_test=samples_test(:,feature_idxs);
     
     % use the classifier to predict it on that data
-    predicted=classifier(selected_samples_train, targets_train, selected_samples_test);
+    predicted=classifier(selected_samples_train, targets_train, selected_samples_test, opt);
     
     
     
