@@ -84,9 +84,7 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % yet the size of the array returned by our dtaset measure. Instead 
     % space will be allocated after the first times the measure is used. 
     ncenters=numel(center_ids);
-    res=[];
-    
-    
+    res_cell=cell(ncenters,1);
     % see if progress is to be reported
     show_progress=~isempty(p.progress);
     if show_progress
@@ -98,7 +96,6 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
         clock_start=clock();
     end
     
-    
     % go over all features; for each feature, apply the measure and 
     % store its output.
     % >>
@@ -106,35 +103,40 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
         center_id=center_ids(k);
         sphere_feature_ids=center2neighbors{center_id};
 
+        % slice the dataset (with disabled kosherness-check)
         sphere_ds=cosmo_slice(dataset, sphere_feature_ids, 2);
 
-        % Call the dataset measure
-        m = measure(sphere_ds, args);
-
-        % Since a dataset measure may return an array of any length, we can
-        % check the measures length on the first iteration and allocated the
-        % appropriate amount of space for the results.
-        if isempty(res) 
-            [x,y] = size(m);
-            if y>1 error('Dataset measure must return N x 1 array'); end
-            res = zeros(x,ncenters);
-        else
-            [xx,yy]=size(m);
-            if yy>1 || xx~=x
-                error(['size mismatch for center id %d: expected ' ...
-                        '%d x %d but found %d x %d'], center_id,x,y,xx,yy);
-            end
-        end             
-
-        % Store the results
-        res(:,k)=m;
-
+        % apply the measure
+        res_cell{k}=measure(sphere_ds, args);
+        
+        % show progress
         if show_progress && (k==1 || mod(k,progress_step)==0 || k==nfeatures)
-            msg=sprintf('mean %.3f',mean(mean(res(:,1:k))));
+            msg='';
             prev_progress_msg=cosmo_show_progress(clock_start, ...
                             k/ncenters, msg, prev_progress_msg);
         end
     end
+    % <<
+    
+    % prepare the output
+    results_map=struct();
+    
+    % set dataset and feature attributes
+    results_map.a=ds_a_fa.a;
+    results_map.fa=ds_a_fa.fa;
+    
+    % join the outputs from the measure for each feature
+    res_stacked=cosmo_stack(res_cell,2);
+    
+    results_map.samples=res_stacked.samples;
+    results_map.sa=res_stacked.sa;
+    
+    % set center_ids for the output dataset
+    all_feature_ids=1:size(dataset.samples,2);
+    results_map.fa.center_ids=reshape(all_feature_ids(center_ids),1,[]);
+    
+    return
+    
     % <<
 
     % store the output in a dataset
@@ -144,10 +146,6 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     if isfield(results_map, 'sa')
         results_map=rmfield(results_map,'sa');
     end
-    
-    % set center_ids for the output dataset
-    all_feature_ids=1:size(dataset.samples,2);
-    results_map.fa.center_ids=reshape(all_feature_ids(center_ids),1,[]);
     
     % store the result from the measure
     results_map.samples=res;
