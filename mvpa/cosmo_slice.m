@@ -1,7 +1,7 @@
 function ds=cosmo_slice(ds, elements_to_select, dim)
 % Slice a dataset by samples (the default) or features
 %
-% sliced_ds=cosmo_slice(ds, elements_to_select[, dim])
+% sliced_ds=cosmo_slice(ds, elements_to_select[, dim][do_check])
 %
 % Inputs:
 %   ds                    dataset struct to be sliced, with PxQ field 
@@ -20,8 +20,11 @@ function ds=cosmo_slice(ds, elements_to_select, dim)
 %
 % NNO Sep 2013
 
-    if nargin<3 || isempty(dim), dim=1; end
+    if nargin<3 || isempty(dim)
+        dim=1;
+    end
     
+    % check kosherness
     cosmo_check_dataset(ds);
     
     % slice the samples
@@ -59,8 +62,6 @@ function ds=cosmo_slice(ds, elements_to_select, dim)
         attrs.(fn)=v_sliced; % set the sliced values
     end
     ds.(attr_fn)=attrs;
-    
-    cosmo_check_dataset(ds);
     
     
     function y=slice_array(x, to_select, dim)

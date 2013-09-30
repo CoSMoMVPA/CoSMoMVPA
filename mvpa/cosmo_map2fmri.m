@@ -35,6 +35,10 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function unfl_ds=unflatten(ds)
+    % puts the time dimension last, instead of first
+    unfl_ds=shiftdim(cosmo_unflatten(ds),1);
+
 function img_formats=get_img_formats()
     img_formats=struct();
     
@@ -55,7 +59,7 @@ function img_formats=get_img_formats()
     img_formats.afni.externals={'afni'};
     
     
-function img_format=get_img_format(dataset, img_formats)
+function img_format=get_img_format(ds, img_formats)
     
     fns=fieldnames(img_formats);
     n=numel(fns);
@@ -63,7 +67,7 @@ function img_format=get_img_format(dataset, img_formats)
     count=0;
     for k=1:n
         fn=fns{k};
-        if isfield(dataset.a, ['hdr_' fn])
+        if isfield(ds.a, ['hdr_' fn])
             img_format=fn;
             count=count+1;
         end
@@ -74,40 +78,46 @@ function img_format=get_img_format(dataset, img_formats)
     end
     
 function check_endswith(fn,ext)
-    b=numel(fn)>=numel(ext) && strcmpi(fn(end+((1-numel(ext)):0)),ext);
+    b=strmatch(cosmo_strsplit(fn,ext,-1),'');
     if ~b
         error('%s should end with %s', fn, ext);
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % format-specific helper functions
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% format-specific helper functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Nifti
     
-    %% Nifti
+function hdr=build_nii(ds)
     
-function hdr=build_nii(dataset)
+    nsamples=size(ds.samples,1);
     
-    nsamples=size(dataset.samples,1);
-    
-    hdr=dataset.a.hdr_nii;
+    hdr=ds.a.hdr_nii;
     
     hdr.hdr.dime.dim(5)=nsamples;
-    hdr.hdr.dime.dim(2:4)=dataset.a.vol.dim;
-    hdr.img=cosmo_map2array(dataset);
+    
+    % set number of values in each voxel dimension
+    ndim=numel(ds.a.dim.values);
+    for k=1:ndim
+        orig_dim(k+1)=numel(ds.a.dim.values{k});
+    end
+    
+    hdr.img=unflatten(ds);
     
     function write_nii(fn, hdr)
     save_nii(hdr, fn);
     
     
     %% Brainvoyager VMP
-function hdr=build_bv_vmp(dataset)
-    samples=dataset.samples;
+function hdr=build_bv_vmp(ds)
+    samples=ds.samples;
     nsamples=size(samples,1);
     
-    hdr=dataset.a.hdr_bv_vmp;
+    hdr=ds.a.hdr_bv_vmp;
     
     samples_cell=cell(1,nsamples);
-    vols=cosmo_map2array(dataset);
+    vols=unflatten(ds);
     
     master_data=hdr.Map(1); 
     
@@ -142,18 +152,18 @@ function write_bv(fn, hdr)
     
     
     %% Brainvoyager GLM
-function hdr=build_bv_glm(dataset)
+function hdr=build_bv_glm(ds)
     
     warning('cosmo:save','Output in BV .glm format not supported - storing as VMP instead');
     
-    dataset.a.hdr_bv_vmp=xff('new:vmp');
-    dataset.a=rmfield(dataset.a,'hdr_bv_glm');
-    hdr=build_bv_vmp(dataset);
+    ds.a.hdr_bv_vmp=xff('new:vmp');
+    ds.a=rmfield(ds.a,'hdr_bv_glm');
+    hdr=build_bv_vmp(ds);
     
 
-function hdr=build_afni(dataset)
-    nsamples=size(dataset.samples,1);
-    hdr=dataset.a.hdr_afni; 
+function hdr=build_afni(ds)
+    nsamples=size(ds.samples,1);
+    hdr=ds.a.hdr_afni; 
     
     hdr.BRICK_TYPES=repmat(3,1,nsamples);
     hdr.DATASET_RANK(2)=nsamples;
@@ -166,14 +176,14 @@ function hdr=build_afni(dataset)
         hdr.(fn)=[];
     end
     
-    % store data in this non-afni field
-    hdr.img=cosmo_map2array(dataset);
+    % store data in this non-afni field 'img'
+    hdr.img=unflatten(ds);
     
 function write_afni(fn, hdr)    
     
     hdr.RootName=fn;
     data=hdr.img; % get the data
-    hdr=rmfield(hdr,'img'); % remove the field
+    hdr=rmfield(hdr,'img'); % remove the non-afni field 'img'
 
     afniopt=struct();
     afniopt.Prefix=fn; %the second input argument

@@ -40,4 +40,5 @@ ds.sa.labels
 ds.fa
 
 % print a few voxel indices
-ds.fa.voxel_indices(:,1:10)
+ijk_indices=[ds.fa.i(:,1:10); ds.fa.j(:,1:10); ds.fa.k(:,1:10)];
+ijk_indices

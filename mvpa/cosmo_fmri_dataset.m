@@ -58,44 +58,58 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         return
     end
     
-    % allocate space for output
-    ds=struct(); 
-    
     % get the supported image formats use the helper defined below
     img_formats=get_img_formats(); 
     
     % read the image
-    [data,hdr,img_format,ds.a,ds.fa,ds.sa]=read_img(p.filename, img_formats);
+    [data,hdr,img_format,sa]=read_img(p.filename, img_formats);
      
-    dims = size(data);
-    if all(numel(dims)~=[3 4])
-        error('Need 3 or 4 dimensions'); 
-    end
-     
-    nx = dims(1); 
-    ny = dims(2); 
-    nz = dims(3); 
-    nxyz=[nx ny nz];
-     
-    % is the volume 4D?
-    is_4d=numel(size(data))==4;
-    
-    % define a potential mask
-    if is_4d
-        nt = dims(4);
-    else
-        nt=1;
+    if ~isa(data,'double')
+        data=double(data); % ensure data stored in double precision
     end
     
+    % see how many diemsions there are, and their size
+    data_size = size(data);
+    ndim = numel(data_size);
+    
+    switch ndim
+        case 3
+            % simple reshape operation
+            data=reshape(data,[1 dims]);
+        case 4
+            % make temporal dimension the first one
+            data=shiftdim(data,3);
+        otherwise
+            error('need 3 or 4 dimensions, found %d', ndims);
+    end
+    % number of values in 3 spatial + 1 temporal dimension
+    [nt,ni,nj,nk]=size(data);
+    
+    % make a dataset
+    ds=cosmo_flatten(data,{'i','j','k'},{1:ni,1:nj,1:nk});
+    ds.sa=sa;
+    
+    header_name=['hdr_' img_format];
+    ds.a.(header_name) = hdr; % store header
+    
+    % set chunks and targets 
+    ds=set_sa_vec(ds,p,'targets');
+    ds=set_sa_vec(ds,p,'chunks');
+    
+    % deal with the mask
+    % for convenience compute an automask
     auto_mask=data~=0 & isfinite(data);
     if numel(size(auto_mask))==4
-        % convert boolean to numeric for older matlab versions
+        % take as a mask anywhere where all features are zero
+        % (convert boolean to numeric for older matlab versions)
         auto_mask=prod((~auto_mask)+0,4)==0; 
     end
         
-    if isempty(p.mask)
+    mask_indices=-1;
+    if isempty(p.mask) || isequal(p.mask,true)
+        % give a warning if there are many empty voxels
         nzero=sum(auto_mask(:));
-        ntotal=prod(nxyz)*nt;
+        ntotal=prod(data_size);
         thr=.1;
         if nzero/ntotal > thr
             warning('comso:msk',['No mask supplied but %.0f%% of the data is',...
@@ -103,17 +117,16 @@ function ds = cosmo_fmri_dataset(filename, varargin)
                     ' from the input mask, use: %s(...,''mask'',true)'],...
                     100*nzero/ntotal,mfilename());
         end 
-        mask_indices = [1:prod(nxyz)]'; % use all voxel indices
     else
         % if a mask was supplied, load it
         if ischar(p.mask)
             m = read_img(p.mask, img_formats);
-        elseif islogical(p.mask) && numel(p.mask)==1 && p.mask
+        elseif isequal(p.mask, true)
             m = auto_mask;
         elseif isnumeric(mask) || islogical(mask)
             m = p.mask;
         else
-            error('Cannot deal with mask');
+            error('Weird mask, need string, array, or ''true''');
         end
      
         mdim = size(m);
@@ -123,42 +136,22 @@ function ds = cosmo_fmri_dataset(filename, varargin)
             case 3
             case 4
                 m=m(:,:,:,1);
-                warning('Found mask with %d volumes - using first', mdim(4));
+                warning('Mask has %d volumes - using first', mdim(4));
             otherwise
                 error('illegal mask: %d dimensions', mdim);
         end
      
         % sanity check to ensure the mask is properly shaped
-        if ~isequal(dims(1:3), mdim(1:3))
+        if ~isequal(data_size(1:3), mdim(1:3))
             error('mask size is different from data size');
         end
         
-        mask_indices=find(m(:));
+        mask_indices=m~=0;
     end
      
-    % compute the voxel indices
-    [ix, iy, iz] = ind2sub(nxyz, mask_indices);
-    ds.fa.voxel_indices=[ix iy iz]';
-     
-    % store the volume data
-    nfeatures=numel(mask_indices);
-    ds.samples = zeros(nt, nfeatures);
-     
-    for v=1:nt
-        if is_4d
-            vol = data(:,:,:,v);
-        else
-            vol = data(:,:,:);
-        end
-        ds.samples(v,:)=vol(mask_indices); % apply the mask
+    if ~isequal(mask_indices,-1)
+        ds=cosmo_slice(ds, mask_indices, 2);
     end
-     
-    header_name=['hdr_' img_format];
-    ds.a.(header_name) = hdr; % store header
-    ds.a.vol.dim=nxyz; % set the volume dimensions
-     
-    ds=set_sa_vec(ds,p,'targets');
-    ds=set_sa_vec(ds,p,'chunks');
     
     cosmo_check_dataset(ds, 'fmri'); % ensure all kosher
      

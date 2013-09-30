@@ -22,8 +22,11 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     if nargin<4 || isempty(slice_start), slice_start=1; end
     if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
     
-    if isstruct(data) && isfield(data,'samples')
-        data=cosmo_map2array(data);
+    if cosmo_check_dataset(data,false)
+        data4D=cosmo_unflatten(data);
+        sz=size(data4D);
+        if sz(1)>1 error('expected single volume data'); end
+        data=reshape(data4D, sz(2:4));
     end
     
     if numel(size(data))~=3
