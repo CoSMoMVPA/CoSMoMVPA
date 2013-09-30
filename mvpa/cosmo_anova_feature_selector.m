@@ -26,7 +26,6 @@ function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
     
     [foo, idxs]=sort(ps);
     n_idxs=round(ratio_to_keep*nfeatures);
-    
     selected_indices=idxs(1:n_idxs);
     
     
