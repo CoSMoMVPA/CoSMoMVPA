@@ -1,10 +1,10 @@
-function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius, center_ids, opt)
+function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, center_ids, opt)
 % computes neighbors for a spherical searchlight
 %
-% [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius[, center_ids])
+% [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
 %
 % Inputs
-%   dataset       a dataset struct (from fmri_dataset)
+%   ds            a dataset struct (from fmri_dataset)
 %   radius        if positive, it indicates sphere radius (in voxel
 %                 units). If negative then (-radius) indicates the 
 %                 (minimum) number of voxels that should be selected 
@@ -23,11 +23,12 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
 %     .fa             feature attributes with fields:
 %       .nvoxels      1xP number of voxels in each searchlight
 %       .radius       1xP radius in voxel units
+%       .center_ids   1xP feature center id
 %                      
 % NNO Aug 2013
     
-    cosmo_check_dataset(dataset,'fmri');
-    [nsamples, nfeatures]=size(dataset.samples);
+    cosmo_check_dataset(ds,'fmri');
+    [nsamples, nfeatures]=size(ds.samples);
     
     if nargin<3 || isempty(center_ids)
         center_ids=1:nfeatures;
@@ -43,13 +44,17 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
     
     show_progress=opt.progress>0;
     
-    orig_dim=dataset.a.vol.dim;
+    
+    ndim=numel(ds.a.dim.values);
+    orig_dim=zeros(1,ndim);
+    for k=1:ndim
+        orig_dim(k)=numel(ds.a.dim.values{k});
+    end
     orig_nvoxels=prod(orig_dim);
     
     % mapping from all linear voxel indices to those in the dataset
     map2full=zeros(orig_nvoxels,1);
-    sub=dataset.fa.voxel_indices;
-    lin=sub2ind(orig_dim, sub(1,:), sub(2,:), sub(3,:));
+    lin=sub2ind(orig_dim, ds.fa.i, ds.fa.j, ds.fa.k);
     map2full(lin)=1:nfeatures;
     
     % offsets in i,j,k direction for searchlight sphere
@@ -59,8 +64,10 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
         radius=1; % as a starting point
     end
     
+    % compute voxel offsets relative to origin
     [sphere_offsets, center_distances]=cosmo_sphere_offsets(radius);
     
+    % allocate space for output
     ncenters=numel(center_ids);
     center2neighbors=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
@@ -74,11 +81,13 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
         prev_progress_msg='';
     end
     
+    % get the indices for output
+    ijk_indices=[ds.fa.i; ds.fa.j; ds.fa.k];
     
     % go over all features
     for k=1:ncenters
         center_id=center_ids(k);
-        center_ijk=dataset.fa.voxel_indices(:,center_id);
+        center_ijk=ijk_indices(:,center_id);
         
         % in case of a variable radius, keep growing sphere_offsets until
         % there are enough voxels selected. This new radius is kept
@@ -161,7 +170,11 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, rad
     end
     
     % set the dataset and feature attributes
-    ds_a_fa=cosmo_slice(dataset, center_ids, 2);
+    ds_a_fa=cosmo_slice(ds, center_ids, 2);
     ds_a_fa.fa.nvoxels=nvoxels;
     ds_a_fa.fa.radius=final_radius;
+    ds_a_fa.fa.center_ids=center_ids(:)';
+    ds_a_fa.fa.i=ds.fa.i(center_ids);
+    ds_a_fa.fa.j=ds.fa.j(center_ids);
+    ds_a_fa.fa.k=ds.fa.k(center_ids);
     
