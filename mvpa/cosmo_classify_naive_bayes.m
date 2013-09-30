@@ -14,7 +14,6 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 %
 % NNO Aug 2013
     
-    
     if nargin<4, opt=struct(); end
     
     [ntrain, nfeatures]=size(samples_train);
