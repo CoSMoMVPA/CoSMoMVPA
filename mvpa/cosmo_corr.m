@@ -9,12 +9,17 @@ function c=cosmo_corr(x,y,corr_type)
 %   corr_type  'Pearson' or 'Spearman' or 'Kendall' (optional). If omitted 
 %              then corrtype='Pearson' and the computation time is
 %              significantly reduced for small matrices x and y (with 
-%              /tiny/ numerical imprecisions).
+%              /tiny/ numerical imprecisions) by the use of a custom
+%              implementation.
+%              Using 'Spearman' or 'Kendall' required the matlab stats
+%              toolbox.
 % Output:
 %   c          MxN matrix with c(i,j)=corr(x(:,i),y(:,j),'type',corr_type).
 %
 % Notes:
 %  - this function does not compute probability values.
+%  - Using 'Spearman' or 'Kendall' for corr_type requires the matlab stats
+%    toolbox.
 %
 % Example:
 % - % generate some random data. 
@@ -26,12 +31,12 @@ function c=cosmo_corr(x,y,corr_type)
 %   % compute differences in output
 %   delta=c-cc;
 %   max_delta=max(abs(delta(:)));
-%   n_eps=eps/max_delta; % how many epsilons
+%   n_eps=max_delta/eps; % how many epsilons
 %   fprintf('max difference: %d (%d epsilons)\n',max_delta,n_eps)
 %   % output:
-%   > Elapsed time is 0.014310 seconds.
-%   > Elapsed time is 0.001418 seconds.
-%   > max difference: 1.110223e-16
+%   Elapsed time is 0.795150 seconds.
+%   Elapsed time is 0.002629 seconds.
+%   max difference: 4.440892e-16 (2 epsilons)
 %
 % See also: corr
 %
@@ -61,7 +66,6 @@ switch corr_type
         % compute correlations
         c=n * (xd' * yd) .* (xs' * ys);
     otherwise
-        'fallback'
         % fall-back: use Matlab's function
         c=corr(x,y,'type',corr_type);
 end
