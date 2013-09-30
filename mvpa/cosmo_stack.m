@@ -65,47 +65,51 @@ function ds_stacked=cosmo_stack(datasets,dim)
     merge_fn=attrs_fns{other_dim};
     
     % stack attributes over dim
-    fns=fieldnames(ds_stacked.(stack_fn));
-    nfn=numel(fns);
-    
-    for k=1:nfn
-        % check k-th fieldname
-        fn=fns{k};
-        vs=cell(n,1);
-        for j=1:n
-            ds=datasets{j};
-            
-            % check this dataset is kosher
-            cosmo_check_dataset(ds);
-            
-            % check presence of fieldname
-            if ~isfield(ds.(stack_fn),fn)
-                error('field name not found for %d-th input: .%s.%s', ...
-                                    j, stack_fn, fn);
+    if isfield(ds_stacked, stack_fn)
+        fns=fieldnames(ds_stacked.(stack_fn));
+        nfn=numel(fns);
+
+        for k=1:nfn
+            % check k-th fieldname
+            fn=fns{k};
+            vs=cell(n,1);
+            for j=1:n
+                ds=datasets{j};
+
+                % check this dataset is kosher
+                cosmo_check_dataset(ds);
+
+                % check presence of fieldname
+                if ~isfield(ds.(stack_fn),fn)
+                    error('field name not found for %d-th input: .%s.%s', ...
+                                        j, stack_fn, fn);
+                end
+                vs{j}=ds.(stack_fn).(fn);
             end
-            vs{j}=ds.(stack_fn).(fn);
+            ds_stacked.(stack_fn).(fn)=cat(dim,vs{:});
         end
-        ds_stacked.(stack_fn).(fn)=cat(dim,vs{:});
     end
     
-    % for the otherdim, just make sure that the attributes are identical
-    fns=fieldnames(ds_stacked.(merge_fn));
-    nfn=numel(fns);
-    
-    for k=1:nfn
-        % check k-th fieldname
-        fn=fns{k};
-        for j=1:n
-            ds=datasets{j};
-            % require that the fieldname is present
-            if ~isfield(ds.(merge_fn),fn)
-                error('field name not found for %d-th input: .%s.%s', ...
-                                    j, merge_fn, fn);
+    % for the other dim, just make sure that the attributes are identical
+    if isfield(ds_stacked, merge_fn)
+        fns=fieldnames(ds_stacked.(merge_fn));
+        nfn=numel(fns);
+
+        for k=1:nfn
+            % check k-th fieldname
+            fn=fns{k};
+            for j=1:n
+                ds=datasets{j};
+                % require that the fieldname is present
+                if ~isfield(ds.(merge_fn),fn)
+                    error('field name not found for %d-th input: .%s.%s', ...
+                                        j, merge_fn, fn);
+                end
+                % if different throw an error
+                if ~isequal(ds.(merge_fn).(fn), ds_stacked.(merge_fn).(fn))
+                    error('value mismatch: .%s.%s', merge_fn, fn);
+                end 
             end
-            % if different throw an error
-            if ~isequal(ds.(merge_fn).(fn), ds_stacked.(merge_fn).(fn))
-                error('value mismatch: .%s.%s', merge_fn, fn);
-            end 
         end
     end
     
