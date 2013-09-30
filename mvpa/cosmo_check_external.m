@@ -5,7 +5,7 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %
 % Inputs:
 %   external               string or cell of strings. Currently supports 
-%                  '       'afni', 'neuroelf', 'nifti'.
+%                  '       'afni', 'neuroelf', 'nifti', 'fieldtrip'.
 %   error_if_not_present   if true (the default), an error is raised if the
 %                          external is not present. 
 %
@@ -68,6 +68,10 @@ function externals=get_externals()
     externals.nifti.label='NIFTI toolbox';
     externals.nifti.url=['http://www.mathworks.com/matlabcentral/',...
                          'fileexchange/8797-tools-for-nifti-and-analyze-image'];
+    
+    externals.fieldtrip.check=@() ~isempty(which('ft_read_data'));
+    externals.fieldtrip.label='FieldTrip toolbox';
+    externals.fieldtrip.url='http://fieldtrip.fcdonders.nl';
 
                         
 
