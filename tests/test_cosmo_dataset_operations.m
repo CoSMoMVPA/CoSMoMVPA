@@ -33,7 +33,7 @@ function test_slicing
 
     fs=cosmo_slice(ds,(1:1001)==2|(1:1001)==4,2);
     assertEqual(es.samples,fs.samples);
-    assertEqual(es.fa.voxel_indices, [2 4; 1 1;1 1]);
+    assertEqual([es.fa.i; es.fa.j; es.fa.k], [2 4; 1 1;1 1]);
 
     f=@() cosmo_slice(ds,-1,2);
     assertExceptionThrown(f,'MATLAB:badsubscript')
