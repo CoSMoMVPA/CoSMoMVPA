@@ -119,8 +119,8 @@ function ds_stacked=cosmo_stack(datasets,dim)
     for k=1:n
         samples=datasets{k}.samples;
         if k==1
-            size_first = size(samples); % store size of first dataset
-        elseif ~isequal(size(samples), size_first)
+            size_first = size(samples,other_dim); % store size of first dataset
+        elseif size(samples,other_dim)~=size_first
             error('sample size mismatch: %d x %d ~= %d x %d',...
                         size(samples), size_first)
         end
