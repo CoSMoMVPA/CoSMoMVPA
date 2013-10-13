@@ -1,8 +1,9 @@
-function results_map = cosmo_searchlight(dataset, measure, varargin)
+function results_map = cosmo_searchlight(ds, measure, varargin)
 %  Generic searchlight function returns a map of results computed at each
 %  searchlight location 
 %   
-%   results_map=cosmo_searchlight(dataset, measure, ['args',args]['radius',radius],['center_ids',center_ids])
+%   results_map=cosmo_searchlight(dataset, measure, ['args',args]...
+%                           ['radius',radius],['center_ids',center_ids])
 %
 %   Inputs
 %       dataset: an instance of a cosmo_fmri_dataset
@@ -10,26 +11,24 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %               the function signature: output = measure(dataset, args)
 %       args:   a struct that contains all the fields necessary to the dataset
 %               measure. args get passed directly to the dataset measure.
-%       radius: searchlight radius in voxels. If provided, the mapping from
-%               center2neighbors is computed using this radius and the
-%               cosmo_spherical_voxel_selection function
+%       radius: searchlight radius in voxels. If provided, the neighborhood
+%               function is computed using this radius and the
+%               cosmo_spherical_voxel_selection (for fMRI datasets).
 %       center_ids:      vector indicating center ids to be used as a 
 %                        searchlight center. By default all feature ids are
 %                        used
-%       center2neighbors: Px1 cell, if the dataset has P features, so that 
-%                         center2neighbors{K} contains the features that 
-%                         are in the neighborhood of the k-th feature.
-%                         This option is mutually exclusive with radius.
-%       ds_a_fa           dataset-like structure but without .sa and
-%                         .samples. Required only if center2neighbors is
+%       ds_fa_a:         dataset-like structure but without .sa and
+%                         .samples. Required only if radius is
 %                         not provided. This forms the template for the
 %                         output dataset. It should have the fields:
 %         .a              struct with dataset attributes
-%         .fa             struct with feature attributes
-%       
+%         .fa             struct with feature attributes. Each field should
+%                         have NF values in the second dimension
+%         .neighborhood   cell with NF mappings from center_ids in output
+%                         dataset to feature ids in input dataset. 
 %
 %   Returns
-%       results_map:    an instance of a cosmo_fmri_dataset where the samples
+%       results_map:    a dataset struct where the samples
 %                       contain the results of the searchlight analysis.
 % 
 %   Example: Using the searchlight to compute a full-brain nearest neighbor
@@ -46,45 +45,52 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
 %
 % ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
     
-    cosmo_check_dataset(dataset);
-    nfeatures=size(dataset.samples,2);
+    cosmo_check_dataset(ds);
 
     parser = inputParser;
     addOptional(parser,'radius',[]);
-    addOptional(parser,'center_ids',1:nfeatures);
+    addOptional(parser,'center_ids',[]);
     addOptional(parser,'args',struct());
-    addOptional(parser,'center2neighbors',[]);
     addOptional(parser,'ds_a_fa',[]);
     addOptional(parser,'progress',1/50);
+    addOptional(parser,'parent_type',[]); % for MEEG datasets
+    
     parse(parser,varargin{:});
     p = parser.Results;
     radius = p.radius;
     args = p.args;
     center_ids=p.center_ids;
-    center2neighbors=p.center2neighbors;
     ds_a_fa=p.ds_a_fa;
+    parent_type=p.parent_type;
 
     % use voxel selection function
-    if ~xor(isempty(radius), isempty(center2neighbors))
+    if ~xor(isempty(radius), isempty(ds_a_fa))
         error('need either radius or center2neighbors, exclusively');
-    elseif isempty(center2neighbors)
-        if ~isempty(ds_a_fa)
-            error('center2neighbors not specified but ds_a_fa is?');
+    elseif isempty(ds_a_fa)
+        if cosmo_check_dataset(ds,'fmri',false)
+            ds_a_fa=cosmo_spherical_voxel_selection(ds, radius);
+        elseif cosmo_check_dataset(ds,'meeg',false)
+            ds_a_fa=cosmo_meeg_neighborhood(ds, radius, parent_type);
+        else
+            error(['Cannot determine dataset type, and no neighborhood '...
+                     'specified in ds_a_fa']);
         end
-        [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(dataset, radius, center_ids);
-    else
-        if isempty(ds_a_fa)
-            error('center2neighbors specified but ds_a_fa is not?');
-        end
-        center2neighbors={center2neighbors{center_ids}};
-        ds_a_fa=cosmo_slice(ds, center_ids);
     end
-
-    % space for output, we will leave res empty for now because we can't know
-    % yet the size of the array returned by our dtaset measure. Instead 
-    % space will be allocated after the first times the measure is used. 
+    
+    % get the neighborhood information. This is a cell where
+    % neighborhood{k} contains the feature indices in input dataset 'ds' 
+    % for the 'k'-th center of the output dataset
+    neighborhood=ds_a_fa.neighborhood;
+    if isempty(center_ids)
+        center_ids=1:numel(neighborhood); % all output features
+    end
+    
+    % allocate space for output. res_cell contains the output
+    % of the measure applied to each group of features defined in 
+    % neighborhood. Afterwards the elements in res_cell are combined.
     ncenters=numel(center_ids);
     res_cell=cell(ncenters,1);
+    
     % see if progress is to be reported
     show_progress=~isempty(p.progress);
     if show_progress
@@ -101,16 +107,25 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     % >>
     for k=1:ncenters
         center_id=center_ids(k);
-        sphere_feature_ids=center2neighbors{center_id};
+        neighbor_feature_ids=neighborhood{center_id};
 
         % slice the dataset (with disabled kosherness-check)
-        sphere_ds=cosmo_slice(dataset, sphere_feature_ids, 2);
+        sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2);
 
         % apply the measure
+        res=measure(sphere_ds, args);
+        
+        % for efficiency, only check first output
+        if k==1 && (~isstruct(res) || ~isfield(res,'samples') || ...
+                    size(res.samples,2)~=1)
+            error(['Measure output must be struct with field .samples '...
+                   'that is a column vector']);
+        end
+        
         res_cell{k}=measure(sphere_ds, args);
         
         % show progress
-        if show_progress && (k==1 || mod(k,progress_step)==0 || k==nfeatures)
+        if show_progress && (k<10 || ~mod(k,progress_step) || k==ncenters)
             msg='';
             prev_progress_msg=cosmo_show_progress(clock_start, ...
                             k/ncenters, msg, prev_progress_msg);
@@ -123,31 +138,32 @@ function results_map = cosmo_searchlight(dataset, measure, varargin)
     
     % set dataset and feature attributes
     results_map.a=ds_a_fa.a;
-    results_map.fa=ds_a_fa.fa;
+    
+    % slice the feature attributes
+    fa_fns=fieldnames(ds_a_fa.fa);
+    for k=1:numel(fa_fns)
+        fa_fn=fa_fns{k};
+        v=ds_a_fa.fa.(fa_fn);
+        
+        % select the proper indices
+        % for now assume that v is always numeric
+        results_map.fa.(fa_fn)=v(:,center_ids);
+    end
     
     % join the outputs from the measure for each feature
     res_stacked=cosmo_stack(res_cell,2);
     
     results_map.samples=res_stacked.samples;
-    results_map.sa=res_stacked.sa;
     
-    % set center_ids for the output dataset
-    all_feature_ids=1:size(dataset.samples,2);
-    results_map.fa.center_ids=reshape(all_feature_ids(center_ids),1,[]);
-    
-    return
-    
-    % <<
-
-    % store the output in a dataset
-    results_map=ds_a_fa;
-    
-    % make sure it has no sample attributes
-    if isfield(results_map, 'sa')
-        results_map=rmfield(results_map,'sa');
+    % if measure returns .sa, add those.
+    if isfield(res_stacked,'sa')
+        results_map.sa=res_stacked.sa;
     end
     
-    % store the result from the measure
-    results_map.samples=res;
+    % set center_ids for the output dataset
+    results_map.fa.center_ids=center_ids(:)';
+    
+    cosmo_check_dataset(results_map);
+    
     
     
