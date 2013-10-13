@@ -9,9 +9,9 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %                     i.e. can never be a winner.
 %
 % Output:
-%   winners           Qx1 indices of classes that occur most often.
-%                     winners(k)==w means that no value in pred(:,k) 
-%                     occurs more often than classes(w)
+%   winners           Px1 indices of classes that occur most often.
+%                     winners(k)==w means that no value in pred(k,:) 
+%                     occurs more often than classes(w).
 %   classes           The sorted list of unique predicted values, across 
 %                     all non-ignored values in pred.
 %
@@ -88,5 +88,8 @@ function [winners,classes]=cosmo_winner_indices(pred)
         
         colpos=colpos+nwinner; % update for next iteration
     end
+    
+    no_winner=prod((pred<=0)+0,2)==1;
+    winners(no_winner)=0;
     
     
