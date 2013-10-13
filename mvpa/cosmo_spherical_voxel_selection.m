@@ -1,7 +1,7 @@
-function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, center_ids, opt)
+function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
 % computes neighbors for a spherical searchlight
 %
-% [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
+% [ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
 %
 % Inputs
 %   ds            a dataset struct (from fmri_dataset)
@@ -12,29 +12,25 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, 
 %                 (-radius) voxels are selected, and that the voxels that 
 %                 are not selected are all further away from the center
 %                 than those that are selected.
-%   center_ids    Px1 vector with feature ids to consider. If omitted it
-%                 will consider all features in dataset
 % 
 % Outputs
-%   center2neighbors  Px1 cell so that center2neighbors{k}==nbrs contains
-%                     the feature ids of the neighbors of feature k
-%   ds_a_fa           dataset-like struct but without .sa or .samples; it has:
+%   ds_a_fa           dataset-like struct without .sa or .samples, with:
 %     .a              dataset attributes, from dataset.a
 %     .fa             feature attributes with fields:
 %       .nvoxels      1xP number of voxels in each searchlight
 %       .radius       1xP radius in voxel units
 %       .center_ids   1xP feature center id
+%     .neighborhood   Px1 cell so that center2neighbors{k}==nbrs contains
+%                     the feature ids of the neighbors of feature k
 %                      
 % NNO Aug 2013
     
     cosmo_check_dataset(ds,'fmri');
     [nsamples, nfeatures]=size(ds.samples);
     
-    if nargin<3 || isempty(center_ids)
-        center_ids=1:nfeatures;
-    end
+    center_ids=1:nfeatures;
     
-    if nargin<4 || isempty(opt);
+    if nargin<3 || isempty(opt);
         opt=struct;
     end
     
@@ -69,7 +65,7 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, 
     
     % allocate space for output
     ncenters=numel(center_ids);
-    center2neighbors=cell(ncenters,1);
+    neighborhood=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
     final_radius=zeros(1,ncenters);
     
@@ -154,7 +150,7 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, 
 
         
         % store results
-        center2neighbors{k}=around_feature_ids;
+        neighborhood{k}=around_feature_ids;
         nvoxels(k)=numel(around_feature_ids);
         if use_fixed_radius
             final_radius(k)=radius;
@@ -178,3 +174,4 @@ function [center2neighbors,ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius, 
     ds_a_fa.fa.j=ds.fa.j(center_ids);
     ds_a_fa.fa.k=ds.fa.k(center_ids);
     
+    ds_a_fa.neighborhood=neighborhood;
