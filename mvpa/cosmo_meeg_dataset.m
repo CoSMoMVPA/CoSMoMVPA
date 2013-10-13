@@ -37,37 +37,46 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %                     channel labels. 
 %     .fa 
 %       .{D}          if D==a.dim.labels{K} is the label for the K-th 
-%                     feature dimension, then .{D} this contains the
+%                     feature dimension, then .{D} contains the
 %                     indices referencing a.dim.values. Thus, all values in
 %                     .{D} are in the range 1:N_K if a.dim.values{K} has
-%                     N_K values.
+%                     N_K values, and the J-th feature has dimension value
+%                     .dim.values{K}(.{D}(J)) in the K-th dimension.
 %       
 % Notes:
+%  - The resulting dataset can be mapped back to MEEG format using
+%    cosmo_map2meeg.
 %  - if the input contains data from a single sample (such as an average)
-%    the .sample_field is set to .tria
+%    the .sample_field is set to .trial, and mapping back to MEEG format
+%    adds a singleton dimension to the .trial data output field.
 %
 % Dependency:
 %  - Loading Fieldtrip structures requires the FieldTrip toolbox:
 %      http://http://fieldtrip.fcdonders.nl
+%
+% See also: cosmo_map2meeg
 %   
 % NNO Sep 2013
 
     % Input parsing stuff
-    if true
-        parser = inputParser;
-        addRequired(parser,'filename');
-        addOptional(parser,'targets',[]);
-        addOptional(parser,'chunks',[]);
-        parse(parser,filename,varargin{:})
-        p = parser.Results;
-    else
-        p.filename='sel_tl_all';
-    end
+    
+    parser = inputParser;
+    addRequired(parser,'filename');
+    addOptional(parser,'targets',[]);
+    addOptional(parser,'chunks',[]);
+    parse(parser,filename,varargin{:})
+    p = parser.Results;
 
     filename=p.filename;
+    
+    if cosmo_check_dataset(filename,'meeg',false)
+        % it is already a dataset, so return it
+        ds=filename;
+        return
+    end
 
+    % get image format and verify it is supported
     img_format=get_img_format(filename);
-
     supported_image_formats=get_supported_image_formats();
 
     % check externals
@@ -79,6 +88,7 @@ function ds=cosmo_meeg_dataset(filename, varargin)
     % read the dataset
     ds=reader(filename);
     
+    % set targets and chunks
     ds=set_vec_sa(ds,'targets',p.targets);
     ds=set_vec_sa(ds,'chunks',p.chunks);
     
@@ -110,7 +120,7 @@ function img_format=get_img_format(filename)
         fn=fns{k};
 
         img_spec=img_formats.(fn);
-        if ischar(filename) && img_spec.file_matcher(filename)
+        if img_spec.file_matcher(filename)
             img_format=fn;
             return
         end
@@ -121,26 +131,40 @@ function img_formats=get_supported_image_formats()
     % helper function to return the image format based on the filename
     img_formats=struct();
 
+    % helper function to see if a filename ends with a certain string.
+    % uses currying - who doesn't like curry?
+    endswith=@(ext) @(fn) ischar(fn) && isempty(cosmo_strsplit(fn,ext,-1));
+    
     % eeglab txt files
-    img_formats.eeglab_txt.file_matcher=@(x) ~isempty(regexp(x,'.*\.txt$'));
+    img_formats.eeglab_txt.file_matcher=endswith('.txt');
     img_formats.eeglab_txt.reader=@read_eeglab_txt;
     img_formats.eeglab_txt.externals={};
 
     % fieldtrip
     % XXX any .mat file is currently assumed to be a fieldtrip struct
-    img_formats.ft.file_matcher=@(x) ~isempty(regexp(x,'.*\.mat$')) || ...
-                                            exist([x '.mat'],'file');
+    img_formats.ft.file_matcher=endswith('.mat');
     img_formats.ft.reader=@read_ft;
     img_formats.ft.externals={'fieldtrip'};
+    
+    % fieldtrip matlab struct
+    img_formats.ft_struct.file_matcher=@(x) isstruct(x) && ...
+                                ~strcmp('unknown',isempty(ft_datatype(x)));
+    img_formats.ft_struct.reader=@convert_ft;
+    img_formats.ft_struct.externals={'fieldtrip'};
+    
+    
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fieldtrip helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ds=read_ft(filename)
-
+    % reads it from a .mat data file
     ft=load(filename);
-
+    ds=convert_ft;
+    
+function ds=convert_ft(ft)    
+    % ft is a fieldtrip struct
     datatype=ft_datatype(ft);
     
     % smallish hack: timelock data with 'avg' data is only 2D, but
@@ -256,25 +280,21 @@ function ds=read_eeglab_txt(fn)
     fid=fopen(fn);
 
     header_line=fgetl(fid); % read header
-    chan_labels=phoebe_splitstring(header_line,sprintf('\t'));
-    chan_labels={chan_labels{2:(end-1)}}; % omit first bogus element
+    chan_labels=cosmo_strsplit(header_line,'\t');
+    chan_labels={chan_labels{2:(end-1)}}; % omit first & last bogus element
 
     nchan=numel(chan_labels);
-    data_pat=sprintf('%%n%s',repmat(sprintf('\t%%n'),1,nchan));
+    data_pat=cosmo_strjoin(repmat({'%n'},1,nchan+1),'\t');
 
     % read data from file
     cell_data=textscan(fid,data_pat);
 
     % check all data was read
-    if fgetl(fid)~=-1
-        fclose(fid);
+    neg_one=fgetl(fid);
+    fgetl(fid);
+    if neg_one~=-1
         error('Could not read all data from %s', fn);
     end
-
-    % all good - close the file so that it's not open if an error must be
-    % thrown later.
-    fclose(fid);
-
     
     %%%%%%%%%%%%%%%
     % data consistency checks
@@ -310,22 +330,23 @@ function ds=read_eeglab_txt(fn)
     % put the data in 3D array
     for chan=1:nchan
         chan_data=cell_data{chan+1}; % skip first column as it has timepoints
-        data(:,chan,:)=reshape(chan_data,ntrial,ntime);
+        data(:,chan,:)=reshape(chan_data,ntime,ntrial)';
     end
 
     %%%%%%%%%%%%%%%
     % flatten and make it a dataset
+    % (convert miliseconds to seconds along the way)
     dim_labels={'chan','time'};
-    dim_values={chan_labels, t_trial'};
+    dim_values={chan_labels, .001*t_trial'};
 
-    % make a dataset
+    % make a dataset 
     ds=cosmo_flatten(data, dim_labels, dim_values);
 
     % set datatype to timelock-ish in fieldtrip-compatible way
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type='timelock';
     ds.a.meeg.samples_label='rpt';
-    ds.a.hdr_ft=struct(); % for now, make it look like a fieldtrip structure
+    ds.a.hdr_ft=struct(); % make it look like a fieldtrip structure
 
     % set sample info
     ds.sa.(ds.a.meeg.samples_label)=(1:ntrial)';
