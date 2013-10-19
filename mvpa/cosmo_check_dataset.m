@@ -50,13 +50,22 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
     % error message. If empty at the end of this function, then ds is ok.
     msg=''; 
 
-    if ~isstruct(ds) || ~isfield(ds,'samples')
-        % jump straight to the end of the function
-        msg='dataset not a struct, or no .samples'; 
-    else
+    % use a for-loop with 'break' statements to simulate a GOTO statement
+    % so that after the first error the loop is quit
+    while true
+        if ~isstruct(ds)
+            msg='dataset not a struct'; break
+        end
+
+        if  ~isfield(ds,'samples')
+            msg='dataset has no field .samples'; break
+        end
+
         % has samples, so check the rest
         ds_size=size(ds.samples);
-        if numel(ds_size) ~=2, msg='.samples should be 2D'; end
+        if numel(ds_size) ~=2, 
+            msg='.samples should be 2D'; break
+        end
 
         attrs_fns={'sa','fa'};
 
@@ -80,38 +89,51 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                     attr_size=size(attr);
                     if numel(attr_size) ~= 2
                         msg=sprintf('%s.%s should be 2D', attrs_fn, fn);
+                        break;
                     end
                     if attr_size(dim) ~= ds_size(dim)
                         msg=sprintf(['%s.%s has %d values in dimension %d, ',...
                                     'expected %d'], attrs_fn, fn,... 
                                     attr_size(dim), dim, ds_size(dim));
+                        break;
                     end
                 end
+                
+                % break out of loop if msg is set
+                if ~isempty(msg), break; end
             end
         end
 
+        % break out of loop if msg is set
+        if ~isempty(msg), break; end
+        
         % if provided, check for this specific type
         if ~isempty(ds_type)
             switch ds_type
                 case 'fmri'
                     if isempty(msg)
                         msg=check_dim(ds);
+                        if ~isempty(msg) break; end
                     end
                     if ~isfield(ds,'fa') || ~isfield(ds.fa,'i') || ...
                             ~isfield(ds.fa,'j') || ~isfield(ds.fa,'k')
-                        msg='missing field ds.fa.{i,j,k}';
+                        msg='missing field ds.fa.{i,j,k}'; break
                     end
                 case 'meeg'
                     if isempty(msg)
                         msg=check_dim(ds);
+                        if ~isempty(msg) break; end
                     end
                     if ~isfield(ds,'a') || ~isfield(ds.a,'meeg')
-                        msg='missing field .a.meeg';
+                        msg='missing field .a.meeg'; break
                     end
                 otherwise
                     error('unsupported ds_type: %s', ds_type);
             end
         end
+        
+        % quit the while loop
+        break;
     end
 
     % throw the error if neccessary
