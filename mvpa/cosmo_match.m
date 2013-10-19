@@ -79,9 +79,11 @@ function msk=cosmo_match(varargin)
 
             case 'cell_with_strings'
                 matches=false(nrows,ncols);
+                max_nchar_haystack=max(cellfun(@numel,haystack));
                 for k=1:nrows
                     needlek=needle{k};
-                    match_indices=strncmp(needlek,haystack,numel(needlek));
+                    nchar=max(numel(needlek),max_nchar_haystack);
+                    match_indices=strncmp(needlek,haystack,nchar);
                     matches(k,match_indices)=true;
                 end
         end
