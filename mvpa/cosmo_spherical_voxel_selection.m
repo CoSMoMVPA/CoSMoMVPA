@@ -166,7 +166,8 @@ function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
     end
     
     % set the dataset and feature attributes
-    ds_a_fa=cosmo_slice(ds, center_ids, 2);
+    ds_a_fa=struct();
+    ds_a_fa.a=ds.a;
     ds_a_fa.fa.nvoxels=nvoxels;
     ds_a_fa.fa.radius=final_radius;
     ds_a_fa.fa.center_ids=center_ids(:)';
