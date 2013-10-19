@@ -40,7 +40,18 @@ function [winners,classes]=cosmo_winner_indices(pred)
     [nsamples,nfeatures]=size(pred);
     msk=pred>0; % ignore those without predictions
     
-    mx_pred=max(pred(:));
+    % allocate space for output
+    winners=zeros(nsamples,1); 
+    
+    if nfeatures==1
+        % special case because histc works differently on singleton dimension
+        
+        [classes,foo,pred_winners]=unique(pred(msk));
+        winners(msk)=pred_winners;
+        return
+    end
+    
+    mx_pred=max(pred(msk));
     
     counts=histc(pred',1:mx_pred)';
     % optimization: if all classes in range 1:mx_pred then set classes directly
@@ -59,9 +70,6 @@ function [winners,classes]=cosmo_winner_indices(pred)
     
     % for each feature the number of winners
     nwinners=sum(winners_msk,2); 
-    
-    % allocate space for output
-    winners=zeros(nsamples,1); 
     
     % optimization: first take features with just one winner
     one_winner=nwinners==1;
