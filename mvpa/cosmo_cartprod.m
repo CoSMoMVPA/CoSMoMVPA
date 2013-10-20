@@ -58,10 +58,11 @@ if nargin<2, convert_to_numeric=true; end
 as_struct=isstruct(xs);
 
 if as_struct
-    s=xs;
+    % input is a struct; put the values in each field in a cell.
+    s=xs; % make a copy
     fns=fieldnames(s);
-    ndim=numel(fns);
-    xs=cell(1,ndim);
+    ndim=numel(fns); 
+    xs=cell(1,ndim); % space for values in each dimension
     for k=1:ndim
         xs{k}=s.(fns{k});
     end
@@ -70,47 +71,70 @@ end
 if iscell(xs)
     ndim=numel(xs);
 else
-    error('Unsupported input');
+    error('Unsupported input: expected a cell or struct');
 end
 
+% get values in first dimension (the 'head')
 xhead=xs{1};
 nhead=numel(xhead);
 if isnumeric(xhead)
+    % put numeric arrays in a cell
     xhead=mat2cell(xhead(:),ones(nhead,1),1);
 end
+
+% ensure head it's a column vector
 xhead={xhead{:}}';
 
 if ndim==1
     p=xhead;
 else
-    me=str2func(mfilename());
+    % use recursion to find cartprod of remaining dimensions (the 'tail')
+    me=str2func(mfilename()); % make imune to renaming of this function
     xtail={xs{2:end}};
-    ptail=me(xtail, false);
+    ptail=me(xtail, false); % ensure output is always a cell
     
+    % get sizes of head and tail
     nhead=numel(xhead);
     ntail=size(ptail,1);
-    
     n=nhead*ntail;
     
+    % allocate space for output
     rows=cell(nhead,1);
-    for k=1:nhead
-        rows{k}=cat(2,repmat({xhead{k}},ntail,1),ptail);
+    for k=1:ntail
+        % merge head and tail
+        % ptailk_rep is a repeated version of the k-th tail row
+        % to match the number of rows in head
+        ptailk_rep=repmat({ptail{k,:}},nhead,1);
+        rows{k}=cat(2,xhead,ptailk_rep);
     end
+    
+    % stack the rows vertically
     p=cat(1,rows{:});
 end
-    
+
+% if input was a struct, output is a cell with structs
 if as_struct();
+    % number of output 
     n=size(p,1);
+    
+    % allocate space for structs
     q=cell(n,1);
+    
+    % set values for each struct
     for k=1:n
         s=struct();
         for j=1:ndim
+            % use the same fieldnames as in the input
             s.(fns{j})=p{k,j};
         end
         q{k}=s;
     end
+    
+    % use value of q in output
     p=q;
-elseif convert_to_numeric && all(cellfun(@isnumeric,{p{:}}))
+elseif convert_to_numeric && ~isempty(p)
+    all(cellfun(@isnumeric,{p{:}}))
+    % all values are numeric; convert to numeric matrix
     p=reshape([p{:}],size(p));
 end
     
