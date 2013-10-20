@@ -1,9 +1,9 @@
 function p=cosmo_cartprod(xs, convert_to_numeric)
 % returns the cartesian product with all combinations from values in xs.
 %
-% p=cosmo_cartprod(xs, convert_to_numeric)
+% p=cosmo_cartprod(xs[, convert_to_numeric])
 %
-% Inputs
+% Inputs:
 %   xs                   Px1 cell array with values for which the product 
 %                        is to be returned. Each element xs{k} should be a
 %                        cell with Qk values; or a numeric array 
@@ -12,10 +12,10 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %                        Alternatively xs can be a struct with P fieldnames
 %                        where each value is a cell with Qk values.
 %                         
-%   convert_to_numeric   If true (the default), then when the output 
+%   convert_to_numeric   Optiona;' if true (default), then when the output 
 %                        contains numeric values only a numerical matrix is
-%                        returned; otherwise a cell is returned
-% Output
+%                        returned; otherwise a cell is returned.
+% Output:
 %   p                    QxP cartesian product of xs (where Q=Q1*...*Qk)
 %                        containing all combinations of values in xs.
 %                        - If xs is a cell, then p is represented by either 
@@ -26,6 +26,31 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %                          element in p is a struct with the same 
 %                          fieldnames as xs.
 %
+% Examples:
+%  % note: outputs are transposed for readability
+%  >> cosmo_cartprod({{1,2},{'a','b','c'}})'
+%  {1,2,1,2,1,2;
+%  'a','a' ,'b','b','c','c'}
+%
+%  >> cosmo_cartprod({[1,2],[5,6,7]})'
+%  [1,2,1,2,1,2;
+%  [5,5,6,6,7,7]
+% 
+%  >> cosmo_cartprod(repmat({1:2},1,4))'
+%  [1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2;
+%   1 1 2 2 1 1 2 2 1 1 2 2 1 1 2 2;
+%   1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2;
+%   1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2]
+%
+%  >> s=struct()
+%  >> s.name={'foo','bar'};
+%  >> s.dim=1:3;
+%  >> p=cosmo_cartprod(s)';
+%  >> p{5}.name
+%  'foo'
+%  >> p{5}.dim
+%  3
+% 
 % NNO Oct 2013
 
 if nargin<2, convert_to_numeric=true; end
