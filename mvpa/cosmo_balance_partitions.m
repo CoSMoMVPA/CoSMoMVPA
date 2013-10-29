@@ -10,7 +10,7 @@ end
 
 npar=numel(partitions.train_indices);
 
-nbalpar=npar*nsets;
+all_unq_targets=unique(targets);
 
 % allocate space for output
 bal_partitions=struct();
@@ -32,6 +32,11 @@ for m=1:numel(fns)
             parj_targ=targets(parj,:);
             
             unq_targ=unique(parj_targ);
+            if ~isequal(unq_targ, all_unq_targets)
+                delta=setxor(unq_targ,all_unq_targets);
+                error('target mismatch in .%s #%d, partition %d: %d',...
+                            fn, k, j, delta(1));
+            end
             h=histc(parj_targ, unq_targ);
             mn=min(h);
 
