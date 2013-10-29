@@ -118,7 +118,7 @@ if as_struct();
     n=size(p,1);
     
     % allocate space for structs
-    q=cell(n,1);
+    p_cell=cell(n,1);
     
     % set values for each struct
     for k=1:n
@@ -127,13 +127,12 @@ if as_struct();
             % use the same fieldnames as in the input
             s.(fns{j})=p{k,j};
         end
-        q{k}=s;
+        p_cell{k}=s;
     end
     
     % use value of q in output
-    p=q;
-elseif convert_to_numeric && ~isempty(p)
-    all(cellfun(@isnumeric,{p{:}}))
+    p=p_cell;
+elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,{p{:}}))
     % all values are numeric; convert to numeric matrix
     p=reshape([p{:}],size(p));
 end
