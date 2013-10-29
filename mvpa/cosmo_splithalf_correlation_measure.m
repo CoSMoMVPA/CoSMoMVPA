@@ -113,10 +113,11 @@ function ds_sa=cosmo_splithalf_correlation_measure(ds, args)
                 end
 
                 nclasses=numel(classes);
+                merged_half_data=zeros(nclasses,nfeatures);
                 for m=1:nclasses
-                    half_data=half_samples(classes(m)==half_targets);
+                    half_data=half_samples(classes(m)==half_targets,:);
                     if size(half_data,1)==1
-                        merged_half_data=half_data;
+                        merged_half_data(m,:)=half_data;
                     else
                         merged_half_data(m,:)=args.merge_func(half_data);
                     end
