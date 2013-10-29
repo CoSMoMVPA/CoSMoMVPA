@@ -1,4 +1,4 @@
-function ds=cosmo_slice(ds, elements_to_select, dim)
+function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
 % Slice a dataset by samples (the default) or features
 %
 % sliced_ds=cosmo_slice(ds, elements_to_select[, dim][do_check])
@@ -22,10 +22,20 @@ function ds=cosmo_slice(ds, elements_to_select, dim)
 
     if nargin<3 || isempty(dim)
         dim=1;
+        do_check=true;
+    elseif nargin<4
+        if islogical(dim)
+            do_check=dim;
+            dim=1;
+        else
+            do_check=true;
+        end
     end
     
     % check kosherness
-    cosmo_check_dataset(ds);
+    if do_check
+        cosmo_check_dataset(ds);
+    end
     
     % slice the samples
     full_data=ds.samples;
@@ -37,32 +47,31 @@ function ds=cosmo_slice(ds, elements_to_select, dim)
     attr_fns={'sa','fa'};
     attr_fn=attr_fns{dim}; % fieldname of attribute to slice
     
-    if ~isfield(ds, attr_fn)
-        error('illegal dataset - no %s', attr_fn); 
-    end 
-    attrs=ds.(attr_fn); % get attribute
-    
-    fns=fieldnames(attrs); % fieldnames
-    n=numel(fns);
-    for k=1:n
-        fn=fns{k};
-        
-        v=attrs.(fn);
-        
-        if isempty(v)
-            continue;
+    if isfield(ds, attr_fn)
+        attrs=ds.(attr_fn); % get attribute
+
+        fns=fieldnames(attrs); % fieldnames
+        n=numel(fns);
+        for k=1:n
+            fn=fns{k};
+
+            v=attrs.(fn);
+
+            if isempty(v)
+                continue;
+            end
+
+            if iscell(v)
+                v_sliced=slice_cell(v, elements_to_select,dim);
+            else
+                v_sliced=slice_array(v, elements_to_select,dim);
+            end
+
+            attrs.(fn)=v_sliced; % set the sliced values
         end
-        
-        if iscell(v)
-            v_sliced=slice_cell(v, elements_to_select,dim);
-        else
-            v_sliced=slice_array(v, elements_to_select,dim);
-        end
-        
-        attrs.(fn)=v_sliced; % set the sliced values
+        ds.(attr_fn)=attrs;
     end
-    ds.(attr_fn)=attrs;
-    
+
     
     function y=slice_array(x, to_select, dim)
         % slices the array x along dim with indices, where dim in [1,2]
