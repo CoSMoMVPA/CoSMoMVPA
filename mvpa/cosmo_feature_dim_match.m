@@ -13,7 +13,10 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 %                     dim is the dimension corresponding to haystack) as
 %                     indexed by ds.fa.(haystack) are used as haystack.
 %   needle*           numeric vector, or cell with strings. A string is
-%                     also allowed and interpreted as {needle}.
+%                     also allowed and interpreted as {needle}. 
+%                     A function handle is also allowed, in which case the
+%                     value use for needle is the function applied to 
+%                     the corresponding value in ds.a.dim.values.
 %   
 % Output:
 %   msk               boolean array of the same size as haystack, with
@@ -31,7 +34,8 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 %   - get features mask for a few MEEG channels
 %     msk=cosmo_feature_dim_match(ds,'chan',{'PO7','O6'});
 %
-%
+%   - get features mask for features 50 ms before stimulus onset:
+%     msk=cosmo_feature_dim_match(ds,'time',@(x) x<.05);
 %
 % Notes
 %  - when haystack or needle are numeric vectors or cells of strings,
@@ -55,7 +59,11 @@ if ischar(dim_label)
         error('Unknown dimension %s in ds.a.dim.labels', dim_label);
     end
     
-    match_mask=cosmo_match(ds.a.dim.values{dim},dim_values);
+    if isa(dim_values,'function_handle')
+        match_mask=dim_values(ds.a.dim.values{dim});
+    else
+        match_mask=cosmo_match(ds.a.dim.values{dim},dim_values);
+    end
     
     % set new value based on indices of the matching mask
     dim_values=find(match_mask);
