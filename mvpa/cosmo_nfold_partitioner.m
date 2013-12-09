@@ -14,13 +14,20 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %                    sample indices for the k-th fold.
 %                    
 % Example:
-% p=cosmo_nfold_partitioner([1 1 2 2 3 3 3])
-% > p = train_indices: {1x3 cell}
-% >     test_indices: {1x3 cell}  
-% p.train_indices{1}'
-% >     [3 4 5 6 7]
-% p.test_indices{1}
-% >     [1 2]
+%   p=cosmo_nfold_partitioner([1 1 2 2 3 3 3])
+%   > p = train_indices: {1x3 cell}
+%   >     test_indices: {1x3 cell}  
+%   p.train_indices{1}'
+%   >     [3 4 5 6 7]
+%   p.test_indices{1}
+%   >     [1 2]
+%
+% Note:
+%  - for cross-validation it is recommended to balance partitions using 
+%    cosmo_balance_partitions.
+%  - More advanced partitining is provided by cosmo_nchoosek_partitioner.
+%
+% See also: cosmo_balance_partitions, cosmo_nchoosek_partitioner 
 %
 % NNO Aug 2013
     

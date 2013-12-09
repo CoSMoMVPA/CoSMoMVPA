@@ -45,6 +45,10 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %    to cosmo_nfold_partitioner.
 %  - as shown in the examples below, this function can be used for
 %    cross-modal and/or cross-participant cross-validation.
+%  - for cross-validation it is recommended to balance partitions using 
+%    cosmo_balance_partitions
+%
+% See also: cosmo_balance_partitions 
 %
 % Examples:
 %   cosmo_nchoosek_partitioner([1 2 1 2 2],.5)
@@ -85,7 +89,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %   cosmo_nchoosek_partitioner(ds,1,'modality',[],'subject,[])
 %     > % full cross-subject cross-modal nfold cross validation
 %
-% See also: cosmo_nfold_partitioner
+% See also: cosmo_nfold_partitioner, cosmo_balance_partitions
 %
 % NNO Sep 2013
 
