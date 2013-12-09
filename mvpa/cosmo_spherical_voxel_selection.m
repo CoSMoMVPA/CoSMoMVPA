@@ -1,7 +1,7 @@
-function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
+function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
 % computes neighbors for a spherical searchlight
 %
-% [ds_a_fa]=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
+% nbrhood=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
 %
 % Inputs
 %   ds            a dataset struct (from fmri_dataset)
@@ -14,13 +14,13 @@ function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
 %                 than those that are selected.
 % 
 % Outputs
-%   ds_a_fa           dataset-like struct without .sa or .samples, with:
+%   nbrhood           dataset-like struct without .sa or .samples, with:
 %     .a              dataset attributes, from dataset.a
 %     .fa             feature attributes with fields:
 %       .nvoxels      1xP number of voxels in each searchlight
 %       .radius       1xP radius in voxel units
 %       .center_ids   1xP feature center id
-%     .neighborhood   Px1 cell so that center2neighbors{k}==nbrs contains
+%     .neighbors      Px1 cell so that center2neighbors{k}==nbrs contains
 %                     the feature ids of the neighbors of feature k
 %                      
 % NNO Aug 2013
@@ -65,7 +65,7 @@ function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
     
     % allocate space for output
     ncenters=numel(center_ids);
-    neighborhood=cell(ncenters,1);
+    neighbors=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
     final_radius=zeros(1,ncenters);
     
@@ -150,7 +150,7 @@ function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
 
         
         % store results
-        neighborhood{k}=around_feature_ids;
+        neighbors{k}=around_feature_ids;
         nvoxels(k)=numel(around_feature_ids);
         if use_fixed_radius
             final_radius(k)=radius;
@@ -166,13 +166,13 @@ function ds_a_fa=cosmo_spherical_voxel_selection(ds, radius, opt)
     end
     
     % set the dataset and feature attributes
-    ds_a_fa=struct();
-    ds_a_fa.a=ds.a;
-    ds_a_fa.fa.nvoxels=nvoxels;
-    ds_a_fa.fa.radius=final_radius;
-    ds_a_fa.fa.center_ids=center_ids(:)';
-    ds_a_fa.fa.i=ds.fa.i(center_ids);
-    ds_a_fa.fa.j=ds.fa.j(center_ids);
-    ds_a_fa.fa.k=ds.fa.k(center_ids);
+    nbrhood=struct();
+    nbrhood.a=ds.a;
+    nbrhood.fa.nvoxels=nvoxels;
+    nbrhood.fa.radius=final_radius;
+    nbrhood.fa.center_ids=center_ids(:)';
+    nbrhood.fa.i=ds.fa.i(center_ids);
+    nbrhood.fa.j=ds.fa.j(center_ids);
+    nbrhood.fa.k=ds.fa.k(center_ids);
     
-    ds_a_fa.neighborhood=neighborhood;
+    nbrhood.neighbors=neighbors;

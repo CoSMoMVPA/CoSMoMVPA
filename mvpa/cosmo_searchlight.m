@@ -17,14 +17,14 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %       center_ids:      vector indicating center ids to be used as a 
 %                        searchlight center. By default all feature ids are
 %                        used
-%       ds_fa_a:         dataset-like structure but without .sa and
+%       nbrhood:         dataset-like structure but without .sa and
 %                         .samples. Required only if radius is
 %                         not provided. This forms the template for the
 %                         output dataset. It should have the fields:
 %         .a              struct with dataset attributes
 %         .fa             struct with feature attributes. Each field should
 %                         have NF values in the second dimension
-%         .neighborhood   cell with NF mappings from center_ids in output
+%         .neighbors      cell with NF mappings from center_ids in output
 %                         dataset to feature ids in input dataset. 
 %
 %   Returns
@@ -51,7 +51,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     addOptional(parser,'radius',[]);
     addOptional(parser,'center_ids',[]);
     addOptional(parser,'args',struct());
-    addOptional(parser,'ds_a_fa',[]);
+    addOptional(parser,'nbrhood',[]);
     addOptional(parser,'progress',1/50);
     addOptional(parser,'parent_type',[]); % for MEEG datasets
     
@@ -60,34 +60,34 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     radius = p.radius;
     args = p.args;
     center_ids=p.center_ids;
-    ds_a_fa=p.ds_a_fa;
+    nbrhood=p.nbrhood;
     parent_type=p.parent_type;
 
     % use voxel selection function
-    if ~xor(isempty(radius), isempty(ds_a_fa))
-        error('need either radius or center2neighbors, exclusively');
-    elseif isempty(ds_a_fa)
+    if ~xor(isempty(radius), isempty(nbrhood))
+        error('need either radius or nbrhood, exclusively');
+    elseif isempty(nbrhood)
         if cosmo_check_dataset(ds,'fmri',false)
-            ds_a_fa=cosmo_spherical_voxel_selection(ds, radius);
+            nbrhood=cosmo_spherical_voxel_selection(ds, radius);
         elseif cosmo_check_dataset(ds,'meeg',false)
-            ds_a_fa=cosmo_meeg_neighborhood(ds, radius, parent_type);
+            nbrhood=cosmo_meeg_neighborhood(ds, radius, parent_type);
         else
             error(['Cannot determine dataset type, and no neighborhood '...
-                     'specified in ds_a_fa']);
+                     'specified in nbrhood']);
         end
     end
     
     % get the neighborhood information. This is a cell where
-    % neighborhood{k} contains the feature indices in input dataset 'ds' 
+    % neighbors{k} contains the feature indices in input dataset 'ds' 
     % for the 'k'-th center of the output dataset
-    neighborhood=ds_a_fa.neighborhood;
+    neighbors=nbrhood.neighbors;
     if isempty(center_ids)
-        center_ids=1:numel(neighborhood); % all output features
+        center_ids=1:numel(neighbors); % all output features
     end
     
     % allocate space for output. res_cell contains the output
     % of the measure applied to each group of features defined in 
-    % neighborhood. Afterwards the elements in res_cell are combined.
+    % nbrhood. Afterwards the elements in res_cell are combined.
     ncenters=numel(center_ids);
     res_cell=cell(ncenters,1);
     
@@ -107,7 +107,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % >>
     for k=1:ncenters
         center_id=center_ids(k);
-        neighbor_feature_ids=neighborhood{center_id};
+        neighbor_feature_ids=neighbors{center_id};
 
         % slice the dataset (with disabled kosherness-check)
         sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2);
@@ -137,13 +137,13 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     results_map=struct();
     
     % set dataset and feature attributes
-    results_map.a=ds_a_fa.a;
+    results_map.a=nbrhood.a;
     
     % slice the feature attributes
-    fa_fns=fieldnames(ds_a_fa.fa);
+    fa_fns=fieldnames(nbrhood.fa);
     for k=1:numel(fa_fns)
         fa_fn=fa_fns{k};
-        v=ds_a_fa.fa.(fa_fn);
+        v=nbrhood.fa.(fa_fn);
         
         % select the proper indices
         % for now assume that v is always numeric

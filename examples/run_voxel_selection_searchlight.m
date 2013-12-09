@@ -19,10 +19,11 @@ ds=cosmo_fmri_dataset(fn, 'mask', maskfn, 'targets', targets, 'chunks', chunks);
 
 %% define centers of searchlight
 nfeatures=size(ds.samples,2);
-center_ids=1:nfeatures; % for now, consider all voxels
 
 %% use voxel selection function
-center2neighbors=cosmo_spherical_voxel_selection(ds, radius, center_ids);
+nbrhood=cosmo_spherical_voxel_selection(ds, radius);
+center2neighbors=nbrhood.neighbors;
+ncenters=numel(center2neighbors); % should be equal to 'nfeatures'
 
 %% set up cross validation
 % (here we use cosmo_oddeven_partitioner; cosmo_nfold_partitioner would be
@@ -60,10 +61,9 @@ end
 % <<
 
 %% store the output
-res_map=ds;
+% this uses the neighborhood from spherical voxel selection
+res_map=nbrhood;
 res_map.samples=accs;
-res_map.sa.targets=[];
-res_map.sa.chunks=[];
 
 cosmo_map2fmri(res_map,[datadir  'voxel_selection_searchlight.nii']);
 
