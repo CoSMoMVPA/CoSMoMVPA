@@ -59,8 +59,13 @@ if ischar(dim_label)
         error('Unknown dimension %s in ds.a.dim.labels', dim_label);
     end
     
+    vs=ds.a.dim.values{dim};
     if isa(dim_values,'function_handle')
-        match_mask=dim_values(ds.a.dim.values{dim});
+        if isnumeric(vs)
+            match_mask=dim_values(vs);
+        else
+            match_mask=cellfun(dim_values,vs,'UniformOutput',true);
+        end
     else
         match_mask=cosmo_match(ds.a.dim.values{dim},dim_values);
     end
