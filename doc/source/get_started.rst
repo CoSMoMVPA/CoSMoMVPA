@@ -23,7 +23,7 @@ CoSMoMVPA_ requires:
 
 - a working installation of Matlab_.
 - the CoSMoMVPA Matlab code; it can be downloaded :ref:`here <download>`.
-    + Alternatively, ``git`` users can clone the repository directly through ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``).
+    + Alternatively, ``git`` users can clone the repository directly through ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
     + see also  :ref:`here <download>` for external toolboxes that provide support for other reading from and writing to other file formats, including AFNI_ and BrainVoyager_
 - An :ref:`advanced beginner level <matlab_experience>`, or higher, of experience in Matlab programming.
 - An :ref:`advanced beginner level <cogneuro_experience>` of cognitive neuroscience (fMRI) data analysis.
