@@ -450,6 +450,7 @@ The following are guidelines, intended to improve:
         n=size(data,1); % number of samples
         for k=1:n
             data_result(k)=f(data(k,:));
+        end
 
 - Do not use global variables: these can have nasty and unpredictable side effects. In other functions, use functions really as *functions*: the output should depend on the input only (with the exception of the state of the random number generator).
 

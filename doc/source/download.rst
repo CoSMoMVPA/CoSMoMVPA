@@ -8,7 +8,8 @@ CoSMoMVPA code
 ++++++++++++++
 The latest code is available from GitHub_. As this code is under development, it may change rapidly.
 
-- GitHub users can clone the repository.
+- GitHub users can clone the repository: ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
+
 - Others can download and extract the `zip archive`_.
 
 Note: when CoSMoMVPA is released officially, there will be permanent links, hosted on the website, containing official, feature-stable, releases.
