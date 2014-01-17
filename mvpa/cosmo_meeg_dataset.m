@@ -160,8 +160,8 @@ function img_formats=get_supported_image_formats()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ds=read_ft(filename)
     % reads it from a .mat data file
-    ft=load(filename);
-    ds=convert_ft;
+    ft=importdata(filename);
+    ds=convert_ft(ft);
     
 function ds=convert_ft(ft)    
     % ft is a fieldtrip struct
