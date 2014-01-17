@@ -99,17 +99,29 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
             error('dim should be 1 or 2');
         end
         
+        
     function y=slice_cell(x, to_select, dim)
         % slices the cell x along dim with indices, where dim in [1,2]
+        check_size(x, to_select, dim);
+        n_other_dim=size(x,3-dim); % size of other dimension
+        
         if dim==1
             % cells are tricky - they become linear after slicing, and have
             % to be put back in shape
-            n_other_dim=size(x,2);
             y=reshape({x{to_select,:}},[],n_other_dim);
         elseif dim==2
-            n_other_dim=size(x,1);
             y=reshape({x{:, to_select}},n_other_dim,[]);
         else
             error('dim should be 1 or 2');
+        end
+        
+    
+    function check_size(x, to_select, dim)
+        if islogical(to_select) && ...
+                    size(x, dim)~=numel(to_select)
+            % be a bit more strict than matlab - binary array must have
+            % exactly the correct size
+            error('Logical mask should have %d elements, found %d', ...
+                    size(x, dim), numel(to_select));
         end
     
