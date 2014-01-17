@@ -11,11 +11,7 @@ function ni=generate_test_nifti_struct()
 
     ni=struct();
 
-    % store rng state, 
-    rng_state=rng; % store state
-    rng('default') % get default state
-    ni.img=single(randn(imgshape)); % generate random data
-    rng(rng_state); % set back to original state
+    ni.img=single(generate_randn_deterministic(imgshape));
 
     hdr=struct();
 
