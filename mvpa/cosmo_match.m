@@ -1,4 +1,4 @@
-function msk=cosmo_match(varargin)
+function msk=cosmo_match(haystack, needle, varargin)
 % returns a mask indicating matching occurences in two arrays or cells
 % relative to the second array
 %
@@ -60,9 +60,9 @@ function msk=cosmo_match(varargin)
     elseif mod(nargin,2) ~= 0
         error('Need an even number of input arguments');
     end
-
-    haystack=varargin{1};
-    needle=just_convert_str2cell(varargin{2});
+    
+    % if needle is a string s, convert to cell {s}
+    needle=just_convert_str2cell(needle);
 
     if isnumeric(haystack) && isnumeric(needle) && numel(needle)==1
         % optimization for most standard case: vector and scalar
@@ -89,16 +89,18 @@ function msk=cosmo_match(varargin)
                 for k=1:nrows
                     needlek=needle{k};
                     nchar=max(numel(needlek),max_nchar_haystack);
-                    match_indices=strncmp(needlek,haystack,nchar);
-                    matches(k,match_indices)=true;
+                    if nchar>0
+                        match_indices=strncmp(needlek,haystack,nchar);
+                        matches(k,match_indices)=true;
+                    end
                 end
         end
         msk=reshape(sum(matches,1)>0,size(haystack));
     end
 
-    if nargin>3
+    if nargin>2
         me=str2func(mfilename()); % immune to renaming
-        other_msk=me(varargin{3:end});  % use recursion
+        other_msk=me(varargin{:});  % use recursion
 
         % check the size is the same
         if numel(msk) ~= numel(other_msk)
