@@ -30,7 +30,6 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
     for k=1:ntest
         delta=bsxfun(@minus, samples_train, samples_test(k,:));
         dst=sqrt(sum(delta.^2,2));
-        if numel(dst)~=ntrain, error('wrng'); end
         [m, i]=min(dst);
         predicted(k)=targets_train(i);
     end
