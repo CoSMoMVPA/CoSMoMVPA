@@ -102,27 +102,44 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         clock_start=clock();
     end
     
-    % go over all features; for each feature, apply the measure and 
-    % store its output.
+    % Core searchlight code.
+    %
+    % For each center_id:
+    % - get the indices of its neighbors
+    % - slice the dataset "ds" using these indices
+    % - apply the measure to this sliced dataset with its arguments "args"
+    % - store the result in "res"
+    % 
     % >>
+    visitorder=randperm(ncenters); % get better progress time estimates
+    
+    % if measure gave the wrong result one wants to know sooner rather than
+    % later. here only the first result is checked. (other errors may only
+    % be caught after this 'for'-loop)
+    % this is a compromise between execution speed and error reporting.
+    checked_first_output=false;    
     for k=1:ncenters
-        center_id=center_ids(k);
+        center_idx=visitorder(k);
+        center_id=center_ids(center_idx);
         neighbor_feature_ids=neighbors{center_id};
-
+        
         % slice the dataset (with disabled kosherness-check)
-        sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2);
+        sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2, false);
 
         % apply the measure
         res=measure(sphere_ds, args);
-        
+
         % for efficiency, only check first output
-        if k==1 && (~isstruct(res) || ~isfield(res,'samples') || ...
+        if ~checked_first_output
+            if (~isstruct(res) || ~isfield(res,'samples') || ...
                     size(res.samples,2)~=1)
-            error(['Measure output must be struct with field .samples '...
-                   'that is a column vector']);
+                error(['Measure output must be struct with field .samples '...
+                       'that is a column vector']);
+            end
+            checked_first_output=true;
         end
-        
-        res_cell{k}=measure(sphere_ds, args);
+
+        res_cell{center_idx}=res;
         
         % show progress
         if show_progress && (k<10 || ~mod(k,progress_step) || k==ncenters)
@@ -145,14 +162,12 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         fa_fn=fa_fns{k};
         v=nbrhood.fa.(fa_fn);
         
-        % select the proper indices
-        % for now assume that v is always numeric
-        results_map.fa.(fa_fn)=v(:,center_ids);
+        % select the proper feature indices
+        results_map.fa.(fa_fn)=cosmo_slice(v,center_ids,2);
     end
     
-    % join the outputs from the measure for each feature
+    % join the outputs from the measure for each searchlight position
     res_stacked=cosmo_stack(res_cell,2);
-    
     results_map.samples=res_stacked.samples;
     
     % if measure returns .sa, add those.
@@ -164,6 +179,3 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     results_map.fa.center_ids=center_ids(:)';
     
     cosmo_check_dataset(results_map);
-    
-    
-    
