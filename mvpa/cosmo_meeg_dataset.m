@@ -234,8 +234,14 @@ function ds=convert_ft(ft)
     end
 
     ndim=numel(size(samples_arr))-1; % number of feature dimensions
+    
+    % store values for each feature dimensions, e.g. labels of the
+    % channels, onets for time, and frequency for freq
     dim_values=cell(1,ndim);
-    dim_values{1}=ft.label;
+    if ~strcmp(dim_labels{1},'chan')
+        error('expcted channel as first dimension');
+    end
+    dim_values{1}=ft.label; % 'chan'
     for k=2:ndim
         dim_values{k}=ft.(dim_labels{k});
     end
