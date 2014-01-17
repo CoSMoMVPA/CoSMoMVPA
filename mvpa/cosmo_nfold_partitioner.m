@@ -35,7 +35,7 @@ function partitions = cosmo_nfold_partitioner(chunks)
         if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
             chunks=chunks.sa.chunks;
         else
-            error('illegal input')
+            error('illegal input: struct without .sa.chunks')
         end
     end
     
