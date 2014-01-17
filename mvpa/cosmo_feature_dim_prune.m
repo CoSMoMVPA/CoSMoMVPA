@@ -15,11 +15,15 @@ end
 
 % removes the values in ds.a.dim that are not used
 
-ndim=numel(labels);
+nlabels=numel(labels);
 ds_pruned=ds; % output
 
-for dim=1:ndim
-    label=ds.a.dim.labels{dim};
+for k=1:nlabels
+    label=labels{k};
+    dim=find(cosmo_match(ds.a.dim.labels, labels));
+    
+    if numel(dim)~=1, error('Illegal label %s', label); end
+        
     values=ds.a.dim.values{dim};
     fa=ds.fa.(label);
     [unq_idxs,foo,map_idxs]=unique(fa);
