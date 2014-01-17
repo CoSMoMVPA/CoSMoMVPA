@@ -52,12 +52,8 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
         end
     end
     
-    % find the classes that were predicted most often
-    % the tricky part is to handle ties: there we take
-    % a winner randomly (rather than the first) to avoid
-    % any particular bias
-    % XXX this is not very efficient - no idea how to
-    % do this efficiently using matlab
+    % find the classes that were predicted most often.
+    % ties are handled by cosmo_winner_indices
     
     [winners, test_classes]=cosmo_winner_indices(all_predicted);
     
