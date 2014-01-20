@@ -1,7 +1,7 @@
 function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 % splits a string based on another delimeter string
 %
-% split=cosmo_strsplit(string, delim, [pos1, delim2, pos2, delim2,...])
+% [split,n]=cosmo_strsplit(string, delim, [pos1, delim2, pos2, delim2,...])
 %
 % Inputs:
 %   string          input to be split
@@ -28,12 +28,12 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %                   If the last argument is positional, then split is
 %                   a string with value split_{pos} where split_ is the
 %                   result if pos where not the last arugment.
-%   nsplit          the number of elements in split, if split is a cell; 
-%                   or 0 otherwise
+%   n               the number of elements in split, if split is a cell; 
+%                   0 otherwise
 %
 % Examples:
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','*')
-%   >  {''A', 'AbbAbA', 'AbA', 'A', 'Ab'}
+%   >  {'A', 'AbbAbA', 'AbA', 'A', 'Ab'}
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A')
 %   >  {'', 'bbAb','b','*Ab'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2)
@@ -70,5 +70,3 @@ if nargin>2
         [split, nsplit]=me(split, varargin{2:end}); % use recursion
     end
 end
-
-
