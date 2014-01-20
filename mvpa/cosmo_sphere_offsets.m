@@ -1,9 +1,9 @@
 function [offsets,distances]=cosmo_sphere_offsets(radius)
 % computes sub index offsets for voxels in a sphere
 %
-% offsets=cosmo_sphere_offsets(radius)
+% [offsets,distances]=cosmo_sphere_offsets(radius)
 %
-% Input
+% Input:
 %  radius      radius of the sphere (in voxel units)
 % 
 % Output
@@ -11,20 +11,22 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
 %              offsets(p,:)=[i, j, k] means that the euclidian distance 
 %              between points at (i,j,k) and the origin is less than or 
 %              or equal to radius
-%  distances   Px1 distances from the origin (in voxels)
+%  distances   Px1 distances from the origin (in voxel units)
 %
-% Note
-%  offsets and distances are sorted by distance
+% Notes:
+%  - offsets and distances are sorted by distance
 %  
-%
-% Example
-% cosmo_sphere_offsets(1.5)'
-% >   [  0    -1     0     0     0     0     1    -1    -1    -1    -1 ...
-% >   [  0     0    -1     0     0     1     0    -1     0     0     1 ...
-% >   [  0     0     0    -1     1     0     0     0    -1     1     0 ...
-%      ...    0     0     0     0     1     1     1     1 ]
-%      ...   -1    -1     1     1    -1     0     0     1 ]
-%      ...   -1     1    -1     1     0    -1     1     0 ]
+% Example:
+%  - % compute offsets for voxels that share a side or edge, but not those
+%    % that only share a corner
+%    >> [o, d]=cosmo_sphere_offsets(1.5);
+%    >> o'
+%    [ 0 -1  0  0 0 0 1 -1 -1 -1 -1  0  0  0 0  1  1 1 1;
+%      0  0 -1  0 0 1 0 -1  0  0  1 -1 -1  1 1 -1  0 0 1;
+%      0  0  0 -1 1 0 0  0 -1  1  0 -1  1 -1 1  0 -1 1 0 ]
+%    >> d'
+%    [ 0 1 1 1 1 1 1 1.4142 1.4142 1.4142 1.4142 1.4142 1.4142
+%      1.4142 1.4142 1.4142 1.4142 1.4142 1.4142 ]
 %
 % See also sub2ind, ind2sub, cosmo_spherical_voxel_selection
 %
@@ -44,8 +46,13 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
     % the grid positions (relative to the origin) to consider
     single_dimension_candidates=floor(-radius):ceil(radius);
     
-    % consider the candidates in all three spatial dimensions using
-    % nested for loops and an if statement
+    % Consider the candidates in all three spatial dimensions using
+    % nested for loops and an if statement.
+    % For each position:
+    % - see if it is at most at distance 'radius' from the origin
+    % - if that is the case, increase row_pos and store the position in
+    %   'offsets'
+    %
     % >@@>
     for x=single_dimension_candidates
         for y=single_dimension_candidates
