@@ -23,6 +23,7 @@ Meta - naming conventions in the documentation
 ++++++++++++++++++++++++++++++++++++++++++++++
 - Path names are `Unix-like`_-based; ``/`` is the path separation character, rather than ``\`` used on Windows platforms.
 - Directories have ``/`` as the last character, and are relative to the directory where ``CoSMoMVPA`` resides.
+- Sometimes ``${a_name}`` is used, this indicates that `a_name` is a meta-syntactic variable. 
 
 
 Setting the Matlab_ path
@@ -30,8 +31,10 @@ Setting the Matlab_ path
 To use ``CoSMoMVPA`` functionality, it is recommended to:
 
 - add the ``mvpa/`` directory to the Matlab_ path.
-- also add ``externals/``, its subdirectories, to the Matlab_ path.
-- to run examples, ``cd`` to ``examples/`` and run scripts from there.
+- also add ``externals/`` and its subdirectories to the Matlab_ path.
+- do *not* add ``examples/`` or ``tests`` to the Matlab_ path. 
+    + To run examples, ``cd`` to ``examples/`` and run scripts from there.
+    + To run unit tests, ``cd`` to ``tests/`` and run ``run_tests`` from there (this requires the xUnit_ framework).
 
 Organization of files and directories
 +++++++++++++++++++++++++++++++++++++
@@ -61,34 +64,41 @@ The remainder of this section is for those experienced in **programming**; it de
 
 Code development
 ^^^^^^^^^^^^^^^^
-The git_ distributed version control system is used for code development. 
-The master branch is at github_. To get your copy of the code and documentation you can of course download the `zip archive`_. 
 
-As stated above, useful contributions would be much appreciated - through any medium. 
+Contributing using git
+++++++++++++++++++++++
 
-- One approach is to contact_ us by email or throught the mailinglist.
-- The preferred approach, however, is using git_, because it allows for 
+The git_ distributed version control system is used for code development. It has several advantages over just downloading the `zip archive`_:
     + a distributed workflow: multiple people can work on the code simultenousely, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easly.
     + keeping track of each individual's contribution. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but then tagging: every change is annotated (see below). This allows one to see what was changed when, and undo unwanted changes back, if necessary.
     + data sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
     + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. Once these are considered ready for the master repository, they can be merged easily.
 
-To get git started
-++++++++++++++++++
-- set up a working installation of git_ (see `installing git`_).
-- make an account on github_, if you have not done so.
-- on the github_ project page, `clone the repository`_, and follow the instructions there. After you have committed changes that you would like to share with us, push them to your own repository on GitHub and then send a pull request on github to github_. [TODO: add a note on branching]
+To get started with git:
+    + set up a working installation of git_ (see `installing git`_).
+    + make an account on github_, if you have not done so.
+    + on the github_ project page, `fork the repository`_, and follow the instructions there. 
+    + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``.
+    + change to the directory: ``cd CoSMoMVPA``.
+    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``.- to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``.s
+    + to add a new feature or provide a bugfix, start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``. 
+    + make the desired changes, then commit them. `See below for details`.
+    + push these changes to github: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``.
+    + on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. 
+    + if you want to use code from the original master, run ``git checkout master``. 
 
-There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. However, please see the notes on committing below.
+There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. 
 
 .. _`installing git`: http://git-scm.com/book/en/Getting-Started-Installing-Git
-.. _`clone the repository`: https://help.github.com/articles/fork-a-repo
+.. _`fork the repository`: https://help.github.com/articles/fork-a-repo
+
 
 Notes on committing
 +++++++++++++++++++
-- Review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
-- Do not add all changes at once; in other words do not use ``git -a``. Rather manually add the (changes to) files of interest (``git add ${filename}`` or ``git add -i``, the later usually with the 'patch' ('p') option) for each meaningful 'atomic' change, and commit these seperately.
-- To view the history of commits, ``gitk`` is useful.
+- Please review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
+- Do *not* use ``git -a``; instead manually add the (changes to) files individually. Preferably commits should be atomic, that is change just one feature.  For example if you changed a file at two places by (1) improving the documentation and (2) refactoring code used internally, then preferably you should make two commits. Using the tags below these could be ``DOC: ...`` and ``RF: ...``.
+    + To add a new file, run ``git add ${filename}``.
+    + To commit changes to a file, run ``git add -i``, then press 'p' (for 'patch'), indicate which files to patch, and press 'y' or 'n' for each meaningful 'atomic' change.- To view the history of commits, ``gitk`` is useful.
 - Use the following tags (inspired by PyMVPA_) for commits:
 
     + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
@@ -114,7 +124,7 @@ Notes on committing
 
     Using these tags allows others to quickly see what *kind of* changes were made, and to generate summary reports on the kind of changes.
 
-    Please describe what changes you made; however, the tags don't have to name which files were changed, as git_ takes care of that.
+    Please describe what changes you made. The tags don't have to name which files were changed, as git_ takes care of that.
 
     Tags can be combined, as it may occur that multiple tags apply; use the ``+``-character to concatenate them.
 
@@ -256,6 +266,20 @@ The following are guidelines, intended to improve:
 
         my_var=0;
 
+- Crash early, and when doing so, provide informative error messages.  
+
+    **bad:**
+
+    .. code-block:: matlab
+        
+        error('What do you mean?');
+
+    **good:**
+
+    .. code-block:: matlab 
+
+        error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
+
 
 - Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
     **bad:**
@@ -308,10 +332,6 @@ The following are guidelines, intended to improve:
 
     .. code-block:: matlab 
 
-        error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
-
-    .. code-block:: matlab 
-
        fprintf('Starting analysis - please be patient...\n');
 
 - When writing function definitions:
@@ -333,10 +353,10 @@ The following are guidelines, intended to improve:
     .. include:: cosmo_winner_indices_hdr.rst
         :start-line: 1
 
-- It is better to allocate space for the data beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
-    + This can greatly improve performance, as growing an array requires reallocating memory, which slows down code execution.
-    + It also signals to those who read the source what the size of the output is, and may help in understanding what the output contains.
-    + This guideline is especially important for large arrays of data, or cases when the output size can be large.
+- Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
+    + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.
+    + It also indicates what the size of the output is, which can help in understanding what code does.
+    + This guideline is especially important when for large arrays of data are used. 
 
     **bad:**
 
@@ -360,7 +380,7 @@ The following are guidelines, intended to improve:
             accs=[accs acc];
         end
         
-- Use vectorization rather than a ``for`` or ``while`` loop.
+- When possible use vectorization rather than a ``for`` or ``while`` loop.
     + Many functions support vectorized functions, where the same function is applied to elements in arrays.
     + Vectorization reduces the number of lines of code.
     + Vectorization reduces execution time.
@@ -452,7 +472,7 @@ The following are guidelines, intended to improve:
             data_result(k)=f(data(k,:));
         end
 
-- Do not use global variables: these can have nasty and unpredictable side effects. In other functions, use functions really as *functions*: the output should depend on the input only (with the exception of the state of the random number generator).
+- Do not use global variables: these can have nasty and unpredictable side effects. In other words: use functions really as *functions*, where the output should depend on the input only (with the exception of the state of the random number generator).
 
 - Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
 
@@ -518,12 +538,9 @@ The following are guidelines, intended to improve:
 
     .. code-block:: matlab 
         
-        joined_labels=sprintf('%s;' labels{:});
-        if ~isempty(joined_labels)
-            joined_labels=joined_labels(1:(end-1));
-        end
+        joined_labels=cosmo_strjoin(labels,';');
     
-    *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons this function is not used in CoSMoMVPA.
+    *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons an alternative implementation is provided as ``cosmo_strjoin``.
 
     
 - Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
@@ -550,8 +567,8 @@ The following are guidelines, intended to improve:
         results=zeros(nsamples,1);
         f_names={'f_odd','f_even'};
         for k=1:nsamples
-            f_name=names(mod(k+1,2)+1);
-            eval(sprintf('results(%d)=%s(data(%d));', k, name, k));
+            f_name=f_names(mod(k+1,2)+1);
+            eval(sprintf('results(%d)=%s(data(%d));', k, f_name, k));
         end
             
     **good:**
@@ -563,10 +580,10 @@ The following are guidelines, intended to improve:
         f_handles={@f_odd, @f_even};
         for k=1:nsamples
             f_handle=f_handles{mod(k+1,2)+1};
-            f_data=handle(data(k));
+            f_data=f_handle(data(k));
         end
 
-- Note on the use of exceptions [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. (Currently the only exception is ``cosmo_publish_run_scripts``, that builds the Matlab_ output from the scripts in ``examples/``).
+- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. (Currently the only exception is ``cosmo_publish_run_scripts``, that builds the Matlab_ output from the scripts in ``examples/``).
 
 - Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using ``cosmo_splithalf_correlation_measure``. Similarly, ``cosmo_dataset_slice`` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
 
@@ -576,7 +593,7 @@ The following are guidelines, intended to improve:
 CoSMoMPVA-specific guidelines
 +++++++++++++++++++++++++++++
 
-+ To indicate that a code block is an exercise, place a line containing ``% >>`` before the block and one containing ``% <<`` after the block. When using the build system (see above), this will replace the corresponding block by a message saying ``%%%% Your code comes here %%%%`` in the online documentation.
++ To indicate that a code block is an exercise, place a line containing ``% >@@>`` before the block and one containing ``% <@@<`` after the block. When using the build system (see above), this will replace the corresponding block by a message saying ``%%%% Your code comes here %%%%`` in the online documentation.
 
     **example:**
 
