@@ -41,13 +41,13 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
         for j=(k+1):nclasses
             pos=pos+1;
             % classify between 2 classes only (from classes(k) and classes(j)).
-            % >>
+            % >@@>
             mask_k=targets_train==classes(k);
             mask_j=targets_train==classes(j);
             mask=mask_k | mask_j;
             
             pred=cosmo_classify_svm_2class(samples_train(mask,:), targets_train(mask), samples_test, opt);
-            % <<
+            % <@@<
             all_predicted(:,pos)=pred;
         end
     end

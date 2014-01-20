@@ -46,7 +46,7 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
     
     % consider the candidates in all three spatial dimensions using
     % nested for loops and an if statement
-    % >>
+    % >@@>
     for x=single_dimension_candidates
         for y=single_dimension_candidates
             for z=single_dimension_candidates
@@ -57,7 +57,7 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
             end
         end
     end
-    % <<
+    % <@@<
     
     % cut off empty values at the end
     offsets=offsets(1:row_pos,:);

@@ -35,10 +35,10 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
     
     % Use svmtrain and svmclassify to get predictions for the testing set.
     % (Hint: 'opt_cell{:}' allows you to pass the options as varargin)
-    % >>
+    % >@@>
     s = svmtrain(samples_train, targets_train, opt_cell{:});
     predicted=svmclassify(s, samples_test);
-    % <<
+    % <@@<
     
     % helper function to convert cell to struct
     function opt_cell=opt2cell(opt)

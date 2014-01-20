@@ -47,7 +47,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
     test_indices=cell(npartitions,1);
     
     % Make partitions using even and odd chunks
-    % >>
+    % >@@>
     
     % generate a mask with even indices
     even_mask=mod(chunks,2)==0;
@@ -63,7 +63,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
     test_indices{1}=odd_indices;
     test_indices{2}=even_indices;
     
-    % <<
+    % <@@<
     
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;

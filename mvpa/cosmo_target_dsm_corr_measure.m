@@ -23,17 +23,23 @@ function ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %   
 % ACC August 2013
     
-% >>
+
     if nargin<2 error('Must supply args.'); end        
     if ~isfield(args,'target_dsm') error('Must supply args.target_dsm.'); end
     if ~isfield(args,'return_p') args.return_p = false; end
+    
+    % - compute the pair-wise distance between all dataset samples using
+    %   pdist
+    % - convert args.target_dsm using
+    % - compute correlation between distances and converted target_dsm
+% >@@>    
     pd = pdist(dataset.samples);
 
     sf=squareform(args.target_dsm);
 
     rho=corr(pd(:),sf(:));
 
-% <<
+% <@@<
 
     ds_sa=struct();
     ds_sa.samples=rho;

@@ -21,9 +21,9 @@ function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
     %%
     % First slice the samples array by rows
     
-    % >>
+    % >@@>
     dataset.samples=dataset.samples(samples_to_select,:);
-    % <<
+    % <@@<
     
     %%
     %   Then go through each of the sample attributes and slice each one.
@@ -32,7 +32,7 @@ function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
     %   dataset.sa in case it is missing either targets or chunk, or in case there
     %   may be extra unknown sample attributes
     
-    % >>
+    % >@@>
     fns = fieldnames(dataset.sa); 
     n = numel(fns);
     
@@ -41,5 +41,5 @@ function dataset=cosmo_dataset_slice_sa(dataset, samples_to_select)
         sa = dataset.sa.(fn);
         dataset.sa.(fn)=sa(samples_to_select,:);
     end
-    % <<
+    % <@@<
     

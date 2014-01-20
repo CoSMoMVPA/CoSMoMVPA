@@ -36,12 +36,12 @@ function confusion_matrix=cosmo_confusion_matrix(targets, predicted)
     nclasses=numel(classes);
     
     confusion_matrix=zeros(nclasses);
-    % >>
+    % >@@>
     for k=1:nclasses
         tmsk=targets==classes(k);
         for j=1:nclasses
             confusion_matrix(k,j)=sum(predicted(tmsk)==classes(j));
         end
     end
-    % <<
+    % <@@<
     

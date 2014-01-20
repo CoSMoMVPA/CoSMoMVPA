@@ -51,8 +51,8 @@ function ds=cosmo_generate_synthetic_dataset(class_distance, nclasses, nsamples_
         pat=randn(nsamples_per_class,nfeatures); % random gaussian patterns
         if different_on_all_dimensions
             error('not implemented');
-            % >>
-            % <<
+            % >@@>
+            % <@@<
         else
             pat(:,k)=pat(:,k)+class_distance;  % add pat_dist in the k-th dimension
         end

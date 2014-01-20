@@ -37,7 +37,7 @@ function [pred, accuracy] = cosmo_cross_validate(ds, classifier, partitions, opt
     all_pred=zeros(nsamples,npartitions); % space for output (one column per partition)
     test_mask=false(nsamples,1); % indicates for which samples there has been a prediction
     for k=1:npartitions
-        % >>
+        % >@@>
         train_data = ds.samples(train_indices{k},:);
         test_data = ds.samples(test_indices{k},:);
         
@@ -47,7 +47,7 @@ function [pred, accuracy] = cosmo_cross_validate(ds, classifier, partitions, opt
         
         all_pred(test_indices{k},k) = p;
         test_mask(test_indices{k})=true;
-        % <<
+        % <@@<
     end
     
     [pred,classes]=cosmo_winner_indices(all_pred);

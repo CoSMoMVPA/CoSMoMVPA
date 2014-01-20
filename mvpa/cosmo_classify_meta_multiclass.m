@@ -40,7 +40,7 @@ function predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, 
     % allocate space for all predictions
     all_predicted=zeros(ntest, ncombi);
     
-    % >>
+    % >@@>
     pos=0;
     for k=1:nclasses
         mask_k=targets_train==classes(k);
@@ -52,7 +52,7 @@ function predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, 
             all_predicted(:,pos)=classifier(samples_train(mask,:), targets_train(mask), samples_test, opt);
         end
     end
-    % <<
+    % <@@<
     
     % find the classes that were predicted most often
     % XXX currently we always take the first one

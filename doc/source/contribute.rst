@@ -137,7 +137,7 @@ The build system is used to generate documentation for the web site (or local us
     + all Matlab files are converted to reStructuredText_ format using the Python_ script ``mat2rst.py`` in ``source/``. This script generates three reStructuredText_  versions of all Matlab functions and example scripts:
         - Full contents (no suffix), containing the full source code.
         - Header contents (suffix ``_hdr``), containing only the header (i.e. the first line and every subsequent line until the first line that does not start with ``%`` (note: line continuation, explained below, is currently *not* supported).
-        - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >>`` and ending line ``% <<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.  
+        - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >@@>`` and ending line ``% <@@<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.  
 
     + the ``Makefile`` in ``source/``, when used through ``make html``, uses the ``mat2rst.py`` to generate reStructuredText_ Matlab files and then uses Sphinx_ to convert these files to html.
 - The ``build.sh`` script builds the documentation and datasets.

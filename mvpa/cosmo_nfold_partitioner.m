@@ -48,11 +48,11 @@ function partitions = cosmo_nfold_partitioner(chunks)
     
     % set the training and test indices for each chunk
     for k=1:nchunks
-        % >>
+        % >@@>
         test_msk=unq(k)==chunks;
         train_indices{k}=find(~test_msk)';
         test_indices{k}=find(test_msk)';
-        % <<
+        % <@@<
     end
     
     partitions.train_indices=train_indices;

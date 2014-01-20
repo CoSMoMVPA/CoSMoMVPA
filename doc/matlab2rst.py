@@ -37,13 +37,13 @@ def matlab2rst(data, output=None):
 
     res=[]
     for i, line in enumerate(lines):
-        if in_skeleton and '% <<' in line.strip():
+        if in_skeleton and '% <@@<' in line.strip():
             in_skeleton=False
             continue
 
-        if not in_skeleton and '% >>' in line.strip():
+        if not in_skeleton and '% >@@>' in line.strip():
             if output=='skl':
-                res.append(line.replace('% >>','%%%% >>> Your code here <<< %%%%'))
+                res.append(line.replace('% >@@>','%%%% >>> Your code here <<< %%%%'))
             in_skeleton=True
             continue
 

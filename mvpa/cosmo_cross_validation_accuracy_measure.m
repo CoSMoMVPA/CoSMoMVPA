@@ -29,14 +29,14 @@ if ~isfield(args,'partitions') error('Missing input args.partitions'); end
 
 % Run cross validation to get the accuracy (see the help of
 % cosmo_cross_validate)
-% >>
+% >@@>
 classifier=args.classifier;
 partitions=args.partitions;
 
 args=rmfield(args,'classifier');
 args=rmfield(args,'partitions');
 [pred, accuracy]=cosmo_cross_validate(dataset, classifier, partitions, args);
-% <<
+% <@@<
 
 ds_sa=struct();
 ds_sa.samples=accuracy;

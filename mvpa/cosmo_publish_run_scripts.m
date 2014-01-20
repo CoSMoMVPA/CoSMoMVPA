@@ -15,7 +15,7 @@ function cosmo_publish_build_html(force)
 % - for this function to function properly, it is required that 
 %   comso_get_data_path returns an absolute path. This is because this 
 %   function makes copies of the run_* scripts in a temporary directory 
-%   with lines containing '% >>' or '% <<' removed, and scripts are run 
+%   with lines containing '% >@@>' or '% <@@<' removed, and scripts are run 
 %   from that directory. When cosmo_get_data_path does not return an
 %   absolute path then it may be unable to find the comso example data.
 % - this function should be run from the cosmo root directory.
@@ -150,7 +150,7 @@ function cosmo_publish_build_html(force)
             break
         end
         
-        if startswith(line,'% >>') || startswith(line,'% <<')
+        if startswith(line,'% >@@>') || startswith(line,'% <@@<')
             continue
         end
         

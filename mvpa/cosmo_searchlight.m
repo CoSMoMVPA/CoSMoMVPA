@@ -110,7 +110,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % - apply the measure to this sliced dataset with its arguments "args"
     % - store the result in "res"
     % 
-    % >>
+    % >@@>
     visitorder=randperm(ncenters); % get better progress time estimates
     
     % if measure gave the wrong result one wants to know sooner rather than
@@ -148,7 +148,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                             k/ncenters, msg, prev_progress_msg);
         end
     end
-    % <<
+    % <@@<
     
     % prepare the output
     results_map=struct();
