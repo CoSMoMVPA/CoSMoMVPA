@@ -14,41 +14,14 @@ config=cosmo_config();
 data_path=fullfile(config.data_path,'ak6','s01');
 
 
-data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+half1_fn=fullfile(data_path,'glm_T_stats_odd.nii');
+half2_fn=fullfile(data_path,'glm_T_stats_even.nii');
 mask_fn=fullfile(data_path,'brain_mask.nii');
 
-targets=repmat(1:6,1,10)';
-chunks=mod(floor(((1:60)-1)/6),2)+1; % odd and even runs
-ds_full = cosmo_fmri_dataset(data_fn, ...
-                        'mask',mask_fn,...
-                        'targets',targets,...
-                        'chunks',chunks);      
-
-% The example data used here has no estimates for odd and even runs 
-% computed from the GLM. Instead we generate such data here.
-% If one were to use pre-computed files with even and odd runs, then
-% these can simply be loaded using:
-% >@@> ni_samples1=load_nii(fn1);
-% >@@> ni_samples2=load_nii(fn2);
-
-% use a helper function to average samples - for each unique combination of
-% targets and chunks. The resulting output has 12 features (6 targets times
-% 2 chunks). Don't worry if you find the next few lines difficult to
-% understand - they just show a quick way to generate even and odd run 
-% data.
-ds_odd_even=cosmo_fx(ds_full,@(x)mean(x,1),{'targets','chunks'});                    
-
-odd_run_msk=mod(ds_odd_even.sa.chunks,2)==1;
-ni_samples1=cosmo_map2fmri(cosmo_slice(ds_odd_even,odd_run_msk));
-ni_samples1=cosmo_map2fmri(cosmo_slice(ds_odd_even,odd_run_msk),[data_path '/glm_T_stats_odd.nii']);
-
-even_run_msk=~odd_run_msk;
-ni_samples2=cosmo_map2fmri(cosmo_slice(ds_odd_even,even_run_msk),[data_path '/glm_T_stats_even.nii']);
-return
 %% Do as if Load the data and extract the data in the mask
 % (as we use similated data computed above, don't load the data here)
-% ni_samples1=load_nii(fn1);
-% ni_samples2=load_nii(fn2);
+ni_samples1=load_nii(half1_fn);
+ni_samples2=load_nii(half2_fn);
 ni_mask=load_nii(mask_fn);
 
 % Get the volume data
@@ -139,7 +112,7 @@ for ii=1:voldim(1)
             half1=selected_sphere_data(half1_samples_mask,:);
             half2=selected_sphere_data(half2_samples_mask,:);
             % <@@<
-            % Compute correlations, fisher transform, then weight them.
+            % Compute correlations, fisher transform, then weigh them.
             % Store the sum of the weighted transformed correlations in the
             % 'output' array.
             %
@@ -182,4 +155,5 @@ for k=1:nslices
     title(sprintf('slice %d', k));
     axis off
 end
+
 
