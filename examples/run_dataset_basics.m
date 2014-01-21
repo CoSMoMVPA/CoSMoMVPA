@@ -2,8 +2,9 @@
 % Set data path, load dataset, set targets and chunks, and add labels as
 % sample attributes
 
-% Set the data path (change cosmo_get_data_path if necessary)
-data_path=cosmo_get_data_path('s01');
+% Set the data path 
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
 
 % Load dataset (and supply a mask file for 'vt')
 % >>

@@ -1,12 +1,12 @@
 %% NIFTI basics
 % In this example, load a brain and visualize it in matlab
 
-% Set the path. (If this gives an error, you may have to edit the
-% cosmo_get_data_path function.)
-data_path=cosmo_get_data_path('s01');
+% Set the path. 
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
 
 % Set filename
-fn=[data_path 'brain.nii'];
+fn=[data_path '/brain.nii'];
 
 % Load with nifti
 ni=load_nii(fn);

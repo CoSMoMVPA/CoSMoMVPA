@@ -1,23 +1,54 @@
 %% Searchlight analysis in the volume
 %
-% This analysis is quite bare-bones - data is loaded directly through
-% load_nii rather than through fmri_dataset, and voxel indices in each
+% This analysis is quite bare-bones - data is simulated to come directly 
+% from load_nii rather than through fmri_dataset, and voxel indices in each
 % searchlight are computed directly in this script rather than using
 % a helper function such as sphereical_voxel_selection.
 %
 % NNO Aug 2013
 
 %% Define input files and searchlight radius
-datadir=cosmo_get_data_path('s01');
-fn1=[datadir 'glm_T_stats_evens.nii'];
-fn2=[datadir 'glm_T_stats_odds.nii'];
-maskfn=[datadir 'brain_mask.nii'];
-radius=3;
+radius=3; % in voxel units
 
-%% Load the data and extract the data in the mask
-ni_samples1=load_nii(fn1);
-ni_samples2=load_nii(fn2);
-ni_mask=load_nii(maskfn);
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
+
+
+data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+mask_fn=fullfile(data_path,'brain_mask.nii');
+
+targets=repmat(1:6,1,10)';
+chunks=mod(floor(((1:60)-1)/6),2)+1; % odd and even runs
+ds_full = cosmo_fmri_dataset(data_fn, ...
+                        'mask',mask_fn,...
+                        'targets',targets,...
+                        'chunks',chunks);      
+
+% The example data used here has no estimates for odd and even runs 
+% computed from the GLM. Instead we generate such data here.
+% If one were to use pre-computed files with even and odd runs, then
+% these can simply be loaded using:
+% >> ni_samples1=load_nii(fn1);
+% >> ni_samples2=load_nii(fn2);
+
+% use a helper function to average samples - for each unique combination of
+% targets and chunks. The resulting output has 12 features (6 targets times
+% 2 chunks). Don't worry if you find the next few lines difficult to
+% understand - they just show a quick way to generate even and odd run 
+% data.
+ds_odd_even=cosmo_fx(ds_full,@(x)mean(x,1),{'targets','chunks'});                    
+
+odd_run_msk=mod(ds_odd_even.sa.chunks,2)==1;
+ni_samples1=cosmo_map2fmri(cosmo_slice(ds_odd_even,odd_run_msk));
+
+even_run_msk=~odd_run_msk;
+ni_samples2=cosmo_map2fmri(cosmo_slice(ds_odd_even,even_run_msk));
+
+%% Do as if Load the data and extract the data in the mask
+% (as we use similated data computed above, don't load the data here)
+% ni_samples1=load_nii(fn1);
+% ni_samples2=load_nii(fn2);
+ni_mask=load_nii(mask_fn);
 
 % Get the volume data
 half1_samples=ni_samples1.img;
@@ -110,8 +141,10 @@ for ii=1:voldim(1)
             % Compute correlations, fisher transform, then weight them.
             % Store the sum of the weighted transformed correlations in the
             % 'output' array.
+            %
+            % Use cosmo_corr instead of corr for faster computations
             % >>
-            c=corr(half1',half2');
+            c=cosmo_corr(half1',half2');
             fisher_c=atanh(c);
             weighted_c=contrast_matrix.*fisher_c;
             
@@ -130,7 +163,9 @@ end
 ni_output=ni_samples1;
 ni_output.img=output;
 ni_output.hdr.dime.dim(5)=1;
-save_nii(ni_output,[datadir 'sphere_offsets_searchlight.nii']);
+
+% use the following lines to store the output as a NIFTI file
+% >> save_nii(ni_output,fullfile(data_path,'sphere_offsets_searchlight.nii'));
 
 
 %% Plot the results as axial slices

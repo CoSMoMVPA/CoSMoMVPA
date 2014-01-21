@@ -4,14 +4,24 @@
 % classifier
 
 %% Define data
-data_path=cosmo_get_data_path('s01');
+config=cosmo_config();
+study_path=fullfile(config.data_path,'ak6');
 
-ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'],...
-                        'mask',[data_path 'brain_mask.nii']);                                
+data_path=fullfile(study_path,'s01');
+data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+mask_fn=fullfile(data_path,'brain_mask.nii');
+targets=repmat(1:6,1,10)';
+ds = cosmo_fmri_dataset(data_fn, ...
+                        'mask',mask_fn,...
+                        'targets',targets);                        
+                    
+% compute average for each unique target, so that the datasets has 6
+% samples - one for each target
+ds=cosmo_fx(ds, @(x)mean(x,1), 'targets', 1);
 
-models_path=cosmo_get_data_path('models');
-load([models_path 'v1_model.mat']);
-load([models_path 'behav_sim.mat']);                            
+models_path=fullfile(study_path,'models');
+load(fullfile(models_path,'v1_model.mat'));
+load(fullfile(models_path,'behav_sim.mat'));                            
                             
 %% Set measure 
 % Use the rsm measure and set its parameters

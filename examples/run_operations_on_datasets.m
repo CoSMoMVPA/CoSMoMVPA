@@ -5,7 +5,9 @@
 %% Load data and set targets
 % Load data as before setting targets and chunks appropriately
 
-data_path=cosmo_get_data_path('s01');
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
+
 % >>
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
                         'mask', [data_path '/vt_mask.nii']);

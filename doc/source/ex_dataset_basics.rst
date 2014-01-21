@@ -7,9 +7,23 @@ Dataset basics
 Nifti basics
 ++++++++++++
 
+Set CoSMoMVPA data path
+-----------------------
+Before loading any data, please make sure that your path to the example data is set properly by running ``config=cosmo_config()``,
+and see what the value is for ``config.data_path``. If your data is not stored in that location, then the easiest way to change that is to make a CoSMoMVPA configuration file. To set the configuration, just make a new file in the matlab editor and set it contents to:: 
+
+    data_path=/Path/do/the/example/data
+
+on a Unix-like system (such as Mac or Linux), or to::
+
+    data_path=C:\\path\\to\\the\\example\\data
+
+on a Windows system. Finally save the file as ``.cosmomvpa.cfg`` in a directory that is part of the Matlab path.
+
+
 Load and view anatomical dataset
 --------------------------------
-First, update the cosmo_get_data_path function so that it returns the directory where the example data is stored. Then, using the function load_nii load the nifti file of the brainof subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
+Using the function ``load_nii``, load the nifti file of the brain of subject s01 (brain.nii) and assign the result to a struct 'ni'. What is contained in this struct?
 
 Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
 

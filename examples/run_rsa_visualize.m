@@ -4,15 +4,26 @@
 %% Load data in EV and VT mask
 % load datasets cosmo_fmri_dataset
 
-data_path=cosmo_get_data_path('s01');
-
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
 % >>
-ev_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
-                            'mask',[data_path 'ev_mask.nii']);
+data_fn=[data_path '/glm_T_stats_perrun.nii'];
+targets=repmat(1:6,1,10)';
+ev_ds = cosmo_fmri_dataset(data_fn, ...
+                            'mask',[data_path '/ev_mask.nii'],...
+                            'targets',targets);
 
-vt_ds = cosmo_fmri_dataset([data_path 'glm_betas_allruns.nii'], ...
-                            'mask',[data_path 'vt_mask.nii']);
+vt_ds = cosmo_fmri_dataset(data_fn, ...
+                            'mask',[data_path '/vt_mask.nii'],...
+                            'targets',targets);                        
 % <<
+
+% compute average for each unique target, so that the datasets have 6
+% samples each - one for each target
+vt_ds=cosmo_fx(vt_ds, @(x)mean(x,1), 'targets', 1);
+ev_ds=cosmo_fx(ev_ds, @(x)mean(x,1), 'targets', 1);
+
+
 
 % Use pdist with correlation distance to get DSMs
 % >>

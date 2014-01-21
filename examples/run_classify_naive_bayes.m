@@ -1,11 +1,12 @@
 %% Two-class classification with naive baysian classifier
 
 %% Define data
-data_dir=cosmo_get_data_path('s01');
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
 
 % Load the dataset with VT mask
-ds = cosmo_fmri_dataset([data_dir '/glm_T_stats_perrun.nii'], ...
-                     'mask', [data_dir '/vt_mask.nii']);
+ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
+                     'mask', [data_path '/vt_mask.nii']);
 
 
 %% set the targets and chunks

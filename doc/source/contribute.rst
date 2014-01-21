@@ -156,8 +156,7 @@ The build system is used to generate documentation for the web site (or local us
 
 .. _download: download.html
 
-- The  ``mvpa/cosmo_publish_run_scripts.m`` function generates the output from all the runnable examples in ``examples/`` as html files and puts them in ``doc/source/_static/publish/``. This function is used to produce output for the web site. Using it requires modification of ``cosmo_get_data_path`` to return an absolute path. Use of this function is, at the moment, not part of the automated build system. 
-
+- The  ``mvpa/cosmo_publish_run_scripts.m`` function generates the output from all the runnable examples in ``examples/`` as html files and puts them in ``doc/source/_static/publish/``. This function is used to produce output for the web site. 
 
 .. _`matlab code guidelines`:
 

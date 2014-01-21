@@ -7,7 +7,8 @@
 niter=1000;
 
 %% Define dataset, classifier, partitioner
-data_path=cosmo_get_data_path('s01');
+config=cosmo_config();
+data_path=fullfile(config.data_path,'ak6','s01');
 
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 mask_fn=fullfile(data_path,'vt_mask.nii');
@@ -31,6 +32,7 @@ acc0=zeros(niter,1); % allocate space for permuted accuracies
 ds0=ds; % make a copy of the dataset
 
 %% for _niter_ iterations, reshuffle the labels and compute accuracy
+% Use the helper function cosmo_randomize_targets
 % >>
 for k=1:niter
     ds0.sa.targets=cosmo_randomize_targets(ds);

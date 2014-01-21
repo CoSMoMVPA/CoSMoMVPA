@@ -7,36 +7,48 @@
 %% Set analysis parameters 
 subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};
 roi='vt'; % 'vt' or 'ev' or 'brain'
-data_type='T_stats'; % 'T_stats' or 'betas'
 
 nsubjects=numel(subject_ids);
 
 % allocate space for output
 mean_weighted_zs=zeros(nsubjects,1);
 
+config=cosmo_config();
+study_path=fullfile(config.data_path,'ak6');
+
 %% Compututations for each subject 
 for j=1:nsubjects
     subject_id=subject_ids{j};
 
-    datadir=cosmo_get_data_path(subject_id);
+    data_path=fullfile(study_path, subject_id);
     
-    % load the mask
-    fn_mask=sprintf('%s/%s_mask.nii', datadir, roi);
-    
-    % load data from the halves
-    fn1=sprintf('%s/glm_%s_evens.nii', datadir, data_type);
-    fn2=sprintf('%s/glm_%s_odds.nii', datadir, data_type);
-    half1_ds=cosmo_fmri_dataset(fn1,'mask',fn_mask);
-    half2_ds=cosmo_fmri_dataset(fn2,'mask',fn_mask);
-    
+    data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+    mask_fn=fullfile(data_path,sprintf('%s_mask.nii', roi));
+
+    targets=repmat(1:6,1,10)';
+    chunks=mod(floor(((1:60)-1)/6),2)+1; % odd and even runs
+    ds_full = cosmo_fmri_dataset(data_fn, ...
+                        'mask',mask_fn,...
+                        'targets',targets,...
+                        'chunks',chunks);      
+                    
+    ds_odd_even=cosmo_fx(ds_full,@(x)mean(x,1),{'targets','chunks'});                    
+
+    odd_run_msk=mod(ds_odd_even.sa.chunks,2)==1;
+    half1_ds=cosmo_slice(ds_odd_even,odd_run_msk);
+
+    even_run_msk=~odd_run_msk;
+    half2_ds=cosmo_slice(ds_odd_even,even_run_msk);
+
     half1_samples=half1_ds.samples;
     half2_samples=half2_ds.samples;
     
     
     % compute all correlation values between the two halves, resulting
     % in a 6x6 matrix. Store this matrix in a variable 'rho'.
+    % Hint: use cosmo_corr
     % >>
-    rho=corr(half1_samples',half2_samples');
+    rho=cosmo_corr(half1_samples',half2_samples');
     % <<
     
     % To make these correlations more 'normal', apply a Fisher

@@ -8,6 +8,9 @@ masks = {'ev_mask.nii','vt_mask.nii'};
 
 dsms = [];
 
+config=cosmo_config();
+study_path=fullfile(config.data_path,'ak6');
+
 %%
 % In a nested loop over masks then subjects:
 %       load each dataset
@@ -18,10 +21,20 @@ for m = 1:length(masks)
     msk = masks{m};
     for s = 1:length(subjects)
         sub = subjects{s};
+        sub_path=fullfile(study_path,sub);
+        
         % load dataset
-        data_path=cosmo_get_data_path(subjects{s});
-        ds = cosmo_fmri_dataset([data_path '/glm_betas_allruns.nii'], ...
-                                'mask',[data_path '/' msk]);
+        ds_fn=fullfile(sub_path,'glm_T_stats_perrun.nii');
+        mask_fn=fullfile(sub_path,msk);
+        ds_full = cosmo_fmri_dataset(ds_fn,...
+                                    'mask',mask_fn,...
+                                    'targets',repmat(1:6,1,10)');
+        
+        % compute average for each unique target
+        ds=cosmo_fx(ds_full, @(x)mean(x,1), 'targets', 1);
+        
+        
+        
         % demean
         % Comment this out to see the effects of demeaning vs. not
         ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples, 1));
@@ -34,9 +47,9 @@ end
 
 %%
 % Then add the v1 model and behavioral DSMs
-models_path=cosmo_get_data_path('models');
-load([models_path 'v1_model.mat']);
-load([models_path 'behav_sim.mat']);
+models_path=fullfile(study_path,'models');
+load(fullfile(models_path,'v1_model.mat'));
+load(fullfile(models_path,'behav_sim.mat'));
 % add to dsms (hint: use squareform)
 % >>
 dsms = [dsms; squareform(v1_model); squareform(behav)];
