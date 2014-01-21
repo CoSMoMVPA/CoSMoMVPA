@@ -33,12 +33,12 @@ ds0=ds; % make a copy of the dataset
 
 %% for _niter_ iterations, reshuffle the labels and compute accuracy
 % Use the helper function cosmo_randomize_targets
-% >>
+% >@@>
 for k=1:niter
     ds0.sa.targets=cosmo_randomize_targets(ds);
     [foo, acc0(k)]=cosmo_cross_validate(ds0, classifier, partitions);
 end
-% <<
+% <@@<
 
 p=sum(acc<acc0)/niter;
 fprintf('%d permutations: accuracy=%.3f, p=%.4f\n', niter, acc, p);

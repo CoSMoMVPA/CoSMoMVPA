@@ -28,8 +28,8 @@ ds_full = cosmo_fmri_dataset(data_fn, ...
 % computed from the GLM. Instead we generate such data here.
 % If one were to use pre-computed files with even and odd runs, then
 % these can simply be loaded using:
-% >> ni_samples1=load_nii(fn1);
-% >> ni_samples2=load_nii(fn2);
+% >@@> ni_samples1=load_nii(fn1);
+% >@@> ni_samples2=load_nii(fn2);
 
 % use a helper function to average samples - for each unique combination of
 % targets and chunks. The resulting output has 12 features (6 targets times
@@ -40,10 +40,11 @@ ds_odd_even=cosmo_fx(ds_full,@(x)mean(x,1),{'targets','chunks'});
 
 odd_run_msk=mod(ds_odd_even.sa.chunks,2)==1;
 ni_samples1=cosmo_map2fmri(cosmo_slice(ds_odd_even,odd_run_msk));
+ni_samples1=cosmo_map2fmri(cosmo_slice(ds_odd_even,odd_run_msk),[data_path '/glm_T_stats_odd.nii']);
 
 even_run_msk=~odd_run_msk;
-ni_samples2=cosmo_map2fmri(cosmo_slice(ds_odd_even,even_run_msk));
-
+ni_samples2=cosmo_map2fmri(cosmo_slice(ds_odd_even,even_run_msk),[data_path '/glm_T_stats_even.nii']);
+return
 %% Do as if Load the data and extract the data in the mask
 % (as we use similated data computed above, don't load the data here)
 % ni_samples1=load_nii(fn1);
@@ -90,11 +91,11 @@ for ii=1:voldim(1)
         for kk=1:voldim(3)
             
             % if outside the mask, continue with next voxel
-            % >>
+            % >@@>
             if ~mask(ii,jj,kk)
                 continue
             end
-            % <<
+            % <@@<
             
             % fill up the sphere_data matrix with data from the sphere
             % centered around location (ii, jj, kk). 
@@ -104,7 +105,7 @@ for ii=1:voldim(1)
             % m=1, 2 and 3, and is not outside the mask).
             row_pos=0;
             sphere_data(:)=NaN; % not necessary, but used to check validity of data
-            % >>
+            % >@@>
             for mm=1:noffsets
                 ii_pos=ii+sphere_offsets(mm,1);
                 jj_pos=jj+sphere_offsets(mm,2);
@@ -122,7 +123,7 @@ for ii=1:voldim(1)
                 % overwrite existing data
                 sphere_data(:,row_pos)=samples(ii_pos, jj_pos, kk_pos, :);
             end
-            %<<
+            %<@@<
             
             % get data only as far down as we got voxels.
             selected_sphere_data=sphere_data(:, 1:row_pos);
@@ -134,22 +135,22 @@ for ii=1:voldim(1)
             
             % take the data from the two halves using the
             % half_{1,2}samples_mask
-            % >>
+            % >@@>
             half1=selected_sphere_data(half1_samples_mask,:);
             half2=selected_sphere_data(half2_samples_mask,:);
-            % <<
+            % <@@<
             % Compute correlations, fisher transform, then weight them.
             % Store the sum of the weighted transformed correlations in the
             % 'output' array.
             %
             % Use cosmo_corr instead of corr for faster computations
-            % >>
+            % >@@>
             c=cosmo_corr(half1',half2');
             fisher_c=atanh(c);
             weighted_c=contrast_matrix.*fisher_c;
             
             output(ii,jj,kk)=sum(weighted_c(:));
-            % <<
+            % <@@<
             
             % set this voxel as visited
             visited(ii,jj,kk)=true;

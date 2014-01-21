@@ -15,7 +15,7 @@ ds = cosmo_fmri_dataset(data_fn, ...
                         'mask',mask_fn,...
                         'targets',targets);                        
                     
-% compute average for each unique target, so that the datasets has 6
+% compute average for each unique target, so that the dataset has 6
 % samples - one for each target
 ds=cosmo_fx(ds, @(x)mean(x,1), 'targets', 1);
 
@@ -26,17 +26,17 @@ load(fullfile(models_path,'behav_sim.mat'));
 %% Set measure 
 % Use the rsm measure and set its parameters
 % behav similarity in the measure_args struct.
-% >>
+% >@@>
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
 measure_args.target_dsm = behav;
-% <<
+% <@@<
 
 % Run the searchlight
 results = cosmo_searchlight(ds,measure,'args',measure_args,'radius',3); 
 
-% Savethe results to disc
-cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);
+% Save the results to disc using the following command:
+% >> cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);
 
 %% Make a histogram of classification accuracies
 hist(results.samples,47)

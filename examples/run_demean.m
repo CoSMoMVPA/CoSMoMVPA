@@ -10,9 +10,9 @@ colorbar();
 title('before de-meaning');
 
 %% Demean the dataset
-% >>
+% >@@>
 ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples,1));
-% <<
+% <@@<
 subplot(1,2,2);
 imagesc(ds.samples,[-1 1])
 colorbar();

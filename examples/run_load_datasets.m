@@ -19,17 +19,17 @@ data_path=fullfile(config.data_path,'ak6','s01');
 %% Compute number of voxels in each mask
 % First load data with full brain mask
 
-% >>
+% >@@>
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
                         'mask', [data_path '/brain_mask.nii']);
 [nsamples, nfeatures] = size(ds.samples);
-% <<
+% <@@<
 
 fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
 
 % Now do the same with the EV and VT masks.
 
-% >>
+% >@@>
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
                         'mask', [data_path '/ev_mask.nii']);
 [nsamples, nfeatures] = size(ds.samples);
@@ -41,4 +41,4 @@ ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
 [nsamples, nfeatures] = size(ds.samples);
 
 fprintf('There are %d voxels in the VT mask\n', nfeatures);
-% <<
+% <@@<

@@ -16,7 +16,7 @@ study_path=fullfile(config.data_path,'ak6');
 %       load each dataset
 %       demean it, get DSM, save it in dsms
 
-% >>
+% >@@>
 for m = 1:length(masks)
     msk = masks{m};
     for s = 1:length(subjects)
@@ -43,7 +43,7 @@ for m = 1:length(masks)
         dsms = [dsms; pdist(ds.samples, 'correlation')];
     end
 end
-% <<
+% <@@<
 
 %%
 % Then add the v1 model and behavioral DSMs
@@ -51,29 +51,29 @@ models_path=fullfile(study_path,'models');
 load(fullfile(models_path,'v1_model.mat'));
 load(fullfile(models_path,'behav_sim.mat'));
 % add to dsms (hint: use squareform)
-% >>
+% >@@>
 dsms = [dsms; squareform(v1_model); squareform(behav)];
-% <<
+% <@@<
 
 %%
 % Now visualize the cross-correlation matrix. Remember that corrcoef calculates
 % correlation coefficients between columns and we want between rows.
 
-% >>
+% >@@>
 cc = corrcoef(dsms');
 figure(); imagesc(cc); 
-% <<
+% <@@<
 
 %%
 % Now use the values in the last to rows of the cross correlation matrix to
 % visualize the distributions in correlations between the neural similarities
 % and the v1 model/behavioral ratings.
 
-% >>
+% >@@>
 cc_models = [cc(1:8,17) cc(9:16,17) cc(1:8,18) cc(9:16,18)];
 labs = {'v1 model~EV','v1 model~VT','behav~EV','behav~VT'};
 figure(); boxplot(cc_models); set(gca,'XTick',[1:4],'XTickLabel',labs);
-% <<
+% <@@<
 
 
 

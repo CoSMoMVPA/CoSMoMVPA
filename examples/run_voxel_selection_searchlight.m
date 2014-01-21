@@ -44,7 +44,7 @@ accs=zeros(1,ncenters);
 % to get classification accuracies (it's its second output argument),
 % and store the classiifcation accuracies.
 for k=1:ncenters
-    % >>
+    % >@@>
     center_id=center_ids(k);
     sphere_feature_ids=center2neighbors{center_id};
     
@@ -60,7 +60,7 @@ for k=1:ncenters
     if k==1 || mod(k,1000)==0 || k==nfeatures
         fprintf('%d / %d features: average accuracy %.3f\n', k, nfeatures, mean(accs(1:k)));
     end
-    % <<
+    % <@@<
 end
 
 %% store the output
