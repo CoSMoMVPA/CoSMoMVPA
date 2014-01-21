@@ -1,17 +1,21 @@
 function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
 % computes neighbors for a spherical searchlight
 %
-% nbrhood=cosmo_spherical_voxel_selection(ds, radius[, center_ids])
+% nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
 %
 % Inputs
 %   ds            a dataset struct (from fmri_dataset)
-%   radius        if positive, it indicates sphere radius (in voxel
-%                 units). If negative then (-radius) indicates the 
-%                 (minimum) number of voxels that should be selected 
-%                 in each searchlight. 'minimum' means that at least 
-%                 (-radius) voxels are selected, and that the voxels that 
-%                 are not selected are all further away from the center
-%                 than those that are selected.
+%   radius        - Ff positive, it indicates the sphere radius (in voxel
+%                 units). 
+%                  - If negative then (-radius) indicates the 
+%                    minimum number of voxels that is selected 
+%                    in each searchlight. 'minimum' means that at least 
+%                    (-radius) voxels are selected, and that the voxels 
+%                    that are not selected are all further away from the 
+%                    center than those that are selected.
+%   opt          optional struct with options  
+%     .progress  if set, show progress every .progress steps (default:
+%                1000).
 % 
 % Outputs
 %   nbrhood           dataset-like struct without .sa or .samples, with:
@@ -40,7 +44,6 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
     
     show_progress=opt.progress>0;
     
-    
     ndim=numel(ds.a.dim.values);
     orig_dim=zeros(1,ndim);
     for k=1:ndim
@@ -48,7 +51,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
     end
     orig_nvoxels=prod(orig_dim);
     
-    % mapping from all linear voxel indices to those in the dataset
+    % mapping from all linear voxel indices to feature indices
     map2full=zeros(orig_nvoxels,1);
     lin=sub2ind(orig_dim, ds.fa.i, ds.fa.j, ds.fa.k);
     map2full(lin)=1:nfeatures;
