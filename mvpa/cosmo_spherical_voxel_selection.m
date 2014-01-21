@@ -60,11 +60,15 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
     use_fixed_radius=radius>0;
     if ~use_fixed_radius
         fixed_voxel_count=-radius;
-        radius=1; % as a starting point
+        if fixel_voxel_count>nfeatures
+            error('Cannot select %d voxels: dataset has % features',...
+                    fixed_voxel_count, nfeatures);
+        end
+        radius=1; % starting point; increase when necessary (below).
     end
     
     % compute voxel offsets relative to origin
-    [sphere_offsets, center_distances]=cosmo_sphere_offsets(radius);
+    [sphere_offsets, o_distances]=cosmo_sphere_offsets(radius);
     
     % allocate space for output
     ncenters=numel(center_ids);
@@ -88,17 +92,18 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
         center_id=center_ids(k);
         center_ijk=ijk_indices(:,center_id);
         
-        % in case of a variable radius, keep growing sphere_offsets until
-        % there are enough voxels selected. This new radius is kept
-        % for every subsequent iteration
-        % when a fixed radius is used then this loop is left after 
-        % the first iteration.
+        % - in case of a variable radius, keep growing sphere_offsets until
+        %   there are enough voxels selected. This new radius is kept
+        %   for every subsequent iteration.
+        % - in case of a fixed radius this loop is left after the first 
+        %   iteration.
         while true
             % add offsets to center
             around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
 
             % see which ones are outside the volume
-            outside_msk=around_ijk<=0 | bsxfun(@minus,orig_dim,around_ijk)<0;
+            outside_msk=around_ijk<=0 | ...
+                            bsxfun(@minus,orig_dim,around_ijk)<0;
 
             % collapse over 3 dimensions
             feature_outside_msk=sum(outside_msk,2)>0;
@@ -108,11 +113,13 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
             
             % if using variable radius, keep track of those 
             if ~use_fixed_radius
-                distances=center_distances(~feature_outside_msk);
+                distances=o_distances(~feature_outside_msk);
             end
 
             % convert to linear indices
-            around_lin=sub2ind(orig_dim,around_ijk(:,1), around_ijk(:,2), around_ijk(:,3));
+            around_lin=sub2ind(orig_dim,around_ijk(:,1), ...
+                                        around_ijk(:,2), ...
+                                        around_ijk(:,3));
 
             % convert linear to feature ids
             around_feature_ids=map2full(around_lin);
@@ -128,8 +135,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
                 % increase the radius by half a voxel and recompute new
                 % offsets, then try again in the next iteration.
                 radius=radius+.5;   
-                [sphere_offsets, center_distances]=cosmo_sphere_offsets(radius);
-                continue; 
+                [sphere_offsets, o_distances]=cosmo_sphere_offsets(radius);
             end
             
             % coming here, the radius is variable and enough features
@@ -164,7 +170,8 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
         if show_progress && (k==1 || k==ncenters || mod(k,opt.progress)==0)
             mean_size=mean(nvoxels(1:k));
             msg=sprintf('mean size %.1f', mean_size);
-            prev_progress_msg=cosmo_show_progress(clock_start, k/ncenters, msg, prev_progress_msg);
+            prev_progress_msg=cosmo_show_progress(clock_start, ...
+                                       k/ncenters, msg, prev_progress_msg);
         end
     end
     
