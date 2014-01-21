@@ -8,7 +8,7 @@ CoSMoMVPA code
 ++++++++++++++
 The latest code is available from GitHub_. As this code is under development, it may change rapidly.
 
-- GitHub users can clone the repository: ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
+- `git` users can clone the repository: ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
 
 - Others can download and extract the `zip archive`_.
 
@@ -16,11 +16,12 @@ Note: when CoSMoMVPA is released officially, there will be permanent links, host
 
 External dependencies
 +++++++++++++++++++++
-Certain functionality require other toolboxes; they are listed 
+Certain functionality require certain external toolboxes: 
 
 - BrainVoyager_ files require NeuroElf_ toolbox.
 - AFNI_ files require the ``AFNI Matlab`` library.
-- To use the Support Vector Machine (SVM) classifier, the `Matlab statistics`_ toolbox is required.
+- the Support Vector Machine (SVM) classifier requires the `Matlab statistics`_ toolbox.
+- MEEG data requires FieldTrip_ for almost all MEEG-related functions.
 
 Tutorial data
 +++++++++++++
@@ -30,7 +31,7 @@ Developers
 ++++++++++
 If you want to contribute, please see :ref:`contribute`. 
 
-Our current build system only supports `Unix-like`_ systems. Some of the programs requires are Sphinx_ and Python_, but this list is not complete. 
+Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_ and Python_. 
 
 Unit tests require the xUnit_ toolbox.
 

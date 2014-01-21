@@ -19,26 +19,27 @@ Get Started
 Prerequisites
 ^^^^^^^^^^^^^
 
-CoSMoMVPA_ requires:
+Using CoSMoMVPA_ effectively requires:
 
 - a working installation of Matlab_.
-- the CoSMoMVPA Matlab code; it can be downloaded :ref:`here <download>`.
-    + Alternatively, ``git`` users can clone the repository directly through ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
-    + see also  :ref:`here <download>` for external toolboxes that provide support for other reading from and writing to other file formats, including AFNI_ and BrainVoyager_
-- An :ref:`advanced beginner level <matlab_experience>`, or higher, of experience in Matlab programming.
-- An :ref:`advanced beginner level <cogneuro_experience>` of cognitive neuroscience (fMRI) data analysis.
-- A basic understanding of :ref:`MVPA concepts <mvpa_concepts>`.
-- Familiarity with :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`, in particular the :ref:`cosmomvpa_dataset`, :ref:`cosmomvpa_classifier` and :ref:`cosmomvpa_measure` concepts.
+- the CoSMoMVPA Matlab source code:
+    + ``git`` users: ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
+    + others can be downloaded the `zip archive`_ 
+- optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support, available :ref:`here <download>`.
+- an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming is recommended.
+- an :ref:`advanced beginner level <cogneuro_experience>` of fMRI or MEEG data analysis is recommended.
+- a basic understanding of :ref:`MVPA concepts <mvpa_concepts>`.
+- familiarity with :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`, in particular the :ref:`cosmomvpa_dataset`, :ref:`cosmomvpa_classifier` and :ref:`cosmomvpa_measure` concepts.
 
 ^^^^^^^^^^
 Next steps
 ^^^^^^^^^^
 
-After fulfilling these requirements, you can: 
+Once you are ready:
 
-- familiarize yourself with CoSMoMVPA by looking at some :ref:`runnable examples <modindex_run>` (and look at the `Matlab outputs`_).
+- look at the :ref:`runnable examples <modindex_run>` and the associated `Matlab outputs`_.
 - try the :ref:`exercises <ex_toc>`.
-- have a look at the :ref:`CoSMoMVPA functions <modindex>`.
+- explore the :ref:`CoSMoMVPA functions <modindex>`.
 
 
 .. include:: links.rst

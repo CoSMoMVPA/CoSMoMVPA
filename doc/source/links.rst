@@ -8,6 +8,7 @@
 .. _`CoSMoMVPA issues`: https://github.com/CoSMoMVPA/CoSMoMVPA/issues
 .. _git: http://gitscm.com
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
+.. _FieldTrip: http://fieldtrip.fcdonders.nl
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. |Matlab(TM)| unicode:: MATLAB U+00AE
 .. _Matlab statistics: http://www.mathworks.it/products/statistics/
