@@ -146,7 +146,7 @@ function tp=get_type(needle, haystack)
                 tp=fn; % matching type found
                 return
             else
-                error('first argument type %s but first is not',fn);
+                error('second argument type %s but first is not',fn);
             end
         end
     end
