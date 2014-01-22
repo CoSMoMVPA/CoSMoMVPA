@@ -108,4 +108,12 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
             error('Logical mask should have %d elements, found %d', ...
                     size(x, dim), numel(to_select));
         end
+        
+        if numel(size(x))~=2
+            error('Only 2D arrays are allowed');
+        end
+        
+        if sum(size(to_select)>1)>1
+            error('elements to select should be in vector');
+        end
     
