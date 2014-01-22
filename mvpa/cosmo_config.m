@@ -83,13 +83,13 @@ function validate_config(config)
     path_exists.test=@(p) exist(p,'file');
     path_exists.msg=@(p) sprintf('Path "%s" does not exist',p);
     
-    checks.data_path.path_exists;
-    checks.tmp_path.path_exists;
+    checks.data_path=path_exists;
+    checks.tmp_path=path_exists;
     
     add_msg=sprintf('To set the configuration, run: help %s', mfilename());
-    
+
     % perform checks on fieldnames present in 'checks'.
-    fns=fieldnames(config);
+    
     for k=1:numel(fns)
         fn=fns{k};
         if isfield(checks,fn)
