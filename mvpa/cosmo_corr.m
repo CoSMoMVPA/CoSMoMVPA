@@ -23,19 +23,18 @@ function c=cosmo_corr(x,y,corr_type)
 %
 % Example:
 % - % generate some random data. 
-%   clear all
-%   x=randn(100); y=randn(100);
+%   >> x=randn(1000); y=randn(1000);
 %   % call the function first to avoid lookup delays; then measure time
-%   corr(x,y); corr(x,y); tic; c=corr(x,y); toc
-%   cosmo_corr(x,y); cosmo_corr(x,y); tic; cc=cosmo_corr(x,y); toc
+%   >> corr(y,x); corr(y,x); tic; c=corr(x,y); toc
+%   >> cosmo_corr(y,x); cosmo_corr(y,x); tic; cc=cosmo_corr(x,y); toc
 %   % compute differences in output
-%   delta=c-cc;
-%   max_delta=max(abs(delta(:)));
-%   n_eps=max_delta/eps; % how many epsilons
-%   fprintf('max difference: %d (%d epsilons)\n',max_delta,n_eps)
+%   >> delta=c-cc;
+%   >> max_delta=max(abs(delta(:)));
+%   >> n_eps=max_delta/eps; % how many epsilons
+%   >> fprintf('max difference: %d (%d epsilons)\n',max_delta,n_eps)
 %   % output:
-%   Elapsed time is 0.795150 seconds.
-%   Elapsed time is 0.002629 seconds.
+%   Elapsed time is 0.013168 seconds.
+%   Elapsed time is 0.002563 seconds.
 %   max difference: 4.440892e-16 (2 epsilons)
 %
 % See also: corr
@@ -67,5 +66,6 @@ switch corr_type
         c=n * (xd' * yd) .* (xs' * ys);
     otherwise
         % fall-back: use Matlab's function
+        % will puke if no Matlab stat toolbox
         c=corr(x,y,'type',corr_type);
 end
