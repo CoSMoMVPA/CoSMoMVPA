@@ -5,7 +5,7 @@
 
 %% Define data
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 targets=repmat(1:6,1,10);
 chunks=floor(((1:60)-1)/6)+1;

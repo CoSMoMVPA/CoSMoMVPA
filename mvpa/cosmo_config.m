@@ -30,7 +30,7 @@ function config=cosmo_config(fn, config)
 %  - an example configuration file (of two lines):
 %
 %    # path for runnable examples
-%    data_path=/Users/nick/organized/_datasets/CoSMoMVPA
+%    tutorial_data_path=/Users/nick/organized/_datasets/CoSMoMVPA
 %  
 %  - If a configuration file with the name '.cosmomvpa.cfg' is stored 
 %    in a directory that is in the matlab path or (on Unix platforms) the 
@@ -61,7 +61,8 @@ function config=cosmo_config(fn, config)
     cosmo_mvpa_dir=fileparts(which('cosmo_corr'));
 
     % set defaults
-    defaults.data_path=fullfile(cosmo_mvpa_dir,'..','data');
+    defaults.tutorial_data_path=fullfile(cosmo_mvpa_dir,...
+                                        '..','tutorial_data');
 
     % overwrite defaults by configuration options
     fns=fieldnames(defaults);
@@ -83,13 +84,14 @@ function validate_config(config)
     path_exists.test=@(p) exist(p,'file');
     path_exists.msg=@(p) sprintf('Path "%s" does not exist',p);
     
-    checks.data_path=path_exists;
+    checks.tutorial_data_path=path_exists;
     checks.tmp_path=path_exists;
     
     add_msg=sprintf('To set the configuration, run: help %s', mfilename());
 
     % perform checks on fieldnames present in 'checks'.
     
+    fns=fieldnames(config);
     for k=1:numel(fns)
         fn=fns{k};
         if isfield(checks,fn)

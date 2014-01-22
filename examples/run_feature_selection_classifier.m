@@ -2,7 +2,7 @@
 % This example plots classification accuracy as a function of the number of
 % features selected using an ANOVA on training set data
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 mask_fn=fullfile(data_path,'vt_mask.nii');

@@ -2,7 +2,7 @@
 
 %% Define data
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 % Load the dataset with VT mask
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...

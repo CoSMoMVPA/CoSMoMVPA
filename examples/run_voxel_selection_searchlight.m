@@ -6,7 +6,7 @@
 
 %% Set up parameters
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 maskfn=fullfile(data_path,'brain_mask.nii');

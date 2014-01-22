@@ -9,7 +9,7 @@ masks = {'ev_mask.nii','vt_mask.nii'};
 dsms = [];
 
 config=cosmo_config();
-study_path=fullfile(config.data_path,'ak6');
+study_path=fullfile(config.tutorial_data_path,'ak6');
 
 %%
 % In a nested loop over masks then subjects:

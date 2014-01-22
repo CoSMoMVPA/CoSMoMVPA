@@ -14,7 +14,7 @@ nsubjects=numel(subject_ids);
 mean_weighted_zs=zeros(nsubjects,1);
 
 config=cosmo_config();
-study_path=fullfile(config.data_path,'ak6');
+study_path=fullfile(config.tutorial_data_path,'ak6');
 
 %% Compututations for each subject 
 for j=1:nsubjects

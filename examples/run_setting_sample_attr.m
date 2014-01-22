@@ -9,7 +9,7 @@
 % attribute) so that 1 corresponds to run1, 2 corresponds to run2, etc.
 
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 %% Load the dataset
 % >@@>

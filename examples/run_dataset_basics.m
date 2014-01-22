@@ -4,7 +4,7 @@
 
 % Set the data path 
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 % Load dataset (and supply a mask file for 'vt')
 % >@@>

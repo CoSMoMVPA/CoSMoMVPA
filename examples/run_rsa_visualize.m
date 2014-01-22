@@ -5,7 +5,7 @@
 % load datasets cosmo_fmri_dataset
 
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 % >@@>
 data_fn=[data_path '/glm_T_stats_perrun.nii'];
 targets=repmat(1:6,1,10)';

@@ -14,7 +14,7 @@
 % 
 
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 %% Compute number of voxels in each mask
 % First load data with full brain mask

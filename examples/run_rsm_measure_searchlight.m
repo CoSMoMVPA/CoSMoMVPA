@@ -5,7 +5,7 @@
 
 %% Define data
 config=cosmo_config();
-study_path=fullfile(config.data_path,'ak6');
+study_path=fullfile(config.tutorial_data_path,'ak6');
 
 data_path=fullfile(study_path,'s01');
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');

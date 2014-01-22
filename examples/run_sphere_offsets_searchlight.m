@@ -11,7 +11,7 @@
 radius=3; % in voxel units
 
 config=cosmo_config();
-data_path=fullfile(config.data_path,'ak6','s01');
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 
 half1_fn=fullfile(data_path,'glm_T_stats_odd.nii');
