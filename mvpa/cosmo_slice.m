@@ -1,4 +1,4 @@
-function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
+function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
 % Slice a dataset by samples (the default) or features
 %
 % sliced_ds=cosmo_slice(ds, elements_to_select[, dim][do_check])
@@ -7,55 +7,55 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
 %   ds                    One of:
 %                         - dataset struct to be sliced, with PxQ field 
 %                           .samples and optionally fields .fa, .sa and .a.
-%                         - cell 
-%                         - logical or numeric array 
-%   elements_to_select    either a binary mask, or a list of indices of 
+%                         - PxQ cell 
+%                         - PxQ logical or numeric array 
+%   elements_to_select    either a binary mask or a list of indices of 
 %                         the samples (if dim==1) or features (if dim==2)
 %                         to select. If a binary mask then the number of
-%                         elements should match those of ds in the dim-th
-%                         dimension.
+%                         elements should match the size of ds in the 
+%                         dim-th dimension.
 %   dim                   Slicing dimension: along samples (dim==1) or 
-%                         features (dim==2). (Default: 1)
+%                         features (dim==2). (default: 1).
 %   do_check              Boolean that indicates that if ds is a dataset, 
 %                         whether it should be checked for proper
-%                         structure (default: true). 
+%                         structure. (default: true). 
 %
 % Output: 
-%   sliced_ds             - if ds is a dataset struct then sliced_ds is a
-%                           .samples NxQ (if dim==1) or PxN (if dim==2), if 
-%                           N elements were selected. 
-%                           Each value in .fa (if dim==1) or .sa(dim==2) 
-%                           has N values along the dim-th dimension.
-%                         - if an array then sliced_ds is the array sliced
-%                           along the dim-th dimension.
+%   sliced_ds             - If ds is a cell or array then sliced_ds is
+%                           the result of slicing ds along the dim-th 
+%                           dimension. The result is of size NxQ (if
+%                           dim==1) or PxN (if dim==2), where N is the
+%                           number of non-zero values in
+%                           elements_to_select.
+%                         - If ds is a dataset struct then 
+%                           sliced_ds.samples is the result of slicing
+%                           ds.samples. 
+%                           If present, fields .sa (if dim==1) or 
+%                           .fa (dim==2) are sliced as well.
 %
 % Notes:
 %   - do_check=false may be preferred for slice-intensive operations such
-%     as searchlights
+%     as when used in searchlights
+%   - this function does not support arrays with more than two dimensions.
 %
 % NNO Sep 2013
 
     % deal with 2, 3, or 4 input arguments
     if nargin<3 || isempty(dim), dim=1; end
-    if nargin<4 || isempty(do_check), do_check=true; end
+    if nargin<4 || isempty(do_check_ds), do_check_ds=true; end
     
     
-    if iscell(ds)
-        ds=slice_cell(ds, elements_to_select, dim);
-    elseif isnumeric(ds) || islogical(ds)
-        ds=slice_array(ds, elements_to_select, dim);
+    if iscell(ds) || isnumeric(ds) || islogical(ds)
+        ds=slice_(ds, elements_to_select, dim);
     elseif isstruct(ds)
         
-        if do_check
+        if do_check_ds
             % check kosherness
             cosmo_check_dataset(ds);
         end
 
-        % this function uses recursion; make it immune to renaming
-        me=str2func(mfilename());
-        
         % slice the samples
-        ds.samples=slice_array(ds.samples,elements_to_select,dim);
+        ds.samples=slice_(ds.samples,elements_to_select,dim);
 
         % now deal with either feature or sample attributes
         attr_fns={'sa','fa'};
@@ -75,7 +75,7 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
                 end
                 
                 % slice cell or array using recursion
-                attrs.(fn)=me(v, elements_to_select, dim);
+                attrs.(fn)=slice_(v, elements_to_select, dim);
             end
             ds.(attr_fn)=attrs;
         end
@@ -88,29 +88,13 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check)
     % helper functions
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function y=slice_array(x, to_select, dim)
-        % slices the array x along dim with indices, where dim in [1,2]
+    function y=slice_(x, to_select, dim)
         check_size(x, to_select, dim);
+        
         if dim==1
             y=x(to_select,:);
         elseif dim==2
             y=x(:,to_select);
-        else
-            error('dim should be 1 or 2');
-        end
-        
-        
-    function y=slice_cell(x, to_select, dim)
-        % slices the cell x along dim with indices, where dim in [1,2]
-        check_size(x, to_select, dim);
-        n_other_dim=size(x,3-dim); % size of other dimension
-        
-        if dim==1
-            % cells are tricky - they become linear after slicing, and have
-            % to be put back in shape
-            y=reshape({x{to_select,:}},[],n_other_dim);
-        elseif dim==2
-            y=reshape({x{:, to_select}},n_other_dim,[]);
         else
             error('dim should be 1 or 2');
         end
