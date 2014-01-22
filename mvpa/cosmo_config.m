@@ -39,15 +39,14 @@ function config=cosmo_config(fn, config)
 %
 % NNO Jan 2014
 
-
-    default_fn='.cosmomvpa.cfg';
+    default_config_fn='.cosmomvpa.cfg';
 
     if nargin==1 && ischar(fn)
         fn=find_file(fn);
         config=read_config(fn);
     elseif nargin==0
         % see if the configuration file can be found
-        fn=find_file(default_fn);
+        fn=find_file(default_config_fn);
         if isempty(fn)
             config=struct();
         else
@@ -78,12 +77,18 @@ function config=cosmo_config(fn, config)
 
 function validate_config(config)
     % simple validation of config
-    % XXX for now just the data_path - maybe a bit overkill
-    checks.data_path.test=@(p) exist(p,'file');
-    checks.data_path.msg=@(p) sprintf('Path "%s" does not exist',p);
-
+    
+    % poor-man version of OO
+    path_exists=struct();
+    path_exists.test=@(p) exist(p,'file');
+    path_exists.msg=@(p) sprintf('Path "%s" does not exist',p);
+    
+    checks.data_path.path_exists;
+    checks.tmp_path.path_exists;
+    
     add_msg=sprintf('To set the configuration, run: help %s', mfilename());
     
+    % perform checks on fieldnames present in 'checks'.
     fns=fieldnames(config);
     for k=1:numel(fns)
         fn=fns{k};
@@ -97,9 +102,6 @@ function validate_config(config)
         end
     end
     
-    
-
-
 
 function fn=find_file(fn, raise_)
 % tries to find a configuration file by looking:
