@@ -137,19 +137,25 @@ function fn=find_file(fn, raise_)
 function config=read_config(fn)
 % reads configuration from a file fn
 
-    config=struct();
+    config=struct(); % space for output
 
     fid=fopen(fn);
+    
     while true
+        % read each line
         line=fgetl(fid);
         if ~ischar(line)
+            % end of file
             break;
         end
-
+        
+        % ignore empty lines or lines starting with '#'
         if isempty(line) || line(1)=='#'
             continue
         end
 
+        % look for lines of form '<key>=<value>'.
+        % white spaces around key or value are ignored.
         m=regexp(line,'(?<key>[^=]+)\s*=\s*(?<value>.*)\s*','names');
 
         if isempty(m)
@@ -157,6 +163,7 @@ function config=read_config(fn)
             continue;
         end
 
+        % get value
         value=m.value;
 
         % see if it can be converted to numeric
@@ -166,13 +173,15 @@ function config=read_config(fn)
         end 
 
         config.(m.key)=value;
-
     end
+    
     fclose(fid);
 
 
 function write_config(fn, config)
 % writes the config to a file fn
+% no support for comments or empty lines
+
     fid=fopen(fn,'w');
     
     fns=fieldnames(config);
@@ -181,6 +190,7 @@ function write_config(fn, config)
 
         v=config.(fn);
         if isnumeric(v)
+            % convert numeric to string
             v=sprintf('%d ',v);
         elseif ischar(v)
             % no converstion
