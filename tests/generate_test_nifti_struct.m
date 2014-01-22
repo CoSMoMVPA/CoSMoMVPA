@@ -11,7 +11,7 @@ function ni=generate_test_nifti_struct()
 
     ni=struct();
 
-    ni.img=single(generate_randn_deterministic(imgshape));
+    ni.img=single(generate_random_deterministic(imgshape));
 
     hdr=struct();
 
