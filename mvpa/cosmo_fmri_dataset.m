@@ -150,7 +150,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     end
      
     if ~isequal(mask_indices,-1)
-        ds=cosmo_slice(ds, mask_indices, 2);
+        ds=cosmo_slice(ds, mask_indices(:), 2);
     end
     
     cosmo_check_dataset(ds, 'fmri'); % ensure all kosher
