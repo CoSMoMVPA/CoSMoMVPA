@@ -66,6 +66,11 @@ if as_struct
     for k=1:ndim
         xs{k}=s.(fns{k});
     end
+    
+    if ndim==0
+        p=xs;
+        return
+    end
 end
     
 if iscell(xs)
