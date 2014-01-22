@@ -27,7 +27,7 @@ function config=cosmo_config(fn, config)
 %    where <key> cannot contain the '=' character and <value> cannot start
 %    or end with a white-space character.
 %
-%  - an example configuration file of two lines:
+%  - an example configuration file (of two lines):
 %
 %    # path for runnable examples
 %    data_path=/Users/nick/organized/_datasets/CoSMoMVPA
