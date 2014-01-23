@@ -10,17 +10,20 @@ samples based on which is nearest (where 'nearest', for now, is defined based on
 
 Your function should have the following signature:
 
-.. include:: cosmo_classify_nn_hdr.rst
+.. include:: matlab/cosmo_classify_nn_sgn.txt
 
-Hint: cosmo_classify_nn_skl_
+Hint: :ref:`cosmo_classify_nn_skl`
 
-.. _cosmo_classify_nn_skl: cosmo_classify_nn_skl.html
-
-Full solution: cosmo_classify_nn_
+Full solution: :ref:`cosmo_classify_nn`
 
 Extra exercise: write a nearest-mean classifier
 
 Extra exercise: Try correlation instead of Euclidian distance. 
+
 Advanced exercise: write a k-nearest neighbor classifier that considers the nearest k neighbors for each test sample. Bonus points if this classifier takes a random class in case of a tie.
 
-.. _cosmo_classify_nn: cosmo_classify_nn.html
+ 
+    
+
+:pb:`classify_naive_bayes`
+    

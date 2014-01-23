@@ -17,10 +17,16 @@
 
 import os
 import glob
-from os.path import join, split
+from os.path import join, split, getmtime, isfile
 matlab_dir='../mvpa'
 example_dir='../examples'
-rst_dir='source'
+trg_dir='source'
+rst_sub_dir='matlab'
+modindex_dir=trg_dir
+
+for d in (trg_dir, join(trg_dir, rst_sub_dir), modindex_dir):
+    if not os.path.isdir(d):
+        os.makedirs(d)
 
 add_indent=lambda x:' '*4+x
 
@@ -70,20 +76,30 @@ fns.sort()
 
 # define filters + file name infix for toc
 filters={'run': lambda x: x.startswith('run'),
-         None: lambda x: x.startswith('cosmo')}
+         None: lambda x: x.startswith('cosmo'),
+         'pb':lambda x: x.startswith('run')}
 
 pf='Runnable examples - '
-output2name={('hdr','run'):pf+'header files',
-             ('skl','run'):pf + 'skeleton files',
+output2name={('skl','run'):pf + 'skeleton files',
              (None,'run'):pf + 'full solution files',
              (None,None): 'Module index',
              ('hdr',None): 'header files',
-             ('skl',None): 'skeleton files'}
+             ('skl',None): 'skeleton files',
+             ('sgn',None): 'signature files',
+             ('None','pb'): 'Matlab outputs'}
 
-for output in ('hdr','skl',None):
+def is_newer(fn, other_fn):
+    return not isfile(other_fn) or getmtime(fn)>getmtime(other_fn) 
+    # return True if fn is newer than other_fn
+    # and other_fn exists
+    return 
+
+for output in ('hdr','skl',None,'sgn'):
     print '@#$====> Converting matlab_%s.m files to *_%s.rst' % (output,output)
     labels=[]
     for fn in fns:
+        if split(fn)[-1].startswith('run') and output=='hdr':
+            continue
         with open(fn) as f:
             data=f.read()
 
@@ -95,20 +111,30 @@ for output in ('hdr','skl',None):
         if not output is None:
             label+='_'+output # add suffix
 
-        fn_out=join(rst_dir, label)
-        fn_out+='.rst'
+        fn_out=join(trg_dir, rst_sub_dir, label)
 
-        with open(fn_out,'w') as f:
-            if output != 'hdr':
+        #fn_out+='.rst'
+        fn_out+='.txt' if output=='sgn' else '.rst'
+
+        if is_newer(fn, fn_out):
+            with open(fn_out,'w') as f:
+
                 f.write('.. _%s:\n\n' % label)
-            f.write('%s\n%s\n' % (label.replace('_',' '),'-'*len(label)))
-            f.write(rst)
-            #print ">>>", rst, "<<<"
-            #print '%s -> %s' % (fn_short, fn_out)
+                if output!='sgn':
+                    f.write('%s\n%s\n\n' % (label.replace('_',' '),'-'*len(label)))
+                f.write(rst)
+                #print ">>>", rst, "<<<"
+                #print '%s -> %s' % (fn_short, fn_out)
 
         labels.append(label) # keep track of all rst files
 
+
     for infix, filter_ in filters.iteritems():
+        if not (output,infix) in output2name:
+            continue
+
+        if output=='sgn':
+            continue
 
         toc_fn='modindex%s' % ('' if output is None else ('_' + output))
         fn=toc_fn
@@ -132,11 +158,11 @@ for output in ('hdr','skl',None):
                   '* :ref:`modindex`',
                   '* :ref:`search`']
    
-        full_toc_fn=join(rst_dir,fn+'.rst')
+        full_toc_fn=join(modindex_dir,fn+'.rst')
         with open(full_toc_fn,'w') as f:
             f.write('\n'.join(header))
             for label in filter(filter_,labels):
-                f.write(add_indent(label) + '\n')
+                f.write(add_indent(rst_sub_dir+'/'+label) + '\n')
             f.write('\n'.join(appendix))
             print "Written toc to %s" % full_toc_fn
 

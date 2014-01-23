@@ -43,6 +43,7 @@ clean:
 	-rm -f source/run_*.rst
 	-rm -f source/cosmo_*.rst
 	-rm -f source/*modindex*.rst
+	-rm -rf source/matlab
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

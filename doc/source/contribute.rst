@@ -349,8 +349,7 @@ The following are guidelines, intended to improve:
 
     **good:**
 
-    .. include:: cosmo_winner_indices_hdr.rst
-        :start-line: 1
+    .. include:: matlab/cosmo_winner_indices_sgn.txt
 
 - Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.

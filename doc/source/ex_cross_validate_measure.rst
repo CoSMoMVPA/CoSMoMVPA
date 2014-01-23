@@ -11,7 +11,7 @@ is a function with the following signature:
     output = dataset_measure(dataset, args)
 
 Thus any function you write can be used as a dataset measure as long as it can
-use this same input scheme. In a similar way, our classifiers all have the same
+use this input scheme. In a similar way, our classifiers all have the same
 signature:
 
 .. code-block:: matlab
@@ -20,7 +20,7 @@ signature:
 
 This is useful for writing code that can be reused for different purposes. The
 cross-validation dataset measure function is written to work with any generic
-classifer, and returns the classification accuracy. 
+classifier, and returns the classification accuracy. 
 This is done by passing a function handle to a classifer in the args struct
 input. For example, the function handle for the nearest neighbor classifer can
 be passed by the args struct by using the @function syntax:
@@ -33,12 +33,9 @@ In the code for cross validation below, your job is to write the missing for
 loop. This for loop must iterate over each data fold in args.partitions, call a
 generic classifier, and keep track of the number of correct classifications.
 
-.. include:: cosmo_cross_validation_accuracy_measure_hdr.rst
+.. include:: matlab/cosmo_cross_validation_accuracy_measure_sgn.txt
 
-Hint: cosmo_cross_validation_accuracy_measure_skl_
+Hint: :ref:`cosmo_cross_validation_accuracy_measure_skl`
 
-.. _cosmo_cross_validation_accuracy_measure_skl: cosmo_cross_validation_accuracy_measure_skl.html
+Solution: :ref:`cosmo_cross_validation_accuracy_measure`
 
-Solution: cosmo_cross_validation_accuracy_measure
-
-.. _cosmo_cross_validation_accuracy_measure: cosmo_cross_validation_accuracy_measure.html

@@ -8,14 +8,13 @@ Wrapper for two classes
 *Note*: this exercise requires the Matlab statistics toolbox.
 
 Matlab_ has an implementation of a support vector machine classifier that supports two classes. Its implementation uses
-two functions: **svmtrain** and **svmclassify**. Have a look at these functions
-and then write a wrapper that will have the same function signature as our
+two functions: ``svmtrain`` and ``svmclassify``. Have a look at these functions' signatures (``help svmtrain`` and ``help svmclassify``) and then write a wrapper that will have the same function signature as our
 generic classifer, but uses matlab's SVM inside.  Below is the signature and
 function header for our new function. 
 
 Test your solution using the first part of :ref:`run_classify_svm`
 
-.. include:: cosmo_classify_svm_2class_hdr.rst
+.. include:: matlab/cosmo_classify_svm_2class_sgn.txt
 
 Hint: :ref:`cosmo_classify_svm_2class_skl`
 
@@ -26,7 +25,7 @@ Wrapper for multiple classes
 Other classifiers (such as naive bayesian) support more than two classes. SVM classifiers can be used for multi-class problems. One approach is to classify based on all possible pairs of classes, and then take as the predicted class the one that was predicted most often. Thus, write a wrapper with the same function signature as the naive bayesian classifier but that uses the 2-class SVM classifier above.
 Test your solution using the second part of :ref:`run_classify_svm`.
 
-.. include:: cosmo_classify_svm_hdr.rst
+.. include:: matlab/cosmo_classify_svm_sgn.txt
 
 Hint: :ref:`cosmo_classify_svm_skl`
 

@@ -13,22 +13,15 @@ for different purposes.
 
 We have provided a couple of helper functions that do some of the heavy lifting
 involved defining the sets of *neighborhood voxels*. For this, use
-cosmo_spherical_voxel_selection_ that was presented in the previous exercise.
+:ref:`cosmo_spherical_voxel_selection` that was presented in the previous exercise.
 
 With the help of these functions, write a generic searchlight function that
 satisfies the following definition:
 
-.. include:: cosmo_searchlight_hdr.rst
+.. include:: matlab/cosmo_searchlight_sgn.txt
 
-Hint: cosmo_searchlight_skl_
+Hint: :ref:`cosmo_searchlight_skl`
 
-Solution: cosmo_searchlight_
-
-
-
-.. _cosmo_searchlight_skl: cosmo_searchlight_skl.html
-.. _cosmo_searchlight: cosmo_searchlight.html
-.. _cosmo_sphere_offsets: cosmo_sphere_offsets.html
-.. _cosmo_spherical_voxel_selection: cosmo_spherical_voxel_selection.html
+Solution: :ref:`cosmo_searchlight`
 
 
