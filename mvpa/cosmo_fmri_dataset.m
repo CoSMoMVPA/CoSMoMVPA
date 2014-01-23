@@ -75,7 +75,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     switch ndim
         case 3
             % simple reshape operation
-            data=reshape(data,[1 dims]);
+            data=reshape(data,[1 data_size]);
         case 4
             % make temporal dimension the first one
             data=shiftdim(data,3);
@@ -199,8 +199,13 @@ function img_formats=get_img_formats()
 function ds=set_sa_vec(ds,p,fieldname)
     % helper: sets a sample attribute as a vector
     % throws an error if it has the wrong size
-    nsamples=size(ds.samples,1);
     v=p.(fieldname);
+    if isequal(size(v),[0 0])
+        % ignore '[]', but not zeros(10,0)
+        return;
+    end
+    nsamples=size(ds.samples,1);
+        
     n=numel(v);
     if n==1
         % singleton element - repeat nsamples times.
