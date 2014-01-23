@@ -44,17 +44,15 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 % ACC, NNO Aug, Sep 2013
      
     % Input parsing stuff
-    parser = inputParser;
-    addRequired(parser,'filename');
-    addOptional(parser,'mask',[]); 
-    addOptional(parser,'targets',[]);
-    addOptional(parser,'chunks',[]);
-    parse(parser,filename,varargin{:})
-    p = parser.Results;
+    defaults.mask=[];
+    defaults.targets=[];
+    defaults.chunks=[];
+    
+    p = cosmo_structjoin(defaults, varargin);
      
     % special case: if it's already a dataset, just return it
-    if isstruct(p.filename) && isfield(p.filename,'samples')
-        ds=p.filename;
+    if isstruct(filename) && isfield(filename,'samples')
+        ds=filename;
         return
     end
     
@@ -62,7 +60,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     img_formats=get_img_formats(); 
     
     % read the image
-    [data,hdr,img_format,sa]=read_img(p.filename, img_formats);
+    [data,hdr,img_format,sa]=read_img(filename, img_formats);
      
     if ~isa(data,'double')
         data=double(data); % ensure data stored in double precision
