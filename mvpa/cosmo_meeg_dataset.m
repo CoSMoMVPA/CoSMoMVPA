@@ -60,14 +60,11 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 
     % Input parsing stuff
     
-    parser = inputParser;
-    addRequired(parser,'filename');
-    addOptional(parser,'targets',[]);
-    addOptional(parser,'chunks',[]);
-    parse(parser,filename,varargin{:})
-    p = parser.Results;
-
-    filename=p.filename;
+    defaults=struct();
+    defaults.targets=[];
+    defaults.chunks=[];
+    
+    params = cosmo_structjoin(params, varargin);
     
     if cosmo_check_dataset(filename,'meeg',false)
         % it is already a dataset, so return it
@@ -89,8 +86,8 @@ function ds=cosmo_meeg_dataset(filename, varargin)
     ds=reader(filename);
     
     % set targets and chunks
-    ds=set_vec_sa(ds,'targets',p.targets);
-    ds=set_vec_sa(ds,'chunks',p.chunks);
+    ds=set_vec_sa(ds,'targets',params.targets);
+    ds=set_vec_sa(ds,'chunks',params.chunks);
     
 
     % check consistency
