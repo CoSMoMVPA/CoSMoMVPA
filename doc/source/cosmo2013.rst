@@ -12,8 +12,8 @@ Contents:
 .. toctree::
     :maxdepth: 2
     
-    intro    
-    ex_toc
+    cosmo2013_intro    
+    cosmo2013_ex_toc
     
 .. toctree::
     :maxdepth: 1
