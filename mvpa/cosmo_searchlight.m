@@ -47,21 +47,20 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     
     cosmo_check_dataset(ds);
 
-    parser = inputParser;
-    addOptional(parser,'radius',[]);
-    addOptional(parser,'center_ids',[]);
-    addOptional(parser,'args',struct());
-    addOptional(parser,'nbrhood',[]);
-    addOptional(parser,'progress',1/50);
-    addOptional(parser,'parent_type',[]); % for MEEG datasets
+    defaults=struct();
+    defaults.radius=[];
+    defaults.center_ids=[];
+    defaults.args=struct();
+    defaults.nbrhood=[];
+    defaults.progress=1/50;
+    defaults.parent_type=[]; % for MEEG datasets
     
-    parse(parser,varargin{:});
-    p = parser.Results;
-    radius = p.radius;
-    args = p.args;
-    center_ids=p.center_ids;
-    nbrhood=p.nbrhood;
-    parent_type=p.parent_type;
+    params = cosmo_structjoin(defaults,varargin);
+    radius = params.radius;
+    args = params.args;
+    center_ids=params.center_ids;
+    nbrhood=params.nbrhood;
+    parent_type=params.parent_type;
 
     % use voxel selection function
     if ~xor(isempty(radius), isempty(nbrhood))
@@ -92,9 +91,9 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     res_cell=cell(ncenters,1);
     
     % see if progress is to be reported
-    show_progress=~isempty(p.progress);
+    show_progress=~isempty(params.progress);
     if show_progress
-        progress_step=p.progress;
+        progress_step=params.progress;
         if progress_step<1
             progress_step=ceil(ncenters*progress_step);
         end
