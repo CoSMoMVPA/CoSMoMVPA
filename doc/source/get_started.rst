@@ -23,9 +23,13 @@ Using CoSMoMVPA_ effectively requires:
 
 - a working installation of Matlab_.
 - the CoSMoMVPA Matlab source code:
-    + ``git`` users: ``git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
-    + others can be downloaded the `zip archive`_ 
-- optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support, available :ref:`here <download>`.
+    + ``git`` users:: 
+
+        git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+
+    + alternatively, download the `zip archive`_.
+- optionally the tutorial data, available :ref:`here <download>` (to run the :ref:`exercises <ex_toc>`).
+- optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support; see :ref:`here <download>`.
 - an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming is recommended.
 - an :ref:`advanced beginner level <cogneuro_experience>` of fMRI or MEEG data analysis is recommended.
 - a basic understanding of :ref:`MVPA concepts <mvpa_concepts>`.

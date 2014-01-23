@@ -62,7 +62,7 @@ function config=cosmo_config(fn, config)
 
     % set defaults
     defaults.tutorial_data_path=fullfile(cosmo_mvpa_dir,...
-                                        '..','tutorial_data');
+                                        '..','datadb','tutorial_data');
 
     % overwrite defaults by configuration options
     fns=fieldnames(defaults);

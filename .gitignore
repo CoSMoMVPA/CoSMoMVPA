@@ -3,5 +3,7 @@
 *.css
 *.m~
 data
+datadb
+datadb.zip
 .git.bfg-report
 *.md.sw?
