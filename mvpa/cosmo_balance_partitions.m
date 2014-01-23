@@ -16,6 +16,18 @@ function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
 %                     - each field is a (N*nsets)x1 cell 
 %                     - each unique target is represented equally often
 %
+% Example:
+%  % ds is a dataset with chunks and targets
+%  >> partitions=cosmo_nchoosek_partitioner(ds, 1); % take-1-fold-out
+%  >> partitions=cosmo_balance_partitions(partitions);
+%
+% Notes:
+% - this function is intended for datasets where the number of
+%   samples across targets is not equally distributed. A typical 
+%   application is MEEG datasets. 
+% - Using this function means that chance accuracy is equal to the inverse
+%   of the number of unique targets.
+%
 % See also: cosmo_nchoosek_partitioner, cosmo_nfold_partitioner
 %
 % NNO Dec 2013
