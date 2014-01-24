@@ -48,7 +48,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     defaults.targets=[];
     defaults.chunks=[];
     
-    p = cosmo_structjoin(defaults, varargin);
+    p = cosmo_structjoin('!',defaults, varargin);
      
     % special case: if it's already a dataset, just return it
     if isstruct(filename) && isfield(filename,'samples')

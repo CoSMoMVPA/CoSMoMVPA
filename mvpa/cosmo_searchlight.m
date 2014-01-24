@@ -55,7 +55,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     defaults.progress=1/50;
     defaults.parent_type=[]; % for MEEG datasets
     
-    params = cosmo_structjoin(defaults,varargin);
+    params = cosmo_structjoin('!',defaults,varargin);
     radius = params.radius;
     args = params.args;
     center_ids=params.center_ids;
