@@ -1,7 +1,7 @@
-function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
+function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 % Slice a dataset by samples (the default) or features
 %
-% sliced_ds=cosmo_slice(ds, elements_to_select[, dim][do_check])
+% sliced_ds=cosmo_slice(ds, elements_to_select[, dim][check|'struct'])
 %
 % Inputs:
 %   ds                    One of:
@@ -16,9 +16,12 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
 %                         dim-th dimension.
 %   dim                   Slicing dimension: along samples (dim==1) or 
 %                         features (dim==2). (default: 1).
-%   do_check              Boolean that indicates that if ds is a dataset, 
+%   check                 Boolean that indicates that if ds is a dataset, 
 %                         whether it should be checked for proper
 %                         structure. (default: true). 
+%   'struct'              If provided and ds is a struct, then 
+%                         all fields of ds, which are assumed to be cell 
+%                         or arrays,  are sliced.
 %
 % Output: 
 %   sliced_ds             - If ds is a cell or array then sliced_ds is
@@ -32,6 +35,8 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
 %                           ds.samples. 
 %                           If present, fields .sa (if dim==1) or 
 %                           .fa (dim==2) are sliced as well.
+%                         - when ds is a struct and the 'struct' option was
+%                           given, then all fields in ds are sliced.
 %
 % Notes:
 %   - do_check=false may be preferred for slice-intensive operations such
@@ -42,42 +47,38 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
 
     % deal with 2, 3, or 4 input arguments
     if nargin<3 || isempty(dim), dim=1; end
-    if nargin<4 || isempty(do_check_ds), do_check_ds=true; end
+    if nargin<4 || isempty(type_or_check), type_or_check=true; end
     
     
     if iscell(ds) || isnumeric(ds) || islogical(ds)
-        ds=slice_(ds, elements_to_select, dim);
+        ds=slice_(ds, to_select, dim);
     elseif isstruct(ds)
-        
-        if do_check_ds
-            % check kosherness
-            cosmo_check_dataset(ds);
-        end
-
-        % slice the samples
-        ds.samples=slice_(ds.samples,elements_to_select,dim);
-
-        % now deal with either feature or sample attributes
-        attr_fns={'sa','fa'};
-        attr_fn=attr_fns{dim}; % fieldname of attribute to slice
-
-        if isfield(ds, attr_fn)
-            attrs=ds.(attr_fn); % get attribute
-
-            fns=fieldnames(attrs); % fieldnames
-            n=numel(fns);
-            for k=1:n
-                fn=fns{k};
-                v=attrs.(fn);
-
-                if isempty(v)
-                    continue;
-                end
-                
-                % slice cell or array using recursion
-                attrs.(fn)=slice_(v, elements_to_select, dim);
+        if strcmp(type_or_check,'struct')
+            ds=slice_struct(ds, to_select, dim);
+        else
+            if ~isfield(ds,'samples')
+                error(['Expected dataset struct. To slice ordinary '...
+                        'structs use "struct" as last argument']);
             end
-            ds.(attr_fn)=attrs;
+                    
+            if type_or_check
+                % check kosherness
+                cosmo_check_dataset(ds);
+            end
+
+            dim_size=size(ds.samples,dim);
+            
+            % slice the samples
+            ds.samples=slice_(ds.samples,to_select,dim);
+
+            % now deal with either feature or sample attributes
+            attr_fns={'sa','fa'};
+            attr_fn=attr_fns{dim}; % fieldname of attribute to slice
+
+            if isfield(ds, attr_fn)
+                ds.(attr_fn)=slice_struct(ds.(attr_fn),to_select,...
+                                                    dim,dim_size);
+            end
         end
     else
         error('Illegal input: expected cell, array or struct');
@@ -87,6 +88,30 @@ function ds=cosmo_slice(ds, elements_to_select, dim, do_check_ds)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % helper functions
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    function y=slice_struct(x, to_select, dim, expected_size)
+        if nargin<4, expected_size=NaN; end
+        
+        y=struct();
+        fns=fieldnames(x);
+        for k=1:numel(fns)
+            fn=fns{k};
+            v=x.(fn);
+            
+            v_size=size(v,dim);
+            
+            % ensure all input sizes are the same
+            if isnan(expected_size)
+                expected_size=v_size;
+            elseif v_size~=expected_size
+                error(['Size mismatch for %s: expected %d but found %d',...
+                        ' elements in dimension %d'],...
+                                v_size, expected_size, dim);
+            end
+            
+            y.(fn)=slice_(v, to_select, dim);
+        end
+           
     
     function y=slice_(x, to_select, dim)
         check_size(x, to_select, dim);

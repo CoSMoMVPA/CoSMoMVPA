@@ -133,12 +133,24 @@ function test_slice_datasets()
                 w=d.(attr_label).(label);
                 
                 if slice_dim==dim
+                    % assumes slicing array works fine
                     v=cosmo_slice(v, slice_arg, slice_dim);
                 end
                 
                 assertEqual(v,w);
             end    
+            
+            % check slicing of structs
+            if slice_dim==dim
+                v=ds.(attr_label);
+                w=d.(attr_label);
+                assertEqual(cosmo_slice(v,slice_arg,dim,'struct'),w);
+            end
+                
         end
+        
+        
+        
     end
     
     
