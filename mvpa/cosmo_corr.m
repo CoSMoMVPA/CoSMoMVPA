@@ -41,16 +41,22 @@ function c=cosmo_corr(x,y,corr_type)
 %
 % NNO Sep 2013 (from NNO's phoebe_corr, July 2010)
 
-if nargin<2 || isempty(y)
+if nargin<2
+    corr_type='Pearson';
     y=x;
-end
-
-if nargin<3 || isempty(corr_type)
+elseif ischar(y)
+    corr_type=y;
+    y=x;
+elseif nargin<3
     corr_type='Pearson';
 end
+   
+
 
 switch corr_type
     case 'Pearson'
+        % speed-optimized version
+        
         % subtract mean
         xd=bsxfun(@minus,x,mean(x));
         yd=bsxfun(@minus,y,mean(y));
