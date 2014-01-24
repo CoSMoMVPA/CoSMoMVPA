@@ -47,8 +47,7 @@ In addition, the *proficient* user should be familar with:
 - namespaces and closures.
 - profiling.
 - unit testing.
-- ``git``
-- Sphinx and restructured text.
+- ``git``.
 
 
 (We have no idea what an *expert* user should be able to do, because we don't consider ourselves in that category).
