@@ -14,7 +14,7 @@ The latest code is available from GitHub_. As this code is under development, it
 
 - Others can download and extract the `zip archive`_.
 
-To use CoSMoMVPA_ in Matlab_, just add the ``mvpa`` and ``external`` directory (and their subdirectories) to the Matlab path.
+To use CoSMoMVPA_ in Matlab_, add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
 
 Note: when CoSMoMVPA is released officially, there will be permanent links, hosted on the website, containing official, feature-stable, releases.
 
