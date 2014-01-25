@@ -49,12 +49,11 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
     if nargin<3 || isempty(dim), dim=1; end
     if nargin<4 || isempty(type_or_check), type_or_check=true; end
     
-    
     if iscell(ds) || isnumeric(ds) || islogical(ds)
-        ds=slice_(ds, to_select, dim);
+        ds=slice_array(ds, to_select, dim, type_or_check);
     elseif isstruct(ds)
         if strcmp(type_or_check,'struct')
-            ds=slice_struct(ds, to_select, dim);
+            ds=slice_struct(ds, to_select, dim, type_or_check);
         else
             if ~isfield(ds,'samples')
                 error(['Expected dataset struct. To slice ordinary '...
@@ -69,7 +68,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
             dim_size=size(ds.samples,dim);
             
             % slice the samples
-            ds.samples=slice_(ds.samples,to_select,dim);
+            ds.samples=slice_array(ds.samples,to_select,dim,type_or_check);
 
             % now deal with either feature or sample attributes
             attr_fns={'sa','fa'};
@@ -77,7 +76,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 
             if isfield(ds, attr_fn)
                 ds.(attr_fn)=slice_struct(ds.(attr_fn),to_select,...
-                                                    dim,dim_size);
+                                               dim,type_or_check,dim_size);
             end
         end
     else
@@ -89,8 +88,8 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
     % helper functions
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    function y=slice_struct(x, to_select, dim, expected_size)
-        if nargin<4, expected_size=NaN; end
+    function y=slice_struct(x, to_select, dim, do_check, expected_size)
+        if nargin<5, expected_size=NaN; end
         
         y=struct();
         fns=fieldnames(x);
@@ -109,12 +108,14 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
                                 v_size, expected_size, dim);
             end
             
-            y.(fn)=slice_(v, to_select, dim);
+            y.(fn)=slice_array(v, to_select, dim, do_check);
         end
            
     
-    function y=slice_(x, to_select, dim)
-        check_size(x, to_select, dim);
+    function y=slice_array(x, to_select, dim, do_check)
+        if do_check
+            check_size(x, to_select, dim);
+        end
         
         if dim==1
             y=x(to_select,:);
