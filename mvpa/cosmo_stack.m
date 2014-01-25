@@ -1,4 +1,4 @@
-function ds_stacked=cosmo_stack(datasets,dim)
+function ds_stacked=cosmo_stack(datasets,dim,check_)
 % stacks multiple datasets to yield a single dataset
 %
 % ds_stacked=cosmo_stack(datasets[,dim])
@@ -41,6 +41,10 @@ function ds_stacked=cosmo_stack(datasets,dim)
         dim=1;
     end
     
+    if nargin<3
+        check_=true;
+    end
+    
     if ~iscell(datasets)
         error('expected cell input');
     end
@@ -77,7 +81,9 @@ function ds_stacked=cosmo_stack(datasets,dim)
                 ds=datasets{j};
 
                 % check this dataset is kosher
-                cosmo_check_dataset(ds);
+                if check_
+                    cosmo_check_dataset(ds);
+                end
 
                 % check presence of fieldname
                 if ~isfield(ds.(stack_fn),fn)
@@ -90,41 +96,50 @@ function ds_stacked=cosmo_stack(datasets,dim)
         end
     end
     
-    % for the other dim, just make sure that the attributes are identical
-    if isfield(ds_stacked, merge_fn)
-        fns=fieldnames(ds_stacked.(merge_fn));
-        nfn=numel(fns);
+    if check_
 
-        for k=1:nfn
-            % check k-th fieldname
-            fn=fns{k};
-            for j=1:n
-                ds=datasets{j};
-                % require that the fieldname is present
-                if ~isfield(ds.(merge_fn),fn)
-                    error('field name not found for %d-th input: .%s.%s', ...
-                                        j, merge_fn, fn);
+        % for the other dim, just make sure that the attributes are identical
+        if isfield(ds_stacked, merge_fn)
+            fns=fieldnames(ds_stacked.(merge_fn));
+            nfn=numel(fns);
+
+            for k=1:nfn
+                % check k-th fieldname
+                fn=fns{k};
+                for j=1:n
+                    ds=datasets{j};
+                    % require that the fieldname is present
+                    if ~isfield(ds.(merge_fn),fn)
+                        error('field name not found for %d-th input: .%s.%s', ...
+                                            j, merge_fn, fn);
+                    end
+                    % if different throw an error
+                    if ~isequal(ds.(merge_fn).(fn), ds_stacked.(merge_fn).(fn))
+                        error('value mismatch: .%s.%s', merge_fn, fn);
+                    end 
                 end
-                % if different throw an error
-                if ~isequal(ds.(merge_fn).(fn), ds_stacked.(merge_fn).(fn))
-                    error('value mismatch: .%s.%s', merge_fn, fn);
-                end 
             end
         end
     end
     
-    % we're good for the attributes - let's stack the sample data
-    vs=cell(n,1);
+        
+        
     
+    % we're good for the attributes - let's stack the sample data
+    vs=cell(1,n);
+    other_dim_sizes=zeros(1,n);
     for k=1:n
         samples=datasets{k}.samples;
-        if k==1
-            size_first = size(samples,other_dim); % store size of first dataset
-        elseif size(samples,other_dim)~=size_first
-            error('sample size mismatch: %d x %d ~= %d x %d',...
-                        size(samples), size_first)
-        end
-        vs{k}=datasets{k}.samples;
+        vs{k}=samples;
+        other_dim_sizes=size(samples,other_dim);
     end
+    
+    if ~all(other_dim_sizes==other_dim_sizes(1))
+        i=find(ther_dim_sizes~=other_dim_sizes(1));
+        error(['size mismatch between elements #%d (%d) and %%d (%d) ' ...
+                    'in dimension %d'], ...
+                    1, dim_sizes(1), i, dim_sizes(i), otherdim);
+    end
+    
     ds_stacked.samples=cat(dim,vs{:});
     
