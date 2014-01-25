@@ -32,7 +32,14 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 % set default dim
 if nargin<3 || isempty(dim), dim=1; end
 
-cosmo_check_dataset(ds);
+is_ds=isstruct(ds) && isfield(ds, 'samples');
+if is_ds
+    size_dim=size(ds.samples,dim);
+elseif isnumeric(ds) || islogical(ds)
+    size_dim=size(ds,dim);
+else
+    error('illegal input: expected struct or array');
+end
 
 if iscell(split_by)
     ndim=numel(split_by);
@@ -68,18 +75,26 @@ end
 
 if all(dim~=[1 2]), error('dim should be 1 or 2'); end
 
-attrs_fns={'sa','fa'};
-attrs_fn=attrs_fns{dim};
+if is_ds
+    attrs_fns={'sa','fa'};
+    attrs_fn=attrs_fns{dim};
 
-% ensure the field is there
-if ~isfield(ds, attrs_fn) || ~isfield(ds.(attrs_fn), split_by)
-    error('missing field .%s.%s', attrs_fn, split_by); 
+    % ensure the field is there
+    if ~isfield(ds, attrs_fn) || ~isfield(ds.(attrs_fn), split_by)
+        error('missing field .%s.%s', attrs_fn, split_by); 
+    end
+    
+    selector_str=sprintf('field %s.%s', attrs_fn, split_by);
+
+    values=ds.(attrs_fn).(split_by);
+else
+    values=split_by;
+    selector_str='split_by';
 end
-
-% attribute values
-values=ds.(attrs_fn).(split_by);
-if ~isnumeric(values) || size(values,3-dim)~=1
-    error('field .%s.%s must be numeric vector', attrs_fn, split_by);
+    
+if sum(size(values)>1)>1 || numel(values)~=size_dim
+    error('%s must be vector with length %d', ...
+                selector_str,size_dim);
 end
 
 if numel(values)==1
@@ -91,11 +106,6 @@ else
 
     ds_splits=cell(1,nsplits);
     for k=1:nsplits
-        ds_splits{k}=cosmo_slice(ds, values==split_values(k), dim);
+        ds_splits{k}=cosmo_slice(ds, values==split_values(k), dim, false);
     end
 end
-
-
-
-
-
