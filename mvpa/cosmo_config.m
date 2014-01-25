@@ -29,8 +29,8 @@ function config=cosmo_config(fn, config)
 %
 %  - an example configuration file (of two lines):
 %
-%    # path for runnable examples
-%    tutorial_data_path=/Users/nick/organized/_datasets/CoSMoMVPA
+% # path for runnable examples
+% tutorial_data_path=/Users/nick/organized/_datasets/CoSMoMVPA/tutorial_data
 %  
 %  - If a configuration file with the name '.cosmomvpa.cfg' is stored 
 %    in a directory that is in the matlab path or (on Unix platforms) the 
@@ -82,7 +82,7 @@ function validate_config(config)
     % poor-man version of OO
     path_exists=struct();
     path_exists.test=@(p) exist(p,'file');
-    path_exists.msg=@(p) sprintf('Path "%s" does not exist',p);
+    path_exists.msg=@(key, p) sprintf('%s: path "%s" not found. ',key,p);
     
     checks.tutorial_data_path=path_exists;
     checks.tmp_path=path_exists;
@@ -99,7 +99,7 @@ function validate_config(config)
             value=config.(fn);
             if ~test_func(value)
                 msg_func=checks.(fn).msg;
-                error('%s\n%s',msg_func(value),add_msg);
+                error('%s\n%s',msg_func(fn, value),add_msg);
             end
         end
     end
