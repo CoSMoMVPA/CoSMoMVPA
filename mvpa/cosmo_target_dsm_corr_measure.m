@@ -1,4 +1,4 @@
-function ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
+function ds_sa = cosmo_target_dsm_corr_measure(dataset, varargin)
 %   ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %
 %   A **dataset measure** that computes the correlation between a target
@@ -13,6 +13,8 @@ function ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %                               triangle, must be same size as dsm for dataset
 %           args.type:  [Optional] Type of correlation can be any 'type' that matlab's
 %                       corr function can take. Default: 'pearson'
+%           args.metric Optional type of distance metric used in pdist.
+%                       Default: 'correlation'
 %
 %   Returns
 %    ds_sa           Struct with fields:
@@ -23,23 +25,31 @@ function ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %   
 % ACC August 2013
     
-
-    if nargin<2 error('Must supply args.'); end        
-    if ~isfield(args,'target_dsm') error('Must supply args.target_dsm.'); end
-    if ~isfield(args,'return_p') args.return_p = false; end
+    % process input arguments
+    params=cosmo_structjoin('type','Pearson',... % set default
+                            'metric','correlation',...
+                            varargin);
     
     % - compute the pair-wise distance between all dataset samples using
-    %   pdist
-    % - convert args.target_dsm using
-    % - compute correlation between distances and converted target_dsm
-% >@@>    
-    pd = pdist(dataset.samples);
+    %   pdist and store in 'pd'
+    % >@@>    
+    pd = pdist(dataset.samples, params.metric);
+    % <@@<
+    
+    % convert params.target_dsm to squareform and store in 'sf'
+    % >@@> 
+    sf=squareform(params.target_dsm);
+    % <@@<
+    
+    % check size
+    if numel(pd) ~= numel(sf),
+        error('Size mismatch between dataset and target dsm');
+    end
 
-    sf=squareform(args.target_dsm);
-
-    rho=corr(pd(:),sf(:));
-
-% <@@<
+    % >@@> 
+    % compute correlations between 'pd' and 'sf', store in 'rho'
+    rho=cosmo_corr(pd(:),sf(:), params.type);
+    % <@@<
 
     ds_sa=struct();
     ds_sa.samples=rho;

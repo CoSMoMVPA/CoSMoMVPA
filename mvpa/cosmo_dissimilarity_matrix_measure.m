@@ -1,13 +1,13 @@
-function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, args)
-%   dsm = cosmo_dissimilarity_matrix_measure(dataset, args)
-%   A wrapper function for Matlab's pdist function that conform to the
-%   definition of a **dataset measure**
+function ds_sa = cosmo_dsm_measure(dataset, varargin)
+% Compute a dissimilarity matrix measure
 %
-%   Inputs
-%       dataset:    an instance of a cosmo_fmri_dataset
-%       args:       an optional struct: 
-%           args.metric: a **cell array** containing the name of the distance
-%                       metric to be used by pdist (default: 'correlation')
+% ds_sa = cosmo_dsm_measure(dataset, varargin)
+%
+% Inputs:
+%  - dataset:        an instance of a cosmo_fmri_dataset
+%  - args:           an optional struct: 
+%      args.metric:  a string with the name of the distance
+%                    metric to be used by pdist (default: 'correlation')
 %
 %   Returns 
 % Output
@@ -29,10 +29,9 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, args)
 % ACC August 2013
 % NNO updated Sep 2013 to return a struct
     
+    args=cosmo_structjoin('metric',correlation,varargin);
 % >@@>
-    if nargin<2 args.metric='correlation'; end
-    if ~isfield(args,'metric') args.metric = 'correlation'; end
-    dsm = pdist(dataset.samples, args.metric{1})';
+    dsm = pdist(dataset.samples, args.metric)';
 % <@@<
 
     % store in a struct
@@ -41,6 +40,6 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, args)
     
     % as sample attributes store the pairs of sample attribute indicues
     % used to compute the dsm.
-    nsamples=size(dataset.samples,1);
-    [i,j]=find(triu(repmat(1:nsamples,nsamples,1)));
+    nclasses=size(dsm,1);
+    [i,j]=find(triu(repmat(1:nclasses,nclasses,1)));
     ds_sa.sa.dsm_pairs=[i j];
