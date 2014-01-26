@@ -34,9 +34,17 @@ function [pred, accuracy] = cosmo_cross_validate(ds, classifier, partitions, opt
     
     [nsamples,nfeatures]=size(ds.samples);
     
-    all_pred=zeros(nsamples,npartitions); % space for output (one column per partition)
-    test_mask=false(nsamples,1); % indicates for which samples there has been a prediction
+    % space for output (one column per partition)
+    % the k-th column contains predictions for the k-th partition
+    % (with values of zeros if there was no prediction)
+    all_pred=zeros(nsamples,npartitions); 
+    
+    % keep track for which samples there has been a prediction
+    test_mask=false(nsamples,1); 
     for k=1:npartitions
+        % for each partition get the training and test data,
+        % then get predictions for the training samples using
+        % the classifer, and store these in the k-th column of all_pred.
         % >@@>
         train_data = ds.samples(train_indices{k},:);
         test_data = ds.samples(test_indices{k},:);
@@ -50,7 +58,13 @@ function [pred, accuracy] = cosmo_cross_validate(ds, classifier, partitions, opt
         % <@@<
     end
     
+    % combine predictions for multiple partitions
+    % - in the case of nfold-crossvalidation there is just one prediction
+    %   for each sample, but with other cross validation schemes such as
+    %   from nchoosek_partitioner(ds, 2) there can be more than one.
     [pred,classes]=cosmo_winner_indices(all_pred);
+    
+    % compute accuracies
     correct_mask=ds.sa.targets(test_mask)==classes(pred(pred>0));
     ncorrect = sum(correct_mask);
     ntotal = numel(correct_mask);
