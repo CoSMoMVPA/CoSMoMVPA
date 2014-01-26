@@ -1,4 +1,4 @@
-function confusion_matrix=cosmo_confusion_matrix(targets, predicted)
+function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
 % Returns a confusion matrix
 %
 % mx=cosmo_confusion_matrix(targets, predicted)
@@ -11,6 +11,7 @@ function confusion_matrix=cosmo_confusion_matrix(targets, predicted)
 %   mx          PxP matrix assuming there are P unique targets.
 %               mx(i,j)==c means that the i-th target class was classified
 %               as the j-th target class c times.
+%   classes     Px1 class labels.
 % 
 % NNO Aug 2013
     
