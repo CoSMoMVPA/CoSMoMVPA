@@ -62,6 +62,7 @@ params=cosmo_structjoin(defaults, args);
 
 partitions=params.partitions;
 template=params.template;
+post_corr_func=params.post_corr_func;
 
 if isempty(partitions)
     partitions=cosmo_nchoosek_partitioner(ds,'half');
@@ -99,7 +100,7 @@ for k=1:npartitions
     
     c=cosmo_corr(target_data{1}', target_data{2}', params.corr_type);
     if ~isempty(post_corr_func)
-        c=params.post_corr_func(c);
+        c=post_corr_func(c);
     end
     
     switch params.output
