@@ -77,4 +77,4 @@ Unless you know exactly what you are doing, in fMRI land we would recommend to e
 **Is there a mailinglist?**
     There is the `CoSMoMVPA Google group`_.
 
-.. include:: links.rst
+.. include:: links.txt

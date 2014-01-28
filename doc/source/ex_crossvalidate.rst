@@ -1,4 +1,4 @@
-.. ex_cross_validate
+.. ex_crossvalidate
 
 Cross-validation part 2: using multiple classifiers
 ===================================================

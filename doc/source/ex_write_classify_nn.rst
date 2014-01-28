@@ -10,7 +10,7 @@ samples based on which is nearest (where 'nearest', for now, is defined based on
 
 Your function should have the following signature:
 
-.. include:: matlab/cosmo_classify_nn_sgn.txt
+.. include:: matlab/cosmo_classify_nn_skl.txt
 
 Hint: :ref:`cosmo_classify_nn_skl`
 

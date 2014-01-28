@@ -29,6 +29,8 @@ CoSMoMVPA
    contribute
    thanks
 
+.. image:: _static/icon_demos.png
+   :target: contents_demo.html
 .. image:: _static/icon_get_started.png
    :target: get_started.html
 .. image:: _static/icon_download.png
@@ -45,6 +47,13 @@ CoSMoMVPA
    :target: contribute.html
 .. image:: _static/icon_thanks.png
    :target: thanks.html
+
+
+Examples
+========
+
+.. include:: matlab/demo_fmri_rois.txt
+
 
 Indices and tables
 ==================

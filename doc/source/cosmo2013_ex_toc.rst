@@ -15,8 +15,8 @@ Contents:
     ex_write_classify_nn
     ex_classify_svm
     ex_nfold_partitioner
-    ex_cross_validate
-    ex_cross_validate_measure
+    ex_crossvalidate
+    ex_crossvalidation_measure
     ex_rsa_tutorial
     ex_sphere_offsets
     ex_searchlight

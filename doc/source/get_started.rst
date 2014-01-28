@@ -23,11 +23,13 @@ Using CoSMoMVPA_ effectively requires:
 
 - a working installation of Matlab_.
 - the CoSMoMVPA Matlab source code:
+
     + ``git`` users:: 
 
         git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
 
     + alternatively, download the `zip archive`_.
+
   In Matlab_, add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
 - optionally the tutorial data, available :ref:`here <download>` (to run the :ref:`exercises <ex_toc>`).
 - optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support; see :ref:`here <download>`.
@@ -47,7 +49,7 @@ Once you are ready:
 - explore the :ref:`CoSMoMVPA functions <modindex>`.
 
 
-.. include:: links.rst
+.. include:: links.txt
 
 .. _Matlab outputs: _static/publish/index.html
 

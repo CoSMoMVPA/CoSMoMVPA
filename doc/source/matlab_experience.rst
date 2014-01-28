@@ -52,4 +52,4 @@ In addition, the *proficient* user should be familar with:
 
 (We have no idea what an *expert* user should be able to do, because we don't consider ourselves in that category).
 
-.. include: links.rst
+.. include: links.txt

@@ -349,7 +349,7 @@ The following are guidelines, intended to improve:
 
     **good:**
 
-    .. include:: matlab/cosmo_winner_indices_sgn.txt
+    .. include:: matlab/cosmo_winner_indices_skl.txt
 
 - Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.
@@ -610,5 +610,5 @@ Unit tests
 ^^^^^^^^^^
 Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects. They are located in ``tests/`` and use the xUnit_ framework. For existing or new features, more tests are very much welcomed.
 
-.. include:: links.rst
+.. include:: links.txt
 

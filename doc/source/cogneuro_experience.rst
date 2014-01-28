@@ -15,5 +15,5 @@ We argue that an *fMRI* users should be at least at the *advanced beginner level
 
 There is currently no support for *MEEG*, although we hope to add it in the future.
 
-.. include:: links.rst
+.. include:: links.txt
 

@@ -12,7 +12,7 @@ training and another for testing. Below is a an incomplete function that compute
 partitions for a given set of chunks sample attributes.  Your task is to
 complete the function by writing the missing for-loop.
 
-.. include:: matlab/cosmo_nfold_partitioner_sgn.txt
+.. include:: matlab/cosmo_nfold_partitioner_hdr.txt
 
 Hint: :ref:`cosmo_nfold_partitioner_skl`
 

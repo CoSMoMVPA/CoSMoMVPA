@@ -18,7 +18,7 @@ involved defining the sets of *neighborhood voxels*. For this, use
 With the help of these functions, write a generic searchlight function that
 satisfies the following definition:
 
-.. include:: matlab/cosmo_searchlight_sgn.txt
+.. include:: matlab/cosmo_searchlight_skl.txt
 
 Hint: :ref:`cosmo_searchlight_skl`
 

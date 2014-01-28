@@ -72,7 +72,7 @@ Slice by samples
 ++++++++++++++++
 Write a function with the following signature.
 
-.. include:: matlab/cosmo_dataset_slice_sa_sgn.txt
+.. include:: matlab/cosmo_dataset_slice_sa_skl.txt
 
 Hint: :ref:`cosmo_dataset_slice_sa_skl`
 
@@ -82,7 +82,7 @@ Slice by features
 +++++++++++++++++
 Write another function with the signature.
 
-.. include::  matlab/cosmo_dataset_slice_fa_sgn.txt
+.. include::  matlab/cosmo_dataset_slice_fa_skl.txt
 
 Hint: :ref:`cosmo_dataset_slice_fa_skl`
 

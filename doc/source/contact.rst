@@ -24,4 +24,4 @@ Contributions
 
 There are more details on how to :ref:`contribute <contribute>`.
 
-.. include:: links.rst
+.. include:: links.txt

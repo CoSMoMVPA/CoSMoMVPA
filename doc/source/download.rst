@@ -47,4 +47,4 @@ Our current build system only supports `Unix-like`_ systems, and dependencies in
 
 Unit tests require the xUnit_ toolbox.
 
-.. include:: links.rst
+.. include:: links.txt
