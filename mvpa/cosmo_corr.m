@@ -56,10 +56,12 @@ end
 switch corr_type
     case 'Pearson'
         % speed-optimized version
+        nx=size(x,1);
+        ny=size(y,1);
         
         % subtract mean
-        xd=bsxfun(@minus,x,mean(x));
-        yd=bsxfun(@minus,y,mean(y));
+        xd=bsxfun(@minus,x,sum(x,1)/nx);
+        yd=bsxfun(@minus,y,sum(y,1)/ny);
 
         % normalization
         n=1/(size(x,1)-1);
