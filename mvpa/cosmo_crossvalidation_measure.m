@@ -34,14 +34,14 @@ params=cosmo_structjoin('output','accuracy',... % default output
                         varargin); % use input arguments
 
 % Run cross validation to get the accuracy (see the help of
-% cosmo_cross_validate)
+% cosmo_crossvalidate)
 % >@@>
 classifier=params.classifier;
 partitions=params.partitions;
 
 params=rmfield(params,'classifier');
 params=rmfield(params,'partitions');
-[pred, accuracy]=cosmo_cross_validate(dataset, classifier, partitions, params);
+[pred, accuracy]=cosmo_crossvalidate(dataset, classifier, partitions, params);
 % <@@<
 
 ds_sa=struct();

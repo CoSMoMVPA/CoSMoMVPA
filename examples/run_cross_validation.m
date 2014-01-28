@@ -29,7 +29,7 @@ partitions=cosmo_nfold_partitioner(ds);
 for k=1:nclassifiers
     classifier=classifiers{k};
     % >@@>
-    [pred,accuracy]=cosmo_cross_validate(ds, classifier, partitions);
+    [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
     
     confusion_matrix=cosmo_confusion_matrix(ds, pred);
     % <@@<

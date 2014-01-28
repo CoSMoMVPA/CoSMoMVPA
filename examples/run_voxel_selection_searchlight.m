@@ -40,7 +40,7 @@ accs=zeros(1,ncenters);
 
 %% Run the searchlight
 % go over all features: in each iteration, slice the dataset to get the 
-% desired features using center2neighbors, then use cosmo_cross_validate
+% desired features using center2neighbors, then use cosmo_crossvalidate
 % to get classification accuracies (it's its second output argument),
 % and store the classiifcation accuracies.
 for k=1:ncenters
@@ -51,7 +51,7 @@ for k=1:ncenters
     sphere_ds=cosmo_slice(ds, sphere_feature_ids, 2);
     
     % run cross validation
-    [pred_cv,acc]=cosmo_cross_validate(sphere_ds, classifier, partitions, classifier_opt);
+    [pred_cv,acc]=cosmo_crossvalidate(sphere_ds, classifier, partitions, classifier_opt);
     
     % for now, just store the accuracy (not the predictions)
     accs(center_id)=acc;

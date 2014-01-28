@@ -25,7 +25,7 @@ classifier=@cosmo_classify_nn;
 partitions=cosmo_oddeven_partitioner(ds);
 
 %% compute classification accuracy of the original data
-[pred, acc]=cosmo_cross_validate(ds, classifier, partitions);
+[pred, acc]=cosmo_crossvalidate(ds, classifier, partitions);
 
 %% prepare for permutations
 acc0=zeros(niter,1); % allocate space for permuted accuracies 
@@ -36,7 +36,7 @@ ds0=ds; % make a copy of the dataset
 % >@@>
 for k=1:niter
     ds0.sa.targets=cosmo_randomize_targets(ds);
-    [foo, acc0(k)]=cosmo_cross_validate(ds0, classifier, partitions);
+    [foo, acc0(k)]=cosmo_crossvalidate(ds0, classifier, partitions);
 end
 % <@@<
 
