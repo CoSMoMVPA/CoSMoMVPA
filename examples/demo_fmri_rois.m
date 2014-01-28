@@ -1,0 +1,155 @@
+%% Demo: fMRI Region-Of-Interest (ROI) analyses
+%
+% The data used here is available from http://cosmomvpa.org/datadb.zip
+%
+% It is based on the following work:
+%  Connolly et al (2012), Representation of biological classes in the human
+%  brain. Journal of Neuroscience, doi 10.1523/JNEUROSCI.5547-11.2012
+%
+% Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth) 
+% during ten runs in an fMRI study. Using the General Linear Model response
+% were estimated for each category in each run, resulting in 6*10=60
+% t-values. 
+
+
+%% Set data paths
+% The function cosmo_config() returns a struct containing paths to tutorial
+% data. (Alternatively the paths can be set manually without using
+% cosmo_config.)
+config=cosmo_config();
+study_path=fullfile(config.tutorial_data_path,'ak6');
+output_path=config.output_data_path;
+     
+
+%% Example 1: split-half correlation measure (Haxby 2001-style)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subject_id='s01';
+mask_label='ev_mask';
+data_path=fullfile(study_path,subject_id); % data from subject s01
+
+% Define data locations and load data from even and odd runs
+mask_fn=fullfile(data_path, [mask_label '.nii']); % whole brain
+
+data_odd_fn=fullfile(data_path,'glm_T_stats_odd.nii');
+ds_odd=cosmo_fmri_dataset(data_odd_fn,'mask',mask_fn,...
+                            'targets',1:6,'chunks',1);
+
+
+data_even_fn=fullfile(data_path,'glm_T_stats_even.nii');
+ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
+                            'targets',1:6,'chunks',2);
+
+% Combine even and odd runs 
+ds_odd_even=cosmo_stack({ds_odd, ds_even});
+
+ds_corr=cosmo_correlation_measure(ds_odd_even);
+
+fprintf(['Average correlation difference between matching and '...
+            'non-matching categories in %s for %s is %.3f\n'],...
+            mask_label, subject_id, ds_corr.samples);
+        
+
+%% Example 1: split-half correlation measure with group analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+            
+subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};
+nsubjects=numel(subject_ids);
+
+mask_label='vt_mask';
+
+ds_corrs=cell(nsubjects,1); % allocate space for output
+for subject_num=1:nsubjects
+    subject_id=subject_ids{subject_num};
+
+    % Code from here is pretty much identical to that above >>>
+    
+    % set path for this subject
+    data_path=fullfile(study_path,subject_id); 
+
+    % Define data locations and load data from even and odd runs
+    mask_fn=fullfile(data_path, [mask_label '.nii']); % whole brain
+
+    data_odd_fn=fullfile(data_path,'glm_T_stats_odd.nii');
+    ds_odd=cosmo_fmri_dataset(data_odd_fn,'mask',mask_fn,...
+                                'targets',1:6,'chunks',1);
+
+
+    data_even_fn=fullfile(data_path,'glm_T_stats_even.nii');
+    ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
+                                'targets',1:6,'chunks',2);
+
+    % Combine even and odd runs 
+    ds_odd_even=cosmo_stack({ds_odd, ds_even});
+
+    ds_corr=cosmo_correlation_measure(ds_odd_even);
+    
+    % <<< identical up to here
+    
+    ds_corrs{subject_num}=ds_corr;
+end
+
+% combine the data from all subjects
+ds_all=cosmo_stack(ds_corrs);
+
+samples=ds_all.samples; % get the correlation differences
+
+% run one-sample t-test again zero
+[h,p,ci,stats]=ttest(samples);
+fprintf(['Correlation difference in %s at group level: '...
+            '%.3f +/- %.3f, t_%d=%.3f, p=%.5f\n'],...
+            mask_label,mean(samples),std(samples),stats.df,stats.tstat,p);
+
+
+
+%% Define data
+config=cosmo_config();
+data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
+
+% Define classifiers and mask labels
+classifiers={@cosmo_classify_nn,...
+             @cosmo_classify_naive_bayes,...
+             @cosmo_classify_svm,...
+             @cosmo_classify_lda};
+         
+mask_labels={'vt_mask','ev_mask'};
+
+% 
+nclassifiers=numel(classifiers);
+nmasks=numel(mask_labels);
+
+labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
+% Define partitions
+
+% little helper function to replace underscores by space
+underscore2space=@(x) strrep(x,'_',' ');
+
+for j=1:nmasks
+    mask_label=mask_labels{j};
+    mask_fn=fullfile(data_path,[mask_label '.nii']);
+    ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
+                        'targets',repmat(1:6,1,10),...
+                        'chunks',floor(((1:60)-1)/6)+1);
+
+    partitions=cosmo_nfold_partitioner(ds);
+
+
+    for k=1:nclassifiers
+        classifier=classifiers{k};
+        [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
+
+        confusion_matrix=cosmo_confusion_matrix(ds, pred);
+        figure
+        imagesc(confusion_matrix,[0 10])
+        cfy_label=underscore2space(func2str(classifier));
+        title_=sprintf('%s using %s: accuracy=%.3f', ...
+                        underscore2space(mask_label), cfy_label, accuracy);
+        title(title_)
+        set(gca,'XTickLabel',labels);
+        set(gca,'YTickLabel',labels);
+        ylabel('target');
+        xlabel('predicted');
+    end
+end
+
+
