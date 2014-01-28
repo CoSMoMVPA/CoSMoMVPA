@@ -54,7 +54,8 @@ for m=1:numel(fns)
     fn=fns{m};
     pos=0;
         
-    par=partitions.(fn);
+    par=partitions.(fn); % train_indices or test_indices
+    
     
     % allocate space for output
     bal_par=cell(nsets*npar,1);
