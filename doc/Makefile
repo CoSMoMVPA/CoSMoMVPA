@@ -40,8 +40,9 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
-	-rm -f source/run_*.rst
-	-rm -f source/cosmo_*.rst
+	-rm -f source/matlab/run_*.rst
+	-rm -f source/matlab/cosmo_*.rst
+	-rm -f source/matlab/demo_*.rst
 	-rm -f source/*modindex*.rst
 	-rm -rf source/matlab
 
