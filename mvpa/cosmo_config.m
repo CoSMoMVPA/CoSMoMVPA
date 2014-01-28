@@ -81,12 +81,11 @@ function validate_config(config)
     
     % poor-man version of OO
     path_exists=struct();
+    path_exists.match=@(x)isempty(cosmo_strsplit(x,'_path',-1));
     path_exists.test=@(p) exist(p,'file');
     path_exists.msg=@(key, p) sprintf('%s: path "%s" not found. ',key,p);
     
-    checks.tutorial_data_path=path_exists;
-    checks.tmp_path=path_exists;
-    
+    checks={path_exists};
     add_msg=sprintf('To set the configuration, run: help %s', mfilename());
 
     % perform checks on fieldnames present in 'checks'.
@@ -94,12 +93,16 @@ function validate_config(config)
     fns=fieldnames(config);
     for k=1:numel(fns)
         fn=fns{k};
-        if isfield(checks,fn)
-            test_func=checks.(fn).test;
-            value=config.(fn);
-            if ~test_func(value)
-                msg_func=checks.(fn).msg;
-                error('%s\n%s',msg_func(fn, value),add_msg);
+        for j=1:numel(checks)
+            check=checks{j};
+            if check.match(fn)
+                test_func=check.test;
+                value=config.(fn);
+                
+                if ~test_func(value)
+                    msg_func=check.msg;
+                    error('%s\n%s',msg_func(fn, value),add_msg);
+                end
             end
         end
     end
