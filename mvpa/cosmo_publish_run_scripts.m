@@ -36,7 +36,7 @@ function cosmo_publish_build_html(force)
         error('Not implemented: temporary directory on non-unix platforms');
     end
     
-    srcpat='run_*';
+    srcpat='*_*';
     srcext='.m';
     trgext='.html';
     
