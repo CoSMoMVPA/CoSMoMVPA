@@ -60,7 +60,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
     use_fixed_radius=radius>0;
     if ~use_fixed_radius
         fixed_voxel_count=-radius;
-        if fixel_voxel_count>nfeatures
+        if fixed_voxel_count>nfeatures
             error('Cannot select %d voxels: dataset has % features',...
                     fixed_voxel_count, nfeatures);
         end
@@ -136,6 +136,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
                 % offsets, then try again in the next iteration.
                 radius=radius+.5;   
                 [sphere_offsets, o_distances]=cosmo_sphere_offsets(radius);
+                continue
             end
             
             % coming here, the radius is variable and enough features
@@ -152,7 +153,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
             % keep all voxels with exactly the same distance
             % (and those of smaller distances as well)
             last_index=fixed_voxel_count-1+find(...
-                    variable_radius==distances(fixed_voxel_count:end),1);
+                    variable_radius==distances(fixed_voxel_count:end),1,'last');
             around_feature_ids=around_feature_ids(1:last_index,:);
             break; % we're done
         end
