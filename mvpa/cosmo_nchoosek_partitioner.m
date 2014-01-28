@@ -96,7 +96,6 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
     % if the first input is a dataset, get the chunks from it
     is_ds=isstruct(chunks_or_ds);
     if is_ds
-        cosmo_check_dataset(chunks_or_ds);
         if isfield(chunks_or_ds,'sa') && isfield(chunks_or_ds.sa,'chunks')
             % it is a dataset
             ds=chunks_or_ds;
@@ -266,7 +265,7 @@ if is_symmetric && mod(nclasses,2)==0
     % each row, when sorted, should be 1:nchunks
     %matches=bsxfun(@eq,sort(check_combis,2),1:nclasses);
     %if ~all(matches(:))
-        error('Unexpected result from nchoosek');
+    %    error('Unexpected result from nchoosek');
     %end
     
     % we're good - just take the first half and update npartitions
