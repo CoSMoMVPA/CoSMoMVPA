@@ -1,4 +1,4 @@
-function ds_sa=cosmo_correlation_measure(ds, args)
+function ds_sa=cosmo_correlation_measure(ds, varargin)
 % Computes a split-half correlation measure
 %
 % d=cosmo_splithalf_correlation_measure(ds[, args])
@@ -53,15 +53,16 @@ function ds_sa=cosmo_correlation_measure(ds, args)
 defaults=struct();
 defaults.partitions=[];
 defaults.template=[];
-defaults.merge_func=@(x)mean(x);
+defaults.merge_func=@mean_sample;
 defaults.corr_type='Pearson';
 defaults.post_corr_func=@atanh;
 defaults.output='mean';
 
-params=cosmo_structjoin(defaults, args);
+params=cosmo_structjoin(defaults, varargin);
 
 partitions=params.partitions;
 template=params.template;
+merge_func=params.merge_func;
 post_corr_func=params.post_corr_func;
 
 if isempty(partitions)
@@ -86,16 +87,22 @@ for k=1:npartitions
         idxs=halves{h}{k};
         data_sel=cosmo_slice(ds.samples,idxs,1,false);
         
-        resj=cell(1,nclasses);
-        for j=1:nclasses
-            msk=targets(idxs)==classes(j);
-            if ~any(msk)
-                error('missing target class %d', classes(j));
+        if isequal(targets(idxs),(1:numel(idxs))')
+            % optimization 
+            target_data{h}=data_sel;
+        else
+            res=cell(1,nclasses);
+            for j=1:nclasses
+                msk=targets(idxs)==classes(j);
+                if ~any(msk)
+                    error('missing target class %d', classes(j));
+                end
+                
+                res{j}=merge_func(data_sel(msk,:));
             end
-            resj{j}=params.merge_func(data_sel(msk,:));
+
+            target_data{h}=cat(1,res{:});
         end
-        
-        target_data{h}=cat(1,resj{:});
     end
     
     c=cosmo_corr(target_data{1}', target_data{2}', params.corr_type);
@@ -128,5 +135,12 @@ switch params.output
 end
         
 ds_sa.sa=sa;
+
+
+function samples=mean_sample(samples)
+
+if size(samples,1)>1
+    samples=mean(samples,1);
+end
 
         
