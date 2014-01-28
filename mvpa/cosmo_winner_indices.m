@@ -31,9 +31,9 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %   calling this function with identical input yields identical output,
 %   but unbiased with respect to which class is the 'winner' sample-wise.
 % - A typical use case is combining results from multiple predictions,
-%   such as in cosmo_classify_svm and cosmo_cross_validate.
+%   such as in cosmo_classify_svm and cosmo_crossvalidate.
 %
-% See also: cosmo_classify_svm, cosmo_cross_validate.
+% See also: cosmo_classify_svm, cosmo_crossvalidate.
 %
 % NNO Aug 2013
     
