@@ -49,11 +49,6 @@ CoSMoMVPA
    :target: thanks.html
 
 
-Examples
-========
-
-.. include:: matlab/demo_fmri_rois.txt
-
 
 Indices and tables
 ==================

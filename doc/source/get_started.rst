@@ -33,10 +33,12 @@ Using CoSMoMVPA_ effectively requires:
   In Matlab_, add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
 - optionally the tutorial data, available :ref:`here <download>` (to run the :ref:`exercises <ex_toc>`).
 - optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support; see :ref:`here <download>`.
-- an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming is recommended.
-- an :ref:`advanced beginner level <cogneuro_experience>` of fMRI or MEEG data analysis is recommended.
+- an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming.
+- an :ref:`advanced beginner level <cogneuro_experience>` of fMRI or MEEG data analysis.
 - a basic understanding of :ref:`MVPA concepts <mvpa_concepts>`.
 - familiarity with :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`, in particular the :ref:`cosmomvpa_dataset`, :ref:`cosmomvpa_classifier` and :ref:`cosmomvpa_measure` concepts.
+
+Have a look at the :ref:`contents_demo.rst` to see how MVPA can be performed using CoSMoMVPA_.
 
 ^^^^^^^^^^
 Next steps

@@ -40,7 +40,7 @@ Organization of files and directories
 +++++++++++++++++++++++++++++++++++++
 
 - Core ``CoSMoMVPA`` Matlab functions are in ``mvpa/``. File names should match the pattern ``cosmo_*.m``.
-- Runnable Matlab example scripts are in ``examples/``. File names should match the pattern ``run_*.m``.
+- Runnable Matlab example scripts are in ``examples/``. File names should match the pattern ``run_*.m`` or ``demo_*.m``.
 - Unit tests are in ``tests/``. File names should match the pattern ``test_*.m`` for unit tests, and any other prefix for helper functionality.
 - External libraries are in ``external/${library}/``.
 - Documentation is in ``doc/source/``:
@@ -69,10 +69,10 @@ Contributing using git
 ++++++++++++++++++++++
 
 The git_ distributed version control system is used for code development. It has several advantages over just downloading the `zip archive`_:
-    + a distributed workflow: multiple people can work on the code simultenousely, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easly.
-    + keeping track of each individual's contribution. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but then tagging: every change is annotated (see below). This allows one to see what was changed when, and undo unwanted changes back, if necessary.
-    + data sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
-    + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. Once these are considered ready for the master repository, they can be merged easily.
+    + a distributed workflow: multiple people can work on the code simultaneously, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easly.
+    + keeping track of individual contributions. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but then tagging: every change is annotated (see below). This allows one to see what was changed when, and undo unwanted changes back, if necessary.
+    + code sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
+    + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. This is very useful for new experimental features or bug-fixing without affecting the *prestine* master code. Once changes are considered ready for the master repository, they can be merged easily.
 
 To get started with git:
     + set up a working installation of git_ (see `installing git`_).
@@ -80,12 +80,15 @@ To get started with git:
     + on the github_ project page, `fork the repository`_, and follow the instructions there. 
     + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``.
     + change to the directory: ``cd CoSMoMVPA``.
-    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``.- to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``.s
-    + to add a new feature or provide a bugfix, start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``. 
-    + make the desired changes, then commit them. `See below for details`.
-    + push these changes to github: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``.
-    + on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. 
-    + if you want to use code from the original master, run ``git checkout master``. 
+    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
+    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``.s
+    + to add a new feature or provide a bugfix:
+        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``. 
+        - make the desired changes, then commit them. `See below for details`.
+        - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``.
+        -  on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
+        - if you want go back to using code from the original master, run ``git checkout master``.
+      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheat; for experimentation please use this feature.
 
 There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. 
 
@@ -144,11 +147,11 @@ The build system is used to generate documentation for the web site (or local us
 
 - Matlab files do not require building.
 - Documentation is built as follows:
-    + all Matlab files are converted to reStructuredText_ format using the Python_ script ``mat2rst.py`` in ``source/``. This script generates three reStructuredText_  versions of all Matlab functions and example scripts:
+    + all Matlab files in ``mvpa/`` and ``examples/`` are converted to reStructuredText_ format using the Python_ script ``matlab2rst.py`` in ``source/``. This script generates three reStructuredText_  versions of all Matlab functions and example scripts:
         - Full contents (no suffix), containing the full source code.
         - Header contents (suffix ``_hdr``), containing only the header (i.e. the first line and every subsequent line until the first line that does not start with ``%`` (note: line continuation, explained below, is currently *not* supported).
         - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >@@>`` and ending line ``% <@@<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.  
-
+    + Both ``.txt`` files (with the raw contents preceded by an ``include`` statement) and ``.rst`` files (with a title and label) are generated; the latter contain ``include`` statements to include the former. 
     + the ``Makefile`` in ``source/``, when used through ``make html``, uses the ``mat2rst.py`` to generate reStructuredText_ Matlab files and then uses Sphinx_ to convert these files to html.
 - The ``build.sh`` script builds the documentation and datasets.
 
@@ -170,7 +173,25 @@ The following are guidelines, intended to improve:
 
 **Note**: None of these guidelines are set in stone. Try to use common sense when considering not to follow them. Indeed, for each guideline there may be a good reason to deviate from it.
 
-- Indentation is 4 spaces, and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end``. should be on a single line.
+- Try to keep line lengths limited to 80 characters. Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
+    **bad:**
+
+    .. code-block:: matlab
+
+        my_output_data=my_awesome_function(first_argument, second_argument, third_argument, fourth_argument, fifth_argument, sixth_argument);
+
+    **good:**
+
+    .. code-block:: matlab
+
+        my_output_data=my_awesome_function(first_argument, second_argument,...
+                                           third_argument, fourth_argument,...
+                                           fifth_argument, sixth_argument);
+
+    (Yes, we break this rule occasionely.)
+
+
+- Indentation is 4 spaces, and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. 
     **bad:**
 
     .. code-block:: matlab
@@ -186,7 +207,29 @@ The following are guidelines, intended to improve:
        function y=plus_two(x)
         y=x+2;
 
+    .. code-block:: matlab
+
+        if my_awesome_function(some_input, more_input)>100, the_array_value(:)=42; else other_array_value(:)=31; end
+
+    **acceptable:**
+
+    .. code-block:: matlab
+    
+        if nargin<2 || isempty(more_input), more_input=42; end
+
+    .. code-block:: matlab
+        
+        if nsamples~=ntrain, error('Size mismatch: %d ~= %d', nsamples, ntrain); end
+
     **good:**
+
+    .. code-block:: matlab    
+
+        if my_awesome_function(some_input, more_input)>100
+            the_array_value(:)=42; 
+        else 
+            other_array_value(:)=31; 
+        end
 
     .. code-block:: matlab
 
@@ -204,47 +247,8 @@ The following are guidelines, intended to improve:
             % this function adds two the input and returns the result.
             y=x+2;
 
-- Try to keep line lengths limited to 80 characters. Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
-    **bad:**
-
-    .. code-block:: matlab
         
-        my_output_data=my_awesome_function(first_argument, second_argument, third_argument, fourth_argument, fifth_argument, sixth_argument);
-
-    **good:**
-
-    .. code-block:: matlab
-
-        my_output_data=my_awesome_function(first_argument, second_argument,...
-                                           third_argument, fourth_argument,...
-                                           fifth_argument, sixth_argument);
-
-    (Yes, we break this rule regularly.)
-
-- Unless for very short statements, ``if-else-end`` and ``while`` blocks should indent code in between ``if-else`` and ``else-end`` and be on seperate lines.
-    **bad:**
-
-    .. code-block:: matlab
-
-        if my_awesome_function(some_input, more_input)>100, the_array_value(:)=42; else other_array_value(:)=31; end
-
-    **acceptable:**
-
-    .. code-block:: matlab
-    
-        if nargin<2 || isempty(more_input), more_input=42; end
-
-    **good:**
-
-    .. code-block:: matlab    
-
-        if my_awesome_function(some_input, more_input)>100
-            the_array_value(:)=42; 
-        else 
-            other_array_value(:)=31; 
-        end
-
-- Use lower-case letters for variable names, with underscores (``_``) to seperate words.
+- Use lower-case letters for variable names, with underscores (``_``) to separate words.
     **bad:**
 
     .. code-block:: matlab    
@@ -272,6 +276,15 @@ The following are guidelines, intended to improve:
     .. code-block:: matlab
         
         error('What do you mean?');
+
+    .. code-block:: matlab
+
+        if ntemplate~=nsamples
+            % this is bad because the friggofrag analysis is invalid.
+            % Telling the user that they provided wrong input could harm their self-esteem 
+            % however, so let's just make up some data that, although completely meaningless,
+            % will ensure that the script does not crash.
+            samples=randn(ntemplate);
 
     **good:**
 
@@ -335,10 +348,10 @@ The following are guidelines, intended to improve:
 
 - When writing function definitions:
     + start with a short sentence (one line) describing its purpose.
-    + describe the signature of the function
+    + describe the signature of the function (input and output arguments)
     + describe the input parameters
     + describe the output parameters
-    + optionally, add examples, notes, and references.
+    + whenever appropriate, add examples, notes, and references.
 
     **bad:**
 
@@ -349,12 +362,12 @@ The following are guidelines, intended to improve:
 
     **good:**
 
-    .. include:: matlab/cosmo_winner_indices_skl.txt
+    .. include:: matlab/cosmo_winner_indices_hdr.txt
 
 - Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.
     + It also indicates what the size of the output is, which can help in understanding what code does.
-    + This guideline is especially important when for large arrays of data are used. 
+    + This guideline is especially important when large arrays of data are used. 
 
     **bad:**
 
@@ -363,7 +376,7 @@ The following are guidelines, intended to improve:
         ndata=size(data,1);
         accs=[]; % start with empty array, then let it grow
         for k=1:ndata;
-            acc=a_func(data(k,:))
+            acc=a_func(data(k,:)) % compute accuracy
             accs=[acss acc];
         end
 
@@ -374,8 +387,8 @@ The following are guidelines, intended to improve:
         ndata=size(data,1);
         accs=zeros(1,ndata); % allocate space for output
         for k=1:ndata
-            acc=a_func(data(k,:))
-            accs=[accs acc];
+            acc=a_func(data(k,:)) % compute accuracy
+            accs(k)=acc;
         end
         
 - When possible use vectorization rather than a ``for`` or ``while`` loop.
@@ -447,6 +460,10 @@ The following are guidelines, intended to improve:
         
         % get the indices of the sample mask
         msxs = find(sm)
+
+    .. code-block:: matlab
+
+        [ns, nf]=size(ds.samples);
   
 
     **good:**
@@ -501,43 +518,13 @@ The following are guidelines, intended to improve:
         disp(['Accuracy for ' label ' is ' num2str(mean_value) ' +/-' ...
                     num2str(std_value)]);
 
-    **acceptable:**
-    
-    .. code-block:: matlab 
-
-        nlabels=numel(labels);
-        joined_labels=[];
-        for k=1:nlabels
-            joined_labels=[joined_labels labels{k}];
-            if k<nlabels
-                joined_labels=[joined_labels ';' ]; % dont add ';' after last label
-            end
-        end
-
     **good:**
 
     .. code-block:: matlab 
 
         fprintf('Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
 
-    .. code-block:: matlab 
-
-        nlabels=numel(labels);
-        labels_with_sep=cell(1,nlabels*2-1);
-        for k=1:n
-            labels_with_sep{k*2-1}=labels{k};
-            if k<n
-                labels_with_sep{k*2}=';';
-            end
-        end
-        joined_labels=[labels_with_spec{:}]
-
-    or:
-
-    .. code-block:: matlab 
-        
-        joined_labels=cosmo_strjoin(labels,';');
-    
+   
     *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons an alternative implementation is provided as ``cosmo_strjoin``.
 
     
@@ -599,11 +586,11 @@ CoSMoMPVA-specific guidelines
 
         % set the training and test indices for each chunk
         for k=1:nchunks
-            % >>
+            % >@@>
             test_msk=unq(k)==chunks;
             train_indices{k}=find(~test_msk)';
             test_indices{k}=find(test_msk)';
-            % <<
+            % <@@<
         end
 
 Unit tests
