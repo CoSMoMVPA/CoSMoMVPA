@@ -68,12 +68,20 @@ if iscell(split_by)
         ds_splits=[split_all{:}];
         return
     end
-   
-    % just one field, get it out and continue
-    split_by=split_by{1};
 end
 
-if all(dim~=[1 2]), error('dim should be 1 or 2'); end
+if isempty(split_by)
+    ds_splits={ds};
+    return
+end
+
+if iscell(split_by)
+    assert(numel(split_by)==1)
+    split_by=split_by{1};
+end
+   
+    
+if dim~=1 && dim~=2, error('dim should be 1 or 2'); end
 
 if is_ds
     attrs_fns={'sa','fa'};
