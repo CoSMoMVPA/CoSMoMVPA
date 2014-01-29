@@ -4,7 +4,9 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 % ds_avg=cosmo_averaging_measure(ds, 'ratio', ratio, ['nrep',nrep])
 %
 % Inputs:
-%   ds              dataset struct with fields .sa.{targets,chunks}.
+%   ds              dataset struct with field:
+%     .samples      NS x NF
+%     .sa           with fields .targets and .chunks
 %   'ratio', ratio  ratio (between 0 and 1) of samples to select for 
 %                   each average. If >=1 then it indicates how many samples
 %                   to select for each average.
@@ -12,13 +14,16 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %                   combination of targets and chunks (default: 1).
 %
 % Returns
-%   ds_avg          dataset struct with 'nrep'*ntargets*nchunks, where
+%   ds_avg          dataset struct with field:
+%      .samples     ('nrep'*ntargets*nchunks) x NF, where
 %                   ntargets and nchunks are the number of unique targets
 %                   and chunks, respectively. Each sample is an average
 %                   from samples that share the same values for 
 %                   .sa.{chunks,targets}. The number of times each sample 
 %                   is used to compute average values differs by one at
 %                   most.
+%      .sa          Based on averaged samples.
+%      .fa,.a       Same as in ds (if present).
 %    
 % Examples:
 %  - % for each unique target-chunk combination, select 40% of the samples
@@ -30,6 +35,15 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %    % times. Each sample in 'ds' is used twice (=.5*4)as an element 
 %    % to compute an average.
 %    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.5),'nrep',4);
+%
+% Notes:
+%  - this function averages feature-wise; the output has the same features
+%    as the input.
+%  - it can be used to average data from trials safely without circular
+%    analysis issues.
+%  - as a result the number of trials in each chunk and target is
+%    identical, so balancing of partitions is not necessary for data from
+%    this function.
 %
 % NNO Jan 2014
 
