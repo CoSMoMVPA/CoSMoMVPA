@@ -21,6 +21,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %
 % NNO Jan 2014
     
+    if nargin<3, split_by=[]; end
     if nargin<4, dim=1; end
 
     if ~isa(f, 'function_handle')
@@ -33,6 +34,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 
     % split the dataset
     ds_split=cosmo_split(ds, split_by, dim);
+    
     nsplits=numel(ds_split);
     res=cell(nsplits,1); % allocate space for output
     
