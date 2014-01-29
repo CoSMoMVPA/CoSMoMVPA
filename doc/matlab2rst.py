@@ -191,7 +191,7 @@ for output in ('hdr','skl',None):
         if rebuild_toc:
             toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
             title='%s - %s' % (rst_type.get_name(), rst_type.type2name(output))
-            header='.. _`%s`:\n\n%s\n%s\n\nContents\n\n.. toctree::\n    :maxdepth: 2\n\n' % (
+            header='.. _`%s`:\n\n%s\n%s\n\n.. toctree::\n    :maxdepth: 2\n\n' % (
                         toc_base_name, title, '='*len(title))
 
             
