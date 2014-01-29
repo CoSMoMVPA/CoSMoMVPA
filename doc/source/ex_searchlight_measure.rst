@@ -7,7 +7,7 @@ In this exercise we bring the generic :ref:`cosmo_crossvalidation_measure` and :
 
 With the help of these functions, run n-fold cross validation and use a nearest neighbor classifier to compute accuracy maps. Visualize the output map and show a histogram of the classification accuracies.
 
-.. include:: matlab/cosmo_searchlight_skl.txt
+.. include:: matlab/cosmo_searchlight_hdr.txt
 
 Hint: :ref:`run_measure_searchlight_skl`
 

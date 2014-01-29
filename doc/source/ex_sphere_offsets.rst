@@ -12,7 +12,7 @@ Compute voxel offsets in a sphere
 In turn, computing the relative offsets from a voxel location is a building block for feature selection part. In this exercise, write a function that returns the voxel indices relative to the origin.
 That is, given a radius r, it returns a Px3 array where every row (i,j,k) is unique and it holds that (i,j,k) is at most at distance r from the origin (0,0,0). This function has the following signature:
 
-.. include:: matlab/cosmo_sphere_offsets_skl.txt
+.. include:: matlab/cosmo_sphere_offsets_hdr.txt
 
 Then, for each radius from 2 to 6 in steps of .5, plot the indices and show how many voxels are in a sphere of that raidus.
 
@@ -24,7 +24,7 @@ Using the sphere offsets for voxel selection
 ++++++++++++++++++++++++++++++++++++++++++++
 If you are up for quite an advanced exercise: write a function that performs voxel selection  (if not, don't spend your time on this and just look at the answer). It should have the following signature:
 
-.. include:: matlab/cosmo_spherical_voxel_selection_skl.txt
+.. include:: matlab/cosmo_spherical_voxel_selection_hdr.txt
 
 As a start you can ignore the requirement that a negative value for radius should select a certain number of voxels; in other words just focus on positive values for radius. 
 

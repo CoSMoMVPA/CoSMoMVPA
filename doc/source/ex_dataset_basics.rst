@@ -16,7 +16,7 @@ and see what the value is for ``config.data_path``. If your data is not stored i
 
 on a Unix-like system (such as Mac or Linux), or to::
 
-    data_path=C:\\path\\to\\the\\example\\data
+    data_path=C:\path\to\the\example\data
 
 on a Windows system. Finally save the file as ``.cosmomvpa.cfg`` in a directory that is part of the Matlab path.
 
@@ -72,7 +72,7 @@ Slice by samples
 ++++++++++++++++
 Write a function with the following signature.
 
-.. include:: matlab/cosmo_dataset_slice_sa_skl.txt
+.. include:: matlab/cosmo_dataset_slice_sa_hdr.txt
 
 Hint: :ref:`cosmo_dataset_slice_sa_skl`
 
@@ -82,7 +82,7 @@ Slice by features
 +++++++++++++++++
 Write another function with the signature.
 
-.. include::  matlab/cosmo_dataset_slice_fa_skl.txt
+.. include::  matlab/cosmo_dataset_slice_fa_hdr.txt
 
 Hint: :ref:`cosmo_dataset_slice_fa_skl`
 

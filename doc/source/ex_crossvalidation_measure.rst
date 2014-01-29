@@ -33,7 +33,7 @@ In the code for cross validation below, your job is to write the missing for
 loop. This for loop must iterate over each data fold in args.partitions, call a
 generic classifier, and keep track of the number of correct classifications.
 
-.. include:: matlab/cosmo_crossvalidation_measure_skl.txt
+.. include:: matlab/cosmo_crossvalidation_measure_hdr.txt
 
 Hint: :ref:`cosmo_crossvalidation_measure_skl`
 
