@@ -23,8 +23,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
 %   cosmo_nchoosek_partitioner(chunks,'half'). 
 % - More generally, this function is intended as an exercise. If
 %   chunks is different from 1:K for all K, then it may yield non-optimal
-%   partitions. In particular, if all chunks are either even or odd,
-%   then either train_indices or test_indices is empty for each partition.
+%   partitions. 
 %   Is is thus advised to use cosmo_nchoosek_partitioner(chunks,.5);
 %
 % See also cosmo_nchoosek_partitioner
@@ -39,6 +38,11 @@ function partitions = cosmo_evenodd_partitioner(chunks)
         end
     end
     
+    [classes,foo,chunk_indices]=unique(chunks);
+    if numel(classes)<2
+        error('Need >=2 classes, found %d', numel(classes));
+    end
+    
     % there are two partitions
     npartitions=2;
     
@@ -50,7 +54,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
     % >@@>
     
     % generate a mask with even indices
-    even_mask=mod(chunks,2)==0;
+    even_mask=mod(chunk_indices,2)==0;
     
     % find the indices of even and odd chunks
     even_indices=find(even_mask);
