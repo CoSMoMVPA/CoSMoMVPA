@@ -50,7 +50,7 @@ function s=cosmo_structjoin(varargin)
 %
 % NNO Jan 2014
 
-me=str2func(mfilename()); % support renaming, make immune to renaming
+me=[]; % function handle to current function, set upon first recursive call
 
 s=struct(); % output
 n=numel(varargin);
@@ -70,11 +70,25 @@ while k<n
     end
     
     if iscell(v)
+        if isempty(v)
+            continue;
+        end
+        
         % process contents of cell recursively
+        if isempty(me)
+            me=str2func(mfilename());
+        end
         v=me(v{:});
     end
     
     if isstruct(v)
+        if isempty(v)
+            continue;
+        elseif isempty(s)
+            v=s;
+            continue;
+        end
+        
         % overwrite any values in c
         fns=fieldnames(v);
         for j=1:numel(fns);
