@@ -15,16 +15,19 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %   pred                Qx1 array with predicted class labels
 %
 % NNO Aug 2013 
-    
-    if nargin<4
-        opt=struct();
-    end
+    if nargin<4,opt=struct(); end
+    if ~isfield(opt, 'normalize'), opt.normalize=[]; end
+    if ~isfield(opt, 'check_partitions'), opt.check_partitions=true; end
     
     % optionally de-mean or zscore the data
     % since class label information is not used here, there is no circular
     % analysis problem.
-    if isfield(opt,'normalize')
+    if ~isempty(opt.normalize)
         ds=cosmo_normalize(ds, opt.normalize);
+    end
+    
+    if opt.check_partitions
+        cosmo_check_partitions(partitions, ds);
     end
     
     train_indices = partitions.train_indices;
@@ -39,22 +42,28 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     % (with values of zeros if there was no prediction)
     all_pred=zeros(nsamples,npartitions); 
     
+    targets=ds.sa.targets;
+    
     % keep track for which samples there has been a prediction
     test_mask=false(nsamples,1); 
     for k=1:npartitions
+        train_idxs=train_indices{k};
+        test_idxs=test_indices{k};
+       
+        
         % for each partition get the training and test data,
         % then get predictions for the training samples using
         % the classifer, and store these in the k-th column of all_pred.
         % >@@>
-        train_data = ds.samples(train_indices{k},:);
-        test_data = ds.samples(test_indices{k},:);
+        train_data = ds.samples(train_idxs,:);
+        test_data = ds.samples(test_idxs,:);
         
-        train_targets = ds.sa.targets(train_indices{k});
+        train_targets = targets(train_idxs);
         
         p = classifier(train_data, train_targets, test_data, opt);
         
-        all_pred(test_indices{k},k) = p;
-        test_mask(test_indices{k})=true;
+        all_pred(test_idxs,k) = p;
+        test_mask(test_idxs)=true;
         % <@@<
     end
     

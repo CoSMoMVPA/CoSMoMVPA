@@ -57,6 +57,7 @@ defaults.merge_func=@mean_sample;
 defaults.corr_type='Pearson';
 defaults.post_corr_func=@atanh;
 defaults.output='mean';
+defaults.check_partitions=true;
 
 params=cosmo_structjoin(defaults, varargin);
 
@@ -67,6 +68,10 @@ post_corr_func=params.post_corr_func;
 
 if isempty(partitions)
     partitions=cosmo_nchoosek_partitioner(ds,'half');
+end
+
+if params.check_partitions
+    cosmo_check_partitions(partitions, ds, params);
 end
 
 targets=ds.sa.targets;
@@ -82,14 +87,14 @@ halves={partitions.train_indices, partitions.test_indices};
 
 pdata=cell(npartitions,1);
 for k=1:npartitions
-    target_data=cell(1,2);
+    avg_halves_data=cell(1,2);
     for h=1:2
         idxs=halves{h}{k};
-        data_sel=cosmo_slice(ds.samples,idxs,1,false);
+        half_data=cosmo_slice(ds.samples,idxs,1,false);
         
         if isequal(targets(idxs),(1:numel(idxs))')
             % optimization 
-            target_data{h}=data_sel;
+            avg_halves_data{h}=half_data;
         else
             res=cell(1,nclasses);
             for j=1:nclasses
@@ -98,14 +103,14 @@ for k=1:npartitions
                     error('missing target class %d', classes(j));
                 end
                 
-                res{j}=merge_func(data_sel(msk,:));
+                res{j}=merge_func(half_data(msk,:));
             end
 
-            target_data{h}=cat(1,res{:});
+            avg_halves_data{h}=cat(1,res{:});
         end
     end
     
-    c=cosmo_corr(target_data{1}', target_data{2}', params.corr_type);
+    c=cosmo_corr(avg_halves_data{1}',avg_halves_data{2}',params.corr_type);
     if ~isempty(post_corr_func)
         c=post_corr_func(c);
     end

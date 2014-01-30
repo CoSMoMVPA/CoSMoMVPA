@@ -136,6 +136,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                        'that is a column vector']);
             end
             checked_first_output=true;
+            args.check_partitions=false;
         end
 
         res_cell{center_idx}=res;
