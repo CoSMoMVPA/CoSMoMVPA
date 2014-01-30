@@ -83,12 +83,14 @@ To get started with git:
     + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
     + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``.s
     + to add a new feature or provide a bugfix:
+
         - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``. 
         - make the desired changes, then commit them. `See below for details`.
         - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``.
         -  on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
         - if you want go back to using code from the original master, run ``git checkout master``.
-      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheat; for experimentation please use this feature.
+
+      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheap; for experimentation please use this feature.
 
 There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. 
 
