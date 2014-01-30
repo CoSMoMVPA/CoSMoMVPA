@@ -41,10 +41,31 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
     % <@@<
     
     % helper function to convert cell to struct
-    function opt_cell=opt2cell(opt)
+function opt_cell=opt2cell(opt)
+        
+    if isempty(opt)
+        opt_cell=cell(0);
+        return;
+    end 
     
+    to_keep={'kernel_function'
+             'rbf_sigma'
+             'polyorder'
+             'mlp_params'
+             'method'
+             'options'
+             'tolkkt'
+             'kktviolationlevel'
+             'kernelcachelimit'
+             'boxconstraint'
+             'autoscale'
+             'showplot'};
+        
     fns=fieldnames(opt);
-    n=numel(fns);
+    keep_msk=cosmo_match(fns, to_keep);
+    keep_fns=fns(keep_msk);
+    
+    n=numel(keep_fns);
     opt_cell=cell(1,2*n);
     for k=1:n
         fn=fns{k};
