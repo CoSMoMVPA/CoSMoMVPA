@@ -18,6 +18,7 @@
 
 import os
 import glob
+import sys
 from os.path import join, split, getmtime, isfile
 matlab_dir='../mvpa'
 example_dir='../examples'
@@ -112,6 +113,10 @@ class RSTType(object):
     def needs_full_include(self):
         return self.prefix=='demo'
 
+    def needs_pb(self, output):
+        return output is None and self.prefix in ('demo','run')
+
+
 class RSTprop(object):
     def __init__(self):
         pass
@@ -154,6 +159,7 @@ for output in ('hdr','skl',None):
         base_names=[]
         rebuild_toc=False
 
+        print ("matlab2rst %s %s: " % (rst_type.prefix, output or '')),
         for fn in fns:
             [p,b]=base_name(fn)
         
@@ -172,21 +178,32 @@ for output in ('hdr','skl',None):
                 
                 with open(trg_fn,'w') as f:
                     f.write(rst)
+            
+            if rst_type.needs_pb(output):
+                pb_path=join(output_root_abs, publish_rel)
+                pb_fn=join(pb_path,b+'.html')
+                if is_newer(fn, pb_fn):
+                    remake_rst=True
+                include_pb=':%s_up:`%s`\n\n' % (rst_type.prefix,b)
+            else:
+                include_pb=''
 
+            # print progress
+            sys.stdout.write("." if remake_rst else 's')
             # make the rst file that includes it
             trg_fn=join(output_mat_abs,'%s.rst' % b)
             if remake_rst or is_newer(fn, trg_fn):
                 label=b.replace('_',' ')
-                header='.. _%s:\n\n%s\n%s\n\n' % (b,label,'='*len(b))
+                header='.. _%s:\n\n%s\n%s\n\n%s' % (b,label,'='*len(b),include_pb)
                 body='.. include :: %s\n\n' % ('%s.txt' % b)
 
                 with open(trg_fn,'w') as f:
                     f.write(header+body)
 
                 rebuild_toc=True
-
-            
+ 
             base_names.append(b)
+
 
         if rebuild_toc:
             toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
@@ -216,6 +233,10 @@ for output in ('hdr','skl',None):
 
                 with open(trg_fn,'w') as f:
                     f.write(header+body+'\n\n')
+
+            sys.stdout.write('<TOC>')
+
+        print
 
 
 
