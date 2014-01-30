@@ -10,6 +10,7 @@ Overview
 .. toctree:: 
    :maxdepth: 1
 
+   contents_demo
    get_started
    download
    cosmo2013 
@@ -24,6 +25,7 @@ Detailed
 .. toctree:: 
    :maxdepth: 2
 
+   contents_demo
    get_started
    download
    cosmo2013 
@@ -37,6 +39,7 @@ Full documentation
 
 .. toctree:: 
 
+   contents_demo
    get_started
    download
    cosmo2013 
