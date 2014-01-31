@@ -12,7 +12,7 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                     
                     
 opt=struct();
-opt.classifier=@cosmo_classify_naive_bayes;
+opt.child_classifier=@cosmo_classify_naive_bayes;
 opt.feature_selector=@cosmo_anova_feature_selector;
 
 partitions=cosmo_nfold_partitioner(ds);

@@ -8,7 +8,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %   targets_train      Px1 training data classes.
 %   samples_test       QxR test data.
 %   opt                struct with the following fields:
-%      .classifier                        handle to classifier to use (e.g.
+%      .child_classifier                  handle to classifier to use (e.g.
 %                                         @cosmo_classify_svm).
 %      .feature_selector                  handle to featur selector (e.g.
 %                                         @cosmo_anove_feature_selector).
@@ -20,7 +20,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %
 % NNO Aug 2013
     
-    classifier=opt.classifier;
+    classifier=opt.child_classifier;
     feature_selector=opt.feature_selector;
     ratio_to_keep=opt.feature_selection_ratio_to_keep;
     
