@@ -1,4 +1,4 @@
-function test_suite = test_slice
+function test_suite = test_corr
     initTestSuite;
 
 
