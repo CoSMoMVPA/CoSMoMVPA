@@ -41,39 +41,39 @@ function c=cosmo_corr(x,y,corr_type)
 %
 % NNO Sep 2013 (from NNO's phoebe_corr, July 2010)
 
-if nargin<2
-    corr_type='Pearson';
-    y=x;
-elseif ischar(y)
-    corr_type=y;
-    y=x;
-elseif nargin<3
-    corr_type='Pearson';
-end
-   
+    if nargin<2
+        corr_type='Pearson';
+        y=x;
+    elseif ischar(y)
+        corr_type=y;
+        y=x;
+    elseif nargin<3
+        corr_type='Pearson';
+    end
 
 
-switch corr_type
-    case 'Pearson'
-        % speed-optimized version
-        nx=size(x,1);
-        ny=size(y,1);
-        
-        % subtract mean
-        xd=bsxfun(@minus,x,sum(x,1)/nx);
-        yd=bsxfun(@minus,y,sum(y,1)/ny);
 
-        % normalization
-        n=1/(size(x,1)-1);
+    switch corr_type
+        case 'Pearson'
+            % speed-optimized version
+            nx=size(x,1);
+            ny=size(y,1);
 
-        % standard deviation
-        xs=(n*sum(xd .^ 2)).^-0.5;
-        ys=(n*sum(yd .^ 2)).^-0.5;
+            % subtract mean
+            xd=bsxfun(@minus,x,sum(x,1)/nx);
+            yd=bsxfun(@minus,y,sum(y,1)/ny);
 
-        % compute correlations
-        c=n * (xd' * yd) .* (xs' * ys);
-    otherwise
-        % fall-back: use Matlab's function
-        % will puke if no Matlab stat toolbox
-        c=corr(x,y,'type',corr_type);
-end
+            % normalization
+            n=1/(size(x,1)-1);
+
+            % standard deviation
+            xs=(n*sum(xd .^ 2)).^-0.5;
+            ys=(n*sum(yd .^ 2)).^-0.5;
+
+            % compute correlations
+            c=n * (xd' * yd) .* (xs' * ys);
+        otherwise
+            % fall-back: use Matlab's function
+            % will puke if no Matlab stat toolbox
+            c=corr(x,y,'type',corr_type);
+    end
