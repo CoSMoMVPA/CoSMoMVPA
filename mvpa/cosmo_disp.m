@@ -1,49 +1,74 @@
 function s=cosmo_disp(x,varargin)
 % converts data to a string representation
 %
+% TODO: - add dimensions for matrix
+%       - documentation
+% 
 % NNO Jan 2014
 
     defaults.min_elips=3;
     defaults.precision=3;
     defaults.strlen=12;
+    defaults.depth=4;
 
     opt=cosmo_structjoin(defaults,varargin);
 
-    if iscell(x)
-        s=disp_cell(x,opt);
-    elseif isnumeric(x) || islogical(x)
-        s=disp_matrix(x,opt);
-    elseif ischar(x)
-        s=disp_string(x,opt);
-    elseif isa(x, 'function_handle')
-        s=disp_function_handle(x,opt);
-    elseif isstruct(x)
-        s=disp_struct(x,opt);
+    depth=opt.depth;
+    if depth<=0
+        s=surround_with('<',class(x),'>',size(x));
     else
-        error('not supported: %s', class(x))
+        opt.depth=depth-1;
+
+        if iscell(x)
+            s=disp_cell(x,opt);
+        elseif isnumeric(x) || islogical(x)
+            s=disp_matrix(x,opt);
+        elseif ischar(x)
+            s=disp_string(x,opt);
+        elseif isa(x, 'function_handle')
+            s=disp_function_handle(x,opt);
+        elseif isstruct(x)
+            s=disp_struct(x,opt);
+        else
+            error('not supported: %s', class(x))
+        end
     end
 
-
-    function y=strcat_vert(xs)
+    function y=strcat_(xs)
+    if isempty(xs)
+        y='';
+        return
+    end
+        
     % all elements in xs are char
     [nr,nc]=size(xs);
-    y=cell(1,nc);
+    ys=cell(1,nc);
 
     % height of each row
-    n_per_row=max(cellfun(@(x)size(x,1),xs),[],2);
+    width_per_col=max(cellfun(@(x)size(x,2),xs),[],1);
+    height_per_row=max(cellfun(@(x)size(x,1),xs),[],2);
     for k=1:nc
-        xf=cell(nr,1);
+        xcol=cell(nr,1);
+        width=width_per_col(k);
+        row_pos=0;
         for j=1:nr
+            height=height_per_row(j);
+            if height==0
+                continue;
+            end
+            
             x=xs{j,k};
             sx=size(x);
+            to_add=[height width]-sx;
+            
             % pad with spaces
-            xf{j}=[x; repmat(' ',n_per_row(j)-sx(1), sx(2))];
+            row_pos=row_pos+1;
+            xcol{row_pos}=[[x repmat(' ',sx(1),to_add(2))];...
+                        repmat(' ',to_add(1), width)];
         end
-        y{k}=char(xf{:});
+        ys{k}=char(xcol{1:row_pos});
     end
-
-    function y=strcat_hor(xs)
-    y=strcat(xs); % TODO: check matlab versions supporting this
+    y=[ys{:}];
 
 
     function y=disp_struct(x,opt)
@@ -56,8 +81,8 @@ function s=cosmo_disp(x,varargin)
             d=cosmo_disp(x.(fn),opt);
             r{k*2}=[repmat(' ',size(d,1),2) d];
         end
-        v=strcat_vert(r);
-        y=[v{:}];
+        y=strcat_(r);
+        
 
 
 
@@ -73,7 +98,6 @@ function s=cosmo_disp(x,varargin)
 
     n=numel(x);
     if n>opt.strlen
-
         h=floor((opt.strlen-infix)/2);
         x=[x(1:h), infix ,x(n+((1-h):0))];
     end
@@ -90,72 +114,61 @@ function s=cosmo_disp(x,varargin)
     [r_pre, r_post]=get_mx_idxs(x, min_elips, 1);
     [c_pre, c_post]=get_mx_idxs(x, min_elips, 2);
 
-    y=x([r_pre r_post],[c_pre c_post]);
-    sy=size(y);
-
-    c=cell(sy);
-    for k=1:numel(c)
-        v=y{k};
-        w=cosmo_disp(v,opt);
-        c{k}=w;
+    part_idxs={{r_pre, r_post}, {c_pre, c_post}};
+    
+    nrows=numel([r_pre r_post])+~isempty(r_post);
+    ncols=numel([c_pre c_post])+~isempty(c_post);
+    
+    sinfix=cell(nrows,ncols*2+1);
+    for k=1:(ncols-1)
+        sinfix{1,k*2+1}='  ';
     end
-
-    sizes=cellfun(@numel,c);
-    nmax=max(sizes(:));
-
-    if ~isempty(r_post)
-        d=cell(sy+[1,0]);
-        d(1:min_elips,:)=c(1:min_elips,:);
-        d(1+min_elips,:)=repmat({':'},1,sy(2));
-        d(min_elips+1+(1:min_elips),:)=c(min_elips+(1:min_elips),:);
-        c=d;
-    end
-
-    s=strcat_vert(c);
-
-    if ~isempty(c_post)
-        sy=size(y);
-        d=cell(sy+[0,1]);
-        d(:,1:min_elips)=c(:,1:min_elips);
-        d(:,1+min_elips)=repmat({'  ...  '},sy(2)+1,1);
-        d(:,min_elips+1+(1:min_elips))=c(:,min_elips+(1:min_elips));
-        c=d;
-    end
-
-    [nr,nc]=size(y);
-
-    s=cell(1,nc*2+1);
-
-    for k=1:nc
-        for j=1:nr
-            if k==1 
-                if j==1
-                    s{j,k}='{ ';
-                else
-                    s{j,k}='  ';
+    
+    cpos=1;
+    for cpart=1:2
+        col_idxs=part_idxs{2}{cpart};
+        nc=numel(col_idxs);
+        
+        rpos=0;
+        for rpart=1:2
+            row_idxs=part_idxs{1}{rpart};
+            
+            nr=numel(row_idxs);
+            if nr==0
+                continue
+            end
+            for ci=1:nc
+                col_idx=col_idxs(ci);
+                
+                for ri=1:nr
+                    row_idx=row_idxs(ri);
+                    sinfix{rpos+ri,cpos+ci*2-1}=cosmo_disp(x{row_idx,col_idx});
+                end
+                
+                if rpart==2
+                    max_length=max(cellfun(@numel,sinfix(:,cpos+ci)));
+                    spaces=repmat(' ',1,floor(max_length/2-1));
+                    sinfix{rpos,cpos+ci}=[spaces ':'];
                 end
             end
-
-            if k==nc
-                if j==nr
-                    filler=sprintf(' }@%dx%d',nr,nc);
-                else
-                    filler=' ;';
-                end
-            else
-                filler='  ';
-            end
-
-            s{j,k*2+1}=filler;
-            s{j,k*2}=c{j,k};
-
+            rpos=rpos+nr+1;
         end
+        cpos=cpos+nc+1;
     end
+    s=surround_with('{ ', strcat_(sinfix), ' }', size(x));
+    
 
-    s=strcat_vert(s);
-    s=[s{:}];
-    %s=c;
-
+    
+    function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
+        if prod(matrix_sz)~=1
+            size_str=sprintf('x%d',matrix_sz);
+            size_str(1)='@';
+        else
+            size_str='';
+        end
+        post=strcat_({repmat(' ',size(infix,1)-1,1); [post size_str]});
+        pre_infix_post=strcat_({pre, infix, post});
+        
 
     function s=disp_matrix(x,opt)
     min_elips=opt.min_elips;
@@ -171,42 +184,47 @@ function s=cosmo_disp(x,varargin)
 
     s=num2str(y,precision);
     [nr,nc]=size(s);
-    if ~isempty(r_post)
-        % insert ':' halfway (row-wise)
-        lastpos=find(sum(s~=' ',1)==0,1,'last');
-        firstpos=find(sum(s~=' ',1)==0,1);
-        step_size=floor(lastpos/(2*min_elips-1));
+    
+    sinfix=cell(3,5);
 
-        offset=firstpos-1;
-        cpos=offset:step_size:nc; % position of colon
-        if isempty(cpos)
-            cpos=nc;
+    if isempty(r_post)
+        % no split in rows
+        sinfix{1,2}=s;
+    else
+        ndata=nc-2*(size(y,2)-1); % without spaces in between
+        step_size=ceil((ndata+1)/size(y,2))+2;
+        offset=1;
+                
+        if isnan(step_size)
+            cpos=offset;
+        else
+            cpos=offset:step_size:nc; % position of colon
         end
-
         line=repmat(' ',1,nc);
         line(cpos)=':';
-
-        s=[s(1:min_elips,:); line; s(min_elips+(1:min_elips),:)];
+        sinfix(1:3,2)={s(1:min_elips,:);line;s(min_elips+(1:min_elips),:)};
     end
 
     if ~isempty(c_post)
         % insert '  ...  ' halfway (column-wise)
-        [nr,nc]=size(s);
-        step_size=nc/(2*min_elips);
-
+        ndata=nc-2*(size(y,2)-1); % without spaces in between
+        step_size=ceil(ndata/size(y,2));
         % position of dots
-        dpos=floor(step_size*min_elips)+1;
+        dpos=step_size*(min_elips)+mod(nc,step_size)+4;
 
-        % insert dots
-        lines=repmat('  ...  ',nr,1);
-        s=[s(:,1:dpos) lines s(:,(dpos+1):end)];
+        for k=1:size(sinfix,1)
+            si=sinfix{k,2};
+            if isempty(si)
+                continue
+            end
+            
+            sinfix(k,2:4)={si(:,1:dpos), ...
+                            repmat('  ...  ',size(si,1),1),...
+                            si(:,(dpos+1):end)};
+        end
     end
-
-    if numel(x)>1
-        nr=size(s,1);
-        s=[['[ ';repmat('  ',nr-1,1)], s, [repmat(' ;',nr-1,1);' ]']];
-    end
-
+    
+    s=surround_with('[ ',strcat_(sinfix),' ]', size(x));
 
     function [pre,post]=get_mx_idxs(x, min_elips, dim)
     n=size(x,dim);
