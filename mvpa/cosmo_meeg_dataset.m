@@ -240,7 +240,8 @@ function ds=convert_ft(ft)
     end
     dim_values{1}=ft.label; % 'chan'
     for k=2:ndim
-        dim_values{k}=ft.(dim_labels{k});
+        dim_value=ft.(dim_labels{k});
+        dim_values{k}=dim_value(:);
     end
 
     % make a dataset
