@@ -17,5 +17,6 @@ We would like to thank the following people:
 +  **Stephania Bracci**: for providing us with sample datasets in BrainVoyager.
 +  **Jimmy Shen**: for providing a free/open source NIFTI library. 
 +  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier.
++  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing us with an MEEG dataset.
 
 
