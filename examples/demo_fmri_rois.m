@@ -3,8 +3,8 @@
 % The data used here is available from http://cosmomvpa.org/datadb.zip
 %
 % It is based on the following work:
-%  Connolly et al (2012), Representation of biological classes in the human
-%  brain. Journal of Neuroscience, doi 10.1523/JNEUROSCI.5547-11.2012
+% * Connolly et al (2012), Representation of biological classes in the human
+%   brain. Journal of Neuroscience, doi 10.1523/JNEUROSCI.5547-11.2012
 %
 % Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth) 
 % during ten runs in an fMRI study. Using the General Linear Model response
@@ -19,6 +19,9 @@
 config=cosmo_config();
 study_path=fullfile(config.tutorial_data_path,'ak6');
 output_path=config.output_data_path;
+
+readme_fn=fullfile(study_path,'README');
+cosmo_type(readme_fn);
      
 
 %% Example 1: split-half correlation measure (Haxby 2001-style)
@@ -49,7 +52,7 @@ fprintf(['Average correlation difference between matching and '...
             mask_label, subject_id, ds_corr.samples);
         
 
-%% Example 1: split-half correlation measure with group analysis
+%% Example 2: split-half correlation measure with group analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
             
 subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};
@@ -101,7 +104,7 @@ fprintf(['Correlation difference in %s at group level: '...
 
 
 
-%% Define data
+%% Example 3: comparison of four classifiers in two regions of interest
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
@@ -121,7 +124,7 @@ nmasks=numel(mask_labels);
 labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
 % Define partitions
 
-% little helper function to replace underscores by space
+% little helper function to replace underscores by spaces
 underscore2space=@(x) strrep(x,'_',' ');
 
 for j=1:nmasks
