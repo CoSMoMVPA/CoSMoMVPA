@@ -113,7 +113,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                 case 'fmri'
                     if isempty(msg)
                         msg=check_dim(ds);
-                        if ~isempty(msg) break; end
+                        if ~isempty(msg); break; end
                     end
                     if ~isfield(ds,'fa') || ~isfield(ds.fa,'i') || ...
                             ~isfield(ds.fa,'j') || ~isfield(ds.fa,'k')
@@ -122,7 +122,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                 case 'meeg'
                     if isempty(msg)
                         msg=check_dim(ds);
-                        if ~isempty(msg) break; end
+                        if ~isempty(msg); break; end
                     end
                     if ~isfield(ds,'a') || ~isfield(ds.a,'meeg')
                         msg='missing field .a.meeg'; break

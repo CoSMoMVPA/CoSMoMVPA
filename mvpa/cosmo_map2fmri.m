@@ -15,9 +15,6 @@ function hdr=cosmo_map2fmri(dataset, fn)
 % NNO Aug 2013
     cosmo_check_dataset(dataset, 'fmri');
 
-    samples=dataset.samples;
-    [nsamples, nfeatures]=size(samples);
-    
     img_formats=get_img_formats();
     img_format=get_img_format(dataset, img_formats);
     
@@ -78,7 +75,7 @@ function img_format=get_img_format(ds, img_formats)
     end
     
 function check_endswith(fn,ext)
-    b=strmatch(cosmo_strsplit(fn,ext,-1),'');
+    b=isempty(cosmo_strsplit(fn,ext,-1));
     if ~b
         error('%s should end with %s', fn, ext);
     end
@@ -89,21 +86,13 @@ function check_endswith(fn,ext)
 
 %% Nifti
     
-function hdr=build_nii(ds)
+function nii=build_nii(ds)
     
     nsamples=size(ds.samples,1);
     
-    hdr=ds.a.hdr_nii;
-    
-    hdr.hdr.dime.dim(5)=nsamples;
-    
-    % set number of values in each voxel dimension
-    ndim=numel(ds.a.dim.values);
-    for k=1:ndim
-        orig_dim(k+1)=numel(ds.a.dim.values{k});
-    end
-    
-    hdr.img=unflatten(ds);
+    nii=ds.a.hdr_nii;
+    nii.hdr.dime.dim(5)=nsamples;
+    nii.img=unflatten(ds);
     
     function write_nii(fn, hdr)
     save_nii(hdr, fn);
@@ -116,7 +105,6 @@ function hdr=build_bv_vmp(ds)
     
     hdr=ds.a.hdr_bv_vmp;
     
-    samples_cell=cell(1,nsamples);
     vols=unflatten(ds);
     
     master_data=hdr.Map(1); 
@@ -136,7 +124,7 @@ function hdr=build_bv_vmp(ds)
             dataj=master_data.(fn);
             if strcmp(fn,'VMPData')
                 dataj=vols(:,:,:,j);
-            elseif ~isempty(strmatch(fn,set_zero))
+            elseif ~isempty(strcmp(fn,set_zero))
                 dataj(:)=0;
             end
             data{j}=dataj;

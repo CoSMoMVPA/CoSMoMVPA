@@ -26,12 +26,16 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
     % allocate space for output
     predicted=zeros(ntest,1);
     
-    % >@@>
     for k=1:ntest
+        % for each sample in the test set:
+        % - compute its euclidian distance to each sample in the train set. 
+        % - assign the class label of the feature that is nearest
+        % >@@>
         delta=bsxfun(@minus, samples_train, samples_test(k,:));
         dst=sqrt(sum(delta.^2,2));
-        [m, i]=min(dst);
+        [unused, i]=min(dst);
         predicted(k)=targets_train(i);
+        % <@@<    
     end
-    % <@@<           
+           
     

@@ -53,7 +53,7 @@ if ischar(dim_label)
         error('no field .a.dim');
     end
 
-    dim=strmatch(dim_label,ds.a.dim.labels,'exact');
+    dim=cosmo_match(ds.a.dim.labels,dim_label);
 
     if isempty(dim)
         error('Unknown dimension %s in ds.a.dim.labels', dim_label);

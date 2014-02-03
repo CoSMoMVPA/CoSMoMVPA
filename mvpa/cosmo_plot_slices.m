@@ -25,7 +25,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     if cosmo_check_dataset(data,false)
         data4D=cosmo_unflatten(data);
         sz=size(data4D);
-        if sz(1)>1 error('expected single volume data'); end
+        if sz(1)>1, error('expected single volume data'); end
         data=reshape(data4D, sz(2:4));
     end
     

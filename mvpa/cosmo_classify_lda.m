@@ -7,8 +7,8 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 % - samples_train      PxR training data for P samples and R features
 % - targets_train      Px1 training data classes
 % - samples_test       QxR test data
-%-  opt                Optional struct with optional field:
-%   regularization     Used to regularize covariance matrix. Default .01
+% - opt                Optional struct with optional field:
+%    .regularization   Used to regularize covariance matrix. Default .01
 %
 % Output:
 % - predicted          Qx1 predicted data classes for samples_test
@@ -25,7 +25,7 @@ if nargin<4 || isempty(opt) || ~isfield(opt, 'regularization')
 end
 
 [ntrain, nfeatures]=size(samples_train);
-[ntest, nfeatures_]=size(samples_test);
+[unused, nfeatures_]=size(samples_test);
 ntrain_=numel(targets_train);
 
 if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end

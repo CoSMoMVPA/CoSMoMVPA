@@ -85,7 +85,7 @@ while k<n
         if isempty(v)
             continue;
         elseif isempty(s)
-            v=s;
+            s=v;
             continue;
         end
         

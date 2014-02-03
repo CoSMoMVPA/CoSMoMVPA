@@ -36,5 +36,5 @@ function test_cartprod_empty()
     aeq=@(arg,v) assertEqual(cosmo_cartprod(arg),v);
     
     aeq(struct(),cell(1,0));
-    aeq(cell(1),{});
+    aeq(cell(1),cell(0,1));
     

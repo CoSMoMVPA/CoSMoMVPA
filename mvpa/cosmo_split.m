@@ -57,7 +57,7 @@ if iscell(split_by)
         split_all=cell(1,nhead);
         
         % remaining fieldnames 
-        split_by_tail={split_by{2:end}};
+        split_by_tail=split_by(2:end);
         
         % split each of them
         for k=1:nhead

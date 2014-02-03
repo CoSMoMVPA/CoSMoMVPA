@@ -28,7 +28,7 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %
 % NNO Sep 2013
 
-[nsamples, nfeatures]=size(ds.samples);
+nsamples=size(ds.samples,1);
 dim_labels=ds.a.dim.labels;
 dim_values=ds.a.dim.values;
 

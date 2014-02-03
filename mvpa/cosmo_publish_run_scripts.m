@@ -1,4 +1,4 @@
-function cosmo_publish_build_html(force)
+function cosmo_publish_run_scripts(force)
 % helper function to publish the run_* scripts of cosmo. Intended for
 % developers only.
 %
@@ -56,28 +56,31 @@ function cosmo_publish_build_html(force)
     nsrc=numel(srcfns);
     ntrg=numel(trgfns);
     
-    outputs=cell(0);
+    outputs=cell(nsrc,1);
     
     p=path();
-    has_pwd=~isempty(findstr(pdir,p));
+    has_pwd=~isempty(strfind(p,pdir));
     if ~has_pwd
         addpath(pdir)
     end
     
     addpath(pdir);
+    
+    output_pos=0;
     for k=1:nsrc
         cd(pdir);
         update=true;
         srcfn=fullfile(srcdir,srcfns(k).name);
-        [p,srcnm,ext]=fileparts(srcfn);
+        [unused,srcnm,unused]=fileparts(srcfn);
         for j=1:ntrg
-            [p,trgnm,ext]=fileparts(trgfns(j).name);
+            [unused,trgnm,unused]=fileparts(trgfns(j).name);
             if ~force && strcmp(srcnm, trgnm) && ...
                         srcfns(k).datenum < trgfns(j).datenum
                 update=false;
                 fprintf('skipping %s%s (%s%s)\n',...
                             trgnm,trgext,srcnm,srcext);
-                outputs{end+1}=srcnm;
+                output_pos=output_pos+1;
+                outputs{output_pos}=srcnm;
                 break;
             end
         end
@@ -92,7 +95,7 @@ function cosmo_publish_build_html(force)
         cd(tmpdir);
         is_built=false;
         try
-            p=publish(srcnm, struct('outputDir',trgdir,'catchError',false));
+            publish(srcnm, struct('outputDir',trgdir,'catchError',false));
             is_built=true;
         catch me
             fnout=fullfile(trgdir,[srcnm trgext]);
@@ -110,7 +113,8 @@ function cosmo_publish_build_html(force)
         end
         fprintf(' done\n');
         
-        outputs{end+1}=srcnm;
+        output_pos=output_pos+1;
+        outputs{output_pos}=srcnm;
     end
            
     if ~has_pwd
@@ -124,8 +128,7 @@ function cosmo_publish_build_html(force)
     fprintf(fid,'<HTML><HEAD><TITLE>Index of matlab outputs</TITLE></HEAD>\n');
     fprintf(fid,'<BODY>Matlab output<UL>\n');
     
-    n=numel(outputs);
-    for k=1:n
+    for k=1:output_pos
         nm=outputs{k};
         fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
     end

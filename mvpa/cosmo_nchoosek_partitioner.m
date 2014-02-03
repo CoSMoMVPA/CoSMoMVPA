@@ -197,8 +197,8 @@ function partitions=group_by(partitions, group_values, test_group_by)
         end
 
         % store the test-indices for m-th group_by_value
-        test_indices{m}={test_indices_cell{1:pos}};
-        train_indices{m}={train_indices_cell{1:pos}};
+        test_indices{m}=test_indices_cell(1:pos);
+        train_indices{m}=train_indices_cell(1:pos);
     end
 
     partitions=struct();
@@ -221,7 +221,7 @@ if all(sum(bsxfun(@eq,chunks(:),1:2),2))
 end
     
 
-[unq,foo,chunk_indices]=unique(chunks);
+[unq,unused,chunk_indices]=unique(chunks);
 nclasses=numel(unq);
 
 % deal with special 'half' case

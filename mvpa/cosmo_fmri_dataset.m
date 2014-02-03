@@ -81,7 +81,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
             error('need 3 or 4 dimensions, found %d', ndims);
     end
     % number of values in 3 spatial + 1 temporal dimension
-    [nt,ni,nj,nk]=size(data);
+    [unused,ni,nj,nk]=size(data);
     
     % make a dataset
     ds=cosmo_flatten(data,{'i','j','k'},{1:ni,1:nj,1:nk});
@@ -361,8 +361,6 @@ function b=isa_bv_msk(hdr)
     
 function [data,hdr,sa]=read_bv_msk(fn)
     hdr=xff(fn);
-    a=[];
-    fa=[];
     sa=[];
     
     data=hdr.Mask>0;

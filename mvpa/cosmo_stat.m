@@ -1,4 +1,4 @@
-function [stat,df]=cosmo_stats(stat_name, samples, targets)
+function [stat,df]=cosmo_stat(stat_name, samples, targets)
 % compute one-sample t, two-sample t, or F statistic
 %
 % Usages:

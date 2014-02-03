@@ -30,9 +30,7 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
     
     targets=targets(:);
     predicted=predicted(:);
-    
-    nsamples=numel(targets);
-    
+        
     classes=unique(targets);
     nclasses=numel(classes);
     

@@ -1,4 +1,4 @@
-function ds_sa = cosmo_dsm_measure(dataset, varargin)
+function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, varargin)
 % Compute a dissimilarity matrix measure
 %
 % ds_sa = cosmo_dsm_measure(dataset, varargin)

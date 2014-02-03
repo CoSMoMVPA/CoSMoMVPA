@@ -75,7 +75,7 @@ if params.check_partitions
 end
 
 targets=ds.sa.targets;
-[classes,foo,target2class]=unique(targets);
+classes=unique(targets);
 nclasses=numel(classes);
 
 if isempty(template)
@@ -88,12 +88,14 @@ halves={partitions.train_indices, partitions.test_indices};
 pdata=cell(npartitions,1);
 for k=1:npartitions
     avg_halves_data=cell(1,2);
+    
+    % compute average over samples, for each target seperately
     for h=1:2
         idxs=halves{h}{k};
         half_data=cosmo_slice(ds.samples,idxs,1,false);
         
         if isequal(targets(idxs),(1:numel(idxs))')
-            % optimization 
+            % optimization: no averaging necessary 
             avg_halves_data{h}=half_data;
         else
             res=cell(1,nclasses);
@@ -111,6 +113,7 @@ for k=1:npartitions
     end
     
     c=cosmo_corr(avg_halves_data{1}',avg_halves_data{2}',params.corr_type);
+    
     if ~isempty(post_corr_func)
         c=post_corr_func(c);
     end

@@ -30,7 +30,7 @@ function nbrhood=cosmo_spherical_voxel_selection(ds, radius, opt)
 % NNO Aug 2013
     
     cosmo_check_dataset(ds,'fmri');
-    [nsamples, nfeatures]=size(ds.samples);
+    nfeatures=size(ds.samples,2);
     
     center_ids=1:nfeatures;
     

@@ -1,4 +1,4 @@
-function partitions = cosmo_evenodd_partitioner(chunks)
+function partitions = cosmo_oddeven_partitioner(chunks)
 % generates an n-fold partition scheme
 %
 % partitions=cosmo_splithalf_partitioner(chunks)
@@ -38,7 +38,7 @@ function partitions = cosmo_evenodd_partitioner(chunks)
         end
     end
     
-    [classes,foo,chunk_indices]=unique(chunks);
+    [classes,unused,chunk_indices]=unique(chunks);
     if numel(classes)<2
         error('Need >=2 classes, found %d', numel(classes));
     end
