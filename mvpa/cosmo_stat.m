@@ -42,6 +42,10 @@ switch stat_name
         [stat,df]=quick_ttest(samples);
         
     case {'t2','f'}
+        if numel(targets)~=size(samples,1)
+            error('Targets has %d values, expected %d', ...
+                        numel(targets), size(samples,1));
+        end
         classes=unique(targets);
         nclasses=numel(classes);
         if strcmp(stat_name,'t2')
@@ -75,8 +79,10 @@ mu=sum(samples,1)/ns;
 
 bss=0;
 wss=0;
+
 for k=1:nclasses
     msk=classes(k)==targets;
+    
     nc=sum(msk);
     sample=samples(msk,:);
     muc=sum(sample,1)/nc;
@@ -84,6 +90,8 @@ for k=1:nclasses
     bss=bss+nc*(mu-muc).^2;
     wss=wss+sum(bsxfun(@minus,muc,sample).^2,1);
 end
+
+
 
 df=[nclasses-1,ns-nclasses];
 
