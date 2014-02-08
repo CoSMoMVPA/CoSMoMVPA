@@ -1,6 +1,6 @@
 %% Spherical searchlight
 % this example implements a spherical searchlight using
-% cosmo_spherical_voxel_selection and performs crossvalidation
+% cosmo_spherical_neighborhood and performs crossvalidation
 % with a nearest neigh classifier
 
 
@@ -24,7 +24,7 @@ nfeatures=size(ds.samples,2);
 center_ids=1:nfeatures;
 
 %% use voxel selection function
-nbrhood=cosmo_spherical_voxel_selection(ds, radius);
+nbrhood=cosmo_spherical_neighborhood(ds, radius);
 center2neighbors=nbrhood.neighbors;
 ncenters=numel(center2neighbors); % should be equal to 'nfeatures'
 
@@ -69,7 +69,7 @@ res_map=nbrhood;
 res_map.samples=accs;
 
 % use the following command to store the output map
-% >> cosmo_map2fmri(res_map,[data_path  '/voxel_selection_searchlight.nii']);
+% >> cosmo_map2fmri(res_map,[data_path  '/spherical_neighborhood_searchlight.nii']);
 
 %% Plot a few slices
 cosmo_plot_slices(res_map);

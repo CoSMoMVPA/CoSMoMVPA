@@ -24,10 +24,10 @@ Using the sphere offsets for voxel selection
 ++++++++++++++++++++++++++++++++++++++++++++
 If you are up for quite an advanced exercise: write a function that performs voxel selection  (if not, don't spend your time on this and just look at the answer). It should have the following signature:
 
-.. include:: matlab/cosmo_spherical_voxel_selection_hdr.txt
+.. include:: matlab/cosmo_spherical_neighborhood_hdr.txt
 
 As a start you can ignore the requirement that a negative value for radius should select a certain number of voxels; in other words just focus on positive values for radius. 
 
 A more advanced exercise: modify this function so that it also supports negative values for radius, which return neighborhoods of the same size (i.e. same number of voxels) at each location.
 
-Solution: :ref:`cosmo_spherical_voxel_selection`
+Solution: :ref:`cosmo_spherical_neighborhood`

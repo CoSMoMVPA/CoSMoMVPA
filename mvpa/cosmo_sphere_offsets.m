@@ -28,7 +28,7 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
 %    [ 0 1 1 1 1 1 1 1.4142 1.4142 1.4142 1.4142 1.4142 1.4142
 %      1.4142 1.4142 1.4142 1.4142 1.4142 1.4142 ]
 %
-% See also sub2ind, ind2sub, cosmo_spherical_voxel_selection
+% See also sub2ind, ind2sub, cosmo_spherical_neighborhood
 %
 % NNO Aug 2013
     

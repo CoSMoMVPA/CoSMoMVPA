@@ -13,7 +13,7 @@ for different purposes.
 
 We have provided a couple of helper functions that do some of the heavy lifting
 involved defining the sets of *neighborhood voxels*. For this, use
-:ref:`cosmo_spherical_voxel_selection` that was presented in the previous exercise.
+:ref:`cosmo_spherical_neighborhood` that was presented in the previous exercise.
 
 With the help of these functions, write a generic searchlight function that
 satisfies the following definition:
