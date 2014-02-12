@@ -364,10 +364,22 @@ function b=isa_bv_msk(hdr)
     
 function [data,hdr,sa]=read_bv_msk(fn)
     hdr=xff(fn);
-    sa=[];
-    
+    sa=struct();
     data=hdr.Mask>0;
-    hdr=[]; % set to empty - may crash (as it should) when used as dataset
+    hdr=struct(); 
+
+function b=isa_bv_vtc(hdr)    
+    
+    b=isa(hdr,'xff') && isfield(hdr, 'VTCData');    
+    
+function [data,hdr,sa]=read_bv_vtc(fn)    
+    hdr=xff(fn);
+    sa=struct();
+    data=shiftdim(hdr.VTCData,1);
+    
+    
+    
+    
     
 %% AFNI     
 function b=isa_afni(hdr)
