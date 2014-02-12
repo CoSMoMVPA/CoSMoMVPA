@@ -71,9 +71,9 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     elseif strcmp(output_stat_name,'p')
         switch stat_name
             case 'F'
-                tail='right';
+                tail='right'; % show anova1  behaviour w.r.t. p-values
             otherwise
-                tail='both';
+                tail='both'; % show ttest[2] "                       "
         end
     end
 
@@ -90,8 +90,6 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         % all other stats do require targets
         error('Missing field .sa.targets');
     end
-
-    
 
     % ensure that targets has the proper size
     if numel(targets)~=nsamples
@@ -130,7 +128,14 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected >=2 classes, found %d',...
                             stat_name, nclasses);
             end 
-            [stat,df]=quick_ftest(samples, targets, classes, nclasses);
+            if isfield(ds.sa,'contrast')
+                contrast=ds.sa.contrast;
+            else
+                contrast=[];
+            end
+            
+            [stat,df]=quick_ftest(samples, targets, classes, nclasses, ...
+                                                            contrast);
 
         otherwise
             error('illegal statname %s', stat_name);
@@ -140,11 +145,11 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     if isempty(output_stat_name)
         output_stat_name=stat_name;
     else
-        % transform to p value
+        % transform to left-tailed p-value
         df_cell=num2cell(df);
         stat=cdf(cdf_label,stat,df_cell{:});
         
-        % ignore degrees of freedom
+        % reset degrees of freedom
         df=[];
         
         switch output_stat_name
@@ -159,11 +164,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                         % invert p-value
                         stat=1-stat;
                     case 'both'
-                        % take whichever tail one is more extreme
+                        % take whichever tail is more extreme
                         stat=(.5-abs(stat-.5))*2;
                     otherwise
-                        % should never get here
-                        error('this should not happen');
+                        assert(false,'this should not happen');
                 end     
             otherwise
                 error('illegal output type %s', output_stat_name);
@@ -184,26 +188,52 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [f,df]=quick_ftest(samples, targets, classes, nclasses)
-    % one-way ANOVA
-    ns=size(samples,1);
-    mu=sum(samples,1)/ns;
 
-    bss=0;
-    wss=0;
+function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
+    % one-way ANOVA
+    has_contrast=~isempty(contrast);
+    contrast_sum=0;
+    
+    [ns,nf]=size(samples);
+    mu=sum(samples,1)/ns; % grand mean
+
+    b=zeros(nclasses,nf); % between-class sum of squares
+    nsc=zeros(nclasses,1);
+    wss=0; % within-class sum of squares
 
     for k=1:nclasses
         msk=classes(k)==targets;
 
-        nc=sum(msk);
+        nsc(k)=sum(msk); % number of samples in this class
         sample=samples(msk,:);
-        muc=sum(sample,1)/nc;
+        muc=sum(sample,1)/nsc(k); % class mean
 
-        bss=bss+nc*(mu-muc).^2;
+        % between- and within-class sum of squares
+        if has_contrast
+            cmsk=contrast(msk);
+            if ~all(cmsk(1)==cmsk)
+                error('Contrast has differerent values in level %d',k);
+            end
+            contrast_sum=contrast_sum+cmsk(1);
+            b(k,:)=sum(bsxfun(@times,contrast(msk),mu-muc),1);
+        else
+            b(k,:)=(mu-muc);
+        end
         wss=wss+sum(bsxfun(@minus,muc,sample).^2,1);
     end
 
-    df=[nclasses-1,ns-nclasses];
+    if has_contrast
+        if contrast_sum~=0
+            error('contrast has sum %d, should be 0', contrast_sum);
+        end
+        bss=sum(b,1).^2/sum(contrast.^2);
+        df1=1;
+    else
+        bss=sum(bsxfun(@times,nsc,b.^2),1);
+        df1=nclasses-1;
+    end
+    
+    df=[df1,ns-nclasses];
 
     bss=bss/df(1);
     wss=wss/df(2);
@@ -211,28 +241,33 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses)
     f=bss./wss;
 
 
-
 function [t,df]=quick_ttest(x)
     % one-sample t-test against zero
+    
     n=size(x,1);
-    mu=sum(x,1)/n;
+    mu=sum(x,1)/n; % grand mean
 
     df=n-1;
-    ss=sum(bsxfun(@minus,x,mu).^2,1);
     scaling=n*df;
 
+    % sum of squares
+    ss=sum(bsxfun(@minus,x,mu).^2,1);
+    
     t=mu .* sqrt(scaling./ss);
 
 
 function [t,df]=quick_ttest2(x,y)
     % two-sample t-test with equal variance assumption
+    
     nx=size(x,1);
     ny=size(y,1);
-    mux=sum(x,1)/nx;
-    muy=sum(y,1)/ny;
+    mux=sum(x,1)/nx; % mean of class x
+    muy=sum(y,1)/ny; % "           " y
 
     df=nx+ny-2;
     scaling=(nx*ny)*df/(nx+ny);
+    
+    % sum of squares
     ss=sum([bsxfun(@minus,x,mux);bsxfun(@minus,y,muy)].^2,1);
 
     t=(mux-muy) .* sqrt(scaling./ss);
