@@ -1,30 +1,29 @@
 function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 % compute one-sample t, two-sample t, or F statistic
 %
-% Usages:
-%  - stat_ds=cosmo_stats(ds, stat_name[, output_stat_name])
+% stat_ds=cosmo_stats(ds, stat_name[, output_stat_name])
 %
 % Inputs:
-%   ds                dataset struct with PxQ .samples and PxQ .sa.targets;
-%                     .sa.targets indicate the conditions (levels)
+%   ds                dataset struct with PxQ .samples and Px1 .sa.targets;
+%                     .sa.targets indicate the conditions (levels).
 %   stat_name         One of:
-%                     't' : one-sample t-test against zero
+%                     't' : one-sample t-test against zero.
 %                     't2': two-sample t-test with equal variance,
 %                           computing classes(1) minus classes (2), where
 %                           classes=unique(ds.sa.targets).
-%                     'F' : one-way ANOVA
+%                     'F' : one-way ANOVA.
 %   output_stat_name  (optional) 'z', 'p', 'left', 'right', 'both', or 
 %                      empty (default). 
-%                     - 'z' returns a z-score
+%                     - 'z' returns a z-score.
 %                     - 'left', 'right', and 'both' return a p-value with 
 %                        the specified tail. 
 %                     - 'p' returns a p-value, with tail='right' if
-%                        stat_name='F' en tail='both' otherwise.
+%                        stat_name='F' and tail='both' otherwise.
 %
 % Returns:
 %   stat_ds          dataset struct with fields:
-%     .samples       1xP statistic value, or (if output_stat_name is 
-%                    non-empty) z-score or p-value. Se ethe Notes below
+%     .samples       1xQ statistic value, or (if output_stat_name is 
+%                    non-empty) z-score or p-value. See the Notes below
 %                    for interpreting p-values.
 %     .sa.df         if output_stat_name is empty the degrees of freedom
 %                    as scalar (if stat_name is 't' or 't2') or 1x2 vector
@@ -33,9 +32,14 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     .[f]a          identical to ds.[f]a, if present.
 %
 % Notes:
-%  - This function runs conserably faster than builtin matlab functions 
-%  - When output_stat_name='p' then the p-values returned are the same as
-%    the builtin matlab functions anova1, ttest, and ttest2 give
+%  - If output_stat_name is not provided or empty, then this function runs 
+%    considerably faster than the builtin matlab functions. 
+%  - When output_stat_name=='p' then the p-values returned are the same as
+%    the builtin matlab functions anova1, ttest, and ttest2 with the 
+%    default tails.
+%  - For paired-sample t-tests: provide the observation differences
+%    to this function.
+%  - For one-sample t-tests against x, if x~=0: subtract x from ds.samples.
 %
 % Examples:
 %  - % compute one-way ANOVA F-values
@@ -48,14 +52,14 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %    >> ds=struct();
 %    >> ds.samples=[1+randn(12,100); randn(12,100)]; % } group 1 > group 2
 %    >> ds.sa.targets=[ones(12,1); 2*ones(12,1)];    % }
-%    >> s=cosmo_stat(ds,'t2','p')
+%    >> s=cosmo_stat(ds,'t2','p') % two-sample t-test, return p-palues
 %    >> fprintf('ps: %.3f +/- %.3f\n', mean(s.samples), std(s.samples))
 %    ps: 0.078 +/- 0.141
-%    >> s=cosmo_stat(ds,'F','z')
+%    >> s=cosmo_stat(ds,'F','z') % one-way ANOVA, return z-scores
 %    >> fprintf('zs: %.3f +/- %.3f\n', mean(s.samples), std(s.samples))
 %    zs: 1.959 +/- 0.932
 %
-% See also: anova1, ttest1
+% See also: anova1, ttest, ttest2
 %
 % NNO Jan 2014
 
