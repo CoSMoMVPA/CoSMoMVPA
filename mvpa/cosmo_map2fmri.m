@@ -159,13 +159,20 @@ function hdr=build_afni(ds)
     hdr.SCENE_DATA(2)=11; %brik
     hdr.SCALE=0;
     
-    set_empty={'BRICK_LABS','BRICK_KEYWORDS','BRICK_STATS','BRICK_FLOAT_FACS'};
+    set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
+                'BRICK_STATS','BRICK_FLOAT_FACS',...
+                'BRICK_STATAUX','STAT_AUX'};
     for k=1:numel(set_empty)
         fn=set_empty{k};
         hdr.(fn)=[];
     end
     
-    % store data in this non-afni field 'img'
+    % if labels for the samples, store them in the header
+    if isfield(ds.sa,'labels') && ~isempty(ds.sa.labels)
+        hdr.BRICK_LABS=cosmo_strjoin(ds.sa.labels,'~');
+    end
+    
+    % store data in non-afni field 'img'
     hdr.img=unflatten(ds);
     
 function write_afni(fn, hdr)    
