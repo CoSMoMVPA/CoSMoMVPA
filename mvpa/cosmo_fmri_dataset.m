@@ -187,6 +187,12 @@ function img_formats=get_img_formats()
     img_formats.bv_msk.reader=@read_bv_msk;
     img_formats.bv_msk.externals={'neuroelf'};
     
+    img_formats.bv_msk.exts={'.vtc'};
+    img_formats.bv_msk.matcher=@isa_bv_vtc;
+    img_formats.bv_msk.reader=@read_bv_vtc;
+    img_formats.bv_msk.externals={'neuroelf'};
+    
+    
     
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
