@@ -15,13 +15,12 @@ function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
 %                     
 % NNO Aug 2013
     
-    targets=dataset.sa.targets;
-    samples=dataset.samples;
-    nfeatures=size(samples,2);
     
-    fs=cosmo_stat('f',samples,targets);
     
-    [unused, idxs]=sort(fs,'descend');
+    fs=cosmo_stat(dataset,'F');
+    
+    [unused, idxs]=sort(fs.samples,'descend');
+    nfeatures=size(dataset.samples,2);
     n_idxs=round(ratio_to_keep*nfeatures);
     selected_indices=idxs(1:n_idxs);
     
