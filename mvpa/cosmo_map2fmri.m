@@ -142,7 +142,8 @@ function write_bv(fn, hdr)
     %% Brainvoyager GLM
 function hdr=build_bv_glm(ds)
     
-    warning('cosmo:save','Output in BV .glm format not supported - storing as VMP instead');
+    warning(['Output in BV .glm format not supported '...
+                '- storing as VMP instead']);
     
     ds.a.hdr_bv_vmp=xff('new:vmp');
     ds.a=rmfield(ds.a,'hdr_bv_glm');
