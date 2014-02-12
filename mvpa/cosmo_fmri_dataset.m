@@ -236,11 +236,7 @@ function img_format=find_img_format(filename, img_formats)
             m=numel(exts);
             for j=1:m
                 ext=exts{j};
-                d=numel(ext)-1;
-                if numel(filename) <= d 
-                    continue % filename is too short
-                end
-                if strcmpi(filename(end+(-d:0)), ext)
+                if isempty(cosmo_strsplit(filename,ext,-1))
                     img_format=fn;
                     return
                 end
