@@ -17,7 +17,7 @@ function ni=generate_test_nifti_struct()
 
     dime=struct();
     dime.datatype=16; %single
-    dime.dim=[3 imgshape 1 1 1];
+    dime.dim=[4 imgshape 1 1 1];
     dime.pixdim=[1 voldim 0 0 0 0];
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
