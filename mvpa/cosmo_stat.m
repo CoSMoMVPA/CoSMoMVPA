@@ -155,7 +155,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         switch output_stat_name
             case 'z'
                 % transform to z-score
-                stat=icdf('norm',stat);
+                stat=norminv(stat);
             case 'p'
                 switch tail
                     case 'left'
