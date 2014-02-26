@@ -46,6 +46,11 @@ function ni=generate_test_nifti_struct()
                         'quatern_d',...
                         'qoffset_x','qoffset_y','qoffset_z'});
     hist=set_all(hist,{'intent_name'},'');                
+    
+    hist.srow_x=[1 0 0 10]; 
+    hist.srow_y=[0 2 0 20]; 
+    hist.srow_z=[0 0 3 30];
+    
     hist.quatern_c=1;                
     hdr.hist=hist;
 
