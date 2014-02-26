@@ -17,9 +17,10 @@ function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
     
     
     
-    fs=cosmo_stat(dataset,'F');
+    fs_ds=cosmo_stat(dataset,'F');
+    fs=fs_ds.samples;
     
-    [unused, idxs]=sort(fs.samples,'descend');
+    [unused, idxs]=sort(fs,'descend');
     nfeatures=size(dataset.samples,2);
     n_idxs=round(ratio_to_keep*nfeatures);
     selected_indices=idxs(1:n_idxs);
