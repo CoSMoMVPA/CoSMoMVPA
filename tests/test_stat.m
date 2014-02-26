@@ -19,7 +19,7 @@ function test_stat_
     % f stat
     ff=cosmo_stat(ds,'F');
     assertVectorsAlmostEqual(f,ff.samples);
-    assertVectorsAlmostEqual(df,ff.sa.df);
+    assertEqual(ff.sa.stats,{sprintf('Ftest(%d,%d)',df)});
     
     pp=cosmo_stat(ds,'F','p');
     assertVectorsAlmostEqual(p,pp.samples);
@@ -40,7 +40,7 @@ function test_stat_
         ds1.sa.targets(:)=10;
         tt=cosmo_stat(ds1,'t');
         assertVectorsAlmostEqual(stats.tstat,tt.samples);
-        assertVectorsAlmostEqual(unique(stats.df),tt.sa.df);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
 
         pp=cosmo_stat(ds1,'t',tail);
         assertVectorsAlmostEqual(p,pp.samples);
@@ -55,7 +55,7 @@ function test_stat_
         [tt]=cosmo_stat(ds2,'t2');
 
         assertVectorsAlmostEqual(stats.tstat,tt.samples);
-        assertVectorsAlmostEqual(unique(stats.df),tt.sa.df);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
         pp=cosmo_stat(ds2,'t2',tail);
         assertVectorsAlmostEqual(p,pp.samples);
     end
