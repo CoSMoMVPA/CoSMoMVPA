@@ -58,7 +58,11 @@ function externals=get_externals()
     externals.afni.check=@() ~isempty(which('BrikLoad'));
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
-
+    
+    externals.afni_bin.check=@() isunix() && ...
+                                    unix('afni --version >/dev/null')==0;
+    externals.afni_bin.label='AFNI suite';
+    externals.afni_bin.url='http://afni.nimh.nih.gov/afni';
 
     externals.neuroelf.check=@() ~isempty(which('xff'));
     externals.neuroelf.label='NeuroElf toolbox';
