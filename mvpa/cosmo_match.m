@@ -84,8 +84,17 @@ function msk=cosmo_match(haystack, needle, varargin)
         elseif iscell(needle) && iscell(haystack)
             matches=false(nrows,ncols);
             
+            for k=1:ncols
+                if ~ischar(haystack{k})
+                    error('cell must contain strings');
+                end
+            end
+            
             for k=1:nrows
                 needlek=needle{k};
+                if ~ischar(needlek)
+                    error('cell must contain strings');
+                end
                 match_indices=strcmp(needlek,haystack);
                 matches(k, match_indices)=true;
             end
