@@ -11,17 +11,20 @@ function test_match_()
     assertEqual(cosmo_match((5:-1:1)',[2 3]),b([0,0,1,1,0])');
 
     % basic strings
-    assertEqual(cosmo_match({'a','b','c'},{'b','c','d','e','b'}),b([0 1 1]));
+    assertEqual(cosmo_match({'a','b','c'},{'b','c','d','e','b'}),...
+                                                        b([0 1 1]));
     assertEqual(cosmo_match({'b','c','d','e','b'},{'a','b','c'}),...
                                                         b([1 1 0 0 1]));
 
-    assertEqual(cosmo_match({'a','b','c'}',{'b','c','d','e','b'}),b([0 1 1]'));
+    assertEqual(cosmo_match({'a','b','c'}',{'b','c','d','e','b'}),...
+                                                        b([0 1 1]'));
     assertEqual(cosmo_match({'b','c','d','e','b'}',{'a','b','c'}),...
                                                         b([1 1 0 0 1]'));
 
     assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a'}),b([0 0 1 0]));                                                
     assertEqual(cosmo_match({'aaa','aa','a','aa'},{'aa'}),b([0 1 0 1]));                                                
-    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a','aaa'}),b([1 0 1 0]));                                                
+    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a','aaa'}),...
+                                                           b([1 0 1 0]));
 
 
     % empty inputs ok if types match
@@ -45,6 +48,8 @@ function test_match_()
     assertExceptionThrown(@()cosmo_match(1,''),'');
     assertExceptionThrown(@()cosmo_match({'x'},1),'');
     assertExceptionThrown(@()cosmo_match({1,2},''),'');
+    assertExceptionThrown(@()cosmo_match('',{1,2}),'');
+
     assertExceptionThrown(@()cosmo_match(['x'],1),'');
 
     assertExceptionThrown(@()cosmo_match({'x',1},''),'');
