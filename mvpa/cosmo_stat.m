@@ -28,7 +28,8 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     .sa.df         if output_stat_name is empty the degrees of freedom
 %                    as scalar (if stat_name is 't' or 't2') or 1x2 vector
 %                    (if stat_name is 'F')
-%     .sa.labels     set to {stat_name}
+%     .sa.stats      One of 'Ftest(df1,df2)', 'Ttest(df)', 'Zscore', or
+%                    'Pval'.
 %     .[f]a          identical to ds.[f]a, if present.
 %
 % Notes:
@@ -77,6 +78,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         end
     end
 
+    
     samples=ds.samples;
     nsamples=size(samples,1);
     
@@ -113,7 +115,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                             stat_name, nclasses);
             end
             [stat,df]=quick_ttest(samples);
-
+            stat_label='Ttest';
         case 't2'
             if nclasses~=2
                 error('%s stat: expected 2 classes, found %d',...
@@ -122,6 +124,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
             [stat,df]=quick_ttest2(samples(targets==classes(1),:),...
                                   samples(targets==classes(2),:));
             cdf_label='t';
+            stat_label='Ttest';
 
         case 'F'
             if nclasses<2
@@ -136,6 +139,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
             
             [stat,df]=quick_ftest(samples, targets, classes, nclasses, ...
                                                             contrast);
+            stat_label='Ftest';
 
         otherwise
             error('illegal statname %s', stat_name);
@@ -156,6 +160,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
             case 'z'
                 % transform to z-score
                 stat=norminv(stat);
+                stat_label='Zscore';
             case 'p'
                 switch tail
                     case 'left'
@@ -169,9 +174,16 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                     otherwise
                         assert(false,'this should not happen');
                 end     
+                stat_label='Pval';
             otherwise
                 error('illegal output type %s', output_stat_name);
         end
+    end
+    
+    if ~isempty(df)
+        df_str=cellfun(@(x) sprintf('%d',x), num2cell(df),...
+                    'UniformOutput',false);
+        stat_label=sprintf('%s(%s)',stat_label,cosmo_strjoin(df_str,','));
     end
 
     % store output
@@ -179,11 +191,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     if isfield(ds,'a'), stat_ds.a=ds.a; end
     if isfield(ds,'fa'), stat_ds.fa=ds.fa; end
     stat_ds.samples=stat;
-    stat_ds.sa.labels={output_stat_name};
-    if ~isempty(df)
-        stat_ds.sa.df=df;
-    end
-
+    stat_ds.sa.stats={stat_label};
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % helper functions
