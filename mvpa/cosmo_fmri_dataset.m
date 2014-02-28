@@ -28,9 +28,10 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                'nii', 'bv_vmp', 'bv_glm', or 'afni'.
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
+%     .a.vol.mat 4x4 voxel-to-world transformation matrix (LPI, base-1).
 %     .sa        struct for holding sample attributes (e.g.,sa.targets,sa.chunks) 
 %     .fa        struct for holding sample attributes 
-%     .fa.voxel_indices   M * 3 indices of voxels (in volume space). 
+%     .fa.{i,j,k} indices of voxels (in voxel space). 
 %
 % Dependencies:
 % - for NIFTI files, it requires the following toolbox:
@@ -61,7 +62,7 @@ p = cosmo_structjoin('!',defaults, varargin);
     img_formats=get_img_formats(); 
     
     % read the image
-    [data,hdr,img_format,sa]=read_img(filename, img_formats);
+    [data,vol,img_format,sa]=read_img(filename, img_formats);
      
     if ~isa(data,'double')
         data=double(data); % ensure data stored in double precision
@@ -88,8 +89,9 @@ p = cosmo_structjoin('!',defaults, varargin);
     ds=cosmo_flatten(data,{'i','j','k'},{1:ni,1:nj,1:nk});
     ds.sa=sa;
     
-    header_name=['hdr_' img_format];
-    ds.a.(header_name) = hdr; % store header
+    %header_name=['hdr_' img_format];
+    %ds.a.(header_name) = hdr; % store header
+    ds.a.vol=vol;
     
     % set chunks and targets 
     ds=set_sa_vec(ds,p,'targets');
@@ -177,6 +179,11 @@ function img_formats=get_img_formats()
     img_formats.bv_vmp.reader=@read_bv_vmp;
     img_formats.bv_vmp.externals={'neuroelf'};
     
+    img_formats.bv_vmr.exts={'.vmr'};
+    img_formats.bv_vmr.matcher=@isa_bv_vmr;
+    img_formats.bv_vmr.reader=@read_bv_vmr;
+    img_formats.bv_vmr.externals={'neuroelf'};
+    
     img_formats.bv_glm.exts={'.glm'};
     img_formats.bv_glm.matcher=@isa_bv_glm;
     img_formats.bv_glm.reader=@read_bv_glm;
@@ -187,10 +194,10 @@ function img_formats=get_img_formats()
     img_formats.bv_msk.reader=@read_bv_msk;
     img_formats.bv_msk.externals={'neuroelf'};
     
-    img_formats.bv_msk.exts={'.vtc'};
-    img_formats.bv_msk.matcher=@isa_bv_vtc;
-    img_formats.bv_msk.reader=@read_bv_vtc;
-    img_formats.bv_msk.externals={'neuroelf'};
+    img_formats.bv_vtc.exts={'.vtc'};
+    img_formats.bv_vtc.matcher=@isa_bv_vtc;
+    img_formats.bv_vtc.reader=@read_bv_vtc;
+    img_formats.bv_vtc.externals={'neuroelf'};
     
     
     
@@ -253,7 +260,7 @@ function img_format=find_img_format(filename, img_formats)
     error('Could not find image format for "%s"', filename)
      
     
-function [data,hdr,img_format,sa]=read_img(fn, img_formats)
+function [data,vol,img_format,sa]=read_img(fn, img_formats)
     % helper: returns data (3D or 4D), header, and a string indicating the
     % image format. It matches the filename extension with what is stored
     % in img_formats
@@ -266,7 +273,7 @@ function [data,hdr,img_format,sa]=read_img(fn, img_formats)
     
     % read the data
     reader=img_formats.(img_format).reader;
-    [data,hdr,sa]=reader(fn);
+    [data,vol,sa]=reader(fn);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
@@ -279,7 +286,7 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
      
-function [data,hdr,sa]=read_nii(fn)
+function [data,vol,sa]=read_nii(fn)
     if ischar(fn)
         hdr=load_nii(fn);  
     elseif isa_nii(fn)
@@ -289,18 +296,32 @@ function [data,hdr,sa]=read_nii(fn)
     end
     
     data=hdr.img;
-    hdr=rmfield(hdr,'img');
-
     sa=struct();
+    vol=get_vol_nii(hdr);
+    
+function vol=get_vol_nii(hdr)        
+    % nifti volume info
+    hdr=hdr.hdr;
+    dim=hdr.dime.dim(2:4);
+    
+    hist=hdr.hist;
+    mat=[hist.srow_x; hist.srow_y; hist.srow_z; 0 0 0 1];
+    
+    % make base1 friendly
+    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
+    
+    vol=struct();
+    vol.mat=mat;
+    vol.dim=dim;
     
 %% Brainvoyager VMP (vmp)
     
 function b=isa_bv_vmp(hdr)
     
-    b=isa(hdr,'xff') && isfield(hdr,'Map') && isstruct(vmp.Map) && ... 
+    b=isa(hdr,'xff') && isfield(hdr,'Map') && isstruct(hdr.Map) && ... 
             isfield(hdr,'VMRDimX') && isfield(hdr,'NrOfMaps');
         
-function [data,hdr,sa]=read_bv_vmp(fn)
+function [data,vol,sa]=read_bv_vmp(fn)
     if ischar(fn)
         hdr=xff(fn);
     elseif isa_bv_vmp(fn)
@@ -313,22 +334,65 @@ function [data,hdr,sa]=read_bv_vmp(fn)
     voldim=size(hdr.Map(1).VMPData);
     
     data=zeros([voldim nsamples]);
-    
+    labels=cell(nsamples,1);
     for k=1:nsamples
-        data(:,:,:,k)=hdr.Map(k).VMPData;
+        map=hdr.Map(k);
+        data(:,:,:,k)=map.VMPData;
+        labels{k}=map.Name;
     end
     
-    bless(hdr); % avoid GC doing unwanted stuff
+    vol=get_vol_bv(hdr);
+    
+    %bless(hdr); % avoid GC doing unwanted stuff
    
     sa=struct();
+    sa.stats=cosmo_statcode(hdr);
+    sa.labels=labels;
     
+function b=isa_bv_vmr(hdr)
+    
+    b=isa(hdr,'xff') && isfield(hdr,'VMRData');
+        
+function [data,vol,sa]=read_bv_vmr(fn)
+    if ischar(fn)
+        hdr=xff(fn);
+    elseif isa_bv_vmr(fn)
+        hdr=fn;
+    else
+        error('illegal input');
+    end
+    
+    nsamples=1;
+    voldim=size(hdr.VMRData);
+    
+    data=zeros([voldim nsamples]);
+    data(:,:,:,1)=double(hdr.VMRData);
+    
+    vol=get_vol_bv(hdr);
+       
+    sa=struct();    
     
 function b=isa_bv_glm(hdr)
     
     b=isa(hdr,'xff') && isfield(hdr,'Predictor') &&  ... 
             isfield(hdr,'GLMData') && isfield(hdr,'DesignMatrix');
+
+
+function vol=get_vol_bv(hdr)   
+    % bv vol info
+    bbox=hdr.BoundingBox;
+    mat=bvcoordconv([],'bvx2tal',bbox);
+    dim=bbox.DimXYZ;
     
-function [data,hdr,sa]=read_bv_glm(fn)
+    % deal with offset at (.5, .5, .5) [CHECKME]
+    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*.5*[1 1 1]';
+
+    vol=struct();
+    vol.mat=mat;
+    vol.dim=dim;
+
+        
+function [data,vol,sa]=read_bv_glm(fn)
     if ischar(fn)
         hdr=xff(fn);
     elseif isa_bv_glm(fn)
@@ -357,28 +421,32 @@ function [data,hdr,sa]=read_bv_glm(fn)
     sa.Name2=name2;
     sa.RGB=rgb;
     
+    vol=get_vol_bv(hdr);
+
+    
 function b=isa_bv_msk(hdr)    
     
     b=isa(hdr,'xff') && isfield(hdr, 'Mask');
 
     
-function [data,hdr,sa]=read_bv_msk(fn)
+function [data,vol,sa]=read_bv_msk(fn)
     hdr=xff(fn);
     sa=struct();
     data=hdr.Mask>0;
-    hdr=struct(); 
+    vol=get_vol_bv(hdr);
+
+    
 
 function b=isa_bv_vtc(hdr)    
     
     b=isa(hdr,'xff') && isfield(hdr, 'VTCData');    
     
-function [data,hdr,sa]=read_bv_vtc(fn)    
+function [data,vol,sa]=read_bv_vtc(fn)    
     hdr=xff(fn);
     sa=struct();
     data=shiftdim(hdr.VTCData,1);
-    
-    
-    
+    vol=get_vol_bv(hdr);
+
     
     
 %% AFNI     
@@ -386,7 +454,7 @@ function b=isa_afni(hdr)
     b=iscell(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
             isfield(hdr,'DATASET_RANK');
 
-function [data,hdr,sa]=read_afni(fn)  
+function [data,vol,sa]=read_afni(fn)  
     [err,data,hdr,err_msg]=BrikLoad(fn);
     if err
         error('Error reading afni file: %s', err_msg);
@@ -395,14 +463,45 @@ function [data,hdr,sa]=read_afni(fn)
     sa=struct();
     
     if isfield(hdr,'BRICK_LABS')
-        labs=['~' hdr.BRICK_LABS '~'];
-        pos=find(labs=='~');
-        ntilde=numel(pos-1);
+        % if present, get labels
+        labels=cosmo_strsplit(hdr.BRICK_LABS,'~');
         nsamples=hdr.DATASET_RANK(2);
-        if ntilde >= nsamples
-            sa.labels=cell(nsamples,1);
-            for k=1:nsamples
-                sa.labels{k}=labs((pos(k)+1):(pos(k+1)-1));
-            end
+        if numel(labels)==nsamples+1 && isempty(labels{end})
+            labels=labels(1:(end-1));
         end
+        sa.labels=labels(:);
     end
+    
+    if isfield(hdr,'BRICK_STATAUX')
+        % if present, get stat codes
+        sa.stats=cosmo_statcode(hdr);
+    end
+    
+    vol=get_vol_afni(hdr);
+    
+function vol=get_vol_afni(hdr)   
+    % afni volume info
+    orient='LPI'; % always return LPI-based matrix
+
+    % origin and basis vectors in world space
+    k=[0 0 0;eye(3)];
+
+    [err,i]=AFNI_Index2XYZcontinuous(k,hdr,orient);
+    
+    % basis vectors in voxel space
+    e1=i(2,:)-i(1,:);
+    e2=i(3,:)-i(1,:);
+    e3=i(4,:)-i(1,:);
+
+    % change from base0 (afni) to base1 (SPM/Matlab)
+    o=i(1,:)-(e1+e2+e3);
+
+    % create matrix
+    mat=[e1;e2;e3;o]';
+
+    % set 4th row
+    mat(4,:)=[0 0 0 1];
+
+    vol=struct();
+    vol.mat=mat;
+    vol.dim=hdr.DATASET_DIMENSIONS(1:3);

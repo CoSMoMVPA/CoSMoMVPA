@@ -16,16 +16,31 @@ function hdr=cosmo_map2fmri(dataset, fn)
     cosmo_check_dataset(dataset, 'fmri');
 
     img_formats=get_img_formats();
-    img_format=get_img_format(dataset, img_formats);
+    sp=cosmo_strsplit(fn,'-');
+    save_to_file=~isempty(sp{1});
     
-    externals=img_formats.(img_format).externals;
+    if save_to_file
+        fmt=get_format(img_formats, fn);
+    else
+        if numel(sp)~=2
+            error('expected -{FORMAT}');
+        end
+        fmt=sp{2};
+    end
+    
+    if ~isfield(img_formats,fmt)
+        error('Unsupported format %s', fmt);
+    end
+    
+    methods=img_formats.(fmt);
+    externals=methods.externals;
     cosmo_check_external(externals);
     
-    builder=img_formats.(img_format).builder;
-    hdr=builder(dataset);
+    creator=methods.creator;
+    hdr=creator(dataset);
     
-    if nargin>1
-        writer=img_formats.(img_format).writer;
+    if save_to_file
+        writer=methods.writer;
         writer(fn, hdr);
     end
     
@@ -36,24 +51,57 @@ function unfl_ds=unflatten(ds)
     % puts the time dimension last, instead of first
     unfl_ds=shiftdim(cosmo_unflatten(ds),1);
 
+
+function b=ends_with(end_str, str)
+    if iscell(end_str)
+        b=any(cellfun(@(x) ends_with(x,str),end_str));
+    else
+        b=isempty(cosmo_strsplit(str, end_str,-1));
+    end
+    
+function fmt=get_format(img_formats, file_name)
+    fns=fieldnames(img_formats);
+    fmt=[];
+    for k=1:numel(fns)
+        fmt=fns{k};
+        exts=img_formats.(fmt).exts;
+        if ends_with(exts, file_name)
+            break;
+        end
+    end
+    if isempty(fmt)
+        error('Not found: format for %s', file_name);
+    end
+    
 function img_formats=get_img_formats()
     img_formats=struct();
     
-    img_formats.nii.builder=@build_nii;
+    img_formats.nii.creator=@new_nii;
     img_formats.nii.writer=@write_nii;
     img_formats.nii.externals={'nifti'};
+    img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
     
-    img_formats.bv_vmp.builder=@build_bv_vmp;
+    img_formats.bv_vmp.creator=@new_bv_vmp;
     img_formats.bv_vmp.writer=@write_bv;
     img_formats.bv_vmp.externals={'neuroelf'};
+    img_formats.bv_vmp.exts={'.vmp'};
     
-    img_formats.bv_glm.builder=@build_bv_glm;
-    img_formats.bv_glm.writer=@write_bv;
-    img_formats.bv_glm.externals={'neuroelf'};
+    img_formats.bv_vmr.creator=@new_bv_vmr;
+    img_formats.bv_vmr.writer=@write_bv;
+    img_formats.bv_vmr.externals={'neuroelf'};
+    img_formats.bv_vmr.exts={'.vmr'};
     
-    img_formats.afni.builder=@build_afni;
+    img_formats.bv_msk.creator=@new_bv_msk;
+    img_formats.bv_msk.writer=@write_bv;
+    img_formats.bv_msk.externals={'neuroelf'};
+    img_formats.bv_msk.exts={'.msk'};
+    
     img_formats.afni.writer=@write_afni;
     img_formats.afni.externals={'afni'};
+    img_formats.afni.creator=@new_afni;
+    img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
+                           '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
+                           '+tlrc.BRIK','+tlrc.BRIK.gz'};
     
     
 function img_format=get_img_format(ds, img_formats)
@@ -85,10 +133,16 @@ function check_endswith(fn,ext)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Nifti
+
+function ni=new_nii(ds)
+    a=ds.a;
+    vol=a.vol;
+    vol_data=unflatten(ds);
+    dim=size(vol_data);
+    if numel(dim)==3
+        dim(4)=1;
+    end
     
-<<<<<<< Updated upstream
-function nii=build_nii(ds)
-=======
     mat=vol.mat;
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[1 1 1]';
     pix_dim=vol.mat(1:3,1:3)*[1 1 1]';
@@ -137,95 +191,212 @@ function nii=build_nii(ds)
 
 function write_nii(fn, hdr)
     save_nii(hdr, fn);
->>>>>>> Stashed changes
-    
-    nsamples=size(ds.samples,1);
-    
-    nii=ds.a.hdr_nii;
-    nii.hdr.dime.dim(5)=nsamples;
-    nii.img=unflatten(ds);
-    
-    function write_nii(fn, hdr)
-    save_nii(hdr, fn);
     
     
     %% Brainvoyager VMP
-function hdr=build_bv_vmp(ds)
-    samples=ds.samples;
-    nsamples=size(samples,1);
+function hdr=add_bv_mat_hdr(hdr,ds,bv_type)    
+    % helper to set matrix in header
+    mat=ds.a.vol.mat;
     
-    hdr=ds.a.hdr_bv_vmp;
+    % ensure proper VMP/VMR orientation
+    dg=mat(1:3,1:3)*[0 0 -1; -1 0 0; 0 -1 0]';
     
-    vols=unflatten(ds);
-    
-    master_data=hdr.Map(1); 
-    
-    set_zero={'Type','LowerThreshold','UpperThreshold','ClusterSize',...
-                'DF1','DF2','BonferroniValue','FDRThresholds'};
-    
-    fns=fieldnames(master_data);
-    n=numel(fns);
-    
-    args=cell(1,n*2);
-    for k=1:n
-        fn=fns{k};
-        args{k*2-1}=fn;
-        data=cell(1,nsamples);
-        for j=1:nsamples
-            dataj=master_data.(fn);
-            if strcmp(fn,'VMPData')
-                dataj=vols(:,:,:,j);
-            elseif ~isempty(strcmp(fn,set_zero))
-                dataj(:)=0;
-            end
-            data{j}=dataj;
-        end
-        args{k*2}=data;
+    if ~isequal(dg,diag(diag(dg)))
+        error('Unsupported orientation: need ARS');
+    end
+    resolution=unique(diag(dg));
+    if numel(resolution)~=1
+        error('Multiple element sizes: %s', sprintf('%d ', resolution));
+    end
+    if resolution<0
+        error('Resolution cannot be negative, found %d', resolution);
     end
     
-    hdr.Map=struct(args{:});
+    % Set {X,Y,Z}{Start,End} values based on the transformation matrix
+    % deal with offset at (.5, .5, .5) [CHECKME]
+    mat(1:3,4)=mat(1:3,4)-mat(1:3,1:3)*.5*[1 1 1]';
+    tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
+    bv_coords=bvcoordconv(tal_coords(1:3,:), 'tal2bvs',hdr.BoundingBox);
     
+    switch bv_type
+        case {'vmp','msk'}
+            labels={'ZStart','ZEnd','XStart','XEnd','YStart','YEnd'};
+            for k=1:numel(labels)
+                label=labels{k};
+                hdr.(label)=bv_coords(k);
+            end
+            hdr.Resolution=resolution;
+
+        case 'vmr'
+            % this *should* be a 256^3 volume
+            % XXX check for this?
+            labels={'X','Y','Z'};
+            for k=1:3
+                label=labels{k};
+                hdr.(['VoXRes' label])=resolution;
+                hdr.(['Dim' label])=bv_coords(2,k);
+            end
+            
+        otherwise
+            error('Unsupported type %s', bv_type);
+    end
+    
+function hdr=new_bv_vmp(ds)   
+    hdr=xff('new:vmp');
+   
+    hdr=add_bv_mat_hdr(hdr,ds,'vmp'); 
+    
+    % Store the data
+    
+    nsamples=size(ds.samples,1);
+    maps=cell(1,nsamples);
+    
+    stats=cosmo_statcode(ds,'bv');
+    
+    for k=1:nsamples
+        empty_hdr=xff('new:vmp');
+        map=empty_hdr.Map;
+        ds_k=cosmo_slice(ds,k);
+        map.VMPData=unflatten(ds_k);
+        if isfield(ds_k,'labels')
+            map.Name=[ds_k.labels{:}];
+        end
+        if ~isempty(stats)
+            map=cosmo_structjoin(map, stats{k});
+        end 
+        maps{k}=map;
+    end
+    
+    hdr.Map=cat(2,maps{:});
+    hdr.NrOfMaps=nsamples;
+            
+    bless(hdr);
+            
 function write_bv(fn, hdr)
-    check_endswith(fn,'.vmp');
+    % general storage function
     hdr.SaveAs(fn);
     
     
     %% Brainvoyager GLM
-function hdr=build_bv_glm(ds)
+function hdr=new_bv_vmr(ds)
+    hdr=xff('new:vmr');
+    hdr=add_bv_mat_hdr(hdr,ds,'vmr');
     
-    warning(['Output in BV .glm format not supported '...
-                '- storing as VMP instead']);
-    
-    ds.a.hdr_bv_vmp=xff('new:vmp');
-    ds.a=rmfield(ds.a,'hdr_bv_glm');
-    hdr=build_bv_vmp(ds);
-    
-
-function hdr=build_afni(ds)
     nsamples=size(ds.samples,1);
-    hdr=ds.a.hdr_afni; 
+    if nsamples~=1, 
+        error('Unsupported: more than 1 sample');
+    end
     
-    hdr.BRICK_TYPES=repmat(3,1,nsamples);
-    hdr.DATASET_RANK(2)=nsamples;
-    hdr.SCENE_DATA(2)=11; %brik
-    hdr.SCALE=0;
+    mn=min(ds.samples);
+    mx=max(ds.samples);
+    
+    % scale to 0..255
+    vol_data=(unflatten(ds)-mn)*255*(mx-mn);
+    hdr.VMRData=uint8(vol_data(:,:,:,1));
+    
+    %% Brainvoyager mask
+function hdr=new_bv_msk(ds)
+    hdr=xff('new:msk');
+    hdr=add_bv_mat_hdr(hdr,ds,'msk');
+
+    nsamples=size(ds.samples,1);
+    if nsamples~=1, 
+        error('Unsupported: more than 1 sample');
+    end
+    
+    vol_data=unflatten(ds);
+    hdr.Mask=uint8(vol_data(:,:,:,1));
+    
+    
+    
+%% AFNI  
+function afni_info=new_afni(ds)
+    vol_data=unflatten(ds);
+    dim=size(vol_data);
+    nsamples=size(ds.samples,1);
+    
+    a=ds.a;
+    vol=a.vol;
+    mat=a.vol.mat;
+    
+    % deal with orientation
+    idxs=zeros(1,3);
+    m=zeros(1,3);
+
+    for k=1:3
+        % for each spatial dimension, find which row transforms it
+        idx=find(mat(1:3,k));
+        switch numel(idx)
+            case 0
+                error('Singular transformation matrix at row %d', k);
+            case 1
+                % ok
+            otherwise
+                error('Cannot deal with non-oblique matrix');
+        end
+        % store index and transformation matrix
+        idxs(k)=idx;
+        m(k)=mat(idx,k);
+    end
+
+    % set voxel size and origin
+    % as the header was stored in LPI but AFNI likes RAI,
+    % convert coordinates to RAI
+    lpi2rai=[-1 -1 1];
+
+    delta=m.*lpi2rai(idxs);
+    origin=mat(idxs,:)*[1 1 1 1]'.*lpi2rai(idxs)';
+
+    % set orientation code. 
+    % thse are neither RAI or LPI, but RPI (when ordered logically)
+    % No idea why Bob Cox made that decision.
+    lpi2orient=[-1 1 1];
+    offset=(1-sign(m).*lpi2orient(idxs))/2;
+    orient=(idxs-1)*2+offset;
+
+    vol_data=unflatten(ds);
+
+        
+    dim=size(vol_data);
+    
+    brik_type=1; %functional head
+    brik_typestring='3DIM_HEAD_FUNC';
+    brik_func=11; % FUNC_BUCK_TYPE
+    brik_view=0; % default to +orig, but overriden by writer
+    
+    afni_info=struct();
+    afni_info.SCENE_DATA=[brik_view, brik_func, brik_type];
+    afni_info.TYPESTRING=brik_typestring;
+    afni_info.BRICK_TYPES=3*ones(1,nsamples); % store in float format
+    afni_info.BRICK_STATS=[];                 % ... and thus need no stats
+    afni_info.BRICK_FLOAT_FACS=[];            % ... or multipliers
+    afni_info.DATASET_RANK=[3 nsamples];      % number of volumes
+    afni_info.DATASET_DIMENSIONS=dim(1:3);
+    afni_info.ORIENT_SPECIFIC=orient;         
+    afni_info.DELTA=delta;
+    afni_info.ORIGIN=origin;
+    afni_info.SCALE=0;
     
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
                 'BRICK_STATS','BRICK_FLOAT_FACS',...
                 'BRICK_STATAUX','STAT_AUX'};
     for k=1:numel(set_empty)
         fn=set_empty{k};
-        hdr.(fn)=[];
+        afni_info.(fn)=[];
     end
     
     % if labels for the samples, store them in the header
     if isfield(ds.sa,'labels') && ~isempty(ds.sa.labels)
-        hdr.BRICK_LABS=cosmo_strjoin(ds.sa.labels,'~');
+        afni_info.BRICK_LABS=cosmo_strjoin(ds.sa.labels,'~');
     end
     
+    if isfield(ds.sa,'stats') && ~isempty(ds.sa.stats)
+        afni_info=cosmo_structjoin(afni_info,cosmo_statcode(ds,'afni'));
+    end
+        
     % store data in non-afni field 'img'
-    hdr.img=unflatten(ds);
-    
+    afni_info.img=vol_data;
+
 function write_afni(fn, hdr)    
     
     hdr.RootName=fn;
@@ -237,10 +408,28 @@ function write_afni(fn, hdr)
     afniopt.OverWrite='y';
     afniopt.NoCheck=0;
     
+    if ends_with({'+orig','+orig.HEAD','+orig.BRIK',...
+                           '+orig.BRIK.gz'},fn)
+        hdr.SCENE_DATA(1)=0;
+    elseif ends_with({'+tlrc','+tlrc.HEAD',...
+                           '+tlrc.BRIK','+tlrc.BRIK.gz'},fn)
+        hdr.SCENE_DATA(1)=2;
+    else
+        error('Unsupported scene data for %s', fn);
+    end
+    
     [err, ErrMessage]=WriteBrik(data, hdr, afniopt);
     if err
         error(ErrMessage);
     end
     
-    
-    
+function s=set_all(s, fns, v)
+    % sets all fields in fns in struct s to v
+    % if v is omitted it is set to 0.
+    if nargin<3, v=0; end
+    n=numel(fns);
+    for k=1:n
+        fn=fns{k};
+        s.(fn)=v;
+    end   
+
