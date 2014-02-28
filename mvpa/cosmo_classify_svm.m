@@ -2,7 +2,7 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 % SVM classifier that uses classify_svm_2class to provide 
 % multi-class classification with SVM.
 %
-% predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, samples_test, opt)
+% predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
 %
 % Inputs
 %   samples_train      PxR training data for P samples and R features
@@ -12,6 +12,12 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %
 % Output
 %   predicted          Qx1 predicted data classes for samples_test
+%
+% Notes:
+%  - this function uses matlab's builtin svmtrain function, which has 
+%    the same name as LIBSVM's version. Use of this function is not
+%    supported when LIBSVM's svmtrain precedes in the matlab path; in 
+%    that case, adjust the path or use cosmo_classify_libsvm instead.
 %
 % See also svmtrain, svmclassify, cosmo_classify_svm_2class
 %
@@ -23,7 +29,9 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
     [ntest, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
     
-    if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end
+    if nfeatures~=nfeatures_ || ntrain_~=ntrain, 
+        error('illegal input size'); 
+    end
     
     classes=unique(targets_train);
     nclasses=numel(classes);
@@ -46,7 +54,8 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
             mask_j=targets_train==classes(j);
             mask=mask_k | mask_j;
             
-            pred=cosmo_classify_svm_2class(samples_train(mask,:), targets_train(mask), samples_test, opt);
+            pred=cosmo_classify_svm_2class(samples_train(mask,:), ...
+                            targets_train(mask), samples_test, opt);
             % <@@<
             all_predicted(:,pos)=pred;
         end
