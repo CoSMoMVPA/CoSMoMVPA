@@ -70,10 +70,10 @@ function fmt=get_format(img_formats, file_name)
     fns=fieldnames(img_formats);
     fmt=[];
     for k=1:numel(fns)
-        fmt=fns{k};
-        exts=img_formats.(fmt).exts;
+        fn=fns{k};
+        exts=img_formats.(fn).exts;
         if ends_with(exts, file_name)
-            break;
+            fmt=fn;
         end
     end
     if isempty(fmt)
