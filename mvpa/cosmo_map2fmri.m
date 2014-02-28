@@ -158,7 +158,6 @@ function ni=new_nii(ds)
         'cal_min','toffset'};
 
     dime=set_all(dime,fns);
-    dime=cosmo_structjoin(dime,cosmo_statcode(ds,'nifti'));
     dime.xyzt_units=10;
     hdr.dime=dime;
 
@@ -423,7 +422,8 @@ function write_afni(fn, hdr)
         error(ErrMessage);
     end
     
-function s=set_all(s, fns, v)
+    
+ function s=set_all(s, fns, v)
     % sets all fields in fns in struct s to v
     % if v is omitted it is set to 0.
     if nargin<3, v=0; end
@@ -432,4 +432,3 @@ function s=set_all(s, fns, v)
         fn=fns{k};
         s.(fn)=v;
     end   
-
