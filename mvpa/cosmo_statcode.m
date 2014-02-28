@@ -161,6 +161,12 @@ function hdr=name_df2hdr(name_df, output_format)
             hdr=maps; % return a cell with maps
                 
         case 'nifti'
+            hdr=struct();
+            
+            if isempty(stat_idxs)
+                return
+            end
+            
             unq_stat_idx=unique(stat_idxs);
             df=name_df(:,2);
             n=numel(df);
@@ -172,7 +178,8 @@ function hdr=name_df2hdr(name_df, output_format)
             end
             unq_df=unique(df_matrix,'rows');
 
-            hdr=struct();
+            
+            
             
             if numel(unq_stat_idx)>1 || numel(unique(ndf))>1 || ...
                             size(unq_df,1)>1
