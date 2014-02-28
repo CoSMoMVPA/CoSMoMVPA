@@ -86,7 +86,58 @@ function check_endswith(fn,ext)
 
 %% Nifti
     
+<<<<<<< Updated upstream
 function nii=build_nii(ds)
+=======
+    mat=vol.mat;
+    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[1 1 1]';
+    pix_dim=vol.mat(1:3,1:3)*[1 1 1]';
+    hdr=struct();
+
+    dime=struct();
+    dime.datatype=16; %single
+    dime.dim=[4 dim(:)' 1 1 1];
+    dime.pixdim=[1 pix_dim(:)' 0 0 0 0];
+    fns={'intent_p1','intent_p2','intent_p3','intent_code',...
+        'slice_start','slice_duration','slice_end',...
+        'scl_slope','scl_inter','slice_code','cal_max',...
+        'cal_min','toffset'};
+
+    dime=set_all(dime,fns);
+    dime=cosmo_structjoin(dime,cosmo_statcode(ds,'nifti'));
+    dime.xyzt_units=10;
+    hdr.dime=dime;
+
+    hk=struct();
+    hk.sizeof_hdr=348;
+    hk.data_type='';
+    hk.db_name='';
+    hk.extents=0;
+    hk.session_error=0;
+    hk.regular='r';
+    hk.dim_info=0;
+    hdr.hk=hk;
+
+    hist=struct();
+    hist.sform_code=2;
+    hist.originator=[1 1 1 1 0];
+    hist=set_all(hist,{'descrip','aux_file','intent_name'},'');
+    hist=set_all(hist,{'qform_code','quatern_b',...
+                        'quatern_d',...
+                        'qoffset_x','qoffset_y','qoffset_z'});
+    hist=set_all(hist,{'intent_name'},'');   
+    hist.srow_x=mat(1,:);
+    hist.srow_y=mat(2,:);
+    hist.srow_z=mat(3,:);
+    hist.quatern_c=1;                
+    hdr.hist=hist;
+
+    ni.img=single(vol_data);
+    ni.hdr=hdr;
+
+function write_nii(fn, hdr)
+    save_nii(hdr, fn);
+>>>>>>> Stashed changes
     
     nsamples=size(ds.samples,1);
     
