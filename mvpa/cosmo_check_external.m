@@ -77,6 +77,7 @@ function externals=get_externals()
     externals.fieldtrip.label='FieldTrip toolbox';
     externals.fieldtrip.url='http://fieldtrip.fcdonders.nl';
 
-                        
-
-
+    externals.libsvm.check=@() ~isempty(which('svmpredict')) && ...
+                                ~isempty(which('svmptrain'));
+    externals.libsvm.label='LIBSVM';
+    externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
