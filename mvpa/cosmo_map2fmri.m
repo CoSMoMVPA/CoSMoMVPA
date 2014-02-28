@@ -165,6 +165,7 @@ function ni=new_nii(ds)
         'cal_min','toffset'};
 
     dime=set_all(dime,fns);
+    dime=cosmo_structjoin(dime, cosmo_statcode(ds,'nifti'));
     dime.xyzt_units=10;
     hdr.dime=dime;
 
