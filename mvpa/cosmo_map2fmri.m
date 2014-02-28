@@ -1,8 +1,14 @@
 function hdr=cosmo_map2fmri(dataset, fn)
-% maps a dataset structure to a nifti structure or file
+% maps a dataset structure to a NIFTI, AFNI, or BV structure or file
 % 
-% Usage 1: hdr=cosmo_map2fmri(dataset) returns a header structure
+% Usage 1: hdr=cosmo_map2fmri(dataset, '-{FMT}) returns a header structure
 % Usage 2: cosmo_map2fmri(dataset, fn) saves dataset to a volumetric file.
+%
+% In Usage 1, {FMT} can be one of 'nii','bv_vmp',bv_vmr','bv_msk','afni'.
+% In Usage 2, fn should end with '.nii.gz', '.nii', '.hdr', '.img', '.vmp',
+%             '.vmr', '.msk', '+orig','+orig.HEAD','+orig.BRIK',
+%             '+orig.BRIK.gz','+tlrc','+tlrc.HEAD','+tlrc.BRIK', or
+%             '+tlrc.BRIK.gz'.
 %
 % - for NIFTI files, it requires the following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
@@ -12,7 +18,8 @@ function hdr=cosmo_map2fmri(dataset, fn)
 % - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
-% NNO Aug 2013
+% NNO Aug 2013, updated Feb 2014
+
     cosmo_check_dataset(dataset, 'fmri');
 
     img_formats=get_img_formats();
