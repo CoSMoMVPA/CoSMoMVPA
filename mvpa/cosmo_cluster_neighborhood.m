@@ -1,159 +1,170 @@
-function nbrhood=cosmo_cluster_neighborhood(ds, nbrhood_size)
+function cluster_nbrhood=cosmo_cluster_neighborhood(ds, nbrhood)
 % Returns a neighborhood for a dataset suitable for cluster-based analysis.
 %
-% nbrhood=cosmo_cluster_neighborhood(ds, nbrhood_size, parent_type)
+% nbrhood=cosmo_cluster_neighborhood(ds, nbrhood)
 %
 % Inputs:
-%   ds              One of the following
-%                   - if a Nx1 vector, then ds is interpreted as the
-%                     size of an NDIM-dimensional array with size ds(1) x
-%                     ds(2) x ... x ds(N). 
-%                   - if a struct, it should be an fmri or meeg dataset
-%   nbrhood_size    One of the following:
-%                   - if a single number then ds should be a vector or
-%                     an fmri dataset. nbrhood_size indicates along how 
-%                     many dimensions distances of neighbors can differ
-%                     by one. For example, in an fmri dataset, or if 
-%                     ds is a vector with 3 elements, then 1=sharing side; 
-%                     2=sharing edge; and 3=sharing corner. In other words,
-%                     two elements are neighbors if all their coordinates
-%                     differ by at most 1 and their manhattan distance is
-%                     not greater than nbrhood_size. 
-%                   - if multiple numbers then ds should be a vector or
-%                     an meeg dataset with NDIM the number of dimensions. 
-%                     nbrhood_size(K) should be either 0 (no clustering 
-%                     along K-th dimension) or 1 (do clustering along K-th
-%                     dimension), except when ds is an meeg dataset with 
-%                     channels in the J-th dimension, in which case 
-%                     nbrhood_size(J) defines neighborhood through 
-%                     cosmo_meeg_chan_nbrs (NaN for Delauney, negative
-%                     values to indicate the number of channels; positive
-%                     numbers to indicate the maximum euclidian distance).
+%   ds               dataset struct
+%   nbrhood          One of the following:
+%                    - if a single number:
+%                      * if ds is an fmri dataset:
+%                        nbrhood indicates along how many dimensions 
+%                        distances of neighbors can differ; 1=sharing side; 
+%                        2=sharing edge; and 3=sharing corner (default: 3).
+%                      * if ds is an MEEG dataset:
+%                        nbrhood indicates the size of the neighborhood
+%                        along the channel dimension (if present).
+%                        See cosmo_meeg_chan_neighborhood. All other
+%                        dimensions (e.g. 'freq' and 'time') are connected
+%                        by order-1 neighborhood (sharing side).
+%                        (default: NaN, i.e. Delauney triangulation).
+%                    - a neighborhood struct, for example from
+%                      cosmo_neighborhood. In this case it should be
+%                      compatible with ds in the .a field and in the
+%                      fieldnames of .fa.
+%   
+%   cluster_nbrhood  Neighborhood struct with fields .neighbors, .a. and 
+%                    .fa.
 %
-% Output:
-%   nbrhood         One of the following:
-%                   - if ds is a vector, then nbrhood is a prod(ds)x1 cell
-%                     with ds(k) containing the linear indices of the
-%                     neighbors of the k-th value in an array of size ds.
-%                   - otherwise (ds is an fmri or meeg dataset) it is a 
-%                     struct with fields .neighbors, .a. and .fa
-%                     as returned by cosmo_spherical_voxel_selection
-%                     or cosmo_meeg_neighborhood
+% Examples:
+%   - % ds is an fmri dataset
+%     >> nbrhood=cosmo_cluster_neighborhood(ds,2) % voxels sharing edge
+%  
+%   - % exactly the same thing
+%     >> sph_nbrhood=cosmo_spherical_neighborhood(ds, 1.5);
+%     >> nbrhood=cosmo_cluster_neighborhood(ds, sph_nbrhood);
+%   
+%   - % ds is an MEEG dataset with 'chan', 'freq', time' dimensions
+%     % connect channels using Delauney triangulation, freq and time
+%     % by matching sides (implicit).
+%     >> nbrhood=cosmo_cluster_neighborhood(ds,NaN) % 
 %
-% Notes:
-%   - MEEG datasets cannot have mixed sensor types
+%     % connect channels over maximum distance of 10, freq and time
+%     % by matching sides (implicit).
+%     >> nbrhood=cosmo_cluster_neighborhood(ds,10) % 
 %
-% See also cosmo_meeg_neighborhood, cosmo_spherical_voxel_selection, 
-%          cosmo_meeg_chan_nbrs.
+%     % connect channels based on nearest 10 channels, freq and time
+%     % by matching sides (implicit).
+%     >> nbrhood=cosmo_cluster_neighborhood(ds,-10) % 
+%
+%     % connect channels using Delauney triangulation, only connect time
+%     % but not frequency. This requires a bit more work.
+%     >> chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,NaN);
+%     >> time_nbrhood=cosmo_interval_neighborhood(ds,'time',1);
+%     >> chan_time_nbrhood=cosmo_neighborhood(chan_nbrhood, time_nbrhood);
+%     >> nbrhood=cosmo_cluster_neighborhood(chan_time_nbrhood)
+%
+% See also: cosmo_meeg_chan_neighborhood, cosmo_spherical_neighborhood, 
+%           cosmo_interval_neighborhood, cosmo_neighborhood.
 %
 % NNO Oct 2013
 
-% handle numeric case
-if isnumeric(ds)
-    sz=ds; % number of values along each dimension
-    ndim=numel(sz);
-    
-    if sum(size(ds)>1)>1
-        % not a vector
-        error('Numeric array must be size vector');
-    end
-    
-    % position of neighbors of origin
-    dim_pos=cosmo_cartprod(repmat({-1:1},1,ndim));
-    
-    % see if nbrhood was specified as diagonal distance
-    diag_nbrhood=numel(nbrhood_size)==1;
-    
-    % set the mask for dim_pos
-    if diag_nbrhood
-        if ~any(nbrhood_size==1:ndim)
-            error('singleton nbrhood size should be in 1:%d',ndim)
-        end
-        
-        msk=sum(dim_pos.^2,2)<=nbrhood_size;
-    else
-        if ~all(cosmo_match(nbrhood_size,[0,1])) || ...
-                        ndim~=numel(nbrhood_size)
-            error('nbrhood should be 1x%d with values 0 or 1',ndim);
-        end
-        
-        msk=sum(bsxfun(@le, abs(dim_pos), nbrhood_size),2)==ndim;
-    end
-    
-    % trim dim_pos to contain only indices in desired neighborhood
-    dim_pos=dim_pos(msk,:);
-    
-    % generate a matrix with the sub-indices of all features
-    sz_cell=num2cell(sz);
-    indices_cell=cellfun(@(x) {1:x}, sz_cell);
-    feature_pos=cosmo_cartprod(indices_cell);
-    
-    % allocate space for output
-    nfeatures=prod(sz);
-    nbrhood=cell(nfeatures,1);
-    
-    for k=1:nfeatures
-        fpos=feature_pos(k,:);
-        
-        % get position of neighbors expressed in sub-indices
-        sub_pos=bsxfun(@plus,fpos,dim_pos);
-        
-        % mask out neighbors out of bounds
-        in_bounds=sum(sub_pos>0 & bsxfun(@le, sub_pos, sz),2)==ndim;
-        sub_pos=sub_pos(in_bounds,:);
-        
-        if ndim==1
-            % no conversion to linear indices necessary
-            ind_pos=sub_pos;
-        else            
-            % prepare of sub2ind: put all subindices in a cell, seperately
-            sub_pos_cell=cell(1,ndim);
-            for dim=1:ndim
-                sub_pos_cell{dim}=sub_pos(:,dim);
+    if nargin<2 || ~isstruct(nbrhood)
+        if cosmo_check_dataset(ds,'fmri',false)
+            % fMRI dataset
+            switch nargin
+                case 1
+                    nbrhood_size=3;
+                case 2
+                    nbrhood_size=nbrhood;
+                otherwise
+                    error('Need single radius for fMRI dataset');
             end
-            
-            % convert neighbor sub to linear indices
-            ind_pos=sub2ind(sz,sub_pos_cell{:});
+
+            radius=sqrt(nbrhood_size)+.01; % pythagoras
+            nbrhood=cosmo_spherical_neighborhood(ds, radius);
+        elseif cosmo_check_dataset(ds,'meeg',false)
+            % MEEG dataset
+
+            % set channel neighborhood size
+            dim_labels=ds.a.dim.labels;
+            chan_dim=find(cosmo_match(dim_labels,'chan'));
+            has_chan=~isempty(chan_dim);
+            switch nargin
+                case 1
+                    chan_nbrhood_size=NaN; % Default: delauney triangulation
+                case 2
+                    if ~has_chan
+                        error('No channel dimension, cannot specify size');
+                    end
+                    chan_nbrhood_size=nbrhood;
+                otherwise
+                    error('Need %d arguments for MEEG neighborhood size',...
+                                has_chan);
+            end
+
+            % determine neighborhoods for all dimensions
+            ndim=numel(dim_labels);
+            nhoods=cell(1,ndim);
+            for dim=1:ndim
+                if dim==chan_dim
+                    % chan is a special case
+                    nhood=cosmo_meeg_chan_neighborhood(ds,...
+                                                chan_nbrhood_size); 
+                else 
+                    % all other dimensions
+                    nhood=cosmo_interval_neighborhood(ds,...
+                                            dim_labels{dim},1);
+                end
+                nhoods{dim}=nhood;
+            end
+
+            % join the neighborhoods
+            nbrhood=cosmo_neighborhood(ds,nhoods{:});
+        else
+            error('unsupported input');
         end
-
-        nbrhood{k}=ind_pos;
-    end
-    
-% fmri dataset case    
-elseif cosmo_check_dataset(ds,'fmri',false);
-    if ~any(nbrhood_size==1:3)
-        error('fmri dataset: clustdef should be 1, 2 or 3'); 
     end
 
-    if nargin>=3
-        error('Cannot have parent_type with fmri dataset');
+    % check the input
+    if ~isequal(ds.a.dim.labels, nbrhood.a.dim.labels)
+        error(['Dimension label mismatch between neighborhood (%s) and '...
+               'dataset (%s)'],cosmo_strjoin(nbrhood.a.dim.labels,', '),...
+                                cosmo_strjoin(ds.a.dim.labels,', '));
     end
 
-    radius=sqrt(nbrhood_size)+.01;
+    if ~isequal(ds.a, nbrhood.a)
+        error('dataset attribute mismatch between neighborhood and dataset');
+    end
 
-    nbrhood=cosmo_spherical_voxel_selection(ds, radius);
-
-% meeg dataset case
-elseif cosmo_check_dataset(ds,'meeg',false);
+    % find mapping from nbrrood fa indices to ds fa indices
     labels=ds.a.dim.labels;
     ndim=numel(labels);
+    dim_sizes=cellfun(@numel,ds.a.dim.values);
 
-    if numel(nbrhood_size)~=ndim
-        error('require clustdef with %d values', ndim);
+    % store fa indices
+    ds_fa=cell(1,ndim);
+    nbrhood_fa=cell(1,ndim);
+    for dim=1:ndim
+        ds_fa{dim}=ds.fa.(labels{dim});
+        nbrhood_fa{dim}=nbrhood.fa.(labels{dim});
+    end 
+
+    % convert to linear indices
+    if ndim==1
+        % trivial case
+        ds_lin=ds_fa{1};
+        nbrhood_lin=nbrhood_fa{1};
+    else
+        ds_lin=sub2ind(dim_sizes, ds_fa{:});
+        nbrhood_lin=sub2ind(dim_sizes, nbrhood_fa{:});
     end
 
-    chandim=find(cosmo_match(ds.a.dim.labels,'chan'));
-    otherdims=setdiff(1:ndim,chandim);
-    illegal_other=find(~cosmo_match(nbrhood_size(otherdims),[0,1]));
-    if any(illegal_other)
-        error('illegal clustering value: %d (should be 0 or 1)', ...
-                    nbrhood_size(otherdims(illegal_other(1))));
+    % total number of features in cross product
+    n=prod(dim_sizes);
+
+    % mapping from all features to those in nbrhood
+    full2nbrhood=zeros(1,n);
+    full2nbrhood(nbrhood_lin)=1:numel(nbrhood_lin);
+
+    % ensure that nbrhood has no features not in ds
+    ds2nbrhood=full2nbrhood(ds_lin);
+    if any(ds2nbrhood==0)
+        idx=find(ds2nbrhood==0,1);
+        error('Missing neighborhood in dataset feature #%d',idx);
     end
 
-    nbrhood_size(otherdims)=nbrhood_size(otherdims)+1;
-    
-    nbrhood=cosmo_meeg_neighborhood(ds,nbrhood_size);
-
-else
-    error('Cannot input type: no array, or fmri or meeg dataset');
-end
+    % slice nbrhood to match feature attributes
+    cluster_nbrhood.neighbors=nbrhood.neighbors(ds2nbrhood);
+    cluster_nbrhood.fa=cosmo_slice(nbrhood.fa,ds2nbrhood,2,'struct');
+    cluster_nbrhood.a=ds.a;
