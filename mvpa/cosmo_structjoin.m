@@ -55,7 +55,7 @@ me=[]; % function handle to current function, set upon first recursive call
 s=struct(); % output
 n=numel(varargin);
 
-q=[]; % superset of output fieldnames, or '[]' for no superset
+q={}; % superset of output fieldnames, or '[]' for no superset
 
 k=0;
 while k<n
@@ -127,7 +127,7 @@ while k<n
     end
 end
         
-if ~isequal(q,[])
+if ~isempty(q)
     d=setdiff(fieldnames(s), q);
     if ~isempty(d)
         error('Illegal key %s - not one of %s', ...
