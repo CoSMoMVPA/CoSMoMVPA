@@ -20,13 +20,21 @@ function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
     fs_ds=cosmo_stat(dataset,'F');
     fs=fs_ds.samples;
     
+    % ensure that nan values are not selected by setting them to
+    % an impossible low F value
+    fs(isnan(fs))=-1;
+    
+    % sort by F values, largest first
     [unused, idxs]=sort(fs,'descend');
+    
+    % determine features to select
     nfeatures=size(dataset.samples,2);
     n_idxs=round(ratio_to_keep*nfeatures);
     selected_indices=idxs(1:n_idxs);
     
-    if any(isnan(fs(selected_indices)))
-        idx=find(isnan(fs(selected_indices)));
+    % throw an error if any indices with NaN F values
+    if any(fs(selected_indices)<0)
+        idx=find(fs(selected_indices)<0);
         error('Feature %d has NaN Fscore', selected_indices(idx));
     end
     
