@@ -1,11 +1,11 @@
 function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
-% partitiones generally for choose(n,k) with optional group schemes.
+% partitions for into nchoosek(n,k) parititions with optional grouping schemas.
 %
 % partitions=cosmo_nchoosek_partitioner(chunks, k, group_values1, test_group_by1,...)
 %
 % Input
 %  - chunks          Px1 chunk indices for P samples. It can also be a
-%                    dataset with field .sa.chunks
+%                    dataset struct with field .sa.chunks
 %  - k               When an integer, k chunks are in each test partition.
 %                    When between 0 and 1, this is interpreted as
 %                    round(k*nchunks) where nchunks is the number of unique
