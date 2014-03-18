@@ -49,6 +49,10 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %  - if the input contains data from a single sample (such as an average)
 %    the .sample_field is set to .trial, and mapping back to MEEG format
 %    adds a singleton dimension to the .trial data output field.
+%  - Most MVPA applications require that .sa.targets (experimental 
+%    condition of each sample) and .sa.chunks (partitioning of the samples 
+%    in independent sets) are set, either by using this function or 
+%    manually afterwards.
 %
 % Dependency:
 %  - Loading Fieldtrip structures requires the FieldTrip toolbox:

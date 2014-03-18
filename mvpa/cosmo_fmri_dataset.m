@@ -33,6 +33,12 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     .fa        struct for holding sample attributes 
 %     .fa.{i,j,k} indices of voxels (in voxel space). 
 %
+% Notes:
+%  - Most MVPA applications require that .sa.targets (experimental 
+%    condition of each sample) and .sa.chunks (partitioning of the samples 
+%    in independent sets) are set, either by using this function or 
+%    manually afterwards.
+%
 % Dependencies:
 % - for NIFTI files, it requires the following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
