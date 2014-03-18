@@ -7,9 +7,12 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %   filename          filename of MEEG data to be loaded. Currently this
 %                     can be a .mat file (for FieldTrip) with timelocked or
 %                     time-frequency data, or .txt (exported EEGLab) for
-%                     timelocked data.
-%   'targets', t      targets for each sample.
-%   'chunks', c       chunks for each sample.
+%                     timelocked data. Alternatively it can be a FieldTrip 
+%                     struct with timelocked or time-frequency data.
+%   'targets', t      Px1 targets for P samples; these will be stored in 
+%                     the output as ds.sa.targets
+%   'chunks', c       Px1 chunks for P samples; these will be stored in the
+%                     the output as ds.sa.chunks
 % 
 % Returns:
 %   ds                dataset struct with the following fields
