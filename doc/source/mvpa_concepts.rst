@@ -6,7 +6,7 @@ Multivariate pattern analysis
 
 Understanding the basic concept of a *pattern*, as used in *multivariate pattern analysis*, is crucial for using CoSMoMVPA. This section introduces this concept gently.
 
-Multivariata pattern analysis (MVPA)
+Multivariate pattern analysis (MVPA)
 ++++++++++++++++++++++++++++++++++++
 
 Before diving into MVPA, let's consider a series of example questions that one might be interested in:
@@ -84,4 +84,7 @@ you may be familiar with:
     * ``procrustes``: Procrustes transformation (used in `hyper-alignment <http://haxbylab.dartmouth.edu/ppl/swaroop.html>`_, )
     * and many many others ...
 
+Further reading
+^^^^^^^^^^^^^^^
+For additional concepts see :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`.
 
