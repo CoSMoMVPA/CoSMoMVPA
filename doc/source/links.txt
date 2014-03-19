@@ -7,9 +7,11 @@
 .. _CoSMoMVPA: http://cosmomvpa.org
 .. _`CoSMoMVPA Google group`: https://groups.google.com/forum/#!forum/cosmomvpa
 .. _`CoSMoMVPA issues`: https://github.com/CoSMoMVPA/CoSMoMVPA/issues
+.. _`easy_install`: https://pypi.python.org/pypi/setuptools
 .. _git: http://gitscm.com
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
 .. _FieldTrip: http://fieldtrip.fcdonders.nl
+.. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. |Matlab(TM)| unicode:: MATLAB U+00AE
 .. _Matlab statistics: http://www.mathworks.it/products/statistics/
@@ -23,6 +25,7 @@
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 .. _Searchmight: http://minerva.csbmb.princeton.edu/searchmight
 .. _Sphinx: http://sphinx-doc.org
+.. _`sphinxcontrib-matlabdomain`: https://pypi.python.org/pypi/sphinxcontrib-matlabdomain
 .. _SPM: http://www.fil.ion.ucl.ac.uk/spm/
 .. _`Unix-like`: http://en.wikipedia.org/wiki/Unix-like
 .. _xUnit: http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework
