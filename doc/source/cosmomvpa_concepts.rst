@@ -47,6 +47,8 @@ Just the data in the sample-by-feature data matrix not sufficient to be able to 
     * The names of the feature attribtues ( ``chan``, ``time``, and ``freq``), stored in ``.a.dim.labels`` . 
     * SQUID channel names are stored in the field ``.a.dim.values{1}``, time-points in ``.a.dim.values{2}``, and frequencies in ``.a.dim.values{3}``.
 
+.. _`cosmomvpa_targets`:
+
 Targets
 +++++++
 The example above showed the sample attribute ``targets``, and its use is not by accident. As for almost all MVPA applications one is interested in the (dis)similarity of patterns within and across *conditions of interest*, these should be stored in the dataset. Here, conditions of interest is typically defined by the experimental paradigm, for example:
@@ -56,6 +58,8 @@ The example above showed the sample attribute ``targets``, and its use is not by
     * whether a peri-threshold auditory stimulus was perceived: yes or no.
 
 In CoSMoMVPA_ these conditions are coded in a special *sample attribute* called *targets*, i.e. in a dataset ``ds`` they are in ``ds.sa.targets``. They should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples. 
+
+.. _`cosmomvpa_chunks`:
 
 Chunks
 ++++++
@@ -137,6 +141,25 @@ where the first three parameters are self-explanatory, and the fourth parameter 
 
 A classifier can be used for cross-validation using :ref:`cosmo_crossvalidate`, or (see below), using a more abstract measure :ref:`cosmo_crossvalidation_measure`.
 
+.. _`cosmomvpa_neighborhood`:
+
+Neighborhood
+^^^^^^^^^^^^
+A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses. For example:
+
+- for a traditional volume-based fMRI searchlight, the features in the source and target domain are the same, and consist of the voxels.
+- for a surface-based fMRI searchlight, the features in the source domain are the voxels in the volume, whereas the features in the target domain are the nodes on the surface.
+- for an MEG-based searchlight with magnetometers in the time-locked domain, the source and target domain are the set of all combinations of magnetometers and time points.
+- for an MEG-based searchlight with planar gradiometers (``planar``) but with output as combined (``cmb``) sensors, sensors in the source domain are the planar gradiometers and sensors in the target domain are the combined sensors.
+
+A neighborhood is a ``struct`` with fields:
+
+- ``.neighbors``: an ``Nx1`` cell for N neighborhoods, where ``.neighbors{k}`` is the list of features in the source domain associated with the ``k``-th neighborhood
+- (optional) ``.fa`` the feature attributes for the target domain. Each field element ``.fa.field`` should have ``N`` elements in the second (i.e. feature) dimension.
+- (optional) ``.a`` the dataset attributes for the target domain.
+
+When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`_ (see below), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
+
 .. _`cosmomvpa_measure`: 
 
 Measure
@@ -148,7 +171,7 @@ Measure
 
         output = dataset_measure(dataset, args)
 
-where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight seperately. The output should be in the column vector format (a scalar satisfies this requirement).
+where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight seperately. The output should be a ``struct`` with fields ``.samples`` (in column vector format) and optionally a field ``.sa`` - but no fields ``.fa`` or ``.a``.
 
 For example, the following code defines a 'measure' that returns classification accuracy based ona support vector machine classifier that uses n-fold cross-validation. The measure is then used in a searchlight with a radius of 3 voxels; the input is an fMRI dataset ``ds`` with chunks and targets set, the output an fMRI dataset with one sample containing classification accuracies.
 
@@ -161,7 +184,8 @@ For example, the following code defines a 'measure' that returns classification 
         sl_dset = cosmo_searchlight(ds,cv,'args',cv_args,'radius',3);  
 
 
-Using classifiers and measures in such an abstract way is a powerful approach to implement new analyses. Any function you write can be used as a dataset measure as long as it use the dataset measure input scheme, and can directly be used with (for example) a searchlight.
+Using classifiers and measures in such an abstract way is a powerful approach to implement new analyses. Any function you write can be used as a dataset measure as long as it use the dataset measure input scheme, and can directly be used with (for example) a searchlight. When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_neighborhood`_ (see above), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
+
 
 .. include:: links.txt
 
