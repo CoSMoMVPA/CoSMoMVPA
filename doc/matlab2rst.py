@@ -77,7 +77,16 @@ def matlab2rst(data, output=None):
     return '\n'.join(header + map(add_indent, res))
 
 def remove_trailing_percent(data):
-    return (data[1:] if data.startswith('%') else data)
+    r=[]
+
+    is_percent=True
+    for d in data:
+        if not d in ' %':
+            is_percent=False
+        
+        r.append(' ' if is_percent else d)
+        
+    return ''.join(r)
     
 
 def matlab2parts(data):
@@ -86,8 +95,13 @@ def matlab2parts(data):
 
     parts=[[] for i in xrange(4)]
     stage=0
-    for line in lines:
+    for i, line in enumerate(lines):
         line=line.strip()
+
+        if i==0 and not 'function' in line:
+            # no function, hence script
+            stage+=1
+
         if stage==2 and not line.startswith('%'):
             stage+=1
         next_stage=False
@@ -268,7 +282,7 @@ for output in ('hdr','skl',None):
             with open(trg_fn,'w') as f:
                 f.write(header)
                 f.write('\n'.join('    %s/%s' % (output_mat_rel,b) for b,_ in base_names))
-                f.write('\n\n%s\n%s\n\n' % (title, '=' * len(title)))
+                f.write('\n\n%s\n%s\n\n' % (title, '+' * len(title)))
 
                 ref_base_names=[[':ref:`%s`' % s if i==0 else s for i,s in enumerate(bs)]
                                         for bs in base_names]
