@@ -71,7 +71,7 @@ Independency is crucial here, because many core MVP analyses assess generalizabi
 
 Typical chunk assignments are:
     * in fMRI studies: each run (period of continuous recording) gives rise to a single chunk. Putting samples in a single run in different chunks may violate the independency assumption because of the slow-ness of the BOLD response, unless samples are seperated by a considerable time interval. 
-    * in MEEG studies: if trials can be assumed to be independent then chunks can be assigned randomly (or in a systematic order). Otherwise they should also be assigned on a run-by-run basis.
+    * in MEEG studies: if trials can be assumed to be independent (which most people in MEEG studies seem to do), then chunks can be assigned randomly (or in a systematic order). This can be done pseudo-randomly using :ref:`cosmo_chunkize`. If the indendency assumption cannot be fullfilled then chunks should be assigned on a run-by-run basis.
 
 As with *targets* above, *chunks* should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples. 
 
@@ -124,12 +124,8 @@ Datasets can also be 'sliced', i.e. subsets of either samples or targets can be 
 
 Classifier
 ^^^^^^^^^^
-Assume a dataset with samples, targets (class labels) and chunks; see above. A classifier can be used to test how well data in a subset of the data generalizes to another, disjoint, subset of the data. Usually this is done by taking some chunks as a test set, and use the remaining classes as a training set :ref:`cosmo_nchoosek_partitioner` , and its special case, :ref:`cosmo_nfold_partitioner`). Using a classifier takes two steps:
+A classifier takes *training* set of patterns, each with a target (class label) associated with them, and a *test* set of patterns, that have no targets associated with them. The patterns in the train and test set should be from disjoint sets of chunks, otherwise circular analysis will ensue (which is a Bad Thing).
 
-- train the classifier on the training set, providing it with the target labels for each sample in the training set.
-- apply the classifier to the test set, without providing it with the target labels; rather it is asked to make a prediction for each sample of the test set.
-
-Classification accuracy can be computed by considering how many samples in the test set were predicted, and this can be compared to what may be expected by chance. In the simple case where each chunk contains the same number of *n* samples in each class, change accuracy is *1/n*.
 
 In CoSMoMVPA, all classifiers use the same signature:
 
@@ -137,9 +133,20 @@ In CoSMoMVPA, all classifiers use the same signature:
 
         function predicted = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
 
-where the first three parameters are self-explanatory, and the fourth parameter is optional and may contain specific options to be used with a specific classifier. The output ``predicted`` contains the predicted class labels for each sample in ``samples_test``. Examples are :ref:`cosmo_classify_nn`, :ref:`cosmo_classify_svm`, :ref:`cosmo_classify_lda`, and :ref:`cosmo_classify_naive_bayes`. 
+where the inputs are:
 
-A classifier can be used for cross-validation using :ref:`cosmo_crossvalidate`, or (see below), using a more abstract measure :ref:`cosmo_crossvalidation_measure`.
+    - ``samples_train`` is a ``PxR`` matrix for ``P`` samples and ``R`` features (i.e. it contains ``P`` patterns).
+    - ``targets_train`` a ``Px1`` class label vector for each pattern in ``samples_train``.
+    - ``samples_test`` is a ``QxR`` matrix with ``Q`` patterns, with no class labels associated
+    - ``opt`` is an optional struct may contain specific options to be used with a specific classifier. 
+    
+The output ``predicted`` is a ``Qx1`` vector containing the predicted class labels for each sample in ``samples_test``. Classification accuracy can be computed by considering how many samples in the test set were predicted, and this can be compared to what may be expected by chance. In the simple case where each chunk contains the same number of *n* samples in each class, change accuracy is *1/n*. For MEEG datasets typically the number of samples in each class is not equal; the function :ref:`cosmo_balance_partitions` can be used to accomplish this.
+
+Examples of classifiers are :ref:`cosmo_classify_nn`, :ref:`cosmo_classify_svm`, :ref:`cosmo_classify_lda`, and :ref:`cosmo_classify_naive_bayes`. 
+
+A classifier is typically used to test how well data in a subset of the data generalizes to another, disjoint, subset of the data. Usually this is done by taking some chunks as a test set, and use the remaining classes as a training set; by repeating this process, each time taking different chunks to form the test set, one or more predictions can be made for each sample in a dataset. Dividing up a dataset in pairs of training and test sets is called *partitioning*, which is facilitated using :ref:`cosmo_nchoosek_partitioner` , and its special case, :ref:`cosmo_nfold_partitioner`). A classifier can be used for cross-validation using :ref:`cosmo_crossvalidate`, or (see below), using a more abstract measure :ref:`cosmo_crossvalidation_measure`.
+
+Note that, unless a :ref:`measure <cosmomvpa_measure>`, classifier functions are rather bare-bone as data structure; they do not operate on a dataset ``struct`` directly.
 
 .. _`cosmomvpa_neighborhood`:
 
@@ -159,6 +166,8 @@ A neighborhood is a ``struct`` with fields:
 - (optional) ``.a`` the dataset attributes for the target domain.
 
 When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`_ (see below), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
+
+Neighborhoods can be generated using :ref:`cosmo_interval_neighborhood` (e.g. MEEG time series searchlight) and  :ref:`cosmo_spherical_neighborhood` (fMRI spherical searchlight). :ref:`cosmo_neighborhood` is a general function that can generate most neighborhoods, and also supports combining multiple neighborhoods. An application of the latter functionality is a time-by-space fMRI searchlight.
 
 .. _`cosmomvpa_measure`: 
 
