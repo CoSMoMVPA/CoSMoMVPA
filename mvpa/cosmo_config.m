@@ -2,10 +2,10 @@ function config=cosmo_config(fn, config)
 % return a struc with configuration settings, or store such settings
 %
 % Usages:
-% - get the configuation:
+% - get the configuation (either default, or what is in '.cosmomvpa.cfg'):
 %   >> config=cosmo_config();
 %
-% - read configuration from a file
+% - read configuration from a specified file
 %   >> config=cosmo_config(fn)
 %
 % - store configuration in a file
@@ -14,8 +14,12 @@ function config=cosmo_config(fn, config)
 % Inputs:
 %   fn          optional filename of a configuration file. 
 %               This can either be a path to a file, a filename to a file 
-%               in the matlab path, or (on Unix platforms) a filename in 
-%               the user's home directory.
+%               in the matlab path, the user path, or (on Unix platforms) 
+%               a filename in the user's home directory.
+%               If fn is omitted, then it defaults to '.cosmomvpa.cfg'
+%               and will read the configuration from that file if it
+%               exists in one of the aforementioned locations; see the 
+%               notes below for details.
 %   to_store    optional struct with configuration to store. 
 %               If omitted then the configuration is not stored.
 %
@@ -23,19 +27,46 @@ function config=cosmo_config(fn, config)
 %   config      Struct with configurations
 %
 % Notes:
+%  - the rationale for this function is to keep the example code fixed
+%    (that is, without any paths hard-coded) and still allow different
+%    users to store the example data in a directory of their choice.
+%
 %  - the format for a configuration file is of the form <key>=<value>,
 %    where <key> cannot contain the '=' character and <value> cannot start
 %    or end with a white-space character.
 %
-%  - an example configuration file (of two lines):
+%  - an example configuration file (of three lines):
 %
 % # path for runnable examples
 % tutorial_data_path=/Users/nick/organized/_datasets/CoSMoMVPA/tutorial_data
+% output_data_path=/Users/nick/organized/_datasets/CoSMoMVPA/tutorial_data
 %  
 %  - If a configuration file with the name '.cosmomvpa.cfg' is stored 
-%    in a directory that is in the matlab path or (on Unix platforms) the 
-%    user's home directory, then calling this function with no arguments
-%    will read that file and return the configuration stored in it.
+%    in a directory that is in the matlab path, the user path, or (on Unix 
+%    platforms) the user's home directory, then calling this function with 
+%    no arguments will read that file and return the configuration stored 
+%    in it.
+%
+%  - The configuration can also be changed as follows:
+%    >> % get default configuration
+%    >> % If the following command gives an error, do: config=struct()
+%    >> config=cosmo_config(); 
+%    >>
+%    >> % update settings
+%    >> config.tutorial_data_path='/path/to/some/data';
+%    >> config.output_data_path='/where/i/want/output';
+%    >>
+%    >> % get first directory in user path
+%    >> matlab_path=cosmo_strsplit (userpath,':',1); 
+%    >>
+%    >> % set configuration filename 
+%    >> config_fn=fullfile(matlab_path,'.cosmomvpa.cfg');
+%    >> cosmo_config(config_fn, config);
+%    >> fprintf('Configuration stored in %s\n', config_fn);
+%    >>
+%    >> % now check they are the same
+%    >> loaded_config=cosmo_config();
+%    >> assert(isequal(loaded_config,config));
 %
 % NNO Jan 2014
 
@@ -61,8 +92,10 @@ function config=cosmo_config(fn, config)
     cosmo_mvpa_dir=fileparts(which('cosmo_corr'));
 
     % set defaults
+    defaults=struct();
     defaults.tutorial_data_path=fullfile(cosmo_mvpa_dir,...
                                         '..','datadb','tutorial_data');
+    defaults.output_data_path=defaults.tutorial_data_path;
 
     % overwrite defaults by configuration options
     fns=fieldnames(defaults);
@@ -70,6 +103,10 @@ function config=cosmo_config(fn, config)
         fn=fns{k};
         if ~isfield(config, fn)
             config.(fn)=defaults.(fn);
+            warning(['Configuration field %s not set, using default:',...
+                    '"%s"\n(To set the configuration, run: help %s)'], ...
+                        fn,defaults.(fn),mfilename());
+
         end
     end
     
@@ -108,36 +145,62 @@ function validate_config(config)
     end
     
 
-function fn=find_file(fn, raise_)
+function path_fn=find_file(fn, raise_)
 % tries to find a configuration file by looking:
 % - for the path of the file
 % - in the matlab path
 % - in the user's home directory (on Unix)
     if nargin<2, raise_=false; end
 
-    exist_=@(fn) exist(fn,'file');
+    exist_=@(fn_) exist(fn_,'file');
 
-    if ~exist_(fn)
+    path_fn=[];
+    
+    % simulate 'go-to' statement using a while loop with break at the end
+    while true
+        % does the file exist 'as is?'
+        if exist_(fn)
+            path_fn=fn;
+            break
+        end
+        
         % is it in the matlab path?
         w_fn=which(fn);
         if ~isempty(w_fn) 
-            fn=w_fn;
-        elseif isunix()
+            path_fn=w_fn;
+            break;
+        end
+        
+        % is it in the user path?
+        upaths=cosmo_strsplit(userpath(),':');
+        for k=1:numel(upaths)
+            u_fn=fullfile(upaths{k},fn);
+            if exist_(u_fn)
+                path_fn=u_fn;
+                break;
+            end
+        end
+        if ~isempty(path_fn)
+            break;
+        end
+
+        if isunix()
             % is it in the home directory?
             u_fn=fullfile(getenv('HOME'),fn);
             if exist_(u_fn)
-                fn=u_fn;
-            else
-                if raise_
-                    % nothing worked
-                    error('Cannot find config file "%s"', fn);
-                else
-                    fn=[];
-                end
+                path_fn=u_fn;
+                break;
             end
         end
+    
+        if raise_
+            error('Cannot find config file "%s"', fn);
+        end
+        
+        break;
     end
-
+    
+    
 
 function config=read_config(fn)
 % reads configuration from a file fn
