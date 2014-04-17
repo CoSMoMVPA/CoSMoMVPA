@@ -50,6 +50,15 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 
     externals=get_externals();
     
+    if strcmp(external,'-list')
+        % return a list of externals
+        supported_externals=fieldnames(externals);
+        me=str2func(mfilename()); % the present function
+        msk=me(supported_externals,false);
+        is_present=supported_externals(msk);
+        return
+    end
+
     if ~isfield(externals, external);
         error('Unknown external %s', external);
     end
@@ -77,7 +86,7 @@ function externals=get_externals()
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
     
     externals.afni_bin.check=@() isunix() && ...
-                                    unix('afni --version >/dev/null')==0;
+                          ~unix('which afni && afni --version >/dev/null');
     externals.afni_bin.label='AFNI suite';
     externals.afni_bin.url='http://afni.nimh.nih.gov/afni';
 
