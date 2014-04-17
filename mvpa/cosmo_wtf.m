@@ -66,7 +66,7 @@ catch e
     sw=e.getReport();
 end
 w=append(w,'CoSMoMVPA config', sw);
-w=append(w,'\n'); % add newline
+w=append(w,sprintf('\n')); % add newline
 w=cut(w);    
 
 % join elements in w
