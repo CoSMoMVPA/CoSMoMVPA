@@ -4,8 +4,16 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 % is_present=cosmo_check_external(external[, error_if_not_present])
 %
 % Inputs:
-%   external               string or cell of strings. Currently supports 
-%                  '       'afni', 'neuroelf', 'nifti', 'fieldtrip'.
+%   external               string or cell of strings. Currently supports: 
+%                          'afni'      AFNI matlab toolbox
+%                          'afni_bin'  AFNI binaries present (unix-only)
+%                          'neuroelf'  Neuroelf toolbox
+%                          'nifti'     NIFTI toolbox
+%                          'fieldtrip' Fieldtrip
+%                          'libsvm'    libSVM toolbox
+%                          It can also be '-list', in which case it returns
+%                          a cell of strings containing the available
+%                          externals.
 %   error_if_not_present   if true (the default), an error is raised if the
 %                          external is not present. 
 %
@@ -13,6 +21,15 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %   is_present             boolean indicating whether the external is
 %                          present. If external is a cell if P elements, 
 %                          then the output is a Px1 boolean vector.
+%
+% Examples:
+%   % see if the AFNI matlab toolbox is available, if not raise an error
+%   >> cosmo_check_external('afni')
+%   
+%   % see if libsvm and neuroelf are available and store the result in 
+%   % the 2x1 boolean array is_present. An error is not raised if 
+%   % either is not present.
+%   >> is_present=cosmo_check_external({'libsvm','neuroelf'},false);
 %
 % NNO Sep 2013  
 
