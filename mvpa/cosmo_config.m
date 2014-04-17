@@ -88,7 +88,7 @@ function config=cosmo_config(fn, config)
     else
         error('Illegal input');
     end
-
+    
     cosmo_mvpa_dir=fileparts(which('cosmo_corr'));
 
     % set defaults

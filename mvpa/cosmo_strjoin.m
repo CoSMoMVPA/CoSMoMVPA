@@ -49,7 +49,7 @@ if nargin<2
 end
 
 if ~is_cell_of_strings(strings)
-    error('first input must be cell lof strings');
+    error('first input must be cell of strings');
 end
 
 n=numel(strings);
