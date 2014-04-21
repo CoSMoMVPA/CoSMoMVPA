@@ -20,7 +20,9 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 % Returns:
 %   is_present             boolean indicating whether the external is
 %                          present. If external is a cell if P elements, 
-%                          then the output is a Px1 boolean vector.
+%                          then the output is a Px1 boolean vector. If
+%                          externals=='-list', then is_present is a cell of
+%                          strings containing the available externals
 %
 % Examples:
 %   % see if the AFNI matlab toolbox is available, if not raise an error
