@@ -33,6 +33,9 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %   % either is not present.
 %   >> is_present=cosmo_check_external({'libsvm','neuroelf'},false);
 %
+%   % list the available externals
+%   >> cosmo_check_external('-list')
+%
 % NNO Sep 2013  
 
     if nargin<2
