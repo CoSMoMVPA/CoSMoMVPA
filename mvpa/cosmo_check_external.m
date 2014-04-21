@@ -109,3 +109,9 @@ function externals=get_externals()
                                 ~isempty(which('svmptrain'));
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
+    
+    externals.surfing.check=@() ~isempty(which('surfing_voxelselection'));
+    externals.surfing.label='Surfing toolbox';
+    externals.surfing.url=['http://surfing.sourceforge.net'];
+    
+    
