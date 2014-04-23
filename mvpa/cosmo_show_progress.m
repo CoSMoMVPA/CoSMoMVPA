@@ -79,37 +79,35 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
     % the '%%' occurences in msg will be replaced back to '%' by fprintf
     fprintf([delete_str strrep(progress_line,'%','%%')]);
     
-    function [m,d]=moddiv(x,y)
-        % helper function that does mod and div together so that m+d*y==x
-        m=mod(x,y);
-        d=(x-m)/y; 
+function [m,d]=moddiv(x,y)
+    % helper function that does mod and div together so that m+d*y==x
+    m=mod(x,y);
+    d=(x-m)/y; 
 
-    function str=secs2str(secs)
-        % helper function that formats the number of seconds as 
-        % human-readable string
-        
-        % make secs positive (calling function should add '+' or '-')
-        secs=abs(secs);
-        
-        if ~isfinite(secs)
-            str='oo'; % attempt to look like 'infinity' symbol
-            return
-        end
-        
-        secs=round(secs); % do not provide sub-second precision
-        
-        % compute number of seconds, minutes, hours, and days
-        [s,secs]=moddiv(secs,60);
-        [m,secs]=moddiv(secs,60);
-        [h,d]=moddiv(secs,24);
-        
-        % add prefix for day, if secs represents at least one day
-        if d>0, daypf='%d+'; else daypf=''; end
-        
-        str=sprintf('%s%02d:%02d:%02d', daypf, h, m, s);
-        
-    
-    
+function str=secs2str(secs)
+    % helper function that formats the number of seconds as 
+    % human-readable string
 
+    % make secs positive (calling function should add '+' or '-')
+    secs=abs(secs);
 
+    if ~isfinite(secs)
+        str='oo'; % attempt to look like 'infinity' symbol
+        return
+    end
 
+    secs=round(secs); % do not provide sub-second precision
+
+    % compute number of seconds, minutes, hours, and days
+    [s,secs]=moddiv(secs,60);
+    [m,secs]=moddiv(secs,60);
+    [h,d]=moddiv(secs,24);
+
+    % add prefix for day, if secs represents at least one day
+    if d>0
+        daypf=sprintf('%dd+',d);
+    else
+        daypf=''; 
+    end
+
+    str=sprintf('%s%02d:%02d:%02d', daypf, h, m, s);
