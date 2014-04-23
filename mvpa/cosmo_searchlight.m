@@ -157,14 +157,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     results_map.a=nbrhood.a;
     
     % slice the feature attributes
-    fa_fns=fieldnames(nbrhood.fa);
-    for k=1:numel(fa_fns)
-        fa_fn=fa_fns{k};
-        v=nbrhood.fa.(fa_fn);
-        
-        % select the proper feature indices
-        results_map.fa.(fa_fn)=cosmo_slice(v,center_ids,2);
-    end
+    results_map.fa=cosmo_slice(nbrhood.fa,center_ids,2,'struct');
     
     % join the outputs from the measure for each searchlight position
     res_stacked=cosmo_stack(res_cell,2);
