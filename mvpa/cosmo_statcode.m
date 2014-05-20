@@ -215,8 +215,9 @@ function stat_strs=hdr2strs(hdr)
 % Returns:
 %   stat_strs   Kx1
 
-    if isfield(hdr, 'Map') && isfield(hdr,'VMRDimX')
-        % bv vmp 
+    if isfield(hdr, 'Map') && (isfield(hdr,'VMRDimX') ||...
+                                isfield(hdr,'NrOfVertices'))
+        % bv vmp or smp
         codes=get_codes('bv');
         nsamples=numel(hdr.Map);
         stat_strs=cell(nsamples,1);
