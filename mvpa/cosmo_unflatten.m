@@ -52,7 +52,11 @@ end
 arr_cell=cell(1,nsamples);
 
 % convert sub indices to linear indices
-lin_indices=sub2ind(dim_sizes,sub_indices{:});
+if ndim==1
+    lin_indices=sub_indices{1};
+else
+    lin_indices=sub2ind(dim_sizes,sub_indices{:});
+end
 
 % allocate space in 'ndim'-space for each sample,
 % but with a first singleton dimension as that one 
