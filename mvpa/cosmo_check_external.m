@@ -11,6 +11,7 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %                          'nifti'     NIFTI toolbox
 %                          'fieldtrip' Fieldtrip
 %                          'libsvm'    libSVM toolbox
+%                          'surfing'   surfing toolbox
 %                          It can also be '-list', in which case it returns
 %                          a cell of strings containing the available
 %                          externals.
@@ -113,8 +114,9 @@ function externals=get_externals()
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
     
-    externals.surfing.check=@() ~isempty(which('surfing_voxelselection'));
-    externals.surfing.label='Surfing toolbox';
-    externals.surfing.url=['http://surfing.sourceforge.net'];
+    externals.surfing.check=@() ~isempty(which('surfing_write')) && ...
+                                ~isempty(which('surfing_voxelselection'));
+    externals.surfing.label='Surfing toolbox (v0.4+)';
+    externals.surfing.url='http://github.com/nno/surfing';
     
     
