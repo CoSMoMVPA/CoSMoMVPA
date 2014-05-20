@@ -29,7 +29,7 @@ function stat_repr=cosmo_statcode(ds, output_format)
     % see what kind of input we got
     if iscell(ds)
         % string representation of stats
-        stat_repr=ds;
+        stat_repr=ds(:);
     elseif isstruct(ds) && isfield(ds,'samples') && isfield(ds,'sa')
         % dataset struct
         if isfield(ds.sa,'stats')
@@ -118,6 +118,8 @@ function hdr=name_df2hdr(name_df, output_format)
         if numel(idx)==1
             % ignore if not found or multiple matches
             stat_idxs(k)=idx;
+        elseif ~strcmp(name,'none')
+            warning('Unrecognized stat name %s at sample %d', name, k);
         end
     end
     
