@@ -1,7 +1,7 @@
 function [arr, dim_labels]=cosmo_unflatten(ds)
 % unflattens a dataset from 2 to (1+K) dimensions.
 %
-% [arr, dim_labels]=cosmo_unflatten(ds)
+% [arr, dim_labels]=cosmo_unflatten(ds[, set_missing_to])
 %
 % Inputs:
 %   ds                 dataset structure, with fields:
@@ -13,6 +13,7 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %                      sub-indices for the K dimensions. It is required
 %                      that for every dimension J in 1:K, all values in
 %                      ds.fa.(a.dim.labels{J}) are in the range 1:S_K.
+%   set_missing_to     value to set missing values to (default: 0)
 %
 % Returns:
 %   arr                an unflattened array of size P x S_1 x ... x S_K.
