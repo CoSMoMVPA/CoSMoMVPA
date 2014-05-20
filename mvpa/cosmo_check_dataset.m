@@ -109,26 +109,29 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
         
         % if provided, check for this specific type
         if ~isempty(ds_type)
+            msg=check_dim(ds);
+            if ~isempty(msg), break; end
+            
             switch ds_type
                 case 'fmri'
-                    if isempty(msg)
-                        msg=check_dim(ds);
-                        if ~isempty(msg); break; end
-                    end
-                    if ~isfield(ds,'fa') || ~isfield(ds.fa,'i') || ...
-                            ~isfield(ds.fa,'j') || ~isfield(ds.fa,'k')
-                        msg='missing field ds.fa.{i,j,k}'; break
-                    end
+                    names={'i','j','k'};
+                case 'surface'
+                    names={'node_indices'};
                 case 'meeg'
-                    if isempty(msg)
-                        msg=check_dim(ds);
-                        if ~isempty(msg); break; end
-                    end
-                    if ~isfield(ds,'a') || ~isfield(ds.a,'meeg')
-                        msg='missing field .a.meeg'; break
+                    names={};
+                    if ~isfield(ds.a,'meeg')
+                        msg='missing field .a.meeg';
                     end
                 otherwise
-                    error('unsupported ds_type: %s', ds_type);
+                    error('Unsupported ds_type=%s', ds_type);
+            end
+            
+            m=cosmo_match(names,ds.a.dim.labels);
+            if ~all(m)
+                i=find(~m,1);
+                msg=sprintf('''%s''-dataset has not dim field %s',...
+                                ds_type,ds.a.dim.labels{i});
+                break;
             end
         end
         
@@ -152,5 +155,37 @@ function msg=check_dim(ds)
             ~isfield(ds.a.dim,'labels') || ...
             ~isfield(ds.a.dim,'values')
         msg='missing field .a.dim.{labels,values}';
+        return
     end
+    
+    ndim=numel(ds.a.dim.labels);
+    if numel(ds.a.dim.values)~=ndim
+        msg='size mismatch between .a.dim.labels and .a.dim.values';
+        return
+    end
+    
+    if ~isfield(ds,'fa')
+        msg='no field .fa';
+        return
+    end
+    
+    names=ds.a.dim.labels;
+    for k=1:numel(names);
+        name=names{k};
+        if ~isfield(ds.fa,name)
+            msg=sprintf('missing field .fa.%s',name);
+            return
+        end
+        vs=ds.fa.(name);
+        
+        nv=numel(ds.a.dim.values{k});
+        if min(vs)<1 || max(vs>nv) || ~isequal(round(vs),vs)
+            msg=sprintf('.fa.%s must have integers in range 1..%d',...
+                            name,nv);
+            return
+        end
+    end
+        
+        
+    
 
