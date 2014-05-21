@@ -56,8 +56,7 @@ cosmo_check_external('surfing');
 % cosmo_config.)
 config=cosmo_config();
 
-%digit_study_path=fullfile(config.tutorial_data_path,'digit');
-digit_study_path='/Users/nick/organized/_datasets/master/CoSMoMVPA/datadb/tutorial_data/digit';
+digit_study_path=fullfile(config.tutorial_data_path,'digit');
 readme_fn=fullfile(digit_study_path,'README');
 cosmo_type(readme_fn);
 
@@ -65,7 +64,7 @@ output_path=config.output_data_path;
 
 % resolution parameter for input surfaces
 % 64 is for high-quality results; use 16 for fast execution
-ld=64; 
+ld=16; 
 
 % Twin surface case (FS)
 pial_fn=fullfile(digit_study_path,...
@@ -128,22 +127,28 @@ ds = cosmo_fmri_dataset(data_fn,'targets',targets,'chunks',chunks);
 zero_msk=all(ds.samples==0,1);
 ds = cosmo_slice(ds, ~zero_msk, 2);
 
-%% Set partition scheme. 
+fprintf('Dataset has %d samples and %d features\n', size(ds.samples));
+
+%% Set partition scheme to odd-even partitioning. 
+%
 % Alternatives are:
-% - cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
-% - cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
+% + cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
+% + cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
 measure_args.partitions = cosmo_oddeven_partitioner(ds);    
 
-%%
+%% Read inflated surface
 [v_inf,f_inf]=surfing_read(inflated_fn);
 
-for one_surf=[false,true]
+
+%% Run four types of searchlights
+for one_surf=[true,false]
     if one_surf
         desc='1surf';
     else
         desc='2surfs';
     end
-    for lowres_output=[false,true]
+    
+    for lowres_output=[true,false]
         if lowres_output
             desc=sprintf('%s_lowres', desc);
         end
@@ -181,12 +186,14 @@ for one_surf=[false,true]
         fprintf('Defining neighborhood with %s\n', desc);
         [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius,...
                                                             surf_def);
+        
 
-        fprintf('The output surface has %d vertices, % nodes\n',...
+        fprintf('The output surface has %d vertices, %d nodes\n',...
                         size(vo,1), size(fo,1));
         % Run the searchlight 
         lda_results = cosmo_searchlight(ds,measure,'args',measure_args,...
                                             'nbrhood',nbrhood); 
+        
         
         % Apply the node mapping from the surifical neighborhood
         % to the high-res inflated surface. 
@@ -201,24 +208,23 @@ for one_surf=[false,true]
         end
         
         % visualize the surfaces, if the afni matlab toolbox is present
-        if cosmo_check_external('afni',false);
+        if cosmo_check_external('afni',false)
             nvertices=size(v_inf_out,1);
             
             opt=struct();
             
             for show_edge=[false, true]
-                opt.ShowEdge=show_edge
+                opt.ShowEdge=show_edge;
                 DispIVSurf(vo,fo,1:nvertices,lda_results.samples',0,opt)
                 title(sprintf('Original %s', desc));
 
-                DispIVSurf(v_inf_out,f_inf_out,1:nvertices,lda_results.samples',0,opt)
+                DispIVSurf(v_inf_out,f_inf_out,1:nvertices,...
+                                        lda_results.samples',0,opt)
                 title(sprintf('Inflated %s', desc));
             end
         else
             fprintf('skip surface display; no afni matlab toolbox\n');
         end
-        
-        return
         
         if lowres_output && one_surf
             % in this example only this case a new surface was generated.
@@ -252,5 +258,33 @@ for one_surf=[false,true]
         if cosmo_check_external('neuroelf',false)
             cosmo_map2surface(lda_results, [data_output_fn '.smp']);
         end
+       
+        % store voxel counts (how often each voxel is in a neighborhood)
+        % take a random sample (the first one) from the input dataset
+        % and count how often each voxel was selected.
+        % If everything works, then voxels in the grey matter have high 
+        % voxel counts but voxels outside it low or zero counts. 
+        % Thus, this can be used as a sanity check that can be visualized 
+        % easily.
+        
+        vox_count_ds=cosmo_slice(ds,1);
+        vox_count_ds.samples(:)=0;
+        
+        ncenters=numel(nbrhood.neighbors);
+        for k=1:ncenters
+            idxs=nbrhood.neighbors{k}; % feature indices in neigborhood
+            vox_count_ds.samples(idxs)=vox_count_ds.samples(idxs)+1;
+        end
+        
+        vox_count_output_fn=fullfile(output_path,['vox_count_' desc]);
+        
+        % store voxel count results
+        cosmo_map2fmri(vox_count_ds, [vox_count_output_fn '.nii']);
+        
+        if cosmo_check_external('afni',false)
+            cosmo_map2fmri(vox_count_ds, [vox_count_output_fn '+orig']);
+        end
+        
+        return
     end
 end
