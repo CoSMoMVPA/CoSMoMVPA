@@ -21,7 +21,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
 % Dependencies:
 %   - for Brainvoyager files (.smp), it requires the NeuroElf
 %     toolbox, available from: http://neuroelf.net
-%   - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
+%   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
 %     Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
 % NNO May 2014
