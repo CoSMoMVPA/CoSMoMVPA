@@ -12,6 +12,7 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %                          'fieldtrip' Fieldtrip
 %                          'libsvm'    libSVM toolbox
 %                          'surfing'   surfing toolbox
+%                          'gifti'     GIfTI library for matlab
 %                          It can also be '-list', in which case it returns
 %                          a cell of strings containing the available
 %                          externals.
@@ -118,5 +119,10 @@ function externals=get_externals()
                                 ~isempty(which('surfing_voxelselection'));
     externals.surfing.label='Surfing toolbox (v0.4+)';
     externals.surfing.url='http://github.com/nno/surfing';
+    
+    externals.gifti.check=@() ~isempty(which('gifti'));
+    externals.gifti.label='GIfTI library for matlab';
+    externals.gifti.url='www.artefact.tk/software/matlab/gifti';
+    
     
     
