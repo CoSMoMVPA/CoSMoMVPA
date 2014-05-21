@@ -195,6 +195,7 @@ switch numel(vo)
     case 0
         % no low-res surface, so use intermediate surface as source
         vo=vi;
+        fo=f;
     case 1
         % subsample the surface
         [vo,fo]=surfing_subsample_surface(vi,f,vo,opt.subsample_min_ratio);
