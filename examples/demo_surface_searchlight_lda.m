@@ -64,7 +64,7 @@ output_path=config.output_data_path;
 
 % resolution parameter for input surfaces
 % 64 is for high-quality results; use 16 for fast execution
-ld=16; 
+ld=64; 
 
 % Twin surface case (FS)
 pial_fn=fullfile(digit_study_path,...
