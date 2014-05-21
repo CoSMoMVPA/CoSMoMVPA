@@ -284,7 +284,5 @@ for one_surf=[true,false]
         if cosmo_check_external('afni',false)
             cosmo_map2fmri(vox_count_ds, [vox_count_output_fn '+orig']);
         end
-        
-        return
     end
 end
