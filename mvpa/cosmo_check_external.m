@@ -104,7 +104,7 @@ function externals=get_externals()
     externals.nifti.check=@() ~isempty(which('load_nii'));
     externals.nifti.label='NIFTI toolbox';
     externals.nifti.url=['http://www.mathworks.com/matlabcentral/',...
-                         'fileexchange/8797-tools-for-nifti-and-analyze-image'];
+                    'fileexchange/8797-tools-for-nifti-and-analyze-image'];
     
     externals.fieldtrip.check=@() ~isempty(which('ft_read_data'));
     externals.fieldtrip.label='FieldTrip toolbox';
