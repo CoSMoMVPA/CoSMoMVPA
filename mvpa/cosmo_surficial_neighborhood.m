@@ -337,7 +337,7 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
     end
     
     if isempty(fo)
-        if numel(vo)~=1
+        if numel(vo)>1
             % if not a scaler (niter) then throw an error
             error('Topology missing for output surface');
         end
