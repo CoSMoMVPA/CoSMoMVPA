@@ -148,10 +148,11 @@ for one_surf=[true,false]
         desc='2surfs';
     end
     
-    for lowres_output=[true,false]
+    for lowres_output=[false,true]
         if lowres_output
             desc=sprintf('%s_lowres', desc);
         end
+        fprintf('\n\n *** Starting analysis with %s *** \n\n\n', desc)
         
         % define searchlight surface paramters for each type of analysis
         if one_surf && lowres_output
@@ -215,12 +216,22 @@ for one_surf=[true,false]
             
             for show_edge=[false, true]
                 opt.ShowEdge=show_edge;
-                DispIVSurf(vo,fo,1:nvertices,lda_results.samples',0,opt)
-                title(sprintf('Original %s', desc));
+                
+                if show_edge
+                    t='with edges';
+                else
+                    t='without edges';
+                end
+                
+                header=strrep([desc ' ' t],'_',' ');
+                    
+                
+                DispIVSurf(vo,fo,1:nvertices,lda_results.samples',0,opt);
+                title(sprintf('Original %s', header));
 
                 DispIVSurf(v_inf_out,f_inf_out,1:nvertices,...
-                                        lda_results.samples',0,opt)
-                title(sprintf('Inflated %s', desc));
+                                        lda_results.samples',0,opt);
+                title(sprintf('Inflated %s', header));
             end
         else
             fprintf('skip surface display; no afni matlab toolbox\n');
