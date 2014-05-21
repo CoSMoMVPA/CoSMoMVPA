@@ -49,6 +49,15 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %
 %   % run searchlight with this measure
 %   searchlight_results=cosmo_searchlight(ds,measure,'radius',4); 
+%
+% Notes:
+%   - by default the post_corr_func is set to @atanh. This is equivalent to 
+%     a Fisher transformation from r (correlation) to z (standard z-score).
+%     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r))
+%   - if multiple samples are present with the same chunk and target, they
+%     are averaged *prior* to computing the correlations
+%
+% NNO May 2014
 
 defaults=struct();
 defaults.partitions=[];
