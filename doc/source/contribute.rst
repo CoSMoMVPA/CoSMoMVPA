@@ -99,23 +99,24 @@ The git_ distributed version control system is used for code development. It has
     + code sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
     + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. This is very useful for new experimental features or bug-fixing without affecting the *prestine* master code. Once changes are considered ready for the master repository, they can be merged easily.
 
-To get started with git:
+The instructions below assume a unix-like platform, and the command below should be run on the terminal (for example in bash). To get started with git:
     + set up a working installation of git_ (see `installing git`_).
+    + tell git about your name and email address: ``git config --global user.name "Your full name"`` and ``git config --global user.email "your_email@the_domain.com"``
     + make an account on github_, if you have not done so.
     + on the github_ project page, `fork the repository`_, and follow the instructions there. 
-    + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``.
-    + change to the directory: ``cd CoSMoMVPA``.
-    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``.
-    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``.s
+    + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``
+    + change to the directory: ``cd CoSMoMVPA``
+    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``
+    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``
     + to add a new feature or provide a bugfix:
 
-        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``. 
+        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}`` 
         - make the desired changes, then commit them. `See below for details`.
-        - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``.
+        - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``
         -  on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
-        - if you want go back to using code from the original master, run ``git checkout master``.
+        - if you want go back to using code from the original master, run ``git checkout master``
 
-      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheap; for experimentation please use this feature.
+      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheap; for experimentation, bug fixes or new features please use branches.
 
 There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. 
 
