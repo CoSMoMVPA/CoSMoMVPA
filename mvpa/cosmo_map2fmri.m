@@ -158,7 +158,8 @@ function ni=new_nii(ds)
     dime=struct();
     dime.datatype=16; %single
     dime.dim=[4 dim(:)' 1 1 1];
-    dime.pixdim=[1 pix_dim(:)' 0 0 0 0];
+    dime.pixdim=[1 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
+    
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
         'scl_slope','scl_inter','slice_code','cal_max',...
@@ -180,7 +181,7 @@ function ni=new_nii(ds)
     hdr.hk=hk;
 
     hist=struct();
-    hist.sform_code=2;
+    hist.sform_code=2; % Tal space - TODO allow other spaces
     hist.originator=[1 1 1 1 0];
     hist=set_all(hist,{'descrip','aux_file','intent_name'},'');
     hist=set_all(hist,{'qform_code','quatern_b',...
@@ -190,7 +191,7 @@ function ni=new_nii(ds)
     hist.srow_x=mat(1,:);
     hist.srow_y=mat(2,:);
     hist.srow_z=mat(3,:);
-    hist.quatern_c=1;                
+    hist.quatern_c=1;      
     hdr.hist=hist;
 
     ni.img=single(vol_data);

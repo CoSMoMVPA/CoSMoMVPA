@@ -316,6 +316,22 @@ function vol=get_vol_nii(hdr)
     % make base1 friendly
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
     
+    % try to deal with old analyze-style files with flipped orientations
+    if isfield(hist, 'flip_orient') && ~isempty(hist.flip_orient)
+        if ~isfield(hist, 'rot_orient') || ~isequal(hist.rot_orient,1:3)
+            error('Unsupported flip_orient with non-identity rot_orient');
+        end
+        
+        flip_orient=hist.flip_orient;
+        for idx=find(flip_orient)
+            dim=flip_orient(idx)-2; % along which dimension to flip
+                                    % (may assume LPI orientation)
+            flip=eye(4);
+            flip(dim)=-1;
+            mat=flip*mat;
+        end
+    end 
+    
     vol=struct();
     vol.mat=mat;
     vol.dim=dim;
