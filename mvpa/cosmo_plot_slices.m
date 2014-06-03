@@ -15,12 +15,43 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %  slice_stop   the index of the last slice to plot (default: the number of 
 %               slices in the dim-th dimension).
 %
+% Examples:
+%  - % plot an fMRI dataset struct with default options
+%    >> cosmo_plot_slices(ds)
+%
+%  - % plot an fMRI dataset struct along the second spatial dimension
+%    >> cosmo_plot_slices(ds, 2)
+%  
+%  - % plot a random gaussian 3D array along the first dimension
+%    >> cosmo_plot_slices(randn([40,50,20]),1)
+%
+%  - % plot an fMRI dataset struct along the default spatial dimension
+%    % every 5-th slice
+%    >> cosmo_plot_slices(ds, [], 5)
+%
+%  - % plot an fMRI dataset struct along the third spatial dimension
+%    % with about 12 slices
+%    >> cosmo_plot_slices(ds, 3, -12)
+%  
+%  - % plot an fMRI dataset struct along the third spatial dimension
+%    % with about 12 slices, starting at slice 10 and stopping at slice 25
+%    >> cosmo_plot_slices(ds, 3, -12, 10, 25)
+%
+% Notes:
+%  - Using this function only really makes sense for fMRI-like data.
+%  - This function does not provide a consistent orientation for slices,
+%    as this depends on the voxel-to-world transformation matrix, which is
+%    completely ignored in this function. Thus left-right and top-down
+%    swaps can occur. Different datasets may provide different views, for
+%    example dim=1 may give a saggital view if the dataset comes from one
+%    program and an axial view if it comes from another program.
+%    
 % NNO Aug 2013
     
     if nargin<2 || isempty(dim), dim=3; end
     if nargin<3 || isempty(slice_step), slice_step=-20; end
     if nargin<4 || isempty(slice_start), slice_start=1; end
-    if nargin<5 || isempty(slice_stop), slice_stop=[]; end % determine after selecting the right dimension
+    if nargin<5 || isempty(slice_stop), slice_stop=[]; end % set later
     
     if cosmo_check_dataset(data,false)
         data4D=cosmo_unflatten(data);
