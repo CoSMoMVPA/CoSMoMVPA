@@ -92,10 +92,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     % use header depending on dim
     header_labels={'i','j','k'};
     
-    % order of slices and whether the slice should be transposes
-    %xorder=[-1,1,1];
-    %yorder=[-1,1,-1];
-    %do_transpose=[true true false];
+    % order of slices and whether the slice should be transposed
     xorder=[-1 -1 1];
     yorder=[-1 1 -1];
     do_transpose=[true false true];
