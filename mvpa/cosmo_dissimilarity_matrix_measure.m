@@ -1,10 +1,12 @@
-function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, varargin)
+function ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
 % Compute a dissimilarity matrix measure
 %
-% ds_sa = cosmo_dsm_measure(dataset, varargin)
+% ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 % Inputs:
-%  - dataset:        an instance of a cosmo_fmri_dataset
+%  - dataset:        dataset struct with fields .samples (PxQ) and 
+%                    .sa.targets (Px1) for P samples and Q features.
+%                    .sa.targets should be a permutation of 1:P.
 %  - args:           an optional struct: 
 %      args.metric:  a string with the name of the distance
 %                    metric to be used by pdist (default: 'correlation')
@@ -29,17 +31,40 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(dataset, varargin)
 % ACC August 2013
 % NNO updated Sep 2013 to return a struct
     
-    args=cosmo_structjoin('metric',correlation,varargin);
-% >@@>
-    dsm = pdist(dataset.samples, args.metric)';
-% <@@<
+    % check input
+    if ~isfield(ds,'sa') || ~isfield(ds.sa,'targets')
+        error('Missing field .sa.targets');
+    end
+    
+    args=cosmo_structjoin('metric','correlation',varargin);
 
-    % store in a struct
-    ds_sa=struct();
+    % check targets
+    targets=ds.sa.targets;
+    ntargets=numel(targets);
+    
+    classes=unique(targets);
+    nclasses=numel(classes);
+    if nclasses~=ntargets || ~isequal(classes,sort(targets))
+        error(['.sa.targets should be permutation of unique targets; '...
+                'to average samples with the same targets, consider '...
+                'ds_mean=cosmo_fx(ds,@(x)mean(x,1),''targets'')'],...
+                    nclasses);
+    end
+    
+% >@@>
+    dsm = pdist(ds.samples, args.metric)';
+% <@@<
+    
+    % take arbitraritly (first) feature and sample as basis for the output
+    ds_sa=cosmo_slice(cosmo_slice(ds,1,2,false),1,1,false);
+    
+    % store dsm
     ds_sa.samples=dsm;
     
     % as sample attributes store the pairs of sample attribute indicues
     % used to compute the dsm.
-    nclasses=size(dsm,1);
-    [i,j]=find(triu(repmat(1:nclasses,nclasses,1)));
-    ds_sa.sa.dsm_pairs=[i j];
+    [i,j]=find(triu(repmat(1:nclasses,nclasses,1),1));
+    
+    % reset sample attributes
+    ds_sa.sa=struct();
+    ds_sa.sa.dsm_pairs=[targets(i), targets(j)];
