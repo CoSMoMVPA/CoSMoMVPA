@@ -1,4 +1,4 @@
-function ds_sa = cosmo_target_dsm_corr_measure(dataset, varargin)
+function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %   ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %
 %   A **dataset measure** that computes the correlation between a target
@@ -33,7 +33,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(dataset, varargin)
     % - compute the pair-wise distance between all dataset samples using
     %   pdist and store in 'pd'
     % >@@>    
-    pd = pdist(dataset.samples, params.metric);
+    pd = pdist(ds.samples, params.metric);
     % <@@<
     
     % convert params.target_dsm to squareform and store in 'sf'
