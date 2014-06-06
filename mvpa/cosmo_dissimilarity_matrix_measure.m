@@ -55,8 +55,11 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
     dsm = pdist(ds.samples, args.metric)';
 % <@@<
     
-    % take arbitraritly (first) feature and sample as basis for the output
-    ds_sa=cosmo_slice(cosmo_slice(ds,1,2,false),1,1,false);
+    % make new dataset
+    ds_sa=struct();
+    
+    % copy dataset attributes
+    ds_sa.a=ds.a;
     
     % store dsm
     ds_sa.samples=dsm;
