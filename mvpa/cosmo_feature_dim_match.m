@@ -45,49 +45,49 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 % See also: cosmo_match
 %
 % NNO Oct 2013
-cosmo_check_dataset(ds);
+    cosmo_check_dataset(ds);
 
-if ischar(dim_label)
-    % get value for needle and haystack
-    if ~isfield(ds,'a') || ~isfield(ds.a,'dim')
-        error('no field .a.dim');
-    end
-
-    dim=cosmo_match(ds.a.dim.labels,dim_label);
-
-    if isempty(dim)
-        error('Unknown dimension %s in ds.a.dim.labels', dim_label);
-    end
-    
-    vs=ds.a.dim.values{dim};
-    if isa(dim_values,'function_handle')
-        if isnumeric(vs)
-            match_mask=dim_values(vs);
-        else
-            match_mask=cellfun(dim_values,vs,'UniformOutput',true);
+    if ischar(dim_label)
+        % get value for needle and haystack
+        if ~isfield(ds,'a') || ~isfield(ds.a,'dim')
+            error('no field .a.dim');
         end
-    else
-        match_mask=cosmo_match(ds.a.dim.values{dim},dim_values);
-    end
-    
-    % set new value based on indices of the matching mask
-    dim_values=find(match_mask);
-    dim_label=ds.fa.(ds.a.dim.labels{dim});
-end
 
-msk=cosmo_match(dim_label, dim_values);
+        dim=cosmo_match(ds.a.dim.labels,dim_label);
 
-if nargin>3
-    if mod(nargin,2)~=1
-        error('Number of input arguments should be odd')
+        if isempty(dim)
+            error('Unknown dimension %s in ds.a.dim.labels', dim_label);
+        end
+
+        vs=ds.a.dim.values{dim};
+        if isa(dim_values,'function_handle')
+            if isnumeric(vs)
+                match_mask=dim_values(vs);
+            else
+                match_mask=cellfun(dim_values,vs,'UniformOutput',true);
+            end
+        else
+            match_mask=cosmo_match(ds.a.dim.values{dim},dim_values);
+        end
+
+        % set new value based on indices of the matching mask
+        dim_values=find(match_mask);
+        dim_label=ds.fa.(ds.a.dim.labels{dim});
     end
-    me=str2func(mfilename());
-    msk_other=me(ds, varargin{:});
-    
-    if ~isequal(size(msk),size(msk_other))
-        error('Mask size mismatch: %d x %d ~= %d x %d', ...
-                size(msk),size(msk_other))
+
+    msk=cosmo_match(dim_label, dim_values);
+
+    if nargin>3
+        if mod(nargin,2)~=1
+            error('Number of input arguments should be odd')
+        end
+        me=str2func(mfilename());
+        msk_other=me(ds, varargin{:});
+
+        if ~isequal(size(msk),size(msk_other))
+            error('Mask size mismatch: %d x %d ~= %d x %d', ...
+                    size(msk),size(msk_other))
+        end
+
+        msk=msk & msk_other;
     end
-    
-    msk=msk & msk_other;
-end
