@@ -28,8 +28,8 @@ function config=cosmo_config(fn, config)
 %
 % Notes:
 %  - the rationale for this function is to keep the example code fixed
-%    (that is, without any paths hard-coded) and still allow different
-%    users to store the example data in a directory of their choice.
+%    (that is, without any paths hard-coded) and still allow each
+%    user to store the example data in a directory of their choice.
 %
 %  - the format for a configuration file is of the form <key>=<value>,
 %    where <key> cannot contain the '=' character and <value> cannot start
@@ -158,7 +158,7 @@ function path_fn=find_file(fn, raise_)
     
     % simulate 'go-to' statement using a while loop with break at the end
     while true
-        % does the file exist 'as is?'
+        % does the file exist 'as is'?
         if exist_(fn)
             path_fn=fn;
             break
