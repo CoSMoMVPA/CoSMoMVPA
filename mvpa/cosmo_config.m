@@ -73,11 +73,11 @@ function config=cosmo_config(fn, config)
     default_config_fn='.cosmomvpa.cfg';
 
     if nargin==1 && ischar(fn)
-        fn=find_file(fn);
+        fn=find_config_file(fn);
         config=read_config(fn);
     elseif nargin==0
         % see if the configuration file can be found
-        fn=find_file(default_config_fn);
+        fn=find_config_file(default_config_fn);
         if isempty(fn)
             config=struct();
         else
@@ -145,7 +145,7 @@ function validate_config(config)
     end
     
 
-function path_fn=find_file(fn, raise_)
+function path_fn=find_config_file(fn, raise_)
 % tries to find a configuration file by looking:
 % - for the path of the file
 % - in the matlab path
