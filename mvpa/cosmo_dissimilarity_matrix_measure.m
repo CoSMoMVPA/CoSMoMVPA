@@ -14,15 +14,16 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %   Returns 
 % Output
 %    ds_sa           Struct with fields:
-%      .samples      the flattened upper triangle of a dissimilarity matrix as
-%                    returned by pdist, but conforming to the output for a dataset
-%                    measure (i.e., N x 1 array, where N is the number of pairwise
-%                    distances between all samples in the dataset).
+%      .samples      Nx1 flattened upper triangle of a dissimilarity matrix
+%                    as returned by pdist, where N=P*(P-1)/2 is the 
+%                    number of pairwise distances between all samples 
+%                    in the dataset.
 %      .sa           Struct with field:
-%        .dsm_pairs  A Px2 array indicating the pairs of indices in the
+%        .dsm_pairs  A Nx2 array indicating the pairs of indices in the
 %                    square form of the dissimilarity matrix. That is,
 %                    if .dsm_pairs(k,:)==[i,j] then .samples(k) contains
-%                    the dissimlarity between the i-th and j-th sample.
+%                    the dissimlarity between the i-th and j-th sample
+%                    target.
 %
 %   NB. pdist defaults to 'euclidean' distance, but correlation distance is
 %       preferable for neural dissimilarity matrices
