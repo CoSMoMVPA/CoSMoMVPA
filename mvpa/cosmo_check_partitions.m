@@ -20,7 +20,9 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %   - the reason to require balancing by default is that chance level is
 %     1/nclasses, which is useful for many subsequent analyses.
 %   - if this function raises an exception for partitions, consider running
-%     partitions=cosmo_balance_partitions(partitiones,...).
+%     partitions=cosmo_balance_partitions(partitions,...).
+%
+% See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
 % NNO Jan 2014  
 
