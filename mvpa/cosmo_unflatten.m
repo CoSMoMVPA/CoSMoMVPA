@@ -21,11 +21,11 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %                      convenience.
 %
 % Notes:
-%   - A typical use case is mapping an fMRI or MEEG back to a 3D or 4D 
-%     array.
+%   - A typical use case is mapping an fMRI or MEEG dataset struct
+%     back to a 3D or 4D array.
 %   - This function is the inverse of cosmo_flatten.
 %
-% See also: cosmo_flatten
+% See also: cosmo_flatten, cosmo_map2fmri, cosmo_map2meeg
 %
 % NNO Sep 2013
 
