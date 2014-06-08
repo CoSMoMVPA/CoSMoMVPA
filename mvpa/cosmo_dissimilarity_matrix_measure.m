@@ -1,18 +1,19 @@
 function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 % Compute a dissimilarity matrix measure
 %
-% ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
+% ds_dsm = cosmo_dissimilarity_matrix_measure(ds[, varargin])
 %
 % Inputs:
-%  - dataset:        dataset struct with fields .samples (PxQ) and 
+%  dataset          dataset struct with fields .samples (PxQ) and 
 %                    .sa.targets (Px1) for P samples and Q features.
 %                    .sa.targets should be a permutation of 1:P.
-%  - args:           an optional struct: 
+%  args             optional struct: 
 %      args.metric:  a string with the name of the distance
 %                    metric to be used by pdist (default: 'correlation')
 %
 %   Returns 
-% Output
+%
+% Output:
 %    ds_sa           Struct with fields:
 %      .samples      Nx1 flattened upper triangle of a dissimilarity matrix
 %                    as returned by pdist, where N=P*(P-1)/2 is the 
@@ -25,10 +26,39 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %                    the dissimlarity between the i-th and j-th sample
 %                    target.
 %
-%   NB. pdist defaults to 'euclidean' distance, but correlation distance is
-%       preferable for neural dissimilarity matrices
+% Notes:
+%  - this function requires the pdist function, available in the matlab
+%    stats toolbox.
+%  - pdist defaults to 'euclidean' distance, but correlation distance is
+%    preferable for neural dissimilarity matrices
 %
-%   
+% Example:
+%  - % ds is a dataset struct with ds.sa.targets=(1:6)';
+%    >> ds=struct();
+%    >> ds.samples=randn(6,99);
+%    >> ds.sa.targets=(1:6)';
+%    % compute all pairwise dissimilarities
+%    >> ds_dsm=cosmo_dissimilarity_matrix_measure(ds)
+%    >> disp(ds_dsm)
+%         samples: [15x1 double]
+%         sa: [1x1 struct]
+%    >> disp(ds_dsm.sa.dsm_pairs)
+%     [1     2
+%      1     3
+%      2     3
+%      1     4
+%      2     4
+%      3     4
+%      1     5
+%      2     5
+%      3     5
+%      4     5
+%      1     6
+%      2     6
+%      3     6
+%      4     6
+%      5     6]
+%
 % ACC August 2013
 % NNO updated Sep 2013 to return a struct
     
