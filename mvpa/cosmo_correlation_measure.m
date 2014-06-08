@@ -1,7 +1,7 @@
 function ds_sa=cosmo_correlation_measure(ds, varargin)
 % Computes a split-half correlation measure
 %
-% d=cosmo_splithalf_correlation_measure(ds[, args])
+% d=cosmo_correlation_measure(ds[, args])
 %
 % Inputs:
 %  ds             dataset structure
@@ -42,7 +42,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %   half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',1);
 %   half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2);
 %   ds=cosmo_stack({half1,half2});
-%   measure=@cosmo_splithalf_correlation_measure;
+%   measure=@cosmo_correlation_measure;
 %
 %   % compute one measure for the whole brain
 %   whole_brain_results=measure(ds); 
