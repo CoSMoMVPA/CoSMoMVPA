@@ -24,7 +24,7 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values)
 %   - Intended use is for flattening fMRI or MEEG datasets
 %   - This function is the inverse of cosmo_unflatten.
 %
-% See also: cosmo_unflatten
+% See also: cosmo_unflatten, cosmo_fmri_dataset, cosmo_meeg_dataset
 %
 % NNO Sep 2013
 
