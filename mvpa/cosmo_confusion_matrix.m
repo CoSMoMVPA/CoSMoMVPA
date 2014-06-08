@@ -29,7 +29,8 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
     end
     
     if numel(targets) ~= numel(predicted)
-        error('size mismach: %d ~= %d', numel(targets), numel(predicted));
+        error('size mismatch between targets and predicted: %d ~= %d', ...
+                                numel(targets), numel(predicted));
     end
     
     targets=targets(:);
