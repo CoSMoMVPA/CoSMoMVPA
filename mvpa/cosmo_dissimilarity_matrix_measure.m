@@ -1,7 +1,7 @@
-function ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
+function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 % Compute a dissimilarity matrix measure
 %
-% ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
+% ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 % Inputs:
 %  - dataset:        dataset struct with fields .samples (PxQ) and 
@@ -38,12 +38,15 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
     
     args=cosmo_structjoin('metric','correlation',varargin);
 
-    % check targets
+    % ensure that targets occur exactly once.
     targets=ds.sa.targets;
     ntargets=numel(targets);
     
+    % unique targets
     classes=unique(targets);
     nclasses=numel(classes);
+    
+    % each should occur exactly once
     if nclasses~=ntargets || ~isequal(classes,sort(targets))
         error(['.sa.targets should be permutation of unique targets; '...
                 'to average samples with the same targets, consider '...
@@ -51,23 +54,20 @@ function ds_sa = cosmo_dissimilarity_matrix_measure(ds, varargin)
                     nclasses);
     end
     
-% >@@>
-    dsm = pdist(ds.samples, args.metric)';
-% <@@<
-    
     % make new dataset
-    ds_sa=struct();
+    ds_dsm=struct();
     
-    % copy dataset attributes
-    ds_sa.a=ds.a;
+    % compute pair-wise distances between all samples using pdist,
+    % then store them as samples in ds_dsm
+    % >@@>
+    dsm = pdist(ds.samples, args.metric)';
     
     % store dsm
-    ds_sa.samples=dsm;
+    ds_dsm.samples=dsm;
+    % <@@<
     
-    % as sample attributes store the pairs of sample attribute indicues
+    % store single sample attribute: the pairs of sample attribute indices
     % used to compute the dsm.
     [i,j]=find(triu(repmat(1:nclasses,nclasses,1),1));
     
-    % reset sample attributes
-    ds_sa.sa=struct();
-    ds_sa.sa.dsm_pairs=[targets(i), targets(j)];
+    ds_dsm.sa.dsm_pairs=[targets(i), targets(j)];
