@@ -4,7 +4,8 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
 % mx=cosmo_confusion_matrix(targets, predicted)
 % 
 % Inputs:           
-%   targets     Nx1 targets for N samples, or a struct with .sa.targets
+%   targets     Nx1 targets for N samples, or a dataset struct with 
+%               .sa.targets
 %   predicted   Nx1 predicted labels (from a classifier)
 % 
 % Returns
@@ -12,6 +13,9 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
 %               mx(i,j)==c means that the i-th target class was classified
 %               as the j-th target class c times.
 %   classes     Px1 class labels.
+%
+% Note:
+%   
 % 
 % NNO Aug 2013
     
