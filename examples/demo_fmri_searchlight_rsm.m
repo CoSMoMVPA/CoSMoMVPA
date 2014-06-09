@@ -126,11 +126,11 @@ cosmo_map2fmri(ds_rsm_binary,output_fn);
 % - This example uses a different target representational similarity 
 %   matrix. The code below allows for identifying regions that show a 
 %   linear dissimilarity across animal class, with primates of distance 1 
-%   from ducks and distance 2 from insects, and insects distance 1 from 
-%   ducks. Graphically:
+%   from birdsand distance 2 from insects, and insects distance 1 from 
+%   birds. Graphically:
 %
 %            +------------------+------------------+
-%        primates             ducks             insects
+%        primates             birds             insects
 %     {monkey,lemur}     {mallard,warbler}   {ladybug,lunamoth}
 %
 % - It uses a Spearman rather than Pearson correlation measure to match
