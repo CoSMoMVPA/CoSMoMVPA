@@ -1,15 +1,73 @@
 function s=cosmo_disp(x,varargin)
 % converts data to a string representation
 %
-% TODO: - add dimensions for matrix
-%       - documentation
+% Usage 1: cosmo_disp(x,opt);  % displays the data in x
+% Usage 2: s=cosmo_disp(x,opt) % stores a string representation in s
+%
+% Inputs:
+%   x              data element, can be a dataset struct
+%                  At present only elements with at most two dimensions are
+%                  supported.
+%   opt            Optional struct with fields
+%     .min_elips   If an element has more twice this number of values along
+%                  a dimension, then the first and last .min_elips elements 
+%                  are shown separated by '...'. 
+%                  Default: 3
+%     .precision   Numeric precision, indicating number of decimals after
+%                  the floating point
+%                  Default: 3
+%     .strlen      Maximal string lenght, if a string is longer the
+%                  beginning and end are shown separated by ' ... '.
+%                  Default: 20
+%     .depth       Recursion depth
+%                  Default: 5
+% Output:
+%    s             String representation of x. 
+%                  
+% 
+% Examples:
+%
+%    >> x=struct();
+%    >> x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
+%    >> x.a_matrix=[10 11 12; 13 14 15];
+%    >> x.a_string='hello world';
+%    >> x.a_struct.another_struct.name='me';
+%    >> cosmo_disp(x);
+%     .a_cell                                                            
+%       { [  ]@0x0  { 'cell within cell'  [ 1         2                  
+%                                           3         4 ]@2x2 }@1x2 }@1x2
+%     .a_matrix                                                          
+%       [ 10        11        12                                         
+%         13        14        15 ]@2x3                                   
+%     .a_string                                                          
+%       'hello world'                                                    
+%     .a_struct                                                          
+%       .another_struct                                                  
+%         .name                                                          
+%           'me'
+%
+%    >> cosmo_disp(x.a_cell);
+%     { [  ]@0x0  { 'cell within cell'  [ 1         2                  
+%                                         3         4 ]@2x2 }@1x2 }@1x2
+%
+%    >> cosmo_disp(x.a_cell{2}{2});     
+%     [ 1         2      
+%       3         4 ]@2x2
+%
+% Notes:
+%   - Unlike the builtin 'disp' function, this function shows the contents 
+%     of x using recursion. For example if a cell contains a struct, then
+%     the contents of that struct is shown as well
+%   - There is no support for structures with more than three dimensions,
+%     and structs must be singleton (of size 1x1)
+%   - A use case is displaying dataset structs
 % 
 % NNO Jan 2014
 
-    defaults.min_elips=3;
-    defaults.precision=3;
-    defaults.strlen=12;
-    defaults.depth=4;
+    defaults.min_elips=3;  % insert '...' with more than 6 elements
+    defaults.precision=3;  % show floats with 3 decimals
+    defaults.strlen=20;    % insert '...' with strings longer than 16 chars
+    defaults.depth=5;      % maximal depth
 
     opt=cosmo_structjoin(defaults,varargin);
 
@@ -20,21 +78,41 @@ function s=cosmo_disp(x,varargin)
         opt.depth=depth-1;
 
         if iscell(x)
+            check_is_matrix(x);
             s=disp_cell(x,opt);
         elseif isnumeric(x) || islogical(x)
+            check_is_matrix(x);
             s=disp_matrix(x,opt);
         elseif ischar(x)
+            check_is_matrix(x);
             s=disp_string(x,opt);
         elseif isa(x, 'function_handle')
             s=disp_function_handle(x,opt);
         elseif isstruct(x)
+            check_is_singleton(x);
             s=disp_struct(x,opt);
         else
             error('not supported: %s', class(x))
         end
     end
 
-    function y=strcat_(xs)
+    if nargout==0
+        disp(s);
+    end
+
+function check_is_matrix(s)
+    ndim=numel(size(s));
+    if ndim~=2
+        error('Element with %d dimensions, only 2 are supported',ndim);
+    end
+    
+function check_is_singleton(s)
+    n=numel(s);
+    if n>1
+        error('Non-singleton elements (found %d values) not supported',n);
+    end
+    
+function y=strcat_(xs)
     if isempty(xs)
         y='';
         return
@@ -71,26 +149,26 @@ function s=cosmo_disp(x,varargin)
     y=[ys{:}];
 
 
-    function y=disp_struct(x,opt)
-        fns=fieldnames(x);
-        n=numel(fns);
-        r=cell(n*2,1);
-        for k=1:n
-            fn=fns{k};
-            r{k*2-1}=['.' fn];
-            d=cosmo_disp(x.(fn),opt);
-            r{k*2}=[repmat(' ',size(d,1),2) d];
-        end
-        y=strcat_(r);
-        
+function y=disp_struct(x,opt)
+    fns=fieldnames(x);
+    n=numel(fns);
+    r=cell(n*2,1);
+    for k=1:n
+        fn=fns{k};
+        r{k*2-1}=['.' fn];
+        d=cosmo_disp(x.(fn),opt);
+        r{k*2}=[repmat(' ',size(d,1),2) d];
+    end
+    y=strcat_(r);
 
 
 
-    function s=disp_function_handle(x,opt)
-        s=['@' disp_string(func2str(x),opt)];
+
+function s=disp_function_handle(x,opt)
+    s=['@' disp_string(func2str(x),opt)];
 
 
-    function s=disp_string(x, opt)
+function s=disp_string(x, opt)
     if ~ischar(x), error('expected a char'); end
     if size(x,1)>1, error('need a single row'); end
 
@@ -98,13 +176,15 @@ function s=cosmo_disp(x,varargin)
 
     n=numel(x);
     if n>opt.strlen
-        h=floor((opt.strlen-infix)/2);
+        h=floor((opt.strlen-numel(infix))/2);
         x=[x(1:h), infix ,x(n+((1-h):0))];
     end
     s=['''' x ''''];
 
 
-    function s=disp_cell(x, opt)
+function s=disp_cell(x, opt)
+    % display a cell
+    
     min_elips=opt.min_elips;
     precision=opt.precision;
 
@@ -159,18 +239,20 @@ function s=cosmo_disp(x,varargin)
     
 
     
-    function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
-        if prod(matrix_sz)~=1
-            size_str=sprintf('x%d',matrix_sz);
-            size_str(1)='@';
-        else
-            size_str='';
-        end
-        post=strcat_({repmat(' ',size(infix,1)-1,1); [post size_str]});
-        pre_infix_post=strcat_({pre, infix, post});
+function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
+    % surround infix by pre and post, doing 
+    if prod(matrix_sz)~=1
+        size_str=sprintf('x%d',matrix_sz);
+        size_str(1)='@';
+    else
+        size_str='';
+    end
+    post=strcat_({repmat(' ',size(infix,1)-1,1); [post size_str]});
+    pre_infix_post=strcat_({pre, infix, post});
         
 
-    function s=disp_matrix(x,opt)
+function s=disp_matrix(x,opt)
+    % display a matrix
     min_elips=opt.min_elips;
     precision=opt.precision;
 
@@ -226,7 +308,11 @@ function s=cosmo_disp(x,varargin)
     
     s=surround_with('[ ',strcat_(sinfix),' ]', size(x));
 
-    function [pre,post]=get_mx_idxs(x, min_elips, dim)
+function [pre,post]=get_mx_idxs(x, min_elips, dim)
+    % returns the first and last indices for showing an array along
+    % dimension dim. If size(x,dim)<2*min_elips, then pre has all the
+    % indices, otherwise pre and post have the first and last min_elips
+    % indices, respectively
     n=size(x,dim);
 
     if n>2*min_elips
