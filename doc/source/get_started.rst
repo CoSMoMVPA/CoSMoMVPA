@@ -36,7 +36,7 @@ Using CoSMoMVPA_ effectively requires:
 - an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming.
 - an :ref:`advanced beginner level <cogneuro_experience>` of fMRI or MEEG data analysis.
 - a basic understanding of :ref:`MVPA concepts <mvpa_concepts>`.
-- familiarity with :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`, in particular the :ref:`cosmomvpa_dataset`, :ref:`cosmomvpa_classifier` and :ref:`cosmomvpa_measure` concepts.
+- familiarity with :ref:`CoSMoMVPA concepts <cosmomvpa_concepts>`, in particular the :ref:`cosmomvpa_dataset`, :ref:`cosmomvpa_targets`, :ref:`cosmomvpa_chunks`, :ref:`cosmomvpa_classifier`, :ref:`cosmomvpa_neighborhood`, and :ref:`cosmomvpa_measure` concepts.
 
 Have a look at the :ref:`contents_demo.rst` to see how MVPA can be performed using CoSMoMVPA_.
 
@@ -46,6 +46,7 @@ Next steps
 
 Once you are ready:
 
+- run the :ref:`demos <contents_demo.rst>`.
 - look at the :ref:`runnable examples <modindex_run>` and the associated `Matlab outputs`_.
 - try the :ref:`exercises <ex_toc>`.
 - explore the :ref:`CoSMoMVPA functions <modindex>`.

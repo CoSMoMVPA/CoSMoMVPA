@@ -20,7 +20,9 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %   - the reason to require balancing by default is that chance level is
 %     1/nclasses, which is useful for many subsequent analyses.
 %   - if this function raises an exception for partitions, consider running
-%     partitions=cosmo_balance_partitions(partitiones,...).
+%     partitions=cosmo_balance_partitions(partitions,...).
+%
+% See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
 % NNO Jan 2014  
 
@@ -50,8 +52,7 @@ function cosmo_check_partitions(partitions, ds, varargin)
     chunks=ds.sa.chunks;
     
     if check_balance
-        [classes,foo,sample2class]=unique(targets);
-        nclasses=numel(classes);
+        [classes,unused,sample2class]=unique(targets);
     end
     
     % ensure equal number of partitions for train and test
@@ -72,10 +73,9 @@ function cosmo_check_partitions(partitions, ds, varargin)
             % counts of number of samples in each each class must be the
             % same
             train_classes=sample2class(train_idxs);
-            h=histc(train_classes,1:classes);
+            h=histc(train_classes,1:numel(classes));
             if ~all(h(1)==h)
                 idx=find(h(1)~=h,1);
-                me=str2func(mfilename());
                 error(['Unbalance in partition %d, classes %d (#=%d) '...
                         'and %d (#=%d). Balance the partitions '...
                         'using cosmo_balance_partitions, or, if you '...
@@ -93,7 +93,7 @@ function cosmo_check_partitions(partitions, ds, varargin)
                 idx=find(m,1);
 
                 error(['double dipping in fold %d: chunk %d is in '...
-                       'train and test set'],k,ctrain(idxs));
+                       'train and test set'],k,ctrain(idx));
             end
         end
     end

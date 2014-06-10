@@ -7,9 +7,12 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %   filename          filename of MEEG data to be loaded. Currently this
 %                     can be a .mat file (for FieldTrip) with timelocked or
 %                     time-frequency data, or .txt (exported EEGLab) for
-%                     timelocked data.
-%   'targets', t      targets for each sample.
-%   'chunks', c       chunks for each sample.
+%                     timelocked data. Alternatively it can be a FieldTrip 
+%                     struct with timelocked or time-frequency data.
+%   'targets', t      Px1 targets for P samples; these will be stored in 
+%                     the output as ds.sa.targets
+%   'chunks', c       Px1 chunks for P samples; these will be stored in the
+%                     the output as ds.sa.chunks
 % 
 % Returns:
 %   ds                dataset struct with the following fields
@@ -49,6 +52,10 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %  - if the input contains data from a single sample (such as an average)
 %    the .sample_field is set to .trial, and mapping back to MEEG format
 %    adds a singleton dimension to the .trial data output field.
+%  - Most MVPA applications require that .sa.targets (experimental 
+%    condition of each sample) and .sa.chunks (partitioning of the samples 
+%    in independent sets) are set, either by using this function or 
+%    manually afterwards.
 %
 % Dependency:
 %  - Loading Fieldtrip structures requires the FieldTrip toolbox:
@@ -204,14 +211,18 @@ function ds=convert_ft(ft)
 
     % get the dimension labels
     [dim_labels,ndim]=cosmo_strsplit(ft.dimord,'_');
+    
+    % See if the first dimension is a dimension label (chan, freq, time).
+    insert_sample_dim=cosmo_match(dim_labels(1),expected_dim_labels);
 
-    expected_ndim=numel(expected_dim_labels)+1;
-    add_dim=ndim==expected_ndim-1;
+    %expected_ndim=numel(expected_dim_labels)+1;
+    %insert_sample_dim=ndim==expected_ndim-1;
 
     sa=struct(); % space for sample attributes
-    if add_dim
+    if insert_sample_dim
+        nsamples=1;
         % one dimension short - add one at first position
-        samples_arr=reshape(samples_arr,[1 size(samples_arr)]);
+        samples_arr=reshape(samples_arr,[nsamples size(samples_arr)]);
         % let's call it a repeat
         samples_label='rpt';
     else
@@ -223,11 +234,12 @@ function ds=convert_ft(ft)
 
     % get the dim labels - they should match expected_dim_labels
     % if add_dim then start at first label, otherwise at second.
-    dim_labels={dim_labels{1+~add_dim:end}};
+    dim_labels={dim_labels{1+~insert_sample_dim:end}};
 
     % check the labels
-    if ~isequal(dim_labels,expected_dim_labels)
-        error('unsupported .dimord %s', ft.dimord);
+    if ~isempty(setdiff(dim_labels,expected_dim_labels))
+        delta=setdiff(dim_labels,expected_dim_labels);
+        error('unexpected field %s in .dimord %s', delta{1}, ft.dimord);
     end
 
     ndim=numel(size(samples_arr))-1; % number of feature dimensions
@@ -235,12 +247,14 @@ function ds=convert_ft(ft)
     % store values for each feature dimensions, e.g. labels of the
     % channels, onets for time, and frequency for freq
     dim_values=cell(1,ndim);
-    if ~strcmp(dim_labels{1},'chan')
-        error('expcted channel as first dimension');
-    end
-    dim_values{1}=ft.label; % 'chan'
-    for k=2:ndim
-        dim_values{k}=ft.(dim_labels{k});
+    for k=1:ndim
+        dim_label=dim_labels{k};
+        if strcmp(dim_label,'chan')
+            % FT uses label to refer to channel names
+            dim_label='label';
+        end
+        dim_value=ft.(dim_label);
+        dim_values{k}=dim_value(:);
     end
 
     % make a dataset

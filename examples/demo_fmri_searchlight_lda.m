@@ -3,7 +3,7 @@
 % The data used here is available from http://cosmomvpa.org/datadb.zip
 %
 % This example uses the following dataset:
-% - 'digit'
+% + 'digit'
 %    A participant made finger pressed with the index and middle finger of
 %    the right hand during 4 runs in an fMRI study. Each run was divided in
 %    4 blocks with presses of each finger and analyzed with the GLM,
@@ -20,6 +20,8 @@
 config=cosmo_config();
 
 digit_study_path=fullfile(config.tutorial_data_path,'digit');
+readme_fn=fullfile(digit_study_path,'README');
+cosmo_type(readme_fn);
 
 output_path=config.output_data_path;
      

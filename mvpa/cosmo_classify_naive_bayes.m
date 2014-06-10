@@ -55,7 +55,7 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
         test_prob=sum(log(ps),2)+class_probs;
         
         % find the one with the highest probability
-        [foo, mx_idx]=max(test_prob);
+        [unused, mx_idx]=max(test_prob);
         
         predicted(k)=classes(mx_idx);
     end

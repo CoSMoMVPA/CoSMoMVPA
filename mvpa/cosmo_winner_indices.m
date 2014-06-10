@@ -46,7 +46,7 @@ function [winners,classes]=cosmo_winner_indices(pred)
     if nfeatures==1
         % special case because histc works differently on singleton dimension
         
-        [classes,foo,pred_winners]=unique(pred(msk));
+        [classes,unused,pred_winners]=unique(pred(msk));
         winners(msk)=pred_winners;
         return
     end
@@ -83,7 +83,7 @@ function [winners,classes]=cosmo_winner_indices(pred)
     
     % get the rows (which correspond to indices of class winners) and 
     % columns (corresponding to each feature)
-    [wrows,wcols]=ind2sub(size(winners_msk),find(winners_msk));
+    [unused,wcols]=ind2sub(size(winners_msk),find(winners_msk));
     
     colpos=0; % referring to wcols
     for k=find(multiple_winners)' % treat each feature seperately

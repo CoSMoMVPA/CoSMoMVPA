@@ -1,4 +1,4 @@
-function randomized_targets=cosmo_randmize_targets(targets, chunks)
+function randomized_targets=cosmo_randomize_targets(targets, chunks)
 % provides randomized target labels
 %
 % randomized_targets=cosmo_randmize_targets(count, targets, chunks)

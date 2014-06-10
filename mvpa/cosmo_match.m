@@ -61,8 +61,9 @@ function msk=cosmo_match(haystack, needle, varargin)
         error('Need an even number of input arguments');
     end
     
-    % if needle is a string s, convert to cell {s}
-    needle=just_convert_str2cell(needle);
+    if ischar(needle)
+        needle={needle};
+    end
 
     if isnumeric(haystack) && isnumeric(needle) && numel(needle)==1
         % optimization for most standard case: vector and scalar
@@ -75,26 +76,33 @@ function msk=cosmo_match(haystack, needle, varargin)
             msk=needle(haystack);
         end
     else
-        tp=get_type(needle, haystack);
         nrows=check_vec(needle);
         ncols=check_vec(haystack);
-
-        switch tp
-            case 'numeric'
-                matches=bsxfun(@eq, needle(:), haystack(:)');
-
-            case 'cell_with_strings'
-                matches=false(nrows,ncols);
-                max_nchar_haystack=max(cellfun(@numel,haystack));
-                for k=1:nrows
-                    needlek=needle{k};
-                    nchar=max(numel(needlek),max_nchar_haystack);
-                    if nchar>0
-                        match_indices=strncmp(needlek,haystack,nchar);
-                        matches(k,match_indices)=true;
-                    end
+        
+        if isnumeric(needle) && isnumeric(haystack)
+            matches=bsxfun(@eq, needle(:), haystack(:)');
+        elseif iscell(needle) && iscell(haystack)
+            matches=false(nrows,ncols);
+            
+            for k=1:ncols
+                if ~ischar(haystack{k})
+                    error('cell must contain strings');
                 end
+            end
+            
+            for k=1:nrows
+                needlek=needle{k};
+                if ~ischar(needlek)
+                    error('cell must contain strings');
+                end
+                match_indices=strcmp(needlek,haystack);
+                matches(k, match_indices)=true;
+            end
+        else
+            error(['Illegal inputs %s and %s: need numeric arrays or '...
+                    'cell with strings'],class(needle),class(haystack));
         end
+        
         msk=reshape(sum(matches,1)>0,size(haystack));
     end
 
@@ -128,27 +136,3 @@ function n=check_vec(x)
     end
     n=numel(x);
         
-function tp=get_type(needle, haystack)
-    % returns a string indicating the type of needle and haystack. If needle
-    % and haystack have different types an error is thrown
-
-    types=struct();
-    types.numeric=@isnumeric;
-    types.cell_with_strings=@(x) iscell(x) && all(cellfun(@ischar,x));
-
-    fns=fieldnames(types);
-    for k=1:numel(fns)
-        fn=fns{k};
-        check_func=types.(fn);
-
-        if check_func(needle) 
-            if check_func(haystack)
-                tp=fn; % matching type found
-                return
-            else
-                error('second argument type %s but first is not',fn);
-            end
-        end
-    end
-
-    error('Unsupported type; type not one of %s.', cosmo_strjoin(fns,', '));

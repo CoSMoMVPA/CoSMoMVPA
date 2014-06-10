@@ -9,8 +9,9 @@ A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab for cognit
 
 CoSMoMVPA
 ---------
-- Provides simple, lightweight Matlab implementations of all common types of MVPA of cognitive neuroscience data.
-- Supports various fMRI file formats, including NIFTI, ANALYZE, BrainVoyager, and AFNI (MEEG support is future work).
+- Provides simple, lightweight Matlab implementations of the most common types of MVPA of cognitive neuroscience data, such as region-of-interest analysis, searchlight analyses, classification, correlations, representational similarity analysis. 
+- Supports most common fMRI (including NIFTI, ANALYZE, BrainVoyager, AFNI, GIFTI) and MEEG (FieldTrip, EEGLab)  data formats.
+- Handles fMRI volumetric, fMRI surface-based, and MEEG data in a uniform manner (e.g. in searchlight analyses).
 - Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
 - Is Free/Open Source Software (MIT License).
 

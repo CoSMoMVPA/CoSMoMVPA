@@ -1,7 +1,7 @@
 function [arr, dim_labels]=cosmo_unflatten(ds)
 % unflattens a dataset from 2 to (1+K) dimensions.
 %
-% [arr, dim_labels]=cosmo_unflatten(ds)
+% [arr, dim_labels]=cosmo_unflatten(ds[, set_missing_to])
 %
 % Inputs:
 %   ds                 dataset structure, with fields:
@@ -13,6 +13,7 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %                      sub-indices for the K dimensions. It is required
 %                      that for every dimension J in 1:K, all values in
 %                      ds.fa.(a.dim.labels{J}) are in the range 1:S_K.
+%   set_missing_to     value to set missing values to (default: 0)
 %
 % Returns:
 %   arr                an unflattened array of size P x S_1 x ... x S_K.
@@ -20,15 +21,15 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %                      convenience.
 %
 % Notes:
-%   - A typical use case is mapping an fMRI or MEEG back to a 3D or 4D 
-%     array.
+%   - A typical use case is mapping an fMRI or MEEG dataset struct
+%     back to a 3D or 4D array.
 %   - This function is the inverse of cosmo_flatten.
 %
-% See also: cosmo_flatten
+% See also: cosmo_flatten, cosmo_map2fmri, cosmo_map2meeg
 %
 % NNO Sep 2013
 
-[nsamples, nfeatures]=size(ds.samples);
+nsamples=size(ds.samples,1);
 dim_labels=ds.a.dim.labels;
 dim_values=ds.a.dim.values;
 
@@ -51,7 +52,11 @@ end
 arr_cell=cell(1,nsamples);
 
 % convert sub indices to linear indices
-lin_indices=sub2ind(dim_sizes,sub_indices{:});
+if ndim==1
+    lin_indices=sub_indices{1};
+else
+    lin_indices=sub2ind(dim_sizes,sub_indices{:});
+end
 
 % allocate space in 'ndim'-space for each sample,
 % but with a first singleton dimension as that one 

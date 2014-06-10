@@ -26,11 +26,11 @@ for k=1:nlabels
         
     values=ds.a.dim.values{dim};
     fa=ds.fa.(label);
-    [unq_idxs,foo,map_idxs]=unique(fa);
+    [unq_idxs,unused,map_idxs]=unique(fa);
     
     ds_pruned.fa.(label)=map_idxs(:)';
     if iscell(values)
-        values={values{unq_idxs}};
+        values=values(unq_idxs);
     else
         values=reshape(values(unq_idxs),1,[]);
     end

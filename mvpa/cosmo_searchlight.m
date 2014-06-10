@@ -13,7 +13,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %               measure. args get passed directly to the dataset measure.
 %       radius: searchlight radius in voxels. If provided, the neighborhood
 %               function is computed using this radius and the
-%               cosmo_spherical_voxel_selection (for fMRI datasets).
+%               cosmo_spherical_neighborhood (for fMRI datasets).
 %       center_ids:      vector indicating center ids to be used as a 
 %                        searchlight center. By default all feature ids are
 %                        used
@@ -41,9 +41,9 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %       m_args.classifier = @cosmo_classify_nn;
 %       m_args.partitions = cosmo_nfold_partitioner(ds);
 %       results = cosmo_searchlight(ds,m,'args',m_args,'radius',3);
-% See also: cosmo_spherical_voxel_selection       
+% See also: cosmo_spherical_neighborhood       
 %
-% ACC Aug 2013, modified from run_voxel_selection_searchlight by NN0
+% ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NN0
     
     cosmo_check_dataset(ds);
 
@@ -67,7 +67,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         error('need either radius or nbrhood, exclusively');
     elseif isempty(nbrhood)
         if cosmo_check_dataset(ds,'fmri',false)
-            nbrhood=cosmo_spherical_voxel_selection(ds, radius);
+            nbrhood=cosmo_spherical_neighborhood(ds, radius);
         elseif cosmo_check_dataset(ds,'meeg',false)
             nbrhood=cosmo_meeg_neighborhood(ds, radius, parent_type);
         else
@@ -157,14 +157,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     results_map.a=nbrhood.a;
     
     % slice the feature attributes
-    fa_fns=fieldnames(nbrhood.fa);
-    for k=1:numel(fa_fns)
-        fa_fn=fa_fns{k};
-        v=nbrhood.fa.(fa_fn);
-        
-        % select the proper feature indices
-        results_map.fa.(fa_fn)=cosmo_slice(v,center_ids,2);
-    end
+    results_map.fa=cosmo_slice(nbrhood.fa,center_ids,2,'struct');
     
     % join the outputs from the measure for each searchlight position
     res_stacked=cosmo_stack(res_cell,2);

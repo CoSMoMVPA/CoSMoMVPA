@@ -25,7 +25,7 @@ function test_searchlight_
     % bit of a smoke test
     measure=@cosmo_correlation_measure;
 
-    nbrhood=cosmo_spherical_voxel_selection(ds,3);
+    nbrhood=cosmo_spherical_neighborhood(ds,3);
     m=cosmo_searchlight(ds, measure,'nbrhood',nbrhood,'center_ids',[100 201]);
 
     assertVectorsAlmostEqual(m.samples,[0.0014 0.0204],'relative',.001);

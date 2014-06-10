@@ -84,24 +84,23 @@ xhead=xs{1};
 nhead=numel(xhead);
 if isnumeric(xhead) || islogical(xhead)
     % put numeric arrays in a cell
-    xhead=mat2cell(xhead(:),ones(nhead,1),1);
+    xhead=num2cell(xhead);
 end
 
-% ensure head it's a column vector
-xhead={xhead{:}}';
+% ensure head is a column vector
+xhead=xhead(:);
 
 if ndim==1
     p=xhead;
 else
     % use recursion to find cartprod of remaining dimensions (the 'tail')
     me=str2func(mfilename()); % make imune to renaming of this function
-    xtail={xs{2:end}};
+    xtail=xs(2:end);
     ptail=me(xtail, false); % ensure output is always a cell
     
     % get sizes of head and tail
     nhead=numel(xhead);
     ntail=size(ptail,1);
-    n=nhead*ntail;
     
     % allocate space for output
     rows=cell(nhead,1);
@@ -109,7 +108,7 @@ else
         % merge head and tail
         % ptailk_rep is a repeated version of the k-th tail row
         % to match the number of rows in head
-        ptailk_rep=repmat({ptail{k,:}},nhead,1);
+        ptailk_rep=repmat(ptail(k,:),nhead,1);
         rows{k}=cat(2,xhead,ptailk_rep);
     end
     
@@ -137,7 +136,7 @@ if as_struct();
     
     % use value of q in output
     p=p_cell;
-elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,{p{:}}))
+elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
     % all values are numeric; convert to numeric matrix
     p=reshape([p{:}],size(p));
 end

@@ -28,7 +28,7 @@ function hdr=cosmo_map2meeg(ds, fn)
 function write_eeglab_txt(fn, hdr)
 
     dimords=cosmo_strsplit(hdr.dimord,'_');
-    if numel(dimords)~=3 || ~isequal({dimords{2:3}},{'chan','time'})
+    if numel(dimords)~=3 || ~isequal(dimords(2:3),{'chan','time'})
         error('Only support timelock data with dimord=..._chan_time');
     end
 
@@ -47,7 +47,7 @@ function write_eeglab_txt(fn, hdr)
     end
 
     % prepare header
-    header=cosmo_strjoin({'', hdr.label{:}},'\t');
+    header=cosmo_strjoin([{''}, hdr.label(:)'],'\t');
 
     % prepare pattern to write data in array
     arr_pat=cosmo_strjoin(repmat({'%.4f'},1,nchan+1),'\t');
@@ -77,7 +77,7 @@ function ft=build_ft(ds)
 
     % set dimord 
     samples_label=ds.a.meeg.samples_label;
-    dimord_labels={samples_label dim_labels{:}};
+    dimord_labels=[{samples_label} dim_labels];
     ft.dimord=cosmo_strjoin(dimord_labels,'_');
 
     % store each feature attribute dimension value
@@ -100,6 +100,6 @@ function ft=build_ft(ds)
 
     % if fieldtrip is present 
     if cosmo_check_external('fieldtrip',false) && ...
-                ~isempty(strmatch(ft_datatype(ft),'unknown'))
+                isequal(ft_datatype(ft),'unknown')
         error('conversion error - fieldtrip does not approve of this dataset');
     end

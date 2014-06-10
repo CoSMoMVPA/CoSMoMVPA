@@ -4,7 +4,6 @@ build/*
 *.gif
 *.pickle
 run*rst
-cosmo*rst
 make*rst
 *.zip
 .buildinfo

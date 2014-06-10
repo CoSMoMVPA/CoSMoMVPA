@@ -76,6 +76,63 @@ def matlab2rst(data, output=None):
     header=['.. code-block:: matlab','']
     return '\n'.join(header + map(add_indent, res))
 
+def remove_trailing_percent(data):
+    r=[]
+
+    is_percent=True
+    for d in data:
+        if not d in ' %':
+            is_percent=False
+        
+        r.append(' ' if is_percent else d)
+        
+    return ''.join(r)
+    
+
+def matlab2parts(data):
+    '''Converts data to tuple (function sepc, first doc line, other doc lines, body)'''
+    lines=data.split('\n')
+
+    parts=[[] for i in xrange(4)]
+    stage=0
+    for i, line in enumerate(lines):
+        line=line.strip()
+
+        if i==0 and not 'function' in line:
+            # no function, hence script
+            stage+=1
+
+        if stage==2 and not line.startswith('%'):
+            stage+=1
+        next_stage=False
+        is_continuation=line.endswith('...')
+        
+        if stage==0:
+            next_stage=True
+        elif stage==1:
+            line=remove_trailing_percent(line).strip()
+            if not line:
+                next_stage=True
+                line=None
+        elif stage==2:
+            line=remove_trailing_percent(line)
+        
+        parts[stage].append(line)
+
+        if next_stage and not is_continuation:
+            stage+=1
+
+    rs=[]
+    for i,part in enumerate(parts):
+        # first explanatory line is concatenated without newline
+        sep=' ' if i==1 else '\n'
+        rs.append(sep.join([p for p in part if p is not None]))
+
+    return tuple(rs)
+            
+            
+            
+
 
 class RSTType(object):
     def __init__(self, prefix, build_types):
@@ -146,6 +203,14 @@ rst_types=(RSTType('demo',[None]),
            RSTType('run',[None,'skl']),
            RSTType('cosmo',[None,'hdr','skl']))
 
+def as_table(data):
+    lengths=[max(map(len,x)) for x in zip(*data)]
+    t=' '.join(['='*length for length in lengths])
+    fill=lambda xs:[x+' '*(lengths[i]+len(x)) for i,x in enumerate(xs)]
+    return '\n'.join([t]+map(' '.join,map(fill,data))+[t])
+    
+
+
 all_fns=sum([glob.glob(join(d,'*.m')) for d in [matlab_dir, example_dir]],[])
 all_fns.sort()
 
@@ -168,12 +233,14 @@ for output in ('hdr','skl',None):
             # make a text file that can be 'included' in sphinx
             trg_fn=join(output_mat_abs,'%s.txt' % b)
             
+            with open(fn) as f:
+                mat=f.read()
+
+            parts=matlab2parts(mat)
+
             remake_rst=False
             if is_newer(fn, trg_fn):
                 remake_rst=True
-                with open(fn) as f:
-                    mat=f.read()
-
                 rst=matlab2rst(mat, output)
                 
                 with open(trg_fn,'w') as f:
@@ -202,20 +269,25 @@ for output in ('hdr','skl',None):
 
                 rebuild_toc=True
  
-            base_names.append(b)
-
+            base_names.append((b,parts[1]))
 
         if rebuild_toc:
             toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
             title='%s - %s' % (rst_type.get_name(), rst_type.type2name(output))
-            header='.. _`%s`:\n\n%s\n%s\n\n.. toctree::\n    :maxdepth: 2\n\n' % (
-                        toc_base_name, title, '='*len(title))
+            header='.. _`%s`:\n\n.. toctree::\n    :maxdepth: 2\n    :hidden:\n\n' % (
+                        toc_base_name)
 
             
             trg_fn=join(output_root_abs,'%s.rst' % toc_base_name)
             with open(trg_fn,'w') as f:
                 f.write(header)
-                f.write('\n'.join('    %s/%s' % (output_mat_rel,b) for b in base_names))
+                f.write('\n'.join('    %s/%s' % (output_mat_rel,b) for b,_ in base_names))
+                f.write('\n\n%s\n%s\n\n' % (title, '+' * len(title)))
+
+                ref_base_names=[[':ref:`%s`' % s if i==0 else s for i,s in enumerate(bs)]
+                                        for bs in base_names]
+                f.write(as_table(ref_base_names))
+
                 
 
             if rst_type.needs_full_include():
@@ -229,7 +301,7 @@ for output in ('hdr','skl',None):
 
                 body='\n'.join(['%s\n%s\n\n :demo:`%s`\n\n.. include:: %s\n\n\n' % (
                             b,'+'*len(b),b,join(output_mat_rel,b)+'.txt')
-                                    for b in base_names])
+                                    for b,_ in base_names])
 
                 with open(trg_fn,'w') as f:
                     f.write(header+body+'\n\n')

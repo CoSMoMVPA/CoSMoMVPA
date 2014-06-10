@@ -34,7 +34,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %    % randomly and average these; repeat the random selection process 4
 %    % times. Each sample in 'ds' is used twice (=.5*4)as an element 
 %    % to compute an average.
-%    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.5),'nrep',4);
+%    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.5,'nrep',4);
 %
 % Notes:
 %  - this function averages feature-wise; the output has the same features

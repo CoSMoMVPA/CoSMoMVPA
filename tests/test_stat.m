@@ -9,52 +9,60 @@ function test_stat_
     [ns,nf]=size(ds.samples);
 
     f=zeros(1,nf);
+    p=zeros(1,nf);
     for k=1:nf
-        [p,tab]=anova1(ds.samples(:,k), ds.sa.targets, 'off');
+        [p(k),tab]=anova1(ds.samples(:,k), ds.sa.targets, 'off');
         f(k)=tab{2,5};
         df=[tab{2:3,3}];
     end
 
     % f stat
-    ff=cosmo_stat('f',ds);
+    ff=cosmo_stat(ds,'F');
     assertVectorsAlmostEqual(f,ff.samples);
-    assertVectorsAlmostEqual(df,ff.sa.df);
+    assertEqual(ff.sa.stats,{sprintf('Ftest(%d,%d)',df)});
+    
+    pp=cosmo_stat(ds,'F','p');
+    assertVectorsAlmostEqual(p,pp.samples);
 
-    [f_,df_]=cosmo_stat('f',ds.samples,ds.sa.targets);
-    assertVectorsAlmostEqual(f,f_);
-    assertVectorsAlmostEqual(df,df_);
 
     % t stat
-    [h,p,ci,stats]=ttest(ds.samples);
-    tt=cosmo_stat('t',ds);
-    assertVectorsAlmostEqual(stats.tstat,tt.samples);
-    assertVectorsAlmostEqual(unique(stats.df),tt.sa.df);
+    tails={'p','left','right','both'};
+    for k=1:numel(tails)
+        tail=tails{k};
+        if strcmp(tail,'p')
+            ttest_arg=cell(0);
+        else
+            ttest_arg={'tail',tail};
+        end
+        [h,p,ci,stats]=ttest(ds.samples,0,ttest_arg{:});
+        assertExceptionThrown(@()cosmo_stat(ds,'t'),'');
+        ds1=ds;
+        ds1.sa.targets(:)=10;
+        tt=cosmo_stat(ds1,'t');
+        assertVectorsAlmostEqual(stats.tstat,tt.samples);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
 
-    [t_,df_]=cosmo_stat('t',ds.samples);
-    assertVectorsAlmostEqual(stats.tstat,t_);
-    assertVectorsAlmostEqual(unique(stats.df),df_);
+        pp=cosmo_stat(ds1,'t',tail);
+        assertVectorsAlmostEqual(p,pp.samples);
 
-    % exceptions
-    assertExceptionThrown(@()cosmo_stat('t2',ds),'');
-    assertExceptionThrown(@()cosmo_stat('t2',ds.samples,ds.sa.targets),'');
+        ds2=ds;
+        ds2.sa.targets(:)=mod(ds.sa.targets,2);
+        ds_sp=cosmo_split(ds2,'targets');
+        x=ds_sp{1}.samples;
+        y=ds_sp{2}.samples;
 
-    assertExceptionThrown(@()cosmo_stat('f',ds.sa),'');
-    assertExceptionThrown(@()cosmo_stat('t',ds.sa),'');
-    assertExceptionThrown(@()cosmo_stat('t2',ds.sa),'');
+        [h,p,ci,stats]=ttest2(x,y,ttest_arg{:});
+        [tt]=cosmo_stat(ds2,'t2');
 
-    % t2 stat
-    ds=cosmo_slice(ds,ds.sa.targets>=3);
-    x=ds.samples(ds.sa.targets==3,:);
-    y=ds.samples(ds.sa.targets==4,:);
+        assertVectorsAlmostEqual(stats.tstat,tt.samples);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
+        pp=cosmo_stat(ds2,'t2',tail);
+        assertVectorsAlmostEqual(p,pp.samples);
+    end
+    
 
-    [h,p,ci,stats]=ttest2(x,y);
-    [tt]=cosmo_stat('t2',ds);
-    assertVectorsAlmostEqual(stats.tstat,tt.samples);
-    assertVectorsAlmostEqual(unique(stats.df),tt.sa.df);
-
-    [t_,df_]=cosmo_stat('t2',ds.samples,ds.sa.targets);
-    assertVectorsAlmostEqual(stats.tstat,t_);
-    assertVectorsAlmostEqual(unique(stats.df),df_);
-
-    ds=cosmo_slice(ds,ds.sa.targets==3); % single target
-    assertExceptionThrown(@()cosmo_stat('t2',ds.sa),'');
+    assertExceptionThrown(@()cosmo_stat(ds,'t2'),'');
+    assertExceptionThrown(@()cosmo_stat(ds,'t'),'');
+    
+    
+    

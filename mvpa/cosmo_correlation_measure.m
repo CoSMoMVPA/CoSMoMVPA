@@ -1,7 +1,7 @@
 function ds_sa=cosmo_correlation_measure(ds, varargin)
 % Computes a split-half correlation measure
 %
-% d=cosmo_splithalf_correlation_measure(ds[, args])
+% d=cosmo_correlation_measure(ds[, args])
 %
 % Inputs:
 %  ds             dataset structure
@@ -42,13 +42,22 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %   half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',1);
 %   half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2);
 %   ds=cosmo_stack({half1,half2});
-%   measure=@cosmo_splithalf_correlation_measure;
+%   measure=@cosmo_correlation_measure;
 %
 %   % compute one measure for the whole brain
 %   whole_brain_results=measure(ds); 
 %
 %   % run searchlight with this measure
 %   searchlight_results=cosmo_searchlight(ds,measure,'radius',4); 
+%
+% Notes:
+%   - by default the post_corr_func is set to @atanh. This is equivalent to 
+%     a Fisher transformation from r (correlation) to z (standard z-score).
+%     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r))
+%   - if multiple samples are present with the same chunk and target, they
+%     are averaged *prior* to computing the correlations
+%
+% NNO May 2014
 
 defaults=struct();
 defaults.partitions=[];
@@ -75,7 +84,7 @@ if params.check_partitions
 end
 
 targets=ds.sa.targets;
-[classes,foo,target2class]=unique(targets);
+classes=unique(targets);
 nclasses=numel(classes);
 
 if isempty(template)
@@ -88,12 +97,14 @@ halves={partitions.train_indices, partitions.test_indices};
 pdata=cell(npartitions,1);
 for k=1:npartitions
     avg_halves_data=cell(1,2);
+    
+    % compute average over samples, for each target seperately
     for h=1:2
         idxs=halves{h}{k};
         half_data=cosmo_slice(ds.samples,idxs,1,false);
         
         if isequal(targets(idxs),(1:numel(idxs))')
-            % optimization 
+            % optimization: no averaging necessary 
             avg_halves_data{h}=half_data;
         else
             res=cell(1,nclasses);
@@ -111,6 +122,7 @@ for k=1:npartitions
     end
     
     c=cosmo_corr(avg_halves_data{1}',avg_halves_data{2}',params.corr_type);
+    
     if ~isempty(post_corr_func)
         c=post_corr_func(c);
     end

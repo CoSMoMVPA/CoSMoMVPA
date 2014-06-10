@@ -1,20 +1,23 @@
-function ds_sa = cosmo_target_dsm_corr_measure(dataset, varargin)
-%   ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
+function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
+% measure correlation with target dissimilarity matrix
 %
-%   A **dataset measure** that computes the correlation between a target
-%   dissimilarity matrix and the dissimilarity matrix of the input dataset
-%   samples 
+% ds_sa = cosmo_target_dsm_corr_measure(dataset, args)
 %
-%   Inputs
-%       dataset:    an instance of a cosmo_fmri_dataset
-%       args:       struct with mandatory field target_dsm and optional field
-%                   type 
-%           args.target_dsm:    Target dissimilarity matrix, flattened upper
-%                               triangle, must be same size as dsm for dataset
-%           args.type:  [Optional] Type of correlation can be any 'type' that matlab's
-%                       corr function can take. Default: 'pearson'
-%           args.metric Optional type of distance metric used in pdist.
-%                       Default: 'correlation'
+% Inputs:
+%   ds             dataset struct with field .samples PxQ for P samples and
+%                  Q features 
+%   args           struct with fields:
+%     .target_dsm  Either: 
+%                  - target dissimilarity matrix of size PxP. It should have
+%                    zeros on the diagonal and be symmetric.
+%                  - target dissimilarity vector of size Nx1, with 
+%                    N=P*(P-1)/2 the number of pairs of samples in ds.
+%     .metric      Distance metric used in pdist to compute pair-wise
+%                  distances between samples in ds. It accepts any
+%                  metric supported by pdist (default: 'correlation')
+%     .type:       Type of correlation between target_dsm and ds,
+%                  one of 'Pearson' (default), 'Spearman', or 'Kendall'
+%                  
 %
 %   Returns
 %    ds_sa           Struct with fields:
@@ -33,24 +36,46 @@ function ds_sa = cosmo_target_dsm_corr_measure(dataset, varargin)
     % - compute the pair-wise distance between all dataset samples using
     %   pdist and store in 'pd'
     % >@@>    
-    pd = pdist(dataset.samples, params.metric);
+    pd = pdist(ds.samples, params.metric);
     % <@@<
     
-    % convert params.target_dsm to squareform and store in 'sf'
-    % >@@> 
-    sf=squareform(params.target_dsm);
-    % <@@<
+    nsamples_pd=size(pd,1);
+    target_dsm=params.target_dsm;
     
-    % check size
-    if numel(pd) ~= numel(sf),
-        error('Size mismatch between dataset and target dsm');
+    if nsamples_pd==size(target_dsm,1)
+        % target_dsm is a vector
+        
+        % check size
+        if numel(target_dsm)~=nsamples_pd
+            error('target_dsm should be column vector or square')
+        end
+        
+        target_dsm_vec=target_dsm;
+    else
+        % target_dsm is a square matrix
+        
+        % convert params.target_dsm to squareform and store in 
+        % 'target_dsm_vec'
+        % >@@> 
+        target_dsm_vec=squareform(params.target_dsm);
+        % <@@<
+    
+        % check size
+        if numel(pd) ~= numel(target_dsm_vec),
+            error(['Size mismatch between dataset (%d) '...
+                    'and target dsm (%d)'], ...
+                        numel(pd) ~= numel(target_dsm_vec));
+        end
     end
 
     % >@@> 
     % compute correlations between 'pd' and 'sf', store in 'rho'
-    rho=cosmo_corr(pd(:),sf(:), params.type);
+    rho=cosmo_corr(pd(:),target_dsm_vec(:), params.type);
     % <@@<
 
+    % store results
     ds_sa=struct();
     ds_sa.samples=rho;
     ds_sa.sa.labels={'rho'};
+    ds_sa.sa.metric=params.metric;
+    ds_sa.sa.type=params.type;

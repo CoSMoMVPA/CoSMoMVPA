@@ -25,6 +25,10 @@ config=cosmo_config();
 
 ak6_study_path=fullfile(config.tutorial_data_path,'ak6');
 
+% show readme information
+readme_fn=fullfile(ak6_study_path,'README');
+cosmo_type(readme_fn);
+
 output_path=config.output_data_path;
      
 

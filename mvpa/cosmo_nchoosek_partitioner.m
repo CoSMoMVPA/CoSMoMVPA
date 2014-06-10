@@ -1,11 +1,11 @@
 function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
-% partitiones generally for choose(n,k) with optional group schemes.
+% partitions for into nchoosek(n,k) parititions with optional grouping schemas.
 %
 % partitions=cosmo_nchoosek_partitioner(chunks, k, group_values1, test_group_by1,...)
 %
 % Input
 %  - chunks          Px1 chunk indices for P samples. It can also be a
-%                    dataset with field .sa.chunks
+%                    dataset struct with field .sa.chunks
 %  - k               When an integer, k chunks are in each test partition.
 %                    When between 0 and 1, this is interpreted as
 %                    round(k*nchunks) where nchunks is the number of unique
@@ -18,8 +18,10 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %                    (If k is odd then train and test indices have 
 %                    (k+1)/nchunks and (k-1)/nchunks elements, 
 %                    respectively, or vice versa).
-%  - group_values*   } Pairs of these determine a subsequent level group 
-%  - test_group_by*  } partition scheme. Each group_values can be
+%  - group_values*   } Intended for cross-participant or cross-condition
+%  - test_group_by*  } generalizability analyses. 
+%                      Pairs of these determine a subsequent level group 
+%                      partition scheme. Each group_values can be
 %                      a Px1 vector with the labels for a test group, or,
 %                      if chunks is a string, the name of a sample
 %                      attribute whose values are used as labels.
@@ -41,46 +43,80 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %                    test_group_by*.
 %
 % Notes:
-%  - when k=1 and two input arguments, this function behaves equivalently 
+%  - When k=1 and two input arguments, this function behaves equivalently 
 %    to cosmo_nfold_partitioner.
-%  - as shown in the examples below, this function can be used for
+%  - Thus, in the most simple case (nfold-partitioning),
+%    cosmo_nfold_partitioner can be used as well as this function.
+%  - As shown in the examples below, this function can be used for
 %    cross-modal and/or cross-participant cross-validation.
-%  - for cross-validation it is recommended to balance partitions using 
+%  - For cross-validation it is recommended to balance partitions using 
 %    cosmo_balance_partitions
 %
-% See also: cosmo_balance_partitions 
-%
 % Examples:
+%   % simple take-one-fold out partitioning; 2 chunks
+%   cosmo_nchoosek_partitioner([1 2 1 2 2],1)
+%     >  train_indices: {[2 4 5]  [1 3]}
+%     >  test_indices: {[1 3]  [2 4 5]}
+% 
+%   % the same partitioning using a floating point between 0 and 1
 %   cosmo_nchoosek_partitioner([1 2 1 2 2],.5)
 %     >  train_indices: {[2 4 5]  [1 3]}
 %     >  test_indices: {[1 3]  [2 4 5]}
 %
+%   % take-one-chunks-out partitioning; 4 chunks numbered [3,4,5,6]
+%   cosmo_nchoosek_partitioner(3:6,1)
+%     > train_indices: {[2 3 4]  [1 3 4]  [1 2 4]  [1 2 3]}
+%     > test_indices: {[1]  [2]  [3]  [4]}
+%
+%   % as above, but take-*two*chunks out
+%   cosmo_nchoosek_partitioner(3:6,2)
+%     > train_indices: {[3 4]  [2 4]  [2 3]  [1 4]  [1 3]  [1 2]}
+%     > test_indices: {[1 2]  [1 3]  [1 4]  [2 3]  [2 4]  [3 4]}
+%
+%   % as above; take half of the chunks out (which is 4/2=2)
 %   cosmo_nchoosek_partitioner(1:4,.5)
 %     >     train_indices: {[3 4]  [2 4]  [2 3]  [1 4]  [1 3]  [1 2]}
 %     >     test_indices: {[1 2]  [1 3]  [1 4]  [2 3]  [2 4]  [3 4]}
 %
+%   % as above, but now omit mirror images over train and test; e.g.
+%   % (train=[3 4],test=[1 2]) is present, but its reverse,
+%   % (train=[1 2],test=[3 4]), is not. Useful for split-half
+%   % correlation measure without feature selection
 %   cosmo_nchoosek_partitioner(1:4,'half')
 %     >     train_indices: {[3 4]  [2 4]  [2 3]}
 %     >     test_indices: {[1 2]  [1 3]  [1 4]}
 %   
-%   % when using a dataset with sample attributes 'chunks','subject_id',
-%   % 'modality', and 'targets'; modality assumed to have values in [1,2].
+%   % A more complicated example using a dataset. Say a dataset contains
+%   % samples from different subjects, and for each subject there were two
+%   % stimuli (targets) presented in two modalities. It is assumed that
+%   % chunks are already assigned, and that the data from the different
+%   % subjects has been combined in one large dataset (e.g. using
+%   % cosmo_stack). Thus, the dataset has sample attributes 
+%   % 'chunks','subject_id', 'modality', and 'targets'; 'targets' and 
+%   % 'modality' has values in [1,2].
 %   cosmo_nchoosek_partitioner(ds,1); 
-%     > % standard nfold crossvalidation
+%     > % standard nfold crossvalidation combining data across
+%     > % participants, i.e. data is treated as if it came from one
+%     > % participant
 %
 %   cosmo_nchoosek_partitioner(ds,1,'subject',[])
-%     > % cross-participant nfold cross validation over all subjects
+%     > % cross-participant nfold cross validation over all subjects, i.e.
+%     > % testing on one chunk in one participant after training on all
+%     > % other participants and all other chunks (for each unique
+%     > % combiniation of chunk and participant)
 %
 %   cosmo_nchoosek_partitioner(ds,1,'subject', [3,5,7])
-%     > % cross-participant nfold crossvalidation, tests on subject 3,5,7;
+%     > % As above, but only test on subject 3, 5, and 7;
 %       % in each fold training is done on all subject except one of 3,5,7.
 %
 %   cosmo_nchoosek_partitioner(ds,1,'modality',2)
 %     > % nfold cross validation with training on samples with modality==2
-%       % and testing on samples in the other modality
+%     > % and testing on samples in the other modality; data is treated as 
+%     > % if it came from one participant
 %
 %   cosmo_nchoosek_partitioner(ds,1,'modality',[])  
-%     > % full cross-modal nfold cross validation
+%     > % as above, but test on modality 1 after training on modality 2 and
+%     > % vice versa
 %
 %   cosmo_nchoosek_partitioner(ds,1,'modality',1,'subject,[])
 %     > % full cross-subject nfold cross validation with testing on
@@ -197,8 +233,8 @@ function partitions=group_by(partitions, group_values, test_group_by)
         end
 
         % store the test-indices for m-th group_by_value
-        test_indices{m}={test_indices_cell{1:pos}};
-        train_indices{m}={train_indices_cell{1:pos}};
+        test_indices{m}=test_indices_cell(1:pos);
+        train_indices{m}=train_indices_cell(1:pos);
     end
 
     partitions=struct();
@@ -221,7 +257,7 @@ if all(sum(bsxfun(@eq,chunks(:),1:2),2))
 end
     
 
-[unq,foo,chunk_indices]=unique(chunks);
+[unq,unused,chunk_indices]=unique(chunks);
 nclasses=numel(unq);
 
 % deal with special 'half' case

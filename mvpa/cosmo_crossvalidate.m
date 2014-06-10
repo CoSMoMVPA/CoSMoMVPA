@@ -35,7 +35,7 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     
     npartitions=numel(train_indices);
     
-    [nsamples,nfeatures]=size(ds.samples);
+    nsamples=size(ds.samples,1);
     
     % space for output (one column per partition)
     % the k-th column contains predictions for the k-th partition

@@ -92,7 +92,7 @@ function predicted=cosmo_classify_selective_naive_bayes(samples_train, targets_t
         
             % naive bayes classification
             ps=bsxfun(@plus,sum(ps_train(:,train_mask,:),2),class_probs);
-            [foo,pred_idxs]=max(squeeze(ps),[],1);            
+            [unused,pred_idxs]=max(squeeze(ps),[],1);            
             
             % compute accuracy for this candidate
             cand_accs(c)=sum(classes(pred_idxs)==targets_train(:))/ntrain;
@@ -136,7 +136,7 @@ function predicted=cosmo_classify_selective_naive_bayes(samples_train, targets_t
         test_prob=sum(log(ps),2)+class_probs;
         
         % find the one with the highest probability
-        [foo, mx_idx]=max(test_prob);
+        [unused, mx_idx]=max(test_prob);
         
         predicted(k)=classes(mx_idx);
     end

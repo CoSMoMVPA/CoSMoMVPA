@@ -20,15 +20,17 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
     if nargin<4, opt=struct(); end
         
     [ntrain, nfeatures]=size(samples_train);
-    [ntest, nfeatures_]=size(samples_test);
+    [unused, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
     
-    if nfeatures~=nfeatures || ntrain_~=ntrain, error('illegal input size'); end
+    if nfeatures~=nfeatures_ || ntrain_~=ntrain
+        error('illegal input size'); 
+    end
     
     classes=unique(targets_train);
     if numel(classes)~=2
-        me=mfilename();
-        error('%s requires 2 classes. Use cosmo_classify_meta_multiclass with opt.classifier=@%s', me, me);
+        error('%s requires 2 classes. Use cosmo_classify_svm instead',...
+                    mfilename());
     end
     
     opt_cell=opt2cell(opt);

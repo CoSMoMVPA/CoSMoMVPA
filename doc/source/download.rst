@@ -24,7 +24,8 @@ Certain functionality require certain external toolboxes:
 
 - BrainVoyager_ files require NeuroElf_ toolbox.
 - AFNI_ files require the ``AFNI Matlab`` library.
-- the Support Vector Machine (SVM) classifier requires the `Matlab statistics`_ toolbox.
+- Matlab_'s Support Vector Machine (SVM) classifier (accessed through :ref:`cosmo_classify_svm`), and some other functions that use statistical computations, require the `Matlab statistics`_ toolbox.
+- LIBSVM_'s Support Vector Machine (SVM) classifier (accessed through  :ref:`cosmo_classify_libsvm`) requires the LIBSVM_ toolbox.
 - MEEG data requires FieldTrip_ for almost all MEEG-related functions.
 
 Tutorial data
@@ -43,7 +44,7 @@ Developers
 ++++++++++
 Contributions are welcomed! Please see :ref:`contribute`. 
 
-Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_ and Python_. 
+Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see `building the documentation`_.
 
 Unit tests require the xUnit_ toolbox.
 
