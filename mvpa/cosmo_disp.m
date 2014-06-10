@@ -58,8 +58,10 @@ function s=cosmo_disp(x,varargin)
 %   - Unlike the builtin 'disp' function, this function shows the contents 
 %     of x using recursion. For example if a cell contains a struct, then
 %     the contents of that struct is shown as well
-%   - There is no support for structures with more than three dimensions,
-%     and structs must be singleton (of size 1x1)
+%   - Limiations:
+%     * no support for structures with more than three dimensions
+%     * structs must be singleton (of size 1x1)
+%     * strings have to be 1xP
 %   - A use case is displaying dataset structs
 % 
 % NNO Jan 2014
@@ -170,7 +172,7 @@ function s=disp_function_handle(x,opt)
 
 function s=disp_string(x, opt)
     if ~ischar(x), error('expected a char'); end
-    if size(x,1)>1, error('need a single row'); end
+    if size(x,1)>1, error('string has to be a single row'); end
 
     infix=' ... ';
 
