@@ -108,7 +108,7 @@ function write_niml_dset(fn,s)
 function s=build_bv_smp(ds)
     s=xff('new:smp');
     
-    [nsamples,nfeatures]=size(ds.samples);
+    nsamples=size(ds.samples,1);
     stats=cosmo_statcode(ds,'bv');
     
     maps=cell(1,nsamples);
@@ -116,6 +116,14 @@ function s=build_bv_smp(ds)
         t=xff('new:smp');
         map=t.Map;
         map.SMPData=cosmo_unflatten(cosmo_slice(ds,k));
+        
+        if k==1
+            % store the number of features
+            % note: unlike the niml_dset implementation, data is stored
+            % for all nodes, even if some node indices did not have a value
+            % originally
+            nfeatures=numel(map.SMPData);
+        end
         
         if isfield(ds.sa,'labels')
             map.Name=ds.sa.labels{k};
