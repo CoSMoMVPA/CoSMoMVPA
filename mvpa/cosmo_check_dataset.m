@@ -130,7 +130,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
             if ~all(m)
                 i=find(~m,1);
                 msg=sprintf('''%s''-dataset has not dim field %s',...
-                                ds_type,ds.a.dim.labels{i});
+                                ds_type,names{i});
                 break;
             end
         end
