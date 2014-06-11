@@ -85,10 +85,13 @@ function formats=get_formats()
     formats.bv_smp.externals={'neuroelf'};
     
 function s=build_niml_dset(ds)
+    if ~isequal(ds.a.dim.values,{'node_indices'})
+        error('Expected a.dim.value={''node_indices''}');
+    end
+    
     s=struct();
-    ds.fa
     s.node_indices=(ds.a.dim.values{1}(ds.fa.node_indices))-1;
-    s.data=cosmo_unflatten(ds)';
+    s.data=ds.samples';
     
     if isfield(ds.sa,'labels');
         s.labels=ds.sa.labels;
