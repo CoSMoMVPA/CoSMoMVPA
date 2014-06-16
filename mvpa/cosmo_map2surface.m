@@ -85,8 +85,8 @@ function formats=get_formats()
     formats.bv_smp.externals={'neuroelf'};
     
 function s=build_niml_dset(ds)
-    if ~isequal(ds.a.dim.values,{'node_indices'})
-        error('Expected a.dim.value={''node_indices''}');
+    if ~isequal(ds.a.dim.labels,{'node_indices'})
+        error('Expected a.dim.labels={''node_indices''}');
     end
     
     s=struct();
