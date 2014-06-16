@@ -30,9 +30,9 @@ function stat_repr=cosmo_statcode(ds, output_format)
     if iscell(ds)
         % string representation of stats
         stat_repr=ds(:);
-    elseif isstruct(ds) && isfield(ds,'samples') && isfield(ds,'sa')
+    elseif isstruct(ds) && isfield(ds,'samples')
         % dataset struct
-        if isfield(ds.sa,'stats')
+        if isfield(ds,'sa') && isfield(ds.sa,'stats')
             % get stat information
             stat_repr=ds.sa.stats;
         else
