@@ -1,7 +1,7 @@
 function files=cosmo_dir(directory,file_pattern)
 % list files recursively in a directory, optionally matching a pattern
 %
-% files=cosmo_dir([directory[,file_pattern]])
+% files=cosmo_dir([directory][,file_pattern])
 %
 % Inputs:
 %   directory      optional parent directory to look for files. If omitted
@@ -26,8 +26,15 @@ function files=cosmo_dir(directory,file_pattern)
 %    directory.
 %  
 % Examples:
+%  % list recursively all files in the current directory
+%  >> d=cosmo_dir()
+%
 %  % list recursively all files in my_dir
 %  >> d=cosmo_dir('my_dir')
+%
+%  % list recursively all files in the current directory with extension 
+%  % '.jpg'
+%  >> d=cosmo_dir('my_d)
 % 
 %  % list recursively all files in my_dir with extension '.jpg'
 %  >> d=cosmo_dir('my_dir', '*.jpg')
@@ -50,13 +57,14 @@ if nargin<1
     directory='.';
 end
 
-if ~isdir(directory)
-    error('''s'' is not a directory', directory);
-end
-
-if nargin<2
+if nargin<2 || isempty(file_pattern)
     % list all files
     file_pattern='*';
+end
+
+if ~isdir(directory)
+    file_pattern=directory;
+    directory='.';
 end
 
 me=[]; % in case of recursion, this is set to a handle of this function
