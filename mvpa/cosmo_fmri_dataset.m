@@ -1,16 +1,20 @@
 function ds = cosmo_fmri_dataset(filename, varargin)
-% load an fmri dataset to facilitate MVPA analyses. Fashioned after
-% the logic and semantics of PyMVPA. 
+% load an fmri volumetric dataset 
 %
 % ds = cosmo_fmri_dataset(filename, [,'mask',mask],...
 %                                   ['targets',targets],...
 %                                   ['chunks',chunks])
 % 
 % Inputs:
-%   filename     filename for dataset. Currently supports NIFTI and ANALYZE
-%   mask         filename for volume mask
-%   targets      Nx1 array of numeric labels to be used as sample attributes
-%   chunks       Nx1 array of numeric labels to be used as feature attributes
+%   filename     filename for dataset         } Supports NIFTI, ANALYZE, 
+%   mask         optional filename for mask   } AFNI, BrainVoyager
+%                or true to apply an automask
+%   targets      optional Tx1 numeric labels of experimental
+%                conditions (where T is the number of samples (volumes)
+%                in the dataset)
+%   chunks       optional Tx1 numeric labels of chunks, typically indices
+%                of runs of data acquisition
+%                
 %
 % Returns:
 %   ds           dataset struct with the following fields:
@@ -18,19 +22,20 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                N samples (observations, volumes) and M features (spatial
 %                locations, voxels).
 %                If the original nifti file contained data with X,Y,Z,T
-%                dimensions, and no mask was applied, then 'data' will have
-%                dimensions N x M, where N = T, and M = X*Y*Z. If a mask was
-%                applied then M = the number of non-zero voxels in the mask
-%                input dataset.
+%                elements in the three spatial and one temporal dimension
+%                and no mask was applied, then .samples will have
+%                dimensions N x M, where N = T, and M = X*Y*Z. If a mask 
+%                was applied then M = the number of non-zero voxels in the 
+%                mask input dataset.
 %     .a         struct intended to contain dataset-relevent data.
-%     .a.hdr_{F} header information for this dataset, required to map the data
-%                back to a volumetric data file. Currently {F} can be 
-%                'nii', 'bv_vmp', 'bv_glm', or 'afni'.
+%     .a.dim.labels   dimension labels, set to {'i','j','k'}
+%     .a.dim.values   dimension values, set to {1:X, 1:Y, 1:Z}
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
 %     .a.vol.mat 4x4 voxel-to-world transformation matrix (LPI, base-1).
-%     .sa        struct for holding sample attributes (e.g.,sa.targets,sa.chunks) 
-%     .fa        struct for holding sample attributes 
+%     .sa        struct for holding sample attributes (e.g.,sa.targets,
+%                sa.chunks) 
+%     .fa        struct for holding feature attributes 
 %     .fa.{i,j,k} indices of voxels (in voxel space). 
 %
 % Notes:
@@ -38,6 +43,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %    condition of each sample) and .sa.chunks (partitioning of the samples 
 %    in independent sets) are set, either by using this function or 
 %    manually afterwards.
+%  - Data can be mapped to the volume using cosmo_map2fmri
 %
 % Dependencies:
 % - for NIFTI files, it requires the following toolbox:
