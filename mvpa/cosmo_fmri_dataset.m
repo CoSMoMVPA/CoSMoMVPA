@@ -54,6 +54,55 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 % - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
+% Examples:
+%     % load nifti file
+%     ds=fmri_dataset('mydata.nii');
+%
+%     % load AFNI file with 6 'bricks' (values per voxel, e.g. beta values);
+%     % set chunks (e.g. runs) and targets (experimental conditions), and
+%     % use a mask
+%     ds=fmri_dataset('mydata+tlrc', 'chunks', [1 1 1 2 2 2]', ...
+%                                     'targets', [1 2 3 1 2 3]',
+%                                     'mask', 'masks/brain_mask+tlrc);
+%   
+%     % load BrainVoyager VMR file in directory 'mydata', and apply an
+%     % automask that removes all features (voxels) that are zero for all
+%     % samples
+%     ds=fmri_dataset('mydata/mydata.vmr', mask, true);
+%
+%     % load two datasets, one for odd runs, the other for even runs, and
+%     % combine them into one dataset. Note that the chunks are set here,
+%     % but the targets are not - for subsequent analyses this may have to
+%     % be done manually
+%     ds_even=fmri_dataset('data_even_runs.glm','chunks',1);
+%     ds_odd=fmri_dataset('data_odd_runs.glm','chunks',2);
+%     
+%   
+%     % load ANALYZE file with a mask
+%     ds=fmri_dataset('mydata.hdr', 'mask', 'brain_mask.hdr');
+%
+%     % load several ANALYZE beta images from SPM, all with the same mask
+%     datadir='where/my/data/is/' 
+%     mask_fn='brain_mask.hdr';                % mask file name
+%     mask_path_fn=fullfile(datadir, mask_fn); % full path to mask file
+%     beta_indices=10:20; % load beta images 10 to 20
+%     n=numel(beta_indices); % number of images (=11 in this case)
+%     ds_betas=cell(n,1); % allocate space for each beta image
+%     for k=1:n
+%         beta_index=beta_indices(k);
+%         fn=sprintf('beta_%04d.hdr',beta_index); % construct file name
+%         path_fn=fullfile(data_dir, fn); % make a full path
+%
+%         % load single beta image with mask
+%         ds_beta=cosmo_fmri_dataset(path_fn,'mask',mask_path_fn);
+%
+%         ds_beta.sa.beta_index=beta_index; % store the beta index
+%         ds_betas{k}=ds_beta; % store the dataset for this beta index
+%     end
+%     ds=cosmo_stack(ds_betas); % combine all data into single dataset
+%
+% See also: cosmo_map2fmri   
+%
 % ACC, NNO Aug, Sep 2013
      
     % Input parsing stuff
