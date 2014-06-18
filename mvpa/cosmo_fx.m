@@ -15,9 +15,24 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %               f to each unique combiniation of attribtues in split_by
 %
 % Example:
-%   % ds is a dataset with several repeats of each target. To get the
+%   % ds is a dataset with several repeats of each target. Compute the
 %   % average sample value for each unique target:
-%   >> f_ds=cosmo_split(ds, @(x) mean(x,1), 'targets', 1)
+%   f_ds=cosmo_fx(ds, @(x) mean(x,1), 'targets', 1)
+%
+%   % Compute the average sample value for each unique combination
+%   % of targets and chunks:
+%   f_ds=cosmo_fx(ds, @(x) mean(x,1), {'targets','chunks'}, 1)
+%
+%   % ds is an MEEG timelocked dataset with feature attributes 'time' and
+%   % 'chan'. Downsample the data by a factor of three over the time 
+%   % dimension by binning the data in bins of three and averaging each bin
+%   downsampling_factor=3
+%   ds.fa.time_downsamp=ceil(ds.fa.time/downsampling_factor);
+%   ds_downsamp=cosmo_fx(ds, @(x) mean(x,2), {'chan','time_downsamp'}, 2);
+%   % fix the 'time' feature dimension so that map2meeg works properly
+%   ds=cosmo_feature_dim_prune(ds_downsamp);
+%
+% See also: cosmo_split, cosmo_stack
 %
 % NNO Jan 2014
     
