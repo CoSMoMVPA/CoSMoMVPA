@@ -62,6 +62,9 @@ cosmo_type(readme_fn);
 
 output_path=config.output_data_path;
 
+% reset citation list
+cosmo_check_external('-tic');
+
 % resolution parameter for input surfaces
 % 64 is for high-quality results; use 16 for fast execution
 ld=64; 
@@ -297,3 +300,6 @@ for one_surf=[true,false]
         end
     end
 end
+
+% Show citation information
+cosmo_check_external('-cite');

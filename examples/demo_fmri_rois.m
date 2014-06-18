@@ -22,7 +22,9 @@ output_path=config.output_data_path;
 
 readme_fn=fullfile(study_path,'README');
 cosmo_type(readme_fn);
-     
+
+% reset citation list
+cosmo_check_external('-tic');
 
 %% Example 1: split-half correlation measure (Haxby 2001-style)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,4 +157,5 @@ for j=1:nmasks
     end
 end
 
-
+% Show citation information
+cosmo_check_external('-cite');

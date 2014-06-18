@@ -32,7 +32,10 @@ readme_fn=fullfile(ak6_study_path,'README');
 cosmo_type(readme_fn);
 
 output_path=config.output_data_path;
-     
+
+% reset citation list
+cosmo_check_external('-tic');
+
 
 %% Load data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,4 +200,5 @@ cosmo_plot_slices(ds_rsm_behav);
 output_fn=fullfile(output_path,'rsm_behav.nii');
 cosmo_map2fmri(ds_rsm_behav,output_fn);
 
-
+% Show citation information
+cosmo_check_external('-cite');

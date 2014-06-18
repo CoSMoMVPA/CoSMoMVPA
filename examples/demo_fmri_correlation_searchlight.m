@@ -29,6 +29,10 @@ ak6_study_path=fullfile(config.tutorial_data_path,'ak6');
 readme_fn=fullfile(ak6_study_path,'README');
 cosmo_type(readme_fn);
 
+% reset citation list
+cosmo_check_external('-tic');
+
+% set result directory
 output_path=config.output_data_path;
      
 
@@ -71,3 +75,6 @@ output_fn=fullfile(output_path,'corr_searchlight.nii');
 
 % Store results to disc
 cosmo_map2fmri(corr_results, output_fn);
+
+% Show citation information
+cosmo_check_external('-cite');
