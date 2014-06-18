@@ -69,7 +69,8 @@ function msk=cosmo_match(haystack, needle, varargin)
         % optimization for most standard case: vector and scalar
         check_vec(haystack);
         msk=needle==haystack;
-    elseif isa(needle,'function_handle')
+    elseif ~iscell(needle) && ~ischar(needle) && ~isnumeric(needle) && ...
+                                            isa(needle,'function_handle')
         if iscell(haystack)
             msk=cellfun(needle,haystack,'UniformOutput',true);
         else
