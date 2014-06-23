@@ -8,7 +8,13 @@ function cosmo_set_path()
 %    the paths $ROOT/{mvpa,external}, and their subdirectories, to the 
 %    matlab path. It removes $ROOT{doc,examples,tests}.
 %  - A warning message is given if an unexpected directory structure is 
-%    encountered 
+%    encountered.
+%  - To store the path, run savepath after calling this function.
+%
+% Example:
+%   cosmo_set_path();
+%   savepath();
+%
 %
 % NNO June 2014
 
