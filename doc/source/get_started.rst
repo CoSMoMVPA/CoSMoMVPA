@@ -30,7 +30,7 @@ Using CoSMoMVPA_ effectively requires:
 
     + alternatively, download the `zip archive`_.
 
-  In Matlab_, add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
+  In Matlab_, run ``cosmo_set_path`` followed by ``savepath``. Alternatively one can manually add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
 - optionally the tutorial data, available :ref:`here <download>` (to run the :ref:`exercises <ex_toc>`).
 - optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support; see :ref:`here <download>`.
 - an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming.
