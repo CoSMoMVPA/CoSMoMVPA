@@ -371,20 +371,38 @@ function vol=get_vol_nii(hdr)
     % make base1 friendly
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
     
-    % try to deal with old analyze-style files with flipped orientations
+    % try to deal with old analyze-style files with flipped orientations.
+    % this code is experimental and has been tried only on a few
+    % nifti/analyze files, hence for now a warning is printed
     if isfield(hist, 'flip_orient') && ~isempty(hist.flip_orient)
-        if ~isfield(hist, 'rot_orient') || ~isequal(hist.rot_orient,1:3)
-            error('Unsupported flip_orient with non-identity rot_orient');
+        assert(isfield(hist,'rot_orient') && ~isempty(hist.rot_orient));
+        warning(['Detected flip_orient field - will flip orientation '...
+                 'and/or swap spatial dimensions. This operation is '... 
+                 '*experimental*. You are advised to check your '...
+                 'results visually. If the orientation is off, please '...
+                 'get in touch with the CoSMoMVPA developers.']);
+        
+        % spatial dimension permutation matrix
+        permute_dim_mat=zeros(4);
+        permute_dim_mat(4,4)=1;
+        
+        % dimension flip (reflection) matrix
+        flip_mat=eye(4);
+        for dim=1:3
+            permute_dim_mat(hist.rot_orient(dim),dim)=1;
+            if hist.flip_orient(dim)>0
+                flip_mat(dim,dim)=-1;
+            end
         end
         
-        flip_orient=hist.flip_orient;
-        for idx=find(flip_orient)
-            dim=flip_orient(idx)-2; % along which dimension to flip
-                                    % (may assume LPI orientation)
-            flip=eye(4);
-            flip(dim)=-1;
-            mat=flip*mat;
-        end
+        % after permutation each column and row should have exactly one 1
+        one_vec=ones(1,4);
+        assert(isequal(sum(permute_dim_mat,1),one_vec) && ...
+                        isequal(sum(permute_dim_mat,2),one_vec'))
+        
+        
+        % apply dimension permutation & reflections
+        mat=permute_dim_mat*flip_mat*mat;
     end 
     
     vol=struct();
