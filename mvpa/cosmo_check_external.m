@@ -145,41 +145,61 @@ function is_present=cosmo_check_external(external, error_if_not_present)
     end
 
     ext=externals.(external);
-    is_present=ext.check();
-
-    if ~is_present && error_if_not_present
-        error(['The %s is required, but it was not found in the '...
-                    'matlab path. If it is not present on your system, '...
-                    'download it from:\n\n    %s\n\nthen, if '...
-                    'applicable, add the necessary directories '...
-                    'to the matlab path.'], ...
-                    ext.label, ext.url);
-    end
+    is_present=ext.is_present();
+    is_recent=ext.is_recent();
     
-    if is_present 
+    if is_present && is_recent
+        % everything ok, add to cached_external_names
         if ~iscell(cached_external_names)
             cached_external_names=cell(0);
         end
         if all(~cosmo_match(cached_external_names,external))
             cached_external_names{end+1}=external;
         end
+    else
+        if ~is_present
+            msg=sprintf(['The %s is required, but it was not found in '...
+                    'the matlab path. If it is not present on your '...
+                    'system, download it from:\n\n    %s\n\nthen, if '...
+                    'applicable, add the necessary directories '...
+                    'to the matlab path.'], ...
+                    ext.label, ext.url);
+        
+        elseif ~is_recent
+            msg=sprintf(['The %s was found on your matlab path, but '...
+                    'seems out of date. Please download the latest '...
+                    'version from:\n\n %s\n\nthen, if '...
+                    'applicable, add the necessary directories '...
+                    'to the matlab path.'], ...
+                    ext.label, ext.url);
+        else
+            assert(false); % should never get here
+        end
+        
+        if error_if_not_present
+            error(msg);
+        end
+        
     end
+    
         
 
 
 function externals=get_externals()
     % helper function that defines the externals.
     externals=struct();
+    yes=@() true;
     
-    externals.cosmo.check=@() true;
+    externals.cosmo.is_present=yes;
     externals.cosmo.label='CoSMoMVPA toolbox';
     externals.cosmo.url='http://cosmomvpa.org';
     externals.cosmo.authors={'N N. Oosterhof','A. C. Connolly'};
     externals.cosmo.ref=['CoSMoMVPA: A lightweight multi-variate '...
                          'pattern analysis toolbox in Matlab'];
     
-    externals.afni_bin.check=@() isunix() && ...
+    externals.afni_bin.is_present=@() isunix() && ...
                           ~unix('which afni && afni --version >/dev/null');
+    externals.afni_bin.is_recent=yes;
     externals.afni_bin.label='AFNI';
     externals.afni_bin.url='http://afni.nimh.nih.gov/afni';
     externals.afni_bin.authors={'R. W. Cox'};
@@ -188,24 +208,30 @@ function externals=get_externals()
                              'resonance neuroimages.  Computers and '...
                              'Biomedical Research, 29: 162-173, 1996'];
     
-    externals.afni.check=@() ~isempty(which('BrikLoad'));
+    externals.afni.is_present=@() ~isempty(which('BrikLoad'));
+    externals.afni.is_recent=@() ~isempty(which('afni_niml_readsimple'));
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
     externals.afni.authors={'Z. Saad','G. Chen'};                         
     externals.afni.ref=externals.afni_bin.ref;
 
-    externals.neuroelf.check=@() ~isempty(which('xff'));
+    externals.neuroelf.is_present=@() ~isempty(which('xff'));
+    externals.neuroelf.is_recent=yes;
     externals.neuroelf.label='NeuroElf toolbox';
     externals.neuroelf.url='http://neuroelf.net';
     externals.neuroelf.authors={'J. Weber'};
 
-    externals.nifti.check=@() ~isempty(which('load_nii'));
+    externals.nifti.is_present=@() ~isempty(which('load_nii'));
+    externals.nifti.is_recent=yes;
     externals.nifti.label='NIFTI toolbox';
     externals.nifti.url=['http://www.mathworks.com/matlabcentral/',...
                     'fileexchange/8797-tools-for-nifti-and-analyze-image'];
     externals.nifti.authors={'J. Shen'};
     
-    externals.fieldtrip.check=@() ~isempty(which('ft_read_data'));
+    externals.fieldtrip.is_present=@() ~isempty(which('ft_read_data'));
+    % require version from 2014 onwards
+    externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
+                                            'datenum')>datenum(2014,1,1);
     externals.fieldtrip.label='FieldTrip toolbox';
     externals.fieldtrip.url='http://fieldtrip.fcdonders.nl';
     externals.fieldtrip.authors={'R. Oostenveld','P. Fries','E. Maris',...
@@ -218,8 +244,9 @@ function externals=get_externals()
                               'Article ID 156869, 9 pages, 2011.',...
                               'doi:10.1155/2011/156869'];
 
-    externals.libsvm.check=@() ~isempty(which('svmpredict')) && ...
+    externals.libsvm.is_present=@() ~isempty(which('svmpredict')) && ...
                                 ~isempty(which('svmptrain'));
+    externals.libsvm.is_recent=yes;
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
     externals.libsvm.authors={'C.-C. Chang and C.-J. Lin'};
@@ -228,9 +255,11 @@ function externals=get_externals()
                             'ACM Transactions on Intelligent Systems '...
                             'and Technology, 2:27:1--27:27, 2011'];
     
-    externals.surfing.check=@() ~isempty(which('surfing_write')) && ...
-                                ~isempty(which('surfing_voxelselection'));
-    externals.surfing.label='Surfing toolbox (v0.4+)';
+    externals.surfing.is_present=@() ~isempty(which(...
+                                            'surfing_voxelselection'));
+    % require recent version with surfing_write
+    externals.surfing.is_recent=~isempty(which('surfing_write'));
+    externals.surfing.label='Surfing toolbox';
     externals.surfing.url='http://github.com/nno/surfing';
     externals.surfing.authors={'N. N. Oosterhof','T Wiestler',...
                                 'J. Diedrichsen'};
@@ -238,7 +267,8 @@ function externals=get_externals()
                             'surface-based multi-voxel pattern '...
                             'analysis. Neuroimage 56 (2), 593-600'];
     
-    externals.gifti.check=@() ~isempty(which('gifti'));
+    externals.gifti.is_present=@() ~isempty(which('gifti'));
+    externals.gifti.is_recent=yes;
     externals.gifti.label='GIfTI library for matlab';
     externals.gifti.url='www.artefact.tk/software/matlab/gifti';
     externals.gifti.authors={'G. Flandin'};
