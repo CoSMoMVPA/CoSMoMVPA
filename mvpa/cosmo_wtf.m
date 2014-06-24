@@ -1,4 +1,4 @@
-function s=wtf
+function s=cosmo_wtf
 % return system, toolbox and externals information 
 %
 % s=cosmo_wtf()
@@ -12,10 +12,10 @@ function s=wtf
 %
 % Examples:
 %   % print the information to standard out (the command window)
-%   >> cosmo_wtf();
+%   >> cosmo_wtf()
 %
 %   % store the information in the variable 'w':
-%   >> w=cosmo_wtf()
+%   >> w=cosmo_wtf();
 %
 % NNO Apr 2014
 
@@ -71,10 +71,7 @@ w=cut(w);
 
 % join elements in w
 s=cosmo_strjoin(w,'\n');
-if nargout==0
-    % print output
-    fprintf(s);
-end
+
 
 function s=dir2str(d, to_omit)
 % d is the result from 'dir' or 'cosmo_dir'
