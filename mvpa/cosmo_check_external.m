@@ -191,6 +191,7 @@ function externals=get_externals()
     yes=@() true;
     
     externals.cosmo.is_present=yes;
+    externals.cosmo.is_recent=yes;
     externals.cosmo.label='CoSMoMVPA toolbox';
     externals.cosmo.url='http://cosmomvpa.org';
     externals.cosmo.authors={'N N. Oosterhof','A. C. Connolly'};
