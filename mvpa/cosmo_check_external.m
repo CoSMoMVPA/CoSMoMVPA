@@ -230,9 +230,10 @@ function externals=get_externals()
     externals.nifti.authors={'J. Shen'};
     
     externals.fieldtrip.is_present=@() ~isempty(which('ft_read_data'));
-    % require version from 2014 onwards
-    externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
-                                            'datenum')>datenum(2014,1,1);
+    % in the future, may require from 2014 onwards
+    %externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
+    %                                        'datenum')>datenum(2014,1,1);
+    externals.fieldtrip.is_recent=yes;
     externals.fieldtrip.label='FieldTrip toolbox';
     externals.fieldtrip.url='http://fieldtrip.fcdonders.nl';
     externals.fieldtrip.authors={'R. Oostenveld','P. Fries','E. Maris',...
