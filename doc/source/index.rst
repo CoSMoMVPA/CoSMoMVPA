@@ -36,6 +36,8 @@ CoSMoMVPA
    :target: get_started.html
 .. image:: _static/icon_download.png
    :target: download.html
+.. image:: _static/icon_modules.png
+   :target: modindex.html
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
