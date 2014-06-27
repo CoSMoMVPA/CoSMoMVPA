@@ -168,7 +168,7 @@ function b=isa_bv_smp(x)
     b=isa(x,'xff') && isfield(x,'NrOfVertices') && isfield(x,'Map');
   
 function s=read_bv_smp(fn)
-    x=xff(fn);
+    s=xff(fn);
     
 function [data,node_indices,sa]=build_bv_smp(s)
     nsamples=s.NrOfMaps;
