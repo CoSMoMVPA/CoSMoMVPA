@@ -12,14 +12,14 @@ The latest code is available from GitHub_. As this code is under development, it
 
     git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
 
-   To update an already existing repository (i.e. after the clone), run::
+  To update a (local) already existing repository (i.e. after the clone) to the latest version on hithub, run::
 
     git checkout master
     git pull origin master
 
 - Others can download and extract the `zip archive`_.
 
-To use CoSMoMVPA_ in Matlab_, run ``cosmo_set_path`` followed by ``savepath``. Alternatively you can manually add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
+To use CoSMoMVPA_ in Matlab_, run ``cosmo_set_path`` (in ``mvpa/``) followed by ``savepath``. Alternatively you can manually add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
 
 Note: when CoSMoMVPA is released officially, there will be permanent links, hosted on the website, containing official, feature-stable, releases.
 
