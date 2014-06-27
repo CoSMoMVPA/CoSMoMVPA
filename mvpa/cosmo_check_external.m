@@ -214,7 +214,6 @@ function externals=get_externals()
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
     externals.afni.authors={'Z. Saad','G. Chen'};                         
-    externals.afni.ref=externals.afni_bin.ref;
 
     externals.neuroelf.is_present=@() ~isempty(which('xff'));
     externals.neuroelf.is_recent=yes;
