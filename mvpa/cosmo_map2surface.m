@@ -93,12 +93,14 @@ function s=build_niml_dset(ds)
     s.node_indices=(ds.a.dim.values{1}(ds.fa.node_indices))-1;
     s.data=ds.samples';
     
-    if isfield(ds.sa,'labels');
-        s.labels=ds.sa.labels;
-    end
-    
-    if isfield(ds.sa,'stats');
-        s.stats=ds.sa.stats;
+    if isfield(ds,'sa')
+        if isfield(ds.sa,'labels');
+            s.labels=ds.sa.labels;
+        end
+
+        if isfield(ds.sa,'stats');
+            s.stats=ds.sa.stats;
+        end
     end
     
 function write_niml_dset(fn,s)
@@ -125,12 +127,14 @@ function s=build_bv_smp(ds)
             nfeatures=numel(map.SMPData);
         end
         
-        if isfield(ds.sa,'labels')
-            map.Name=ds.sa.labels{k};
-        end
-        
-        if ~isempty(stats) && ~isempty(stats{k})
-            map=cosmo_structjoin(map, stats{k});
+        if isfield(ds,'sa')
+            if isfield(ds.sa,'labels')
+                map.Name=ds.sa.labels{k};
+            end
+
+            if ~isempty(stats) && ~isempty(stats{k})
+                map=cosmo_structjoin(map, stats{k});
+            end
         end
         
         map.BonferroniValue=nfeatures;
