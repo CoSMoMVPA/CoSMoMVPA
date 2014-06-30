@@ -122,9 +122,10 @@ function is_present=cosmo_check_external(external, error_if_not_present)
                 
             case 'cite'
                 citation_str=get_citation_str(cached_external_names);
-                fprintf(['If you use CoSMoMVPA and/or some '...
+                s=sprintf(['If you use CoSMoMVPA and/or some '...
                          'other toolboxes for a publication, '...
                         'please cite:\n\n%s\n'], citation_str);
+                disp(s);    
                 is_present=[];
                 
             otherwise
@@ -153,6 +154,8 @@ function is_present=cosmo_check_external(external, error_if_not_present)
         if ~iscell(cached_external_names)
             cached_external_names=cell(0);
         end
+        
+        % avoid duplicates
         if all(~cosmo_match(cached_external_names,external))
             cached_external_names{end+1}=external;
         end
