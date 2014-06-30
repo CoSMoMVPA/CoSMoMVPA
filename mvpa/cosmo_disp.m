@@ -1,17 +1,20 @@
-function s=cosmo_disp(x,varargin)
+function cosmo_disp(x,varargin)
 % converts data to a string representation
 %
-% Usage 1: cosmo_disp(x,opt);  % displays the data in x
-% Usage 2: s=cosmo_disp(x,opt) % stores a string representation in s
+% cosmo_disp(x,opt)
 %
 % Inputs:
 %   x              data element, can be a dataset struct
 %                  At present only elements with at most two dimensions are
 %                  supported.
 %   opt            Optional struct with fields
-%     .min_elips   If an element has more twice this number of values along
-%                  a dimension, then the first and last .min_elips elements 
-%                  are shown separated by '...'. 
+%     .threshold   If the number of values in an array along a dimension 
+%                  exceeds threshold, then an array is showed in summary
+%                  style along that dimension. Default: 5
+%     .edgeitems   When an array is shown in summary style, edgeitems sets
+%                  the number of items at the beginning and end of the 
+%                  array to be shown (separated by '...' in rows and by ':'
+%                  in columns).
 %                  Default: 3
 %     .precision   Numeric precision, indicating number of decimals after
 %                  the floating point
@@ -19,87 +22,115 @@ function s=cosmo_disp(x,varargin)
 %     .strlen      Maximal string lenght, if a string is longer the
 %                  beginning and end are shown separated by ' ... '.
 %                  Default: 20
-%     .depth       Recursion depth
+%     .depth       Maximum recursion depth
 %                  Default: 5
-% Output:
-%    s             String representation of x. 
-%                  
+%
+% Side effect:     Calling this function caused the representation of x
+%                  to be displayed.
+%    
 % 
 % Examples:
 %
-%    >> x=struct();
-%    >> x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
-%    >> x.a_matrix=[10 11 12; 13 14 15];
-%    >> x.a_string='hello world';
-%    >> x.a_struct.another_struct.name='me';
-%    >> cosmo_disp(x);
-%     .a_cell                                                            
-%       { [  ]@0x0  { 'cell within cell'  [ 1         2                  
-%                                           3         4 ]@2x2 }@1x2 }@1x2
-%     .a_matrix                                                          
-%       [ 10        11        12                                         
-%         13        14        15 ]@2x3                                   
-%     .a_string                                                          
-%       'hello world'                                                    
-%     .a_struct                                                          
-%       .another_struct                                                  
-%         .name                                                          
-%           'me'
+%    x=struct();
+%    x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
+%    x.a_matrix=[10 11 12; 13 14 15];
+%    x.a_string='hello world';
+%    x.a_struct.another_struct.name='me';
+%    cosmo_disp(x);
+%    >  .a_cell                                                            
+%    >    { [  ]@0x0  { 'cell within cell'  [ 1         2                  
+%    >                                        3         4 ]@2x2 }@1x2 }@1x2
+%    >  .a_matrix                                                          
+%    >    [ 10        11        12                                         
+%    >      13        14        15 ]@2x3                                   
+%    >  .a_string                                                          
+%    >    'hello world'                                                    
+%    >  .a_struct                                                          
+%    >    .another_struct                                                  
+%    >      .name                                                          
+%    >        'me'
 %
-%    >> cosmo_disp(x.a_cell);
-%     { [  ]@0x0  { 'cell within cell'  [ 1         2                  
-%                                         3         4 ]@2x2 }@1x2 }@1x2
+%    cosmo_disp(x.a_cell)
+%    > { [  ]@0x0  { 'cell within cell'  [ 1         2                  
+%    >                                     3         4 ]@2x2 }@1x2 }@1x2
 %
-%    >> cosmo_disp(x.a_cell{2}{2});     
-%     [ 1         2      
-%       3         4 ]@2x2
+%    cosmo_disp(x.a_cell{2}{2})
+%    >  [ 1         2      
+%    >    3         4 ]@2x2
+%
+%    % illustrate recursion 'depth' argument 
+%    m={'hello'};
+%    for k=1:10, m{1}=m; end;
+%    cosmo_disp(m)
+%    > { { { { { <cell> } } } } }
+%    cosmo_disp(m,'depth',8)
+%    > { { { { { { { { <cell> } } } } } } } }
+%    cosmo_disp(m,'depth',Inf)
+%    > { { { { { { { { { { { 'hello' } } } } } } } } } } }
+%
+%    % illustrate 'threshold' and 'edgeitems' arguments
+%    cosmo_disp(num2cell('a':'k'))
+%    > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
+%    cosmo_disp(num2cell('a':'k'),'threshold',Inf)
+%    > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }@1x11
+%    cosmo_disp(num2cell('a':'k'),'edgeitems',2)
+%    > { 'a'  'b' ... 'j'  'k'   }@1x11
+%
 %
 % Notes:
 %   - Unlike the builtin 'disp' function, this function shows the contents 
 %     of x using recursion. For example if a cell contains a struct, then
 %     the contents of that struct is shown as well
-%   - Limiations:
+%   - Limitations:
 %     * no support for structures with more than three dimensions
 %     * structs must be singleton (of size 1x1)
-%     * strings have to be 1xP
+%     * character arrays must be 1xP
 %   - A use case is displaying dataset structs
 % 
 % NNO Jan 2014
 
-    defaults.min_elips=3;  % insert '...' with more than 6 elements
+    defaults.threshold=5;  % max #items before triggering summary style
+    defaults.edgeitems=3;  % #items at edges in summary style
     defaults.precision=3;  % show floats with 3 decimals
     defaults.strlen=20;    % insert '...' with strings longer than 16 chars
     defaults.depth=5;      % maximal depth
 
     opt=cosmo_structjoin(defaults,varargin);
 
+    % get string representation of x
+    s=disp_helper(x, opt);
+    
+    % print string representation of x
+    disp(s);
+    
+function s=disp_helper(x, opt)
+    % general helper function to get a string representation. Unlike the 
+    % main function this function returns a string, which makes it suitable
+    % for recursion
     depth=opt.depth;
     if depth<=0
         s=surround_with('<',class(x),'>',size(x));
+        return
+    end    
+
+    opt.depth=depth-1;
+
+    if iscell(x)
+        check_is_matrix(x);
+        s=disp_cell(x,opt);
+    elseif isnumeric(x) || islogical(x)
+        check_is_matrix(x);
+        s=disp_matrix(x,opt);
+    elseif ischar(x)
+        check_is_matrix(x);
+        s=disp_string(x,opt);
+    elseif isa(x, 'function_handle')
+        s=disp_function_handle(x,opt);
+    elseif isstruct(x)
+        check_is_singleton(x);
+        s=disp_struct(x,opt);
     else
-        opt.depth=depth-1;
-
-        if iscell(x)
-            check_is_matrix(x);
-            s=disp_cell(x,opt);
-        elseif isnumeric(x) || islogical(x)
-            check_is_matrix(x);
-            s=disp_matrix(x,opt);
-        elseif ischar(x)
-            check_is_matrix(x);
-            s=disp_string(x,opt);
-        elseif isa(x, 'function_handle')
-            s=disp_function_handle(x,opt);
-        elseif isstruct(x)
-            check_is_singleton(x);
-            s=disp_struct(x,opt);
-        else
-            error('not supported: %s', class(x))
-        end
-    end
-
-    if nargout==0
-        disp(s);
+        error('not supported: %s', class(x))
     end
 
 function check_is_matrix(s)
@@ -158,7 +189,7 @@ function y=disp_struct(x,opt)
     for k=1:n
         fn=fns{k};
         r{k*2-1}=['.' fn];
-        d=cosmo_disp(x.(fn),opt);
+        d=disp_helper(x.(fn),opt);
         r{k*2}=[repmat(' ',size(d,1),2) d];
     end
     y=strcat_(r);
@@ -187,14 +218,15 @@ function s=disp_string(x, opt)
 function s=disp_cell(x, opt)
     % display a cell
     
-    min_elips=opt.min_elips;
+    edgeitems=opt.edgeitems;
+    threshold=opt.threshold;
     precision=opt.precision;
 
     [ns,nf]=size(x);
 
     % get indices of rows and columns to show
-    [r_pre, r_post]=get_mx_idxs(x, min_elips, 1);
-    [c_pre, c_post]=get_mx_idxs(x, min_elips, 2);
+    [r_pre, r_post]=get_mx_idxs(x, edgeitems, threshold, 1);
+    [c_pre, c_post]=get_mx_idxs(x, edgeitems, threshold, 2);
 
     part_idxs={{r_pre, r_post}, {c_pre, c_post}};
     
@@ -203,7 +235,7 @@ function s=disp_cell(x, opt)
     
     sinfix=cell(nrows,ncols*2+1);
     for k=1:(ncols-1)
-        sinfix{1,k*2+1}='  ';
+        sinfix{1,k*2+2}='  ';
     end
     
     cpos=1;
@@ -221,22 +253,28 @@ function s=disp_cell(x, opt)
             end
             for ci=1:nc
                 col_idx=col_idxs(ci);
-                
+                trgc=cpos+ci*2;
                 for ri=1:nr
                     row_idx=row_idxs(ri);
-                    sinfix{rpos+ri,cpos+ci*2-1}=cosmo_disp(x{row_idx,col_idx});
+                    sinfix{rpos+ri,trgc}=disp_helper(x{row_idx,...
+                                                             col_idx},opt);
+                    if cpart==2 && ci==1 && nc>0
+                        sinfix{rpos+ri,cpos+ci*2-1}=' ... ';
+                    end
                 end
                 
+                
                 if rpart==2
-                    max_length=max(cellfun(@numel,sinfix(:,cpos+ci)));
+                    max_length=max(cellfun(@numel,sinfix(:,trgc)));
                     spaces=repmat(' ',1,floor(max_length/2-1));
-                    sinfix{rpos,cpos+ci}=[spaces ':'];
+                    sinfix{rpos,cpos+ci*2}=[spaces ':'];
                 end
             end
             rpos=rpos+nr+1;
         end
-        cpos=cpos+nc+1;
+        cpos=cpos+nc*2;
     end
+    
     s=surround_with('{ ', strcat_(sinfix), ' }', size(x));
     
 
@@ -255,14 +293,15 @@ function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
 
 function s=disp_matrix(x,opt)
     % display a matrix
-    min_elips=opt.min_elips;
+    edgeitems=opt.edgeitems;
+    threshold=opt.threshold;
     precision=opt.precision;
 
     [ns,nf]=size(x);
 
     % get indices of rows and columns to show
-    [r_pre, r_post]=get_mx_idxs(x, min_elips, 1);
-    [c_pre, c_post]=get_mx_idxs(x, min_elips, 2);
+    [r_pre, r_post]=get_mx_idxs(x, edgeitems, threshold, 1);
+    [c_pre, c_post]=get_mx_idxs(x, edgeitems, threshold, 2);
 
     y=x([r_pre r_post],[c_pre c_post]);
 
@@ -286,7 +325,7 @@ function s=disp_matrix(x,opt)
         end
         line=repmat(' ',1,nc);
         line(cpos)=':';
-        sinfix(1:3,2)={s(1:min_elips,:);line;s(min_elips+(1:min_elips),:)};
+        sinfix(1:3,2)={s(1:edgeitems,:);line;s(edgeitems+(1:edgeitems),:)};
     end
 
     if ~isempty(c_post)
@@ -294,7 +333,7 @@ function s=disp_matrix(x,opt)
         ndata=nc-2*(size(y,2)-1); % without spaces in between
         step_size=ceil(ndata/size(y,2));
         % position of dots
-        dpos=step_size*(min_elips)+mod(nc,step_size)+4;
+        dpos=step_size*(edgeitems)+mod(nc,step_size)+4;
 
         for k=1:size(sinfix,1)
             si=sinfix{k,2};
@@ -310,16 +349,16 @@ function s=disp_matrix(x,opt)
     
     s=surround_with('[ ',strcat_(sinfix),' ]', size(x));
 
-function [pre,post]=get_mx_idxs(x, min_elips, dim)
+function [pre,post]=get_mx_idxs(x, edgeitems, threshold, dim)
     % returns the first and last indices for showing an array along
-    % dimension dim. If size(x,dim)<2*min_elips, then pre has all the
-    % indices, otherwise pre and post have the first and last min_elips
+    % dimension dim. If size(x,dim)<2*edgeitems, then pre has all the
+    % indices, otherwise pre and post have the first and last edgeitems
     % indices, respectively
     n=size(x,dim);
 
-    if n>2*min_elips
-        pre=1:min_elips;
-        post=n-min_elips+(1:min_elips);
+    if n>max(threshold,2*edgeitems)
+        pre=1:edgeitems;
+        post=n-edgeitems+(1:edgeitems);
     else
         pre=1:n;
         post=[];
