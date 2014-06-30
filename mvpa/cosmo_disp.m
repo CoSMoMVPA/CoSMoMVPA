@@ -4,9 +4,7 @@ function cosmo_disp(x,varargin)
 % cosmo_disp(x,opt)
 %
 % Inputs:
-%   x              data element, can be a dataset struct
-%                  At present only elements with at most two dimensions are
-%                  supported.
+%   x              any type of data element (can be a dataset struct)
 %   opt            Optional struct with fields
 %     .threshold   If the number of values in an array along a dimension 
 %                  exceeds threshold, then an array is showed in summary
@@ -30,7 +28,7 @@ function cosmo_disp(x,varargin)
 %    
 % 
 % Examples:
-%
+%    % display a complicated data structure
 %    x=struct();
 %    x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
 %    x.a_matrix=[10 11 12; 13 14 15];
@@ -63,18 +61,31 @@ function cosmo_disp(x,varargin)
 %    for k=1:10, m{1}=m; end;
 %    cosmo_disp(m)
 %    > { { { { { <cell> } } } } }
+%
 %    cosmo_disp(m,'depth',8)
 %    > { { { { { { { { <cell> } } } } } } } }
+%
 %    cosmo_disp(m,'depth',Inf)
 %    > { { { { { { { { { { { 'hello' } } } } } } } } } } }
+%
 %
 %    % illustrate 'threshold' and 'edgeitems' arguments
 %    cosmo_disp(num2cell('a':'k'))
 %    > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
+%
 %    cosmo_disp(num2cell('a':'k'),'threshold',Inf)
 %    > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }@1x11
+%
 %    cosmo_disp(num2cell('a':'k'),'edgeitems',2)
 %    > { 'a'  'b' ... 'j'  'k'   }@1x11
+%
+%
+%    % illustrate 'precision' argument
+%    for p=1:2:7, cosmo_disp(pi*[1 2],'precision',p); end
+%    > [ 3       6 ]@1x2
+%    > [ 3.14      6.28 ]@1x2
+%    > [ 3.1416      6.2832 ]@1x2
+%    > [ 3.141593      6.283185 ]@1x2
 %
 %
 % Notes:
@@ -82,9 +93,9 @@ function cosmo_disp(x,varargin)
 %     of x using recursion. For example if a cell contains a struct, then
 %     the contents of that struct is shown as well
 %   - Limitations:
-%     * no support for structures with more than three dimensions
+%     * no support for structures with more than two dimensions
 %     * structs must be singleton (of size 1x1)
-%     * character arrays must be 1xP
+%     * character arrays must be of size 1xP
 %   - A use case is displaying dataset structs
 % 
 % NNO Jan 2014
@@ -116,24 +127,24 @@ function s=disp_helper(x, opt)
     opt.depth=depth-1;
 
     if iscell(x)
-        check_is_matrix(x);
-        s=disp_cell(x,opt);
+        check_is_2d(x);
+        s=cell2str(x,opt);
     elseif isnumeric(x) || islogical(x)
-        check_is_matrix(x);
-        s=disp_matrix(x,opt);
+        check_is_2d(x);
+        s=matrix2str(x,opt);
     elseif ischar(x)
-        check_is_matrix(x);
-        s=disp_string(x,opt);
+        check_is_2d(x);
+        s=string2str(x,opt);
     elseif isa(x, 'function_handle')
-        s=disp_function_handle(x,opt);
+        s=function_handle2str(x,opt);
     elseif isstruct(x)
         check_is_singleton(x);
-        s=disp_struct(x,opt);
+        s=struct2str(x,opt);
     else
-        error('not supported: %s', class(x))
+        s=sprintf('<%s>',class(x));
     end
 
-function check_is_matrix(s)
+function check_is_2d(s)
     ndim=numel(size(s));
     if ndim~=2
         error('Element with %d dimensions, only 2 are supported',ndim);
@@ -182,7 +193,7 @@ function y=strcat_(xs)
     y=[ys{:}];
 
 
-function y=disp_struct(x,opt)
+function y=struct2str(x,opt)
     fns=fieldnames(x);
     n=numel(fns);
     r=cell(n*2,1);
@@ -197,11 +208,12 @@ function y=disp_struct(x,opt)
 
 
 
-function s=disp_function_handle(x,opt)
-    s=['@' disp_string(func2str(x),opt)];
+function s=function_handle2str(x,opt)
+    s_with_quotes=string2str(func2str(x),opt);
+    s=['@' s_with_quotes(2:(end-1))];
 
 
-function s=disp_string(x, opt)
+function s=string2str(x, opt)
     if ~ischar(x), error('expected a char'); end
     if size(x,1)>1, error('string has to be a single row'); end
 
@@ -215,7 +227,7 @@ function s=disp_string(x, opt)
     s=['''' x ''''];
 
 
-function s=disp_cell(x, opt)
+function s=cell2str(x, opt)
     % display a cell
     
     edgeitems=opt.edgeitems;
@@ -291,7 +303,7 @@ function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
     pre_infix_post=strcat_({pre, infix, post});
         
 
-function s=disp_matrix(x,opt)
+function s=matrix2str(x,opt)    
     % display a matrix
     edgeitems=opt.edgeitems;
     threshold=opt.threshold;
@@ -303,51 +315,78 @@ function s=disp_matrix(x,opt)
     [r_pre, r_post]=get_mx_idxs(x, edgeitems, threshold, 1);
     [c_pre, c_post]=get_mx_idxs(x, edgeitems, threshold, 2);
 
+    % data to be shown
     y=x([r_pre r_post],[c_pre c_post]);
-
+    
+    % convert to string
     s=num2str(y,precision);
-    [nr,nc]=size(s);
     
-    sinfix=cell(3,5);
-
-    if isempty(r_post)
-        % no split in rows
-        sinfix{1,2}=s;
-    else
-        ndata=nc-2*(size(y,2)-1); % without spaces in between
-        step_size=ceil((ndata+1)/size(y,2))+2;
-        offset=1;
+    % number of characters in first and second dimension
+    [nc_row,nc_col]=size(s);
+    
+    % see where each column is a space; that's a potential split point
+    sp_col=sum(s==' ',1)==nc_row;
+    
+    % col_index has value k for characters in the k-th column, else zero
+    col_index=zeros(1,nc_col);
+    col_count=1;
+    in_num=true;
+    for k=1:nc_col
+        if in_num 
+            if sp_col(k)
+                col_count=col_count+1;
+                in_num=false;
                 
-        if isnan(step_size)
-            cpos=offset;
-        else
-            cpos=offset:step_size:nc; % position of colon
-        end
-        line=repmat(' ',1,nc);
-        line(cpos)=':';
-        sinfix(1:3,2)={s(1:edgeitems,:);line;s(edgeitems+(1:edgeitems),:)};
-    end
-
-    if ~isempty(c_post)
-        % insert '  ...  ' halfway (column-wise)
-        ndata=nc-2*(size(y,2)-1); % without spaces in between
-        step_size=ceil(ndata/size(y,2));
-        % position of dots
-        dpos=step_size*(edgeitems)+mod(nc,step_size)+4;
-
-        for k=1:size(sinfix,1)
-            si=sinfix{k,2};
-            if isempty(si)
-                continue
+            else
+                col_index(k)=col_count;
             end
-            
-            sinfix(k,2:4)={si(:,1:dpos), ...
-                            repmat('  ...  ',size(si,1),1),...
-                            si(:,(dpos+1):end)};
+        elseif ~sp_col(k)
+            in_num=true;
+            col_index(k)=col_count;
         end
     end
     
-    s=surround_with('[ ',strcat_(sinfix),' ]', size(x));
+    % deal with rows
+    row_blocks=cell(3,1);
+    if isempty(r_post)
+        row_blocks{1,1}=s;
+    else
+        % insert ':' for each column
+        line=repmat(' ',1,nc_col);
+        for k=1:max(col_index)
+            idxs=find(col_index==k);
+            median_pos=round(mean(idxs));
+            line(median_pos)=':';
+        end
+        row_blocks{1}=s(1:edgeitems,:);
+        row_blocks{2}=line;
+        row_blocks{3}=s(edgeitems+(1:edgeitems),:);
+    end
+    
+    % deal with columns
+    row_and_col_blocks=cell(3,3);
+    for row=1:3
+        if isempty(c_post)
+            row_and_col_blocks{row}=row_blocks{row};
+        else
+            % insert ' ... ' halfway each row
+            pre_end=find(col_index==edgeitems,1,'last')+1;
+            post_start=find(col_index==(edgeitems+1),1,'first')-1;
+            
+            r=row_blocks{row,1};
+            if isempty(r)
+                continue;
+            end
+            row_and_col_blocks{row,1}=r(:,1:pre_end);
+            if row~=2
+                row_and_col_blocks{row,2}=repmat(' ... ',size(r,1),1);
+            end
+            row_and_col_blocks{row,3}=r(:,post_start:end);
+        end
+    end
+    
+    s=surround_with('[ ',strcat_(row_and_col_blocks),' ]', size(x));
+
 
 function [pre,post]=get_mx_idxs(x, edgeitems, threshold, dim)
     % returns the first and last indices for showing an array along
@@ -356,7 +395,7 @@ function [pre,post]=get_mx_idxs(x, edgeitems, threshold, dim)
     % indices, respectively
     n=size(x,dim);
 
-    if n>max(threshold,2*edgeitems)
+    if n>max(threshold,2*edgeitems) % properly deal with Inf values
         pre=1:edgeitems;
         post=n-edgeitems+(1:edgeitems);
     else
