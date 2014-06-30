@@ -132,6 +132,10 @@ ds = cosmo_slice(ds, ~zero_msk, 2);
 
 fprintf('Dataset has %d samples and %d features\n', size(ds.samples));
 
+% print dataset
+fprintf('Dataset input:\n');
+cosmo_disp(ds);
+
 %% Set partition scheme to odd-even partitioning. 
 %
 % Alternatives are:
@@ -139,9 +143,16 @@ fprintf('Dataset has %d samples and %d features\n', size(ds.samples));
 % + cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
 measure_args.partitions = cosmo_oddeven_partitioner(ds);    
 
+% print measure and arguments
+fprintf('Searchlight measure:\n');
+cosmo_disp(measure);
+fprintf('Searchlight measure arguments:\n');
+cosmo_disp(measure_args);
+
 %% Read inflated surface
 [v_inf,f_inf]=surfing_read(inflated_fn);
-
+fprintf('The inflated surface has %d vertices, %d faces\n',...
+            size(v_inf,1), size(f_inf,1))
 
 %% Run four types of searchlights
 for one_surf=[true,false]
@@ -191,13 +202,24 @@ for one_surf=[true,false]
         [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius,...
                                                             surf_def);
         
+        % print neighborhood
+        fprintf('Searchlight neighborhood definition:\n');
+        cosmo_disp(nbrhood);
+                                                        
 
         fprintf('The output surface has %d vertices, %d nodes\n',...
                         size(vo,1), size(fo,1));
+                    
+        
+                    
         % Run the searchlight 
         lda_results = cosmo_searchlight(ds,measure,'args',measure_args,...
                                             'nbrhood',nbrhood); 
+                                        
         
+        % print searchlight output
+        fprintf('Dataset output:\n');
+        cosmo_disp(lda_results);
         
         % Apply the node mapping from the surifical neighborhood
         % to the high-res inflated surface. 

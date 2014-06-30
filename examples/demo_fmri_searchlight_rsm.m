@@ -63,6 +63,10 @@ ds.sa.animal_class=[1 1 2 2 3 3]';
 % simple sanity check to ensure all attributes are set properly
 cosmo_check_dataset(ds);
                         
+% print dataset
+fprintf('Dataset input:\n');
+cosmo_disp(ds_per_run);
+
 %% Define feature neighorhoods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -76,6 +80,10 @@ nvoxels_per_searchlight=100;
 % cosmo_searchlight(...,'radius',-nvoxels_per_searchlight)
 fprintf('Defining neighborhood for each feature\n');
 nbrhood=cosmo_spherical_neighborhood(ds,-nvoxels_per_searchlight);
+
+% print neighborhood
+fprintf('Searchlight neighborhood definition:\n');
+cosmo_disp(nbrhood);
 
 
 %% Simple RSM searchlight
@@ -110,6 +118,12 @@ set(gca,'XTick',1:nsamples,'XTickLabel',ds.sa.labels,...
 measure=@cosmo_target_dsm_corr_measure;
 measure_args=struct();
 measure_args.target_dsm=target_dsm;
+
+% print measure and arguments
+fprintf('Searchlight measure:\n');
+cosmo_disp(measure);
+fprintf('Searchlight measure arguments:\n');
+cosmo_disp(measure_args);
 
 % run searchlight
 ds_rsm_binary=cosmo_searchlight(ds,measure,'args',measure_args,...

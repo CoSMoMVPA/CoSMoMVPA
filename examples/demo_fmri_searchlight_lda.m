@@ -44,7 +44,11 @@ chunks=floor(((1:32)-1)/8)+1; % run labels:   1 1 1 1 1 1 1 1 2 2 ... 4 4
 ds_per_run = cosmo_fmri_dataset(data_fn, 'mask', mask_fn,...
                                 'targets',targets,'chunks',chunks);
 
- 
+% print dataset
+fprintf('Dataset input:\n');
+cosmo_disp(ds_per_run);
+                            
+                            
 % Use the cosmo_cross_validation_measure and set its parameters
 % (classifier and partitions) in a measure_args struct.
 measure = @cosmo_crossvalidation_measure;
@@ -60,12 +64,22 @@ measure_args.classifier = @cosmo_classify_lda;
 % - cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
 measure_args.partitions = cosmo_oddeven_partitioner(ds_per_run); 
 
+% print measure and arguments
+fprintf('Searchlight measure:\n');
+cosmo_disp(measure);
+fprintf('Searchlight measure arguments:\n');
+cosmo_disp(measure_args);
+
 % Run the searchlight with approximately 100 voxels in each searchlight.
 % (A positive value for 'radius' sets the radius in voxel units)
 % (The radius of the searchlight sphere is a bit larger at
 % the edges of the brain.)
 lda_results = cosmo_searchlight(ds_per_run,measure,'args',measure_args,...
                                     'radius',-100); 
+                                
+% print output dataset
+fprintf('Dataset output:\n');
+cosmo_disp(lda_results);                                
 
 % Plot the output
 cosmo_plot_slices(lda_results);

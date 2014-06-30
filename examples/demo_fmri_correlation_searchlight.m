@@ -58,6 +58,10 @@ ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
 % Combine even and odd runs 
 ds_odd_even=cosmo_stack({ds_odd, ds_even});
 
+% print dataset
+fprintf('Dataset input:\n');
+cosmo_disp(ds_odd_even);
+
 % Use cosmo_correlation_measure.
 % This measure returns, by default, a split-half correlation measure
 % based on the difference of mean correlations for matching and
@@ -66,6 +70,11 @@ measure=@cosmo_correlation_measure;
 
 % Run the searchlight with a 3 voxel radius
 corr_results=cosmo_searchlight(ds_odd_even,measure,'radius',3);
+
+% print output
+fprintf('Dataset output:\n');
+cosmo_disp(corr_results);
+
 
 % Plot the output
 cosmo_plot_slices(corr_results);

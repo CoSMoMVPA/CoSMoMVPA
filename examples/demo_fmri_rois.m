@@ -47,6 +47,11 @@ ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
 % Combine even and odd runs 
 ds_odd_even=cosmo_stack({ds_odd, ds_even});
 
+% print dataset
+fprintf('Dataset input:\n');
+cosmo_disp(ds_odd_even);
+
+% compute correlations
 ds_corr=cosmo_correlation_measure(ds_odd_even);
 
 fprintf(['Average correlation difference between matching and '...
@@ -124,7 +129,6 @@ nclassifiers=numel(classifiers);
 nmasks=numel(mask_labels);
 
 labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
-% Define partitions
 
 % little helper function to replace underscores by spaces
 underscore2space=@(x) strrep(x,'_',' ');
@@ -136,8 +140,16 @@ for j=1:nmasks
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
+    % print dataset
+    fprintf('Dataset input:\n');
+    cosmo_disp(ds);
+                    
+    % Define partitions
     partitions=cosmo_nfold_partitioner(ds);
 
+    % print dataset
+    fprintf('Partitions:\n');
+    cosmo_disp(ds_odd_even);
 
     for k=1:nclassifiers
         classifier=classifiers{k};
@@ -157,5 +169,5 @@ for j=1:nmasks
     end
 end
 
-% Show citation information
+%% Show citation information
 cosmo_check_external('-cite');
