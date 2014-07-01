@@ -31,7 +31,7 @@ The following people have provided valuable suggestions, advice, or code to PyMV
 
 Citations
 ---------
-CoSMoMVPA uses external toolboxes to provide certain functionality. If you use certain features in CoSMoMVPA, please cite the appropriate toolboxes/packages (in addition to citing CoSMoMVPA). (Note that you can get a citation list in matlab by running ``cosmo_check_external('-cite')`` after running your analysis).
+CoSMoMVPA uses external toolboxes to provide certain functionality. If you use certain features in CoSMoMVPA, please cite the appropriate toolboxes/packages (in addition to citing CoSMoMVPA). Note that you can get a citation list in matlab by running ``cosmo_check_external('-cite')`` after running your analysis.
 
 + *GIFTI data:* G. Flandin, GIfTI library for matlab. available online from www.artefact.tk/software/matlab/gifti
 + *FieldTrip MEG data:* R. Oostenveld, P. Fries, E. Maris, J.-M. Schoffelen, FieldTrip: Open Source Software for Advanced Analysis of MEG, EEG, and Invasive Electrophysiological Data, Computational Intelligence and Neuroscience, vol. 2011, Article ID 156869, 9 pages, 2011.doi:10.1155/2011/156869. FieldTrip toolbox available online from http://fieldtrip.fcdonders.nl
