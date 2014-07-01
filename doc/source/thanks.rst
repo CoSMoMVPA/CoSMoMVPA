@@ -19,7 +19,7 @@ We would like to thank the following people for specific contributions:
 +  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier.
 +  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing us with an MEEG dataset.
 
-The following people have provided valuable advice or code to PyMVPA:
+The following people have provided valuable suggestions, advice, or code to PyMVPA:
 
 + Daniel Kaiser
 + Thomas Hartmann
