@@ -49,7 +49,7 @@ Developers
 ++++++++++
 Contributions are welcomed! Please see :ref:`contribute`. 
 
-Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see `building the documentation`_.
+Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see :ref:`building the documentation`.
 
 Unit tests require the xUnit_ toolbox.
 
