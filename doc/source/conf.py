@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'CoSMo Multivariate Pattern Analysis toolbox'
-copyright = u'2013, Andrew C. Connolly, Nikolaas N. Oosterhof'
+copyright = u'2013-2014, Nikolaas N. Oosterhof and Andrew C. Connolly'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -197,7 +197,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'Cosmo.tex', u'CoSMo Multivariate Pattern Analysis Workshop',
-   u'Andy Connolly, Nick Oosterhof', 'manual'),
+   u'Nikolaas N. Oosterhof and Andrew C. Connolly', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -227,7 +227,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'cosmo', u'CoSMo Multivariate Pattern Analysis toolbox',
-     [u'Andy Connolly, Nick Oosterhof'], 1)
+     [u'Nikolaas N. Oosterhof and Andrew C. Connolly'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -241,7 +241,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Cosmo', u'CoSMo Multivarate Pattern Analysis Workshop',
-   u'Andy Connolly, Nick Oosterhof', 'Cosmo', 'One line description of project.',
+   u'Nikolaas N. Oosterhof and Andrew C. Connolly', 'Cosmo', 'One line description of project.',
    'Miscellaneous'),
 ]
 
