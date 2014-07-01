@@ -91,7 +91,8 @@ case $targets in
             ;;
         esac 
         webdir=doc/build/html/
-        scp -r ${webdir}/* ${host}:~/web/
+        #scp -r ${webdir}/* ${host}:~/web/
+        rsync -vcru ${webdir}/* db:~/web/
     ;;
 
     xx)
