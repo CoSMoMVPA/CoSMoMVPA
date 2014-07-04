@@ -43,11 +43,97 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %  - For one-sample t-tests against x, if x~=0: subtract x from ds.samples.
 %
 % Examples:
-%  - % compute one-way ANOVA F-values
-%    >> ds=struct();
-%    >> ds.samples=randn(12,100);
-%    >> ds.sa.targets=repmat(1:3,1,4)';
-%    >> s=cosmo_stat(ds,'F'); % compute F-values
+%     % one-sample t-test
+%     % make a simple dataset
+%     ds=struct();
+%     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
+%     cosmo_disp(ds);
+%     > .samples
+%     >   [ -2         4        -3
+%     >      5        -2         4
+%     >     -1         5        -2
+%     >      :         :         :
+%     >      9         2         8
+%     >      3         9         2
+%     >     -3         3         9 ]@12x3
+%     %
+%     % run one-sample t-test
+%     s=cosmo_stat(ds,'t');
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 2.49      3.36      2.55 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Ttest(11)' }
+%     %
+%     % compute z-score of t-test
+%     s=cosmo_stat(ds,'t','z');
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 2.17      2.73      2.21 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Zscore' }
+%     %
+%     % compute (two-tailed) p-value of t-test
+%     s=cosmo_stat(ds,'t','p');
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 0.03   0.00633    0.0268 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Pval' }
+%     %
+%     % compute left-tailed p-value of t-test
+%     s=cosmo_stat(ds,'t','left');
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 0.985     0.997     0.987 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Pval' }
+%
+%     % one-way anova
+%     % each observation is independent and thus each chunk is unique; 
+%     % there are three conditions with four observations per condition
+%     ds=struct();
+%     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
+%     ds.sa.targets=repmat(1:3,1,4)';
+%     ds.sa.chunks=(1:12)';
+%     s=cosmo_stat(ds,'F'); 
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 0.472    0.0638      0.05 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Ftest(2,9)' }
+%     % compute z-score
+%     s=cosmo_stat(ds,'F','z'); 
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ -0.354     -1.54     -1.66 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Zscore' }
+%
+%
+%     % two-sample t-test
+%     % each observation is independent and thus each chunk is unique; 
+%     % there are ttwo conditions with four observations per condition
+%     ds=struct();
+%     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
+%     ds.sa.targets=repmat(1:2,1,6)';
+%     ds.sa.chunks=(1:12)';
+%     s=cosmo_stat(ds,'t2'); 
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ -2.51      5.55     -6.48 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Ttest(10)' }
+%
+%     
+%     
 %
 %  - % compute two-sample t-test p-values and z-scores
 %    >> ds=struct();
@@ -92,13 +178,25 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         % all other stats do require targets
         error('Missing field .sa.targets');
     end
-
+    
+    if isfield(ds,'sa') && isfield(ds.sa,'chunks')
+        chunks=ds.sa.chunks;
+    elseif cosmo_match({stat_name},{'t','F'})
+        chunks=[];
+    else
+        error('Missing field .sa.chunks');
+    end
+    
     % ensure that targets has the proper size
     if numel(targets)~=nsamples
         error('Targets has %d values, expected %d', ...
                             numel(targets), nsamples);
     end
 
+    if ~(isempty(chunks) || isequal(sort(chunks),unique(chunks)))
+        error('Chunks must be unique');
+    end
+    
     % get class information
     classes=unique(targets);
     nclasses=numel(classes);
@@ -114,6 +212,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected 1 class, found %d',...
                             stat_name, nclasses);
             end
+            
             [stat,df]=quick_ttest(samples);
             stat_label='Ttest';
         case 't2'
@@ -121,8 +220,12 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected 2 classes, found %d',...
                             stat_name, nclasses);
             end
-            [stat,df]=quick_ttest2(samples(targets==classes(1),:),...
-                                  samples(targets==classes(2),:));
+            
+            m1=targets==classes(1);
+            m2=targets==classes(2);
+            
+            [stat,df]=quick_ttest2(samples(m1,:),...
+                                  samples(m2,:));
             cdf_label='t';
             stat_label='Ttest';
 
@@ -131,6 +234,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected >=2 classes, found %d',...
                             stat_name, nclasses);
             end 
+            
             if isfield(ds.sa,'contrast')
                 contrast=ds.sa.contrast;
             else
