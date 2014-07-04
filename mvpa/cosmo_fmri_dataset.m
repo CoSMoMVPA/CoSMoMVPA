@@ -7,7 +7,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 % 
 % Inputs:
 %   filename     filename for dataset         } Supports NIFTI, ANALYZE, 
-%   mask         optional filename for mask   } AFNI, BrainVoyager
+%   mask         optional filename for mask   } AFNI, BrainVoyager, SPM
 %                or true to apply an automask
 %   targets      optional Tx1 numeric labels of experimental
 %                conditions (where T is the number of samples (volumes)
@@ -44,13 +44,20 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %    in independent sets) are set, either by using this function or 
 %    manually afterwards.
 %  - Data can be mapped to the volume using cosmo_map2fmri
+%  - SPM data can also be specified as filename:format, where format
+%    can be 'beta', 'con' or 'spm' (e.g. 'SPM.mat:beta', 'SPM.mat:con', or
+%    'SPM.mat:spm') to load beta, contrast, or statistic images, 
+%    respectively. If format is omitted it is set to 'beta'.
+%  - If SPM data contains a field .Sess (session) then .sa.chunks are set 
+%    according to its contents
 %
 % Dependencies:
-% - for NIFTI files, it requires the following toolbox:
+% - for NIFTI, analyze (.hdr/.img) and SPM.mat files, it requires the 
+%   following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 %   (note that his toolbox is included in CoSMoMVPA in /externals)
-% - for Brainvoyager files (.vmp and .vtc), it requires the NeuroElf
-%   toolbox, available from: http://neuroelf.net
+% - for Brainvoyager files (.vmp, .vtc, .msk, .glm), it requires the 
+%   NeuroElf toolbox, available from: http://neuroelf.net
 % - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
@@ -81,25 +88,22 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     % load ANALYZE file with a mask
 %     ds=fmri_dataset('mydata.hdr', 'mask', 'brain_mask.hdr');
 %
-%     % load several ANALYZE beta images from SPM, all with the same mask
-%     datadir='where/my/data/is/' 
-%     mask_fn='brain_mask.hdr';                % mask file name
-%     mask_path_fn=fullfile(datadir, mask_fn); % full path to mask file
-%     beta_indices=10:20; % load beta images 10 to 20
-%     n=numel(beta_indices); % number of images (=11 in this case)
-%     ds_betas=cell(n,1); % allocate space for each beta image
-%     for k=1:n
-%         beta_index=beta_indices(k);
-%         fn=sprintf('beta_%04d.hdr',beta_index); % construct file name
-%         path_fn=fullfile(data_dir, fn); % make a full path
 %
-%         % load single beta image with mask
-%         ds_beta=cosmo_fmri_dataset(path_fn,'mask',mask_path_fn);
+%     % load beta values from SPM GLM analysis stored
+%     % in a file SPM.mat.
+%     % If SPM.mat contains a field .Sess (sessions) then .sa.chunks
+%     % is set according to the contents of .Sess.
+%     ds=cosmo_fmri_dataset('path/to/SPM.mat');
+%     
+%     % as above, and apply an automask to remove voxels that
+%     % are NaN or 0 in all values. 
+%     ds=cosmo_fmri_dataset('path/to/SPM.mat','mask',true);
 %
-%         ds_beta.sa.beta_index=beta_index; % store the beta index
-%         ds_betas{k}=ds_beta; % store the dataset for this beta index
-%     end
-%     ds=cosmo_stack(ds_betas); % combine all data into single dataset
+%     % load contrast beta values from SPM GLM file SPM.mat
+%     ds=cosmo_fmri_dataset('path/to/SPM.mat:con');
+%
+%     % load contrast statisticvalues from SPM GLM file SPM.mat
+%     ds=cosmo_fmri_dataset('path/to/SPM.mat:spm');
 %
 % See also: cosmo_map2fmri   
 %
@@ -164,14 +168,14 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     if numel(size(auto_mask))==4
         % take as a mask anywhere where all features are zero
         % (convert boolean to numeric for older matlab versions)
-        auto_mask=prod((~auto_mask)+0,4)==0; 
+        auto_mask=squeeze(prod((~auto_mask)+0,1)==0); 
     end
         
     mask_indices=-1;
-    if isempty(p.mask) || isequal(p.mask,true)
+    if isempty(p.mask)
         % give a warning if there are many empty voxels
         nzero=sum(auto_mask(:));
-        ntotal=prod(data_size);
+        ntotal=prod(data_size(1:3));
         thr=.1;
         if nzero/ntotal > thr
             warning(['No mask supplied but %.0f%% of the data is ',...
@@ -260,7 +264,10 @@ function img_formats=get_img_formats()
     img_formats.bv_vtc.reader=@read_bv_vtc;
     img_formats.bv_vtc.externals={'neuroelf'};
     
-    
+    img_formats.spm.exts={'.mat','mat:con','mat:beta','mat:spm'};
+    img_formats.spm.matcher=@isa_spm;
+    img_formats.spm.reader=@read_spm;
+    img_formats.spm.externals=img_formats.nii.externals;
     
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
@@ -338,7 +345,7 @@ function [data,vol,img_format,sa]=read_img(fn, img_formats)
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
 
 %% nifti (nii)
 function b=isa_nii(hdr)
@@ -347,7 +354,11 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
      
-function [data,vol,sa]=read_nii(fn)
+function [data,vol,sa]=read_nii(fn, show_warning)
+    if nargin<2
+        show_warning=true; 
+    end
+    
     if ischar(fn)
         hdr=load_nii(fn);  
     elseif isa_nii(fn)
@@ -358,9 +369,12 @@ function [data,vol,sa]=read_nii(fn)
     
     data=hdr.img;
     sa=struct();
-    vol=get_vol_nii(hdr);
+    vol=get_vol_nii(hdr, show_warning);
     
-function vol=get_vol_nii(hdr)        
+function vol=get_vol_nii(hdr, show_warning)        
+    if nargin<2
+        show_warning=true; 
+    end
     % nifti volume info
     hdr=hdr.hdr;
     dim=hdr.dime.dim(2:4);
@@ -376,11 +390,13 @@ function vol=get_vol_nii(hdr)
     % nifti/analyze files, hence for now a warning is printed
     if isfield(hist, 'flip_orient') && ~isempty(hist.flip_orient)
         assert(isfield(hist,'rot_orient') && ~isempty(hist.rot_orient));
-        warning(['Detected flip_orient field - will flip orientation '...
+        if show_warning
+            warning(['flip_orient field found - will flip orientation '...
                  'and/or swap spatial dimensions. This operation is '... 
                  '*experimental*. You are advised to check your '...
                  'results visually. If the orientation is off, please '...
                  'get in touch with the CoSMoMVPA developers.']);
+        end
         
         % spatial dimension permutation matrix
         permute_dim_mat=zeros(4);
@@ -600,3 +616,103 @@ function vol=get_vol_afni(hdr)
     vol=struct();
     vol.mat=mat;
     vol.dim=hdr.DATASET_DIMENSIONS(1:3);
+    
+
+%% SPM
+function b=isa_spm(hdr)
+    a=isstruct(hdr) && isfield(hdr,'xX') && isfield(hdr.xX,'X') && ...
+                isnumeric(hdr.xX.X) && isfield(hdr,'SPMid') && ...
+                (isfield(hdr,'Sess') || isfield(hdr,'nscan'));
+            
+function [data,vol,sa]=read_spm(fn)
+    pth=fileparts(fn);
+    
+    sep=':';
+    input_type=cosmo_strsplit(fn,sep,-1);
+    switch input_type
+        case {'beta','con','spm'}
+            fn=fn(1:(end-numel(input_type)-numel(sep)));
+        otherwise
+            input_type='beta'; % the default; function will crash
+                               % if fn is not a proper filename
+    end
+    
+    % 'load' is faster than 'importdata'
+    spm=load(fn);
+    spm=spm.SPM;
+
+    switch input_type
+            case 'beta'
+                input_vols=spm.Vbeta;
+                input_labels=spm.xX.name';
+            case 'con'
+                input_vols=[spm.xCon.Vcon];
+                input_labels={spm.xCon.name}';
+            case 'spm'
+                input_vols=[spm.xCon.Vspm];
+                input_labels={spm.xCon.name}';
+        otherwise
+            error('illegal data type %s', input_type);
+    end
+    
+    ninput=numel(input_vols);
+    assert(numel(input_labels)==ninput);
+    
+    sa=struct();
+    
+    if isfield(spm,'Sess') && strcmp(input_type,'beta')
+        % single subject GLM; will use only betas of interest
+        % and set chunks based on runs
+        nruns=numel(spm.Sess);
+        nbeta=numel(spm.Vbeta);
+        sessions=zeros(nbeta,1);
+        beta_index=zeros(nbeta,1);
+        for k=1:nruns
+            sess=spm.Sess(k);
+            sess_idxs=[sess.Fc.i];
+            row_idxs=sess.col(sess_idxs);
+
+            sessions(row_idxs)=k; 
+            beta_index(row_idxs)=row_idxs;
+        end
+
+        keep_vol_msk=sessions>0;
+        sa.chunks=sessions(keep_vol_msk);
+    else
+        keep_vol_msk=true(ninput,1);
+    end
+
+    sa.labels=input_labels(keep_vol_msk);
+    nkeep=sum(keep_vol_msk);
+    
+    % copy volume information
+    vol_source=input_vols(1);
+    vol=struct();
+    vol.dim=vol_source.dim;
+    vol.mat=vol_source.mat;
+
+    nsamples=sum(keep_vol_msk);
+    data=zeros([vol.dim nsamples]);
+    sample_counter=0;
+    
+    sa.fname=cell(nkeep,1);
+    for k=1:ninput
+        if ~keep_vol_msk(k)
+            continue;
+        end
+        vol_fn=fullfile(pth,input_vols(k).fname);
+        if ~exist(vol_fn)
+            error('Volume #%d not found: %s',k,vol_fn);
+        end
+
+        % show at most one warning, only at the beginning
+        show_warning=sample_counter==0;
+        
+        vol_data=read_nii(vol_fn, show_warning);
+        sample_counter=sample_counter+1;
+        data(:,:,:,sample_counter)=vol_data;
+        sa.fname{sample_counter}=vol_fn;
+    end
+
+    assert(sample_counter==nsamples);
+        
