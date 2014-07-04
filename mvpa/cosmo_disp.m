@@ -111,11 +111,12 @@ function cosmo_disp(x,varargin)
 % 
 % NNO Jan 2014
 
-    defaults.threshold=5;  % max #items before triggering summary style
-    defaults.edgeitems=3;  % #items at edges in summary style
-    defaults.precision=3;  % show floats with 3 decimals
-    defaults.strlen=20;    % insert '...' with strings longer than 16 chars
-    defaults.depth=5;      % maximal depth
+    defaults.threshold=5;    % max #items before triggering summary style
+    defaults.edgeitems=3;    % #items at edges in summary style
+    defaults.precision=3;    % show floats with 3 decimals
+    defaults.strlen=20;      % insert '...' with strings more than 20 chars
+    defaults.depth=5;        % maximal depth
+    defaults.show_size=false;% always show size of matrices
 
     opt=cosmo_structjoin(defaults,varargin);
 
@@ -131,7 +132,7 @@ function s=disp_helper(x, opt)
     % for recursion
     depth=opt.depth;
     if depth<=0
-        s=surround_with('<',class(x),'>',size(x));
+        s=surround_with(true,'<',class(x),'>',size(x));
         return
     end    
 
@@ -298,13 +299,14 @@ function s=cell2str(x, opt)
         cpos=cpos+nc*2;
     end
     
-    s=surround_with('{ ', strcat_(sinfix), ' }', size(x));
+    show_size=opt.show_size || ~isempty(r_post) || ~isempty(c_post);
+    s=surround_with(show_size,'{ ', strcat_(sinfix), ' }', size(x));
     
 
     
-function pre_infix_post=surround_with(pre, infix, post, matrix_sz)
+function pre_infix_post=surround_with(show_size, pre, infix, post, matrix_sz)
     % surround infix by pre and post, doing 
-    if prod(matrix_sz)~=1
+    if show_size && prod(matrix_sz)~=1
         size_str=sprintf('x%d',matrix_sz);
         size_str(1)='@';
     else
@@ -396,7 +398,9 @@ function s=matrix2str(x,opt)
         end
     end
     
-    s=surround_with('[ ',strcat_(row_and_col_blocks),' ]', size(x));
+    show_size=opt.show_size || ~isempty(r_post) || ~isempty(c_post);
+    s=surround_with(show_size,'[ ',strcat_(row_and_col_blocks),' ]',...
+                                                                size(x));
 
 
 function [pre,post]=get_mx_idxs(x, edgeitems, threshold, dim)
