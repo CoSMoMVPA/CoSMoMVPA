@@ -17,16 +17,25 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
 %  - offsets and distances are sorted by distance
 %  
 % Example:
-%  - % compute offsets for voxels that share a side or edge, but not those
-%    % that only share a corner
-%    >> [o, d]=cosmo_sphere_offsets(1.5);
-%    >> o'
-%    [ 0 -1  0  0 0 0 1 -1 -1 -1 -1  0  0  0 0  1  1 1 1;
-%      0  0 -1  0 0 1 0 -1  0  0  1 -1 -1  1 1 -1  0 0 1;
-%      0  0  0 -1 1 0 0  0 -1  1  0 -1  1 -1 1  0 -1 1 0 ]
-%    >> d'
-%    [ 0 1 1 1 1 1 1 1.4142 1.4142 1.4142 1.4142 1.4142 1.4142
-%      1.4142 1.4142 1.4142 1.4142 1.4142 1.4142 ]
+%     % compute offsets for voxels that share a side or edge, but not those
+%     % that only share a corner
+%     [o, d]=cosmo_sphere_offsets(1.5);
+%     cosmo_disp(o);
+%     > [  0         0         0
+%     >   -1         0         0
+%     >    0        -1         0
+%     >    :         :         :
+%     >    1         0        -1
+%     >    1         0         1
+%     >    1         1         0 ]@19x3
+%     cosmo_disp(d)
+%     > [    0
+%     >      1
+%     >      1
+%     >     :
+%     >   1.41
+%     >   1.41
+%     >   1.41 ]@19x1
 %
 % See also sub2ind, ind2sub, cosmo_spherical_neighborhood
 %

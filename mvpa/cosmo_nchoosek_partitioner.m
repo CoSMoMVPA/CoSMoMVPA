@@ -47,83 +47,211 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %    to cosmo_nfold_partitioner.
 %  - Thus, in the most simple case (nfold-partitioning),
 %    cosmo_nfold_partitioner can be used as well as this function.
+%  - This function does not consider any .sa.targets (trial condition)
+%    information
 %  - As shown in the examples below, this function can be used for
 %    cross-modal and/or cross-participant cross-validation.
 %  - For cross-validation it is recommended to balance partitions using 
 %    cosmo_balance_partitions
 %
 % Examples:
-%   % simple take-one-fold out partitioning; 2 chunks
-%   cosmo_nchoosek_partitioner([1 2 1 2 2],1)
-%     >  train_indices: {[2 4 5]  [1 3]}
-%     >  test_indices: {[1 3]  [2 4 5]}
-% 
-%   % the same partitioning using a floating point between 0 and 1
-%   cosmo_nchoosek_partitioner([1 2 1 2 2],.5)
-%     >  train_indices: {[2 4 5]  [1 3]}
-%     >  test_indices: {[1 3]  [2 4 5]}
+%     % make a simple dataset with 4 chunks, 2 samples each
+%     % assume two targets (i.e. conditions, say piano versus guitar)
+%     ds=struct();
+%     ds.samples=randn(8,99); % 8 samples, 99 
+%     ds.sa.targets=[1 1 1 1 2 2 2 2]';
+%     ds.sa.chunks=2+[1 2 3 4 4 3 2 1]';
+%     cosmo_check_dataset(ds); % sanity check
+%     %
+%     % take-one-chunk out partitioning
+%     p=cosmo_nchoosek_partitioner(ds,1);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 2    [ 1    [ 1    [ 1
+%     >       3      3      2      2
+%     >       4      4      4      3
+%     >       5      5      5      6
+%     >       6      6      7      7
+%     >       7 ]    8 ]    8 ]    8 ] }
+%     > .test_indices
+%     >   { [ 1    [ 2    [ 3    [ 4
+%     >       8 ]    7 ]    6 ]    5 ] }
+%     %
+%     % take-two chunks out partitioning
+%     p=cosmo_nchoosek_partitioner(ds,2);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 3    [ 2    [ 2    [ 1    [ 1    [ 1
+%     >       4      4      3      4      3      2
+%     >       5      5      6      5      6      7
+%     >       6 ]    7 ]    7 ]    8 ]    8 ]    8 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 3
+%     >       2      3      4      3      4      4
+%     >       7      6      5      6      5      5
+%     >       8 ]    8 ]    8 ]    7 ]    7 ]    6 ] }
+%     %
+%     % take-half-of-the-chunks out partitioning
+%     % (this effectively gives same chunks as above)
+%     p_alt=cosmo_nchoosek_partitioner(ds,.5);
+%     isequal(p, p_alt)
+%     > true
+%     %
+%     % do half split (cor correlation measure); this leaves out
+%     % mirror partitions of train and test indices
+%     p=cosmo_nchoosek_partitioner(ds,'half');
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 3    [ 2    [ 2
+%     >       4      4      3
+%     >       5      5      6
+%     >       6 ]    7 ]    7 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1
+%     >       2      3      4
+%     >       7      6      5
+%     >       8 ]    8 ]    8 ] }
 %
-%   % take-one-chunks-out partitioning; 4 chunks numbered [3,4,5,6]
-%   cosmo_nchoosek_partitioner(3:6,1)
-%     > train_indices: {[2 3 4]  [1 3 4]  [1 2 4]  [1 2 3]}
-%     > test_indices: {[1]  [2]  [3]  [4]}
+%     % test on samples with chunk=3 only using take-one-fold out
+%     p=cosmo_nchoosek_partitioner(ds,1,'chunks',3);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 2
+%     >       3
+%     >       4
+%     >       5
+%     >       6
+%     >       7 ] }
+%     > .test_indices
+%     >   { [ 1
+%     >       8 ] }
+%     
+%     % 
+%     % make a slightly more complicated dataset: with three chunks,
+%     % suppose there are two modalities (e.g. (1) visual and (2) 
+%     % auditory stimulation) which are stored in an
+%     % additional field 'modality'
+%     ds=struct();
+%     ds.samples=randn(12,99);
+%     ds.sa.chunks  =[1 1 1 1 2 2 2 2 3 3 3 3]';
+%     ds.sa.targets =[1 2 1 2 1 2 1 2 1 2 1 2]';
+%     ds.sa.modality=[1 1 2 2 1 1 2 2 1 1 2 2]';
+%     cosmo_check_dataset(ds);
+%     %
+%     % take-one-chunk out, test on samples with modality=1 (and train
+%     % on samples with other modalities, i.e. modality=2)
+%     p=cosmo_nchoosek_partitioner(ds,1,'modality',1);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [  7    [  3    [ 3
+%     >        8       4      4
+%     >       11      11      7
+%     >       12 ]    12 ]    8 ] }
+%     > .test_indices
+%     >   { [ 1    [ 5    [  9
+%     >       2 ]    6 ]    10 ] }
+%     %
+%     % take-one-chunk out, test on samples with modality=1
+%     p=cosmo_nchoosek_partitioner(ds,1,'modality',2);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [  5    [  1    [ 1
+%     >        6       2      2
+%     >        9       9      5
+%     >       10 ]    10 ]    6 ] }
+%     > .test_indices
+%     >   { [ 3    [ 7    [ 11
+%     >       4 ]    8 ]    12 ] }
+%     % take-one-chunk out, test on samples with modality=1 (and train on
+%     % modality=2) and vice verse
+%     p=cosmo_nchoosek_partitioner(ds,1,'modality',[]);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [  7    [  3    [ 3    [  5    [  1    [ 1
+%     >        8       4      4       6       2      2
+%     >       11      11      7       9       9      5
+%     >       12 ]    12 ]    8 ]    10 ]    10 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 5    [  9    [ 3    [ 7    [ 11
+%     >       2 ]    6 ]    10 ]    4 ]    8 ]    12 ] }
 %
-%   % as above, but take-*two*chunks out
-%   cosmo_nchoosek_partitioner(3:6,2)
-%     > train_indices: {[3 4]  [2 4]  [2 3]  [1 4]  [1 3]  [1 2]}
-%     > test_indices: {[1 2]  [1 3]  [1 4]  [2 3]  [2 4]  [3 4]}
+%     % between-subject classification: 3 chunks, 2 modalities, 5 subjects
+%     ds=struct();
+%     ds.samples=randn(60,99);
+%     ds.sa.targets=repmat([1 2],1,30)';
+%     ds.sa.chunks=repmat([1 1 1 1 2 2 2 2 3 3 3 3],1,5)';
+%     ds.sa.modality=repmat([1 1 2 2],1,15)';
+%     ds.sa.subject=kron(1:5,ones(1,12))';
+%     cosmo_check_dataset(ds);
+%     %
+%     % test on subject 1, train on other subjects using take-one-chunk out
+%     p=cosmo_nchoosek_partitioner(ds,1,'subject',1);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 17         [ 13         [ 13
+%     >       18           14           14
+%     >       19           15           15
+%     >        :            :            :
+%     >       58           58           54
+%     >       59           59           55
+%     >       60 ]@32x1    60 ]@32x1    56 ]@32x1 }
+%     > .test_indices
+%     >   { [ 1    [ 5    [  9
+%     >       2      6      10
+%     >       3      7      11
+%     >       4 ]    8 ]    12 ] }
 %
-%   % as above; take half of the chunks out (which is 4/2=2)
-%   cosmo_nchoosek_partitioner(1:4,.5)
-%     >     train_indices: {[3 4]  [2 4]  [2 3]  [1 4]  [1 3]  [1 2]}
-%     >     test_indices: {[1 2]  [1 3]  [1 4]  [2 3]  [2 4]  [3 4]}
+%     % test on each subject after training on each other subject
+%     % in each fold, the test data is from one subject and one chunks,
+%     % and the train data from all other subjects and all other chunks.
+%     % since there are 5 subjects and 3 chunks, there are 15 folds.
+%     p=cosmo_nchoosek_partitioner(ds,1,'subject',[]);
+%     cosmo_disp(p);
+%     > .train_indices                                                                              
+%     >   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1                
+%     >       18           14           14               6            2            2                
+%     >       19           15           15               7            3            3                
+%     >        :            :            :               :            :            :                
+%     >       58           58           54              46           46           42                
+%     >       59           59           55              47           47           43                
+%     >       60 ]@32x1    60 ]@32x1    56 ]@32x1       48 ]@32x1    48 ]@32x1    44 ]@32x1   }@1x15
+%     > .test_indices
+%     >   { [ 1    [ 5    [  9   ... [ 49    [ 53    [ 57
+%     >       2      6      10         50      54      58
+%     >       3      7      11         51      55      59
+%     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15
+%     % 
+%     % as above, but test on modality=2 (and train on other values for
+%     % modality, i.e. modality=1)
+%     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',2);
+%     cosmo_disp(p);
+%     > .train_indices                                                                              
+%     >   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1                
+%     >       18           14           14               6            2            2                
+%     >       21           21           17               9            9            5                
+%     >        :            :            :               :            :            :                
+%     >       54           50           50              42           38           38                
+%     >       57           57           53              45           45           41                
+%     >       58 ]@16x1    58 ]@16x1    54 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x15
+%     > .test_indices                                                                               
+%     >   { [ 3    [ 7    [ 11   ... [ 51    [ 55    [ 59                                           
+%     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15    
 %
-%   % as above, but now omit mirror images over train and test; e.g.
-%   % (train=[3 4],test=[1 2]) is present, but its reverse,
-%   % (train=[1 2],test=[3 4]), is not. Useful for split-half
-%   % correlation measure without feature selection
-%   cosmo_nchoosek_partitioner(1:4,'half')
-%     >     train_indices: {[3 4]  [2 4]  [2 3]}
-%     >     test_indices: {[1 2]  [1 3]  [1 4]}
-%   
-%   % A more complicated example using a dataset. Say a dataset contains
-%   % samples from different subjects, and for each subject there were two
-%   % stimuli (targets) presented in two modalities. It is assumed that
-%   % chunks are already assigned, and that the data from the different
-%   % subjects has been combined in one large dataset (e.g. using
-%   % cosmo_stack). Thus, the dataset has sample attributes 
-%   % 'chunks','subject_id', 'modality', and 'targets'; 'targets' and 
-%   % 'modality' has values in [1,2].
-%   cosmo_nchoosek_partitioner(ds,1); 
-%     > % standard nfold crossvalidation combining data across
-%     > % participants, i.e. data is treated as if it came from one
-%     > % participant
-%
-%   cosmo_nchoosek_partitioner(ds,1,'subject',[])
-%     > % cross-participant nfold cross validation over all subjects, i.e.
-%     > % testing on one chunk in one participant after training on all
-%     > % other participants and all other chunks (for each unique
-%     > % combiniation of chunk and participant)
-%
-%   cosmo_nchoosek_partitioner(ds,1,'subject', [3,5,7])
-%     > % As above, but only test on subject 3, 5, and 7;
-%       % in each fold training is done on all subject except one of 3,5,7.
-%
-%   cosmo_nchoosek_partitioner(ds,1,'modality',2)
-%     > % nfold cross validation with training on samples with modality==2
-%     > % and testing on samples in the other modality; data is treated as 
-%     > % if it came from one participant
-%
-%   cosmo_nchoosek_partitioner(ds,1,'modality',[])  
-%     > % as above, but test on modality 1 after training on modality 2 and
-%     > % vice versa
-%
-%   cosmo_nchoosek_partitioner(ds,1,'modality',1,'subject,[])
-%     > % full cross-subject nfold cross validation with testing on
-%         samples with modality==1 and training on the other modality
-%
-%   cosmo_nchoosek_partitioner(ds,1,'modality',[],'subject,[])
-%     > % full cross-subject cross-modal nfold cross validation
+%     % as above, but test on each modality after training on the other
+%     % modality
+%     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',[]);
+%     cosmo_disp(p);
+%     > .train_indices                                                                              
+%     >   { [ 19         [ 15         [ 15        ... [  5         [  1         [  1                
+%     >       20           16           16               6            2            2                
+%     >       23           23           19               9            9            5                
+%     >        :            :            :               :            :            :                
+%     >       56           52           52              42           38           38                
+%     >       59           59           55              45           45           41                
+%     >       60 ]@16x1    60 ]@16x1    56 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x30
+%     > .test_indices                                                                               
+%     >   { [ 1    [ 5    [  9   ... [ 51    [ 55    [ 59                                           
+%     >       2 ]    6 ]    10 ]       52 ]    56 ]    60 ]   }@1x30
 %
 % See also: cosmo_nfold_partitioner, cosmo_balance_partitions
 %
@@ -143,7 +271,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
         chunks=chunks_or_ds;
         ds=[];
     end
-
+    
     % use helper function defined below
     partitions=nchoosek_partitioner(chunks,k);
     
@@ -251,8 +379,20 @@ function partitions=nchoosek_partitioner(chunks,k)
 % straightfoward partitioner
 
 % little optimization: if just two chunks, the split is easy
-if all(sum(bsxfun(@eq,chunks(:),1:2),2))
-    partitions=cosmo_oddeven_partitioner(chunks);
+if all(cosmo_match(chunks,[1 2]))
+    
+    chunk_msk1=chunks==1;
+    chunk1_idxs=find(chunk_msk1);
+    chunk2_idxs=find(~chunk_msk1);
+    
+    partitions=struct();
+    if strcmp(k,'half')
+        partitions.train_indices={chunk1_idxs};
+        partitions.test_indices={chunk2_idxs};
+    else
+        partitions.train_indices={chunk1_idxs,chunk2_idxs};
+        partitions.test_indices={chunk2_idxs,chunk1_idxs};
+    end
     return
 end
     
@@ -325,7 +465,7 @@ test_indices=cell(1,npartitions);
 %       chunk_indices_mat=repmat(chunk_indices',nidx,1);
 %       matching_mat=idx_mat==chunk_indices_mat;
 %       any_matching_mat_column=sum(matching_mat,1);
-chunk_idx2count=@(idx) sum(bsxfun(@eq,idx',chunk_indices'),1);
+chunk_idx2count=@(idx) sum(bsxfun(@eq,idx',chunk_indices'),1)';
 
 % make all partitions
 for j=1:npartitions

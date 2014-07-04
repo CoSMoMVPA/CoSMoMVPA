@@ -24,24 +24,24 @@ function msk=cosmo_match(haystack, needle, varargin)
 %                     the intersection of the individual masks. 
 %                     
 % Examples
-%   - % simple character comparison
+%     % simple character comparison
 %     cosmo_match({'a','b','c'},{'b','c','d','e','b'})
 %     > [false true true]
-%   - % swap the order of inputs
+%     % swap the order of inputs
 %     cosmo_match({'b','c','d','e','b'},{'a','b','c'})
 %     > [true true false false true]
 %
-%   - % in an fMRI dataset, get mask for features with with first spatial
+%     % in an fMRI dataset, get mask for features with with first spatial
 %     % dimension indices 5 or 7.
 %     msk=cosmo_match(ds.fa.i,[5 7]);
 %
-%   - % get mask for chunk values 1 and 4
+%     % get mask for chunk values 1 and 4
 %     msk=cosmo_match(ds.sa.chunks,[1 4]);
 %
-%   - % get mask for chunk values 1 and 4, and target values 1, 3 or 6.
+%     % get mask for chunk values 1 and 4, and target values 1, 3 or 6.
 %     msk=cosmo_match(ds.sa.chunks, [1 4], ds.sa.targets, [1 3 6]);
 %
-%   - % get feature mask for the fourth channel in an MEEG dataset
+%     % get feature mask for the fourth channel in an MEEG dataset
 %     msk=cosmo_match(ds.fa.chan,4)
 %
 % Notes:

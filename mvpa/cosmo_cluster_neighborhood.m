@@ -27,32 +27,32 @@ function cluster_nbrhood=cosmo_cluster_neighborhood(ds, nbrhood)
 %                    .fa.
 %
 % Examples:
-%   - % ds is an fmri dataset
-%     >> nbrhood=cosmo_cluster_neighborhood(ds,2) % voxels sharing edge
+%     % ds is an fmri dataset
+%     nbrhood=cosmo_cluster_neighborhood(ds,2) % voxels sharing edge
 %  
-%   - % exactly the same thing
-%     >> sph_nbrhood=cosmo_spherical_neighborhood(ds, 1.5);
-%     >> nbrhood=cosmo_cluster_neighborhood(ds, sph_nbrhood);
+%     % exactly the same thing
+%     sph_nbrhood=cosmo_spherical_neighborhood(ds, 1.5);
+%     nbrhood=cosmo_cluster_neighborhood(ds, sph_nbrhood);
 %   
-%   - % ds is an MEEG dataset with 'chan', 'freq', time' dimensions
+%     % ds is an MEEG dataset with 'chan', 'freq', time' dimensions.
 %     % connect channels using Delauney triangulation, freq and time
 %     % by matching sides (implicit).
-%     >> nbrhood=cosmo_cluster_neighborhood(ds,NaN) % 
+%     nbrhood=cosmo_cluster_neighborhood(ds,NaN)
 %
 %     % connect channels over maximum distance of 10, freq and time
 %     % by matching sides (implicit).
-%     >> nbrhood=cosmo_cluster_neighborhood(ds,10) % 
+%     nbrhood=cosmo_cluster_neighborhood(ds,10) 
 %
 %     % connect channels based on nearest 10 channels, freq and time
 %     % by matching sides (implicit).
-%     >> nbrhood=cosmo_cluster_neighborhood(ds,-10) % 
+%     nbrhood=cosmo_cluster_neighborhood(ds,-10) % 
 %
 %     % connect channels using Delauney triangulation, only connect time
 %     % but not frequency. This requires a bit more work.
-%     >> chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,NaN);
-%     >> time_nbrhood=cosmo_interval_neighborhood(ds,'time',1);
-%     >> chan_time_nbrhood=cosmo_neighborhood(chan_nbrhood, time_nbrhood);
-%     >> nbrhood=cosmo_cluster_neighborhood(chan_time_nbrhood)
+%     chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,NaN);
+%     time_nbrhood=cosmo_interval_neighborhood(ds,'time',1);
+%     chan_time_nbrhood=cosmo_neighborhood(chan_nbrhood, time_nbrhood);
+%     nbrhood=cosmo_cluster_neighborhood(chan_time_nbrhood);
 %
 % See also: cosmo_meeg_chan_neighborhood, cosmo_spherical_neighborhood, 
 %           cosmo_interval_neighborhood, cosmo_neighborhood.

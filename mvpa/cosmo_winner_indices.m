@@ -16,13 +16,13 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %                     all non-ignored values in pred.
 %
 % Example:
-%   - % given three predictions each for five samples, compute
+%     % given three predictions each for five samples, compute
 %     % which predictions occur most often.
-%     >> [p, c]=cosmo_winner_indices([4 4 4; 4 5 6; 4 5 6; 4 5 6; 6 0 0]);
-%     >> p'
-%     [1, 1, 2, 3, 3]
-%     >> c'
-%     [4, 5, 6]
+%     [p, c]=cosmo_winner_indices([4 4 4; 4 5 6; 4 5 6; 4 5 6; 6 0 0]);
+%     p'
+%     > [1, 1, 2, 3, 3]
+%     c'
+%     > [4, 5, 6]
 %
 % Notes: 
 % - The current implementation selects a winner pseudo-randomly (but 

@@ -22,20 +22,18 @@ function c=cosmo_corr(x,y,corr_type)
 %    toolbox.
 %
 % Example:
-% - % generate some random data. 
-%   >> x=randn(1000); y=randn(1000);
+%   % generate some pseudo-random data. 
+%   x=reshape(mod(3:7:7e5,41),100,[]);
+%   y=reshape(mod(1:7:7e5,37),100,[]);
+%   % compute builtiin corr with cosmo_corr
 %   % call the function first to avoid lookup delays; then measure time
-%   >> corr(y,x); corr(y,x); tic; c=corr(x,y); toc
-%   >> cosmo_corr(y,x); cosmo_corr(y,x); tic; cc=cosmo_corr(x,y); toc
+%   c=corr(x,y);
+%   cc=cosmo_corr(x,y);
 %   % compute differences in output
-%   >> delta=c-cc;
-%   >> max_delta=max(abs(delta(:)));
-%   >> n_eps=max_delta/eps; % how many epsilons
-%   >> fprintf('max difference: %d (%d epsilons)\n',max_delta,n_eps)
-%   % output:
-%   Elapsed time is 0.013168 seconds.
-%   Elapsed time is 0.002563 seconds.
-%   max difference: 4.440892e-16 (2 epsilons)
+%   delta=c-cc;
+%   max_delta=max(abs(delta(:)));
+%   fprintf('difference not greater than eps: %d\n',max_delta<=eps);
+%   > difference not greater than eps: 1
 %
 % See also: corr
 %

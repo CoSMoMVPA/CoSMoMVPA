@@ -21,16 +21,61 @@ function ds=cosmo_normalize(ds, norm_type, dim)
 %                 and if norm_type is set to "zscore" then it has variance
 %                 of 1 along the dim-th dimension as well.
 %
-% Example:
-%   d=randn(3,5);
-%   e=cosmo_normalize(d,'demean1')
-%   mean(e,1) 
-%   > 1.0e-15 * [0.0278 0 -0.0370 -0.0093 -0.1480]
-%   e2=cosmo_normalize(d,'zscoreF')
-%   mean(e2,1)
-%   > [0.4319 -0.7906 0.8651 0.4190 -0.9254]
-%   mean(e2,2)'
-%   > [0 0 1.526557e-17]
+% Examples:
+%     ds=struct();
+%     ds.samples=reshape(1:12,3,4)*2;
+%     cosmo_disp(ds);
+%     > .samples
+%     >   [ 2         8        14        20
+%     >     4        10        16        22
+%     >     6        12        18        24 ]
+%     %
+%     % demean along first dimension
+%     dsn=cosmo_normalize(ds,'demean',1);
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -2        -2        -2        -2
+%     >      0         0         0         0
+%     >      2         2         2         2 ]
+%     %
+%     % demean along second dimension
+%     dsn=cosmo_normalize(ds,'demean',2);
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -9        -3         3         9
+%     >     -9        -3         3         9
+%     >     -9        -3         3         9 ]
+%     %
+%     % z-score along first dimension
+%     dsn=cosmo_normalize(ds,'zscore',1);
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -1        -1        -1        -1
+%     >      0         0         0         0
+%     >      1         1         1         1 ]
+%     %
+%     % z-score along second dimension
+%     dsn=cosmo_normalize(ds,'zscore',2);
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -1.16    -0.387     0.387      1.16
+%     >     -1.16    -0.387     0.387      1.16
+%     >     -1.16    -0.387     0.387      1.16 ]
+%     % do the same as the above, but now specify the dimension 
+%     % in the 2nd argument
+%     > a
+%     dsn=cosmo_normalize(ds,'zscoreS');
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -1        -1        -1        -1
+%     >      0         0         0         0
+%     >      1         1         1         1 ]
+%     dsn=cosmo_normalize(ds,'zscoreF');
+%     cosmo_disp(dsn);
+%     > .samples
+%     >   [ -1.16    -0.387     0.387      1.16
+%     >     -1.16    -0.387     0.387      1.16
+%     >     -1.16    -0.387     0.387      1.16 ]
 %   
 % NNO Oc 2013
 

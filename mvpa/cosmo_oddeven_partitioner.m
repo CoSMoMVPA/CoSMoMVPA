@@ -14,9 +14,22 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %                    sample indices for the odd and even chunks
 %                    
 % Example:
-% cosmo_oddeven_partitioner([1 1 2 2 3 3 3])
-% >    train_indices: {[3 4]  [1 2 5 6 7]}
-% >    test_indices: {[1 2 5 6 7]  [3 4]}
+%     ds=struct();
+%     ds.sa.samples=NaN(6,99); % will be ignored by this function
+%     ds.sa.chunks=[1 1 2 2 6 6 7 7]';
+%     p=cosmo_oddeven_partitioner(ds);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 3    [ 1
+%     >       4      2
+%     >       7      5
+%     >       8 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 3
+%     >       2      4
+%     >       5      7
+%     >       6 ]    8 ] }
+%     >
 %
 % Notes: 
 % - For splithalf correlation measures it is recommended to use 
@@ -47,8 +60,8 @@ function partitions = cosmo_oddeven_partitioner(chunks)
     npartitions=2;
     
     % allocate space for output
-    train_indices=cell(npartitions,1);
-    test_indices=cell(npartitions,1);
+    train_indices=cell(1,npartitions);
+    test_indices=cell(1,npartitions);
     
     % Make partitions using even and odd chunks
     % >@@>

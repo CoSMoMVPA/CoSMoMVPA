@@ -1,15 +1,17 @@
 function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 % splits a string based on another delimeter string
 %
-% [split,n]=cosmo_strsplit(string, delim, [pos1, delim2, pos2, delim2,...])
+% [split,n]=cosmo_strsplit(string[,delim,][pos1, delim2, pos2, delim2,...])
 %
 % Inputs:
 %   string          input to be split
 %   delim           delimiter string. delim can contain backslash-escaped 
 %                   characters that are interpreted by sprintf; for 
-%                   example '\t' represents a tab character, '\n' a 
-%                   newline character, and '\\' a backslash.
-%             character
+%                   example '\t', '\n' and '\\' represent a tab, newline
+%                   and backslash character, respectively. 
+%                   If omitted, then the string is split based on 
+%                   whitespaces occuring in string
+%                   
 %   pos             (optional) a single index indicating which split part 
 %                   should be returned. If string is split in N elements,
 %                   then a negative value for pos is equivalent to pos+1+N.
@@ -32,21 +34,47 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %                   0 otherwise
 %
 % Examples:
+%   % split by '*'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','*')
-%   >  {'A', 'AbbAbA', 'AbA', 'A', 'Ab'}
+%   >      'A'    'AbbAbA'    'AbA'    'A'    'Ab'
+% 
+%   % split by 'A*A'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A')
-%   >  {'', 'bbAb','b','*Ab'
+%   >   ''    'bbAb'    'b'    '*Ab'
+%   
+%   % take second element
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2)
-%   >  'bbAB'   % second element
+%   >  bbAb
+%
+%   % get last element
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',-1)
-%   >  '*Ab'    % last element
+%   >  *Ab
+%
+%   % split twice, first on 'A*A', then on 'A'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A')
-%   >  {'bb','b'}  % split second result of split by 'A*A' by 'A'
+%   >     'bb'    'b'
+%
+%   % take for element of second split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A',1)
-%   >  'bb' 
+%   >  bb 
+%
+%   % illustrate effect of not using a delimiter string 
+%   % (which causes the string to be split by whitespace) and using 
+%   % a space as delimiter
+%   cosmo_strsplit(' CoSMoMVPA makes live...  easy!')
+%   >    'CoSMoMVPA'    'makes'    'live...'    'easy!'
+%   cosmo_strsplit(' CoSMoMVPA makes live...  easy!',' ')
+%   >     ''    'CoSMoMVPA'    'makes'    'live...'    ''    'easy!'
+%
+%   
 %
 % NNO Sep 2013
-   
+
+if nargin<2
+    split=regexp(string,'(\S)*','match');
+    nsplit=numel(split);
+    return
+end
 
 pat=regexptranslate('escape',sprintf(delim));
 split=regexp(string,pat,'split');

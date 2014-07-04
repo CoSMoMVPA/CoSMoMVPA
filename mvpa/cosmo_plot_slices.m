@@ -16,26 +16,26 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %               slices in the dim-th dimension).
 %
 % Examples:
-%  - % plot an fMRI dataset struct with default options
-%    >> cosmo_plot_slices(ds)
+%    % plot an fMRI dataset struct with default options
+%    cosmo_plot_slices(ds)
 %
-%  - % plot an fMRI dataset struct along the second spatial dimension
-%    >> cosmo_plot_slices(ds, 2)
+%    % plot an fMRI dataset struct along the second spatial dimension
+%    cosmo_plot_slices(ds, 2)
 %  
-%  - % plot a random gaussian 3D array along the first dimension
-%    >> cosmo_plot_slices(randn([40,50,20]),1)
+%    % plot a random gaussian 3D array along the first dimension
+%    cosmo_plot_slices(randn([40,50,20]),1)
 %
-%  - % plot an fMRI dataset struct along the default spatial dimension
+%    % plot an fMRI dataset struct along the default spatial dimension
 %    % every 5-th slice
-%    >> cosmo_plot_slices(ds, [], 5)
+%    cosmo_plot_slices(ds, [], 5)
 %
-%  - % plot an fMRI dataset struct along the third spatial dimension
+%    % plot an fMRI dataset struct along the third spatial dimension
 %    % with about 12 slices
-%    >> cosmo_plot_slices(ds, 3, -12)
+%    cosmo_plot_slices(ds, 3, -12)
 %  
-%  - % plot an fMRI dataset struct along the third spatial dimension
+%    % plot an fMRI dataset struct along the third spatial dimension
 %    % with about 12 slices, starting at slice 10 and stopping at slice 25
-%    >> cosmo_plot_slices(ds, 3, -12, 10, 25)
+%    cosmo_plot_slices(ds, 3, -12, 10, 25)
 %
 % Notes:
 %  - Using this function only really makes sense for fMRI-like data.
