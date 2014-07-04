@@ -28,57 +28,68 @@ function cosmo_disp(x,varargin)
 %    
 % 
 % Examples:
-%    % display a complicated data structure
-%    x=struct();
-%    x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
-%    x.a_matrix=[10 11 12; 13 14 15];
-%    x.a_string='hello world';
-%    x.a_struct.another_struct.name='me';
-%    cosmo_disp(x);
-%    >  .a_cell                                                            
-%    >    { [  ]@0x0  { 'cell within cell'  [ 1         2                  
-%    >                                        3         4 ]@2x2 }@1x2 }@1x2
-%    >  .a_matrix                                                          
-%    >    [ 10        11        12                                         
-%    >      13        14        15 ]@2x3                                   
-%    >  .a_string                                                          
-%    >    'hello world'                                                    
-%    >  .a_struct                                                          
-%    >    .another_struct                                                  
-%    >      .name                                                          
-%    >        'me'
-%
-%    cosmo_disp(x.a_cell)
-%    > { [  ]@0x0  { 'cell within cell'  [ 1         2                  
-%    >                                     3         4 ]@2x2 }@1x2 }@1x2
-%
-%    cosmo_disp(x.a_cell{2}{2})
-%    >  [ 1         2      
-%    >    3         4 ]@2x2
+%     % display a complicated data structure
+%     x=struct();
+%     x.a_cell={[],{'cell within cell',[1 2; 3 4]}};
+%     x.small_matrix=[10 11 12; 13 14 15];
+%     x.big_matrix=reshape(1:200,10,20);
+%     x.huge=2^40;
+%     x.tiny=2^-40;
+%     x.a_string='hello world';
+%     x.a_struct.another_struct.name='me';
+%     x.a_struct.another_struct.func=@abs;
+%     cosmo_disp(x);
+%     > .a_cell
+%     >   { [  ]  { 'cell within cell'  [ 1         2
+%     >                                   3         4 ] } }
+%     > .small_matrix
+%     >   [ 10        11        12
+%     >     13        14        15 ]
+%     > .big_matrix
+%     >   [  1        11        21  ...  171       181       191
+%     >      2        12        22  ...  172       182       192
+%     >      3        13        23  ...  173       183       193
+%     >      :         :         :        :         :         :
+%     >      8        18        28  ...  178       188       198
+%     >      9        19        29  ...  179       189       199
+%     >     10        20        30  ...  180       190       200 ]@10x20
+%     > .huge
+%     >   [ 1.1e+12 ]
+%     > .tiny
+%     >   [ 9.09e-13 ]
+%     > .a_string
+%     >   'hello world'
+%     > .a_struct
+%     >   .another_struct
+%     >     .name
+%     >       'me'
+%     >     .func
+%     >       @abs
+%     cosmo_disp(x.a_cell)
+%     > { [  ]  { 'cell within cell'  [ 1         2
+%     >                                 3         4 ] } }
+%     cosmo_disp(x.a_cell{2}{2})
+%     > [ 1         2
+%     >   3         4 ]
 %
 %    % illustrate recursion 'depth' argument 
 %    m={'hello'};
+%    % make a cell in a cell in a cell in a cell ...
 %    for k=1:10, m{1}=m; end;
 %    cosmo_disp(m)
 %    > { { { { { <cell> } } } } }
-%
 %    cosmo_disp(m,'depth',8)
 %    > { { { { { { { { <cell> } } } } } } } }
-%
 %    cosmo_disp(m,'depth',Inf)
 %    > { { { { { { { { { { { 'hello' } } } } } } } } } } }
-%
 %
 %    % illustrate 'threshold' and 'edgeitems' arguments
 %    cosmo_disp(num2cell('a':'k'))
 %    > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
-%
 %    cosmo_disp(num2cell('a':'k'),'threshold',Inf)
 %    > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }@1x11
-%
 %    cosmo_disp(num2cell('a':'k'),'edgeitems',2)
 %    > { 'a'  'b' ... 'j'  'k'   }@1x11
-%
 %
 %    % illustrate 'precision' argument
 %    for p=1:2:7, cosmo_disp(pi*[1 2],'precision',p); end
