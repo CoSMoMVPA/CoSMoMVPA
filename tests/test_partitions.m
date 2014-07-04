@@ -20,7 +20,7 @@ function test_nfold_partitioner()
                 v=test_indices;
             end
             w=p.(fn);
-            assertEqual(w{k}, v);
+            assertEqual(w{k}, v');
         end
     end
 

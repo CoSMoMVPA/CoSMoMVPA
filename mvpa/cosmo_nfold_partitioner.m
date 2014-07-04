@@ -14,13 +14,58 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %                    sample indices for the k-th fold.
 %                    
 % Example:
-%   p=cosmo_nfold_partitioner([1 1 2 2 3 3 3])
-%   > p = train_indices: {1x3 cell}
-%   >     test_indices: {1x3 cell}  
-%   p.train_indices{1}'
-%   >     [3 4 5 6 7]
-%   p.test_indices{1}
-%   >     [1 2]
+%     % simple partitioning scheme with 3 chunks with two samples each
+%     % (chunk values are not necessarily in increasing order)
+%     p=cosmo_nfold_partitioner([3 1 2 3 2 1]);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 1    [ 1    [ 2
+%     >       3      2      3
+%     >       4      4      5
+%     >       5 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 2    [ 3    [ 1
+%     >       6 ]    5 ]    4 ] }
+%
+%     % show the same with a dataset struct
+%     ds=struct();
+%     ds.samples=randn(6,99); % 6 samples, 99 features
+%     ds.sa.targets=[1 2 1 2 1 2]'; % conditions; ignored by this function
+%     ds.sa.chunks=[3 1 2 3 2 1]';  % use for partitioning
+%     p=cosmo_nfold_partitioner(ds);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 1    [ 1    [ 2
+%     >       3      2      3
+%     >       4      4      5
+%     >       5 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 2    [ 3    [ 1
+%     >       6 ]    5 ]    4 ] }
+%
+%
+%     % Example of an unbalanced partitioning scheme. Generally it is 
+%     % advised to balance the partitions before using them for MVPA.
+%     % (see cosmo_balance_partitions)
+%     ds=struct();
+%     ds.samples=randn(7,99); % 7 samples (1 extra), 99 features
+%     ds.sa.targets=[1 2 1 2 1 2 2]';
+%     ds.sa.chunks= [1 1 3 3 3 3 3]';
+%     p=cosmo_nfold_partitioner(ds);
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 3    [ 1
+%     >       4      2 ]
+%     >       5
+%     >       6
+%     >       7 ]        }
+%     > .test_indices
+%     >   { [ 1    [ 3
+%     >       2 ]    4
+%     >              5
+%     >              6
+%     >              7 ] }
+%   
 %
 % Note:
 %  - for cross-validation it is recommended to balance partitions using 
@@ -49,9 +94,9 @@ function partitions = cosmo_nfold_partitioner(chunks)
     % set the training and test indices for each chunk
     for k=1:nchunks
         % >@@>
-        test_msk=unq(k)==chunks;
-        train_indices{k}=find(~test_msk)';
-        test_indices{k}=find(test_msk)';
+        test_msk=unq(k)==chunks(:); % ensure column vector
+        train_indices{k}=find(~test_msk);
+        test_indices{k}=find(test_msk);
         % <@@<
     end
     
