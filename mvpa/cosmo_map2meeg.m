@@ -1,4 +1,31 @@
 function hdr=cosmo_map2meeg(ds, fn)
+% maps a dataset to a FieldTrip or EEGlab structure or file
+%
+% hdr=cosmo_map2meeg(ds[, fn])
+%
+% Inputs:
+%    ds         dataset struct with field .samples with MEEG data
+%    fn         optional filename to write output to. Supported extensions
+%               are .txt (EEGlab time course) or .mat (FieldTrip data)
+% 
+% Returns:
+%    hdr        FieldTrip struct with the MEEG data
+%
+% Notes:
+%    - a typical use case is to use this function to map the dataset to a
+%      FieldTrip struct, then use FieldTrip to visualize the data
+%   
+% Examples:
+%     % convert a dataset struct to a FieldTrip struct
+%     ft=cosmo_map2meeg(ds);
+%     
+%     % store a dataset in FieldTrip file
+%     cosmo_map2meeg(ds,'fieldtrip_data.mat');
+%     
+%     % store a timeseries dataset in an EEGlab text file
+%     cosmo_map2meeg(ds,'eeglab_data.txt');
+%    
+% NNO Jan 2014
 
     cosmo_check_dataset(ds,'meeg');
 
@@ -52,6 +79,7 @@ function write_eeglab_txt(fn, hdr)
     % prepare pattern to write data in array
     arr_pat=cosmo_strjoin(repmat({'%.4f'},1,nchan+1),'\t');
 
+    % write data
     fid=fopen(fn,'w');
     fprintf(fid,[header '\n']);
     fprintf(fid,[arr_pat '\n'], arr);
