@@ -111,7 +111,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >       2      3      4
 %     >       7      6      5
 %     >       8 ]    8 ]    8 ] }
-%
+%     %
 %     % test on samples with chunk=3 only using take-one-fold out
 %     p=cosmo_nchoosek_partitioner(ds,1,'chunks',3);
 %     cosmo_disp(p);
@@ -200,7 +200,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >       2      6      10
 %     >       3      7      11
 %     >       4 ]    8 ]    12 ] }
-%
+%     %
 %     % test on each subject after training on each other subject
 %     % in each fold, the test data is from one subject and one chunks,
 %     % and the train data from all other subjects and all other chunks.
@@ -236,7 +236,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     > .test_indices                                                                               
 %     >   { [ 3    [ 7    [ 11   ... [ 51    [ 55    [ 59                                           
 %     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15    
-%
+%     %
 %     % as above, but test on each modality after training on the other
 %     % modality
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',[]);
