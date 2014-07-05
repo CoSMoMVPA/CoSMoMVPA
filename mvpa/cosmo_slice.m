@@ -38,10 +38,152 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %                         - when ds is a struct and the 'struct' option was
 %                           given, then all fields in ds are sliced.
 %
+% Examples:
+%     % make a simple dataset
+%     ds=struct();
+%     ds.samples=reshape(1:12,4,3); % 4 samples, 3 features
+%     % sample attributes
+%     ds.sa.chunks=[1 1 2 2]';
+%     ds.sa.targets=[1 2 1 2]';
+%     % feature attributes
+%     ds.fa.i=[3 8 13];
+%     ds.fa.roi={'vt','loc','v1'};
+%     % dataset attributes
+%     ds.a.note='an example';
+%     % display dataset
+%     cosmo_disp(ds);
+%     > .samples
+%     >   [ 1         5         9
+%     >     2         6        10
+%     >     3         7        11
+%     >     4         8        12 ]
+%     > .sa
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2 ]
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2 ]
+%     > .fa
+%     >   .i
+%     >     [ 3         8        13 ]
+%     >   .roi
+%     >     { 'vt'  'loc'  'v1' }
+%     > .a
+%     >   .note
+%     >     'an example'
+%     %
+%     % select third and second samples (in that order)
+%     sliced_ds=cosmo_slice(ds, [3 2], 1);
+%     cosmo_disp(sliced_ds);
+%     > .samples
+%     >   [ 3         7        11
+%     >     2         6        10 ]
+%     > .sa
+%     >   .chunks
+%     >     [ 2
+%     >       1 ]
+%     >   .targets
+%     >     [ 1
+%     >       2 ]
+%     > .fa
+%     >   .i
+%     >     [ 3         8        13 ]
+%     >   .roi
+%     >     { 'vt'  'loc'  'v1' }
+%     > .a
+%     >   .note
+%     >     'an example'
+%     %
+%     % select third and second feature (in that order)
+%     sliced_ds=cosmo_slice(ds, [3 2], 2);
+%     cosmo_disp(sliced_ds);
+%     > .samples
+%     >   [  9         5
+%     >     10         6
+%     >     11         7
+%     >     12         8 ]
+%     > .sa
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2 ]
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2 ]
+%     > .fa
+%     >   .i
+%     >     [ 13         8 ]
+%     >   .roi
+%     >     { 'v1'  'loc' }
+%     > .a
+%     >   .note
+%     >     'an example'
+%     %
+%     % using a logical mask, select features with odd value for .i
+%     msk=mod(ds.fa.i,2)==1;
+%     disp(msk)
+%     > [1 0 1]
+%     sliced_ds=cosmo_slice(ds, msk, 2);
+%     cosmo_disp(sliced_ds);
+%     > .samples
+%     >   [ 1         9
+%     >     2        10
+%     >     3        11
+%     >     4        12 ]
+%     > .sa
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2 ]
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2 ]
+%     > .fa
+%     >   .i
+%     >     [ 3        13 ]
+%     >   .roi
+%     >     { 'vt'  'v1' }
+%     > .a
+%     >   .note
+%     >     'an example'
+%
+%     % slice all fields in a struct 
+%     s=struct();
+%     s.a_field=[1 2 3; 4 5 6];
+%     s.another_field={'this','is','fun'};
+%     cosmo_disp(s);
+%     > .a_field
+%     >   [ 1         2         3
+%     >     4         5         6 ]
+%     > .another_field
+%     >   { 'this'  'is'  'fun' }
+%     %
+%     % select first, third, third, and second column (dim=2)
+%     t=cosmo_slice(s, [1 3 3 2], 2, 'struct');
+%     cosmo_disp(t);
+%     > .a_field
+%     >   [ 1         3         3         2
+%     >     4         6         6         5 ]
+%     > .another_field
+%     >   { 'this'  'fun'  'fun'  'is' }
+%     
+%
 % Notes:
 %   - do_check=false may be preferred for slice-intensive operations such
 %     as when used in searchlights
 %   - this function does not support arrays with more than two dimensions.
+%
 %
 % NNO Sep 2013
 
