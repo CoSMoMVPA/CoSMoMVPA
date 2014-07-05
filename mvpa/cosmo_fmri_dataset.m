@@ -6,9 +6,16 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                                   ['chunks',chunks])
 % 
 % Inputs:
-%   filename     filename for dataset         } Supports NIFTI, ANALYZE, 
-%   mask         optional filename for mask   } AFNI, BrainVoyager, SPM
-%                or true to apply an automask
+%   filename     filename for dataset  } It should end with one of:
+%   mask         optional filename for } .nii, .nii.gz        NIFTI
+%                volume mask, or true    +{orig}.{HEAD,BRIK}  AFNI
+%                to apply an automask    .vmr, .vmp,          } Brain-
+%                                              .glm, .msk     } voyager
+%                                        .mat (SPM.mat)       SPM
+%                                        .mat:beta            SPM beta
+%                                        .mat:con             SPM contrast
+%                                        .mat:spm             SPM stats                                               
+%                                               
 %   targets      optional Tx1 numeric labels of experimental
 %                conditions (where T is the number of samples (volumes)
 %                in the dataset)
@@ -33,7 +40,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
 %     .a.vol.mat 4x4 voxel-to-world transformation matrix (LPI, base-1).
-%     .sa        struct for holding sample attributes (e.g.,sa.targets,
+%     .a.vol.dim 1x3 number of voxels in each spatial dimension
+%     .sa        struct for holding sample attributes (e.g., sa.targets,
 %                sa.chunks) 
 %     .fa        struct for holding feature attributes 
 %     .fa.{i,j,k} indices of voxels (in voxel space). 
@@ -102,7 +110,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     % load contrast beta values from SPM GLM file SPM.mat
 %     ds=cosmo_fmri_dataset('path/to/SPM.mat:con');
 %
-%     % load contrast statisticvalues from SPM GLM file SPM.mat
+%     % load contrast statistic values from SPM GLM file SPM.mat
 %     ds=cosmo_fmri_dataset('path/to/SPM.mat:spm');
 %
 % See also: cosmo_map2fmri   
