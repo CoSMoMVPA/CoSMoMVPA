@@ -1,11 +1,11 @@
-function nbrhood=cosmo_spherical_neighborhood(ds, radius, opt)
+function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 % computes neighbors for a spherical searchlight
 %
 % nbrhood=cosmo_spherical_neighborhood(ds, radius, opt)
 %
 % Inputs
 %   ds            a dataset struct (from fmri_dataset)
-%   radius        - Ff positive, it indicates the sphere radius (in voxel
+%   radius        - If positive, it indicates the sphere radius (in voxel
 %                 units). 
 %                  - If negative then (-radius) indicates the 
 %                    minimum number of voxels that is selected 
