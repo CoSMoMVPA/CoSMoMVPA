@@ -34,13 +34,8 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, opt)
     
     center_ids=1:nfeatures;
     
-    if nargin<3 || isempty(opt);
-        opt=struct;
-    end
-    
-    if ~isfield(opt,'progress')
-        opt.progress=1000;
-    end
+    defaults.progress=1000;
+    opt=cosmo_structjoin(defaults,varargin);
     
     show_progress=opt.progress>0;
     

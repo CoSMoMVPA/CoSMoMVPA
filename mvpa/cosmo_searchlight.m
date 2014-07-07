@@ -88,7 +88,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     res_cell=cell(ncenters,1);
     
     % see if progress is to be reported
-    show_progress=~isempty(params.progress);
+    show_progress=~isempty(params.progress) && params.progress;
     if show_progress
         progress_step=params.progress;
         if progress_step<1
