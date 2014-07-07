@@ -159,13 +159,14 @@ function is_present=cosmo_check_external(external, error_if_not_present)
             cached_external_names{end+1}=external;
         end
     else
+        
         if ~is_present
             msg=sprintf(['The %s is required, but it was not found in '...
                     'the matlab path. If it is not present on your '...
                     'system, download it from:\n\n    %s\n\nthen, if '...
                     'applicable, add the necessary directories '...
                     'to the matlab path.'], ...
-                    ext.label, ext.url);
+                    ext.label, url2str(ext.url));
         
         elseif ~is_recent
             msg=sprintf(['The %s was found on your matlab path, but '...
@@ -173,7 +174,7 @@ function is_present=cosmo_check_external(external, error_if_not_present)
                     'version from:\n\n %s\n\nthen, if '...
                     'applicable, add the necessary directories '...
                     'to the matlab path.'], ...
-                    ext.label, ext.url);
+                    ext.label, url2str(ext.url));
         else
             assert(false); % should never get here
         end
@@ -185,12 +186,14 @@ function is_present=cosmo_check_external(external, error_if_not_present)
     end
     
         
-
+function s=url2str(url)
+    s=sprintf('<a href="%s">%s</a>',url,url);
 
 function externals=get_externals()
     % helper function that defines the externals.
     externals=struct();
     yes=@() true;
+    has=@(x) ~isempty(which(x));
     
     externals.cosmo.is_present=yes;
     externals.cosmo.is_recent=yes;
@@ -211,26 +214,26 @@ function externals=get_externals()
                              'resonance neuroimages.  Computers and '...
                              'Biomedical Research, 29: 162-173, 1996'];
     
-    externals.afni.is_present=@() ~isempty(which('BrikLoad'));
-    externals.afni.is_recent=@() ~isempty(which('afni_niml_readsimple'));
+    externals.afni.is_present=@() has('BrikLoad');
+    externals.afni.is_recent=@() has('afni_niml_readsimple');
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
     externals.afni.authors={'Z. Saad','G. Chen'};                         
 
-    externals.neuroelf.is_present=@() ~isempty(which('xff'));
+    externals.neuroelf.is_present=@() has('xff');
     externals.neuroelf.is_recent=yes;
     externals.neuroelf.label='NeuroElf toolbox';
     externals.neuroelf.url='http://neuroelf.net';
     externals.neuroelf.authors={'J. Weber'};
 
-    externals.nifti.is_present=@() ~isempty(which('load_nii'));
+    externals.nifti.is_present=@() has('load_nii');
     externals.nifti.is_recent=yes;
     externals.nifti.label='NIFTI toolbox';
     externals.nifti.url=['http://www.mathworks.com/matlabcentral/',...
                     'fileexchange/8797-tools-for-nifti-and-analyze-image'];
     externals.nifti.authors={'J. Shen'};
     
-    externals.fieldtrip.is_present=@() ~isempty(which('ft_read_data'));
+    externals.fieldtrip.is_present=@() has('ft_read_data');
     % in the future, may require from 2014 onwards
     %externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
     %                                        'datenum')>datenum(2014,1,1);
@@ -247,8 +250,8 @@ function externals=get_externals()
                               'Article ID 156869, 9 pages, 2011.',...
                               'doi:10.1155/2011/156869'];
 
-    externals.libsvm.is_present=@() ~isempty(which('svmpredict')) && ...
-                                ~isempty(which('svmptrain'));
+    externals.libsvm.is_present=@() has('svmpredict') && ...
+                                        has('svmptrain');
     externals.libsvm.is_recent=yes;
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
@@ -258,8 +261,7 @@ function externals=get_externals()
                             'ACM Transactions on Intelligent Systems '...
                             'and Technology, 2:27:1--27:27, 2011'];
     
-    externals.surfing.is_present=@() ~isempty(which(...
-                                            'surfing_voxelselection'));
+    externals.surfing.is_present=has('surfing_voxelselection');
     % require recent version with surfing_write
     externals.surfing.is_recent=~isempty(which('surfing_write'));
     externals.surfing.label='Surfing toolbox';
