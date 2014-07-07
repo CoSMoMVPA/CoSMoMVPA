@@ -13,9 +13,9 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %                          'libsvm'    libSVM toolbox
 %                          'surfing'   surfing toolbox
 %                          'gifti'     GIfTI library for matlab
-%                          It can also be '-list', in which case it returns
-%                          a cell of strings containing the available
-%                          externals.
+%                          'xunit'     xUnit unit test framework
+%                          It can also be '-list', '-tic', '-toc',' or
+%                          '-cite'; see below for their meaning.
 %   error_if_not_present   if true (the default), an error is raised if the
 %                          external is not present. 
 %
@@ -60,10 +60,9 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %   cosmo_check_external('-cite');
 %
 % Notes:
-%   - For performance reasons, keep a persistent variable with the names
-%     of externals that have already been checked for.
+%   - For performance reasons this function keeps a persistent variable 
+%     with the names of externals that have already been checked for.
 %     Benchmarking suggests a speedup of at least a factor of 30.
-%     
 %     If the user changes the path in between successive calls of this
 %     function and removes a toolbox from the path, then this function may
 %     incorrectly report the external present when
@@ -271,11 +270,20 @@ function externals=get_externals()
                             'surface-based multi-voxel pattern '...
                             'analysis. Neuroimage 56 (2), 593-600'];
     
-    externals.gifti.is_present=@() ~isempty(which('gifti'));
+    externals.gifti.is_present=@() has('gifti');
     externals.gifti.is_recent=yes;
     externals.gifti.label='GIfTI library for matlab';
     externals.gifti.url='www.artefact.tk/software/matlab/gifti';
     externals.gifti.authors={'G. Flandin'};
+    
+    externals.xunit.is_present=@() has('runtests') && ...
+                                    has('VerboseTestRunDisplay');
+    externals.xunit.is_recent=yes;
+    externals.xunit.label='MATLAB xUnit Test Framework';
+    externals.xunit.url=['http://www.mathworks.it/matlabcentral/'...
+                    'fileexchange/22846-matlab-xunit-test-framework'];
+    externals.xunit.authors={'S. Eddins'};
+    
     
    
     
