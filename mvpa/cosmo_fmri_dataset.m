@@ -716,9 +716,19 @@ function [data,vol,sa]=read_spm(fn)
         % show at most one warning, only at the beginning
         show_warning=sample_counter==0;
         
-        vol_data=read_nii(vol_fn, show_warning);
+        [vol_data_k, vol_k]=read_nii(vol_fn, show_warning);
+        
+        if sample_counter==0
+            vol=vol_k;
+        else
+            if ~isequal(vol, vol_k)
+                error(['Different volume orientation in volumes '...
+                            '#1 (%s) and #%d (%s)'],...
+                            sa.fname{1},k,vol_fn);
+            end
+        end
         sample_counter=sample_counter+1;
-        data(:,:,:,sample_counter)=vol_data;
+        data(:,:,:,sample_counter)=vol_data_k;
         sa.fname{sample_counter}=vol_fn;
     end
 
