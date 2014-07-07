@@ -12,7 +12,7 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %                        Alternatively xs can be a struct with P fieldnames
 %                        where each value is a cell with Qk values.
 %                         
-%   convert_to_numeric   Optiona;' if true (default), then when the output 
+%   convert_to_numeric   Optional; if true (default), then when the output 
 %                        contains numeric values only a numerical matrix is
 %                        returned; otherwise a cell is returned.
 % Output:
