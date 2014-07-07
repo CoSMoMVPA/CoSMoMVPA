@@ -182,7 +182,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     mask_indices=-1;
     if isempty(p.mask)
         % give a warning if there are many empty voxels
-        nzero=sum(auto_mask(:));
+        nzero=sum(~auto_mask(:));
         ntotal=prod(data_size(1:3));
         thr=.1;
         if nzero/ntotal > thr
