@@ -60,16 +60,13 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     args = params.args;
     center_ids=params.center_ids;
     nbrhood=params.nbrhood;
-    parent_type=params.parent_type;
 
     % use voxel selection function
     if ~xor(isempty(radius), isempty(nbrhood))
         error('need either radius or nbrhood, exclusively');
     elseif isempty(nbrhood)
         if cosmo_check_dataset(ds,'fmri',false)
-            nbrhood=cosmo_spherical_neighborhood(ds, radius);
-        elseif cosmo_check_dataset(ds,'meeg',false)
-            nbrhood=cosmo_meeg_neighborhood(ds, radius, parent_type);
+            nbrhood=cosmo_spherical_neighborhood(ds, radius, params);
         else
             error(['Cannot determine dataset type, and no neighborhood '...
                      'specified in nbrhood']);
