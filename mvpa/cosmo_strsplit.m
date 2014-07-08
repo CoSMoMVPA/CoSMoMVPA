@@ -14,7 +14,10 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %                   
 %   pos             (optional) a single index indicating which split part 
 %                   should be returned. If string is split in N elements,
-%                   then a negative value for pos is equivalent to pos+1+N.
+%                   then a negative value for pos is equivalent to pos+1+N
+%                   (similar to Python). For example, pos=-1 means that the
+%                   last element is returned, and pos=-2 means that the
+%                   element before the last element is returned.
 %                   If omitted a cell with all parts are returned.
 %   delim*          (optional) subsequent delimeters applied after applying 
 %                   pos. It requires that the preceding pos has a single
@@ -42,19 +45,19 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A')
 %   >   ''    'bbAb'    'b'    '*Ab'
 %   
-%   % take second element
+%   % take second element after split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2)
 %   >  bbAb
 %
-%   % get last element
+%   % get last element after split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',-1)
 %   >  *Ab
 %
-%   % split twice, first on 'A*A', then on 'A'
+%   % split twice, first on 'A*A', take second element, then on 'A'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A')
 %   >     'bb'    'b'
 %
-%   % take for element of second split
+%   % take first element after second split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A',1)
 %   >  bb 
 %
@@ -71,6 +74,7 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 % NNO Sep 2013
 
 if nargin<2
+    % split by white-space
     split=regexp(string,'(\S)*','match');
     nsplit=numel(split);
     return
