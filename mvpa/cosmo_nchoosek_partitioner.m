@@ -15,9 +15,9 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %                    and if k is even, it treats train_indices and 
 %                    test_indices as symmetrical, meaning it returns only 
 %                    half the number of partitions (avoiding duplicates). 
-%                    (If k is odd then train and test indices have 
+%                    If k is odd then train and test indices have 
 %                    (k+1)/nchunks and (k-1)/nchunks elements, 
-%                    respectively, or vice versa).
+%                    respectively, or vice versa.
 %  - group_values*   } Intended for cross-participant or cross-condition
 %  - test_group_by*  } generalizability analyses. 
 %                      Pairs of these determine a subsequent level group 
@@ -44,15 +44,15 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %
 % Notes:
 %  - When k=1 and two input arguments, this function behaves equivalently 
-%    to cosmo_nfold_partitioner.
-%  - Thus, in the most simple case (nfold-partitioning),
-%    cosmo_nfold_partitioner can be used as well as this function.
+%    to cosmo_nfold_partitioner. Thus, in the most simple case 
+%    (nfold-partitioning), cosmo_nfold_partitioner with k=1 can be used 
+%    as well as this function.
 %  - This function does not consider any .sa.targets (trial condition)
-%    information
+%    or .samples information.
 %  - As shown in the examples below, this function can be used for
 %    cross-modal and/or cross-participant cross-validation.
 %  - For cross-validation it is recommended to balance partitions using 
-%    cosmo_balance_partitions
+%    cosmo_balance_partitions.
 %
 % Examples:
 %     % make a simple dataset with 4 chunks, 2 samples each
@@ -97,7 +97,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     isequal(p, p_alt)
 %     > true
 %     %
-%     % do half split (cor correlation measure); this leaves out
+%     % do half split (for correlation measure); this leaves out
 %     % mirror partitions of train and test indices
 %     p=cosmo_nchoosek_partitioner(ds,'half');
 %     cosmo_disp(p);
@@ -126,7 +126,6 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >   { [ 1
 %     >       8 ] }
 %     
-%     % 
 %     % make a slightly more complicated dataset: with three chunks,
 %     % suppose there are two modalities (e.g. (1) visual and (2) 
 %     % auditory stimulation) which are stored in an
@@ -151,7 +150,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >   { [ 1    [ 5    [  9
 %     >       2 ]    6 ]    10 ] }
 %     %
-%     % take-one-chunk out, test on samples with modality=1
+%     % take-one-chunk out, test on samples with modality=2
 %     p=cosmo_nchoosek_partitioner(ds,1,'modality',2);
 %     cosmo_disp(p);
 %     > .train_indices
@@ -202,7 +201,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >       4 ]    8 ]    12 ] }
 %     %
 %     % test on each subject after training on each other subject
-%     % in each fold, the test data is from one subject and one chunks,
+%     % in each fold, the test data is from one subject and one chunk,
 %     % and the train data from all other subjects and all other chunks.
 %     % since there are 5 subjects and 3 chunks, there are 15 folds.
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[]);
@@ -238,7 +237,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15    
 %     %
 %     % as above, but test on each modality after training on the other
-%     % modality
+%     % modality. There are 30 folds (5 subjects, 3 chunks, 2 modalities).
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',[]);
 %     cosmo_disp(p);
 %     > .train_indices                                                                              
@@ -269,7 +268,6 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
         end
     else
         chunks=chunks_or_ds;
-        ds=[];
     end
     
     % use helper function defined below
@@ -334,8 +332,8 @@ function partitions=group_by(partitions, group_values, test_group_by)
         train_indices_cell=cell(1,npartitions);
         test_indices_cell=cell(1,npartitions);
 
-        % some filtered partitions may be empty
-        % so keep track of the last position where a value was stored
+        % some filtered partitions may be empty, so keep track of the 
+        % last position where a value was stored
         pos=0;
         for j=1:npartitions
             % get testing chunk indices
