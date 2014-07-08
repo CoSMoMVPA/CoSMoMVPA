@@ -119,7 +119,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %
 %     % two-sample t-test
 %     % each observation is independent and thus each chunk is unique; 
-%     % there are ttwo conditions with four observations per condition
+%     % there are two conditions with four observations per condition
 %     ds=struct();
 %     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
 %     ds.sa.targets=repmat(1:2,1,6)';
