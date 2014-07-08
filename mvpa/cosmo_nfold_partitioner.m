@@ -31,7 +31,7 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     ds=struct();
 %     ds.samples=randn(6,99); % 6 samples, 99 features
 %     ds.sa.targets=[1 2 1 2 1 2]'; % conditions; ignored by this function
-%     ds.sa.chunks=[3 1 2 3 2 1]';  % use for partitioning
+%     ds.sa.chunks=[3 1 2 3 2 1]';  % used for partitioning
 %     p=cosmo_nfold_partitioner(ds);
 %     cosmo_disp(p);
 %     > .train_indices
