@@ -10,9 +10,15 @@ classdef CosmoDocTestCase < TestCase
 %  filename: name of the file in which the doctest was found
 %  line_number: position in tile where the doctest was found
 %
-% This class extends the xUnit framework by S. Eddings (2009),
-% BSD License, http://www.mathworks.it/matlabcentral/fileexchange/
-%                       22846-matlab-xunit-test-framework
+% Notes:
+%   - Typically test cases are generated using CosmoDocTestSuite, or run
+%     using cosmo_run_tests
+%   - This class extends the xUnit framework by S. Eddings (2009),
+%     BSD License, http://www.mathworks.it/matlabcentral/fileexchange/
+%                         22846-matlab-xunit-test-framework
+%   - Doctest functionality was inspired by T. Smith.
+%
+% See also: CosmoDocTestSuite, cosmo_run_tests
 %
 % NNO Jul 2014
     
