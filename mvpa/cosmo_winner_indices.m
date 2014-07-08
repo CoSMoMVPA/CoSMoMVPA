@@ -18,18 +18,21 @@ function [winners,classes]=cosmo_winner_indices(pred)
 % Example:
 %     % given three predictions each for five samples, compute
 %     % which predictions occur most often.
-%     [p, c]=cosmo_winner_indices([4 4 4; 4 5 6; 4 5 6; 4 5 6; 6 0 0]);
+%     [p, c]=cosmo_winner_indices([4 4 4;4 5 6;4 5 6;4 5 6;6 0 0;0 0 0]);
 %     p'
-%     > [1, 1, 2, 3, 3]
+%     > [1, 1, 2, 3, 3, 0]
 %     c'
 %     > [4, 5, 6]
 %
-% Notes: 
+% Notes:
+% - The typical use case is combining results from multiple classification
+%   predictions, such as in binary support vector machines (SVMs).
 % - The current implementation selects a winner pseudo-randomly (but 
-%   deterministically) and, presumably, unbiased in case of a tie between 
+%   deterministically) and (presumably) unbiased in case of a tie between 
 %   multiple winners. That is, using the present implementation, repeatedly 
 %   calling this function with identical input yields identical output,
 %   but unbiased with respect to which class is the 'winner' sample-wise.
+% - Samples with no winner are assigned a value of zero.
 % - A typical use case is combining results from multiple predictions,
 %   such as in cosmo_classify_svm and cosmo_crossvalidate.
 %
@@ -85,14 +88,21 @@ function [winners,classes]=cosmo_winner_indices(pred)
     % columns (corresponding to each feature)
     [unused,wcols]=ind2sub(size(winners_msk),find(winners_msk));
     
-    colpos=0; % referring to wcols
+    colpos=1; % referring to wcols - for pseudo-random selection in ties
     for k=find(multiple_winners)' % treat each feature seperately
         nwinner=nwinners(k);
-        seed=seed+nwinner; % pseudorandomly update the seed
-        wind=colpos+(1:nwinner); % indices of winner values
         
-        idx=mod(seed, nwinner)+1; % select one value randomly in range 1..nwinner
-        winners(k)=wcols(wind(idx)); % set the winner accordingly
+        % pseudorandomly update the seed
+        seed=seed+nwinner; 
+        
+        % indices of winner values
+        wind=colpos+(1:nwinner); 
+        
+        % select one value randomly in range 1..nwinner
+        idx=mod(seed, nwinner)+2; 
+        
+        % set the winner accordingly
+        winners(k)=wcols(wind(idx)); 
         
         colpos=colpos+nwinner; % update for next iteration
     end
