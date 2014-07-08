@@ -159,8 +159,3 @@ elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
     % all values are numeric; convert to numeric matrix
     p=reshape([p{:}],size(p));
 end
-    
-        
-    
-
-
