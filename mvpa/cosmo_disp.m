@@ -65,6 +65,7 @@ function cosmo_disp(x,varargin)
 %     >       'me'
 %     >     .func
 %     >       @abs
+%     %
 %     cosmo_disp(x.a_cell)
 %     > { [  ]  { 'cell within cell'  [ 1         2
 %     >                                 3         4 ] } }
@@ -72,31 +73,31 @@ function cosmo_disp(x,varargin)
 %     > [ 1         2
 %     >   3         4 ]
 %
-%    % illustrate recursion 'depth' argument 
-%    m={'hello'};
-%    % make a cell in a cell in a cell in a cell ...
-%    for k=1:10, m{1}=m; end;
-%    cosmo_disp(m)
-%    > { { { { { <cell> } } } } }
-%    cosmo_disp(m,'depth',8)
-%    > { { { { { { { { <cell> } } } } } } } }
-%    cosmo_disp(m,'depth',Inf)
-%    > { { { { { { { { { { { 'hello' } } } } } } } } } } }
+%     % illustrate recursion 'depth' argument 
+%     m={'hello'};
+%     % make a cell in a cell in a cell in a cell ...
+%     for k=1:10, m{1}=m; end;
+%     cosmo_disp(m)
+%     > { { { { { <cell> } } } } }
+%     cosmo_disp(m,'depth',8)
+%     > { { { { { { { { <cell> } } } } } } } }
+%     cosmo_disp(m,'depth',Inf)
+%     > { { { { { { { { { { { 'hello' } } } } } } } } } } }
 %
-%    % illustrate 'threshold' and 'edgeitems' arguments
-%    cosmo_disp(num2cell('a':'k'))
-%    > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
-%    cosmo_disp(num2cell('a':'k'),'threshold',Inf)
-%    > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }@1x11
-%    cosmo_disp(num2cell('a':'k'),'edgeitems',2)
-%    > { 'a'  'b' ... 'j'  'k'   }@1x11
+%     % illustrate 'threshold' and 'edgeitems' arguments
+%     cosmo_disp(num2cell('a':'k'))
+%     > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
+%     cosmo_disp(num2cell('a':'k'),'threshold',Inf)
+%     > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }
+%     cosmo_disp(num2cell('a':'k'),'edgeitems',2)
+%     > { 'a'  'b' ... 'j'  'k'   }@1x11
 %
-%    % illustrate 'precision' argument
-%    for p=1:2:7, cosmo_disp(pi*[1 2],'precision',p); end
-%    > [ 3       6 ]@1x2
-%    > [ 3.14      6.28 ]@1x2
-%    > [ 3.1416      6.2832 ]@1x2
-%    > [ 3.141593      6.283185 ]@1x2
+%     % illustrate 'precision' argument
+%     for p=1:2:7, cosmo_disp(pi*[1 2],'precision',p); end
+%     > [ 3       6 ]
+%     > [ 3.14      6.28 ]
+%     > [ 3.1416      6.2832 ]
+%     > [ 3.141593      6.283185 ]
 %
 %
 % Notes:
