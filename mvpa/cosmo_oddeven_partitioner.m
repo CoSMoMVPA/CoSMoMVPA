@@ -1,5 +1,5 @@
 function partitions = cosmo_oddeven_partitioner(chunks)
-% generates an n-fold partition scheme
+% generates an odd-even partition scheme
 %
 % partitions=cosmo_splithalf_partitioner(chunks)
 %
@@ -11,24 +11,27 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %  - partitions      A struct with fields .train_indices and .test_indices.
 %                    Each of these is an 2x1 cell (for 2 partitions), where
 %                    .train_indices{k} and .test_indices{k} contain the
-%                    sample indices for the odd and even chunks
+%                    sample indices for the sets of unique chunks
+%                    alternatingly
 %                    
 % Example:
 %     ds=struct();
 %     ds.sa.samples=NaN(6,99); % will be ignored by this function
-%     ds.sa.chunks=[1 1 2 2 6 6 7 7]';
+%     ds.sa.chunks=[1 1 2 2 6 7 7 6]';
 %     p=cosmo_oddeven_partitioner(ds);
+%     % note that chunks=6 ends up in the odd chunks and chunks=7 in the
+%     % even chunks, as 6 [7] is the third [fourth] unique value of chunks.
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 3    [ 1
-%     >       4      2
-%     >       7      5
-%     >       8 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 3
-%     >       2      4
-%     >       5      7
-%     >       6 ]    8 ] }
+%     > .train_indices    
+%     >   { [ 3    [ 1    
+%     >       4      2    
+%     >       6      5    
+%     >       7 ]    8 ] }
+%     > .test_indices     
+%     >   { [ 1    [ 3    
+%     >       2      4    
+%     >       5      6    
+%     >       8 ]    7 ] }
 %     >
 %
 % Notes: 
