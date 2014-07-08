@@ -132,20 +132,6 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   .stats
 %     >     { 'Ttest(10)' }
 %
-%     
-%     
-%
-%  - % compute two-sample t-test p-values and z-scores
-%    >> ds=struct();
-%    >> ds.samples=[1+randn(12,100); randn(12,100)]; % } group 1 > group 2
-%    >> ds.sa.targets=[ones(12,1); 2*ones(12,1)];    % }
-%    >> s=cosmo_stat(ds,'t2','p') % two-sample t-test, return p-palues
-%    >> fprintf('ps: %.3f +/- %.3f\n', mean(s.samples), std(s.samples))
-%    ps: 0.078 +/- 0.141
-%    >> s=cosmo_stat(ds,'F','z') % one-way ANOVA, return z-scores
-%    >> fprintf('zs: %.3f +/- %.3f\n', mean(s.samples), std(s.samples))
-%    zs: 1.959 +/- 0.932
-%
 % See also: anova1, ttest, ttest2
 %
 % NNO Jan 2014
