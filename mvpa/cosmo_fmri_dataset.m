@@ -693,17 +693,17 @@ function [data,vol,sa]=read_spm(fn)
     sa.labels=input_labels(keep_vol_msk);
     nkeep=sum(keep_vol_msk);
     
-    % copy volume information
-    vol_source=input_vols(1);
-    vol=struct();
-    vol.dim=vol_source.dim;
-    vol.mat=vol_source.mat;
-
+    if nkeep==0
+        error('No input volumes found in %s', fn);
+    end
+    
     nsamples=sum(keep_vol_msk);
     data=zeros([vol.dim nsamples]);
     sample_counter=0;
     
-    sa.fname=cell(nkeep,1);
+    % make space for filenames
+    sa.fname=cell(nkeep,1); 
+    
     for k=1:ninput
         if ~keep_vol_msk(k)
             continue;
@@ -719,8 +719,10 @@ function [data,vol,sa]=read_spm(fn)
         [vol_data_k, vol_k]=read_nii(vol_fn, show_warning);
         
         if sample_counter==0
+            % store volume information
             vol=vol_k;
         else
+            % ensure volume information is same across all volumes
             if ~isequal(vol, vol_k)
                 error(['Different volume orientation in volumes '...
                             '#1 (%s) and #%d (%s)'],...
