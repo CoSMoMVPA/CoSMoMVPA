@@ -29,7 +29,7 @@ function joined=cosmo_strjoin(strings, delim)
 %   cosmo_strjoin({'a','b','c'}, '\t')
 %   > 'a	b	c'   % each string of spaces is a tab character
 %   cosmo_strjoin({'a','b','c'}, '\\')
-%   > 'a\b\c'        % '\\' is the esacaped backslash character
+%   > 'a\b\c'        % '\\' is the escaped backslash character
 %   cosmo_strjoin({'a','b','c'},{'*','='})
 %   > 'a*b=c'
 %
