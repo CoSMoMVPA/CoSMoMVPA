@@ -128,6 +128,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     % special case: if it's already a dataset, just return it
     if isstruct(filename) && isfield(filename,'samples')
         ds=filename;
+        cosmo_check_dataset(ds,'fmri');
         return
     end
     
