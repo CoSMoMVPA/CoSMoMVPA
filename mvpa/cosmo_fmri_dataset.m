@@ -629,9 +629,8 @@ function vol=get_vol_afni(hdr)
 
 %% SPM
 function b=isa_spm(hdr)
-    a=isstruct(hdr) && isfield(hdr,'xX') && isfield(hdr.xX,'X') && ...
-                isnumeric(hdr.xX.X) && isfield(hdr,'SPMid') && ...
-                (isfield(hdr,'Sess') || isfield(hdr,'nscan'));
+    b=isstruct(hdr) && isfield(hdr,'xX') && isfield(hdr.xX,'X') && ...
+                isnumeric(hdr.xX.X) && isfield(hdr,'SPMid');
             
 function [data,vol,sa]=read_spm(fn)
     if ischar(fn)
