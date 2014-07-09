@@ -655,7 +655,7 @@ function [data,vol,sa]=read_spm(fn)
     end
     
     % ignore output
-    get_and_check_data(spm);
+    get_and_check_data(spm, [], @isa_spm);
 
     switch input_type
             case 'beta'
