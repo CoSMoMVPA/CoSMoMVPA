@@ -352,6 +352,18 @@ function [data,vol,img_format,sa]=read_img(fn, img_formats)
     % read the data
     reader=img_formats.(img_format).reader;
     [data,vol,sa]=reader(fn);
+
+function hdr=get_and_check_data(hdr, loader_func, check_func)
+    % is hdr is a char, load it using loader; otherwise return the input.
+    % in any case the output is checked using check_func
+    if ischar(hdr)
+        hdr=loader_func(hdr);
+    end
+    if ~check_func(hdr)
+        error('Illegal input of type %s - failed to pass %s',...
+                    class(hdr), func2str(check_func));
+    end
+    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
@@ -369,13 +381,7 @@ function [data,vol,sa]=read_nii(fn, show_warning)
         show_warning=true; 
     end
     
-    if ischar(fn)
-        hdr=load_nii(fn);  
-    elseif isa_nii(fn)
-        hdr=fn;
-    else
-        error('illegal input');
-    end
+    hdr=get_and_check_data(fn, @load_nii, @isa_nii);
     
     data=hdr.img;
     sa=struct();
@@ -435,21 +441,40 @@ function vol=get_vol_nii(hdr, show_warning)
     vol.mat=mat;
     vol.dim=dim;
     
-%% Brainvoyager VMP (vmp)
+%% Brainvoyager
+
+% helpers
+function z=xff_struct(x)
+    % helper function: applies xff and returns a struct
+    % this avoids clearing of the object (which xff seems like doing)
+    y=xff(x);
+    z=getcont(y);
     
+    % BoundingBox is a method; copy its output to the struct
+    z.BoundingBox=y.BoundingBox;
+
+function vol=get_vol_bv(hdr)   
+    % bv vol info
+    bbox=hdr.BoundingBox;
+    mat=bvcoordconv([],'bvx2tal',bbox);
+    dim=bbox.DimXYZ;
+    
+    % deal with offset at (.5, .5, .5) [CHECKME]
+    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*.5*[1 1 1]';
+
+    vol=struct();
+    vol.mat=mat;
+    vol.dim=dim;    
+    
+% BV volumetric map
 function b=isa_bv_vmp(hdr)
     
-    b=isa(hdr,'xff') && isfield(hdr,'Map') && isstruct(hdr.Map) && ... 
+    b=(isa(hdr,'xff') || isstruct(hdr)) && ...
+            isfield(hdr,'Map') && isstruct(hdr.Map) && ...
             isfield(hdr,'VMRDimX') && isfield(hdr,'NrOfMaps');
         
 function [data,vol,sa]=read_bv_vmp(fn)
-    if ischar(fn)
-        hdr=xff(fn);
-    elseif isa_bv_vmp(fn)
-        hdr=fn;
-    else
-        error('illegal input');
-    end
+    hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vmp);
     
     nsamples=hdr.NrOfMaps;
     voldim=size(hdr.Map(1).VMPData);
@@ -469,19 +494,13 @@ function [data,vol,sa]=read_bv_vmp(fn)
     sa=struct();
     sa.stats=cosmo_statcode(hdr);
     sa.labels=labels;
-    
+
+% BV volume (usually anatomical)    
 function b=isa_bv_vmr(hdr)
-    
-    b=isa(hdr,'xff') && isfield(hdr,'VMRData');
+    b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr,'VMRData');
         
 function [data,vol,sa]=read_bv_vmr(fn)
-    if ischar(fn)
-        hdr=xff(fn);
-    elseif isa_bv_vmr(fn)
-        hdr=fn;
-    else
-        error('illegal input');
-    end
+    hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vmr);
     
     nsamples=1;
     voldim=size(hdr.VMRData);
@@ -492,40 +511,18 @@ function [data,vol,sa]=read_bv_vmr(fn)
     vol=get_vol_bv(hdr);
        
     sa=struct();    
-    
+
+% BV GLM    
 function b=isa_bv_glm(hdr)
     
-    b=isa(hdr,'xff') && isfield(hdr,'Predictor') &&  ... 
+    b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr,'Predictor') &&  ... 
             isfield(hdr,'GLMData') && isfield(hdr,'DesignMatrix');
-
-
-function vol=get_vol_bv(hdr)   
-    % bv vol info
-    bbox=hdr.BoundingBox;
-    mat=bvcoordconv([],'bvx2tal',bbox);
-    dim=bbox.DimXYZ;
-    
-    % deal with offset at (.5, .5, .5) [CHECKME]
-    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*.5*[1 1 1]';
-
-    vol=struct();
-    vol.mat=mat;
-    vol.dim=dim;
-
         
 function [data,vol,sa]=read_bv_glm(fn)
-    if ischar(fn)
-        hdr=xff(fn);
-    elseif isa_bv_glm(fn)
-        hdr=fn;
-    else
-        error('illegal input');
-    end
+    hdr=get_and_check_data(fn, @xff_struct, @isa_bv_glm);
     
     nsamples=hdr.NrOfPredictors;
     data=hdr.GLMData.BetaMaps(:,:,:,:);
-    
-    bless(hdr);
     
     name1=cell(nsamples,1);
     name2=cell(nsamples,1);
@@ -544,25 +541,27 @@ function [data,vol,sa]=read_bv_glm(fn)
     
     vol=get_vol_bv(hdr);
 
-    
+% BV mask    
 function b=isa_bv_msk(hdr)    
     
-    b=isa(hdr,'xff') && isfield(hdr, 'Mask');
+    b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr, 'Mask');
 
     
 function [data,vol,sa]=read_bv_msk(fn)
-    hdr=xff(fn);
+    hdr=get_and_check_data(fn, @xff_struct, @isa_bv_msk);
+    
     sa=struct();
     data=hdr.Mask>0;
     vol=get_vol_bv(hdr);
 
     
-
+% BV volume time course
 function b=isa_bv_vtc(hdr)    
     
-    b=isa(hdr,'xff') && isfield(hdr, 'VTCData');    
+    b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr, 'VTCData');    
     
-function [data,vol,sa]=read_bv_vtc(fn)    
+function [data,vol,sa]=read_bv_vtc(fn)
+    hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vtc);
     hdr=xff(fn);
     sa=struct();
     data=shiftdim(hdr.VTCData,1);
@@ -635,21 +634,29 @@ function b=isa_spm(hdr)
                 (isfield(hdr,'Sess') || isfield(hdr,'nscan'));
             
 function [data,vol,sa]=read_spm(fn)
-    pth=fileparts(fn);
-    
-    sep=':';
-    input_type=cosmo_strsplit(fn,sep,-1);
-    switch input_type
-        case {'beta','con','spm'}
-            fn=fn(1:(end-numel(input_type)-numel(sep)));
-        otherwise
-            input_type='beta'; % the default; function will crash
-                               % if fn is not a proper filename
+    if ischar(fn)
+        pth=fileparts(fn);
+
+        sep=':';
+        input_type=cosmo_strsplit(fn,sep,-1);
+        switch input_type
+            case {'beta','con','spm'}
+                fn=fn(1:(end-numel(input_type)-numel(sep)));
+            otherwise
+                input_type='beta'; % the default; function will crash
+                                   % if fn is not a proper filename
+        end
+
+        % 'load' is faster than 'importdata'
+        spm=load(fn);
+        if ~isstruct(spm) || ~isequal(fieldnames(spm),{'SPM'})
+            error('expected data with struct ''SPM''');
+        end
+        spm=spm.SPM;
     end
     
-    % 'load' is faster than 'importdata'
-    spm=load(fn);
-    spm=spm.SPM;
+    % ignore output
+    get_and_check_data(spm);
 
     switch input_type
             case 'beta'
