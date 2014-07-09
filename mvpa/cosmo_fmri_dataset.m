@@ -706,7 +706,6 @@ function [data,vol,sa]=read_spm(fn)
     end
     
     nsamples=sum(keep_vol_msk);
-    data=zeros([vol.dim nsamples]);
     sample_counter=0;
     
     % make space for filenames
@@ -727,8 +726,13 @@ function [data,vol,sa]=read_spm(fn)
         [vol_data_k, vol_k]=read_nii(vol_fn, show_warning);
         
         if sample_counter==0
+            % first volume
+            
             % store volume information
             vol=vol_k;
+            
+            % allocate space for output
+            data=zeros([vol.dim nsamples]);
         else
             % ensure volume information is same across all volumes
             if ~isequal(vol, vol_k)
