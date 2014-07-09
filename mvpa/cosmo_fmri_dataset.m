@@ -420,10 +420,10 @@ function vol=get_vol_nii(hdr, show_warning)
         
         % dimension flip (reflection) matrix
         flip_mat=eye(4);
-        for dim=1:3
-            permute_dim_mat(hist.rot_orient(dim),dim)=1;
-            if hist.flip_orient(dim)>0
-                flip_mat(dim,dim)=-1;
+        for dim_index=1:3
+            permute_dim_mat(hist.rot_orient(dim_index),dim_index)=1;
+            if hist.flip_orient(dim_index)>0
+                flip_mat(dim_index,dim_index)=-1;
             end
         end
         
