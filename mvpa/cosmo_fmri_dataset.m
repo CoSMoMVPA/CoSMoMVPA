@@ -60,14 +60,14 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %    according to its contents
 %
 % Dependencies:
-% - for NIFTI, analyze (.hdr/.img) and SPM.mat files, it requires the 
-%   following toolbox:
-%   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
-%   (note that his toolbox is included in CoSMoMVPA in /externals)
-% - for Brainvoyager files (.vmp, .vtc, .msk, .glm), it requires the 
-%   NeuroElf toolbox, available from: http://neuroelf.net
-% - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
-%   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+% -  for NIFTI, analyze (.hdr/.img) and SPM.mat files, it requires the 
+%    following toolbox:
+%    http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
+%    (note that his toolbox is included in CoSMoMVPA in /externals)
+% -  for Brainvoyager files (.vmp, .vtc, .msk, .glm), it requires the 
+%    NeuroElf toolbox, available from: http://neuroelf.net
+% -  for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
+%    Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
 % Examples:
 %     % load nifti file
@@ -81,9 +81,9 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                                     'mask', 'masks/brain_mask+tlrc);
 %   
 %     % load BrainVoyager VMR file in directory 'mydata', and apply an
-%     % automask that removes all features (voxels) that are zero for all
-%     % samples
-%     ds=fmri_dataset('mydata/mydata.vmr', mask, true);
+%     % automask that removes all features (voxels) that are zero or 
+%     non-finite for all samples
+%     ds=fmri_dataset('mydata/mydata.vmr', 'mask', true);
 %
 %     % load two datasets, one for odd runs, the other for even runs, and
 %     % combine them into one dataset. Note that the chunks are set here,
@@ -104,7 +104,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     ds=cosmo_fmri_dataset('path/to/SPM.mat');
 %     
 %     % as above, and apply an automask to remove voxels that
-%     % are NaN or 0 in all values. 
+%     % are zero or non-finite in all samples. 
 %     ds=cosmo_fmri_dataset('path/to/SPM.mat','mask',true);
 %
 %     % load contrast beta values from SPM GLM file SPM.mat
