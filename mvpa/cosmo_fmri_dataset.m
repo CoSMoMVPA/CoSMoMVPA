@@ -8,14 +8,14 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 % Inputs:
 %   filename     filename for dataset  } It should end with one of:
 %   mask         optional filename for } .nii, .nii.gz        NIFTI
+%                                      } .hdr, .img           ANALYZE
 %                volume mask, or true    +{orig}.{HEAD,BRIK}  AFNI
-%                to apply an automask    .vmr, .vmp,          } Brain-
+%                to apply an automask    .vmr, .vmp, .vtc     } Brain-
 %                                              .glm, .msk     } voyager
-%                                        .mat (SPM.mat)       SPM
+%                                        .mat                 SPM (SPM.mat)
 %                                        .mat:beta            SPM beta
 %                                        .mat:con             SPM contrast
 %                                        .mat:spm             SPM stats                                               
-%                                               
 %   targets      optional Tx1 numeric labels of experimental
 %                conditions (where T is the number of samples (volumes)
 %                in the dataset)
@@ -31,10 +31,10 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                If the original nifti file contained data with X,Y,Z,T
 %                elements in the three spatial and one temporal dimension
 %                and no mask was applied, then .samples will have
-%                dimensions N x M, where N = T, and M = X*Y*Z. If a mask 
-%                was applied then M = the number of non-zero voxels in the 
-%                mask input dataset.
-%     .a         struct intended to contain dataset-relevent data.
+%                dimensions N x M, where N = T and M = X*Y*Z. If a mask 
+%                was applied then M (M<=X*Y*Z) is the number of non-zero
+%                voxels in the  mask input dataset.
+%     .a         struct with dataset-relevent data.
 %     .a.dim.labels   dimension labels, set to {'i','j','k'}
 %     .a.dim.values   dimension values, set to {1:X, 1:Y, 1:Z}
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
@@ -73,6 +73,12 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     % load nifti file
 %     ds=fmri_dataset('mydata.nii');
 %
+%     % load gzipped nifti file
+%     ds=fmri_dataset('mydata.nii.gz');
+%
+%     % load ANALYZE file and apply brain mask 
+%     ds=fmri_dataset('mydata.hdr','mask','brain_mask.hdr');
+%
 %     % load AFNI file with 6 'bricks' (values per voxel, e.g. beta values);
 %     % set chunks (e.g. runs) and targets (experimental conditions), and
 %     % use a mask
@@ -91,12 +97,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     % be done manually
 %     ds_even=fmri_dataset('data_even_runs.glm','chunks',1);
 %     ds_odd=fmri_dataset('data_odd_runs.glm','chunks',2);
+%     ds=cosmo_stack({ds_even,ds_odd});
 %     
-%   
-%     % load ANALYZE file with a mask
-%     ds=fmri_dataset('mydata.hdr', 'mask', 'brain_mask.hdr');
-%
-%
 %     % load beta values from SPM GLM analysis stored
 %     % in a file SPM.mat.
 %     % If SPM.mat contains a field .Sess (sessions) then .sa.chunks
@@ -378,6 +380,9 @@ function b=isa_nii(hdr)
      
 function [data,vol,sa]=read_nii(fn, show_warning)
     if nargin<2
+        % show_warning is used by read_spm for each volume separately. 
+        % This parameter allows read_spm to show warning messages just once
+        % instead of for each volume
         show_warning=true; 
     end
     
