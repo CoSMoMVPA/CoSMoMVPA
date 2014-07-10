@@ -717,9 +717,6 @@ function [data,vol,sa]=read_spm(fn)
     nsamples=sum(keep_vol_msk);
     sample_counter=0;
     
-    % make space for filenames
-    sa.fname=cell(nkeep,1); 
-    
     for k=1:ninput
         if ~keep_vol_msk(k)
             continue;
@@ -742,6 +739,7 @@ function [data,vol,sa]=read_spm(fn)
             
             % allocate space for output
             data=zeros([vol.dim nsamples]);
+            sa.fname=cell(nkeep,1); 
         else
             % ensure volume information is same across all volumes
             if ~isequal(vol, vol_k)
