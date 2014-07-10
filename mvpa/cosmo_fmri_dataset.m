@@ -652,26 +652,28 @@ function [data,vol,sa]=read_spm(fn)
         end
 
         % 'load' is faster than 'importdata'
-        spm=load(fn);
-        if ~isstruct(spm) || ~isequal(fieldnames(spm),{'SPM'})
+        % (use 'spm_' instead of 'spm' to avoid name space conflicts)
+        spm_=load(fn);
+        if ~isstruct(spm_) || ~isequal(fieldnames(spm_),{'SPM'})
             error('expected data with struct ''SPM''');
         end
-        spm=spm.SPM;
+        spm_=spm_.SPM;
     end
     
-    % ignore output
-    get_and_check_data(spm, [], @isa_spm);
+    % just do a check (ignore output)
+    get_and_check_data(spm_, [], @isa_spm);
 
+    % get data of interest
     switch input_type
             case 'beta'
-                input_vols=spm.Vbeta;
-                input_labels=spm.xX.name';
+                input_vols=spm_.Vbeta;
+                input_labels=spm_.xX.name';
             case 'con'
-                input_vols=[spm.xCon.Vcon];
-                input_labels={spm.xCon.name}';
+                input_vols=[spm_.xCon.Vcon];
+                input_labels={spm_.xCon.name}';
             case 'spm'
-                input_vols=[spm.xCon.Vspm];
-                input_labels={spm.xCon.name}';
+                input_vols=[spm_.xCon.Vspm];
+                input_labels={spm_.xCon.name}';
         otherwise
             error('illegal data type %s', input_type);
     end
@@ -681,15 +683,15 @@ function [data,vol,sa]=read_spm(fn)
     
     sa=struct();
     
-    if isfield(spm,'Sess') && strcmp(input_type,'beta')
-        % single subject GLM; will use only betas of interest
+    if isfield(spm_,'Sess') && strcmp(input_type,'beta')
+        % single subject GLM with betas; will use only betas of interest
         % and set chunks based on runs
-        nruns=numel(spm.Sess);
-        nbeta=numel(spm.Vbeta);
+        nruns=numel(spm_.Sess);
+        nbeta=numel(spm_.Vbeta);
         sessions=zeros(nbeta,1);
         beta_index=zeros(nbeta,1);
         for k=1:nruns
-            sess=spm.Sess(k);
+            sess=spm_.Sess(k);
             sess_idxs=[sess.Fc.i];
             row_idxs=sess.col(sess_idxs);
 
