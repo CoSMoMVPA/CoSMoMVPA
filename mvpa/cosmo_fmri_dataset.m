@@ -701,7 +701,9 @@ function [data,vol,sa]=read_spm(fn)
 
         keep_vol_msk=sessions>0;
         sa.chunks=sessions(keep_vol_msk);
+        sa.beta_index=beta_index(keep_vol_msk);
     else
+        % anything else: use all volumes
         keep_vol_msk=true(ninput,1);
     end
 
