@@ -26,20 +26,13 @@ ds.sa.labels = repmat(labels,10,1);
 % <@@<
 
 %% Overview of the dataset
-ds
+fprintf('\nOverview of dataset:\n');
+cosmo_disp(ds)
 
-%% Overview of sample attributes
-ds.sa
+%% Overview of sample attributes (targets, chunks, and labels, in this case):
+fprintf('\nOverview of sample attributes\n');
+cosmo_disp(ds.sa,'edgeitems',10)
 
-% print targets and chunks
-[ds.sa.targets ds.sa.chunks]
-
-% print labels
-ds.sa.labels
-
-%% Overview of feature attributes
-ds.fa
-
-% print a few voxel indices
-ijk_indices=[ds.fa.i(:,1:10); ds.fa.j(:,1:10); ds.fa.k(:,1:10)];
-ijk_indices
+%% Overview of feature attributes (the voxel indices, in this case):
+fprintf('\nOverview of feature attributes\n');
+cosmo_disp(ds.fa,'edgeitems',10)

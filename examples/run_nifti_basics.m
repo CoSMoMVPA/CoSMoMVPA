@@ -11,8 +11,8 @@ fn=[data_path '/brain.nii'];
 % Load with nifti
 ni=load_nii(fn);
 
-%% Show the contents of the nifti struct
-ni
+%% Show the contents of the nifti header
+cosmo_disp(ni.hdr);
 
 % print the dimensions
 size(ni.img)
