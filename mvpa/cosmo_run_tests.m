@@ -45,7 +45,7 @@ function did_pass=cosmo_run_tests(varargin)
 % %         %                                 %  7      1     C     C
 % %         nine=3*3;                         %  8      1     E     P 1.3
 % %         abs(negative_four-nine)           %  9      1     E     E 1.2
-% %         > 13                              % 15      1     W     W 1.2.1
+% %         > 13                              % 10      1     W     W 1.2.1
 % %                                           % 11            S     S
 % %         unused=3;                         % 12      2     E     E 2.1
 % %                                           % 13            S     S
@@ -53,49 +53,79 @@ function did_pass=cosmo_run_tests(varargin)
 % %         disp({@abs postfix})              % 15      3     E     E 3.1
 % %         >   @abs    ' is useful '         % 16      3     W     W 3.1.1
 % % 
-% %     (offside position: other documentation here ...)
+% %     (more documentation here ['offside position'; see (3) below] ...)
 %
-%     The right-hand side shows three columns with line number, type and 
-%     token. Doctests are processed as follows:
+%     The right-hand side shows (for clarification) four columns with line
+%     number, block number, type and test-type. Doctests are processed as 
+%     follows:
 %     1) A doctest section starts with a line containing just 'Example' 
-%        (or 'Examples:' or 'examples').
+%        (or 'Examples:', 'example' or other variants; to be exact,
+%        the regular expression to be matched is '^\s*[eE]xamples?:?\s*$').
 %     2) The indent level is the number of spaces after the first non-empty
-%        line after the Example line
+%        line after the Example line.
 %     3) A doctest section ends whenever a line is found with a lower 
-%        indent level ('offside rule')
-%     4) Only a single doctest section is supported.
-%     5) Doctests are split in blocks by empty lines
-%     6) in a first over all doctest lines, each line is set to a type:
-%        + (C)omment
+%        indent level ('offside rule').
+%     4) Only a single doctest section is supported. If multiple doctest
+%        sections are found an error is raised.
+%     5) Doctests are split in blocks by empty lines. (A line containing 
+%        only spaces is considered empty; a line with comment is considered 
+%        non-empty.)
+%     6) In a first pass over all doctest lines, each line is assigned a 
+%        type:
 %        + (E)xpression (string that can be evaluated by matlab)
 %        + (W)ant       (expected output from evaluating an expression)
-%        + (S)pace      (white-space)
+%        + (C)omment    (not an 'E' or 'W' line; contains '%' character)
+%        + (S)pace      (white-space, i.e. not 'E', 'W' or 'C' line)
 %     7) In a second pass, 'E' lines followed by another 'E' line are
-%        set to the (P)reamble state.
+%        set to the (P)reamble state (see test-type column, above).
 %        Preamble lines can assign values to variables, but should not
 %        produce output.
 %        Non-preamble expression lines followed by one or more W-lines
 %        should produce the output indicated by these W-lines.
-%     8) A doctest is run as follows:
+%     8) A single doctest is run as follows:
 %        - each block is processed separately
 %        - for each line with test-type E (in each block):
 %          + if it is not followed by one or more W-lines, then the 
 %            expression is ignored.
 %          + otherwise:
-%            * otherwrun all preceding preamble lines in the block
-%              # if this produces output or an error, the test fails.
+%            * run all preceding preamble lines in the block
+%              # if this produces non-empty output or an error, the test 
+%                fails.
 %            * run the line with test-type E
 %              # if this produces an error, the test fails
 %            * compare the output of the previous step with the W-lines
-%              # if the output is different, the test fails
+%              # comparison of equality is somewhat 'lenient':
+%                + equality is based on the output without the ' ans = '
+%                  prefix string that matlab gives when showing output
+%                + both the output of the W-lines and the evaluated output
+%                  is compared after splitting the string by white-space
+%                  characters. For example, if the real output is 'foo bar'
+%                  and the expected output is '   foo   bar ', the test
+%                  passes
+%                + if the previous string comparison does not pass the
+%                  test, an attempt is made to convert both the output of 
+%                  the W-lines and the evaluated output to a numeric array.
+%                  If this conversion is succesfull and both arrays are
+%                  equal, the test passes.
+%                + if the conversion to numeric does not make the test
+%                  pass, the W-lines are evaluated (and any ' ans = '
+%                  prefix is removed). If this evaluation is succesfull 
+%                  (does not raise an exception) in is equal to the 
+%                  evaluated output, the test passes.
+%              # if none of the above attempts make the test pass, the test
+%                fails.
 %            * if no test has failed, the test passes
-%        - In this example:
-%          + E-1.1 is executed after P-1.1 and P-1.2; output should be 
-%            W-1.1.1 and W-1.1.2
-%          + E-1.2 is executed after P-1.1, P-1.2, and P-1.3; output should
-%            be W-1.2.1.
+%        - To illustrate, in the example above:
+%          + E-1.1 is executed after P-1.1 and P-1.2; evaluating P-1.[1-2]
+%            should not give output. The output of evaluating E-1.1 
+%            should be W-1.1.1 and W-1.1.2
+%          + E-1.2 is executed after P-1.1, P-1.2, and P-1.3; evaluating
+%            P-1.[1-3] should not give output. The output of evaluating 
+%            E-1.2 should be W-1.2.1.
 %          + E-2.1 is ignored, because there is no corresponding W-2.1.*
-%          + E-3.1 is executed after P-3.1; output should be W-3.1.1.
+%          + E-3.1 is executed after P-3.1; evaluating P-3.1 should 
+%            not give ouput. The output of evaluating E-1.3 should be 
+%            W-3.1.1.
 %     9) The suite passes if all tests pass     
 %
 % NNO Jul 2014    

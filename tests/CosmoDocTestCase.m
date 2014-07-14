@@ -122,7 +122,7 @@ function run_doctest(preamb, expr, wants, filename, line)
             to_evaluate=cosmo_strjoin(lines,'\n');
 
             if isempty(to_evaluate) && ~preamble_with_expr
-                % empty preamble, skip
+                % empty preamble and no expression, skip
                 continue;
             end
 
