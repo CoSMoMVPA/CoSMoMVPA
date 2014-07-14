@@ -27,10 +27,9 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %                    target.
 %
 % Notes:
-%  - this function requires the pdist function, available in the matlab
-%    stats toolbox.
-%  - pdist defaults to 'euclidean' distance, but correlation distance is
-%    preferable for neural dissimilarity matrices
+%  - [cosmo_]pdist defaults to 'euclidean' distance, but correlation 
+%    distance is preferable for neural dissimilarity matrices, hence it 
+%    is used as the default here
 %
 % Example:
 %    % ds is a dataset struct with ds.sa.targets=(1:6)';
@@ -58,6 +57,8 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %    >  3     6
 %    >  4     6
 %    >  5     6]
+%
+% See also: cosmo_pdist, pdist
 %
 % ACC August 2013
 % NNO updated Sep 2013 to return a struct
@@ -88,10 +89,10 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     % make new dataset
     ds_dsm=struct();
     
-    % compute pair-wise distances between all samples using pdist,
+    % compute pair-wise distances between all samples using cosmo_pdist,
     % then store them as samples in ds_dsm
     % >@@>
-    dsm = pdist(ds.samples, args.metric)';
+    dsm = cosmo_pdist(ds.samples, args.metric)';
     
     % store dsm
     ds_dsm.samples=dsm;

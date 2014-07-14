@@ -40,7 +40,12 @@ for m = 1:length(masks)
         ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples, 1));
 
         % add to stack
-        dsms = [dsms; pdist(ds.samples, 'correlation')];
+        dsm=cosmo_pdist(ds.samples, 'correlation');
+        if isempty(dsms)
+            dsms=dsm;
+        else 
+            dsms = [dsms; dsm];
+        end
     end
 end
 % <@@<
@@ -52,7 +57,11 @@ load(fullfile(models_path,'v1_model.mat'));
 load(fullfile(models_path,'behav_sim.mat'));
 % add to dsms (hint: use squareform)
 % >@@>
-dsms = [dsms; squareform(v1_model); squareform(behav)];
+v1_model_sf=squareform(v1_model);
+behav_model_sf=squareform(behav);
+% ensure row vector because Matlab and Octave return
+% row and column vectors, respectively
+dsms = [dsms; v1_model_sf(:)'; behav_model_sf(:)'];
 % <@@<
 
 %%

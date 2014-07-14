@@ -1,6 +1,11 @@
 %% Classification using svm
 %
 
+if ~cosmo_check_external('@stats',false)
+    fprintf('Matlab toolbox ''stats'' not present, skipping\n');
+    return
+end
+
 %% Define data
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');

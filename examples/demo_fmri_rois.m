@@ -101,14 +101,30 @@ end
 % combine the data from all subjects
 ds_all=cosmo_stack(ds_corrs);
 
-samples=ds_all.samples; % get the correlation differences
+%%
+samples=ds_all.samples; % get the correlations for all subjects
 
 % run one-sample t-test again zero
-[h,p,ci,stats]=ttest(samples);
-fprintf(['Correlation difference in %s at group level: '...
-            '%.3f +/- %.3f, t_%d=%.3f, p=%.5f\n'],...
-            mask_label,mean(samples),std(samples),stats.df,stats.tstat,p);
 
+% Using cosmo_stats
+ds_t=cosmo_stat(ds_all,'t');     % t-test against zero
+ds_p=cosmo_stat(ds_all,'t','p'); % convert to p-value
+
+fprintf(['correlation difference in %s at group level: '...
+           '%.3f +/- %.3f, %s=%.3f, p=%.5f (using cosmo_stat)\n'],...
+            mask_label,mean(samples),std(samples),...
+            ds_t.sa.stats{1},ds_t.samples,ds_p.samples);
+
+% Using matlab's stat toolbox (if present)        
+if cosmo_check_external('@stats',false)        
+    [h,p,ci,stats]=ttest(samples);
+    fprintf(['Correlation difference in %s at group level: '...
+            '%.3f +/- %.3f, t_%d=%.3f, p=%.5f (using matlab stats '...
+            'toolbox)\n'],...
+            mask_label,mean(samples),std(samples),stats.df,stats.tstat,p);
+else
+    fprintf('Matlab stats toolbox not found\n');
+end
 
 
 %% Example 3: comparison of four classifiers in two regions of interest
@@ -153,6 +169,12 @@ for j=1:nmasks
 
     for k=1:nclassifiers
         classifier=classifiers{k};
+        if ~cosmo_check_external('@stats',false) && ...
+                    isequal(classifier,@cosmo_classify_svm)
+            warning('Classifier %s skipped: stats toolbox not present',...
+                            func2str(classifier));
+            continue;
+        end
         [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
         confusion_matrix=cosmo_confusion_matrix(ds, pred);

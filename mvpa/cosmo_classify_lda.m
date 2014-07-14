@@ -63,7 +63,7 @@ end;
 % apply regularization
 regularization=opt.regularization;
 class_cov=class_cov/ntrain; 
-reg=eye(nfeatures)*trace(class_cov)/nfeatures;
+reg=eye(nfeatures)*trace(class_cov)/max(1,nfeatures);
 class_cov_reg=class_cov+reg*regularization;
 
 % linear discriminant

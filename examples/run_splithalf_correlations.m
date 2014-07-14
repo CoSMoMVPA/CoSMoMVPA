@@ -81,5 +81,28 @@ for j=1:nsubjects
 end
 
 %% compute t statistic and print the result
-[h,p,ci,stats]=ttest(mean_weighted_zs);
-fprintf('ROI %s: mean %.3f, t_%d=%.3f, p=%.4f\n', roi, mean(mean_weighted_zs), stats.df, stats.tstat, p);
+% run one-sample t-test again zero
+
+% Using cosmo_stats - convert to dataset struct
+mean_weighted_zs_ds=struct();
+mean_weighted_zs_ds.samples=mean_weighted_zs;
+
+ds_t=cosmo_stat(mean_weighted_zs_ds,'t');     % t-test against zero
+ds_p=cosmo_stat(mean_weighted_zs_ds,'t','p'); % convert to p-value
+
+fprintf(['correlation difference in %s at group level: '...
+           '%.3f +/- %.3f, %s=%.3f, p=%.5f (using cosmo_stat)\n'],...
+            roi,mean(mean_weighted_zs),std(mean_weighted_zs),...
+            ds_t.sa.stats{1},ds_t.samples,ds_p.samples);
+
+% Using matlab's stat toolbox (if present)        
+if cosmo_check_external('@stats',false)        
+    [h,p,ci,stats]=ttest(mean_weighted_zs);
+    fprintf(['Correlation difference in %s at group level: '...
+            '%.3f +/- %.3f, t_%d=%.3f, p=%.5f (using matlab stats '...
+            'toolbox)\n'],...
+            roi,mean(mean_weighted_zs),std(mean_weighted_zs),...
+            stats.df,stats.tstat,p);
+else
+    fprintf('Matlab stats toolbox not found\n');
+end

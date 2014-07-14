@@ -16,7 +16,12 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
 % >@@> 
 classifiers={@cosmo_classify_nn,...
              @cosmo_classify_naive_bayes,...
-             @cosmo_classify_svm};
+             @cosmo_classify_lda};
+
+% if matlab stats toolbox is present, also run svm
+if cosmo_check_external('@stats',false)
+    classifiers{end+1}=@cosmo_classify_svm;
+end    
 % <@@<         
 nclassifiers=numel(classifiers);
 

@@ -34,9 +34,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
                             varargin);
     
     % - compute the pair-wise distance between all dataset samples using
-    %   pdist and store in 'pd'
+    %   cosmo_pdist and store in 'pd'
     % >@@>    
-    pd = pdist(ds.samples, params.metric);
+    pd = cosmo_pdist(ds.samples, params.metric);
     % <@@<
     
     nsamples_pd=size(pd,1);
@@ -54,10 +54,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     else
         % target_dsm is a square matrix
         
-        % convert params.target_dsm to squareform and store in 
-        % 'target_dsm_vec'
+        % convert params.target_dsm to squareform (using cosmo_squareform)
+        %  and store in 'target_dsm_vec'
         % >@@> 
-        target_dsm_vec=squareform(params.target_dsm);
+        target_dsm_vec=cosmo_squareform(params.target_dsm);
         % <@@<
     
         % check size

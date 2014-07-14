@@ -49,6 +49,9 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
         % compute feature-wise probality relative to stats of each class
         ps=normcdf(repmat(sample,nclasses,1), mus, stds);
         
+        % make octave more compatible with matlab: convert nan to 1
+        ps(isnan(ps))=1;
+        
         % being 'naive' we assume independence - so take the product of the
         % p values. (for better precision we take the log of the probablities
         % and sum them)

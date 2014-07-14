@@ -241,7 +241,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     else
         % transform to left-tailed p-value
         df_cell=num2cell(df);
-        stat=cdf(cdf_label,stat,df_cell{:});
+        stat=cdf_wrapper(cdf_label,stat,df_cell{:});
         
         % reset degrees of freedom
         df=[];
@@ -249,7 +249,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         switch output_stat_name
             case 'z'
                 % transform to z-score
-                stat=norminv(stat);
+                stat=norminv_wrapper(stat);
                 stat_label='Zscore';
             case 'p'
                 switch tail
@@ -370,3 +370,28 @@ function [t,df]=quick_ttest2(x,y)
 
     t=(mux-muy) .* sqrt(scaling./ss);
 
+function y=cdf_wrapper(name, x, df1, df2)
+    check_has_stats_toolbox()
+    switch lower(name)
+        case 't'
+            assert(nargin==3);
+            y=tcdf(x, df1);
+        case 'f'
+            assert(nargin==4);
+            y=fcdf(x, df1, df2);
+        otherwise
+            assert(false);
+    end
+            
+            
+function y=norminv_wrapper(x)
+    check_has_stats_toolbox()
+    y=norminv(x);
+    
+function check_has_stats_toolbox()
+    % - Octave has the required functionality in the octave-forge
+    %   statistics toolbox and will raise an error if it is not installed.
+    % - Matlab needs checking for the toolbox
+    if cosmo_wtf('is_matlab')
+        cosmo_check_external('@stats');
+    end

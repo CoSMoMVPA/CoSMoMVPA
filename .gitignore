@@ -7,3 +7,4 @@ datadb
 datadb.zip
 .git.bfg-report
 *.md.sw?
+octave-workspace

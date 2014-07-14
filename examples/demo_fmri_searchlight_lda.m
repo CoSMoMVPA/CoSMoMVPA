@@ -35,8 +35,8 @@ cosmo_check_external('-tic');
 % Discriminant Analysis (LDA) classifier.
 
 data_path=digit_study_path;
-data_fn=fullfile(data_path,'glm_T_stats_perblock+orig');
-mask_fn=fullfile(data_path,'brain_mask+orig');
+data_fn=fullfile(data_path,'glm_T_stats_perblock+orig.HEAD');
+mask_fn=fullfile(data_path,'brain_mask+orig.HEAD');
 
 targets=repmat(1:2,1,16)';    % class labels: 1 2 1 2 1 2 1 2 1 2 ... 1 2
 chunks=floor(((1:32)-1)/8)+1; % run labels:   1 1 1 1 1 1 1 1 2 2 ... 4 4

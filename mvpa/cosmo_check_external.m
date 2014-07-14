@@ -1,7 +1,7 @@
-function is_present=cosmo_check_external(external, error_if_not_present)
+function is_ok=cosmo_check_external(external, raise_)
 % Checks whether a certain external toolbox exists, or list citation info
 %
-% is_present=cosmo_check_external(external[, error_if_not_present])
+% is_ok=cosmo_check_external(external[, raise_])
 %
 % Inputs:
 %   external               string or cell of strings. Currently supports: 
@@ -14,14 +14,16 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %                          'surfing'   surfing toolbox
 %                          'gifti'     GIfTI library for matlab
 %                          'xunit'     xUnit unit test framework
+%                          '@{name}'   Matlab toolbox {name}
 %                          It can also be '-list', '-tic', '-toc',' or
 %                          '-cite'; see below for their meaning.
-%   error_if_not_present   if true (the default), an error is raised if the
+%   raise_                 if true (the default), an error is raised if the
 %                          external is not present. 
 %
 % Returns:
-%   is_present             boolean indicating whether the external is
-%                          present. If external is a cell if P elements, 
+%   is_ok             boolean indicating whether the external is
+%                          present. A matlab toolbox must be prefixed
+%                          by a '@'. If external is a cell if P elements, 
 %                          then the output is a Px1 boolean vector. 
 %                          Special switches allowed are:
 %                            '-list':   returns a cell of strings with
@@ -38,10 +40,16 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 %   % see if the AFNI matlab toolbox is available, if not raise an error
 %   cosmo_check_external('afni')
 %   
-%   % see if libsvm and neuroelf are available and store the result in 
-%   % the 2x1 boolean array is_present. An error is not raised if 
+%   % see if libsvm and neuroelf are available, if not raise an error
+%   cosmo_check_external({'libsvm','neuroelf'});
+%
+%   % see if libsvm and neuroelf and store the result in 
+%   % the 2x1 boolean array is_ok. An error is not raised if 
 %   % either is not present.
-%   is_present=cosmo_check_external({'libsvm','neuroelf'},false);
+%   is_ok=cosmo_check_external({'libsvm','neuroelf'},false);
+%
+%   % see if the matlab 'stats' toolbox is available
+%   cosmo_check_external('@stats');
 %
 %   % list the available externals
 %   cosmo_check_external('-list')
@@ -72,32 +80,39 @@ function is_present=cosmo_check_external(external, error_if_not_present)
 % NNO Sep 2013  
 
 
-    persistent cached_external_names
+    persistent cached_present_names
+    persistent cached_absent_names;
 
     if nargin<2
-        error_if_not_present=true;
+        raise_=true;
     end
 
     if strcmp(external,'-tic')
         % clear cache
-        cached_external_names=[];
+        cached_present_names=[];
+        cached_absent_names=[];
     end
     
     if iscell(external)
         % cell input - check for each of them using recursion
         nexternals=numel(external);
-        is_present=false(nexternals,1); % space for output
+        is_ok=false(nexternals,1); % space for output
         me=str2func(mfilename()); % the present function
         for k=1:nexternals
-            is_present(k)=me(external{k}, error_if_not_present);
+            is_ok(k)=me(external{k}, raise_);
         end
         return
     end
-
-    if ~iscell(cached_external_names)
-        % not set, initialize to empty
-        cached_external_names=cell(0);
+    
+    % initialize to empty if not set
+    if ~iscell(cached_present_names)
+        cached_present_names=cell(0);
     end
+    
+    if ~iscell(cached_absent_names)
+        cached_absent_names=cell(0);
+    end
+    
     
     if external(1)=='-'
         % process special user switch
@@ -107,25 +122,25 @@ function is_present=cosmo_check_external(external, error_if_not_present)
                 supported_externals=fieldnames(get_externals());
                 me=str2func(mfilename()); % the present function
                 
-                cached_external_names_copy=cached_external_names;
+                cached_present_names_copy=cached_present_names;
                 msk=me(supported_externals,false);
-                cached_external_names=cached_external_names_copy;
+                cached_present_names=cached_present_names_copy;
                 
-                is_present=supported_externals(msk);
+                is_ok=supported_externals(msk);
                 
             case 'tic'
-                cached_external_names=cell(0);
+                cached_present_names=cell(0);
                 
             case 'toc'
-                is_present=cached_external_names;
+                is_ok=cached_present_names;
                 
             case 'cite'
-                citation_str=get_citation_str(cached_external_names);
+                citation_str=get_citation_str(cached_present_names);
                 s=sprintf(['If you use CoSMoMVPA and/or some '...
                          'other toolboxes for a publication, '...
                         'please cite:\n\n%s\n'], citation_str);
                 disp(s);    
-                is_present=[];
+                is_ok=[];
                 
             otherwise
                 error('illegal switch %s', external);     
@@ -134,60 +149,90 @@ function is_present=cosmo_check_external(external, error_if_not_present)
         return
     end
     
-    if any(cosmo_match(cached_external_names,external))
-        is_present=true;
-        return;
+    if cosmo_match({external},cached_present_names)
+        is_ok=true;
+    elseif cosmo_match({external},cached_absent_names)
+        is_ok=false; 
+    elseif external(1)=='@'
+        toolbox_name=external(2:end);
+        is_ok=check_matlab_toolbox(toolbox_name,raise_);
+    else
+        is_ok=check_external_toolbox(external,raise_);
     end
 
+    % add if not in cache already
+    if is_ok    
+        if ~cosmo_match({external},cached_present_names)
+            cached_present_names{end+1}=external;
+        end    
+    else
+        if ~cosmo_match({external},cached_absent_names)
+            cached_absent_names{end+1}=external;
+        end    
+    end
+
+function is_ok=check_external_toolbox(external_name,raise_)
     externals=get_externals();
-    if ~isfield(externals, external);
-        error('Unknown external %s', external);
+    if ~isfield(externals, external_name);
+        error('Unknown external ''%s''', external_name);
     end
-
-    ext=externals.(external);
+    
+    ext=externals.(external_name);
     is_present=ext.is_present();
     is_recent=ext.is_recent();
     
-    if is_present && is_recent
-        % everything ok, add to cached_external_names
-        if ~iscell(cached_external_names)
-            cached_external_names=cell(0);
-        end
-        
-        % avoid duplicates
-        if all(~cosmo_match(cached_external_names,external))
-            cached_external_names{end+1}=external;
-        end
-    else
-        
+    is_ok=is_present && is_recent;
+    if ~is_ok
+        env=cosmo_wtf('environment');
         if ~is_present
             msg=sprintf(['The %s is required, but it was not found in '...
-                    'the matlab path. If it is not present on your '...
-                    'system, download it from:\n\n    %s\n\nthen, if '...
-                    'applicable, add the necessary directories '...
-                    'to the matlab path.'], ...
-                    ext.label, url2str(ext.url));
-        
+                'the %s path. If it is not present on your '...
+                'system, download it from:\n\n    %s\n\nthen, if '...
+                'applicable, add the necessary directories '...
+                'to the %s path.'], ...
+                ext.label, env, url2str(ext.url), env);
+
         elseif ~is_recent
-            msg=sprintf(['The %s was found on your matlab path, but '...
-                    'seems out of date. Please download the latest '...
-                    'version from:\n\n %s\n\nthen, if '...
-                    'applicable, add the necessary directories '...
-                    'to the matlab path.'], ...
-                    ext.label, url2str(ext.url));
+            msg=sprintf(['The %s was found on your %s path, but '...
+                'seems out of date. Please download the latest '...
+                'version from:\n\n %s\n\nthen, if '...
+                'applicable, add the necessary directories '...
+                'to the %s path.'], ...
+                ext.label, env, url2str(ext.url), env);
         else
-            assert(false); % should never get here
+            assert(false,'should never get here');
         end
         
-        if error_if_not_present
+        if ~strcmp(env,'matlab')
+            msg=sprintf(['%s\n\nNote: your environment is %s, not '...
+                        '''native'' matlab - the %s may not work '...
+                        'in this environment'],msg,env,ext.label);
+        end
+        
+        if raise_
             error(msg);
         end
-        
     end
     
+    
+function is_ok=check_matlab_toolbox(toolbox_name,raise_)
+    if cosmo_wtf('is_matlab')
+        toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
+        is_ok=isdir(toolbox_dir);
+    else
+        is_ok=false;
+    end
+    if ~is_ok && raise_
+        error('The matlab toolbox ''%s'' seems absent',...
+                            toolbox_name);
+    end
         
 function s=url2str(url)
-    s=sprintf('<a href="%s">%s</a>',url,url);
+    if strcmp(cosmo_wtf('environment'),'matlab')
+        s=sprintf('<a href="%s">%s</a>',url,url);
+    else
+        s=url;
+    end
 
 function externals=get_externals()
     % helper function that defines the externals.
@@ -290,21 +335,25 @@ function externals=get_externals()
    
     
 
-function citation_str=get_citation_str(cached_external_names)
+function citation_str=get_citation_str(cached_present_names)
     % always cite CoSMoMVPA
     self='cosmo';
-    if ~any(cosmo_match(cached_external_names,self))
-        cached_external_names{end+1}=self;
+    if ~any(cosmo_match(cached_present_names,self))
+        cached_present_names{end+1}=self;
     end
     
     externals=get_externals();
     
-    n=numel(cached_external_names);
+    n=numel(cached_present_names);
     cites=cell(n,1);
+    cites_msk=false(n,1);
     
     for k=1:n
-        external_name=cached_external_names{k};
-        assert(isfield(externals,external_name));
+        external_name=cached_present_names{k};
+        if ~isfield(externals,external_name)
+            % built-in
+            continue;
+        end
         
         external=externals.(external_name);
         
@@ -322,10 +371,11 @@ function citation_str=get_citation_str(cached_external_names)
         cites{n-k+1}=sprintf('%s, %s. %savailable online from %s',...
                              cosmo_strjoin(external.authors,', '),...
                              title_str, url_prefix_str, external.url);
+        cites_msk(k)=true;
                     
     end
     
-    citation_str=cosmo_strjoin(cites,'\n\n');
+    citation_str=cosmo_strjoin(cites(cites_msk),'\n\n');
                     
         
         

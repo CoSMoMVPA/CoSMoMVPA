@@ -172,16 +172,19 @@ function path_fn=find_config_file(fn, raise_)
         end
         
         % is it in the user path?
-        upaths=cosmo_strsplit(userpath(),':');
-        for k=1:numel(upaths)
-            u_fn=fullfile(upaths{k},fn);
-            if exist_(u_fn)
-                path_fn=u_fn;
+        % (not supported on octave)
+        if cosmo_wtf('is_matlab')
+            upaths=cosmo_strsplit(userpath(),':');
+            for k=1:numel(upaths)
+                u_fn=fullfile(upaths{k},fn);
+                if exist_(u_fn)
+                    path_fn=u_fn;
+                    break;
+                end
+            end
+            if ~isempty(path_fn)
                 break;
             end
-        end
-        if ~isempty(path_fn)
-            break;
         end
 
         if isunix()

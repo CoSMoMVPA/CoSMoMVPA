@@ -42,13 +42,22 @@ subplot(3,2,2); imagesc(squareform(vt_dsm)); title('VT');
 
 
 % Now add the dendrograms for EV and LV in the middle row of the subplot figure 
+% (this requires matlab's stats toolbox)
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 %
 % >@@>
 ev_hclus = linkage(ev_dsm);
 vt_hclus = linkage(vt_dsm);
-subplot(3,2,3); dendrogram(ev_hclus,'labels',labels,'orientation','left');
-subplot(3,2,4); dendrogram(vt_hclus,'labels',labels,'orientation','left');
+
+% skip if stats toolbox is not present
+if cosmo_check_external('@stats',false)
+    subplot(3,2,3); 
+    dendrogram(ev_hclus,'labels',labels,'orientation','left');
+    subplot(3,2,4); 
+    dendrogram(vt_hclus,'labels',labels,'orientation','left');
+else
+    fprintf('stats toolbox not present; cannot show dendrograms\n');
+end
 % <@@<
 
 % Finally pu the MDS plots in the bottom row

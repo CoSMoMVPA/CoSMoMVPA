@@ -38,9 +38,15 @@ function ds=cosmo_generate_synthetic_dataset(class_distance, nclasses, nsamples_
         error('Cannot divide %d samples per class in %d chunks', numel(nsamples_per_class), nchunks);
     end
     
-    
-    s=rng;
-    rng('default');
+    is_matlab=cosmo_wtf('is_matlab');
+    if is_matlab
+        rng_state=rng;
+        rng('default');
+    else
+        rng_state=rand('state');
+        rand('state',0);
+    end
+        
     
     nsamples=nsamples_per_class*nclasses;
     
@@ -62,7 +68,12 @@ function ds=cosmo_generate_synthetic_dataset(class_distance, nclasses, nsamples_
         targets(idxs)=k;
         chunks(idxs)=mod(0:(nsamples_per_class-1),nchunks)+1;
     end
-    rng(s);
+    
+    if is_matlab
+        rng(rng_state);
+    else
+        rand('state',rng_state);
+    end
     
     ds=struct();
     ds.samples=data;
