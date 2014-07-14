@@ -29,16 +29,16 @@ ds.sa.chunks = floor(((1:60)-1)/6)'+1;
 %% Show the results
 
 %% print the dataset
-ds
+fprintf('\nDataset:\n')
+cosmo_disp(ds)
 
 %% print the sample attributes
-ds.sa
+fprintf('\nSample attributes (in full):\n')
+cosmo_disp(ds.sa,'edgeitems',Inf);
 
-%% print the chunks
-ds.sa.chunks
-
-%% print the targets
-ds.sa.targets
-
-
-
+%% print targets and chunks next to each other
+fprintf('\nTargets and chunks attributes (in full):\n')
+nsamples=size(ds.samples,1);
+fprintf('sample #   target   chunk\n');
+index_target_chunks=[(1:nsamples)', ds.sa.targets,ds.sa.chunks];
+cosmo_disp(index_target_chunks,'edgeitems',Inf);
