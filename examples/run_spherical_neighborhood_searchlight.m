@@ -86,8 +86,15 @@ end
 res_map=nbrhood;
 res_map.samples=accs;
 
-% use the following command to store the output map
-% >> cosmo_map2fmri(res_map,[data_path  '/spherical_neighborhood_searchlight.nii']);
+% little sanity check
+cosmo_check_dataset(ds);
+
+fprintf('Output dataset:\n');
+cosmo_disp(res_map);
+
+
+output_fn=fullfile(output_path, 'spherical_neighborhood_searchlight.nii');
+fprintf('Output written to %s\n', output_fn);
 
 %% Plot a few slices
 cosmo_plot_slices(res_map);
