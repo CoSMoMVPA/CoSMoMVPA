@@ -60,6 +60,11 @@ output=zeros(voldim);
 visited=false(voldim);
 
 %% Run the searchlight
+
+% for pretty progress reporting
+prev_msg=''; 
+clock_start=clock();
+
 % run over voxels in all three spatial dimensions
 for ii=1:voldim(1)
     for jj=1:voldim(2)
@@ -132,7 +137,8 @@ for ii=1:voldim(1)
         end
     end
     % Keep us updated on progress
-    fprintf('Completed %d / %d slices; mean so far %.3f\n', ii, voldim(1), mean(output(visited)));
+    msg=sprintf('%d slices: mean %.3f', ii, mean(output(visited)));
+    prev_msg=cosmo_show_progress(clock_start,ii/voldim(1),msg,prev_msg);
 end
 
 %% Save the results
