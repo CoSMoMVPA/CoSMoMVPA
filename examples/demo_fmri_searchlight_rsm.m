@@ -168,7 +168,16 @@ set(gca,'XTick',1:nsamples,'XTickLabel',ds.sa.labels,...
 measure=@cosmo_target_dsm_corr_measure;
 measure_args=struct();
 measure_args.target_dsm=target_dsm;
-measure_args.type='Spearman';
+
+% 'Spearman' requires  matlab with stats toolbox; if not present use
+% 'Pearson'
+if cosmo_check_external('@stats',false)
+    measure_args.type='Spearman';
+else
+    measure_args.type='Pearson';
+    fprintf('Matlab stats toolbox not present, using %s correlation\n',...
+                measure_args.type)
+end
 
 % run searchlight
 ds_rsm_linear=cosmo_searchlight(ds,measure,'args',measure_args,...
