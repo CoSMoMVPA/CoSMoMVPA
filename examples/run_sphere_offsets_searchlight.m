@@ -3,7 +3,10 @@
 % This analysis is quite bare-bones - data is simulated to come directly 
 % from load_nii rather than through fmri_dataset, and voxel indices in each
 % searchlight are computed directly in this script rather than using
-% a helper function such as sphereical_voxel_selection.
+% a helper function such as spherical_voxel_selection.
+%
+% Note: for running searchlights it is recommended to use 
+%       cosmo_searchlight and cosmo_spherical_neighborhood
 %
 % NNO Aug 2013
 
@@ -18,8 +21,7 @@ half1_fn=fullfile(data_path,'glm_T_stats_odd.nii');
 half2_fn=fullfile(data_path,'glm_T_stats_even.nii');
 mask_fn=fullfile(data_path,'brain_mask.nii');
 
-%% Do as if Load the data and extract the data in the mask
-% (as we use similated data computed above, don't load the data here)
+%% Load the data and extract the data in the mask
 ni_samples1=load_nii(half1_fn);
 ni_samples2=load_nii(half2_fn);
 ni_mask=load_nii(mask_fn);
