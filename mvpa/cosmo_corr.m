@@ -38,18 +38,21 @@ function c=cosmo_corr(x,y,corr_type)
 % See also: corr
 %
 % NNO Sep 2013 (from NNO's phoebe_corr, July 2010)
+    y_as_x=false;
 
     if nargin<2
         corr_type='Pearson';
-        y=x;
+        y_as_x=true;
     elseif ischar(y)
         corr_type=y;
-        y=x;
+        y_as_x=true;
     elseif nargin<3
         corr_type='Pearson';
     end
-
-
+    
+    if y_as_x
+        y=x;
+    end
 
     switch corr_type
         case 'Pearson'
@@ -70,6 +73,13 @@ function c=cosmo_corr(x,y,corr_type)
 
             % compute correlations
             c=n * (xd' * yd) .* (xs' * ys);
+            
+            if y_as_x
+                % ensure diagonal elements are 1
+                dc=diag(c);
+                c=(c-diag(dc))+eye(numel(dc));
+            end
+            
         otherwise
             % fall-back: use Matlab's function
             % will puke if no Matlab stat toolbox
