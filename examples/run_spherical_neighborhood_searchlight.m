@@ -2,11 +2,15 @@
 % this example implements a spherical searchlight using
 % cosmo_spherical_neighborhood and performs crossvalidation
 % with a nearest neigh classifier
+%
+% Note: for running searchlights it is recommended to use 
+%       cosmo_searchlight and cosmo_spherical_neighborhood
 
 
 %% Set up parameters
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+output_path=fullfile(config.output_data_path);
 
 fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 maskfn=fullfile(data_path,'brain_mask.nii');
@@ -17,7 +21,12 @@ classifier=@cosmo_classify_nn;
 classifier_opt=struct();
 
 %% load data and set sample attributes
-ds=cosmo_fmri_dataset(fn, 'mask', maskfn, 'targets', targets, 'chunks', chunks); 
+ds=cosmo_fmri_dataset(fn, 'mask', maskfn, ...
+                          'targets', targets, ...
+                          'chunks', chunks); 
+
+fprintf('Input dataset:\n');
+cosmo_disp(ds);
 
 %% define centers of searchlight
 nfeatures=size(ds.samples,2);
