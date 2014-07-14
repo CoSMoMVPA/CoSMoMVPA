@@ -33,39 +33,48 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
                             'metric','correlation',...
                             varargin);
     
+    if ~isfield(params,'target_dsm')
+        error('Missing parameter ''target_dsm''');
+    end
+                        
+    nsamples=size(ds.samples,1);
+    % for safety require targets to be 1:N
+    has_sa=isfield(ds,'sa');
+    if ~has_sa || ~isfield(ds.sa,'targets')
+        error('Missing field .sa.target');
+    elseif ~isequal(ds.sa.targets',1:nsamples)
+        msg('.sa.targets must be (1:%d)''',nsamples);
+        if isequal(unique(ds.sa.targets),(1:nsamples)');
+            msg=sprintf(['%s\nMultiple samples with the same chunks '...
+                            'can be averaged using cosmo_fx'],msg);
+        else
+            msg=sprintf(['%s\nConsider setting .sa.chunks to q, where '...
+                            '[~,~,q]=unique(ds.sa.targets)',msg]);
+        end
+        error(msg);
+    end
+                        
     % - compute the pair-wise distance between all dataset samples using
     %   cosmo_pdist and store in 'pd'
     % >@@>    
     pd = cosmo_pdist(ds.samples, params.metric);
     % <@@<
     
-    nsamples_pd=size(pd,1);
+    nsamples_pd=numel(pd);
     target_dsm=params.target_dsm;
     
-    if nsamples_pd==size(target_dsm,1)
-        % target_dsm is a vector
-        
-        % check size
-        if numel(target_dsm)~=nsamples_pd
-            error('target_dsm should be column vector or square')
-        end
-        
+    if isvector(target_dsm)
         target_dsm_vec=target_dsm;
     else
-        % target_dsm is a square matrix
-        
-        % convert params.target_dsm to squareform (using cosmo_squareform)
-        %  and store in 'target_dsm_vec'
-        % >@@> 
+        % convert square matrix to vector
         target_dsm_vec=cosmo_squareform(params.target_dsm);
-        % <@@<
-    
-        % check size
-        if numel(pd) ~= numel(target_dsm_vec),
-            error(['Size mismatch between dataset (%d) '...
-                    'and target dsm (%d)'], ...
+    end
+        % target_dsm is a vector
+        
+    if numel(pd) ~= numel(target_dsm_vec),
+        error(['Sample size mismatch between dataset (%d) '...
+                    'and target dsm in vector form (%d)'], ...
                         numel(pd) ~= numel(target_dsm_vec));
-        end
     end
 
     % >@@> 
