@@ -52,6 +52,11 @@ accs=zeros(1,ncenters);
 % desired features using center2neighbors, then use cosmo_crossvalidate
 % to get classification accuracies (it's its second output argument),
 % and store the classiifcation accuracies.
+
+% use cosmo_show_progress to show a pretty progress bar
+prev_msg=''; 
+clock_start=clock(); 
+show_progress_every=1000;
 for k=1:ncenters
     % >@@>
     center_id=center_ids(k);
@@ -60,16 +65,20 @@ for k=1:ncenters
     sphere_ds=cosmo_slice(ds, sphere_feature_ids, 2);
     
     % run cross validation
-    [pred_cv,acc]=cosmo_crossvalidate(sphere_ds, classifier, partitions, classifier_opt);
+    [pred_cv,acc]=cosmo_crossvalidate(sphere_ds, classifier, ...
+                                        partitions, classifier_opt);
     
     % for now, just store the accuracy (not the predictions)
     accs(center_id)=acc;
     
-    % show progress every 1000 steps, and a the beginning and end.
-    if k==1 || mod(k,1000)==0 || k==nfeatures
-        fprintf('%d / %d features: average accuracy %.3f\n', k, nfeatures, mean(accs(1:k)));
-    end
     % <@@<
+    
+    % show progress every 1000 steps, and at the beginning and end.
+    if k==1 || mod(k,show_progress_every)==0 || k==nfeatures
+        mean_so_far=mean(accs(1:k));
+        msg=sprintf('accuracy %.3f (%d features visited)', k, mean_so_far);
+        prev_msg=cosmo_show_progress(clock_start,k/ncenters,msg,prev_msg); 
+    end
 end
 
 %% store the output
