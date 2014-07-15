@@ -24,7 +24,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %
 % NNO Feb 2014
     
-    if nargin<4, opt=struct(); end
+    has_opt=nargin>4 && ~isempty(fieldnames(opt));
     
     [ntrain, nfeatures]=size(samples_train);
     [ntest, nfeatures_]=size(samples_test);
@@ -33,9 +33,15 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end
 
     % construct options string for svmtrain
-    opt=cosmo_structjoin('t',2,opt); % use linear kernel by default
-    opt_str=libsvm_opt2str(opt);
-        
+    if has_opt
+        default_opt=struct();
+        default_opt.t=0; % linear
+        default.opt.q=true; % no output
+        opt_str=libsvm_opt2str(default_opt,opt);
+    else
+        opt_str='-t 0 -q';
+    end 
+    
     % train
     m=svmtrain(targets_train, samples_train, opt_str);
     
@@ -59,6 +65,8 @@ function opt_str=libsvm_opt2str(opt)
             v=opt.(fn);
             if isnumeric(v)
                 v=sprintf('%d',v);
+            else
+                v='';
             end
             
             opt_cell{2*k}=v;
