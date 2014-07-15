@@ -2,13 +2,14 @@
 License information
 ^^^^^^^^^^^^^^^^^^^
 
-CoSMoMVPA is Copyright (c) 2013 Nikolaas N. Oosterhof, Andrew C. Connolly.
+CoSMoMVPA is Copyright (c) 2013-2014 Nikolaas N. Oosterhof, Andrew C. Connolly.
 
 Parts of CoSMoMVPA are distributed under different licenses, included below:
 
 - Matlab source code is distributed under the 'MIT License'. Matlab source code snippets in documentation and generated documentation files containing Matlab source code (preceded by a line containing '``.. code-block:: matlab``'), and components of the build system, are distributed under the 'MIT license'. Exception: external libaries (in the directory 'external/' are distributed under the license included in their respective directories.
 - All documentation, excluding Matlab source code (see above), is distributed under the 'Creative Commons Attribution-ShareAlike 3.0 Unported' license. 
 - Datasets are distributed under the licenses included in their respective LICENSE files.
+- The NIfTI library (included in the "external" directory) is copyright (c) 2014 Jimmy Shen, distributed under a BSD license. See license.txt in the NIfTI directory for details.
 
 ====================================================
 The MIT License (MIT)
