@@ -20,6 +20,7 @@ We would like to thank the following people for specific contributions:
 +  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing an MEEG dataset.
 +  **S. Eddins** for the MATLAB xUnit_ Test Framework.
 +  **T. Smith** for inspiration for the doctest functionality.
++  **J. Shen** for providing the NIfTI toolbox.
 
 The following people have provided valuable suggestions, advice, support, or code to PyMVPA:
 
