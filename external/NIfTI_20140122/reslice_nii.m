@@ -20,7 +20,7 @@
 %
 %  voxel_size (optional)  - size of a voxel in millimeter along x y z
 %		direction for resliced NIfTI file. 'voxel_size' will use
-%		the rounded minimum voxel_size in original NIfTI header,
+%		the minimum voxel_size in original NIfTI header,
 %		if it is default or empty.
 %
 %  verbose (optional) - 1, 0
@@ -55,7 +55,7 @@
 %
 %  NIFTI data format can be found on: http://nifti.nimh.nih.gov
 %  
-%  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
+%  - Jimmy Shen (jshen@research.baycrest.org)
 %
 function reslice_nii(old_fn, new_fn, voxel_size, verbose, bg, method, img_idx, preferredForm)
 
