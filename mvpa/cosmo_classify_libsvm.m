@@ -14,7 +14,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %
 % Notes:
 %  - LIBSVM is required: http://www.csie.ntu.edu.tw/~cjlin/libsvm
-%  - by default a linear kernel is used ('-t 2')
+%  - by default a linear kernel is used ('-t 0')
 %  - this function uses LIBSVM's svmtrain function, which has the same 
 %    name as matlab's builtin version. Use of this function is not
 %    supported when matlab's svmtrain precedes in the matlab path; in 
