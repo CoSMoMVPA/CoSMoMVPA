@@ -296,7 +296,7 @@ function externals=get_externals()
                               'doi:10.1155/2011/156869'];
 
     externals.libsvm.is_present=@() has('svmpredict') && ...
-                                        has('svmptrain');
+                                        has('svmtrain');
     externals.libsvm.is_recent=yes;
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
