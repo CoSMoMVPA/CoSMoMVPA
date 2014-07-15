@@ -41,7 +41,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     % for safety require targets to be 1:N
     has_sa=isfield(ds,'sa');
     if ~has_sa || ~isfield(ds.sa,'targets')
-        error('Missing field .sa.target');
+        error('Missing field .sa.targets');
     elseif ~isequal(ds.sa.targets',1:nsamples)
         msg('.sa.targets must be (1:%d)''',nsamples);
         if isequal(unique(ds.sa.targets),(1:nsamples)');
