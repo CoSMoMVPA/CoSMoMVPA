@@ -156,8 +156,9 @@ ds_sa.sa=sa;
 
 function samples=mean_sample(samples)
 
-if size(samples,1)>1
-    samples=mean(samples,1);
+nsamples=size(samples,1);
+if nsamples>1
+    samples=sum(samples,1)/nsamples;
 end
 
         

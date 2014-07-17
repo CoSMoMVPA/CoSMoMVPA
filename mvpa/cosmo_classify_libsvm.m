@@ -36,7 +36,6 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     if has_opt
         default_opt=struct();
         default_opt.t=0; % linear
-        default.opt.q=true; % no output
         opt_str=libsvm_opt2str(default_opt,opt);
     else
         opt_str='-t 0 -q';
@@ -65,8 +64,6 @@ function opt_str=libsvm_opt2str(opt)
             v=opt.(fn);
             if isnumeric(v)
                 v=sprintf('%d',v);
-            else
-                v='';
             end
             
             opt_cell{2*k}=v;
@@ -75,7 +72,7 @@ function opt_str=libsvm_opt2str(opt)
         opt_cell=cell(1);
     end
     
-    opt_cell{end}='-q';
+    opt_cell{end}='-q'; % quiet (no output to terminal window)
     opt_str=cosmo_strjoin(opt_cell,' ');
     
             

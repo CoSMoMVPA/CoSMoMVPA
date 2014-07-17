@@ -33,7 +33,7 @@ function cosmo_set_path()
     % get matlab path, each path in a cell
     pathsep_=pathsep(); % store path separator
     matlab_pth=cosmo_strsplit(path(),pathsep_);
-
+    
     for add=[0,1]
         subdirs=remove_add_subdirs{add+1};
 
