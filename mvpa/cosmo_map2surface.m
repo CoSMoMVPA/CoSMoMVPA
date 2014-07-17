@@ -137,6 +137,10 @@ function s=build_bv_smp(ds)
             end
         end
         
+        if ~isempty(stats) && ~isempty(stats{k})
+            map=cosmo_structjoin(map, stats{k});
+        end
+        
         map.BonferroniValue=nfeatures;
         
         maps{k}=map;
