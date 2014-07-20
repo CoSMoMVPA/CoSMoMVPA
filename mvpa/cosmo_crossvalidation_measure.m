@@ -52,7 +52,7 @@ switch params.output
         ds_sa.sa.labels={'accuracy'};
     case 'predictions'
         ds_sa.sa.targets=dataset.sa.targets;
-        ds_sa.sa.predictions=pred(:);
+        ds_sa.samples=pred(:);
     otherwise
         error('Illegal output parameter %s', params.output);
 end
