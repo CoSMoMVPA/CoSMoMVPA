@@ -82,12 +82,24 @@ function is_ok=cosmo_check_external(external, raise_)
 
     persistent cached_present_names
     persistent cached_absent_names;
+    persistent cached_path;
 
     if nargin<2
         raise_=true;
     end
+    
+    path_has_changed=false;
+    if isempty(cached_path);
+        cached_path=path();
+    else
+        p=path();
+        % use fast strncmp function instead of strcmp
+        n=max(numel(cached_path),numel(path));
+        path_has_changed=~strncmp(p,cached_path,n);
+    end
 
-    if strcmp(external,'-tic')
+    if path_has_changed || strcmp(external,'-tic')
+        warning('Path change detection; resetting cache');
         % clear cache
         cached_present_names=[];
         cached_absent_names=[];
