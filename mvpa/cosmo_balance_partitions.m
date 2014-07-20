@@ -18,8 +18,8 @@ function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
 %
 % Example:
 %  % ds is a dataset with chunks and targets
-%  >> partitions=cosmo_nchoosek_partitioner(ds, 1); % take-1-fold-out
-%  >> partitions=cosmo_balance_partitions(partitions);
+%  partitions=cosmo_nchoosek_partitioner(ds, 1); % take-1-fold-out
+%  partitions=cosmo_balance_partitions(partitions, ds);
 %
 % Notes:
 % - this function is intended for datasets where the number of
