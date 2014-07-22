@@ -88,8 +88,8 @@ function is_ok=cosmo_check_external(external, raise_)
         raise_=true;
     end
     
-    path_has_changed=false;
-    if isempty(cached_path);
+    path_has_changed=isempty(cached_path);
+    if path_has_changed
         cached_path=path();
     else
         p=path();
@@ -99,7 +99,6 @@ function is_ok=cosmo_check_external(external, raise_)
     end
 
     if path_has_changed || strcmp(external,'-tic')
-        warning('Path change detection; resetting cache');
         % clear cache
         cached_present_names=[];
         cached_absent_names=[];
