@@ -1,6 +1,6 @@
 %% Cross validation example with multiple classifiers
 % This example runs cross validation and shows confusion matrix using
-% multiple 
+% multiple classifiers
 
 %% Define data
 config=cosmo_config();
