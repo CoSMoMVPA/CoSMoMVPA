@@ -24,9 +24,10 @@ We would like to thank the following people for specific contributions:
 
 The following people have provided valuable suggestions, advice, support, or code to PyMVPA:
 
-+ Daniel Kaiser
 + Thomas Hartmann
 + James Haxby
++ Daniel Kaiser
++ James Keidel
 + Nicholas Peatfield
 + Reshanne Reader
 + Jens Schwarzbach

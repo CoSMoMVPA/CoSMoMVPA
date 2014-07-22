@@ -1,4 +1,4 @@
-function ds_sa = cosmo_crossvalidation_measure(dataset, varargin)
+function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 % performs cross-validation using a classifier
 %
 % accuracy = cosmo_cross_validation_accuracy_measure(dataset, args)
@@ -41,7 +41,7 @@ partitions=params.partitions;
 
 params=rmfield(params,'classifier');
 params=rmfield(params,'partitions');
-[pred, accuracy]=cosmo_crossvalidate(dataset, classifier, partitions, params);
+[pred, accuracy]=cosmo_crossvalidate(ds,classifier,partitions,params);
 % <@@<
 
 ds_sa=struct();
@@ -51,7 +51,7 @@ switch params.output
         ds_sa.samples=accuracy;
         ds_sa.sa.labels={'accuracy'};
     case 'predictions'
-        ds_sa.sa.targets=dataset.sa.targets;
+        ds_sa.sa.targets=ds.sa.targets;
         ds_sa.samples=pred(:);
     otherwise
         error('Illegal output parameter %s', params.output);

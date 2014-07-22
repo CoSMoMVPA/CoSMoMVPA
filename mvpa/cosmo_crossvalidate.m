@@ -10,22 +10,27 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %                       @classify_naive_baysian
 %   partitions          For example the output from nfold_partition
 %   opt                 optional struct with options for classifier
+%     .normalization    optional, one of '{zscore,demean,scale_unit}{1,2}' 
+%                       to normalize the data prior to classification using
+%                       zscoring, demeaning or scaling to [-1,1] along the
+%                       first or second dimension of ds. Normalization
+%                       parameters are estimated using the training data
+%                       and applied to the testing data.
 %   
 % Output
 %   pred                Qx1 array with predicted class labels
 %
 % NNO Aug 2013 
     if nargin<4,opt=struct(); end
-    if ~isfield(opt, 'normalize'), opt.normalize=[]; end
+    if ~isfield(opt, 'normalization'), opt.normalization=[]; end
     if ~isfield(opt, 'check_partitions'), opt.check_partitions=true; end
     
-    % optionally de-mean or zscore the data
-    % since class label information is not used here, there is no circular
-    % analysis problem.
-    if ~isempty(opt.normalize)
-        ds=cosmo_normalize(ds, opt.normalize);
+    if ~isempty(opt.normalization);
+        normalization=opt.normalization;
+    else
+        normalization=[];
     end
-    
+        
     if opt.check_partitions
         cosmo_check_partitions(partitions, ds);
     end
@@ -46,20 +51,29 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     
     % keep track for which samples there has been a prediction
     test_mask=false(nsamples,1); 
+    
+    % process each fold
     for k=1:npartitions
         train_idxs=train_indices{k};
-        test_idxs=test_indices{k};
-       
-        
-        % for each partition get the training and test data,
-        % then get predictions for the training samples using
-        % the classifer, and store these in the k-th column of all_pred.
+        test_idxs=test_indices{k}; 
+        % for each partition get the training and test data, store in
+        % train_data and test_data
         % >@@>
         train_data = ds.samples(train_idxs,:);
         test_data = ds.samples(test_idxs,:);
+        % <@@<
+        
+        % apply normalization
+        if ~isempty(normalization)
+            [train_data,params]=cosmo_normalize(train_data,normalization);
+            test_data=cosmo_normalize(test_data,params);
+        end
+            
+        % >@@>
+        % then get predictions for the training samples using
+        % the classifier, and store these in the k-th column of all_pred.
         
         train_targets = targets(train_idxs);
-        
         p = classifier(train_data, train_targets, test_data, opt);
         
         all_pred(test_idxs,k) = p;
