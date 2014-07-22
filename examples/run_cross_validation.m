@@ -43,3 +43,27 @@ for k=1:nclassifiers
     title(sprintf('%s: %.3f', strrep(func2str(classifier),'_',' '), accuracy))
     
 end
+
+%% Consider effect or normalization
+normalizations={'zscore1',...
+                'demean1',...
+                'scale_unit1',...
+                'none'};
+
+for k=1:nclassifiers
+    classifier=classifiers{k};
+    classifier_name=strrep(func2str(classifier),'_',' ');
+    for j=1:numel(normalizations)
+        opt=struct();
+        opt.normalization=normalizations{j};
+        [pred,accuracy]=cosmo_crossvalidate(ds,classifier,partitions,opt);
+        
+        fprintf('%s with %s-normalization: %.3f\n', classifier_name,...
+                opt.normalization, accuracy);
+    end
+end
+        
+        
+        
+        
+
