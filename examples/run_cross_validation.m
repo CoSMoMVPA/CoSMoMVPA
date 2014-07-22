@@ -19,8 +19,8 @@ classifiers={@cosmo_classify_nn,...
              @cosmo_classify_lda};
 
 % if matlab stats toolbox is present, also run svm
-if cosmo_check_external('@stats',false)
-    classifiers{end+1}=@cosmo_classify_svm;
+if cosmo_check_external('libsvm',false)
+    classifiers{end+1}=@cosmo_classify_libsvm;
 end    
 % <@@<         
 nclassifiers=numel(classifiers);
