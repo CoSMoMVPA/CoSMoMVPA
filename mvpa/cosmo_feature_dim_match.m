@@ -5,6 +5,7 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 % msk=cosmo_match(ds, haystack1, needle1[, needle2, haystack2, ...])
 %
 % Inputs:
+%   ds                dataset struct or neighborhood struct
 %   haystack*         numeric vector, or cell with strings. A string is
 %                     also allowed and interpreted as the name of a feature
 %                     dimension ('i','j' or 'k' in fmri datasets; 'chan',
@@ -45,7 +46,13 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 % See also: cosmo_match
 %
 % NNO Oct 2013
-    cosmo_check_dataset(ds);
+    if ~isstruct(ds)
+        error('expected a struct as input');
+    end
+       
+    if ~isfield(ds,'neighbors')
+        cosmo_check_dataset(ds);
+    end
 
     if ischar(dim_label)
         % get value for needle and haystack
