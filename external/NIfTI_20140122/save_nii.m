@@ -89,16 +89,19 @@ function save_nii(nii, fileprefix, old_RGB)
 
    %  Note: fileprefix is actually the filename you want to save
    %   
-   if findstr('.nii',fileprefix) & strcmp(fileprefix(end-3:end), '.nii')
+   if ~isempty(findstr('.nii',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.nii')
       filetype = 2;
       fileprefix(end-3:end)='';
    end
    
-   if findstr('.hdr',fileprefix) & strcmp(fileprefix(end-3:end), '.hdr')
+   if ~isempty(findstr('.hdr',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.hdr')
       fileprefix(end-3:end)='';
    end
    
-   if findstr('.img',fileprefix) & strcmp(fileprefix(end-3:end), '.img')
+   if ~isempty(findstr('.img',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.img')
       fileprefix(end-3:end)='';
    end
 
@@ -229,7 +232,7 @@ function write_nii(nii, filetype, fileprefix, old_RGB)
    
    x = 1:PixelDim;
 
-   if filetype == 2 & isempty(ext)
+   if filetype == 2 && isempty(ext)
       skip_bytes = double(hdr.dime.vox_offset) - 348;
    else
       skip_bytes = 0;
@@ -268,7 +271,7 @@ function write_nii(nii, filetype, fileprefix, old_RGB)
    %  For complex float32 or complex float64, voxel values
    %  include [real, imag]
    %
-   if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
+   if hdr.dime.datatype == 32 || hdr.dime.datatype == 1792
       real_img = real(nii.img(:))';
       nii.img = imag(nii.img(:))';
       nii.img = [real_img; nii.img];
