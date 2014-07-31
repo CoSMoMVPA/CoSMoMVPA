@@ -98,7 +98,7 @@ function is_ok=cosmo_check_external(external, raise_)
         path_has_changed=~strncmp(p,cached_path,n);
     end
 
-    if path_has_changed || strcmp(external,'-tic')
+    if path_has_changed || (ischar(external) && strcmp(external,'-tic'))
         % clear cache
         cached_present_names=[];
         cached_absent_names=[];
