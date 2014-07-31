@@ -199,9 +199,11 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         % if a mask was supplied, load it
         if ischar(p.mask)
             m = read_img(p.mask, img_formats);
-        elseif isequal(p.mask, true)
-            m = auto_mask;
-        elseif isnumeric(mask) || islogical(mask)
+        elseif islogical(p.mask)
+            % if true, use automask
+            % if false, use all features
+            m = bsxfun(@or,auto_mask,~p.mask);
+        elseif isnumeric(p.mask) || islogical(p.mask)
             m = p.mask;
         else
             error('Weird mask, need string, array, or ''true''');
