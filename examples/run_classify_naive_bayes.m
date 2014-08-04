@@ -35,7 +35,7 @@ odds = cosmo_slice(ds2, odd_idx);
 pred = cosmo_classify_naive_bayes(evens.samples, evens.sa.targets, odds.samples);
 accuracy = mean(odds.sa.targets == pred);
 fprintf('Train on even, test on odd: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be .70 
+% Answer: accuracy should be .70
 
 %% train on odd, test on even
 pred = cosmo_classify_naive_bayes(odds.samples, odds.sa.targets,evens.samples);
@@ -43,4 +43,4 @@ accuracy = mean(evens.sa.targets == pred);
 fprintf('Train on odd, test on even: accuracy %.3f\n', accuracy);
 % Answer: accuracy = .60
 
- 
+

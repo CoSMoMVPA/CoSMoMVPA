@@ -11,4 +11,4 @@ catch
 end
 
 % ensure that state is restored even if randn raised an exception
-rng(rng_state); 
+rng(rng_state);

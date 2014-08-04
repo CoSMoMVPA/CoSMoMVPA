@@ -107,7 +107,7 @@ function ext = load_nii_ext(filename)
 
    fid = fopen(fn,'r',machine);
    vox_offset = 0;
-    
+
    if fid < 0,
       msg = sprintf('Cannot open file %s.',fn);
       error(msg);

@@ -1,5 +1,5 @@
 function s=cosmo_wtf(param)
-% return system, toolbox and externals information 
+% return system, toolbox and externals information
 %
 % s=cosmo_wtf([param])
 %
@@ -8,8 +8,8 @@ function s=cosmo_wtf(param)
 %
 % Output:
 %
-%   s         - if param is not provided it returns a string 
-%               representation with system information; 
+%   s         - if param is not provided it returns a string
+%               representation with system information;
 %             - if param is 'is_{octave,matlab}' a boolean is returned
 %             - if param is one of 'computer', 'environment', version',
 %               'matlab_toolboxes', 'cosmo_externals', 'cosmo_files'
@@ -83,11 +83,11 @@ function s=environment()
 
 function tf=environment_is_octave()
     tf=logical(exist('OCTAVE_VERSION', 'builtin'));
-    
+
 function tf=environment_is_matlab()
     % assume either matlab or octave, no third interpretr
     tf=~environment_is_octave();
-    
+
 function s=version_()
     if environment_is_matlab()
         [version_,date_]=version();
@@ -95,25 +95,25 @@ function s=version_()
     else
         s=sprintf('%s',version());
     end
-    
+
 function s=matlab_toolboxes()
     if ~environment_is_matlab()
         s=sprintf('not supported in environment ''%s''',environment());
         return
     end
-    
+
     d=dir(toolboxdir(''));
     to_omit={'.','..','matlab','system'};
     s=dir2str(d,to_omit);
-    
+
 function s=cosmo_externals()
     s=cosmo_strjoin(cosmo_check_external('-list'),', ');
-    
-function s=cosmo_files()    
+
+function s=cosmo_files()
     pth=fileparts(which(mfilename())); % cosmo root directory
     d=cosmo_dir(pth,'cosmo_*.m'); % list files
     s=dir2str(d);
-    
+
 function s=cosmo_config()
     try
         c=cosmo_config();
@@ -130,19 +130,19 @@ function s=cosmo_config()
         s=e.getReport();
     end
 
-    
+
 function s=dir2str(d, to_omit)
 % d is the result from 'dir' or 'cosmo_dir'
 if nargin<2, to_omit=cell(0); end
 
-n=numel(d); 
+n=numel(d);
 ww=cell(n+1,1); % allocate space for output
 ww{1}='';       % start with newline
 pos=1;
 for k=1:n
     dk=d(k);
     name=dk.name;
-    
+
     if ~any(cosmo_match(to_omit, {name}))
         pos=pos+1;
         ww{pos}=sprintf('  %s % 10d %s',dk.date,dk.bytes,dk.name);

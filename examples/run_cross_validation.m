@@ -13,7 +13,7 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'chunks',floor(((1:60)-1)/6)+1);
 
 %% Define classifiers in a cell
-% >@@> 
+% >@@>
 classifiers={@cosmo_classify_nn,...
              @cosmo_classify_naive_bayes,...
              @cosmo_classify_lda};
@@ -21,8 +21,8 @@ classifiers={@cosmo_classify_nn,...
 % if matlab stats toolbox is present, also run svm
 if cosmo_check_external('libsvm',false)
     classifiers{end+1}=@cosmo_classify_libsvm;
-end    
-% <@@<         
+end
+% <@@<
 nclassifiers=numel(classifiers);
 
 %% Define partitions
@@ -35,13 +35,13 @@ for k=1:nclassifiers
     classifier=classifiers{k};
     % >@@>
     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
-    
+
     confusion_matrix=cosmo_confusion_matrix(ds, pred);
     % <@@<
     figure
     imagesc(confusion_matrix,[0 10])
     title(sprintf('%s: %.3f', strrep(func2str(classifier),'_',' '), accuracy))
-    
+
 end
 
 %% Consider effect or normalization
@@ -57,13 +57,13 @@ for k=1:nclassifiers
         opt=struct();
         opt.normalization=normalizations{j};
         [pred,accuracy]=cosmo_crossvalidate(ds,classifier,partitions,opt);
-        
+
         fprintf('%s with %s-normalization: %.3f\n', classifier_name,...
                 opt.normalization, accuracy);
     end
 end
-        
-        
-        
-        
+
+
+
+
 

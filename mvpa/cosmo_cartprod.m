@@ -4,26 +4,26 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 % p=cosmo_cartprod(xs[, convert_to_numeric])
 %
 % Inputs:
-%   xs                   Px1 cell array with values for which the product 
+%   xs                   Px1 cell array with values for which the product
 %                        is to be returned. Each element xs{k} should be a
-%                        cell with Qk values; or a numeric array 
+%                        cell with Qk values; or a numeric array
 %                        [xk_1,...,xk_Qk] which is interpreted as the cell
 %                        {xk_1,...,xk_Qk}.
 %                        Alternatively xs can be a struct with P fieldnames
 %                        where each value is a cell with Qk values.
-%                         
-%   convert_to_numeric   Optional; if true (default), then when the output 
+%
+%   convert_to_numeric   Optional; if true (default), then when the output
 %                        contains numeric values only a numerical matrix is
 %                        returned; otherwise a cell is returned.
 % Output:
 %   p                    QxP cartesian product of xs (where Q=Q1*...*Qk)
 %                        containing all combinations of values in xs.
-%                        - If xs is a cell, then p is represented by either 
-%                          a matrix (if all values in xs are numeric and 
-%                          convert_to_numeric==true) or a cell (in all 
-%                          other cases). 
+%                        - If xs is a cell, then p is represented by either
+%                          a matrix (if all values in xs are numeric and
+%                          convert_to_numeric==true) or a cell (in all
+%                          other cases).
 %                        - If xs is a struct, then p is a Qx1 cell. Each
-%                          element in p is a struct with the same 
+%                          element in p is a struct with the same
 %                          fieldnames as xs.
 %
 % Examples:
@@ -34,7 +34,7 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     cosmo_cartprod({[1,2],[5,6,7]})'
 %     > [1,2,1,2,1,2;
 %     >  5,5,6,6,7,7]
-% 
+%
 %     cosmo_cartprod(repmat({1:2},1,4))'
 %     > [1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2;
 %     >  1 1 2 2 1 1 2 2 1 1 2 2 1 1 2 2;
@@ -69,7 +69,7 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     > #9:Rv1
 %     > #9:Rloc
 %
-% 
+%
 % NNO Oct 2013
 
 if nargin<2, convert_to_numeric=true; end
@@ -80,18 +80,18 @@ if as_struct
     % input is a struct; put the values in each field in a cell.
     s=xs; % make a copy
     fns=fieldnames(s);
-    ndim=numel(fns); 
+    ndim=numel(fns);
     xs=cell(1,ndim); % space for values in each dimension
     for k=1:ndim
         xs{k}=s.(fns{k});
     end
-    
+
     if ndim==0
         p=xs;
         return
     end
 end
-    
+
 if iscell(xs)
     ndim=numel(xs);
 else
@@ -116,11 +116,11 @@ else
     me=str2func(mfilename()); % make imune to renaming of this function
     xtail=xs(2:end);
     ptail=me(xtail, false); % ensure output is always a cell
-    
+
     % get sizes of head and tail
     nhead=numel(xhead);
     ntail=size(ptail,1);
-    
+
     % allocate space for output
     rows=cell(nhead,1);
     for k=1:ntail
@@ -130,19 +130,19 @@ else
         ptailk_rep=repmat(ptail(k,:),nhead,1);
         rows{k}=cat(2,xhead,ptailk_rep);
     end
-    
+
     % stack the rows vertically
     p=cat(1,rows{:});
 end
 
 % if input was a struct, output is a cell with structs
 if as_struct();
-    % number of output 
+    % number of output
     n=size(p,1);
-    
+
     % allocate space for structs
     p_cell=cell(n,1);
-    
+
     % set values for each struct
     for k=1:n
         s=struct();
@@ -152,7 +152,7 @@ if as_struct();
         end
         p_cell{k}=s;
     end
-    
+
     % use value of q in output
     p=p_cell;
 elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))

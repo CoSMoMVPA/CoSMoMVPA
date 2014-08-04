@@ -10,7 +10,7 @@ function test_searchlight_
     assertVectorsAlmostEqual(histc(m.samples,[38 46 47 100 123]),...
                             [ 24 24 558 352 35])
 
-                        
+
     m=cosmo_searchlight(ds, measure,'radius',-18,'progress',0);
     assertVectorsAlmostEqual(histc(m.samples,[18 19 20 23 26]),...
                             [398 495 8 24 76]);
@@ -19,9 +19,9 @@ function test_searchlight_
     m=cosmo_searchlight(d, measure,'radius',-18,'progress',0);
     assertVectorsAlmostEqual(histc(m.samples,[18 19 21]),[80 56 150]);
     assertVectorsAlmostEqual(m.samples([100 201]),[21 18]);
-    
-                        
-                        
+
+
+
     % bit of a smoke test
     measure=@cosmo_correlation_measure;
 

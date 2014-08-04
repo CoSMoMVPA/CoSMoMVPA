@@ -9,7 +9,7 @@
 %    4 blocks with presses of each finger and analyzed with the GLM,
 %    resulting in 2*4*4=32 t-values
 %
-% The example shows four possible searchlight analyses, covering typical 
+% The example shows four possible searchlight analyses, covering typical
 % use cases:
 %   1) single or twin surfaces
 %      + Caret and BrainVoyager use a single surface; a parameter 'offsets'
@@ -33,8 +33,8 @@
 % disc for which the metric radius varies from node to node. For a fixed
 % metric radius of the disc, use a positive value for 'radius' below.
 % Distances are measured across the cortical surface using a geodesic
-% distance metric. 
-% 
+% distance metric.
+%
 % This example requires the surfing toolbox, github.com/nno/surfing
 %
 % This example may take quite some time to run. For faster execution, set
@@ -42,7 +42,7 @@
 %
 % If you use this code for a publication, please cite:
 % Oosterhof, N.N., Wiestler, T, Downing, P.E., & Diedrichsen, J. (2011)
-% A comparison of volume-based and surface-based information mapping. 
+% A comparison of volume-based and surface-based information mapping.
 % Neuroimage. DOI:10.1016/j.neuroimage.2010.04.270
 %
 % NNO Jan 2014
@@ -67,7 +67,7 @@ cosmo_check_external('-tic');
 
 % resolution parameter for input surfaces
 % 64 is for high-quality results; use 16 for fast execution
-ld=16; 
+ld=16;
 
 % Twin surface case (FS)
 pial_fn=fullfile(digit_study_path,...
@@ -87,15 +87,15 @@ inflated_fn=fullfile(digit_study_path,...
 % Set parameters
 
 % Searchlight radius: select 100 features in each searchlight
-% (to use a fixed radius of 8mm, set radius=8)            
+% (to use a fixed radius of 8mm, set radius=8)
 
-radius=-100; 
+radius=-100;
 
-% Single surface case: select voxels that are 3 mm or closer to the surface  
-% on the white-matter side, up to voxels that are 2 mm from the surface on 
-% the pial matter side             
-single_surf_offsets=[-2 3];             
-             
+% Single surface case: select voxels that are 3 mm or closer to the surface
+% on the white-matter side, up to voxels that are 2 mm from the surface on
+% the pial matter side
+single_surf_offsets=[-2 3];
+
 % Single surface case: number of iterations to downsample surface
 lowres_output_onesurf_niter=10;
 
@@ -105,7 +105,7 @@ lowres_intermediate_fn=fullfile(digit_study_path,...
                                 sprintf('ico%d_mh.intermediate_al.asc',...
                                         lowres_output_twosurf_icold));
 
-                                    
+
 % Use the cosmo_cross_validation_measure and set its parameters
 % (classifier and partitions) in a measure_args struct.
 measure = @cosmo_crossvalidation_measure;
@@ -115,8 +115,8 @@ measure_args = struct();
 % Alternatives are @cosmo_classify_{svm,nn,naive_bayes}
 measure_args.classifier = @cosmo_classify_lda;
 
-                                 
-                                    
+
+
 %% Load functional data
 data_path=digit_study_path;
 data_fn=fullfile(data_path,'glm_T_stats_perblock+orig');
@@ -136,12 +136,12 @@ fprintf('Dataset has %d samples and %d features\n', size(ds.samples));
 fprintf('Dataset input:\n');
 cosmo_disp(ds);
 
-%% Set partition scheme to odd-even partitioning. 
+%% Set partition scheme to odd-even partitioning.
 %
 % Alternatives are:
 % + cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
 % + cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
-measure_args.partitions = cosmo_oddeven_partitioner(ds);    
+measure_args.partitions = cosmo_oddeven_partitioner(ds);
 
 % print measure and arguments
 fprintf('Searchlight measure:\n');
@@ -161,39 +161,39 @@ for one_surf=[true,false]
     else
         desc='2surfs';
     end
-    
+
     for lowres_output=[false,true]
         if lowres_output
             desc=sprintf('%s_lowres', desc);
         end
         fprintf('\n\n *** Starting analysis with %s *** \n\n\n', desc)
-        
+
         % define searchlight surface paramters for each type of analysis
         if one_surf && lowres_output
-            
+
             % single surface (Caret/BV) with lower-res output
             surf_def={intermediate_fn,single_surf_offsets,...
                             lowres_output_onesurf_niter};
-                        
+
         elseif one_surf && ~lowres_output
-            
+
             % single surface (Caret/BV) with original-res output
             surf_def={intermediate_fn,single_surf_offsets};
-            
+
         elseif ~one_surf && lowres_output
-            
+
             % single surface (FS) with lower-res output
             surf_def={white_fn,pial_fn,lowres_intermediate_fn};
-            
+
         elseif ~one_surf && ~lowres_output
-            
+
             % single surface (FS) with original-res output
             surf_def={white_fn,pial_fn};
-        
+
         else
             assert(false); % should never get here
         end
-        
+
         % Define the feature neighborhood for each node on the surface
         % - nbrhood has the neighborhood information
         % - vo and fo are vertices and faces of the output surface
@@ -201,28 +201,28 @@ for one_surf=[true,false]
         fprintf('Defining neighborhood with %s\n', desc);
         [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius,...
                                                             surf_def);
-        
+
         % print neighborhood
         fprintf('Searchlight neighborhood definition:\n');
         cosmo_disp(nbrhood);
-                                                        
+
 
         fprintf('The output surface has %d vertices, %d nodes\n',...
                         size(vo,1), size(fo,1));
-                    
-        
-                    
-        % Run the searchlight 
+
+
+
+        % Run the searchlight
         lda_results = cosmo_searchlight(ds,measure,'args',measure_args,...
-                                            'nbrhood',nbrhood); 
-                                        
-        
+                                            'nbrhood',nbrhood);
+
+
         % print searchlight output
         fprintf('Dataset output:\n');
         cosmo_disp(lda_results);
-        
+
         % Apply the node mapping from the surifical neighborhood
-        % to the high-res inflated surface. 
+        % to the high-res inflated surface.
         % (This example shows how such a mapping can be applied to new
         % surfaces)
         if lowres_output
@@ -232,25 +232,25 @@ for one_surf=[true,false]
             v_inf_out=v_inf;
             f_inf_out=f_inf;
         end
-        
+
         % visualize the surfaces, if the afni matlab toolbox is present
         if cosmo_check_external('afni',false)
             nvertices=size(v_inf_out,1);
-            
+
             opt=struct();
-            
+
             for show_edge=[false, true]
                 opt.ShowEdge=show_edge;
-                
+
                 if show_edge
                     t='with edges';
                 else
                     t='without edges';
                 end
-                
+
                 header=strrep([desc ' ' t],'_',' ');
-                    
-                
+
+
                 DispIVSurf(vo,fo,1:nvertices,lda_results.samples',0,opt);
                 title(sprintf('Original %s', header));
 
@@ -261,62 +261,62 @@ for one_surf=[true,false]
         else
             fprintf('skip surface display; no afni matlab toolbox\n');
         end
-        
+
         if lowres_output && one_surf
             % in this example only this case a new surface was generated.
             % To aid visualization using external tools, store it to disc.
-            
+
             % The surface is stored in ASCII, GIFTI and BV SRF
             % formats, if the required externals are present
             surf_output_fn=fullfile(output_path,['inflated_' desc]);
-            
+
             % AFNI/SUMA ASC
             surfing_write([surf_output_fn '.asc'],v_inf_out,f_inf_out);
-            
+
             % BV SRF
             if cosmo_check_external('neuroelf',false)
                 surfing_write([surf_output_fn '.srf'],v_inf_out,f_inf_out);
             end
-            
+
             % GIFTI
             if cosmo_check_external('gifti',false)
                 surfing_write([surf_output_fn '.gii'],v_inf_out,f_inf_out);
             end
         end
-        
+
         % store searchlight results
         data_output_fn=fullfile(output_path,['lda_' desc]);
-        
+
         if cosmo_check_external('afni',false)
             cosmo_map2surface(lda_results, [data_output_fn '.niml.dset']);
         end
-            
+
         if cosmo_check_external('neuroelf',false)
             cosmo_map2surface(lda_results, [data_output_fn '.smp']);
         end
-       
+
         % store voxel counts (how often each voxel is in a neighborhood)
         % take a random sample (the first one) from the input dataset
         % and count how often each voxel was selected.
-        % If everything works, then voxels in the grey matter have high 
-        % voxel counts but voxels outside it low or zero counts. 
-        % Thus, this can be used as a sanity check that can be visualized 
+        % If everything works, then voxels in the grey matter have high
+        % voxel counts but voxels outside it low or zero counts.
+        % Thus, this can be used as a sanity check that can be visualized
         % easily.
-        
+
         vox_count_ds=cosmo_slice(ds,1);
         vox_count_ds.samples(:)=0;
-        
+
         ncenters=numel(nbrhood.neighbors);
         for k=1:ncenters
             idxs=nbrhood.neighbors{k}; % feature indices in neigborhood
             vox_count_ds.samples(idxs)=vox_count_ds.samples(idxs)+1;
         end
-        
+
         vox_count_output_fn=fullfile(output_path,['vox_count_' desc]);
-        
+
         % store voxel count results
         cosmo_map2fmri(vox_count_ds, [vox_count_output_fn '.nii']);
-        
+
         if cosmo_check_external('afni',false)
             cosmo_map2fmri(vox_count_ds, [vox_count_output_fn '+orig']);
         end

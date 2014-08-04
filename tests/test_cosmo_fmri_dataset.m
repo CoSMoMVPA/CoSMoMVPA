@@ -11,14 +11,14 @@ function test_init()
 function test_nifti()
     ni=generate_test_nifti_struct();
     g=generate_test_dataset();
-    
+
     tmpfn='__tmp_.nii';
     save_nii(ni,tmpfn);
     ds=cosmo_fmri_dataset(tmpfn,'targets',g.sa.targets,...
                                 'chunks',g.sa.chunks);
     delete(tmpfn)
 
-    
+
     assertTrue(numel(setxor(fieldnames(ds),...
                fieldnames(g)))==0);
 

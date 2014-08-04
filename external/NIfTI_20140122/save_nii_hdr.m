@@ -1,17 +1,17 @@
 %  internal function
-  
+
 %  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
 
 function save_nii_hdr(hdr, fid)
-   
+
    if ~exist('hdr','var') || ~exist('fid','var')
       error('Usage: save_nii_hdr(hdr, fid)');
    end
-   
+
    if ~isequal(hdr.hk.sizeof_hdr,348),
       error('hdr.hk.sizeof_hdr must be 348.');
    end
-   
+
    if hdr.hist.qform_code == 0 && hdr.hist.sform_code == 0
       hdr.hist.sform_code = 1;
       hdr.hist.srow_x(1) = hdr.dime.pixdim(2);
@@ -27,7 +27,7 @@ function save_nii_hdr(hdr, fid)
       hdr.hist.srow_y(4) = (1-hdr.hist.originator(2))*hdr.dime.pixdim(3);
       hdr.hist.srow_z(4) = (1-hdr.hist.originator(3))*hdr.dime.pixdim(4);
    end
-   
+
    write_header(hdr, fid);
 
    return;					% save_nii_hdr
@@ -38,35 +38,35 @@ function write_header(hdr, fid)
 
         %  Original header structures
 	%  struct dsr				/* dsr = hdr */
-	%       { 
+	%       {
 	%       struct header_key hk;            /*   0 +  40       */
 	%       struct image_dimension dime;     /*  40 + 108       */
 	%       struct data_history hist;        /* 148 + 200       */
 	%       };                               /* total= 348 bytes*/
-   
+
    header_key(fid, hdr.hk);
    image_dimension(fid, hdr.dime);
    data_history(fid, hdr.hist);
-   
+
    %  check the file size is 348 bytes
    %
    fbytes = ftell(fid);
-   
+
    if ~isequal(fbytes,348),
       msg = sprintf('Header size is not 348 bytes.');
       warning(msg);
    end
-    
+
    return;					% write_header
 
 
 %---------------------------------------------------------------------
 function header_key(fid, hk)
-   
+
    fseek(fid,0,'bof');
 
-	%  Original header structures    
-	%  struct header_key                      /* header key      */ 
+	%  Original header structures
+	%  struct header_key                      /* header key      */
 	%       {                                /* off + size      */
 	%       int sizeof_hdr                   /*  0 +  4         */
 	%       char data_type[10];              /*  4 + 10         */
@@ -76,36 +76,36 @@ function header_key(fid, hk)
 	%       char regular;                    /* 38 +  1         */
 	%       char dim_info;   % char hkey_un0;        /* 39 +  1 */
 	%       };                               /* total=40 bytes  */
-        
+
    fwrite(fid, hk.sizeof_hdr(1),    'int32');	% must be 348.
-    
+
    % data_type = sprintf('%-10s',hk.data_type);	% ensure it is 10 chars from left
    % fwrite(fid, data_type(1:10), 'uchar');
    pad = zeros(1, 10-length(hk.data_type));
    hk.data_type = [hk.data_type  char(pad)];
    fwrite(fid, hk.data_type(1:10), 'uchar');
-    
+
    % db_name   = sprintf('%-18s', hk.db_name);	% ensure it is 18 chars from left
    % fwrite(fid, db_name(1:18), 'uchar');
    pad = zeros(1, 18-length(hk.db_name));
    hk.db_name = [hk.db_name  char(pad)];
    fwrite(fid, hk.db_name(1:18), 'uchar');
-    
+
    fwrite(fid, hk.extents(1),       'int32');
    fwrite(fid, hk.session_error(1), 'int16');
    fwrite(fid, hk.regular(1),       'uchar');	% might be uint8
-    
+
    % fwrite(fid, hk.hkey_un0(1),    'uchar');
    % fwrite(fid, hk.hkey_un0(1),    'uint8');
    fwrite(fid, hk.dim_info(1),      'uchar');
-    
+
    return;					% header_key
 
 
 %---------------------------------------------------------------------
 function image_dimension(fid, dime)
 
-	%  Original header structures        
+	%  Original header structures
 	%  struct image_dimension
 	%       {                                /* off + size      */
 	%       short int dim[8];                /* 0 + 16          */
@@ -138,7 +138,7 @@ function image_dimension(fid, dime)
 	%       int glmax;                       /* 100 + 4         */
 	%       int glmin;                       /* 104 + 4         */
 	%       };                               /* total=108 bytes */
-	
+
    fwrite(fid, dime.dim(1:8),        'int16');
    fwrite(fid, dime.intent_p1(1),  'float32');
    fwrite(fid, dime.intent_p2(1),  'float32');
@@ -160,15 +160,15 @@ function image_dimension(fid, dime)
    fwrite(fid, dime.toffset(1),    'float32');
    fwrite(fid, dime.glmax(1),        'int32');
    fwrite(fid, dime.glmin(1),        'int32');
-   
+
    return;					% image_dimension
 
 
 %---------------------------------------------------------------------
 function data_history(fid, hist)
-    
+
 	% Original header structures
-	%struct data_history       
+	%struct data_history
 	%       {                                /* off + size      */
 	%       char descrip[80];                /* 0 + 80          */
 	%       char aux_file[24];               /* 80 + 24         */
@@ -186,19 +186,19 @@ function data_history(fid, hist)
 	%       char intent_name[16];            /* 180 + 16        */
 	%       char magic[4];   % int smin;     /* 196 + 4         */
 	%       };                               /* total=200 bytes */
-	
+
    % descrip     = sprintf('%-80s', hist.descrip);     % 80 chars from left
    % fwrite(fid, descrip(1:80),    'uchar');
    pad = zeros(1, 80-length(hist.descrip));
    hist.descrip = [hist.descrip  char(pad)];
    fwrite(fid, hist.descrip(1:80), 'uchar');
-    
+
    % aux_file    = sprintf('%-24s', hist.aux_file);    % 24 chars from left
    % fwrite(fid, aux_file(1:24),   'uchar');
    pad = zeros(1, 24-length(hist.aux_file));
    hist.aux_file = [hist.aux_file  char(pad)];
    fwrite(fid, hist.aux_file(1:24), 'uchar');
-    
+
    fwrite(fid, hist.qform_code,    'int16');
    fwrite(fid, hist.sform_code,    'int16');
    fwrite(fid, hist.quatern_b,   'float32');
@@ -216,12 +216,12 @@ function data_history(fid, hist)
    pad = zeros(1, 16-length(hist.intent_name));
    hist.intent_name = [hist.intent_name  char(pad)];
    fwrite(fid, hist.intent_name(1:16), 'uchar');
-    
+
    % magic	= sprintf('%-4s', hist.magic);		% 4 chars from left
    % fwrite(fid, magic(1:4),           'uchar');
    pad = zeros(1, 4-length(hist.magic));
    hist.magic = [hist.magic  char(pad)];
    fwrite(fid, hist.magic(1:4),        'uchar');
-    
+
    return;					% data_history
 

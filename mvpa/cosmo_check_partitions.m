@@ -2,17 +2,17 @@ function cosmo_check_partitions(partitions, ds, varargin)
 % check whether partitions are balanced and not double-dippy
 %
 % cosmo_check_partitions(partitions, ds, varargin)
-% 
+%
 % Inputs:
 %   ds          dataset struct with fields .sa.{targets,chunks}
-%   partitions  struct with partitions, e.g. from 
+%   partitions  struct with partitions, e.g. from
 %               cosmo_{nfold,oddeven,nchoosek}_partitioner
 %   opt         (optional) struct with optional field:
 %     .unbalanced_partitions_ok    if set to true, then unbalanced
 %                                  partitions (with a different number of
 %                                  targets of each class in a chunk) is ok
 %
-% Throws: 
+% Throws:
 %   - an error if partitions are double dippy or (unless specified in opt)
 %     not balanced
 %
@@ -24,50 +24,50 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %
 % See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
-% NNO Jan 2014  
+% NNO Jan 2014
 
     % process input arguments
     defaults=struct();
     defaults.unbalanced_partitions_ok=false;
-    
+
     params=cosmo_structjoin(defaults,varargin{:});
-    
+
     % whether to check for equal number of samples of each class in
     % each chunks
     check_balance=~params.unbalanced_partitions_ok;
-    
+
     % whether to check for the same chunk in train and test set
     check_double_dipping=true;
-    
+
     % check dataset
     cosmo_check_dataset(ds);
-    
+
     % ensure it has targets and chunks
     if ~isfield(ds,'sa') || ~isfield(ds.sa,'targets') || ...
             ~isfield(ds.sa,'targets')
         error('dataset requires .sa.{chunks,targets}');
     end
-    
+
     targets=ds.sa.targets;
     chunks=ds.sa.chunks;
-    
+
     if check_balance
         [classes,unused,sample2class]=unique(targets);
     end
-    
+
     % ensure equal number of partitions for train and test
     train_indices=partitions.train_indices;
     test_indices=partitions.test_indices;
-    
+
     npartitions=numel(train_indices);
     if npartitions~=numel(test_indices)
         error('Partition count mismatch for train and test: %d ~= %d',...
                     npartitions,numel(test_indices));
     end
-    
+
     for k=1:npartitions
         train_idxs=train_indices{k};
-        test_idxs=test_indices{k}; 
+        test_idxs=test_indices{k};
 
         if check_balance
             % counts of number of samples in each each class must be the

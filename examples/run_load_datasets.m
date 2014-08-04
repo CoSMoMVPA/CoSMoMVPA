@@ -4,14 +4,14 @@
 % This function loads data stored in a nifti file and return a dataset struct
 % where the data are store in the 2-D array in field dataset.samples
 %
-% For each of the three masks ('brain','ev','vt'), 
+% For each of the three masks ('brain','ev','vt'),
 % print the number of voxels when loading the dataset with that mask.
 %
 % Hint: the number of voxels is given by the number of columns in
 % dataset.samples
 
 %% Set the datapath
-% 
+%
 
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');

@@ -5,35 +5,35 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %
 % Inputs:
 %   ds                    One of:
-%                         - dataset struct to be sliced, with PxQ field 
+%                         - dataset struct to be sliced, with PxQ field
 %                           .samples and optionally fields .fa, .sa and .a.
-%                         - PxQ cell 
-%                         - PxQ logical or numeric array 
-%   elements_to_select    either a binary mask or a list of indices of 
+%                         - PxQ cell
+%                         - PxQ logical or numeric array
+%   elements_to_select    either a binary mask or a list of indices of
 %                         the samples (if dim==1) or features (if dim==2)
 %                         to select. If a binary mask then the number of
-%                         elements should match the size of ds in the 
+%                         elements should match the size of ds in the
 %                         dim-th dimension.
-%   dim                   Slicing dimension: along samples (dim==1) or 
+%   dim                   Slicing dimension: along samples (dim==1) or
 %                         features (dim==2). (default: 1).
-%   check                 Boolean that indicates that if ds is a dataset, 
+%   check                 Boolean that indicates that if ds is a dataset,
 %                         whether it should be checked for proper
-%                         structure. (default: true). 
-%   'struct'              If provided and ds is a struct, then 
-%                         all fields of ds, which are assumed to be cell 
+%                         structure. (default: true).
+%   'struct'              If provided and ds is a struct, then
+%                         all fields of ds, which are assumed to be cell
 %                         or arrays,  are sliced.
 %
-% Output: 
+% Output:
 %   sliced_ds             - If ds is a cell or array then sliced_ds is
-%                           the result of slicing ds along the dim-th 
+%                           the result of slicing ds along the dim-th
 %                           dimension. The result is of size NxQ (if
 %                           dim==1) or PxN (if dim==2), where N is the
 %                           number of non-zero values in
 %                           elements_to_select.
-%                         - If ds is a dataset struct then 
+%                         - If ds is a dataset struct then
 %                           sliced_ds.samples is the result of slicing
-%                           ds.samples. 
-%                           If present, fields .sa (if dim==1) or 
+%                           ds.samples.
+%                           If present, fields .sa (if dim==1) or
 %                           .fa (dim==2) are sliced as well.
 %                         - when ds is a struct and the 'struct' option was
 %                           given, then all fields in ds are sliced.
@@ -158,7 +158,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %     >   .note
 %     >     'an example'
 %
-%     % slice all fields in a struct 
+%     % slice all fields in a struct
 %     s=struct();
 %     s.a_field=[1 2 3; 4 5 6];
 %     s.another_field={'this','is','fun'};
@@ -177,7 +177,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %     >     4         6         6         5 ]
 %     > .another_field
 %     >   { 'this'  'fun'  'fun'  'is' }
-%     
+%
 %
 % Notes:
 %   - do_check=false may be preferred for slice-intensive operations such
@@ -190,7 +190,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
     % deal with 2, 3, or 4 input arguments
     if nargin<3 || isempty(dim), dim=1; end
     if nargin<4 || isempty(type_or_check), type_or_check=true; end
-    
+
     if iscell(ds) || isnumeric(ds) || islogical(ds)
         ds=slice_array(ds, to_select, dim, type_or_check);
     elseif isstruct(ds)
@@ -201,14 +201,14 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
                 error(['Expected dataset struct. To slice ordinary '...
                         'structs use "struct" as last argument']);
             end
-                    
+
             if type_or_check
                 % check kosherness
                 cosmo_check_dataset(ds);
             end
 
             dim_size=size(ds.samples,dim);
-            
+
             % slice the samples
             ds.samples=slice_array(ds.samples,to_select,dim,type_or_check);
 
@@ -224,23 +224,23 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
     else
         error('Illegal input: expected cell, array or struct');
     end
-    
-    
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % helper functions
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     function y=slice_struct(x, to_select, dim, do_check, expected_size)
         if nargin<5, expected_size=NaN; end
-        
+
         y=struct();
         fns=fieldnames(x);
         for k=1:numel(fns)
             fn=fns{k};
             v=x.(fn);
-            
+
             v_size=size(v,dim);
-            
+
             % ensure all input sizes are the same
             if isnan(expected_size)
                 expected_size=v_size;
@@ -249,16 +249,16 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
                         ' elements in dimension %d'],...
                                 v_size, expected_size, dim);
             end
-            
+
             y.(fn)=slice_array(v, to_select, dim, do_check);
         end
-           
-    
+
+
     function y=slice_array(x, to_select, dim, do_check)
         if do_check
             check_size(x, to_select, dim);
         end
-        
+
         if dim==1
             y=x(to_select,:);
         elseif dim==2
@@ -266,8 +266,8 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
         else
             error('dim should be 1 or 2');
         end
-        
-    
+
+
     function check_size(x, to_select, dim)
         if islogical(to_select) && ...
                     size(x, dim)~=numel(to_select)
@@ -276,12 +276,12 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
             error('Logical mask should have %d elements, found %d', ...
                     size(x, dim), numel(to_select));
         end
-        
+
         if numel(size(x))~=2
             error('Only 2D arrays are allowed');
         end
-        
+
         if sum(size(to_select)>1)>1
             error('elements to select should be in vector');
         end
-    
+

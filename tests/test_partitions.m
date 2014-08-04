@@ -24,7 +24,7 @@ function test_nfold_partitioner()
         end
     end
 
-function test_nchoosek_partitioner()    
+function test_nchoosek_partitioner()
     ds=generate_test_dataset();
 
     p=cosmo_nfold_partitioner(ds);

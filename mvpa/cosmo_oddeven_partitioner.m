@@ -13,7 +13,7 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %                    .train_indices{k} and .test_indices{k} contain the
 %                    sample indices for the sets of unique chunks
 %                    alternatingly
-%                    
+%
 % Example:
 %     ds=struct();
 %     ds.sa.samples=NaN(6,99); % will be ignored by this function
@@ -22,30 +22,30 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %     % note that chunks=6 ends up in the odd chunks and chunks=7 in the
 %     % even chunks, as 6 [7] is the third [fourth] unique value of chunks.
 %     cosmo_disp(p);
-%     > .train_indices    
-%     >   { [ 3    [ 1    
-%     >       4      2    
-%     >       6      5    
+%     > .train_indices
+%     >   { [ 3    [ 1
+%     >       4      2
+%     >       6      5
 %     >       7 ]    8 ] }
-%     > .test_indices     
-%     >   { [ 1    [ 3    
-%     >       2      4    
-%     >       5      6    
+%     > .test_indices
+%     >   { [ 1    [ 3
+%     >       2      4
+%     >       5      6
 %     >       8 ]    7 ] }
 %     >
 %
-% Notes: 
-% - For splithalf correlation measures it is recommended to use 
-%   cosmo_nchoosek_partitioner(chunks,'half'). 
+% Notes:
+% - For splithalf correlation measures it is recommended to use
+%   cosmo_nchoosek_partitioner(chunks,'half').
 % - More generally, this function is intended as an exercise. If
 %   chunks is different from 1:K for all K, then it may yield non-optimal
-%   partitions. 
+%   partitions.
 %   Is is thus advised to use cosmo_nchoosek_partitioner(chunks,.5);
 %
 % See also cosmo_nchoosek_partitioner
 %
 % NNO Aug 2013
-    
+
     if isstruct(chunks)
         if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
             chunks=chunks.sa.chunks;
@@ -53,40 +53,40 @@ function partitions = cosmo_oddeven_partitioner(chunks)
             error('illegal input')
         end
     end
-    
+
     [classes,unused,chunk_indices]=unique(chunks);
     if numel(classes)<2
         error('Need >=2 classes, found %d', numel(classes));
     end
-    
+
     % there are two partitions
     npartitions=2;
-    
+
     % allocate space for output
     train_indices=cell(1,npartitions);
     test_indices=cell(1,npartitions);
-    
+
     % Make partitions using even and odd chunks
     % >@@>
-    
+
     % generate a mask with even indices
     even_mask=mod(chunk_indices,2)==0;
-    
+
     % find the indices of even and odd chunks
     even_indices=find(even_mask);
     odd_indices=find(~even_mask);
-    
+
     % set the train and test indices
     train_indices{1}=even_indices;
     train_indices{2}=odd_indices;
-    
+
     test_indices{1}=odd_indices;
     test_indices{2}=even_indices;
-    
+
     % <@@<
-    
+
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;
-    
-        
-    
+
+
+

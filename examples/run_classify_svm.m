@@ -25,13 +25,13 @@ ds_2class_test=cosmo_slice(ds_2class,ds_2class.sa.chunks>5);
 pred2=cosmo_classify_svm_2class(ds_2class_train.samples,...
                                 ds_2class_train.sa.targets,...
                                 ds_2class_test.samples);
-                            
+
 fprintf('2-class accuracy %.3f\n', sum(pred2==ds_2class_test.sa.targets)/numel(pred2));
 mx=cosmo_confusion_matrix(ds_2class_test,pred2);
 imagesc(mx);
 colorbar();
-                            
-   
+
+
 %% Four class classification
 ds_4class=cosmo_slice(ds, ds.sa.targets>=2 & ds.sa.targets<=5);
 ds_4class_train=cosmo_slice(ds_4class,ds_4class.sa.chunks<=5);

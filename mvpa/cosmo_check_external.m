@@ -4,7 +4,7 @@ function is_ok=cosmo_check_external(external, raise_)
 % is_ok=cosmo_check_external(external[, raise_])
 %
 % Inputs:
-%   external               string or cell of strings. Currently supports: 
+%   external               string or cell of strings. Currently supports:
 %                          'afni'      AFNI matlab toolbox
 %                          'afni_bin'  AFNI binaries present (unix-only)
 %                          'neuroelf'  Neuroelf toolbox
@@ -18,13 +18,13 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          It can also be '-list', '-tic', '-toc',' or
 %                          '-cite'; see below for their meaning.
 %   raise_                 if true (the default), an error is raised if the
-%                          external is not present. 
+%                          external is not present.
 %
 % Returns:
 %   is_ok             boolean indicating whether the external is
 %                          present. A matlab toolbox must be prefixed
-%                          by a '@'. If external is a cell if P elements, 
-%                          then the output is a Px1 boolean vector. 
+%                          by a '@'. If external is a cell if P elements,
+%                          then the output is a Px1 boolean vector.
 %                          Special switches allowed are:
 %                            '-list':   returns a cell of strings with
 %                                       the available externals
@@ -39,12 +39,12 @@ function is_ok=cosmo_check_external(external, raise_)
 % Examples:
 %   % see if the AFNI matlab toolbox is available, if not raise an error
 %   cosmo_check_external('afni')
-%   
+%
 %   % see if libsvm and neuroelf are available, if not raise an error
 %   cosmo_check_external({'libsvm','neuroelf'});
 %
-%   % see if libsvm and neuroelf and store the result in 
-%   % the 2x1 boolean array is_ok. An error is not raised if 
+%   % see if libsvm and neuroelf and store the result in
+%   % the 2x1 boolean array is_ok. An error is not raised if
 %   % either is not present.
 %   is_ok=cosmo_check_external({'libsvm','neuroelf'},false);
 %
@@ -68,7 +68,7 @@ function is_ok=cosmo_check_external(external, raise_)
 %   cosmo_check_external('-cite');
 %
 % Notes:
-%   - For performance reasons this function keeps a persistent variable 
+%   - For performance reasons this function keeps a persistent variable
 %     with the names of externals that have already been checked for.
 %     Benchmarking suggests a speedup of at least a factor of 30.
 %     If the user changes the path in between successive calls of this
@@ -77,7 +77,7 @@ function is_ok=cosmo_check_external(external, raise_)
 %     using cosmo_check_external, with a less user-friendly error message
 %     as a result
 %
-% NNO Sep 2013  
+% NNO Sep 2013
 
 
     persistent cached_present_names
@@ -87,7 +87,7 @@ function is_ok=cosmo_check_external(external, raise_)
     if nargin<2
         raise_=true;
     end
-    
+
     path_has_changed=isempty(cached_path);
     if path_has_changed
         cached_path=path();
@@ -103,7 +103,7 @@ function is_ok=cosmo_check_external(external, raise_)
         cached_present_names=[];
         cached_absent_names=[];
     end
-    
+
     if iscell(external)
         % cell input - check for each of them using recursion
         nexternals=numel(external);
@@ -114,17 +114,17 @@ function is_ok=cosmo_check_external(external, raise_)
         end
         return
     end
-    
+
     % initialize to empty if not set
     if ~iscell(cached_present_names)
         cached_present_names=cell(0);
     end
-    
+
     if ~iscell(cached_absent_names)
         cached_absent_names=cell(0);
     end
-    
-    
+
+
     if external(1)=='-'
         % process special user switch
         switch external(2:end)
@@ -132,38 +132,38 @@ function is_ok=cosmo_check_external(external, raise_)
                 % return a list of externals
                 supported_externals=fieldnames(get_externals());
                 me=str2func(mfilename()); % the present function
-                
+
                 cached_present_names_copy=cached_present_names;
                 msk=me(supported_externals,false);
                 cached_present_names=cached_present_names_copy;
-                
+
                 is_ok=supported_externals(msk);
-                
+
             case 'tic'
                 cached_present_names=cell(0);
-                
+
             case 'toc'
                 is_ok=cached_present_names;
-                
+
             case 'cite'
                 citation_str=get_citation_str(cached_present_names);
                 s=sprintf(['If you use CoSMoMVPA and/or some '...
                          'other toolboxes for a publication, '...
                         'please cite:\n\n%s\n'], citation_str);
-                disp(s);    
+                disp(s);
                 is_ok=[];
-                
+
             otherwise
-                error('illegal switch %s', external);     
+                error('illegal switch %s', external);
         end
-        
+
         return
     end
-    
+
     if cosmo_match({external},cached_present_names)
         is_ok=true;
     elseif cosmo_match({external},cached_absent_names)
-        is_ok=false; 
+        is_ok=false;
     elseif external(1)=='@'
         toolbox_name=external(2:end);
         is_ok=check_matlab_toolbox(toolbox_name,raise_);
@@ -172,14 +172,14 @@ function is_ok=cosmo_check_external(external, raise_)
     end
 
     % add if not in cache already
-    if is_ok    
+    if is_ok
         if ~cosmo_match({external},cached_present_names)
             cached_present_names{end+1}=external;
-        end    
+        end
     else
         if ~cosmo_match({external},cached_absent_names)
             cached_absent_names{end+1}=external;
-        end    
+        end
     end
 
 function is_ok=check_external_toolbox(external_name,raise_)
@@ -187,11 +187,11 @@ function is_ok=check_external_toolbox(external_name,raise_)
     if ~isfield(externals, external_name);
         error('Unknown external ''%s''', external_name);
     end
-    
+
     ext=externals.(external_name);
     is_present=ext.is_present();
     is_recent=ext.is_recent();
-    
+
     is_ok=is_present && is_recent;
     if ~is_ok
         env=cosmo_wtf('environment');
@@ -213,19 +213,19 @@ function is_ok=check_external_toolbox(external_name,raise_)
         else
             assert(false,'should never get here');
         end
-        
+
         if ~strcmp(env,'matlab')
             msg=sprintf(['%s\n\nNote: your environment is %s, not '...
                         '''native'' matlab - the %s may not work '...
                         'in this environment'],msg,env,ext.label);
         end
-        
+
         if raise_
             error(msg);
         end
     end
-    
-    
+
+
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     if cosmo_wtf('is_matlab')
         toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
@@ -237,7 +237,7 @@ function is_ok=check_matlab_toolbox(toolbox_name,raise_)
         error('The matlab toolbox ''%s'' seems absent',...
                             toolbox_name);
     end
-        
+
 function s=url2str(url)
     if strcmp(cosmo_wtf('environment'),'matlab')
         s=sprintf('<a href="%s">%s</a>',url,url);
@@ -250,7 +250,7 @@ function externals=get_externals()
     externals=struct();
     yes=@() true;
     has=@(x) ~isempty(which(x));
-    
+
     externals.cosmo.is_present=yes;
     externals.cosmo.is_recent=yes;
     externals.cosmo.label='CoSMoMVPA toolbox';
@@ -258,7 +258,7 @@ function externals=get_externals()
     externals.cosmo.authors={'N N. Oosterhof','A. C. Connolly'};
     externals.cosmo.ref=['CoSMoMVPA: A lightweight multi-variate '...
                          'pattern analysis toolbox in Matlab'];
-    
+
     externals.afni_bin.is_present=@() isunix() && ...
                           ~unix('which afni && afni --version >/dev/null');
     externals.afni_bin.is_recent=yes;
@@ -269,12 +269,12 @@ function externals=get_externals()
                              'visualization of functional magnetic '...
                              'resonance neuroimages.  Computers and '...
                              'Biomedical Research, 29: 162-173, 1996'];
-    
+
     externals.afni.is_present=@() has('BrikLoad');
     externals.afni.is_recent=@() has('afni_niml_readsimple');
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
-    externals.afni.authors={'Z. Saad','G. Chen'};                         
+    externals.afni.authors={'Z. Saad','G. Chen'};
 
     externals.neuroelf.is_present=@() has('xff');
     externals.neuroelf.is_recent=yes;
@@ -288,7 +288,7 @@ function externals=get_externals()
     externals.nifti.url=['http://www.mathworks.com/matlabcentral/',...
                     'fileexchange/8797-tools-for-nifti-and-analyze-image'];
     externals.nifti.authors={'J. Shen'};
-    
+
     externals.fieldtrip.is_present=@() has('ft_read_data');
     % in the future, may require from 2014 onwards
     %externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
@@ -316,7 +316,7 @@ function externals=get_externals()
                             'a library for support vector machines. '...
                             'ACM Transactions on Intelligent Systems '...
                             'and Technology, 2:27:1--27:27, 2011'];
-    
+
     externals.surfing.is_present=has('surfing_voxelselection');
     % require recent version with surfing_write
     externals.surfing.is_recent=~isempty(which('surfing_write'));
@@ -327,13 +327,13 @@ function externals=get_externals()
     externals.surfing.ref=['A comparison of volume-based and '...
                             'surface-based multi-voxel pattern '...
                             'analysis. Neuroimage 56 (2), 593-600'];
-    
+
     externals.gifti.is_present=@() has('gifti');
     externals.gifti.is_recent=yes;
     externals.gifti.label='GIfTI library for matlab';
     externals.gifti.url='www.artefact.tk/software/matlab/gifti';
     externals.gifti.authors={'G. Flandin'};
-    
+
     externals.xunit.is_present=@() has('runtests') && ...
                                     has('VerboseTestRunDisplay');
     externals.xunit.is_recent=yes;
@@ -341,10 +341,10 @@ function externals=get_externals()
     externals.xunit.url=['http://www.mathworks.it/matlabcentral/'...
                     'fileexchange/22846-matlab-xunit-test-framework'];
     externals.xunit.authors={'S. Eddins'};
-    
-    
-   
-    
+
+
+
+
 
 function citation_str=get_citation_str(cached_present_names)
     % always cite CoSMoMVPA
@@ -352,22 +352,22 @@ function citation_str=get_citation_str(cached_present_names)
     if ~any(cosmo_match(cached_present_names,self))
         cached_present_names{end+1}=self;
     end
-    
+
     externals=get_externals();
-    
+
     n=numel(cached_present_names);
     cites=cell(n,1);
     cites_msk=false(n,1);
-    
+
     for k=1:n
         external_name=cached_present_names{k};
         if ~isfield(externals,external_name)
             % built-in
             continue;
         end
-        
+
         external=externals.(external_name);
-        
+
         if isfield(external,'ref')
             % reference provided, use label to prefix URL
             title_str=external.ref;
@@ -377,18 +377,18 @@ function citation_str=get_citation_str(cached_present_names)
             title_str=external.label;
             url_prefix_str='';
         end
-        
+
         % ensure CoSMoMVPA is mentioned first
         cites{n-k+1}=sprintf('%s, %s. %savailable online from %s',...
                              cosmo_strjoin(external.authors,', '),...
                              title_str, url_prefix_str, external.url);
         cites_msk(k)=true;
-                    
+
     end
-    
+
     citation_str=cosmo_strjoin(cites(cites_msk),'\n\n');
-                    
-        
-        
-        
-    
+
+
+
+
+

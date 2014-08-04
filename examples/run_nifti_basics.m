@@ -1,7 +1,7 @@
 %% NIFTI basics
 % In this example, load a brain and visualize it in matlab
 
-% Set the path. 
+% Set the path.
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 

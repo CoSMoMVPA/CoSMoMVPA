@@ -7,7 +7,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %   ds              dataset struct with field:
 %     .samples      NS x NF
 %     .sa           with fields .targets and .chunks
-%   'ratio', ratio  ratio (between 0 and 1) of samples to select for 
+%   'ratio', ratio  ratio (between 0 and 1) of samples to select for
 %                   each average. If >=1 then it indicates how many samples
 %                   to select for each average.
 %   'nrep', nrep    number of repeated sampling operations for each
@@ -18,13 +18,13 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %      .samples     ('nrep'*ntargets*nchunks) x NF, where
 %                   ntargets and nchunks are the number of unique targets
 %                   and chunks, respectively. Each sample is an average
-%                   from samples that share the same values for 
-%                   .sa.{chunks,targets}. The number of times each sample 
+%                   from samples that share the same values for
+%                   .sa.{chunks,targets}. The number of times each sample
 %                   is used to compute average values differs by one at
 %                   most.
 %      .sa          Based on averaged samples.
 %      .fa,.a       Same as in ds (if present).
-%    
+%
 % Examples:
 %  - % for each unique target-chunk combination, select 40% of the samples
 %    % randomly and average these.
@@ -32,7 +32,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %
 %  - % for each unique target-chunk combination, select 50% of the samples
 %    % randomly and average these; repeat the random selection process 4
-%    % times. Each sample in 'ds' is used twice (=.5*4)as an element 
+%    % times. Each sample in 'ds' is used twice (=.5*4)as an element
 %    % to compute an average.
 %    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.5,'nrep',4);
 %
@@ -59,7 +59,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 
     % split by unique target-chunk combinations
     ds_splits=cosmo_split(ds,{'targets','chunks'});
-    
+
     % allocate space for output
     nsplits=numel(ds_splits);
     res=cell(nsplits,nrep);
@@ -83,7 +83,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
         end
 
         % generate 'nset' random permutations of 1:n and concatenate these.
-        % this ensures that the numbers of times specific samples are 
+        % this ensures that the numbers of times specific samples are
         % selected differ by 1 at most.
         rp_cells=cellfun(@randperm,repmat({n},1,nrep),'UniformOutput',false);
         rp=[rp_cells{:}];
@@ -95,7 +95,7 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
             ds_split_sel=cosmo_slice(ds_split,idxs);
             res{k,j}=cosmo_fx(ds_split_sel,averager,[]);
         end
-    end    
+    end
 
     % join results
     ds_avg=cosmo_stack(res);

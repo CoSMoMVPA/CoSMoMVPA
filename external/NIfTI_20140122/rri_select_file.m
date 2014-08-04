@@ -78,7 +78,7 @@ function [selected_file, selected_path] = rri_select_file(varargin)
    %  if it is a file, select that,
    %  if it is more than a file (*), select those,
    %  if it is a directory, select based on file pattern
-   %  
+   %
    elseif strcmp(action,'EditSelection'),
       EditSelection;
 
@@ -434,7 +434,7 @@ function update_dirlist;
 
    old_pointer = get(gcf,'Pointer');
    set(gcf,'Pointer','watch');
-   
+
    dir_list = dir_struct(find([dir_struct.isdir] == 1));
    [sorted_dir_names,sorted_dir_index] = sortrows({dir_list.name}');
 
@@ -525,10 +525,10 @@ function select_dir()
    selected_dir_idx = get(gcbo,'Value');
    selected_dir = listed_dir{selected_dir_idx};
    curr_dir = getappdata(gcf,'curr_dir');
-   
+
    %  update the selection box
    %
-   try 
+   try
       cd ([curr_dir filesep selected_dir]);
    catch
       msg = 'ERROR: Cannot access directory';
@@ -582,7 +582,7 @@ function select_file()
 %  if it is a file, select that,
 %  if it is more than a file (*), select those,
 %  if it is a directory, select based on file pattern
-%  
+%
 % --------------------------------------------------------------------
 
 function EditSelection()

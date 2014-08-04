@@ -5,11 +5,11 @@ function test_suite = test_disp
 function test_disp_()
     aeq=@(s,y) assertEqual([s repmat(sprintf('\n'),size(s,1),1)],...
                                         evalc('cosmo_disp(y)'));
-    
+
     aeq(['[ 1         2         3  ...  '...
                 '8         9        10 ]@1x10'],1:10);
-    
-    
+
+
     x=struct();
     x.a_cell={[],{'cell in cell',[1 2; 3 4]}};
     x.a_matrix=[10 11 12; 13 14 15];
@@ -29,11 +29,11 @@ function test_disp_()
                 '    .name                                      \n'...
                 '      ''me''                                     ']);
 
-    
+
 
     aeq(s,x);
-    
-    
-    
-    
-    
+
+
+
+
+

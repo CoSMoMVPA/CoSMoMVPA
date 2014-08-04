@@ -26,7 +26,7 @@
 %	from old RGB24. New RGB24 uses RGB triple sequentially for each
 %	voxel, like [R1 G1 B1 R2 G2 B2 ...]. Analyze 6.0 from AnalyzeDirect
 %	uses old RGB24, in a way like [R1 R2 ... G1 G2 ... B1 B2 ...] for
-%	each slices. If the image that you view is garbled, try to set 
+%	each slices. If the image that you view is garbled, try to set
 %	old_RGB variable to 1 and try again, because it could be in
 %	old RGB24. It will be set to 0, if it is default or empty.
 %
@@ -36,7 +36,7 @@
 %
 %  preferredForm (optional)  -  selects which transformation from voxels
 %	to RAS coordinates; values are s,q,S,Q.  Lower case s,q indicate
-%	"prefer sform or qform, but use others if preferred not present". 
+%	"prefer sform or qform, but use others if preferred not present".
 %	Upper case indicate the program is forced to use the specificied
 %	tranform or fail loading.  'preferredForm' will be 's', if it is
 %	default or empty.	- Jeff Gunter

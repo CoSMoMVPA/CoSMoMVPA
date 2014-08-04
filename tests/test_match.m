@@ -21,8 +21,8 @@ function test_match_()
     assertEqual(cosmo_match({'b','c','d','e','b'}',{'a','b','c'}),...
                                                         b([1 1 0 0 1]'));
 
-    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a'}),b([0 0 1 0]));                                                
-    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'aa'}),b([0 1 0 1]));                                                
+    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a'}),b([0 0 1 0]));
+    assertEqual(cosmo_match({'aaa','aa','a','aa'},{'aa'}),b([0 1 0 1]));
     assertEqual(cosmo_match({'aaa','aa','a','aa'},{'a','aaa'}),...
                                                            b([1 0 1 0]));
 
@@ -32,9 +32,9 @@ function test_match_()
     assertEqual(cosmo_match([],[]),b([]));
 
     assertExceptionThrown(@()cosmo_match({},[]),'');
-    assertExceptionThrown(@()cosmo_match([],{}),'');                                                
+    assertExceptionThrown(@()cosmo_match([],{}),'');
 
-    % can use a single string                                                
+    % can use a single string
     assertEqual(cosmo_match({'b','c','d','e','b'},'b'),b([1 0 0 0 1]));
 
     % cannot deal with logical arrays

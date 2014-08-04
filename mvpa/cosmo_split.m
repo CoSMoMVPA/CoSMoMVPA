@@ -26,7 +26,7 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %       >> ds_humpty_dumpty=cosmo_stack(ds_splits,dim)
 %
 %   - means that ds and ds_humpty_dumpty contain the same data, except that
-%     the order of the data (in the rows [columns] of .samples, or 
+%     the order of the data (in the rows [columns] of .samples, or
 %     .sa [.fa]) may be different if dim==1 [dim==2].
 %
 % Examples:
@@ -41,14 +41,14 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %
 %   % split by 'chunks' sample attribute
 %   >> splits=cosmo_split(ds,'targets')
-%  
-%   % split by 'chunks' and 'targets' sample attributes. 
+%
+%   % split by 'chunks' and 'targets' sample attributes.
 %   >> splits=cosmo_split(ds,{'targets','chunks'})
 %
 %   % split by 'time' feature attribute (e.g. when ds is an MEEG dataset).
 %   >> splits=cosmo_split(ds,'time',2)
 %
-%   % split by 'time' and 'chan' feature attributes. 
+%   % split by 'time' and 'chan' feature attributes.
 %   >> splits=cosmo_split(ds,{'time','chan'},2)
 %
 % See also: cosmo_stack, cosmo_slice
@@ -57,11 +57,11 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 
     % set default dim & check input
     if nargin<3 || isempty(dim)
-        dim=1; 
+        dim=1;
     elseif dim~=1 && dim~=2
-        error('dim should be 1 or 2'); 
+        error('dim should be 1 or 2');
     end
-    
+
     % undocumented feature: support arrays as well
     is_ds=isstruct(ds) && isfield(ds, 'samples');
     if is_ds
@@ -77,9 +77,9 @@ function ds_splits=cosmo_split(ds, split_by, dim)
         ds_splits={ds};
         return
     end
-    
+
     % cell input, one or more fieldnames to split by
-    if iscell(split_by) 
+    if iscell(split_by)
         if numel(split_by)>1
             % delegate to helper function
             ds_splits=split_recursively(ds, split_by, dim);
@@ -89,15 +89,15 @@ function ds_splits=cosmo_split(ds, split_by, dim)
             split_by=split_by{1};
         end
     end
-    
-    
+
+
     if is_ds
         attrs_fns={'sa','fa'};
         attrs_fn=attrs_fns{dim};
 
         % ensure the field is there
         if ~isfield(ds, attrs_fn) || ~isfield(ds.(attrs_fn), split_by)
-            error('missing field .%s.%s', attrs_fn, split_by); 
+            error('missing field .%s.%s', attrs_fn, split_by);
         end
 
         values=ds.(attrs_fn).(split_by);
@@ -107,7 +107,7 @@ function ds_splits=cosmo_split(ds, split_by, dim)
     end
 
     is_vector=sum(size(values)>1)<=1;
-    
+
     % ensure splitting based on values in a vector
     if ~is_vector || numel(values)~=size_dim
         if is_ds
@@ -115,7 +115,7 @@ function ds_splits=cosmo_split(ds, split_by, dim)
         else
             selector_str='split_by';
         end
-        
+
         error('%s must be vector with length %d', ...
                     selector_str,size_dim);
     end
@@ -130,7 +130,7 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 
         % allocate space for output
         ds_splits=cell(1,nsplits);
-        
+
         % slice for each unique value seperately
         for k=1:nsplits
             ds_splits{k}=cosmo_slice(ds, values==split_values(k), ...
@@ -145,12 +145,12 @@ function ds_splits=split_recursively(ds, split_by, dim)
 
     % split by first fieldname
     split_head=me(ds, split_by{1}, dim);
-    
+
     % allocate space for remaining splits
     nhead=numel(split_head);
     split_all=cell(1,nhead);
 
-    % remaining fieldnames 
+    % remaining fieldnames
     split_by_tail=split_by(2:end);
 
     % split each of them

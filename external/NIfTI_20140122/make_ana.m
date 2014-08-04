@@ -1,19 +1,19 @@
 %  Make ANALYZE 7.5 data structure specified by a 3D or 4D matrix.
-%  Optional parameters can also be included, such as: voxel_size, 
-%  origin, datatype, and description. 
-%  
-%  Once the ANALYZE structure is made, it can be saved into ANALYZE 7.5 
-%  format data file using "save_untouch_nii" command (for more detail, 
-%  type: help save_untouch_nii). 
-%  
+%  Optional parameters can also be included, such as: voxel_size,
+%  origin, datatype, and description.
+%
+%  Once the ANALYZE structure is made, it can be saved into ANALYZE 7.5
+%  format data file using "save_untouch_nii" command (for more detail,
+%  type: help save_untouch_nii).
+%
 %  Usage: ana = make_ana(img, [voxel_size], [origin], [datatype], [description])
 %
 %  Where:
 %
 %	img:		a 3D matrix [x y z], or a 4D matrix with time
 %			series [x y z t]. When image is in RGB format,
-%			make sure that the size of 4th dimension is 
-%			always 3 (i.e. [R G B]). In that case, make 
+%			make sure that the size of 4th dimension is
+%			always 3 (i.e. [R G B]). In that case, make
 %			sure that you must specify RGB datatype to 128.
 %
 %	voxel_size (optional):	Voxel size in millimeter for each
@@ -124,7 +124,7 @@ function hdr = make_header(dims, voxel_size, origin, datatype, ...
    hdr.hk   = header_key;
    hdr.dime = image_dimension(dims, voxel_size, datatype, maxval, minval);
    hdr.hist = data_history(origin, descrip);
-    
+
    return;					% make_header
 
 
@@ -138,19 +138,19 @@ function hk = header_key
     hk.session_error    = 0;
     hk.regular          = 'r';
     hk.hkey_un0         = '0';
-    
+
     return;					% header_key
 
 
 %---------------------------------------------------------------------
 function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
-   
+
    dime.dim = dims;
    dime.vox_units = 'mm';
    dime.cal_units = '';
    dime.unused1 = 0;
    dime.datatype = datatype;
-   
+
    switch dime.datatype
    case   2,
       dime.bitpix = 8;  precision = 'uint8';
@@ -167,7 +167,7 @@ function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
    otherwise
       error('Datatype is not supported by make_ana.');
    end
-   
+
    dime.dim_un0 = 0;
    dime.pixdim = voxel_size;
    dime.vox_offset = 0;
@@ -180,13 +180,13 @@ function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
    dime.verified = 0;
    dime.glmax = maxval;
    dime.glmin = minval;
-   
+
    return;					% image_dimension
 
 
 %---------------------------------------------------------------------
 function hist = data_history(origin, descrip)
-   
+
    hist.descrip = descrip;
    hist.aux_file = 'none';
    hist.orient = 0;
@@ -205,6 +205,6 @@ function hist = data_history(origin, descrip)
    hist.omin = 0;
    hist.smax = 0;
    hist.smin = 0;
-   
+
    return;					% data_history
 

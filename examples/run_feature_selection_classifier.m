@@ -9,8 +9,8 @@ mask_fn=fullfile(data_path,'vt_mask.nii');
 ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
-                    
-                    
+
+
 opt=struct();
 opt.child_classifier=@cosmo_classify_naive_bayes;
 opt.feature_selector=@cosmo_anova_feature_selector;

@@ -2,8 +2,8 @@
 
 %  'xform_nii.m' is an internal function called by "load_nii.m", so
 %  you do not need run this program by yourself. It does simplified
-%  NIfTI sform/qform affine transform, and supports some of the 
-%  affine transforms, including translation, reflection, and 
+%  NIfTI sform/qform affine transform, and supports some of the
+%  affine transforms, including translation, reflection, and
 %  orthogonal rotation (N*90 degree).
 %
 %  For other affine transforms, e.g. any degree rotation, shearing
@@ -14,7 +14,7 @@
 %
 %  Since 'xform_nii.m' does not involve any interpolation or any
 %  slice change, the original image volume is supposed to be
-%  untouched, although it is translated, reflected, or even 
+%  untouched, although it is translated, reflected, or even
 %  orthogonally rotated, based on the affine matrix in the
 %  NIfTI header.
 %
@@ -30,7 +30,7 @@
 %
 %  Because 'reslice_nii.m' has to perform 3D interpolation, it can
 %  be slow depending on image size and affine matrix in the header.
-%  
+%
 %  After you perform the affine transform, the 'nii' structure
 %  generated from 'xform_nii.m' or new NIfTI file created from
 %  'reslice_nii.m' will be in RAS orientation, i.e. X axis from
@@ -38,9 +38,9 @@
 %  from Inferior to Superior.
 %
 %  NOTE: This function should be called immediately after load_nii.
-%  
+%
 %  Usage: [ nii ] = xform_nii(nii, [tolerance], [preferredForm])
-%  
+%
 %  nii	- NIFTI structure (returned from load_nii)
 %
 %  tolerance (optional) - distortion allowed for non-orthogonal rotation
@@ -49,11 +49,11 @@
 %
 %  preferredForm (optional)  -  selects which transformation from voxels
 %	to RAS coordinates; values are s,q,S,Q.  Lower case s,q indicate
-%	"prefer sform or qform, but use others if preferred not present". 
+%	"prefer sform or qform, but use others if preferred not present".
 %	Upper case indicate the program is forced to use the specificied
 %	tranform or fail loading.  'preferredForm' will be 's', if it is
 %	default or empty.	- Jeff Gunter
-%  
+%
 %  NIFTI data format can be found on: http://nifti.nimh.nih.gov
 %
 %  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
@@ -306,7 +306,7 @@ function [hdr, orient] = change_hdr(hdr, tolerance, preferredForm)
            useForm='q';
        end
    end						% Jeff
-   
+
    if isequal(preferredForm,'q')
        if hdr.hist.qform_code > 0
            useForm='q';
@@ -382,10 +382,10 @@ function [hdr, orient] = change_hdr(hdr, tolerance, preferredForm)
 
       %  qforms are expected to generate rotation matrices R which are
       %  det(R) = 1; we'll make sure that happens.
-      %  
+      %
       %  now we make the same checks as were done above for sform data
       %  BUT we do it on a transform that is in terms of voxels not mm;
-      %  after we figure out the angles and squash them to closest 
+      %  after we figure out the angles and squash them to closest
       %  rectilinear direction. After that, the voxel sizes are then
       %  added.
       %
@@ -395,7 +395,7 @@ function [hdr, orient] = change_hdr(hdr, tolerance, preferredForm)
 
          %  det(R) == 0 is not a common trigger for this ---
          %  R(find(R)) is a list of non-zero elements in R; if that
-         %  is straight (not oblique) then it should be the same as 
+         %  is straight (not oblique) then it should be the same as
          %  columnwise summation. Could just as well have checked the
          %  lengths of R(find(R)) and sum(R)' (which should be 3)
          %

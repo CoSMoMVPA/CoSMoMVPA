@@ -6,7 +6,7 @@
 %  If collapsed_fileprefix is omit, 'multi_scan' will be used
 %  If scan_file_folder is omit, current file folder will be used
 %
-%  The order of volumes in the collapsed file will be the order of 
+%  The order of volumes in the collapsed file will be the order of
 %  corresponding filenames for those selected scan files.
 %
 %  NIFTI data format can be found on: http://nifti.nimh.nih.gov
@@ -90,11 +90,11 @@ function collapse_nii_scan(scan_pattern, fileprefix, scan_path)
       hdr.dime.bitpix = int16(64); precision = 'float64';
    case 128,
       hdr.dime.bitpix = int16(24); precision = 'uint8';
-   case 256 
+   case 256
       hdr.dime.bitpix = int16(8 ); precision = 'int8';
-   case 512 
+   case 512
       hdr.dime.bitpix = int16(16); precision = 'uint16';
-   case 768 
+   case 768
       hdr.dime.bitpix = int16(32); precision = 'uint32';
    case 1024
       hdr.dime.bitpix = int16(64); precision = 'int64';
@@ -108,12 +108,12 @@ function collapse_nii_scan(scan_pattern, fileprefix, scan_path)
 
    if filetype == 2
       fid = fopen(sprintf('%s.nii',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.nii.',fileprefix);
          error(msg);
       end
-      
+
       hdr.dime.vox_offset = 352;
 
       if ~isempty(ext)
@@ -128,12 +128,12 @@ function collapse_nii_scan(scan_pattern, fileprefix, scan_path)
       end
    elseif filetype == 1
       fid = fopen(sprintf('%s.hdr',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.hdr.',fileprefix);
          error(msg);
       end
-      
+
       hdr.dime.vox_offset = 0;
       hdr.hist.magic = 'ni1';
       save_untouch_nii_hdr(hdr, fid);
@@ -141,19 +141,19 @@ function collapse_nii_scan(scan_pattern, fileprefix, scan_path)
       if ~isempty(ext)
          save_nii_ext(ext, fid);
       end
-      
+
       fclose(fid);
       fid = fopen(sprintf('%s.img',fileprefix),'w');
    else
       fid = fopen(sprintf('%s.hdr',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.hdr.',fileprefix);
          error(msg);
       end
-      
+
       save_untouch0_nii_hdr(hdr, fid);
-      
+
       fclose(fid);
       fid = fopen(sprintf('%s.img',fileprefix),'w');
    end

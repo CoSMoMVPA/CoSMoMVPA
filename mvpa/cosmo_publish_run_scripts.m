@@ -3,69 +3,68 @@ function cosmo_publish_run_scripts(force)
 % developers only.
 %
 % cosmo_publish_build_html([force])
-% 
+%
 % Inputs:
-%   force        boolean; indicates whether to always rebuild the output 
+%   force        boolean; indicates whether to always rebuild the output
 %                even if it already exists. If false (the default), then
 %                only run_* scripts that are newer than the output are
 %                published again. If true, all run_* scripts are published
 %                (rebuilt)
 %
-% Notes to developers: 
-% - for this function to function properly, it is required that 
-%   comso_get_data_path returns an absolute path. This is because this 
-%   function makes copies of the run_* scripts in a temporary directory 
-%   with lines containing '% >@@>' or '% <@@<' removed, and scripts are run 
+% Notes to developers:
+% - for this function to function properly, it is required that
+%   comso_get_data_path returns an absolute path. This is because this
+%   function makes copies of the run_* scripts in a temporary directory
+%   with lines containing '% >@@>' or '% <@@<' removed, and scripts are run
 %   from that directory. When cosmo_get_data_path does not return an
 %   absolute path then it may be unable to find the comso example data.
-% - this function should be run from the cosmo root directory.
-    
-    
+%
+
+
     pdir=pwd();
+
+    c=onCleanup(@()cd(pdir));
+
     medir=fileparts(which(mfilename()));
-    if ~strcmpi(pdir, medir)
-        error('The function %s should be run from its root directory (%s)',...
-                mfilename(), medir)
-    end
+    cd(medir);
+
     srcdir=fullfile(pdir,'../examples/');
     trgdir=fullfile(pdir,'..//doc/source/_static/publish/');
-    
+
     if isunix()
         tmpdir='/tmp';
     else
         error('Not implemented: temporary directory on non-unix platforms');
     end
-    
+
     srcpat='*_*';
     srcext='.m';
     trgext='.html';
-    
+
     summaryfn='index.html';
-    
+
     if nargin<1
         force=false;
     end
-    
+
     if ~exist(trgdir,'file');
         mkdir(trgdir);
     end
-    
+
     srcfns=dir(fullfile(srcdir,[srcpat srcext]));
     trgfns=dir(fullfile(trgdir,[srcpat trgext]));
-    
+
     nsrc=numel(srcfns);
     ntrg=numel(trgfns);
-    
+
     outputs=cell(nsrc,1);
-    
+
     p=path();
     has_pwd=~isempty(strfind(p,pdir));
     if ~has_pwd
         addpath(pdir)
     end
-    
-    addpath(pdir);
-    
+
     output_pos=0;
     for k=1:nsrc
         cd(pdir);
@@ -84,11 +83,11 @@ function cosmo_publish_run_scripts(force)
                 break;
             end
         end
-        
+
         if ~update
             continue;
         end
-        
+
         fprintf('building: %s ...', srcnm);
         tmpfn=fullfile(tmpdir,srcfns(k).name);
         remove_annotation(srcfn, tmpfn);
@@ -102,80 +101,80 @@ function cosmo_publish_run_scripts(force)
             if exist(fnout,'file')
                 delete(fnout);
             end
-            
+
             warning('Unable to build %s%s: %s', srcnm, srcext, me.message);
             fprintf('%s\n', me.getReport);
         end
         cd(pdir);
-            
+
         if ~is_built
             continue
         end
         fprintf(' done\n');
-        
+
         output_pos=output_pos+1;
         outputs{output_pos}=srcnm;
     end
-           
+
     if ~has_pwd
         rmpath(pdir);
     end
-    
+
     outputfn=fullfile(trgdir, summaryfn);
     fid=fopen(outputfn,'w');
     fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
             '>\n']);
     fprintf(fid,'<HTML><HEAD><TITLE>Index of matlab outputs</TITLE></HEAD>\n');
     fprintf(fid,'<BODY>Matlab output<UL>\n');
-    
+
     for k=1:output_pos
         nm=outputs{k};
         fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
     end
     fprintf(fid,'</UL>Back to <A HREF="../../index.html">index</A>.</BODY></HTML>\n');
     fclose(fid);
-        
-    fprintf('Index written to %s\n', outputfn); 
-    
-    
+
+    fprintf('Index written to %s\n', outputfn);
+
+
     function remove_annotation(srcfn,trgfn)
-    
+
     if strcmpi(srcfn,trgfn)
         error('source and target are the same: %s', srcfn);
     end
-    
+
     fid=fopen(srcfn);
     wid=fopen(trgfn,'w');
-    
+
     while true
         line=fgetl(fid);
         if ~ischar(line)
             break
         end
-        
+
         if startswith(line,'% >@@>') || startswith(line,'% <@@<')
             continue
         end
-        
+
         fprintf(wid,'%s\n',line);
     end
-    
+
     fclose(fid);
     fclose(wid);
-    
-        
+
+
     function s=startswith(haystack, needle)
-    
+
     t=strtrim(haystack);
     n=numel(needle);
     if numel(t) < n
         s=false;
         return;
     end
-    
+
     s=~isempty(strfind(t(1:n), needle));
-        
-    
-    
-    
-    
+
+
+
+
+

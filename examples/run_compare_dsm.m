@@ -22,19 +22,19 @@ for m = 1:length(masks)
     for s = 1:length(subjects)
         sub = subjects{s};
         sub_path=fullfile(study_path,sub);
-        
+
         % load dataset
         ds_fn=fullfile(sub_path,'glm_T_stats_perrun.nii');
         mask_fn=fullfile(sub_path,msk);
         ds_full = cosmo_fmri_dataset(ds_fn,...
                                     'mask',mask_fn,...
                                     'targets',repmat(1:6,1,10)');
-        
+
         % compute average for each unique target
         ds=cosmo_fx(ds_full, @(x)mean(x,1), 'targets', 1);
-        
-        
-        
+
+
+
         % demean
         % Comment this out to see the effects of demeaning vs. not
         ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples, 1));
@@ -43,7 +43,7 @@ for m = 1:length(masks)
         dsm=cosmo_pdist(ds.samples, 'correlation');
         if isempty(dsms)
             dsms=dsm;
-        else 
+        else
             dsms = [dsms; dsm];
         end
     end
@@ -70,7 +70,7 @@ dsms = [dsms; v1_model_sf(:)'; behav_model_sf(:)'];
 
 % >@@>
 cc = corrcoef(dsms');
-figure(); imagesc(cc); 
+figure(); imagesc(cc);
 % <@@<
 
 %%

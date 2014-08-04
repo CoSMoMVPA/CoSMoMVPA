@@ -6,9 +6,9 @@ function c=cosmo_corr(x,y,corr_type)
 % Inputs:
 %   x          PxM matrix.
 %   y          PxN matrix (optional). If omitted then y=x.
-%   corr_type  'Pearson' or 'Spearman' or 'Kendall' (optional). If omitted 
+%   corr_type  'Pearson' or 'Spearman' or 'Kendall' (optional). If omitted
 %              then corrtype='Pearson' and the computation time is
-%              significantly reduced for small matrices x and y (with 
+%              significantly reduced for small matrices x and y (with
 %              /tiny/ numerical imprecisions) by the use of a custom
 %              implementation.
 %              Using 'Spearman' or 'Kendall' required the matlab stats
@@ -22,7 +22,7 @@ function c=cosmo_corr(x,y,corr_type)
 %    toolbox.
 %
 % Example:
-%   % generate some pseudo-random data. 
+%   % generate some pseudo-random data.
 %   x=reshape(mod(3:7:7e5,41),100,[]);
 %   y=reshape(mod(1:7:7e5,37),100,[]);
 %   % compute builtin corr with cosmo_corr
@@ -49,7 +49,7 @@ function c=cosmo_corr(x,y,corr_type)
     elseif nargin<3
         corr_type='Pearson';
     end
-    
+
     if y_as_x
         y=x;
     end
@@ -73,13 +73,13 @@ function c=cosmo_corr(x,y,corr_type)
 
             % compute correlations
             c=n * (xd' * yd) .* (xs' * ys);
-            
+
             if y_as_x
                 % ensure diagonal elements are 1
                 dc=diag(c);
                 c=(c-diag(dc))+eye(numel(dc));
             end
-            
+
         otherwise
             % fall-back: use Matlab's function
             % will puke if no Matlab stat toolbox

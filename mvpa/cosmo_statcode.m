@@ -4,8 +4,8 @@ function stat_repr=cosmo_statcode(ds, output_format)
 % stat_repr=cosmo_statcode(ds[, output_format])
 %
 % Inputs:
-%   ds             dataset struct with N samples, or Nx1 cell with strings 
-%                  with statistic labels, or AFNI, BV or NIFTI header 
+%   ds             dataset struct with N samples, or Nx1 cell with strings
+%                  with statistic labels, or AFNI, BV or NIFTI header
 %                  struct for N samples.
 %   output_format  Optional; one of 'afni', 'bv', or 'nifti'; or empty.
 %
@@ -13,15 +13,15 @@ function stat_repr=cosmo_statcode(ds, output_format)
 %   stat_repr      - If output_format is empty or omitted: an Nx1 cell
 %                    with a string representation of the statistic in each
 %                    sample, e.g. 'Ftest(123,2)' or 'Zscore()' or empty.
-%                  - If output_format=='afni': struct with field 
+%                  - If output_format=='afni': struct with field
 %                    .BRICK_STATAUX.
 %                  - If output_format=='bv': Nx1 cell with structs, each
 %                    with fieldnames .name, .DF1 and .DF2.
 %                  - If output_format=='nifti': struct with fieldnames
-%                    .intent_code and .intent_p{1,2,3} if all stat codes 
+%                    .intent_code and .intent_p{1,2,3} if all stat codes
 %                    are the same; empty otherwise (NIFTI does not support
 %                    different stat codes for different samples).
-%  
+%
 % NNO Feb 2014
 
     if nargin<2, output_format=''; end
@@ -44,26 +44,26 @@ function stat_repr=cosmo_statcode(ds, output_format)
         % representation, or fail in hdr2strs if that's not the case
         stat_repr=hdr2strs(ds);
     end
-        
+
     if isempty(output_format)
         % we're done
         return
     end
-    
+
     % convert to (name, df) pairs
     name_df=stat_strs2name_df(stat_repr);
-    
+
     % convert to package-specific header
     stat_repr=name_df2hdr(name_df, output_format);
-  
-    
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function name_df=stat_strs2name_df(stat_strs)
 % converts string representations to name and degrees of freedom
     n=numel(stat_strs);
-    
+
     name_df=cell(n,2);
     for k=1:n
         stat_str=stat_strs{k};
@@ -80,20 +80,20 @@ function name_df=stat_strs2name_df(stat_strs)
                 df_split=cosmo_strsplit(names.df,',');
                 df=cellfun(@str2num,df_split);
             end
-            
+
             if isempty(names)
                 error('Unable to parse stat string %s', stat_str);
             end
-            
+
             name_df{k,1}=names.name;
             name_df{k,2}=df;
         end
     end
-    
-    
+
+
 function hdr=name_df2hdr(name_df, output_format)
 % converts statistic name and df to package-specific header
-% 
+%
 % hdr=name_df2hdr(name_df, output_format)
 %
 % Inputs:
@@ -106,7 +106,7 @@ function hdr=name_df2hdr(name_df, output_format)
 %                   statistical information
     codes=get_codes(output_format);
     nsamples=size(name_df,1);
-    
+
     stat_idxs=zeros(nsamples,1);
     names=codes(:,1);
     for k=1:nsamples
@@ -122,14 +122,14 @@ function hdr=name_df2hdr(name_df, output_format)
             warning('Unrecognized stat name %s at sample %d', name, k);
         end
     end
-    
+
     switch output_format
         case 'afni'
             hdr=struct();
-            
+
             % space for each sample
             auxs=cell(1,nsamples);
-            
+
             % build BRICK_STATAUX struct
             for k=1:nsamples
                 stat_idx=stat_idxs(k);
@@ -139,36 +139,36 @@ function hdr=name_df2hdr(name_df, output_format)
                 df=name_df{k,2};
                 auxs{k}=[(k-1) stat_idx numel(df) df];
             end
-            
+
             % concatenate information for all samples
             hdr.BRICK_STATAUX=[auxs{:}];
-            
+
         case 'bv'
             maps=cell(nsamples,1);
             for k=1:nsamples
                 map=struct();
                 stat_idx=stat_idxs(k);
-                
+
                 if stat_idx==0
                     continue;
                 end
-                
+
                 map.Type=stat_idx;
                 df=name_df{k,2};
                 if numel(df)>=1, map.DF1=df(1); end
                 if numel(df)>=2, map.DF2=df(2); end
                 maps{k}=map;
             end
-            
+
             hdr=maps; % return a cell with maps
-                
+
         case 'nifti'
             hdr=struct();
-            
+
             if isempty(stat_idxs)
                 return
             end
-            
+
             unq_stat_idx=unique(stat_idxs);
             df=name_df(:,2);
             n=numel(df);
@@ -180,17 +180,17 @@ function hdr=name_df2hdr(name_df, output_format)
             end
             unq_df=unique(df_matrix,'rows');
 
-            
-            
-            
+
+
+
             if numel(unq_stat_idx)>1 || numel(unique(ndf))>1 || ...
                             size(unq_df,1)>1
                 warning('Multiple stat codes found, unsupported by nifti');
                 return
             end
-            
+
             hdr.intent_code=unq_stat_idx;
-            
+
             df=zeros(1,3);
             if ~isempty(unq_df)
                 df(1:numel(unq_df))=unq_df;
@@ -211,7 +211,7 @@ function stat_strs=hdr2strs(hdr)
 %
 % Inputs:
 %   hdr         AFNI, BV vmp, or NIFTI header
-%   
+%
 % Returns:
 %   stat_strs   Kx1
 
@@ -228,12 +228,12 @@ function stat_strs=hdr2strs(hdr)
             df=[map.DF1 map.DF2];
             stat_strs{k}=stat_code2str(codes, tp, df);
         end
-        
+
     elseif isstruct(hdr) && isfield(hdr,'DATASET_RANK')
         % afni
         nsamples=hdr.DATASET_RANK(2);
         stat_strs=cell(nsamples,1);
-        
+
         if isfield(hdr,'BRICK_STATAUX')
             codes=get_codes('afni');
             aux=hdr.BRICK_STATAUX;
@@ -248,28 +248,28 @@ function stat_strs=hdr2strs(hdr)
                 stat_strs{brik_idx}=stat_code2str(codes, stat_code, df);
                 pos=pos+2+n_df;
             end
-            
+
             % sanity check
             if pos~=naux
                 error('Not all elements were processed in STATAUX %s',...
                             sprintf('%d ', aux));
             end
         end
-            
+
     elseif isstruct(hdr) && isfield(hdr,'dime') && isfield(hdr.dime,'dim')
         % nifti
         codes=get_codes('nifti');
-        
+
         dime=hdr.dime;
         % deal with potential data in >4th dimension
         % (AFNI-NIFTI conversion syndrome)
         nsamples=max(prod(dime.dim(5:end)),dime.dim(5));
-        
+
         % get stat codes
         stat_code=dime.intent_code;
         stat_df=[dime.intent_p1 dime.intent_p2 dime.intent_p3];
         stat_str=stat_code2str(codes,stat_code,stat_df);
-        
+
         % repeat for as many samples as there are in the dataset
         stat_strs=repmat({stat_str},nsamples,1);
     else
@@ -285,7 +285,7 @@ function str=stat_code2str(codes, stat_code, df)
         str='';
         return
     end
-    
+
     name=codes{stat_code,1};
 
     if isempty(name)
@@ -296,11 +296,11 @@ function str=stat_code2str(codes, stat_code, df)
     df_count=codes{stat_code,2};
     df_str=cellfun(@(x) sprintf('%d',x),num2cell(df(1:df_count)),...
                         'UniformOutput',false);
-                    
+
     % join with stat name
     str=sprintf('%s(%s)',name,cosmo_strjoin(df_str,','));
-    
-    
+
+
 
 function codes=get_codes(package)
 % get names and number of degrees of freedom for an analysis package
@@ -319,7 +319,7 @@ function codes=get_codes(package)
         case 'nifti'
             % http://nifti.nimh.nih.gov/nifti-1/documentation/...
             %                 nifti_stats.pdf
-            codes={'',0; % not defined 
+            codes={'',0; % not defined
                     'Correl',1; % first one starts at 2
                     'Ttest',1;
                     'Ftest',2;
@@ -347,7 +347,7 @@ function codes=get_codes(package)
 
         case 'afni'
             % http://afni.nimh.nih.gov/pub/dist/doc/program_help/...
-            %                README.attributes.html   
+            %                README.attributes.html
             % AFNI uses a subset of NIFTI.
             nifti_codes=get_codes('nifti'); % recursive call
             codes=nifti_codes(1:10,:);
@@ -356,10 +356,10 @@ function codes=get_codes(package)
         case 'bv'
             % http://support.brainvoyager.com/documents/Available_Tools/...
             %              Available_Plugins/niftiplugin_manual_v12.pdf
-            % why follow a standard (like NIFTI) if one can 
+            % why follow a standard (like NIFTI) if one can
             % come up with something incompatible too?
-            codes={'Ttest',1;  
-                      'Correl',1; 
+            codes={'Ttest',1;
+                      'Correl',1;
                       'Correl',1; % "cross-correlation", whatever it means
                       'Ftest',2;
                       'Zscore',0,
@@ -373,10 +373,10 @@ function codes=get_codes(package)
                       '',0;
                       '',0;
                       '',0;
-                      'Chisq',1; 
+                      'Chisq',1;
                       'Beta',2};
         otherwise
             error('Unsupported analysis package %s', package);
     end
 
-        
+

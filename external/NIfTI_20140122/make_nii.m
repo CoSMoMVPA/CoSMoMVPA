@@ -1,11 +1,11 @@
-%  Make NIfTI structure specified by an N-D matrix. Usually, N is 3 for 
-%  3D matrix [x y z], or 4 for 4D matrix with time series [x y z t]. 
-%  Optional parameters can also be included, such as: voxel_size, 
-%  origin, datatype, and description. 
-%  
-%  Once the NIfTI structure is made, it can be saved into NIfTI file 
-%  using "save_nii" command (for more detail, type: help save_nii). 
-%  
+%  Make NIfTI structure specified by an N-D matrix. Usually, N is 3 for
+%  3D matrix [x y z], or 4 for 4D matrix with time series [x y z t].
+%  Optional parameters can also be included, such as: voxel_size,
+%  origin, datatype, and description.
+%
+%  Once the NIfTI structure is made, it can be saved into NIfTI file
+%  using "save_nii" command (for more detail, type: help save_nii).
+%
 %  Usage: nii = make_nii(img, [voxel_size], [origin], [datatype], [description])
 %
 %  Where:
@@ -157,7 +157,7 @@ function hdr = make_header(dims, voxel_size, origin, datatype, ...
    hdr.hk   = header_key;
    hdr.dime = image_dimension(dims, voxel_size, datatype, maxval, minval);
    hdr.hist = data_history(origin, descrip);
-    
+
    return;					% make_header
 
 
@@ -171,20 +171,20 @@ function hk = header_key
     hk.session_error    = 0;
     hk.regular          = 'r';
     hk.dim_info         = 0;
-    
+
     return;					% header_key
 
 
 %---------------------------------------------------------------------
 function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
-   
+
    dime.dim = dims;
    dime.intent_p1 = 0;
    dime.intent_p2 = 0;
    dime.intent_p3 = 0;
    dime.intent_code = 0;
    dime.datatype = datatype;
-   
+
    switch dime.datatype
    case 2,
       dime.bitpix = 8;  precision = 'uint8';
@@ -200,20 +200,20 @@ function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
       dime.bitpix = 64; precision = 'float64';
    case 128
       dime.bitpix = 24;  precision = 'uint8';
-   case 256 
+   case 256
       dime.bitpix = 8;  precision = 'int8';
    case 511
       dime.bitpix = 96;  precision = 'float32';
-   case 512 
+   case 512
       dime.bitpix = 16; precision = 'uint16';
-   case 768 
+   case 768
       dime.bitpix = 32; precision = 'uint32';
    case 1792,
       dime.bitpix = 128; precision = 'float64';
    otherwise
       error('Datatype is not supported by make_nii.');
    end
-   
+
    dime.slice_start = 0;
    dime.pixdim = voxel_size;
    dime.vox_offset = 0;
@@ -228,13 +228,13 @@ function dime = image_dimension(dims, voxel_size, datatype, maxval, minval)
    dime.toffset = 0;
    dime.glmax = maxval;
    dime.glmin = minval;
-   
+
    return;					% image_dimension
 
 
 %---------------------------------------------------------------------
 function hist = data_history(origin, descrip)
-   
+
    hist.descrip = descrip;
    hist.aux_file = 'none';
    hist.qform_code = 0;
@@ -251,6 +251,6 @@ function hist = data_history(origin, descrip)
    hist.intent_name = '';
    hist.magic = '';
    hist.originator = origin;
-   
+
    return;					% data_history
 

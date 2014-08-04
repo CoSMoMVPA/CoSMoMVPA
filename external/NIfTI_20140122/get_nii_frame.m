@@ -1,10 +1,10 @@
-%  Return time frame of a NIFTI dataset. Support both *.nii and 
+%  Return time frame of a NIFTI dataset. Support both *.nii and
 %  *.hdr/*.img file extension. If file extension is not provided,
-%  *.hdr/*.img will be used as default. 
+%  *.hdr/*.img will be used as default.
 %
 %  It is a lightweighted "load_nii_hdr", and is equivalent to
 %  hdr.dime.dim(5)
-%  
+%
 %  Usage: [ total_scan ] = get_nii_frame(filename)
 %
 %  filename - NIFTI file name.
@@ -107,7 +107,7 @@ function [ total_scan ] = get_nii_frame(filename)
    end
 
    fid = fopen(fn,'r',machine);
-    
+
    if fid < 0,
       msg = sprintf('Cannot open file %s.',fn);
       error(msg);
@@ -115,16 +115,16 @@ function [ total_scan ] = get_nii_frame(filename)
       hdr = read_header(fid);
       fclose(fid);
    end
-   
+
    if hdr.sizeof_hdr ~= 348
       % first try reading the opposite endian to 'machine'
       switch machine,
       case 'ieee-le', machine = 'ieee-be';
       case 'ieee-be', machine = 'ieee-le';
       end
-        
+
       fid = fopen(fn,'r',machine);
-        
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.',fn);
          error(msg);

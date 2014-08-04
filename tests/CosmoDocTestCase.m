@@ -21,7 +21,7 @@ classdef CosmoDocTestCase < TestCase
 % See also: CosmoDocTestSuite, cosmo_run_tests
 %
 % NNO Jul 2014
-    
+
     properties (SetAccess = protected, GetAccess = protected, Hidden = true)
         %
         preamb;
@@ -36,20 +36,20 @@ classdef CosmoDocTestCase < TestCase
                                                 filename, line_number)
             % constructor
             self = self@TestCase('runTestCase');
-                        
+
             self.preamb=preamb;
             self.expr=expr;
             self.wants=wants;
             self.filename=filename;
             self.line_number=line_number;
-            
+
             [unused, name] = fileparts(filename);
             prefix='Doctest: ';
             linkto=@CosmoDocTestCase.linkto;
             self.Name=linkto(filename,line_number,[prefix name]);
             self.MethodName=linkto(filename, line_number, name);
             self.Location = linkto(filename, line_number);
-            
+
         end
 
         function did_pass = run(self, monitor)
@@ -57,10 +57,10 @@ classdef CosmoDocTestCase < TestCase
             if nargin < 2
                 monitor = CommandWindowTestRunDisplay();
             end
-            
+
             did_pass = true;
             monitor.testComponentStarted(self);
-            
+
             try
                 % delegate the real work to the helper function below
                 run_doctest(self.preamb, self.expr, self.wants, ...
@@ -72,18 +72,18 @@ classdef CosmoDocTestCase < TestCase
 
             monitor.testComponentFinished(self, did_pass);
         end
-        
+
         function num = numTestCases(self)
             num = 1;
         end
-           
+
         function print(self, numLeadingBlanks)
             if nargin < 2
                 numLeadingBlanks = 0;
             end
             fprintf('%s%s\n', blanks(numLeadingBlanks), self.Name);
         end
-        
+
         function setUp(self)
             % do nothing
         end
@@ -92,7 +92,7 @@ classdef CosmoDocTestCase < TestCase
             % do nothing
         end
     end
-    
+
     methods (Static)
         function s=linkto(filename, line_number, name)
             % helper function: makes a clickable link in matlab
@@ -153,10 +153,10 @@ function run_doctest(preamb, expr, wants, filename, line)
                                 expr,prefix_gt(wants),prefix_gt(ve));
             break
         end
-        
+
         % always ensure to break out of the loop
         break;
-        
+
         assert(false,'Should never come here');
     end
 
@@ -179,11 +179,11 @@ end
 
 function [CosmoDocTestCase__eval_res,CosmoDocTestCase__eval_me]=...
                                         CosmoDocTestCase__evalc(expr)
-    % helper function with minimal namespace to avoid variable name 
+    % helper function with minimal namespace to avoid variable name
     % collisions when using evalc
     %
     % CosmoDocTestCase__eval_me==[] means succesful evaluation of 'expr',
-    % otherwise CosmoDocTestCase__eval_me contains the exception 
+    % otherwise CosmoDocTestCase__eval_me contains the exception
     CosmoDocTestCase__eval_res=[];
     CosmoDocTestCase__eval_me=[];
     try
@@ -195,7 +195,7 @@ end
 function cmp=doctest_compare(found, wanted)
     % not-so-stringent comparison of found (output from evaluting an
     % expression) and wanted (an expected output string)
-    
+
     % remove ' ans = ' line if present
     found=without_ans(found);
 

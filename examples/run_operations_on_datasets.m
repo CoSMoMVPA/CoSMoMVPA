@@ -19,7 +19,7 @@ ds.sa.targets = repmat([1:6]',10,1);
 % equivalent code would be:
 %   chunks=zeros(60,1);
 %   for k=1:10
-%       chunks((k-1)*6+(1:6))=k; 
+%       chunks((k-1)*6+(1:6))=k;
 %   end
 ds.sa.chunks=floor(((1:60)-1)'/6)+1;
 
@@ -38,7 +38,7 @@ bug_idx = ds.sa.targets > 4;
 % >@@>
 primate_ds = cosmo_slice(ds, primate_idx);
 bug_ds = cosmo_slice(ds, bug_idx);
-% <@@<                    
+% <@@<
 
 %% Subtract mean pattern
 % Find the mean pattern for primates and bugs and subtract the bug pattern from

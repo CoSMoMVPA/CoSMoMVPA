@@ -19,11 +19,11 @@ function test_structjoin_
     y_.c='hello';
     assertEqual(sj(ya),y_);
     assertEqual(sj(ya{:}),y_);
-    
+
     % deal with empty struct fine
     assertEqual(sj(struct),struct);
     assertEqual(sj(cell(0)),struct);
-    
+
     % check exceptions
     ar=@(args) assertExceptionThrown(@()cosmo_structjoin(args{:}),'');
     ar({'a'});
@@ -31,16 +31,16 @@ function test_structjoin_
     ar({1});
     ar({ar});
     ar({[]});
-    
+
     % test shebang
     ar({'!',{'b'},'b',{1,2}});
     ar({'!',{'c',3},'b',{1,2}});
     ar({'!',{'c',3},'b',{1,2}});
     ar({'!',x_,y_});
-    
+
     assertEqual(sj('!',y_,x_),sj(y_,x_));
     assertEqual(sj(x_,y_),sj(y_,x_,'!',y_));
-    
-    
-    
-    
+
+
+
+

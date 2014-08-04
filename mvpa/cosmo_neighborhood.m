@@ -10,18 +10,18 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %                   for a spherical neighborhood (set to negative to select
 %                   at least (-args) features per neighborhood).
 %                 - otherwise a dimension label (in ds.a.dim.labels);
-%                   if 'chan' then args are the arguments for 
+%                   if 'chan' then args are the arguments for
 %                   cosmo_meeg_chan_neighborhood, otherwise args is half of
 %                   the size of the linear interval around each feature
 %   nbrhood*      a neighborhood struct with fields .[f]a and .neighbors,
 %                 for example from cosmo_spherical_neighborhood,
-%                 cosmo_meeg_chan_neighborhood, or 
+%                 cosmo_meeg_chan_neighborhood, or
 %                 cosmo_interval_neighborhood.
-%   
+%
 % Returns:
 %   joined_nbrhood  neighborhood struct with fields .[f]a and .neighbors,
 %                   constructed by intersecting the neighborhoods from the
-%                   input. 
+%                   input.
 %
 % See also: cosmo_spherical_neighborhood, cosmo_meeg_chan_neighborhood,
 %           cosmo_interval_neighborhood
@@ -37,7 +37,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     dims.values=cell(1,ndim_max);
     dims.fa=cell(1,ndim_max);
 
-    % progress input 
+    % progress input
     ndim=0;
     narg=numel(varargin);
     k=0;
@@ -90,7 +90,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
                     cosmo_strjoin(expected_dim_labels,', '),...
                     cosmo_strjoin(fieldnames(nbrhood.fa),', '));
         end
-        
+
         % ensure everything is sorted, as the helper function
         % 'conj_indices' requires that
         for j=1:numel(nbrhood.neighbors)
@@ -100,8 +100,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
         end
 
         dims.nbrs{ndim}=nbrhood.neighbors;
-        dims.values{ndim}=nbrhood.a.dim.values; 
-        dims.labels{ndim}=nbrhood.a.dim.labels; 
+        dims.values{ndim}=nbrhood.a.dim.values;
+        dims.labels{ndim}=nbrhood.a.dim.labels;
         dims.fa{ndim}=nbrhood.fa;
     end
 
@@ -111,7 +111,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     % merge labels and values
     dim_labels=[dims.labels{:}];
     dim_values=[dims.values{:}];
-    
+
     % ensure no duplicate or missing labels
     if ~isequal(sort(dim_labels), unique(dim_labels))
         error('Duplicate dimension labels in %s', ...
@@ -142,18 +142,18 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 
 
 
-function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress) 
+function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress)
     % computes conjunction indices
     %
-    % Input: 
+    % Input:
     %   dim_idxs     A NDIMx1 cell, each with X_v cells with indices
-    %                As used in this function, dim_idxs{dim}{j} are the 
-    %                sorted indices with feature attribute for the  
+    %                As used in this function, dim_idxs{dim}{j} are the
+    %                sorted indices with feature attribute for the
     %                dim-th value equal to j.
     %
-    % Outputs: 
+    % Outputs:
     %   flat_idxs    Nx1 cell values where N=prod(X_*), each of which
-    %                has the linear indices of the neighbors of an output 
+    %                has the linear indices of the neighbors of an output
     %                feature.
     %   map_idxs     N*ndim matrix with values in the dim-th column
     %                in the range 1..X_dim. This can be used to index the
@@ -208,8 +208,8 @@ function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress)
 
 
 function xy=fast_intersect(x,y)
-    % finds the intersection between two vectors 
-    % 
+    % finds the intersection between two vectors
+    %
     % xy=fast_intersect(x,y)
     %
     % Inputs:
@@ -221,8 +221,8 @@ function xy=fast_intersect(x,y)
     %         without duplicates and with elements sorted.
     %
     % Notes:
-    %  - this function runs in O(n) compared to O(n*log(n)) with n=max(numel(x),numel(y)) for the 
-    %    built-in function 'intersect', as that function sorts the input 
+    %  - this function runs in O(n) compared to O(n*log(n)) with n=max(numel(x),numel(y)) for the
+    %    built-in function 'intersect', as that function sorts the input
     %    data first.
 
     nx=numel(x);
@@ -230,7 +230,7 @@ function xy=fast_intersect(x,y)
     n=min(nx,ny); % maximum size possible for output
 
     xy=zeros(n,1); % allocate space for output
-    
+
     pos=0; % last position where a value was stored in xy
     xi=1;  % position in x
     yi=1;  % position in y
@@ -251,10 +251,10 @@ function xy=fast_intersect(x,y)
 
     xy=xy(1:pos); % only keep stored elements
 
-    
-    
-    
-    
-            
-            
-            
+
+
+
+
+
+
+

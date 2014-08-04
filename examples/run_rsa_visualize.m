@@ -15,7 +15,7 @@ ev_ds = cosmo_fmri_dataset(data_fn, ...
 
 vt_ds = cosmo_fmri_dataset(data_fn, ...
                             'mask',[data_path '/vt_mask.nii'],...
-                            'targets',targets);                        
+                            'targets',targets);
 % <@@<
 
 % compute average for each unique target, so that the datasets have 6
@@ -34,14 +34,14 @@ vt_dsm = pdist(vt_ds.samples, 'correlation');
 % Using matlab's subplot function place the heat maps for EV and VT DSMs side by
 % side in the top two positions of a 3 x 2 subplot figure
 
-% >@@> 
+% >@@>
 figure(); subplot(3,2,1); imagesc(squareform(ev_dsm)); title('EV');
 subplot(3,2,2); imagesc(squareform(vt_dsm)); title('VT');
 % <@@<
 
 
 
-% Now add the dendrograms for EV and LV in the middle row of the subplot figure 
+% Now add the dendrograms for EV and LV in the middle row of the subplot figure
 % (this requires matlab's stats toolbox)
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 %
@@ -51,9 +51,9 @@ vt_hclus = linkage(vt_dsm);
 
 % skip if stats toolbox is not present
 if cosmo_check_external('@stats',false)
-    subplot(3,2,3); 
+    subplot(3,2,3);
     dendrogram(ev_hclus,'labels',labels,'orientation','left');
-    subplot(3,2,4); 
+    subplot(3,2,4);
     dendrogram(vt_hclus,'labels',labels,'orientation','left');
 else
     fprintf('stats toolbox not present; cannot show dendrograms\n');
@@ -70,7 +70,7 @@ mx = max(abs(F_ev(:)));
 xlim([-mx mx]); ylim([-mx mx]);
 
 subplot(3,2,6); text(F_vt(:,1), F_vt(:,2), labels);
-mx = max(abs(F_vt(:)));        
+mx = max(abs(F_vt(:)));
 xlim([-mx mx]); ylim([-mx mx]);
 % <@@<
-                            
+

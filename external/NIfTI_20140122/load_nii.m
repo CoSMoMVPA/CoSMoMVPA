@@ -9,16 +9,16 @@
 %  nii will be in RAS orientation, i.e. X axis from Left to Right,
 %  Y axis from Posterior to Anterior, and Z axis from Inferior to
 %  Superior.
-%  
+%
 %  Usage: nii = load_nii(filename, [img_idx], [dim5_idx], [dim6_idx], ...
 %			[dim7_idx], [old_RGB], [tolerance], [preferredForm])
-%  
+%
 %  filename  - 	NIFTI or ANALYZE file name.
-%  
+%
 %  img_idx (optional)  -  a numerical array of 4th dimension indices,
 %	which is the indices of image scan volume. The number of images
 %	scan volumes can be obtained from get_nii_frame.m, or simply
-%	hdr.dime.dim(5). Only the specified volumes will be loaded. 
+%	hdr.dime.dim(5). Only the specified volumes will be loaded.
 %	All available image volumes will be loaded, if it is default or
 %	empty.
 %
@@ -38,32 +38,32 @@
 %	from old RGB24. New RGB24 uses RGB triple sequentially for each
 %	voxel, like [R1 G1 B1 R2 G2 B2 ...]. Analyze 6.0 from AnalyzeDirect
 %	uses old RGB24, in a way like [R1 R2 ... G1 G2 ... B1 B2 ...] for
-%	each slices. If the image that you view is garbled, try to set 
+%	each slices. If the image that you view is garbled, try to set
 %	old_RGB variable to 1 and try again, because it could be in
 %	old RGB24. It will be set to 0, if it is default or empty.
 %
 %  tolerance (optional) - distortion allowed in the loaded image for any
-%	non-orthogonal rotation or shearing of NIfTI affine matrix. If 
-%	you set 'tolerance' to 0, it means that you do not allow any 
-%	distortion. If you set 'tolerance' to 1, it means that you do 
+%	non-orthogonal rotation or shearing of NIfTI affine matrix. If
+%	you set 'tolerance' to 0, it means that you do not allow any
+%	distortion. If you set 'tolerance' to 1, it means that you do
 %	not care any distortion. The image will fail to be loaded if it
 %	can not be tolerated. The tolerance will be set to 0.1 (10%), if
 %	it is default or empty.
 %
 %  preferredForm (optional)  -  selects which transformation from voxels
 %	to RAS coordinates; values are s,q,S,Q.  Lower case s,q indicate
-%	"prefer sform or qform, but use others if preferred not present". 
+%	"prefer sform or qform, but use others if preferred not present".
 %	Upper case indicate the program is forced to use the specificied
 %	tranform or fail loading.  'preferredForm' will be 's', if it is
 %	default or empty.	- Jeff Gunter
 %
 %  Returned values:
-%  
+%
 %  nii structure:
 %
 %	hdr -		struct with NIFTI header fields.
 %
-%	filetype -	Analyze format .hdr/.img (0); 
+%	filetype -	Analyze format .hdr/.img (0);
 %			NIFTI .hdr/.img (1);
 %			NIFTI .nii (2)
 %
@@ -74,12 +74,12 @@
 %	img - 		3D (or 4D) matrix of NIFTI data.
 %
 %	original -	the original header before any affine transform.
-%  
+%
 %  Part of this file is copied and modified from:
 %  http://www.mathworks.com/matlabcentral/fileexchange/1878-mri-analyze-tools
-%  
+%
 %  NIFTI data format can be found on: http://nifti.nimh.nih.gov
-%  
+%
 %  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
 %
 function nii = load_nii(filename, img_idx, dim5_idx, dim6_idx, dim7_idx, ...

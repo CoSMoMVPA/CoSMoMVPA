@@ -21,7 +21,7 @@ function hdr = load_nii_hdr(fileprefix, machine, filetype)
    end
 
    fid = fopen(fn,'r',machine);
-    
+
    if fid < 0,
       msg = sprintf('Cannot open file %s.',fn);
       error(msg);
@@ -39,7 +39,7 @@ function [ dsr ] = read_header(fid)
 
         %  Original header structures
 	%  struct dsr
-	%       { 
+	%       {
 	%       struct header_key hk;            /*   0 +  40       */
 	%       struct image_dimension dime;     /*  40 + 108       */
 	%       struct data_history hist;        /* 148 + 200       */
@@ -63,9 +63,9 @@ function [ dsr ] = read_header(fid)
 function [ hk ] = header_key(fid)
 
     fseek(fid,0,'bof');
-    
-	%  Original header structures	
-	%  struct header_key                     /* header key      */ 
+
+	%  Original header structures
+	%  struct header_key                     /* header key      */
 	%       {                                /* off + size      */
 	%       int sizeof_hdr                   /*  0 +  4         */
 	%       char data_type[10];              /*  4 + 10         */
@@ -77,8 +77,8 @@ function [ hk ] = header_key(fid)
 	%       };                               /* total=40 bytes  */
 	%
 	% int sizeof_header   Should be 348.
-	% char regular        Must be 'r' to indicate that all images and 
-	%                     volumes are the same size. 
+	% char regular        Must be 'r' to indicate that all images and
+	%                     volumes are the same size.
 
     v6 = version;
     if str2num(v6(1))<6
@@ -86,7 +86,7 @@ function [ hk ] = header_key(fid)
     else
        directchar = 'uchar=>char';
     end
-	
+
     hk.sizeof_hdr    = fread(fid, 1,'int32')';	% should be 348!
     hk.data_type     = deblank(fread(fid,10,directchar)');
     hk.db_name       = deblank(fread(fid,18,directchar)');
@@ -94,22 +94,22 @@ function [ hk ] = header_key(fid)
     hk.session_error = fread(fid, 1,'int16')';
     hk.regular       = fread(fid, 1,directchar)';
     hk.dim_info      = fread(fid, 1,'uchar')';
-    
+
     return					% header_key
 
 
 %---------------------------------------------------------------------
 function [ dime ] = image_dimension(fid)
 
-	%  Original header structures    
+	%  Original header structures
 	%  struct image_dimension
 	%       {                                /* off + size      */
 	%       short int dim[8];                /* 0 + 16          */
         %       /*
-        %           dim[0]      Number of dimensions in database; usually 4. 
-        %           dim[1]      Image X dimension;  number of *pixels* in an image row. 
-        %           dim[2]      Image Y dimension;  number of *pixel rows* in slice. 
-        %           dim[3]      Volume Z dimension; number of *slices* in a volume. 
+        %           dim[0]      Number of dimensions in database; usually 4.
+        %           dim[1]      Image X dimension;  number of *pixels* in an image row.
+        %           dim[2]      Image Y dimension;  number of *pixel rows* in slice.
+        %           dim[3]      Volume Z dimension; number of *slices* in a volume.
         %           dim[4]      Time points; number of volumes in database
         %       */
 	%       float intent_p1;   % char vox_units[4];   /* 16 + 4       */
@@ -141,7 +141,7 @@ function [ dime ] = image_dimension(fid)
 	%       int glmax;                       /* 100 + 4         */
 	%       int glmin;                       /* 104 + 4         */
 	%       };                               /* total=108 bytes */
-	
+
     dime.dim        = fread(fid,8,'int16')';
     dime.intent_p1  = fread(fid,1,'float32')';
     dime.intent_p2  = fread(fid,1,'float32')';
@@ -163,15 +163,15 @@ function [ dime ] = image_dimension(fid)
     dime.toffset    = fread(fid,1,'float32')';
     dime.glmax      = fread(fid,1,'int32')';
     dime.glmin      = fread(fid,1,'int32')';
-        
+
     return					% image_dimension
 
 
 %---------------------------------------------------------------------
 function [ hist ] = data_history(fid)
-        
+
 	%  Original header structures
-	%  struct data_history       
+	%  struct data_history
 	%       {                                /* off + size      */
 	%       char descrip[80];                /* 0 + 80          */
 	%       char aux_file[24];               /* 80 + 24         */
@@ -196,7 +196,7 @@ function [ hist ] = data_history(fid)
     else
        directchar = 'uchar=>char';
     end
-    
+
     hist.descrip     = deblank(fread(fid,80,directchar)');
     hist.aux_file    = deblank(fread(fid,24,directchar)');
     hist.qform_code  = fread(fid,1,'int16')';
@@ -212,6 +212,6 @@ function [ hist ] = data_history(fid)
     hist.srow_z      = fread(fid,4,'float32')';
     hist.intent_name = deblank(fread(fid,16,directchar)');
     hist.magic       = deblank(fread(fid,4,directchar)');
-    
+
     return					% data_history
 

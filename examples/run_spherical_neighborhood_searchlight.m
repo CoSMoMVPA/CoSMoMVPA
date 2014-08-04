@@ -3,7 +3,7 @@
 % cosmo_spherical_neighborhood and performs crossvalidation
 % with a nearest neigh classifier
 %
-% Note: for running searchlights it is recommended to use 
+% Note: for running searchlights it is recommended to use
 %       cosmo_searchlight and cosmo_spherical_neighborhood
 
 
@@ -23,7 +23,7 @@ classifier_opt=struct();
 %% load data and set sample attributes
 ds=cosmo_fmri_dataset(fn, 'mask', maskfn, ...
                           'targets', targets, ...
-                          'chunks', chunks); 
+                          'chunks', chunks);
 
 fprintf('Input dataset:\n');
 cosmo_disp(ds);
@@ -39,7 +39,7 @@ ncenters=numel(center2neighbors); % should be equal to 'nfeatures'
 
 %% set up cross validation
 % (here we use cosmo_oddeven_partitioner; cosmo_nfold_partitioner would be
-% another possiblity, with the advantage of using a larger training set, 
+% another possiblity, with the advantage of using a larger training set,
 % but the disadvantage that it takes longer to run)
 partitions=cosmo_oddeven_partitioner(ds.sa.chunks);
 
@@ -48,36 +48,36 @@ ncenters=numel(center_ids);
 accs=zeros(1,ncenters);
 
 %% Run the searchlight
-% go over all features: in each iteration, slice the dataset to get the 
+% go over all features: in each iteration, slice the dataset to get the
 % desired features using center2neighbors, then use cosmo_crossvalidate
 % to get classification accuracies (it's its second output argument),
 % and store the classiifcation accuracies.
 
 % use cosmo_show_progress to show a pretty progress bar
-prev_msg=''; 
-clock_start=clock(); 
+prev_msg='';
+clock_start=clock();
 show_progress_every=1000;
 for k=1:ncenters
     % >@@>
     center_id=center_ids(k);
     sphere_feature_ids=center2neighbors{center_id};
-    
+
     sphere_ds=cosmo_slice(ds, sphere_feature_ids, 2);
-    
+
     % run cross validation
     [pred_cv,acc]=cosmo_crossvalidate(sphere_ds, classifier, ...
                                         partitions, classifier_opt);
-    
+
     % for now, just store the accuracy (not the predictions)
     accs(center_id)=acc;
-    
+
     % <@@<
-    
+
     % show progress every 1000 steps, and at the beginning and end.
     if k==1 || mod(k,show_progress_every)==0 || k==nfeatures
         mean_so_far=mean(accs(1:k));
         msg=sprintf('accuracy %.3f (%d features visited)', k, mean_so_far);
-        prev_msg=cosmo_show_progress(clock_start,k/ncenters,msg,prev_msg); 
+        prev_msg=cosmo_show_progress(clock_start,k/ncenters,msg,prev_msg);
     end
 end
 

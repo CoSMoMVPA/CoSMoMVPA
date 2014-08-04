@@ -4,7 +4,7 @@
 %  extension that you specified will be ignored.
 %
 %  Usage: save_untouch_nii(nii, filename)
-%  
+%
 %  nii - nii structure that is loaded by "load_untouch_nii.m"
 %
 %  filename  - 	NIFTI or ANALYZE file name.
@@ -12,7 +12,7 @@
 %  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
 %
 function save_untouch_nii(nii, filename)
-   
+
    if ~exist('nii','var') | isempty(nii) | ~isfield(nii,'hdr') | ...
 	~isfield(nii,'img') | ~exist('filename','var') | isempty(filename)
 
@@ -80,7 +80,7 @@ function save_untouch_nii(nii, filename)
  %     M=[];
   %    save(fileprefix, 'M');
    %end
-   
+
    return					% save_untouch_nii
 
 
@@ -113,11 +113,11 @@ function write_nii(nii, filetype, fileprefix)
       hdr.dime.bitpix = int16(64); precision = 'float64';
    case 128,
       hdr.dime.bitpix = int16(24); precision = 'uint8';
-   case 256 
+   case 256
       hdr.dime.bitpix = int16(8 ); precision = 'int8';
-   case 512 
+   case 512
       hdr.dime.bitpix = int16(16); precision = 'uint16';
-   case 768 
+   case 768
       hdr.dime.bitpix = int16(32); precision = 'uint32';
    case 1024
       hdr.dime.bitpix = int16(64); precision = 'int64';
@@ -128,18 +128,18 @@ function write_nii(nii, filetype, fileprefix)
    otherwise
       error('This datatype is not supported');
    end
-   
+
 %   hdr.dime.glmax = round(double(max(nii.img(:))));
  %  hdr.dime.glmin = round(double(min(nii.img(:))));
-   
+
    if filetype == 2
       fid = fopen(sprintf('%s.nii',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.nii.',fileprefix);
          error(msg);
       end
-      
+
       hdr.dime.vox_offset = 352;
 
       if ~isempty(ext)
@@ -154,12 +154,12 @@ function write_nii(nii, filetype, fileprefix)
       end
    elseif filetype == 1
       fid = fopen(sprintf('%s.hdr',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.hdr.',fileprefix);
          error(msg);
       end
-      
+
       hdr.dime.vox_offset = 0;
       hdr.hist.magic = 'ni1';
       save_untouch_nii_hdr(hdr, fid);
@@ -167,19 +167,19 @@ function write_nii(nii, filetype, fileprefix)
       if ~isempty(ext)
          save_nii_ext(ext, fid);
       end
-      
+
       fclose(fid);
       fid = fopen(sprintf('%s.img',fileprefix),'w');
    else
       fid = fopen(sprintf('%s.hdr',fileprefix),'w');
-      
+
       if fid < 0,
          msg = sprintf('Cannot open file %s.hdr.',fileprefix);
          error(msg);
       end
-      
+
       save_untouch0_nii_hdr(hdr, fid);
-      
+
       fclose(fid);
       fid = fopen(sprintf('%s.img',fileprefix),'w');
    end
@@ -191,9 +191,9 @@ function write_nii(nii, filetype, fileprefix)
    SliceSz  = double(hdr.dime.pixdim(4));
    RowSz    = double(hdr.dime.pixdim(3));
    PixelSz  = double(hdr.dime.pixdim(2));
-   
+
    x = 1:PixelDim;
-   
+
    if filetype == 2 & isempty(ext)
       skip_bytes = double(hdr.dime.vox_offset) - 348;
    else

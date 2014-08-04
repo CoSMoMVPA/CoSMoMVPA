@@ -7,24 +7,24 @@ function hdr=cosmo_map2meeg(ds, fn)
 %    ds         dataset struct with field .samples with MEEG data
 %    fn         optional filename to write output to. Supported extensions
 %               are .txt (EEGlab time course) or .mat (FieldTrip data)
-% 
+%
 % Returns:
 %    hdr        FieldTrip struct with the MEEG data
 %
 % Notes:
 %    - a typical use case is to use this function to map the dataset to a
 %      FieldTrip struct, then use FieldTrip to visualize the data
-%   
+%
 % Examples:
 %     % convert a dataset struct to a FieldTrip struct
 %     ft=cosmo_map2meeg(ds);
-%     
+%
 %     % store a dataset in FieldTrip file
 %     cosmo_map2meeg(ds,'fieldtrip_data.mat');
-%     
+%
 %     % store a timeseries dataset in an EEGlab text file
 %     cosmo_map2meeg(ds,'eeglab_data.txt');
-%    
+%
 % NNO Jan 2014
 
     cosmo_check_dataset(ds,'meeg');
@@ -50,7 +50,7 @@ function hdr=cosmo_map2meeg(ds, fn)
         % write the file
         writer(fn, hdr);
     end
-  
+
 
 function write_eeglab_txt(fn, hdr)
 
@@ -68,7 +68,7 @@ function write_eeglab_txt(fn, hdr)
     % set time dimension - and convert seconds to miliseconds
     arr(1,:)=repmat(hdr.time(:)*1000,ntrial,1);
 
-    % set channel data 
+    % set channel data
     for k=1:nchan
         arr(k+1,:)=reshape(squeeze(data(:,k,:)),[],1);
     end
@@ -84,13 +84,13 @@ function write_eeglab_txt(fn, hdr)
     fprintf(fid,[header '\n']);
     fprintf(fid,[arr_pat '\n'], arr);
     fclose(fid);
-    
 
-function write_ft(fn,hdr)   
+
+function write_ft(fn,hdr)
     % use matlab save
     save(fn, '-struct', hdr);
 
-        
+
 function ft=build_ft(ds)
 
     % get fieldtrip-specific fields from header
@@ -103,7 +103,7 @@ function ft=build_ft(ds)
     samples_field=ds.a.meeg.samples_field;
     ft.(samples_field)=arr;
 
-    % set dimord 
+    % set dimord
     samples_label=ds.a.meeg.samples_label;
     dimord_labels=[{samples_label} dim_labels];
     ft.dimord=cosmo_strjoin(dimord_labels,'_');
@@ -126,7 +126,7 @@ function ft=build_ft(ds)
         ft.cumtapcnt=ds.sa.cumtapcnt;
     end
 
-    % if fieldtrip is present 
+    % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
                 isequal(ft_datatype(ft),'unknown')
         error('conversion error - fieldtrip does not approve of this dataset');

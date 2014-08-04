@@ -1,6 +1,6 @@
 %  Undo the flipping and rotations performed by xform_nii; spit back only
 %  the raw img data block. Initial cut will only deal with 3D volumes
-%  strongly assume we have called xform_nii to write down the steps used 
+%  strongly assume we have called xform_nii to write down the steps used
 %  in xform_nii.
 %
 %  Usage:  a = load_nii('original_name');
@@ -13,13 +13,13 @@
 %          save_nii(nii.original,'newname');
 %
 %  Where, 'newname' is created with data in the same space as the
-%         original_name data    
+%         original_name data
 %
 %  - Jeff Gunter, 26-JUN-06
 %
 function outblock = unxform_nii(nii, inblock)
-  
-   if isempty(nii.hdr.hist.rot_orient)     
+
+   if isempty(nii.hdr.hist.rot_orient)
       outblock=inblock;
    else
       [dummy unrotate_orient] = sort(nii.hdr.hist.rot_orient);

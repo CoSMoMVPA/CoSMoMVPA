@@ -6,7 +6,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %
 % Inputs:
 %   ds                     dataset struct.
-%   ds_type                string indicating the specific type of dataset. 
+%   ds_type                string indicating the specific type of dataset.
 %                          Currently  supports 'fmri' and 'meeg'.
 %   error_if_not_present   if true (the default), an error is raised if the
 %                          dataset is not kosher (see below).
@@ -48,7 +48,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
     end
 
     % error message. If empty at the end of this function, then ds is ok.
-    msg=''; 
+    msg='';
 
     % use a for-loop with 'break' statements to simulate a GOTO statement
     % so that after the first error the loop is quit
@@ -63,7 +63,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 
         % has samples, so check the rest
         ds_size=size(ds.samples);
-        if numel(ds_size) ~=2, 
+        if numel(ds_size) ~=2,
             msg='.samples should be 2D'; break
         end
 
@@ -93,12 +93,12 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                     end
                     if attr_size(dim) ~= ds_size(dim)
                         msg=sprintf(['%s.%s has %d values in dimension %d, ',...
-                                    'expected %d'], attrs_fn, fn,... 
+                                    'expected %d'], attrs_fn, fn,...
                                     attr_size(dim), dim, ds_size(dim));
                         break;
                     end
                 end
-                
+
                 % break out of loop if msg is set
                 if ~isempty(msg), break; end
             end
@@ -106,12 +106,12 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 
         % break out of loop if msg is set
         if ~isempty(msg), break; end
-        
+
         % if provided, check for this specific type
         if ~isempty(ds_type)
             msg=check_dim(ds);
             if ~isempty(msg), break; end
-            
+
             switch ds_type
                 case 'fmri'
                     names={'i','j','k'};
@@ -125,7 +125,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                 otherwise
                     error('Unsupported ds_type=%s', ds_type);
             end
-            
+
             m=cosmo_match(names,ds.a.dim.labels);
             if ~all(m)
                 i=find(~m,1);
@@ -134,7 +134,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                 break;
             end
         end
-        
+
         % quit the while loop
         break;
     end
@@ -157,18 +157,18 @@ function msg=check_dim(ds)
         msg='missing field .a.dim.{labels,values}';
         return
     end
-    
+
     ndim=numel(ds.a.dim.labels);
     if numel(ds.a.dim.values)~=ndim
         msg='size mismatch between .a.dim.labels and .a.dim.values';
         return
     end
-    
+
     if ~isfield(ds,'fa')
         msg='no field .fa';
         return
     end
-    
+
     names=ds.a.dim.labels;
     for k=1:numel(names);
         name=names{k};
@@ -177,7 +177,7 @@ function msg=check_dim(ds)
             return
         end
         vs=ds.fa.(name);
-        
+
         nv=numel(ds.a.dim.values{k});
         if min(vs)<1 || max(vs>nv) || ~isequal(round(vs),vs)
             msg=sprintf('.fa.%s must have integers in range 1..%d',...
@@ -185,7 +185,7 @@ function msg=check_dim(ds)
             return
         end
     end
-        
-        
-    
+
+
+
 

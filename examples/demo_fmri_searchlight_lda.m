@@ -8,7 +8,7 @@
 %    the right hand during 4 runs in an fMRI study. Each run was divided in
 %    4 blocks with presses of each finger and analyzed with the GLM,
 %    resulting in 2*4*4=32 t-values
-% 
+%
 % NNO Jan 2014
 
 
@@ -27,11 +27,11 @@ output_path=config.output_data_path;
 
 % reset citation list
 cosmo_check_external('-tic');
-     
+
 %% LDA classifier searchlight analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This analysis identified brain regions where the categories can be
-% distinguished using an odd-even partitioning scheme and a Linear 
+% distinguished using an odd-even partitioning scheme and a Linear
 % Discriminant Analysis (LDA) classifier.
 
 data_path=digit_study_path;
@@ -47,8 +47,8 @@ ds_per_run = cosmo_fmri_dataset(data_fn, 'mask', mask_fn,...
 % print dataset
 fprintf('Dataset input:\n');
 cosmo_disp(ds_per_run);
-                            
-                            
+
+
 % Use the cosmo_cross_validation_measure and set its parameters
 % (classifier and partitions) in a measure_args struct.
 measure = @cosmo_crossvalidation_measure;
@@ -58,11 +58,11 @@ measure_args = struct();
 % Alternatives are @cosmo_classify_{svm,nn,naive_bayes}
 measure_args.classifier = @cosmo_classify_lda;
 
-% Set partition scheme. 
+% Set partition scheme.
 % Alternatives are:
 % - cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
 % - cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
-measure_args.partitions = cosmo_oddeven_partitioner(ds_per_run); 
+measure_args.partitions = cosmo_oddeven_partitioner(ds_per_run);
 
 % print measure and arguments
 fprintf('Searchlight measure:\n');
@@ -75,11 +75,11 @@ cosmo_disp(measure_args);
 % (The radius of the searchlight sphere is a bit larger at
 % the edges of the brain.)
 lda_results = cosmo_searchlight(ds_per_run,measure,'args',measure_args,...
-                                    'radius',-100); 
-                                
+                                    'radius',-100);
+
 % print output dataset
 fprintf('Dataset output:\n');
-cosmo_disp(lda_results);                                
+cosmo_disp(lda_results);
 
 % Plot the output
 cosmo_plot_slices(lda_results);

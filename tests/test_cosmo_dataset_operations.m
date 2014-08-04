@@ -37,7 +37,7 @@ function test_slicing
 
     f=@() cosmo_slice(ds,-1,2);
     assertExceptionThrown(f,'MATLAB:badsubscript')
-    
+
     f=@() cosmo_slice(ds,[2 4], 3);
     assertExceptionThrown(f,'')
 

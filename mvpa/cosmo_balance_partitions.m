@@ -3,17 +3,17 @@ function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
 % chunk
 %
 % bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
-% 
+%
 % Inputs:
 %   partitions        struct with fields:
-%     .train_indices  } Each is a Nx1 cell (for N chunks) containing the 
+%     .train_indices  } Each is a Nx1 cell (for N chunks) containing the
 %     .test_indics    } feature indices for each chunk
 %   targets           Px1 vector, or dataset struct with field .sa.targets.
 %   nsets             Number of balanced sets (default: 1)
 %
 % Ouput:
-%   bal_partitions    similar struct as input partitions, except that 
-%                     - each field is a (N*nsets)x1 cell 
+%   bal_partitions    similar struct as input partitions, except that
+%                     - each field is a (N*nsets)x1 cell
 %                     - each unique target is represented equally often
 %
 % Example:
@@ -23,8 +23,8 @@ function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
 %
 % Notes:
 % - this function is intended for datasets where the number of
-%   samples across targets is not equally distributed. A typical 
-%   application is MEEG datasets. 
+%   samples across targets is not equally distributed. A typical
+%   application is MEEG datasets.
 % - Using this function means that chance accuracy is equal to the inverse
 %   of the number of unique targets.
 %
@@ -38,7 +38,7 @@ if isstruct(targets) && isfield(targets,'sa') && ...
                 isfield(targets.sa,'targets')
     targets=targets.sa.targets;
 end
-    
+
 
 npar=numel(partitions.train_indices);
 
@@ -53,10 +53,10 @@ fns={'train_indices','test_indices'};
 for m=1:numel(fns)
     fn=fns{m};
     pos=0;
-        
+
     par=partitions.(fn); % train_indices or test_indices
-    
-    
+
+
     % allocate space for output
     bal_par=cell(nsets*npar,1);
     for k=1:nsets
@@ -65,7 +65,7 @@ for m=1:numel(fns)
 
             parj=par{j};
             parj_targ=targets(parj,:);
-            
+
             % ensure that the set of targets in this chunk is the
             % same as the set of targets in the input (not a subset)
             unq_targ=unique(parj_targ);
@@ -74,28 +74,28 @@ for m=1:numel(fns)
                 error('target mismatch in .%s #%d, partition %d: %d',...
                             fn, k, j, delta(1));
             end
-            
+
             % see how often each target is present in this chunk
             h=histc(parj_targ, unq_targ);
-            
+
             % for balance take the minimal count
             mn=min(h);
 
             % number of unique targets
             nunq=numel(unq_targ);
-            
+
             % allocate space for indices of this chunk
             balparj=zeros(nunq*mn,1);
             for u=1:nunq
                 % find indices for u-th target
                 unqidxs=find(parj_targ==unq_targ(u));
-                
+
                 % make random permutation
                 rp=randperm(numel(unqidxs));
-                
+
                 % space for output
                 pidxs=(u-1)*mn+(1:mn);
-                
+
                 % select 'mn' indices randomly
                 balparj(pidxs)=parj(unqidxs(rp(1:mn)));
             end

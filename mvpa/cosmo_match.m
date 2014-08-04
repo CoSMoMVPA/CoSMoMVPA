@@ -8,21 +8,21 @@ function msk=cosmo_match(haystack, needle, varargin)
 %   haystack*         numeric vector, or cell with strings. A string is
 %                     also allowed and interpreted as the name of a feature
 %                     dimension ('i','j' or 'k' in fmri datasets; 'chan',
-%                     'time', or 'freq' in MEEG datasets), and its 
+%                     'time', or 'freq' in MEEG datasets), and its
 %                     respective values (from ds.a.dim.values{dim}, where
 %                     dim is the dimension corresponding to haystack) as
 %                     indexed by ds.fa.(haystack) are used as haystack.
 %   needle*           numeric vector, or cell with strings. A string is
 %                     also allowed and interpreted as {needle}.
-%   
+%
 % Output:
 %   msk               boolean array of the same size as haystack, with
 %                     true where the value in haystack is equal to at least
 %                     one value in needle. If multiple needle/haystack
-%                     pairs are provided, then the haystack inputs should 
-%                     have the same number of elements, and msk contains 
-%                     the intersection of the individual masks. 
-%                     
+%                     pairs are provided, then the haystack inputs should
+%                     have the same number of elements, and msk contains
+%                     the intersection of the individual masks.
+%
 % Examples
 %     % simple character comparison
 %     cosmo_match({'a','b','c'},{'b','c','d','e','b'})
@@ -47,7 +47,7 @@ function msk=cosmo_match(haystack, needle, varargin)
 % Notes:
 %   - the output of this function can be used with cosmo_slice
 %     to select features or samples of interest
-%   - to select feature dimension values in an fmri or meeg dataset 
+%   - to select feature dimension values in an fmri or meeg dataset
 %     (e.g., channel selection), see cosmo_feature_dim_match
 %
 % See also: cosmo_slice, cosmo_stack, cosmo_feature_dim_match
@@ -60,7 +60,7 @@ function msk=cosmo_match(haystack, needle, varargin)
     elseif mod(nargin,2) ~= 0
         error('Need an even number of input arguments');
     end
-    
+
     if ischar(needle)
         needle={needle};
     end
@@ -79,18 +79,18 @@ function msk=cosmo_match(haystack, needle, varargin)
     else
         nrows=check_vec(needle);
         ncols=check_vec(haystack);
-        
+
         if isnumeric(needle) && isnumeric(haystack)
             matches=bsxfun(@eq, needle(:), haystack(:)');
         elseif iscell(needle) && iscell(haystack)
             matches=false(nrows,ncols);
-            
+
             for k=1:ncols
                 if ~ischar(haystack{k})
                     error('cell must contain strings');
                 end
             end
-            
+
             for k=1:nrows
                 needlek=needle{k};
                 if ~ischar(needlek)
@@ -103,7 +103,7 @@ function msk=cosmo_match(haystack, needle, varargin)
             error(['Illegal inputs %s and %s: need numeric arrays or '...
                     'cell with strings'],class(needle),class(haystack));
         end
-        
+
         msk=reshape(sum(matches,1)>0,size(haystack));
     end
 
@@ -136,4 +136,4 @@ function n=check_vec(x)
         error('Input argument is not a vector');
     end
     n=numel(x);
-        
+

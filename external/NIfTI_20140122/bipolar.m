@@ -1,5 +1,5 @@
 %BIPOLAR returns an M-by-3 matrix containing a blue-red colormap, in
-%	in which red stands for positive, blue stands for negative, 
+%	in which red stands for positive, blue stands for negative,
 %	and white stands for 0.
 %
 %  Usage: cmap = bipolar(M, lo, hi, contrast);  or  cmap = bipolar;
@@ -79,7 +79,7 @@ function cmap = bipolar(M, lo, hi, contrast)
       for i=linspace(maxc/M, hi, round(M*hi/(hi-lo)))
          t = exp(log(i/maxc)*steepness);
          doubleredc = [doubleredc; [(1-t)+t,(1-t)+0,(1-t)+0]];
-      end      
+      end
 
       for i=linspace(maxc/M, abs(lo), round(M*abs(lo)/(hi-lo)))
          t = exp(log(i/maxc)*steepness);

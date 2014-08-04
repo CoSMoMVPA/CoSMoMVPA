@@ -19,15 +19,15 @@
 %	volume indices, which should be the same as that you entered
 %	in "load_untouch_nii" command.
 %
-%  dim5_idx (depending on slice size)  -  a numerical array of 5th 
+%  dim5_idx (depending on slice size)  -  a numerical array of 5th
 %	dimension indices, which should be the same as that you entered
 %	in "load_untouch_nii" command.
 %
-%  dim6_idx (depending on slice size)  -  a numerical array of 6th 
+%  dim6_idx (depending on slice size)  -  a numerical array of 6th
 %	dimension indices, which should be the same as that you entered
 %	in "load_untouch_nii" command.
 %
-%  dim7_idx (depending on slice size)  -  a numerical array of 7th 
+%  dim7_idx (depending on slice size)  -  a numerical array of 7th
 %	dimension indices, which should be the same as that you entered
 %	in "load_untouch_nii" command.
 %
@@ -398,26 +398,26 @@ function write_image(slice,hdr,filetype,fileprefix,machine,slice_idx,img_idx,dim
 
    %  Set bitpix according to datatype
    %
-   %  /*Acceptable values for datatype are*/ 
+   %  /*Acceptable values for datatype are*/
    %
-   %     0 None                     (Unknown bit per voxel) % DT_NONE, DT_UNKNOWN 
-   %     1 Binary                         (ubit1, bitpix=1) % DT_BINARY 
-   %     2 Unsigned char         (uchar or uint8, bitpix=8) % DT_UINT8, NIFTI_TYPE_UINT8 
-   %     4 Signed short                  (int16, bitpix=16) % DT_INT16, NIFTI_TYPE_INT16 
-   %     8 Signed integer                (int32, bitpix=32) % DT_INT32, NIFTI_TYPE_INT32 
-   %    16 Floating point    (single or float32, bitpix=32) % DT_FLOAT32, NIFTI_TYPE_FLOAT32 
+   %     0 None                     (Unknown bit per voxel) % DT_NONE, DT_UNKNOWN
+   %     1 Binary                         (ubit1, bitpix=1) % DT_BINARY
+   %     2 Unsigned char         (uchar or uint8, bitpix=8) % DT_UINT8, NIFTI_TYPE_UINT8
+   %     4 Signed short                  (int16, bitpix=16) % DT_INT16, NIFTI_TYPE_INT16
+   %     8 Signed integer                (int32, bitpix=32) % DT_INT32, NIFTI_TYPE_INT32
+   %    16 Floating point    (single or float32, bitpix=32) % DT_FLOAT32, NIFTI_TYPE_FLOAT32
    %    32 Complex, 2 float32      (Use float32, bitpix=64) % DT_COMPLEX64, NIFTI_TYPE_COMPLEX64
-   %    64 Double precision  (double or float64, bitpix=64) % DT_FLOAT64, NIFTI_TYPE_FLOAT64 
-   %   128 uint8 RGB                 (Use uint8, bitpix=24) % DT_RGB24, NIFTI_TYPE_RGB24 
-   %   256 Signed char            (schar or int8, bitpix=8) % DT_INT8, NIFTI_TYPE_INT8 
+   %    64 Double precision  (double or float64, bitpix=64) % DT_FLOAT64, NIFTI_TYPE_FLOAT64
+   %   128 uint8 RGB                 (Use uint8, bitpix=24) % DT_RGB24, NIFTI_TYPE_RGB24
+   %   256 Signed char            (schar or int8, bitpix=8) % DT_INT8, NIFTI_TYPE_INT8
    %   511 Single RGB              (Use float32, bitpix=96) % DT_RGB96, NIFTI_TYPE_RGB96
-   %   512 Unsigned short               (uint16, bitpix=16) % DT_UNINT16, NIFTI_TYPE_UNINT16 
-   %   768 Unsigned integer             (uint32, bitpix=32) % DT_UNINT32, NIFTI_TYPE_UNINT32 
+   %   512 Unsigned short               (uint16, bitpix=16) % DT_UNINT16, NIFTI_TYPE_UNINT16
+   %   768 Unsigned integer             (uint32, bitpix=32) % DT_UNINT32, NIFTI_TYPE_UNINT32
    %  1024 Signed long long              (int64, bitpix=64) % DT_INT64, NIFTI_TYPE_INT64
-   %  1280 Unsigned long long           (uint64, bitpix=64) % DT_UINT64, NIFTI_TYPE_UINT64 
-   %  1536 Long double, float128  (Unsupported, bitpix=128) % DT_FLOAT128, NIFTI_TYPE_FLOAT128 
-   %  1792 Complex128, 2 float64  (Use float64, bitpix=128) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128 
-   %  2048 Complex256, 2 float128 (Unsupported, bitpix=256) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128 
+   %  1280 Unsigned long long           (uint64, bitpix=64) % DT_UINT64, NIFTI_TYPE_UINT64
+   %  1536 Long double, float128  (Unsupported, bitpix=128) % DT_FLOAT128, NIFTI_TYPE_FLOAT128
+   %  1792 Complex128, 2 float64  (Use float64, bitpix=128) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128
+   %  2048 Complex256, 2 float128 (Unsupported, bitpix=256) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128
    %
    switch hdr.dime.datatype
    case   2,
@@ -432,20 +432,20 @@ function write_image(slice,hdr,filetype,fileprefix,machine,slice_idx,img_idx,dim
       hdr.dime.bitpix = 64; precision = 'float64';
    case 128,
       hdr.dime.bitpix = 24; precision = 'uint8';
-   case 256 
+   case 256
       hdr.dime.bitpix = 8;  precision = 'int8';
-   case 511 
+   case 511
       hdr.dime.bitpix = 96; precision = 'float32';
-   case 512 
+   case 512
       hdr.dime.bitpix = 16; precision = 'uint16';
-   case 768 
+   case 768
       hdr.dime.bitpix = 32; precision = 'uint32';
    case 1024
       hdr.dime.bitpix = 64; precision = 'int64';
    case 1280
       hdr.dime.bitpix = 64; precision = 'uint64';
    otherwise
-      error('This datatype is not supported'); 
+      error('This datatype is not supported');
    end
 
    hdr.dime.dim(find(hdr.dime.dim < 1)) = 1;
@@ -496,7 +496,7 @@ function write_image(slice,hdr,filetype,fileprefix,machine,slice_idx,img_idx,dim
       if isempty(dim7_idx)
          dim7_idx = 1:d7;
       end
-      
+
       %ROMAN: begin
       roman = 1;
       if(roman)
@@ -555,7 +555,7 @@ function write_image(slice,hdr,filetype,fileprefix,machine,slice_idx,img_idx,dim
                      end
                   end; % if (roman)
                   % ROMAN: end
-         
+
                   if filetype == 2
                      fseek(fid, pos + hdr.dime.vox_offset, 'bof');
                   else
@@ -566,7 +566,7 @@ function write_image(slice,hdr,filetype,fileprefix,machine,slice_idx,img_idx,dim
                   %  in img_siz times
                   %
                   fwrite(fid, slice(:,:,s,t,i5,i6,i7), sprintf('*%s',precision));
-                  
+
                end
                end
             end

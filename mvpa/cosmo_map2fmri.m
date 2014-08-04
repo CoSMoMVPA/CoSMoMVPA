@@ -1,6 +1,6 @@
 function hdr=cosmo_map2fmri(dataset, fn)
 % maps a dataset structure to a NIFTI, AFNI, or BV structure or file
-% 
+%
 % Usage 1: hdr=cosmo_map2fmri(dataset, '-{FMT}) returns a header structure
 % Usage 2: cosmo_map2fmri(dataset, fn) saves dataset to a volumetric file.
 %
@@ -25,7 +25,7 @@ function hdr=cosmo_map2fmri(dataset, fn)
     img_formats=get_img_formats();
     sp=cosmo_strsplit(fn,'-');
     save_to_file=~isempty(sp{1});
-    
+
     if save_to_file
         fmt=get_format(img_formats, fn);
     else
@@ -34,23 +34,23 @@ function hdr=cosmo_map2fmri(dataset, fn)
         end
         fmt=sp{2};
     end
-    
+
     if ~isfield(img_formats,fmt)
         error('Unsupported format %s', fmt);
     end
-    
+
     methods=img_formats.(fmt);
     externals=methods.externals;
     cosmo_check_external(externals);
-    
+
     creator=methods.creator;
     hdr=creator(dataset);
-    
+
     if save_to_file
         writer=methods.writer;
         writer(fn, hdr);
     end
-    
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,7 +65,7 @@ function b=ends_with(end_str, str)
     else
         b=isempty(cosmo_strsplit(str, end_str,-1));
     end
-    
+
 function fmt=get_format(img_formats, file_name)
     fns=fieldnames(img_formats);
     fmt=[];
@@ -79,43 +79,43 @@ function fmt=get_format(img_formats, file_name)
     if isempty(fmt)
         error('Not found: format for %s', file_name);
     end
-    
+
 function img_formats=get_img_formats()
     img_formats=struct();
-    
+
     img_formats.nii.creator=@new_nii;
     img_formats.nii.writer=@write_nii;
     img_formats.nii.externals={'nifti'};
     img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
-    
+
     img_formats.bv_vmp.creator=@new_bv_vmp;
     img_formats.bv_vmp.writer=@write_bv;
     img_formats.bv_vmp.externals={'neuroelf'};
     img_formats.bv_vmp.exts={'.vmp'};
-    
+
     img_formats.bv_vmr.creator=@new_bv_vmr;
     img_formats.bv_vmr.writer=@write_bv;
     img_formats.bv_vmr.externals={'neuroelf'};
     img_formats.bv_vmr.exts={'.vmr'};
-    
+
     img_formats.bv_msk.creator=@new_bv_msk;
     img_formats.bv_msk.writer=@write_bv;
     img_formats.bv_msk.externals={'neuroelf'};
     img_formats.bv_msk.exts={'.msk'};
-    
+
     img_formats.afni.writer=@write_afni;
     img_formats.afni.externals={'afni'};
     img_formats.afni.creator=@new_afni;
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
                            '+tlrc.BRIK','+tlrc.BRIK.gz'};
-    
-    
+
+
 function img_format=get_img_format(ds, img_formats)
-    
+
     fns=fieldnames(img_formats);
     n=numel(fns);
-    
+
     count=0;
     for k=1:n
         fn=fns{k};
@@ -124,17 +124,17 @@ function img_format=get_img_format(ds, img_formats)
             count=count+1;
         end
     end
-    
+
     if count~=1
         error('Found %d image formats, expected 1', count)
     end
-    
+
 function check_endswith(fn,ext)
     b=isempty(cosmo_strsplit(fn,ext,-1));
     if ~b
         error('%s should end with %s', fn, ext);
     end
-    
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -149,7 +149,7 @@ function ni=new_nii(ds)
     if numel(dim)==3
         dim(4)=1;
     end
-    
+
     mat=vol.mat;
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[1 1 1]';
     pix_dim=vol.mat(1:3,1:3)*[1 1 1]';
@@ -159,7 +159,7 @@ function ni=new_nii(ds)
     dime.datatype=16; %single
     dime.dim=[4 dim(:)' 1 1 1];
     dime.pixdim=[1 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
-    
+
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
         'scl_slope','scl_inter','slice_code','cal_max',...
@@ -187,11 +187,11 @@ function ni=new_nii(ds)
     hist=set_all(hist,{'qform_code','quatern_b',...
                         'quatern_d',...
                         'qoffset_x','qoffset_y','qoffset_z'});
-    hist=set_all(hist,{'intent_name'},'');   
+    hist=set_all(hist,{'intent_name'},'');
     hist.srow_x=mat(1,:);
     hist.srow_y=mat(2,:);
     hist.srow_z=mat(3,:);
-    hist.quatern_c=1;      
+    hist.quatern_c=1;
     hdr.hist=hist;
 
     ni.img=single(vol_data);
@@ -199,16 +199,16 @@ function ni=new_nii(ds)
 
 function write_nii(fn, hdr)
     save_nii(hdr, fn);
-    
-    
+
+
     %% Brainvoyager VMP
-function hdr=add_bv_mat_hdr(hdr,ds,bv_type)    
+function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
     % helper to set matrix in header
     mat=ds.a.vol.mat;
-    
+
     % ensure proper VMP/VMR orientation
     dg=mat(1:3,1:3)*[0 0 -1; -1 0 0; 0 -1 0]';
-    
+
     if ~isequal(dg,diag(diag(dg)))
         error('Unsupported orientation: need ARS');
     end
@@ -219,13 +219,13 @@ function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
     if resolution<0
         error('Resolution cannot be negative, found %d', resolution);
     end
-    
+
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
     % deal with offset at (.5, .5, .5) [CHECKME]
     mat(1:3,4)=mat(1:3,4)-mat(1:3,1:3)*.5*[1 1 1]';
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
     bv_coords=bvcoordconv(tal_coords(1:3,:), 'tal2bvs',hdr.BoundingBox);
-    
+
     switch bv_type
         case {'vmp','msk'}
             labels={'ZStart','ZEnd','XStart','XEnd','YStart','YEnd'};
@@ -244,23 +244,23 @@ function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
                 hdr.(['VoXRes' label])=resolution;
                 hdr.(['Dim' label])=bv_coords(2,k);
             end
-            
+
         otherwise
             error('Unsupported type %s', bv_type);
     end
-    
-function hdr=new_bv_vmp(ds)   
+
+function hdr=new_bv_vmp(ds)
     hdr=xff('new:vmp');
-   
-    hdr=add_bv_mat_hdr(hdr,ds,'vmp'); 
-    
+
+    hdr=add_bv_mat_hdr(hdr,ds,'vmp');
+
     % Store the data
-    
+
     nsamples=size(ds.samples,1);
     maps=cell(1,nsamples);
-    
+
     stats=cosmo_statcode(ds,'bv');
-    
+
     for k=1:nsamples
         empty_hdr=xff('new:vmp');
         map=empty_hdr.Map;
@@ -271,62 +271,62 @@ function hdr=new_bv_vmp(ds)
         end
         if ~isempty(stats)
             map=cosmo_structjoin(map, stats{k});
-        end 
+        end
         maps{k}=map;
     end
-    
+
     hdr.Map=cat(2,maps{:});
     hdr.NrOfMaps=nsamples;
-            
+
     bless(hdr);
-            
+
 function write_bv(fn, hdr)
     % general storage function
     hdr.SaveAs(fn);
-    
-    
+
+
     %% Brainvoyager GLM
 function hdr=new_bv_vmr(ds)
     hdr=xff('new:vmr');
     hdr=add_bv_mat_hdr(hdr,ds,'vmr');
-    
+
     nsamples=size(ds.samples,1);
-    if nsamples~=1, 
+    if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
-    
+
     mn=min(ds.samples);
     mx=max(ds.samples);
-    
+
     % scale to 0..255
     vol_data=(unflatten(ds)-mn)*255*(mx-mn);
     hdr.VMRData=uint8(vol_data(:,:,:,1));
-    
+
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
     hdr=xff('new:msk');
     hdr=add_bv_mat_hdr(hdr,ds,'msk');
 
     nsamples=size(ds.samples,1);
-    if nsamples~=1, 
+    if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
-    
+
     vol_data=unflatten(ds);
     hdr.Mask=uint8(vol_data(:,:,:,1));
-    
-    
-    
-%% AFNI  
+
+
+
+%% AFNI
 function afni_info=new_afni(ds)
     vol_data=unflatten(ds);
     dim=size(vol_data);
     nsamples=size(ds.samples,1);
-    
+
     a=ds.a;
     vol=a.vol;
     mat=a.vol.mat;
-    
+
     % deal with orientation
     idxs=zeros(1,3);
     m=zeros(1,3);
@@ -355,7 +355,7 @@ function afni_info=new_afni(ds)
     delta=m.*lpi2rai(idxs);
     origin=mat(idxs,:)*[1 1 1 1]'.*lpi2rai(idxs)';
 
-    % set orientation code. 
+    % set orientation code.
     % thse are neither RAI or LPI, but RPI (when ordered logically)
     % No idea why Bob Cox made that decision.
     lpi2orient=[-1 1 1];
@@ -364,14 +364,14 @@ function afni_info=new_afni(ds)
 
     vol_data=unflatten(ds);
 
-        
+
     dim=size(vol_data);
-    
+
     brik_type=1; %functional head
     brik_typestring='3DIM_HEAD_FUNC';
     brik_func=11; % FUNC_BUCK_TYPE
     brik_view=0; % default to +orig, but overriden by writer
-    
+
     afni_info=struct();
     afni_info.SCENE_DATA=[brik_view, brik_func, brik_type];
     afni_info.TYPESTRING=brik_typestring;
@@ -380,11 +380,11 @@ function afni_info=new_afni(ds)
     afni_info.BRICK_FLOAT_FACS=[];            % ... or multipliers
     afni_info.DATASET_RANK=[3 nsamples];      % number of volumes
     afni_info.DATASET_DIMENSIONS=dim(1:3);
-    afni_info.ORIENT_SPECIFIC=orient;         
+    afni_info.ORIENT_SPECIFIC=orient;
     afni_info.DELTA=delta;
     afni_info.ORIGIN=origin;
     afni_info.SCALE=0;
-    
+
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
                 'BRICK_STATS','BRICK_FLOAT_FACS',...
                 'BRICK_STATAUX','STAT_AUX'};
@@ -392,21 +392,21 @@ function afni_info=new_afni(ds)
         fn=set_empty{k};
         afni_info.(fn)=[];
     end
-    
+
     % if labels for the samples, store them in the header
     if isfield(ds.sa,'labels') && ~isempty(ds.sa.labels)
         afni_info.BRICK_LABS=cosmo_strjoin(ds.sa.labels,'~');
     end
-    
+
     if isfield(ds.sa,'stats') && ~isempty(ds.sa.stats)
         afni_info=cosmo_structjoin(afni_info,cosmo_statcode(ds,'afni'));
     end
-        
+
     % store data in non-afni field 'img'
     afni_info.img=vol_data;
 
-function write_afni(fn, hdr)    
-    
+function write_afni(fn, hdr)
+
     hdr.RootName=fn;
     data=hdr.img; % get the data
     hdr=rmfield(hdr,'img'); % remove the non-afni field 'img'
@@ -415,7 +415,7 @@ function write_afni(fn, hdr)
     afniopt.Prefix=fn; %the second input argument
     afniopt.OverWrite='y';
     afniopt.NoCheck=0;
-    
+
     if ends_with({'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz'},fn)
         hdr.SCENE_DATA(1)=0;
@@ -425,13 +425,13 @@ function write_afni(fn, hdr)
     else
         error('Unsupported scene data for %s', fn);
     end
-    
+
     [err, ErrMessage]=WriteBrik(data, hdr, afniopt);
     if err
         error(ErrMessage);
     end
-    
-    
+
+
  function s=set_all(s, fns, v)
     % sets all fields in fns in struct s to v
     % if v is omitted it is set to 0.
@@ -440,4 +440,4 @@ function write_afni(fn, hdr)
     for k=1:n
         fn=fns{k};
         s.(fn)=v;
-    end   
+    end

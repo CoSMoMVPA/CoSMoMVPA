@@ -8,7 +8,7 @@ function joined=cosmo_strjoin(strings, delim)
 %             row vector of characters
 %   delim     delimeter string, or a cell of strings. In the
 %             latter case delim should have P-1 elements. If omitted a
-%             single space character ' ' is used. 
+%             single space character ' ' is used.
 %             delim can contain backslash-escaped characters that are
 %             interpreted by sprintf; for example '\t' represents a tab
 %             character, '\n' a newline character, and '\\' a backslash
@@ -16,7 +16,7 @@ function joined=cosmo_strjoin(strings, delim)
 %
 % Output
 %   joined    the string formed by alternating between strings and delim;
-%             if delim is a string, joined=[strings{1} delim strings{2} ... 
+%             if delim is a string, joined=[strings{1} delim strings{2} ...
 %                                            strings{P}].
 %             if delim is a cell, joined=strings{1} delim{1} strings{2} ...
 %                                            strings{P}

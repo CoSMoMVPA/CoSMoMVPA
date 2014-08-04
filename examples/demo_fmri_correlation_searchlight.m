@@ -4,14 +4,14 @@
 %
 % This example uses the following dataset:
 % - 'ak6' is based on the following work (please cite if you use it):
-%    Connolly et al (2012), Representation of biological classes in the 
-%    human brain. Journal of Neuroscience, 
+%    Connolly et al (2012), Representation of biological classes in the
+%    human brain. Journal of Neuroscience,
 %    doi 10.1523/JNEUROSCI.5547-11.2012
 %
-%    Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth) 
-%    during ten runs in an fMRI study. Using the General Linear Model 
-%    response were estimated for each category in each run, resulting 
-%    in 6*10=60 t-values. 
+%    Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth)
+%    during ten runs in an fMRI study. Using the General Linear Model
+%    response were estimated for each category in each run, resulting
+%    in 6*10=60 t-values.
 %
 % NNO Jan 2014
 
@@ -34,7 +34,7 @@ cosmo_check_external('-tic');
 
 % set result directory
 output_path=config.output_data_path;
-     
+
 
 %% Example: split-half correlation measure (Haxby 2001-style)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,7 +55,7 @@ data_even_fn=fullfile(data_path,'glm_T_stats_even.nii');
 ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
                             'targets',1:6,'chunks',2);
 
-% Combine even and odd runs 
+% Combine even and odd runs
 ds_odd_even=cosmo_stack({ds_odd, ds_even});
 
 % print dataset

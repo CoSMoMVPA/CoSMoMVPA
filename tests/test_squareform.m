@@ -5,7 +5,7 @@ function test_suite = test_squareform
 function test_squareform_()
     vec=1:6;
     mx=[0 1 2 3; 1 0 4 5; 2 4 0 6; 3 5 6 0];
-    
+
     sf=@cosmo_squareform;
 
 
@@ -33,6 +33,6 @@ function test_squareform_()
 
     mx(2,1)=3;
     assertExceptionThrown(@() sf(mx,'tovector'),'');
-    
+
 
 

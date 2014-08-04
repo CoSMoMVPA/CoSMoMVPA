@@ -14,7 +14,7 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values)
 %   ds                 dataset structure, with fields:
 %      .samples        PxQ data for P samples and Q features.
 %      .a.dim.labels   1xK cell with the values in dim_labels
-%      .a.dim.values   1xK cell with the values in dim_values. 
+%      .a.dim.values   1xK cell with the values in dim_values.
 %      .fa.(label)     for each label in a.dim.labels it contains the
 %                      sub-indices for the K dimensions. It is ensured
 %                      that for every dimension J in 1:K, all values in
@@ -53,13 +53,13 @@ for dim=1:ndim
 
     values=dim_values{dim};
     nvalues=numel(values);
-    
+
     % another sanity check
     if nvalues ~= dim_sizes(dim)
         error('expected %d values in dimension %d, found %d',...
                     nvalues, dim, dim_sizes(dim));
     end
-    
+
     % set the indices
     indices=1:nvalues;
 
@@ -87,6 +87,6 @@ ds.a.dim.labels=dim_labels;
 ds.a.dim.values=dim_values;
 ds.fa=fa;
 
-    
-    
-    
+
+
+

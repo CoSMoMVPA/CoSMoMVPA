@@ -1,18 +1,18 @@
 %  This function is only used to save Analyze or NIfTI header that is
-%  ended with .hdr and loaded by load_untouch_header_only.m. If you 
+%  ended with .hdr and loaded by load_untouch_header_only.m. If you
 %  have NIfTI file that is ended with .nii and you want to change its
 %  header only, you can use load_untouch_nii / save_untouch_nii pair.
-%  
+%
 %  Usage: save_untouch_header_only(hdr, new_header_file_name)
-%  
+%
 %  hdr - struct with NIfTI / Analyze header fields, which is obtained from:
 %        hdr = load_untouch_header_only(original_header_file_name)
-%  
+%
 %  new_header_file_name - NIfTI / Analyze header name ended with .hdr.
 %        You can either copy original.img(.gz) to new.img(.gz) manually,
 %        or simply input original.hdr(.gz) in save_untouch_header_only.m
 %        to overwrite the original header.
-%  
+%
 %  - Jimmy Shen (jshen@research.baycrest.org)
 %
 function save_untouch_header_only(hdr, filename)

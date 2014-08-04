@@ -12,13 +12,13 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %   nbrhood       struct with fields:
 %     .a          } dataset and feature attributes of neighborhood
 %     .fa         }
-%     .neighbors  If ds has N values in the dimension label, then 
-%                 neighbors is a Nx1 cell with indices of features 
+%     .neighbors  If ds has N values in the dimension label, then
+%                 neighbors is a Nx1 cell with indices of features
 %                 where the indices differ at most radius from each other.
 %
 % Examples
 %   % ds is an MEEG dataset with a time dimension
-%   % 
+%   %
 %   % neighborhoods with time bins 7 timepoints wide
 %   >> nbrhood=cosmo_interval_neighborhood(ds, 'time', 3);
 %   %
@@ -46,7 +46,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
     % compute neighborhood
     neighbors=cell(nvalues,1);
     for k=1:nvalues
-        
+
         % deal with indices near borders
         mn=max(1,ceil(k-radius));
         mx=min(nvalues,floor(k+radius));

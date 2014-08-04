@@ -6,14 +6,14 @@ classdef CosmoDocTestSuite < TestSuite
 % collects the doc tests in such directories recursively.
 %
 % A doctest is specified in the comment header section of an .m file; it is
-% based on the text that is shown by the command 'help foo' if the function 
+% based on the text that is shown by the command 'help foo' if the function
 % is defined in a file 'foo.m'.
 %
 % Example:
 % %     (this example pretends to be the help of a function definition)
-% % 
+% %
 % %     (other documentation here ...)
-% % 
+% %
 % %     Example:                     % legend: line  block  type  test-type
 % %         % this is a comment               %  1      1     C     C
 % %         negative_four=-4;                 %  2      1     E     P 1.1
@@ -31,25 +31,25 @@ classdef CosmoDocTestSuite < TestSuite
 % %         postfix=' is useful'              % 14      3     E     P 3.1
 % %         disp({@abs postfix})              % 15      3     E     E 3.1
 % %         >   @abs    ' is useful '         % 16      3     W     W 3.1.1
-% % 
+% %
 % %     (more documentation here ['offside position'; see (3) below] ...)
 %
 %     The right-hand side shows (for clarification) four columns with line
-%     number, block number, type and test-type. Doctests are processed as 
+%     number, block number, type and test-type. Doctests are processed as
 %     follows:
-%     1) A doctest section starts with a line containing just 'Example' 
+%     1) A doctest section starts with a line containing just 'Example'
 %        (or 'Examples:', 'example' or other variants; to be exact,
 %        the regular expression to be matched is '^\s*[eE]xamples?:?\s*$').
 %     2) The indent level is the number of spaces after the first non-empty
 %        line after the Example line.
-%     3) A doctest section ends whenever a line is found with a lower 
+%     3) A doctest section ends whenever a line is found with a lower
 %        indent level ('offside rule').
 %     4) Only a single doctest section is supported. If multiple doctest
 %        sections are found an error is raised.
-%     5) Doctests are split in blocks by empty lines. (A line containing 
-%        only spaces is considered empty; a line with comment is considered 
+%     5) Doctests are split in blocks by empty lines. (A line containing
+%        only spaces is considered empty; a line with comment is considered
 %        non-empty.)
-%     6) In a first pass over all doctest lines, each line is assigned a 
+%     6) In a first pass over all doctest lines, each line is assigned a
 %        type:
 %        + (E)xpression (string that can be evaluated by matlab)
 %        + (W)ant       (expected output from evaluating an expression)
@@ -64,11 +64,11 @@ classdef CosmoDocTestSuite < TestSuite
 %     8) A single doctest is run as follows:
 %        - each block is processed separately
 %        - for each line with test-type E (in each block):
-%          + if it is not followed by one or more W-lines, then the 
+%          + if it is not followed by one or more W-lines, then the
 %            expression is ignored.
 %          + otherwise:
 %            * run all preceding preamble lines in the block
-%              # if this produces non-empty output or an error, the test 
+%              # if this produces non-empty output or an error, the test
 %                fails.
 %            * run the line with test-type E
 %              # if this produces an error, the test fails
@@ -82,32 +82,32 @@ classdef CosmoDocTestSuite < TestSuite
 %                  and the expected output is '   foo   bar ', the test
 %                  passes
 %                + if the previous string comparison does not pass the
-%                  test, an attempt is made to convert both the output of 
+%                  test, an attempt is made to convert both the output of
 %                  the W-lines and the evaluated output to a numeric array.
 %                  If this conversion is succesfull and both arrays are
 %                  equal, the test passes.
 %                + if the conversion to numeric does not make the test
 %                  pass, the W-lines are evaluated (and any ' ans = '
-%                  prefix is removed). If this evaluation is succesfull 
-%                  (does not raise an exception) in is equal to the 
+%                  prefix is removed). If this evaluation is succesfull
+%                  (does not raise an exception) in is equal to the
 %                  evaluated output, the test passes.
 %              # if none of the above attempts make the test pass, the test
 %                fails.
 %            * if no test has failed, the test passes
 %        - To illustrate, in the example above:
 %          + E-1.1 is executed after P-1.1 and P-1.2; evaluating P-1.[1-2]
-%            should not give output. The output of evaluating E-1.1 
+%            should not give output. The output of evaluating E-1.1
 %            should be W-1.1.1 and W-1.1.2
 %          + E-1.2 is executed after P-1.1, P-1.2, and P-1.3; evaluating
-%            P-1.[1-3] should not give output. The output of evaluating 
+%            P-1.[1-3] should not give output. The output of evaluating
 %            E-1.2 should be W-1.2.1.
 %          + E-2.1 is ignored, because there is no corresponding W-2.1.*
-%          + E-3.1 is executed after P-3.1; evaluating P-3.1 should 
-%            not give ouput. The output of evaluating E-1.3 should be 
+%          + E-3.1 is executed after P-3.1; evaluating P-3.1 should
+%            not give ouput. The output of evaluating E-1.3 should be
 %            W-3.1.1.
-%     9) The suite passes if all tests pass     
-% 
-% 
+%     9) The suite passes if all tests pass
+%
+%
 % Notes:
 %   - Typically test cases are generated using CosmoDocTestSuite, or run
 %     using cosmo_run_tests
@@ -120,34 +120,34 @@ classdef CosmoDocTestSuite < TestSuite
 %
 % NNO Jul 2014
 
-    
+
     methods
         function self = CosmoDocTestSuite(name)
             % constructs an empty suite when no arguments are give;
-            % otherwise name is used to construct tests 
-            
+            % otherwise name is used to construct tests
+
             if nargin >= 1
                 self = CosmoDocTestSuite.fromName(name);
             end
         end
     end
-    
+
     methods (Static)
         function suite = fromName(name)
-            % collects tests from an .m file with doctests, from a 
-            % cell with .m files, or from a directory with such files 
+            % collects tests from an .m file with doctests, from a
+            % cell with .m files, or from a directory with such files
             % (recursively)
             if ischar(name) && isdir(name)
                 suite=CosmoDocTestSuite.fromDir(name);
                 return;
             end
-            
+
             suite = CosmoDocTestSuite();
             suite.Name = name;
             suite.Location = name;
-            
+
             if iscell(name)
-                % typically the output from from{Dir,Pwd}; add 
+                % typically the output from from{Dir,Pwd}; add
                 % the tests from each component
                 for k=1:numel(name)
                     suite_k=CosmoDocTestSuite.fromName(name{k});
@@ -158,7 +158,7 @@ classdef CosmoDocTestSuite < TestSuite
                 end
                 return;
             end
-            
+
             try
                 % process filename of '.m' file (possibly with doctest)
                 suite = get_tests_from_help(name);
@@ -166,12 +166,12 @@ classdef CosmoDocTestSuite < TestSuite
                 disp(getReport(me))
             end
         end
-        
+
         function test_suite = fromPwd()
             % collects tests from the current directory (recursively)
             test_suite = CosmoDocTestSuite.fromDir(pwd());
         end
-        
+
         function test_suite=fromDir(dir_)
             % collects tests from the directory 'dir_ ' (recursively)
             filenames_struct=cosmo_dir(dir_,'*.m');
@@ -193,13 +193,13 @@ function suite=get_tests_from_help(filename)
     % initialize empty test suite
     suite=CosmoDocTestSuite();
     suite.Name=filename;
-    
+
     % if not in path skip the test
     w=which(filename);
     if isempty(w)
         return;
     end
-    
+
     % constants for state of every line in the help output
     state_pre=0;           % before any doctest
     state_whitespace=1;    % line with only whitespaces
@@ -214,27 +214,27 @@ function suite=get_tests_from_help(filename)
     prefix_comment='%';
 
     % examples start with a line which may start and end with white space,
-    % and otherwise just contains 'example' with the first 'e' in either 
+    % and otherwise just contains 'example' with the first 'e' in either
     % upper or lower case, either in singular or plurar,
     % and optionally with a colon at the end
     start_re='^\s*[eE]xamples?:?\s*$';
-    
+
     % initialize variables to go over doctests
     suite.Location=w;
     help_str=help(filename);
     help_lines=cosmo_strsplit(help_str,'\n');
-    
+
     n=numel(help_lines);
     line_states=zeros(n,1);
-    
+
     % initialize to empty; once this is eet, doctests end when an indent
     % less than first_indent is encountered ('offside')
     first_indent=[];
-    
+
     state=state_pre;
     for line_number=1:numel(help_lines)
         line=help_lines{line_number};
-        
+
         % remove whitespace
         line_trim=strtrim(line);
 
@@ -252,15 +252,15 @@ function suite=get_tests_from_help(filename)
         else
             % non-whitespace line
             indent=regexp(line,'(\S)+.*$','start');
-            
+
             % sanity check
             assert(~isempty(indent));
-           
+
             % first line after 'Examples:'; store indent level
             if isempty(first_indent)
                 first_indent=indent;
             end
-            
+
             if indent<first_indent
                 % offside; done with doctest section
                 state=state_post;
@@ -277,7 +277,7 @@ function suite=get_tests_from_help(filename)
         end
         line_states(line_number)=state;
     end
-    
+
     % every 'expr' line followed by another 'expr' line is preamble
     expr_msk=line_states==state_expr & [line_states(2:end);0]==state_want;
     line_states(line_states==state_expr & ~expr_msk)=state_preamb;
@@ -299,21 +299,21 @@ function suite=get_tests_from_help(filename)
 
     for k=1:nblocks
         block_msk=block_start(k)<=rng & rng<=block_end(k);
-        
+
         % find expressions to test for
         expr_idxs=find(expr_msk' & block_msk);
         nexprs=numel(expr_idxs);
         expr=cell(nexprs,1);
         wants=cell(nexprs,1);
-        
+
         for j=1:nexprs
             expr_idx=expr_idxs(j);
-            
+
             % preamble contains all non-'expr' lines preceding the 'expr'
             preamb_msk=block_msk' & line_states==state_preamb & ...
                                                     rng'<=expr_idx;
             preamb=help_lines(preamb_msk);
-            
+
             % 'want'-part has all lines following 'expr' until a non-'want'
             % line is encountered
             want_idx=expr_idx+1;
@@ -321,18 +321,18 @@ function suite=get_tests_from_help(filename)
                 want_idx=want_idx+1;
             end
             wants_with_prefix=help_lines((expr_idx+1):(want_idx-1));
-            
+
             if numel(wants_with_prefix)==0
                 % no want lines, do not add test
                 continue;
             end
-            
+
             % 'expr' line is after 'preamb' and before 'wants'
             % (expr_lines should have one element, for now, so
             % using strjoin is a not really necessary)
             expr_lines=help_lines(expr_idx);
             expr=cosmo_strjoin(expr_lines,'\n');
-            
+
             % remove the 'want' prefix ('>')
             re=['^\s*' prefix_want '(?<f>.*)$'];
             wants_lines=regexprep(wants_with_prefix,re,'$1');
@@ -340,7 +340,7 @@ function suite=get_tests_from_help(filename)
 
             % store line number of expression
             line_number=expr_idx;
-            
+
             % add doctest
             doctest=CosmoDocTestCase(preamb,expr,wants,...
                                             filename,line_number);

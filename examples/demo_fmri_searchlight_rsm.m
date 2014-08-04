@@ -4,14 +4,14 @@
 %
 % This example uses the following dataset:
 % - 'ak6' is based on the following work (please cite if you use it):
-%    Connolly et al (2012), Representation of biological classes in the 
-%    human brain. Journal of Neuroscience, 
+%    Connolly et al (2012), Representation of biological classes in the
+%    human brain. Journal of Neuroscience,
 %    doi 10.1523/JNEUROSCI.5547-11.2012
 %
-%    Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth) 
-%    during ten runs in an fMRI study. Using the General Linear Model 
-%    response were estimated for each category in each run, resulting 
-%    in 6*10=60 t-values. 
+%    Six categories (monkey, lemur, mallard, warbler, ladybug, lunamoth)
+%    during ten runs in an fMRI study. Using the General Linear Model
+%    response were estimated for each category in each run, resulting
+%    in 6*10=60 t-values.
 %
 % The example shows a searchlight analysis matching local neural similarity
 % patterns to three different target similarity matrices
@@ -45,7 +45,7 @@ cosmo_check_external('-tic');
 % per feature (voxel) is used. Here this is done using t-stats from odd
 % runs. One could also use output from a GLM based on an entire
 % scanning session experiment.
-% 
+%
 
 % define data filenames & load data from even and odd runs
 
@@ -56,13 +56,13 @@ data_fn=fullfile(data_path,'glm_T_stats_odd.nii');
 ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                             'targets',1:6,'chunks',1);
 
-%% Set animal species & class 
+%% Set animal species & class
 ds.sa.labels={'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 ds.sa.animal_class=[1 1 2 2 3 3]';
 
 % simple sanity check to ensure all attributes are set properly
 cosmo_check_dataset(ds);
-                        
+
 % print dataset
 fprintf('Dataset input:\n');
 cosmo_disp(ds_per_run);
@@ -90,16 +90,16 @@ cosmo_disp(nbrhood);
 nsamples=size(ds.samples,1);
 target_dsm=zeros(nsamples);
 
-% define 'simple' target structure where primates (monkey, lemur), 
-% birds (mallard, warbler) and insects (ladybug, lunamoth) are the same 
+% define 'simple' target structure where primates (monkey, lemur),
+% birds (mallard, warbler) and insects (ladybug, lunamoth) are the same
 % (distance=0), all other pairs are equally dissimilar (distance=1).
-% Given the ds.sa.targets assignment, pairs (1,2), (3,4) and (5,6) have 
+% Given the ds.sa.targets assignment, pairs (1,2), (3,4) and (5,6) have
 % distance 0, all others distance 1.
 animal_class=ds.sa.animal_class;
 for row=1:nsamples
     for col=1:nsamples
         same_animal_class=animal_class(row)==animal_class(col);
-        
+
         if same_animal_class
             target_dsm(row,col)=0;
         else
@@ -129,7 +129,7 @@ cosmo_disp(measure_args);
 ds_rsm_binary=cosmo_searchlight(ds,measure,'args',measure_args,...
                                         'nbrhood',nbrhood);
 
-% show results                                    
+% show results
 cosmo_plot_slices(ds_rsm_binary);
 
 % store results
@@ -140,10 +140,10 @@ cosmo_map2fmri(ds_rsm_binary,output_fn);
 %% Using another RSM
 
 % This example is very similar to the previous example.
-% - This example uses a different target representational similarity 
-%   matrix. The code below allows for identifying regions that show a 
-%   linear dissimilarity across animal class, with primates of distance 1 
-%   from birdsand distance 2 from insects, and insects distance 1 from 
+% - This example uses a different target representational similarity
+%   matrix. The code below allows for identifying regions that show a
+%   linear dissimilarity across animal class, with primates of distance 1
+%   from birdsand distance 2 from insects, and insects distance 1 from
 %   birds. Graphically:
 %
 %            +------------------+------------------+
@@ -183,7 +183,7 @@ end
 ds_rsm_linear=cosmo_searchlight(ds,measure,'args',measure_args,...
                                         'nbrhood',nbrhood);
 
-% show results                                    
+% show results
 cosmo_plot_slices(ds_rsm_linear);
 
 % store results
@@ -216,7 +216,7 @@ measure_args.target_dsm=target_dsm;
 ds_rsm_behav=cosmo_searchlight(ds,measure,'args',measure_args,...
                                         'nbrhood',nbrhood);
 
-% show results                                    
+% show results
 cosmo_plot_slices(ds_rsm_behav);
 
 % store results

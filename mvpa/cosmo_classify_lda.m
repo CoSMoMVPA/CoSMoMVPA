@@ -31,19 +31,19 @@ ntrain_=numel(targets_train);
 if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end
 
 classes=unique(targets_train);
-nclasses=numel(classes);    
+nclasses=numel(classes);
 
 class_mean=zeros(nclasses,nfeatures);   % class means
-class_cov=zeros(nfeatures);              % within-class variability 
+class_cov=zeros(nfeatures);              % within-class variability
 
 % compute mean and (co)variance
 for k=1:nclasses;
     % select data in this class
-    msk=targets_train==classes(k);  
-    
+    msk=targets_train==classes(k);
+
     % number of samples in k-th class
-    n=sum(msk); 
-    
+    n=sum(msk);
+
     if k==1
         if n<2
             error('Need at least two samples per class in training');
@@ -53,21 +53,21 @@ for k=1:nclasses;
         error(['Different number of classes (%d and %d) - this is '...
                 'not supported'], n, nfirst);
     end
-    
+
     class_samples=samples_train(msk,:);
-    
+
     class_mean(k,:) = sum(class_samples,1)/n; % class mean
     res = bsxfun(@minus,class_samples,class_mean(k,:)); % residuals
     class_cov = class_cov+res'*res; % estimate common covariance matrix
 end;
 % apply regularization
 regularization=opt.regularization;
-class_cov=class_cov/ntrain; 
+class_cov=class_cov/ntrain;
 reg=eye(nfeatures)*trace(class_cov)/max(1,nfeatures);
 class_cov_reg=class_cov+reg*regularization;
 
 % linear discriminant
-class_weight=class_mean/class_cov_reg; 
+class_weight=class_mean/class_cov_reg;
 class_offset=sum(class_weight .* class_mean,2);
 class_proj=bsxfun(@plus,-.5*class_offset,class_weight*samples_test');
 

@@ -7,8 +7,8 @@ function [arr, dim_labels]=cosmo_unflatten(ds)
 %   ds                 dataset structure, with fields:
 %      .samples        PxQ for P samples and Q features.
 %      .a.dim.labels   1xK cell with string labels for each dimension.
-%      .a.dim.values   1xK cell, with S_J values (J in 1:K) corresponding 
-%                      to the labels in each of the K dimensions. 
+%      .a.dim.values   1xK cell, with S_J values (J in 1:K) corresponding
+%                      to the labels in each of the K dimensions.
 %      .fa.(label)     for each label in a.dim.labels it contains the
 %                      sub-indices for the K dimensions. It is required
 %                      that for every dimension J in 1:K, all values in
@@ -59,7 +59,7 @@ else
 end
 
 % allocate space in 'ndim'-space for each sample,
-% but with a first singleton dimension as that one 
+% but with a first singleton dimension as that one
 % is used for the samples
 arr_dim=zeros([1, dim_sizes]);
 
@@ -67,13 +67,13 @@ arr_dim=zeros([1, dim_sizes]);
 for k=1:nsamples
     % make empty
     arr_dim(:)=0;
-    
+
     % assign to proper location
     arr_dim(lin_indices)=ds.samples(k, :);
-    
+
     % store result for this sample
     arr_cell{k}=arr_dim;
 end
 
 % combine all samples
-arr=cat(1, arr_cell{:});    
+arr=cat(1, arr_cell{:});

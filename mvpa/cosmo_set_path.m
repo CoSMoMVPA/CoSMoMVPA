@@ -4,10 +4,10 @@ function cosmo_set_path()
 % cosmo_set_path()
 %
 % Notes:
-%  - if $ROOT is the root directory of CoSMoMVPA, then this function adds 
-%    the paths $ROOT/{mvpa,external}, and their subdirectories, to the 
+%  - if $ROOT is the root directory of CoSMoMVPA, then this function adds
+%    the paths $ROOT/{mvpa,external}, and their subdirectories, to the
 %    matlab path. It removes $ROOT{doc,examples,tests}.
-%  - A warning message is given if an unexpected directory structure is 
+%  - A warning message is given if an unexpected directory structure is
 %    encountered.
 %  - To store the path, run savepath after calling this function.
 %
@@ -26,14 +26,14 @@ function cosmo_set_path()
 
     % get path of this very function
     me_pth=fileparts(which(mfilename()));
-    
+
     % get CoSMoMVPA root path
     root_pth=fullfile(me_pth,'..');
 
     % get matlab path, each path in a cell
     pathsep_=pathsep(); % store path separator
     matlab_pth=cosmo_strsplit(path(),pathsep_);
-    
+
     for add=[0,1]
         subdirs=remove_add_subdirs{add+1};
 
@@ -45,7 +45,7 @@ function cosmo_set_path()
             if exist(full_pth,'file') && isdir(full_pth)
                 % generate all subdirectories
                 all_pths=cosmo_strsplit(genpath(full_pth),pathsep_);
-                
+
                 % see which ones are in the matlab path
                 in_matlab_pth=cosmo_match(all_pths,matlab_pth);
 

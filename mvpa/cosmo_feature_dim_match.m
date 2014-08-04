@@ -9,26 +9,26 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 %   haystack*         numeric vector, or cell with strings. A string is
 %                     also allowed and interpreted as the name of a feature
 %                     dimension ('i','j' or 'k' in fmri datasets; 'chan',
-%                     'time', or 'freq' in MEEG datasets), and its 
+%                     'time', or 'freq' in MEEG datasets), and its
 %                     respective values (from ds.a.dim.values{dim}, where
 %                     dim is the dimension corresponding to haystack) as
 %                     indexed by ds.fa.(haystack) are used as haystack.
 %   needle*           numeric vector, or cell with strings. A string is
-%                     also allowed and interpreted as {needle}. 
+%                     also allowed and interpreted as {needle}.
 %                     A function handle is also allowed, in which case the
-%                     value use for needle is the function applied to 
+%                     value use for needle is the function applied to
 %                     the corresponding value in ds.a.dim.values.
-%   
+%
 % Output:
 %   msk               boolean array of the same size as haystack, with
 %                     true where the value in haystack is equal to at least
 %                     one value in needle. If multiple needle/haystack
-%                     pairs are provided, then the haystack inputs should 
-%                     have the same number of elements, and msk contains 
-%                     the intersection of the individual masks. 
+%                     pairs are provided, then the haystack inputs should
+%                     have the same number of elements, and msk contains
+%                     the intersection of the individual masks.
 %
 % Examples:
-%   - % in an fmri dataset, get mask for first spatial dimension 'i' with 
+%   - % in an fmri dataset, get mask for first spatial dimension 'i' with
 %     % values in between 5 and 10 (inclusive)
 %     msk=cosmo_feature_dim_match(ds,'i',5:10);
 %
@@ -41,7 +41,7 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
 % Notes
 %  - when haystack or needle are numeric vectors or cells of strings,
 %    then this function behaves like cosmo_match (and does not consider
-%    information in its first input argument ds).  
+%    information in its first input argument ds).
 %
 % See also: cosmo_match
 %
@@ -49,7 +49,7 @@ function msk=cosmo_feature_dim_match(ds, dim_label, dim_values, varargin)
     if ~isstruct(ds)
         error('expected a struct as input');
     end
-       
+
     if ~isfield(ds,'neighbors')
         cosmo_check_dataset(ds);
     end

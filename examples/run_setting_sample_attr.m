@@ -19,7 +19,7 @@ ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
 % <@@<
 %% set targets
 % >@@>
-ds.sa.targets = repmat([1:6]',10,1); 
+ds.sa.targets = repmat([1:6]',10,1);
 % <@@<
 %% set chunks
 % >@@>

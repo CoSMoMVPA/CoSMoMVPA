@@ -2,7 +2,7 @@
 % Set data path, load dataset, set targets and chunks, and add labels as
 % sample attributes
 
-% Set the data path 
+% Set the data path
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 

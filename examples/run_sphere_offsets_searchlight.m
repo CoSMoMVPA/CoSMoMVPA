@@ -1,11 +1,11 @@
 %% Searchlight analysis in the volume
 %
-% This analysis is quite bare-bones - data is simulated to come directly 
+% This analysis is quite bare-bones - data is simulated to come directly
 % from load_nii rather than through fmri_dataset, and voxel indices in each
 % searchlight are computed directly in this script rather than using
 % a helper function such as spherical_voxel_selection.
 %
-% Note: for running searchlights it is recommended to use 
+% Note: for running searchlights it is recommended to use
 %       cosmo_searchlight and cosmo_spherical_neighborhood
 %
 % NNO Aug 2013
@@ -44,7 +44,7 @@ half2_samples_mask=~half1_samples_mask;
 % that correlations are equal on and off the diagonal, weighting these
 % correlations by the contrast matrix and then summing them should
 % give a mean of zero as well.
-contrast_matrix=eye(6)-1/6; 
+contrast_matrix=eye(6)-1/6;
 
 %% Define voxel offset positions in the searchlight
 % get the sphere offsets
@@ -62,23 +62,23 @@ visited=false(voldim);
 %% Run the searchlight
 
 % for pretty progress reporting
-prev_msg=''; 
+prev_msg='';
 clock_start=clock();
 
 % run over voxels in all three spatial dimensions
 for ii=1:voldim(1)
     for jj=1:voldim(2)
         for kk=1:voldim(3)
-            
+
             % if outside the mask, continue with next voxel
             % >@@>
             if ~mask(ii,jj,kk)
                 continue
             end
             % <@@<
-            
+
             % fill up the sphere_data matrix with data from the sphere
-            % centered around location (ii, jj, kk). 
+            % centered around location (ii, jj, kk).
             % for every valid position increment row_pos first, then
             % fill it with the sample data for of that position.
             % (a valid position p=[i, j, k] has 1 <= p(m) <= voldim(m) for
@@ -90,7 +90,7 @@ for ii=1:voldim(1)
                 ii_pos=ii+sphere_offsets(mm,1);
                 jj_pos=jj+sphere_offsets(mm,2);
                 kk_pos=kk+sphere_offsets(mm,3);
-                
+
                 if ii_pos<1 || ii_pos>voldim(1) || ...
                         jj_pos<1 || kk_pos>voldim(2) || ...
                         kk_pos<1 || kk_pos>voldim(3) || ...
@@ -99,20 +99,20 @@ for ii=1:voldim(1)
                 end
                 % go one position down
                 row_pos=row_pos+1;
-                
+
                 % overwrite existing data
                 sphere_data(:,row_pos)=samples(ii_pos, jj_pos, kk_pos, :);
             end
             %<@@<
-            
+
             % get data only as far down as we got voxels.
             selected_sphere_data=sphere_data(:, 1:row_pos);
-            
+
             % a little sanity check
             if any(isnan(selected_sphere_data))
                 error('found NaN - this should not happen');
             end
-            
+
             % take the data from the two halves using the
             % half_{1,2}samples_mask
             % >@@>
@@ -128,10 +128,10 @@ for ii=1:voldim(1)
             c=cosmo_corr(half1',half2');
             fisher_c=atanh(c);
             weighted_c=contrast_matrix.*fisher_c;
-            
+
             output(ii,jj,kk)=sum(weighted_c(:));
             % <@@<
-            
+
             % set this voxel as visited
             visited(ii,jj,kk)=true;
         end

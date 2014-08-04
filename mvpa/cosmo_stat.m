@@ -12,17 +12,17 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                           computing classes(1) minus classes (2), where
 %                           classes=unique(ds.sa.targets).
 %                     'F' : one-way ANOVA.
-%   output_stat_name  (optional) 'z', 'p', 'left', 'right', 'both', or 
-%                      empty (default). 
+%   output_stat_name  (optional) 'z', 'p', 'left', 'right', 'both', or
+%                      empty (default).
 %                     - 'z' returns a z-score.
-%                     - 'left', 'right', and 'both' return a p-value with 
-%                        the specified tail. 
+%                     - 'left', 'right', and 'both' return a p-value with
+%                        the specified tail.
 %                     - 'p' returns a p-value, with tail='right' if
 %                        stat_name='F' and tail='both' otherwise.
 %
 % Returns:
 %   stat_ds          dataset struct with fields:
-%     .samples       1xQ statistic value, or (if output_stat_name is 
+%     .samples       1xQ statistic value, or (if output_stat_name is
 %                    non-empty) z-score or p-value. See the Notes below
 %                    for interpreting p-values.
 %     .sa.df         if output_stat_name is empty the degrees of freedom
@@ -33,10 +33,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     .[f]a          identical to ds.[f]a, if present.
 %
 % Notes:
-%  - If output_stat_name is not provided or empty, then this function runs 
-%    considerably faster than the builtin matlab functions. 
+%  - If output_stat_name is not provided or empty, then this function runs
+%    considerably faster than the builtin matlab functions.
 %  - When output_stat_name=='p' then the p-values returned are the same as
-%    the builtin matlab functions anova1, ttest, and ttest2 with the 
+%    the builtin matlab functions anova1, ttest, and ttest2 with the
 %    default tails.
 %  - For paired-sample t-tests: provide the observation differences
 %    to this function.
@@ -94,13 +94,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >     { 'Pval' }
 %
 %     % one-way anova
-%     % each observation is independent and thus each chunk is unique; 
+%     % each observation is independent and thus each chunk is unique;
 %     % there are three conditions with four observations per condition
 %     ds=struct();
 %     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
 %     ds.sa.targets=repmat(1:3,1,4)';
 %     ds.sa.chunks=(1:12)';
-%     s=cosmo_stat(ds,'F'); 
+%     s=cosmo_stat(ds,'F');
 %     cosmo_disp(s);
 %     > .samples
 %     >   [ 0.472    0.0638      0.05 ]
@@ -108,7 +108,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   .stats
 %     >     { 'Ftest(2,9)' }
 %     % compute z-score
-%     s=cosmo_stat(ds,'F','z'); 
+%     s=cosmo_stat(ds,'F','z');
 %     cosmo_disp(s);
 %     > .samples
 %     >   [ -0.354     -1.54     -1.66 ]
@@ -118,13 +118,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %
 %
 %     % two-sample t-test
-%     % each observation is independent and thus each chunk is unique; 
+%     % each observation is independent and thus each chunk is unique;
 %     % there are two conditions with four observations per condition
 %     ds=struct();
 %     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
 %     ds.sa.targets=repmat(1:2,1,6)';
 %     ds.sa.chunks=(1:12)';
-%     s=cosmo_stat(ds,'t2'); 
+%     s=cosmo_stat(ds,'t2');
 %     cosmo_disp(s);
 %     > .samples
 %     >   [ -2.51      5.55     -6.48 ]
@@ -137,7 +137,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 % NNO Jan 2014
 
     if nargin<3
-        output_stat_name=''; 
+        output_stat_name='';
     elseif any(cosmo_match({'left','right','both'},output_stat_name))
         tail=output_stat_name;
         output_stat_name='p';
@@ -150,10 +150,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         end
     end
 
-    
+
     samples=ds.samples;
     nsamples=size(samples,1);
-    
+
     % get targets
     if isfield(ds,'sa') && isfield(ds.sa,'targets')
         targets=ds.sa.targets;
@@ -164,7 +164,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         % all other stats do require targets
         error('Missing field .sa.targets');
     end
-    
+
     if isfield(ds,'sa') && isfield(ds.sa,'chunks')
         chunks=ds.sa.chunks;
     elseif cosmo_match({stat_name},{'t','F'})
@@ -172,7 +172,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     else
         error('Missing field .sa.chunks');
     end
-    
+
     % ensure that targets has the proper size
     if numel(targets)~=nsamples
         error('Targets has %d values, expected %d', ...
@@ -182,11 +182,11 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     if ~(isempty(chunks) || isequal(sort(chunks),unique(chunks)))
         error('Chunks must be unique');
     end
-    
+
     % get class information
     classes=unique(targets);
     nclasses=numel(classes);
-    
+
     % Set label to be used for cdf (in case 'p' or 'z' has to be computed).
     % This is only different from stat_name in the case of 't2'
     cdf_label=stat_name;
@@ -198,7 +198,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected 1 class, found %d',...
                             stat_name, nclasses);
             end
-            
+
             [stat,df]=quick_ttest(samples);
             stat_label='Ttest';
         case 't2'
@@ -206,10 +206,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 error('%s stat: expected 2 classes, found %d',...
                             stat_name, nclasses);
             end
-            
+
             m1=targets==classes(1);
             m2=targets==classes(2);
-            
+
             [stat,df]=quick_ttest2(samples(m1,:),...
                                   samples(m2,:));
             cdf_label='t';
@@ -219,14 +219,14 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
             if nclasses<2
                 error('%s stat: expected >=2 classes, found %d',...
                             stat_name, nclasses);
-            end 
-            
+            end
+
             if isfield(ds.sa,'contrast')
                 contrast=ds.sa.contrast;
             else
                 contrast=[];
             end
-            
+
             [stat,df]=quick_ftest(samples, targets, classes, nclasses, ...
                                                             contrast);
             stat_label='Ftest';
@@ -242,10 +242,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         % transform to left-tailed p-value
         df_cell=num2cell(df);
         stat=cdf_wrapper(cdf_label,stat,df_cell{:});
-        
+
         % reset degrees of freedom
         df=[];
-        
+
         switch output_stat_name
             case 'z'
                 % transform to z-score
@@ -263,13 +263,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                         stat=(.5-abs(stat-.5))*2;
                     otherwise
                         assert(false,'this should not happen');
-                end     
+                end
                 stat_label='Pval';
             otherwise
                 error('illegal output type %s', output_stat_name);
         end
     end
-    
+
     if ~isempty(df)
         df_str=cellfun(@(x) sprintf('%d',x), num2cell(df),...
                     'UniformOutput',false);
@@ -282,7 +282,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     if isfield(ds,'fa'), stat_ds.fa=ds.fa; end
     stat_ds.samples=stat;
     stat_ds.sa.stats={stat_label};
-    
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -291,7 +291,7 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
     % one-way ANOVA
     has_contrast=~isempty(contrast);
     contrast_sum=0;
-    
+
     [ns,nf]=size(samples);
     mu=sum(samples,1)/ns; % grand mean
 
@@ -330,7 +330,7 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
         bss=sum(bsxfun(@times,nsc,b.^2),1);
         df1=nclasses-1;
     end
-    
+
     df=[df1,ns-nclasses];
 
     bss=bss/df(1);
@@ -341,7 +341,7 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
 
 function [t,df]=quick_ttest(x)
     % one-sample t-test against zero
-    
+
     n=size(x,1);
     mu=sum(x,1)/n; % grand mean
 
@@ -350,13 +350,13 @@ function [t,df]=quick_ttest(x)
 
     % sum of squares
     ss=sum(bsxfun(@minus,x,mu).^2,1);
-    
+
     t=mu .* sqrt(scaling./ss);
 
 
 function [t,df]=quick_ttest2(x,y)
     % two-sample t-test with equal variance assumption
-    
+
     nx=size(x,1);
     ny=size(y,1);
     mux=sum(x,1)/nx; % mean of class x
@@ -364,7 +364,7 @@ function [t,df]=quick_ttest2(x,y)
 
     df=nx+ny-2;
     scaling=(nx*ny)*df/(nx+ny);
-    
+
     % sum of squares
     ss=sum([bsxfun(@minus,x,mux);bsxfun(@minus,y,muy)].^2,1);
 
@@ -382,12 +382,12 @@ function y=cdf_wrapper(name, x, df1, df2)
         otherwise
             assert(false);
     end
-            
-            
+
+
 function y=norminv_wrapper(x)
     check_has_stats_toolbox()
     y=norminv(x);
-    
+
 function check_has_stats_toolbox()
     % - Octave has the required functionality in the octave-forge
     %   statistics toolbox and will raise an error if it is not installed.

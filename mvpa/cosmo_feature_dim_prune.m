@@ -21,13 +21,13 @@ ds_pruned=ds; % output
 for k=1:nlabels
     label=labels{k};
     dim=find(cosmo_match(ds.a.dim.labels, label));
-    
+
     if numel(dim)~=1, error('Illegal label %s', label); end
-        
+
     values=ds.a.dim.values{dim};
     fa=ds.fa.(label);
     [unq_idxs,unused,map_idxs]=unique(fa);
-    
+
     ds_pruned.fa.(label)=map_idxs(:)';
     if iscell(values)
         values=values(unq_idxs);

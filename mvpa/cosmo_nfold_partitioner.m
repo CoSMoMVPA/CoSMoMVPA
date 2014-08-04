@@ -12,7 +12,7 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %                    Each of these is an 1xQ cell for Q partitions, where
 %                    .train_indices{k} and .test_indices{k} contain the
 %                    sample indices for the k-th fold.
-%                    
+%
 % Example:
 %     % simple partitioning scheme with 3 chunks with two samples each
 %     % (chunk values are not necessarily in increasing order)
@@ -44,7 +44,7 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     >       6 ]    5 ]    4 ] }
 %
 %
-%     % Example of an unbalanced partitioning scheme. Generally it is 
+%     % Example of an unbalanced partitioning scheme. Generally it is
 %     % advised to balance the partitions before using them for MVPA.
 %     % (see cosmo_balance_partitions)
 %     ds=struct();
@@ -65,17 +65,17 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     >              5
 %     >              6
 %     >              7 ] }
-%   
+%
 %
 % Note:
-%  - for cross-validation it is recommended to balance partitions using 
+%  - for cross-validation it is recommended to balance partitions using
 %    cosmo_balance_partitions.
 %  - More advanced partitining is provided by cosmo_nchoosek_partitioner.
 %
-% See also: cosmo_balance_partitions, cosmo_nchoosek_partitioner 
+% See also: cosmo_balance_partitions, cosmo_nchoosek_partitioner
 %
 % NNO Aug 2013
-    
+
     if isstruct(chunks)
         if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
             chunks=chunks.sa.chunks;
@@ -83,14 +83,14 @@ function partitions = cosmo_nfold_partitioner(chunks)
             error('illegal input: struct without .sa.chunks')
         end
     end
-    
+
     unq=unique(chunks);
     nchunks=numel(unq);
-    
+
     % allocate space for output
     train_indices=cell(1,nchunks);
     test_indices=cell(1,nchunks);
-    
+
     % set the training and test indices for each chunk
     for k=1:nchunks
         % >@@>
@@ -99,9 +99,9 @@ function partitions = cosmo_nfold_partitioner(chunks)
         test_indices{k}=find(test_msk);
         % <@@<
     end
-    
+
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;
-    
-        
-    
+
+
+

@@ -12,9 +12,9 @@ function randomized_targets=cosmo_randomize_targets(targets, chunks)
 %                         Each chunk in each row is randomized seperately
 %
 % NNO Aug 2013
-    
+
     if isstruct(targets)
-        if isfield(targets,'sa') && isfield(targets.sa,'targets') 
+        if isfield(targets,'sa') && isfield(targets.sa,'targets')
             if isfield(targets.sa,'chunks') && nargin<3
                 chunks=targets.sa.chunks;
             end
@@ -23,13 +23,13 @@ function randomized_targets=cosmo_randomize_targets(targets, chunks)
             error('illegal input')
         end
     end
-    
+
     ntargets=numel(targets);
     randomized_targets=zeros(ntargets, 1); %space for output
-    
+
     unq=unique(chunks);
     nchunks=numel(unq);
-    
+
     % << permute the target labels randomly, seperately for each chunk
     for j=1:nchunks
         msk=chunks==unq(j);

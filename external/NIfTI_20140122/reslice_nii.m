@@ -8,7 +8,7 @@
 %  The resliced NIfTI file will always be in RAS orientation.
 %
 %  This program only supports real integer or floating-point data type.
-%  For other data type, the program will exit with an error message 
+%  For other data type, the program will exit with an error message
 %  "Transform of this NIFTI data is not supported by the program".
 %
 %  Usage: reslice_nii(old_fn, new_fn, [voxel_size], [verbose], [bg], ...
@@ -48,13 +48,13 @@
 %
 %  preferredForm (optional)  -  selects which transformation from voxels
 %	to RAS coordinates; values are s,q,S,Q.  Lower case s,q indicate
-%	"prefer sform or qform, but use others if preferred not present". 
+%	"prefer sform or qform, but use others if preferred not present".
 %	Upper case indicate the program is forced to use the specificied
 %	tranform or fail loading.  'preferredForm' will be 's', if it is
 %	default or empty.	- Jeff Gunter
 %
 %  NIFTI data format can be found on: http://nifti.nimh.nih.gov
-%  
+%
 %  - Jimmy Shen (jshen@research.baycrest.org)
 %
 function reslice_nii(old_fn, new_fn, voxel_size, verbose, bg, method, img_idx, preferredForm)
@@ -136,7 +136,7 @@ function [nii] = load_nii_no_xform(filename, img_idx, old_RGB, preferredForm)
    if ~exist('filename','var'),
       error('Usage: [nii] = load_nii(filename, [img_idx], [old_RGB])');
    end
-   
+
    if ~exist('img_idx','var'), img_idx = []; end
    if ~exist('old_RGB','var'), old_RGB = 0; end
    if ~exist('preferredForm','var'), preferredForm= 's'; end     % Jeff
@@ -198,12 +198,12 @@ function [nii] = load_nii_no_xform(filename, img_idx, old_RGB, preferredForm)
    %  Read the header extension
    %
 %   nii.ext = load_nii_ext(filename);
-   
+
    %  Read the dataset body
    %
    [nii.img,nii.hdr] = ...
         load_nii_img(nii.hdr,nii.filetype,nii.fileprefix,nii.machine,img_idx,'','','',old_RGB);
-   
+
    %  Perform some of sform/qform transform
    %
 %   nii = xform_nii(nii, preferredForm);
@@ -252,7 +252,7 @@ function [nii] = load_nii_no_xform(filename, img_idx, old_RGB, preferredForm)
            useForm='q';
        end
    end						% Jeff
-   
+
    if isequal(preferredForm,'q')
        if hdr.hist.qform_code > 0
            useForm='q';

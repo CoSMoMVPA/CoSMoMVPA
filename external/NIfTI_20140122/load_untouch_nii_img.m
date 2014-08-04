@@ -161,26 +161,26 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
 
    %  Set bitpix according to datatype
    %
-   %  /*Acceptable values for datatype are*/ 
+   %  /*Acceptable values for datatype are*/
    %
-   %     0 None                     (Unknown bit per voxel) % DT_NONE, DT_UNKNOWN 
-   %     1 Binary                         (ubit1, bitpix=1) % DT_BINARY 
-   %     2 Unsigned char         (uchar or uint8, bitpix=8) % DT_UINT8, NIFTI_TYPE_UINT8 
-   %     4 Signed short                  (int16, bitpix=16) % DT_INT16, NIFTI_TYPE_INT16 
-   %     8 Signed integer                (int32, bitpix=32) % DT_INT32, NIFTI_TYPE_INT32 
-   %    16 Floating point    (single or float32, bitpix=32) % DT_FLOAT32, NIFTI_TYPE_FLOAT32 
+   %     0 None                     (Unknown bit per voxel) % DT_NONE, DT_UNKNOWN
+   %     1 Binary                         (ubit1, bitpix=1) % DT_BINARY
+   %     2 Unsigned char         (uchar or uint8, bitpix=8) % DT_UINT8, NIFTI_TYPE_UINT8
+   %     4 Signed short                  (int16, bitpix=16) % DT_INT16, NIFTI_TYPE_INT16
+   %     8 Signed integer                (int32, bitpix=32) % DT_INT32, NIFTI_TYPE_INT32
+   %    16 Floating point    (single or float32, bitpix=32) % DT_FLOAT32, NIFTI_TYPE_FLOAT32
    %    32 Complex, 2 float32      (Use float32, bitpix=64) % DT_COMPLEX64, NIFTI_TYPE_COMPLEX64
-   %    64 Double precision  (double or float64, bitpix=64) % DT_FLOAT64, NIFTI_TYPE_FLOAT64 
-   %   128 uint8 RGB                 (Use uint8, bitpix=24) % DT_RGB24, NIFTI_TYPE_RGB24 
-   %   256 Signed char            (schar or int8, bitpix=8) % DT_INT8, NIFTI_TYPE_INT8 
+   %    64 Double precision  (double or float64, bitpix=64) % DT_FLOAT64, NIFTI_TYPE_FLOAT64
+   %   128 uint8 RGB                 (Use uint8, bitpix=24) % DT_RGB24, NIFTI_TYPE_RGB24
+   %   256 Signed char            (schar or int8, bitpix=8) % DT_INT8, NIFTI_TYPE_INT8
    %   511 Single RGB              (Use float32, bitpix=96) % DT_RGB96, NIFTI_TYPE_RGB96
-   %   512 Unsigned short               (uint16, bitpix=16) % DT_UNINT16, NIFTI_TYPE_UNINT16 
-   %   768 Unsigned integer             (uint32, bitpix=32) % DT_UNINT32, NIFTI_TYPE_UNINT32 
+   %   512 Unsigned short               (uint16, bitpix=16) % DT_UNINT16, NIFTI_TYPE_UNINT16
+   %   768 Unsigned integer             (uint32, bitpix=32) % DT_UNINT32, NIFTI_TYPE_UNINT32
    %  1024 Signed long long              (int64, bitpix=64) % DT_INT64, NIFTI_TYPE_INT64
-   %  1280 Unsigned long long           (uint64, bitpix=64) % DT_UINT64, NIFTI_TYPE_UINT64 
-   %  1536 Long double, float128  (Unsupported, bitpix=128) % DT_FLOAT128, NIFTI_TYPE_FLOAT128 
-   %  1792 Complex128, 2 float64  (Use float64, bitpix=128) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128 
-   %  2048 Complex256, 2 float128 (Unsupported, bitpix=256) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128 
+   %  1280 Unsigned long long           (uint64, bitpix=64) % DT_UINT64, NIFTI_TYPE_UINT64
+   %  1536 Long double, float128  (Unsupported, bitpix=128) % DT_FLOAT128, NIFTI_TYPE_FLOAT128
+   %  1792 Complex128, 2 float64  (Use float64, bitpix=128) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128
+   %  2048 Complex256, 2 float128 (Unsupported, bitpix=256) % DT_COMPLEX128, NIFTI_TYPE_COMPLEX128
    %
    switch hdr.dime.datatype
    case   1,
@@ -199,13 +199,13 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
       hdr.dime.bitpix = 64; precision = 'float64';
    case 128,
       hdr.dime.bitpix = 24; precision = 'uint8';
-   case 256 
+   case 256
       hdr.dime.bitpix = 8;  precision = 'int8';
-   case 511 
+   case 511
       hdr.dime.bitpix = 96; precision = 'float32';
-   case 512 
+   case 512
       hdr.dime.bitpix = 16; precision = 'uint16';
-   case 768 
+   case 768
       hdr.dime.bitpix = 32; precision = 'uint32';
    case 1024
       hdr.dime.bitpix = 64; precision = 'int64';
@@ -214,7 +214,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
    case 1792,
       hdr.dime.bitpix = 128; precision = 'float64';
    otherwise
-      error('This datatype is not supported'); 
+      error('This datatype is not supported');
    end
 
    tmp = hdr.dime.dim(2:end);
@@ -240,8 +240,8 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
    if hdr.dime.datatype == 1 | isequal(hdr.dime.dim(4:8),ones(1,5)) | ...
 	(isempty(img_idx) & isempty(dim5_idx) & isempty(dim6_idx) & isempty(dim7_idx) & isempty(slice_idx))
 
-      %  For each frame, precision of value will be read 
-      %  in img_siz times, where img_siz is only the 
+      %  For each frame, precision of value will be read
+      %  in img_siz times, where img_siz is only the
       %  dimension size of an image, not the byte storage
       %  size of an image.
       %
@@ -253,7 +253,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
       if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
          img_siz = img_siz * 2;
       end
-	 
+
       %MPH: For RGB24, voxel values include 3 separate color planes
       %
       if hdr.dime.datatype == 128 | hdr.dime.datatype == 511
@@ -318,7 +318,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
       if isempty(dim7_idx)
          dim7_idx = 1:d7;
       end
-      
+
       %ROMAN: begin
       roman = 1;
       if(roman)
@@ -382,7 +382,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
                      end
                   end; % if (roman)
                   % ROMAN: end
-         
+
                   if filetype == 2
                      fseek(fid, pos + hdr.dime.vox_offset, 'bof');
                   else
@@ -400,14 +400,14 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
                      img = [img fread(fid, img_siz, sprintf('*%s',precision))];
                   end; %if(roman)
                   % ROMAN: end
-                  
+
                end
                end
             end
          end
       end
    end
-   
+
    %  For complex float32 or complex float64, voxel values
    %  include [real, imag]
    %
@@ -418,7 +418,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
 
    fclose(fid);
 
-   %  Update the global min and max values 
+   %  Update the global min and max values
    %
    hdr.dime.glmax = double(max(img(:)));
    hdr.dime.glmin = double(min(img(:)));

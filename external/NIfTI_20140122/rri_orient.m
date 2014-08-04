@@ -21,8 +21,8 @@ function [nii, orient, pattern] = rri_orient(nii, varargin)
    else
        orient = [1 2 3];
    end
-   
-   
+
+
    dim = double(nii.hdr.dime.dim([2:4]));
 
    if ~isempty(pattern) & ~isequal(length(pattern), prod(dim))

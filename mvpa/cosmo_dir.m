@@ -7,12 +7,12 @@ function files=cosmo_dir(directory,file_pattern)
 %   directory      optional parent directory to look for files. If omitted
 %                  the current directory is used.
 %   file_pattern   optional pattern to match file names. The wildcards '*'
-%                  (zero or more of any character) and '?' (any single 
+%                  (zero or more of any character) and '?' (any single
 %                  character) can be used. If omitted, '*' is used, meaning
 %                  that all files are listed.
 % Output:
-%   files          Px1 struct (if P files were found in the directory or  
-%                  recursively in any (sub^X)-directorie) with fields 
+%   files          Px1 struct (if P files were found in the directory or
+%                  recursively in any (sub^X)-directorie) with fields
 %                  .name, .date, .bytes, .isdir, .datenum. Unlike the
 %                  built-in 'dir' function, .name contains the path and
 %                  filename.
@@ -24,7 +24,7 @@ function files=cosmo_dir(directory,file_pattern)
 %    the built-in 'dir' function.
 %  - this function does not return '.' (current directory) or '..' (parent
 %    directory.
-%  
+%
 % Examples:
 %  % list recursively all files in the current directory
 %  >> d=cosmo_dir()
@@ -32,13 +32,13 @@ function files=cosmo_dir(directory,file_pattern)
 %  % list recursively all files in my_dir
 %  >> d=cosmo_dir('my_dir')
 %
-%  % list recursively all files in the current directory with extension 
+%  % list recursively all files in the current directory with extension
 %  % '.jpg'
 %  >> d=cosmo_dir('my_d)
-% 
+%
 %  % list recursively all files in my_dir with extension '.jpg'
 %  >> d=cosmo_dir('my_dir', '*.jpg')
-% 
+%
 %  % list recursively all files in my_dir that are two characters long,
 %  % followed by the extension '.jpg'
 %  >> d=cosmo_dir('my_dir', '??.jpg')
@@ -92,15 +92,15 @@ for k=1:n
             % ignore current and parent directory
             continue
         end
-      
+
         if isempty(me)
             % prepare first recursive call; make immune to function rename
-            me=str2func(mfilename()); 
+            me=str2func(mfilename());
         end
-        
+
         % get all files in this directory through recursion
         r=me(full_path,file_pattern);
-        
+
         if ~isempty(r)
             % store result
             pos=pos+1;

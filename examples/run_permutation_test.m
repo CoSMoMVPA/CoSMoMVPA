@@ -16,9 +16,9 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
-% Only consider four classes (otherwise the classifier does extremily well)                    
-ds=cosmo_slice(ds,ds.sa.targets<=4);                    
-                    
+% Only consider four classes (otherwise the classifier does extremily well)
+ds=cosmo_slice(ds,ds.sa.targets<=4);
+
 classifier=@cosmo_classify_nn;
 
 % for more speed, just do odd-even partitioning
@@ -28,7 +28,7 @@ partitions=cosmo_oddeven_partitioner(ds);
 [pred, acc]=cosmo_crossvalidate(ds, classifier, partitions);
 
 %% prepare for permutations
-acc0=zeros(niter,1); % allocate space for permuted accuracies 
+acc0=zeros(niter,1); % allocate space for permuted accuracies
 ds0=ds; % make a copy of the dataset
 
 %% for _niter_ iterations, reshuffle the labels and compute accuracy
@@ -43,11 +43,11 @@ end
 p=sum(acc<acc0)/niter;
 fprintf('%d permutations: accuracy=%.3f, p=%.4f\n', niter, acc, p);
 
-bins=0:10/niter:1; 
+bins=0:10/niter:1;
 h=histc(acc0,bins);
 bar(bins,h)
 hold on
 line([acc acc],[0,max(h)])
 hold off
-title(sprintf('acc=%.3f',acc)) 
+title(sprintf('acc=%.3f',acc))
 

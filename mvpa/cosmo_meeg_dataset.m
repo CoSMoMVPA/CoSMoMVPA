@@ -2,59 +2,59 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 % Returns a dataset structure based on MEEG data
 %
 % ds=cosmo_meeg_dataset(filename, varargin)
-% 
+%
 % Inputs:
 %   filename          filename of MEEG data to be loaded. Currently this
 %                     can be a .mat file (for FieldTrip) with timelocked or
 %                     time-frequency data, or .txt (exported EEGLab) for
-%                     timelocked data. Alternatively it can be a FieldTrip 
+%                     timelocked data. Alternatively it can be a FieldTrip
 %                     struct with timelocked or time-frequency data.
-%   'targets', t      Px1 targets for P samples; these will be stored in 
+%   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
 %                     the output as ds.sa.chunks
-% 
+%
 % Returns:
 %   ds                dataset struct with the following fields
 %     .samples        PxQ for P samples and Q features.
 %     .sa.targets     Px1 sample targets (if provided)
 %     .sa.chunks      Px1 sample chunks (if provided)
 %     .a
-%       .hdr_{F}           header information for format F. Currently 
+%       .hdr_{F}           header information for format F. Currently
 %                          F is always 'ft'.
 %       .meeg
 %         .sample_field   name of sample field. One of 'fourierspctrm',
-%                         'powspctrm', or 'trial'. 
+%                         'powspctrm', or 'trial'.
 %         .samples_type   'timelock' or 'timefreq'.
 %         .samples_label  Usually 'rpt'; or the first field of .dimord
 %                         for FieldTrip data
 %       .dim
-%         .labels     1xS cell struct with labels for the feature 
-%                     dimensions of the input. Usually this is 
+%         .labels     1xS cell struct with labels for the feature
+%                     dimensions of the input. Usually this is
 %                     {'chan','time'} or {'chan','freq','time'}.
 %         .values     1xS cell struct with values associated with .labels.
 %                     If the K-th value has N_K values, this means that
-%                     the feature dimension .labels{K} takes the 
-%                     values in .values{K}. For example, if 
+%                     the feature dimension .labels{K} takes the
+%                     values in .values{K}. For example, if
 %                     .labels{1}=='chan', then .values{1} contains the
-%                     channel labels. 
-%     .fa 
-%       .{D}          if D==a.dim.labels{K} is the label for the K-th 
+%                     channel labels.
+%     .fa
+%       .{D}          if D==a.dim.labels{K} is the label for the K-th
 %                     feature dimension, then .{D} contains the
 %                     indices referencing a.dim.values. Thus, all values in
 %                     .{D} are in the range 1:N_K if a.dim.values{K} has
 %                     N_K values, and the J-th feature has dimension value
 %                     .dim.values{K}(.{D}(J)) in the K-th dimension.
-%       
+%
 % Notes:
 %  - The resulting dataset can be mapped back to MEEG format using
 %    cosmo_map2meeg.
 %  - if the input contains data from a single sample (such as an average)
 %    the .sample_field is set to .trial, and mapping back to MEEG format
 %    adds a singleton dimension to the .trial data output field.
-%  - Most MVPA applications require that .sa.targets (experimental 
-%    condition of each sample) and .sa.chunks (partitioning of the samples 
-%    in independent sets) are set, either by using this function or 
+%  - Most MVPA applications require that .sa.targets (experimental
+%    condition of each sample) and .sa.chunks (partitioning of the samples
+%    in independent sets) are set, either by using this function or
 %    manually afterwards.
 %
 % Dependency:
@@ -62,17 +62,17 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %      http://http://fieldtrip.fcdonders.nl
 %
 % See also: cosmo_map2meeg
-%   
+%
 % NNO Sep 2013
 
     % Input parsing stuff
-    
+
     defaults=struct();
     defaults.targets=[];
     defaults.chunks=[];
-    
+
     params = cosmo_structjoin('!', defaults, varargin);
-    
+
     if cosmo_check_dataset(filename,'meeg',false)
         % it is already a dataset, so return it
         ds=filename;
@@ -91,11 +91,11 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 
     % read the dataset
     ds=reader(filename);
-    
+
     % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
     ds=set_vec_sa(ds,'chunks',params.chunks);
-    
+
 
     % check consistency
     cosmo_check_dataset(ds,'meeg');
@@ -138,7 +138,7 @@ function img_formats=get_supported_image_formats()
     % helper function to see if a filename ends with a certain string.
     % uses currying - who doesn't like curry?
     endswith=@(ext) @(fn) ischar(fn) && isempty(cosmo_strsplit(fn,ext,-1));
-    
+
     % eeglab txt files
     img_formats.eeglab_txt.file_matcher=endswith('.txt');
     img_formats.eeglab_txt.reader=@read_eeglab_txt;
@@ -149,14 +149,14 @@ function img_formats=get_supported_image_formats()
     img_formats.ft.file_matcher=endswith('.mat');
     img_formats.ft.reader=@read_ft;
     img_formats.ft.externals={'fieldtrip'};
-    
+
     % fieldtrip matlab struct
     img_formats.ft_struct.file_matcher=@(x) isstruct(x) && ...
                                 ~strcmp('unknown',isempty(ft_datatype(x)));
     img_formats.ft_struct.reader=@convert_ft;
     img_formats.ft_struct.externals={'fieldtrip'};
-    
-    
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,15 +166,15 @@ function ds=read_ft(filename)
     % reads it from a .mat data file
     ft=importdata(filename);
     ds=convert_ft(ft);
-    
-function ds=convert_ft(ft)    
+
+function ds=convert_ft(ft)
     % ft is a fieldtrip struct
     datatype=ft_datatype(ft);
-    
+
     % smallish hack: timelock data with 'avg' data is only 2D, but
     % must be transformed to 3D with singleton dimension before
     % flattening it to a 2D (row-vector) array.
-    set_samples_field=[]; 
+    set_samples_field=[];
     switch datatype
         case 'freq'
             % see in which field the data is stored
@@ -198,7 +198,7 @@ function ds=convert_ft(ft)
         if isfield(ft, samples_field)
             samples_arr=ft.(samples_field);
             ft=rmfield(ft,samples_field);
-            
+
             % apply hack - override the samples field
             if ~isempty(set_samples_field)
                 samples_field=set_samples_field;
@@ -211,7 +211,7 @@ function ds=convert_ft(ft)
 
     % get the dimension labels
     [dim_labels,ndim]=cosmo_strsplit(ft.dimord,'_');
-    
+
     % See if the first dimension is a dimension label (chan, freq, time).
     insert_sample_dim=cosmo_match(dim_labels(1),expected_dim_labels);
 
@@ -243,7 +243,7 @@ function ds=convert_ft(ft)
     end
 
     ndim=numel(size(samples_arr))-1; % number of feature dimensions
-    
+
     % store values for each feature dimensions, e.g. labels of the
     % channels, onets for time, and frequency for freq
     dim_values=cell(1,ndim);
@@ -259,7 +259,7 @@ function ds=convert_ft(ft)
 
     % make a dataset
     ds=cosmo_flatten(samples_arr, dim_labels, dim_values);
-    
+
     % store as attribtues
     ds.a.meeg.samples_field=samples_field;
     ds.a.meeg.samples_type=datatype;
@@ -273,7 +273,7 @@ function ds=convert_ft(ft)
     if isfield(ft,'cumtapcnt') && size(ft.cumtapcnt,1)==nsamples
         ds.sa.cumtapcnt=ft.cumtapcnt;
     end
-    
+
     % fields to leave out in output
     % XXX timelock data .var, .dof, .avg are removed - not sure if that is
     % bad.
@@ -286,7 +286,7 @@ function ds=convert_ft(ft)
         fn=all_fields{keep_field_indices(k)};
         ds.a.hdr_ft.(fn)=ft.(fn);
     end
-    
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % eeglab helper function
@@ -312,7 +312,7 @@ function ds=read_eeglab_txt(fn)
     if neg_one~=-1
         error('Could not read all data from %s', fn);
     end
-    
+
     %%%%%%%%%%%%%%%
     % data consistency checks
 
@@ -356,7 +356,7 @@ function ds=read_eeglab_txt(fn)
     dim_labels={'chan','time'};
     dim_values={chan_labels, .001*t_trial'};
 
-    % make a dataset 
+    % make a dataset
     ds=cosmo_flatten(data, dim_labels, dim_values);
 
     % set datatype to timelock-ish in fieldtrip-compatible way

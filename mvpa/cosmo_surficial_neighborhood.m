@@ -9,9 +9,9 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                  - if radius>0, then voxels are selected around each node
 %                    if the associated neighboring nodes are within a
 %                    distance less than or equal to readius
-%                  - if radius<0, then the nearest (-radius) voxels are 
+%                  - if radius<0, then the nearest (-radius) voxels are
 %                    selected around each node
-%    surfs         cell with specification of surfaces. The following 
+%    surfs         cell with specification of surfaces. The following
 %                  formats are valid options:
 %                  * Single surface (Caret, BrainVoyager)
 %                    - {fn, [start,stop]}
@@ -19,17 +19,17 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                    - {v,f}
 %                    - {v,f,[start,stop], niter}
 %                    where
-%                       + fn is the filename of a single surface 
+%                       + fn is the filename of a single surface
 %                       + start and stop are distances towards and away
 %                         from the center of a hemisphere. For example,
 %                         if surface coordinates are in mm (which is
-%                         typical), start=-3 and stop=2 means selecting 
-%                         voxels that are 3 mm or closer to the surface on 
-%                         the white-matter side, up to voxels that are 2 mm 
+%                         typical), start=-3 and stop=2 means selecting
+%                         voxels that are 3 mm or closer to the surface on
+%                         the white-matter side, up to voxels that are 2 mm
 %                         from the surface on the pial matter side
 %                       + niter is the number of subsampling (mesh
 %                         decimation) iterations to use for the output
-%                         surface. 
+%                         surface.
 %                       + v are Px3 coordinates for P nodes
 %                       + f are Qx3 node indices for Q faces
 %                  * Twin surface (FreeSurfer)
@@ -44,8 +44,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                         surfaces
 %                       + fn_o is the filename of an intermediate
 %                         (node-wise average of a pial and white
-%                         surface) output surface, and can be of a lower 
-%                         resolution than the pial and white surfaces. This 
+%                         surface) output surface, and can be of a lower
+%                         resolution than the pial and white surfaces. This
 %                         can be achieved by using MapIcosahedron to
 %                         generate meshes of different densities, e.g.
 %                         ld=64 for the pial and white surface and ld=16
@@ -58,12 +58,12 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                         pial and white surfaces
 %                       + f are Qx3 node indices for Q faces on the pial
 %                         and white surfaces
-%                       + v_o and f_o are the nodes and vertices of an 
+%                       + v_o and f_o are the nodes and vertices of an
 %                         intermediate output surface
 %                       + niter is the number of subsampling (mesh
 %                         decimation) iterations to use for the output
 %                         surface.
-%    'metric',metric     distance metric along cortical surface. One of 
+%    'metric',metric     distance metric along cortical surface. One of
 %                        'geodesic' (default), 'dijkstra' or 'euclidian'.
 %    'line_def',line_def definition of lines from inner to outer surface
 %                        See surfing_nodeidxs2coords
@@ -74,13 +74,13 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                        based on ds
 %    'subsample_min_ratio', r   When niter is provided and positive, it
 %                               defines the minimum ratio between surfaces
-%                               of old and new faces. This should help in 
+%                               of old and new faces. This should help in
 %                               preventing the generation of triangles with
 %                               angles close to 180 degrees (default: 0.2).
-%    'center_ids', c     Center ids in output surface of the nodes for 
-%                        which the neighborhood should be computed. Empty 
+%    'center_ids', c     Center ids in output surface of the nodes for
+%                        which the neighborhood should be computed. Empty
 %                        means all nodes are used (default: [])
-%                       
+%
 % Outputs:
 %     nbrhood       neighborhood struct with fields
 %                   .neighbors       Mx1 cell with .neighbors{k} the
@@ -98,50 +98,50 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %     % this example uses BrainVoyager Surfaces
 %     anat_fn='SUB02_MPRAGE_ISO_IIHC_TAL.vmr';
 %     surf_fn='SUB02_MPRAGE_ISO_IIHC_TAL_LH_RECOSM.srf';
-% 
+%
 %     % read dataset and surface
 %     ds=cosmo_fmri_dataset(anat_fn,'mask',anat_fn);
 %     fprintf('Dataset has %d samples and %d features\n',size(ds.samples));
-% 
+%
 %     [v,f]=surfing_read(surf_fn);
 %     fprintf('Input surface has %d nodes and %d faces\n',size(v,1),size(f,1))
-% 
+%
 %     % define neighborhood parameters
-%     radius=-100; % 100 voxels per searchlight 
+%     radius=-100; % 100 voxels per searchlight
 %     niter=10;    % 10 mesh decimation algorithms
-% 
-%     % surface definition; voxels are selected that are 3 mm or closer to the 
-%     % surface on the white-matter side, up to voxels that are 1 mm from the 
+%
+%     % surface definition; voxels are selected that are 3 mm or closer to the
+%     % surface on the white-matter side, up to voxels that are 1 mm from the
 %     % surface on the pial matter side.
 %
-%     % Note: for FreeSurfer surfaces one could use 
+%     % Note: for FreeSurfer surfaces one could use
 %     %       {surf_white_fn, surf_pial_fn [,niter]}
-%     surfs={surf_fn,[-3 1],niter}; 
+%     surfs={surf_fn,[-3 1],niter};
 %     [nbrhood,vo,fo]=cosmo_surficial_neighborhood(ds,radius,surfs);
 %     fprintf('Neighborhood has %d elements\n', numel(nbrhood.neighbors))
 %     fprintf('Output surface has %d nodes and %d faces\n',size(vo,1),size(fo,1))
-% 
-%     % write decimated (smaller) output surface in ASCII format 
+%
+%     % write decimated (smaller) output surface in ASCII format
 %     surfing_write(['small_surf.asc'],vo,fo);
-% 
+%
 %     % define a measure that counts the number of features in each searchlight
 %     % (in more practical applications the measure could be, for example,
 %     %  cosmo_correlation_measure or cosmo_crossvalidation_measure)
 %     voxel_counter=@(x,opt) cosmo_structjoin('samples',size(x.samples,2));
-% 
+%
 %     % run a searchlight
 %     res=cosmo_searchlight(ds,voxel_counter,'nbrhood',nbrhood);
 %     fprintf('Searchlights have mean %.3f +/- %.3f features\n',...
 %                     mean(res.samples), std(res.samples));
-% 
-% 
-%     % store surface dataset (in AFNI/SUMA NIML format) with the number of 
+%
+%
+%     % store surface dataset (in AFNI/SUMA NIML format) with the number of
 %     % features (voxels) for each center node of the output surface
 %     s=struct();
 %     s.node_indices=res.a.dim.values{1}(res.fa.node_indices);
 %     s.data=res.samples';
 %     surfing_write('voxcount.niml.dset',s);
-% 
+%
 %     % store volume dataset (in NIFTI format) with the number of times each
 %     % voxel was selected by a searchlight
 %     vol=ds;
@@ -151,17 +151,17 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %         vol.samples(nbrs)=vol.samples(nbrs)+1;
 %     end
 %     cosmo_map2fmri(vol,'voxcount.nii');
-%     cosmo_map2fmri(ds,'anat.nii');                  
-%                   
+%     cosmo_map2fmri(ds,'anat.nii');
+%
 % Notes
-%  - Higher values of niter, or using a less dense mesh for fn_o or 
+%  - Higher values of niter, or using a less dense mesh for fn_o or
 %    (v_o, f_o) means that the output surface has fewer nodes, which will
 %    decrease execution time for searchlights.
 %  - This function requires the surfing toolbox, surfing.sourceforge.net or
 %    github.com/nno/surfing
-%                   
+%
 % See also: surfing, surfing_nodeidxs2coords, cosmo_searchlight
-% 
+%
 
 cosmo_check_dataset(ds,'fmri');
 if ~isequal(ds.a.dim.labels,{'i','j','k'})
@@ -238,10 +238,10 @@ end
 
 ncenters=numel(center_ids);
 assert(ncenters==numel(n2v));
-% determine unique center ids used                                     
+% determine unique center ids used
 [unq_center_ids,unused,center_ids_mapping]=unique(center_ids);
 
-% find mapping from features 
+% find mapping from features
 nf_full=numel(vol_def.mask);
 nf_mask=sum(vol_def.mask(:));
 all2msk_indices=zeros(1,nf_full);
@@ -268,16 +268,16 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
     if ~iscell(surfs)
         error('surfs argument must be a cell');
     end
-    
+
     n=numel(surfs);
-    
+
     % space for output
     v1=[];
     v2=[];
     f=[];
     vo=[];
     fo=[];
-    
+
     for k=1:n
         s=surfs{k};
         if ischar(s)
@@ -316,26 +316,26 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
             error('Expected surface filename or array at position %d', k);
         end
     end
-    
+
     if isempty(v1) || isempty(v2) || isempty(f)
         error('Not enough arguments for two surfaces and topology');
     end
-    
+
     % c2 can be vector with two elements indicating the size of the curved
     % cylinder with a circle as basis; if not, it should be a surface with
     % the same size as c1
     one_surface=numel(v2)==2;
-    
+
     if ~(one_surface || isequal(size(v1),size(v2)))
         error('Size mismatch between surfaces: %dx%d != %dx%d',...
                     size(v1), size(v2));
     end
-    
+
     surfing_check_surface(v1,f);
     if ~one_surface
         surfing_check_surface(v2,f);
     end
-    
+
     if isempty(fo)
         if numel(vo)>1
             % if not a scaler (niter) then throw an error
@@ -344,5 +344,5 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
     else
         surfing_check_surface(vo,fo);
     end
-    
-    
+
+

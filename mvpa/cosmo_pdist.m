@@ -6,7 +6,7 @@ function d=cosmo_pdist(x, distance)
 % Inputs:
 %   x            PxM matrix for P samples and M features
 %   distance     distance metric: one of 'euclidean' (default),
-%                'correlation' (computing one-minus-correlation), or any 
+%                'correlation' (computing one-minus-correlation), or any
 %                other metric supported by matlab's built-in 'pdist'
 %
 % Outputs:
@@ -25,7 +25,7 @@ function d=cosmo_pdist(x, distance)
 %     % compute distances with one-minus-correlation distance metric
 %     cosmo_pdist(data,'correlation')
 %     > 0.8110    1.6547    0.0551    1.8660    0.5000    1.8660
-%     
+%
 % Notes:
 %   - this function provides a native implementation for 'euclidean' and
 %     'correlation'; other distance metrics require the pdist function
@@ -35,18 +35,18 @@ function d=cosmo_pdist(x, distance)
 %     distances on platforms without the stats toolbox
 %   - to compute pair-wise distances on a dataset struct, use
 %     cosmo_dissimilarity_matrix_measure
-%   - the output of this function can be given to [cosmo_]squareform to 
+%   - the output of this function can be given to [cosmo_]squareform to
 %     recreate a PxP distance matrix
 %
 % See also: cosmo_dissimilarity_matrix_measure, cosmo_squareform
-%   
+%
 % NNO Jul 2014
 
     if nargin<2 || isempty(distance), distance='euclidean'; end
-    
+
     [ns,nf]=size(x);
     d=zeros(1,ns*(ns-1)/2);
-    
+
     switch distance
         case 'euclidean'
             pos=0;
@@ -54,25 +54,25 @@ function d=cosmo_pdist(x, distance)
                 ji=((k+1):ns);
                 nj=numel(ji);
                 idxs=pos+(1:nj);
-                
+
                 delta=bsxfun(@minus,x(k,:),x(ji,:));
                 d_idxs=sqrt(sum(delta.^2,2));
-                
+
                 d(idxs)=d_idxs;
                 pos=pos+nj;
             end
-            
+
         case 'correlation'
             % it's faster to compute all correlations that just the lower
             % diagonal
             dfull=cosmo_corr(x');
             ns_rng=1:ns;
-            
+
             % make diagonal mask
             msk=bsxfun(@gt,ns_rng',ns_rng);
             d=1-dfull(msk)';
-                
-                
+
+
         otherwise
             is_octave=cosmo_wtf('is_octave');
             if is_octave || cosmo_check_external('@stats',false)
@@ -81,6 +81,6 @@ function d=cosmo_pdist(x, distance)
                 error(['Matlab requires the stats toolbox for distance '...
                             'metric %s'], distance);
             end
-        
+
     end
-        
+

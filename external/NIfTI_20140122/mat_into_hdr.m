@@ -1,5 +1,5 @@
 %MAT_INTO_HDR  The old versions of SPM (any version before SPM5) store
-%	an affine matrix of the SPM Reoriented image into a matlab file 
+%	an affine matrix of the SPM Reoriented image into a matlab file
 %	(.mat extension). The file name of this SPM matlab file is the
 %	same as the SPM Reoriented image file (.img/.hdr extension).
 %

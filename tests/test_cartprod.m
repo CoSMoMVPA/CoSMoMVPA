@@ -16,7 +16,7 @@ function test_cartprod_cells()
         1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2;...
         1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2]')
 
-function test_cartprod_struct()    
+function test_cartprod_struct()
     s=struct();
     s.name={'foo','bar'};
     s.dim=1:3;
@@ -32,9 +32,9 @@ function test_cartprod_struct()
     assertEqual([m.bool],(1:12)<=6);
     assertEqual(fieldnames(m),fieldnames(s));
 
-function test_cartprod_empty()  
+function test_cartprod_empty()
     aeq=@(arg,v) assertEqual(cosmo_cartprod(arg),v);
-    
+
     aeq(struct(),cell(1,0));
     aeq(cell(1),cell(0,1));
-    
+
