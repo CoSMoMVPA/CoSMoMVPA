@@ -60,7 +60,7 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
     eta=(1-progress)/progress*took; % 'estimated time of arrival'
 
     % set number of backspace characters
-    delete_str=repmat('\b',1,1+delete_count);
+    delete_str=repmat('\b',1,delete_count);
 
     % define the bar
     bar_width=20;
