@@ -91,6 +91,8 @@ if isempty(template)
     template=eye(nclasses)-1/nclasses;
 end
 
+template_msk=isfinite(template);
+
 npartitions=numel(partitions.train_indices);
 halves={partitions.train_indices, partitions.test_indices};
 
@@ -129,7 +131,7 @@ for k=1:npartitions
     
     switch params.output
         case 'mean'
-            pcw=c.*template;
+            pcw=c(template_msk).*template(template_msk);
             pdatak=mean(pcw(:));
         case 'raw'
             pdatak=c(:);
