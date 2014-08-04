@@ -30,7 +30,7 @@ function s=cosmo_structjoin(varargin)
 %     y=cosmo_structjoin(x,'a',66,'x',x,{'c','hello'});
 %     cosmo_disp(y);
 %     > .a
-%     >   [ 3 ]
+%     >   [ 66 ]
 %     > .b
 %     >   { [ 3 ]  [ 4 ] }
 %     > .x

@@ -38,9 +38,6 @@ function test_structjoin_
     ar({'!',{'c',3},'b',{1,2}});
     ar({'!',x_,y_});
 
-    assertEqual(sj('!',y_,x_),sj(y_,x_));
-    assertEqual(sj(x_,y_),sj(y_,x_,'!',y_));
-
 
 
 
