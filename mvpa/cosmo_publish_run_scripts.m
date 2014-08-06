@@ -81,9 +81,6 @@ function cosmo_publish_run_scripts(force)
         end
 
         fprintf('building: %s ...', srcnm);
-        %tmpfn=fullfile(tmpdir,srcfns(k).name);
-        %remove_annotation(srcfn, tmpfn);
-        %cd(tmpdir);
         cd(srcpth);
         is_built=false;
         try
@@ -127,37 +124,6 @@ function cosmo_publish_run_scripts(force)
     end
     fprintf(fid,'</UL>Back to <A HREF="../../index.html">index</A>.</BODY></HTML>\n');
     fprintf('Index written to %s\n', outputfn);
-
-
-function remove_annotation(srcfn,trgfn)
-    srcfn
-    trgfn
-    if strcmpi(srcfn,trgfn)
-        error('source and target are the same: %s', srcfn);
-    end
-
-    fid=fopen(srcfn);
-    c=onCleanup(@()fclose(fid));
-    wid=fopen(trgfn,'w');
-    c_=onCleanup(@()fclose(wid));
-
-    while true
-        line=fgetl(fid);
-        if ~ischar(line)
-            break
-        end
-
-        % For now remove annotation is disabled
-        % XXX should it be re-enabled
-        % if startswith(line,'% >@@>') || startswith(line,'% <@@<')
-        %     continue
-        % end
-
-        fprintf(wid,'%s\n',line);
-    end
-
-    fclose(fid);
-    fclose(wid);
 
 
 function s=startswith(haystack, needle)
