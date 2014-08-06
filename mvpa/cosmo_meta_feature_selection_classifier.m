@@ -9,7 +9,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %   samples_test       QxR test data.
 %   opt                struct with the following fields:
 %      .child_classifier                  handle to classifier to use (e.g.
-%                                         @cosmo_classify_svm).
+%                                         @cosmo_classify_matlabsvm).
 %      .feature_selector                  handle to featur selector (e.g.
 %                                         @cosmo_anove_feature_selector).
 %      .feature_selection_ratio_to_keep   ratio of how many features to

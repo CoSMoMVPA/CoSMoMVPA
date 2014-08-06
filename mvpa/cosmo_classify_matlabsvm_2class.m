@@ -1,7 +1,7 @@
-function predicted=cosmo_classify_svm_2class(samples_train, targets_train, samples_test, opt)
+function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train, samples_test, opt)
 % svm classifier wrapper (around svmtrain/svmclassify)
 %
-% predicted=cosmo_classify_svm_2class(samples_train, targets_train, samples_test, opt)
+% predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train, samples_test, opt)
 %
 % Inputs
 % - samples_train      PxR training data for P samples and R features
@@ -13,7 +13,7 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
 % Output
 % - predicted          Qx1 predicted data classes for samples_test
 %
-% See also svmtrain, svmclassify, cosmo_classify_svm
+% See also svmtrain, svmclassify, cosmo_classify_matlabsvm
 %
 % NNO Aug 2013
 
@@ -29,7 +29,7 @@ function predicted=cosmo_classify_svm_2class(samples_train, targets_train, sampl
 
     classes=unique(targets_train);
     if numel(classes)~=2
-        error('%s requires 2 classes. Use cosmo_classify_svm instead',...
+        error('%s requires 2 classes. Use cosmo_classify_matlabsvm instead',...
                     mfilename());
     end
 

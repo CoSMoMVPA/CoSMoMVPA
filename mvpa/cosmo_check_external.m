@@ -14,6 +14,9 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          'surfing'   surfing toolbox
 %                          'gifti'     GIfTI library for matlab
 %                          'xunit'     xUnit unit test framework
+%                          'matlabsvm' SVM classifier in matlab stats
+%                                      toolbox
+%                          'svm'       Either matlabsvm or libsvm
 %                          '@{name}'   Matlab toolbox {name}
 %                          It can also be '-list', '-tic', '-toc',' or
 %                          '-cite'; see below for their meaning.
@@ -88,20 +91,23 @@ function is_ok=cosmo_check_external(external, raise_)
         raise_=true;
     end
 
-    path_has_changed=isempty(cached_path);
-    if path_has_changed
-        cached_path=path();
+    current_path=path();
+    if isempty(cached_path)
+        path_has_changed=true;
     else
-        p=path();
         % use fast strncmp function instead of strcmp
-        n=max(numel(cached_path),numel(path));
-        path_has_changed=~strncmp(p,cached_path,n);
+        n=numel(cached_path);
+        path_has_changed=n~=numel(current_path) || ...
+                            ~strncmp(current_path,cached_path,n);
     end
 
     if path_has_changed || (ischar(external) && strcmp(external,'-tic'))
         % clear cache
-        cached_present_names=[];
-        cached_absent_names=[];
+        cached_present_names=cell(0);
+        cached_absent_names=cell(0);
+        
+        % store path
+        cached_path=current_path;
     end
 
     if iscell(external)
@@ -114,16 +120,6 @@ function is_ok=cosmo_check_external(external, raise_)
         end
         return
     end
-
-    % initialize to empty if not set
-    if ~iscell(cached_present_names)
-        cached_present_names=cell(0);
-    end
-
-    if ~iscell(cached_absent_names)
-        cached_absent_names=cell(0);
-    end
-
 
     if external(1)=='-'
         % process special user switch
@@ -162,8 +158,10 @@ function is_ok=cosmo_check_external(external, raise_)
 
     if cosmo_match({external},cached_present_names)
         is_ok=true;
-    elseif cosmo_match({external},cached_absent_names)
+        return;
+    elseif cosmo_match({external},cached_absent_names) && ~raise_
         is_ok=false;
+        return;
     elseif external(1)=='@'
         toolbox_name=external(2:end);
         is_ok=check_matlab_toolbox(toolbox_name,raise_);
@@ -189,43 +187,78 @@ function is_ok=check_external_toolbox(external_name,raise_)
     end
 
     ext=externals.(external_name);
-    is_present=ext.is_present();
-    is_recent=ext.is_recent();
-
-    is_ok=is_present && is_recent;
-    if ~is_ok
-        env=cosmo_wtf('environment');
-        if ~is_present
-            msg=sprintf(['The %s is required, but it was not found in '...
-                'the %s path. If it is not present on your '...
-                'system, download it from:\n\n    %s\n\nthen, if '...
+    if iscell(ext)
+        % at least one of them must be ok
+        is_ok=false;
+        for j=1:numel(ext)
+            is_ok=is_ok || check_external_toolbox(ext{j},false);
+        end
+        if ~is_ok && raise_
+            error('None of the following externals was found: %s',...
+                        cosmo_strjoin(ext,', '));
+        end
+        return
+    end
+    
+    env=cosmo_wtf('environment');
+    error_msg=[]; 
+    
+    % simulate goto statement
+    while true
+        if ~ext.is_present()
+            error_msg=sprintf(['%s is required, but it was not '...
+                'found in the %s path. If it is not present on your '...
+                'system, obtain it from:\n\n    %s\n\nthen, if '...
                 'applicable, add the necessary directories '...
                 'to the %s path.'], ...
-                ext.label, env, url2str(ext.url), env);
-
-        elseif ~is_recent
-            msg=sprintf(['The %s was found on your %s path, but '...
+                ext.label(), env, url2str(ext.url), env);
+            break;
+        end
+        
+        if ~ext.is_recent()
+            error_msg=sprintf(['%s was found on your %s path, but '...
                 'seems out of date. Please download the latest '...
                 'version from:\n\n %s\n\nthen, if '...
                 'applicable, add the necessary directories '...
                 'to the %s path.'], ...
-                ext.label, env, url2str(ext.url), env);
-        else
-            assert(false,'should never get here');
+                ext.label(), env, url2str(ext.url), env);
+            break;
         end
-
-        if ~strcmp(env,'matlab')
-            msg=sprintf(['%s\n\nNote: your environment is %s, not '...
-                        '''native'' matlab - the %s may not work '...
-                        'in this environment'],msg,env,ext.label);
+        
+        if isfield(ext,'conflicts')
+            conflicts=ext.conflicts;
+            names=fieldnames(conflicts);
+            for k=1:numel(names)
+                name=names{k};
+                
+                if ~externals.(name).is_present()
+                    continue;
+                end
+                
+                conflict=conflicts.(name);
+                if conflict()
+                    error_msg=sprintf(['%s conflicts with %s, making %s '...
+                                    'unusable. You may '...
+                                    'have to adjust the %s path '...
+                                    'to resolve this.']...
+                                    ,externals.(name).label(),...
+                                    ext.label(),ext.label(),env);
+                    break;
+                end
+            end
+            if ~isempty(error_msg)
+                break;
+            end
         end
-
-        if raise_
-            error(msg);
-        end
+        
+        break;
     end
-
-
+    
+    is_ok=isempty(error_msg);
+    if ~is_ok && raise_
+        error(error_msg);
+    end
+    
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     if cosmo_wtf('is_matlab')
         toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
@@ -237,6 +270,7 @@ function is_ok=check_matlab_toolbox(toolbox_name,raise_)
         error('The matlab toolbox ''%s'' seems absent',...
                             toolbox_name);
     end
+       
 
 function s=url2str(url)
     if strcmp(cosmo_wtf('environment'),'matlab')
@@ -250,6 +284,7 @@ function externals=get_externals()
     externals=struct();
     yes=@() true;
     has=@(x) ~isempty(which(x));
+    path_of=@(x) fileparts(which(x));
 
     externals.cosmo.is_present=yes;
     externals.cosmo.is_recent=yes;
@@ -311,18 +346,21 @@ function externals=get_externals()
     externals.libsvm.is_recent=yes;
     externals.libsvm.label='LIBSVM';
     externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
-    externals.libsvm.authors={'C.-C. Chang and C.-J. Lin'};
+    externals.libsvm.authors={'C.-C. Chang', 'C.-J. Lin'};
     externals.libsvm.ref=['LIBSVM: '...
                             'a library for support vector machines. '...
                             'ACM Transactions on Intelligent Systems '...
                             'and Technology, 2:27:1--27:27, 2011'];
+    externals.libsvm.conflicts.matlabsvm=@() ~isequal(...
+                                                path_of('svmpredict'),...
+                                                path_of('svmtrain'));
 
     externals.surfing.is_present=has('surfing_voxelselection');
     % require recent version with surfing_write
     externals.surfing.is_recent=~isempty(which('surfing_write'));
     externals.surfing.label='Surfing toolbox';
     externals.surfing.url='http://github.com/nno/surfing';
-    externals.surfing.authors={'N. N. Oosterhof','T Wiestler',...
+    externals.surfing.authors={'N. N. Oosterhof','T. Wiestler',...
                                 'J. Diedrichsen'};
     externals.surfing.ref=['A comparison of volume-based and '...
                             'surface-based multi-voxel pattern '...
@@ -341,32 +379,72 @@ function externals=get_externals()
     externals.xunit.url=['http://www.mathworks.it/matlabcentral/'...
                     'fileexchange/22846-matlab-xunit-test-framework'];
     externals.xunit.authors={'S. Eddins'};
+    
+    externals.matlab.is_present=@() cosmo_wtf('is_matlab');
+    externals.matlab.is_recent=yes;
+    externals.matlab.label=@() sprintf('Matlab %s',cosmo_wtf('version'));
+    externals.matlab.url='http://www.mathworks.com';
+    externals.matlab.authors={'The Mathworks, Natick, MA, United States'};
+    
+    externals.octave.is_present=@() cosmo_wtf('is_octave');
+    externals.octave.is_recent=yes;
+    externals.octave.label=@() sprintf('GNU Octave %s',...
+                                    cosmo_wtf('version'));
+    externals.octave.url='http://www.gnu.org/software/octave/';
+    externals.octave.authors={'Octave community'};
+
+    externals.matlabsvm.is_present=@() check_matlab_toolbox('stats',...
+                                                              false) && ...
+                                            has('svmpredict') && ...
+                                            has('svmclassify');
+    externals.matlabsvm.is_recent=yes;
+    externals.matlabsvm.conflicts.libsvm=@() ~isequal(...
+                                                path_of('svmtrain'),...
+                                                path_of('svmclassify'));
+    externals.matlabsvm.label='matlab stats toolbox';
+    externals.matlabsvm.url='http://www.mathworks.com';
+    
+    externals.svm={'libsvm', 'matlabsvm'}; % need either
+    
 
 
-
-
+function c=add_to_cell(c, v)
+    if ~cosmo_match({v},c)
+        c{end+1}=v;
+    end
+    
 
 function citation_str=get_citation_str(cached_present_names)
     % always cite CoSMoMVPA
-    self='cosmo';
-    if ~any(cosmo_match(cached_present_names,self))
-        cached_present_names{end+1}=self;
+    present_names=cached_present_names;
+    
+    present_names=add_to_cell(present_names,'cosmo');
+    if cosmo_wtf('is_matlab')
+        present_names=add_to_cell(present_names,'matlab');
     end
-
+    
+    if cosmo_wtf('is_octave')
+        present_names=add_to_cell(present_names,'octave');
+    end
+    
     externals=get_externals();
 
-    n=numel(cached_present_names);
+    n=numel(present_names);
     cites=cell(n,1);
     cites_msk=false(n,1);
 
     for k=1:n
-        external_name=cached_present_names{k};
+        external_name=present_names{k};
         if ~isfield(externals,external_name)
             % built-in
             continue;
         end
 
         external=externals.(external_name);
+        
+        if ~isfield(external,'authors')
+            continue;
+        end
 
         if isfield(external,'ref')
             % reference provided, use label to prefix URL
@@ -374,12 +452,11 @@ function citation_str=get_citation_str(cached_present_names)
             url_prefix_str=sprintf('%s ', external.label);
         else
             % no reference, use label as title and no prefix for URL
-            title_str=external.label;
+            title_str=external.label();
             url_prefix_str='';
         end
 
-        % ensure CoSMoMVPA is mentioned first
-        cites{n-k+1}=sprintf('%s, %s. %savailable online from %s',...
+        cites{k}=sprintf('%s, %s. %savailable online from %s',...
                              cosmo_strjoin(external.authors,', '),...
                              title_str, url_prefix_str, external.url);
         cites_msk(k)=true;
@@ -387,8 +464,3 @@ function citation_str=get_citation_str(cached_present_names)
     end
 
     citation_str=cosmo_strjoin(cites(cites_msk),'\n\n');
-
-
-
-
-

@@ -135,8 +135,22 @@ data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 % Define classifiers and mask labels
 classifiers={@cosmo_classify_nn,...
              @cosmo_classify_naive_bayes,...
-             @cosmo_classify_svm,...
              @cosmo_classify_lda};
+
+% Use svm classifiers, if present
+svm_name2func=struct();
+svm_name2func.matlabsvm=@cosmo_classify_matlabsvm;
+svm_name2func.libsvm=@cosmo_classify_libsvm;
+svm_name2func.svm=@cosmo_classify_svm;
+svm_names=fieldnames(svm_name2func);
+for k=1:numel(svm_names)
+    svm_name=svm_names{k};
+    if cosmo_check_external(svm_name,false)
+        classifiers{end+1}=svm_name2func.(svm_name);
+    else
+        warning('Classifier %s skipped because not available', svm_name);
+    end
+end
 
 mask_labels={'vt_mask','ev_mask'};
 
@@ -169,12 +183,6 @@ for j=1:nmasks
 
     for k=1:nclassifiers
         classifier=classifiers{k};
-        if ~cosmo_check_external('@stats',false) && ...
-                    isequal(classifier,@cosmo_classify_svm)
-            warning('Classifier %s skipped: stats toolbox not present',...
-                            func2str(classifier));
-            continue;
-        end
         [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
         confusion_matrix=cosmo_confusion_matrix(ds, pred);

@@ -10,7 +10,7 @@ function predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, 
 %   samples_test       QxR test data
 %   opt                struct with a field .base_classifier, which should
 %                      be a function handle to another classifier
-%                      (for example opt.base_classifier=@cosmo_classify_svm)
+%                      (for example opt.base_classifier=@cosmo_classify_matlabsvm)
 %
 % Output
 %   predicted          Qx1 predicted data classes for samples_test

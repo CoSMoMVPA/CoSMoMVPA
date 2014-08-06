@@ -136,11 +136,11 @@ fprintf('Dataset has %d samples and %d features\n', size(ds.samples));
 fprintf('Dataset input:\n');
 cosmo_disp(ds);
 
-%% Set partition scheme to odd-even partitioning.
-%
+%% Set partition scheme. odd_even is fast; for publication-quality analysis
+% nfold_partitioner is recommended.
 % Alternatives are:
-% + cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
-% + cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
+% - cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
+% - cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").
 measure_args.partitions = cosmo_oddeven_partitioner(ds);
 
 % print measure and arguments

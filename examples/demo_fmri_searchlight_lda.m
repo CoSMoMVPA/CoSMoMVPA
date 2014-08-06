@@ -55,10 +55,11 @@ measure = @cosmo_crossvalidation_measure;
 measure_args = struct();
 
 % Define which classifier to use, using a function handle.
-% Alternatives are @cosmo_classify_{svm,nn,naive_bayes}
+% Alternatives are @cosmo_classify_{svm,matlabsvm,libsvm,nn,naive_bayes}
 measure_args.classifier = @cosmo_classify_lda;
 
-% Set partition scheme.
+% Set partition scheme. odd_even is fast; for publication-quality analysis
+% nfold_partitioner is recommended.
 % Alternatives are:
 % - cosmo_nfold_partitioner    (take-one-chunk-out crossvalidation)
 % - cosmo_nchoosek_partitioner (take-K-chunks-out  "             ").

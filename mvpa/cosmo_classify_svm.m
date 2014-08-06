@@ -1,70 +1,77 @@
 function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
-% SVM classifier that uses classify_svm_2class to provide
-% multi-class classification with SVM.
+% classifier wrapper that uses either matlab's or libsvm's SVM.
 %
 % predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
 %
-% Inputs
+% Inputs:
 %   samples_train      PxR training data for P samples and R features
 %   targets_train      Px1 training data classes
 %   samples_test       QxR test data
-%   opt                (optional) struct with options for svm_classify
+%   opt                (optional) struct with options for classification
+%                      If a field 'svm' is present it should be either
+%                      'libsvm' or 'matlabsvm' to use that SVM. If this
+%                      field is absent it will be selected automatically.
 %
 % Output
 %   predicted          Qx1 predicted data classes for samples_test
 %
 % Notes:
-%  - this function uses matlab's builtin svmtrain function, which has
-%    the same name as LIBSVM's version. Use of this function is not
-%    supported when LIBSVM's svmtrain precedes in the matlab path; in
-%    that case, adjust the path or use cosmo_classify_libsvm instead.
+%  - cosmo_classify_svm can use either libsvm or matlab's svm, whichever is
+%    present
 %
-% See also svmtrain, svmclassify, cosmo_classify_svm_2class
-%
-% NNO Aug 2013
+% See also svmtrain, svmclassify, cosmo_classify_svm
 
-    if nargin<4, opt=struct(); end
+persistent cached_path;
+persistent cached_classifier_func;
+persistent cached_classifier_name;
 
-    [ntrain, nfeatures]=size(samples_train);
-    [ntest, nfeatures_]=size(samples_test);
-    ntrain_=numel(targets_train);
+if nargin>=4 && isfield(opt,'svm')
+    svm_name=opt.svm;
+    auto_select=false;
+    opt=rmfield(opt,'svm');
+else
+    opt=struct();
+    auto_select=true;
+end
 
-    if nfeatures~=nfeatures_ || ntrain_~=ntrain,
-        error('illegal input size');
+n=numel(cached_path);
+path_changed=true;
+if n>0
+    p=path();
+    path_changed=n~=numel(p) || ~strncmp(p,cached_path,n);
+end
+
+if ~path_changed && (auto_select || strcmp(svm_name, ...
+                                        cached_classifier_name))
+    classifier_func=cached_classifier_func;
+else
+    if path_changed
+        cached_path=path();
     end
 
-    classes=unique(targets_train);
-    nclasses=numel(classes);
-
-    % number of pair-wise comparisons
-    ncombi=nclasses*(nclasses-1)/2;
-
-    % allocate space for all predictions
-    all_predicted=zeros(ntest, ncombi);
-
-    % Consider all pairwise comparisons (over classes)
-    % and store the predictions in all_predicted
-    pos=0;
-    for k=1:(nclasses-1)
-        for j=(k+1):nclasses
-            pos=pos+1;
-            % classify between 2 classes only (from classes(k) and classes(j)).
-            % >@@>
-            mask_k=targets_train==classes(k);
-            mask_j=targets_train==classes(j);
-            mask=mask_k | mask_j;
-
-            pred=cosmo_classify_svm_2class(samples_train(mask,:), ...
-                            targets_train(mask), samples_test, opt);
-            % <@@<
-            all_predicted(:,pos)=pred;
+    if auto_select
+        if cosmo_check_external('libsvm',false)
+            svm_name='libsvm';
+        elseif cosmo_check_external('matlabsvm',false)
+            svm_name='matlabsvm';
         end
     end
 
-    % find the classes that were predicted most often.
-    % ties are handled by cosmo_winner_indices
+    cosmo_check_external(svm_name);
 
-    [winners, test_classes]=cosmo_winner_indices(all_predicted);
+    switch svm_name
+        case 'libsvm'
+            classifier_func=@cosmo_classify_libsvm;
+        case 'matlabsvm';
+            classifier_func=@cosmo_classify_matlabsvm;
+        otherwise
+            error('unsupported svm ''%s''', svm_name);
+    end
 
-    predicted=test_classes(winners);
+    cached_classifier_func=classifier_func;
+    cached_classifier_name=svm_name;
+end
+
+predicted=classifier_func(samples_train, targets_train, samples_test, opt);
+
 

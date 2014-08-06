@@ -1,7 +1,7 @@
 %% Classification using svm
 %
 
-if ~cosmo_check_external('@stats',false)
+if ~cosmo_check_external('matlabsvm',false)
     fprintf('Matlab toolbox ''stats'' not present, skipping\n');
     return
 end
@@ -22,7 +22,7 @@ ds_2class_train=cosmo_slice(ds_2class,ds_2class.sa.chunks<=5);
 ds_2class_test=cosmo_slice(ds_2class,ds_2class.sa.chunks>5);
 
 % predict using 2 class svm
-pred2=cosmo_classify_svm_2class(ds_2class_train.samples,...
+pred2=cosmo_classify_matlabsvm_2class(ds_2class_train.samples,...
                                 ds_2class_train.sa.targets,...
                                 ds_2class_test.samples);
 
@@ -37,7 +37,7 @@ ds_4class=cosmo_slice(ds, ds.sa.targets>=2 & ds.sa.targets<=5);
 ds_4class_train=cosmo_slice(ds_4class,ds_4class.sa.chunks<=5);
 ds_4class_test=cosmo_slice(ds_4class,ds_4class.sa.chunks>5);
 
-pred4=cosmo_classify_svm(ds_4class_train.samples,...
+pred4=cosmo_classify_matlabsvm(ds_4class_train.samples,...
                         ds_4class_train.sa.targets,...
                         ds_4class_test.samples);
 

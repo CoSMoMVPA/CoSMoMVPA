@@ -34,9 +34,9 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %   but unbiased with respect to which class is the 'winner' sample-wise.
 % - Samples with no winner are assigned a value of zero.
 % - A typical use case is combining results from multiple predictions,
-%   such as in cosmo_classify_svm and cosmo_crossvalidate.
+%   such as in cosmo_classify_matlabsvm and cosmo_crossvalidate.
 %
-% See also: cosmo_classify_svm, cosmo_crossvalidate.
+% See also: cosmo_classify_matlabsvm, cosmo_crossvalidate.
 %
 % NNO Aug 2013
 

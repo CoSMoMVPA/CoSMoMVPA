@@ -18,11 +18,12 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %  - this function uses LIBSVM's svmtrain function, which has the same
 %    name as matlab's builtin version. Use of this function is not
 %    supported when matlab's svmtrain precedes in the matlab path; in
-%    that case, adjust the path or use cosmo_classify_svm instead.
+%    that case, adjust the path or use cosmo_classify_matlabsvm instead.
 %
-% See also svmtrain, svmpredict, cosmo_classify_svm
+% See also svmtrain, svmclassify, cosmo_classify_svm, cosmo_classify_matlabsvm
 %
 % NNO Feb 2014
+    cosmo_check_external('libsvm');
 
     has_opt=nargin>4 && ~isempty(fieldnames(opt));
 
@@ -38,6 +39,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
         default_opt.t=0; % linear
         opt_str=libsvm_opt2str(default_opt,opt);
     else
+        % build string directly (for faster execution)
         opt_str='-t 0 -q';
     end
 
