@@ -104,5 +104,5 @@ if cosmo_check_external('@stats',false)
             roi,mean(mean_weighted_zs),std(mean_weighted_zs),...
             stats.df,stats.tstat,p);
 else
-    fprintf('Matlab stats toolbox not found\n');
+    fprintf('Matlab stats toolbox not available\n');
 end
