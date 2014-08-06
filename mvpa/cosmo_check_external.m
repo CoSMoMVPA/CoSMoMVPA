@@ -105,7 +105,7 @@ function is_ok=cosmo_check_external(external, raise_)
         % clear cache
         cached_present_names=cell(0);
         cached_absent_names=cell(0);
-        
+
         % store path
         cached_path=current_path;
     end
@@ -199,10 +199,10 @@ function is_ok=check_external_toolbox(external_name,raise_)
         end
         return
     end
-    
+
     env=cosmo_wtf('environment');
-    error_msg=[]; 
-    
+    error_msg=[];
+
     % simulate goto statement
     while true
         if ~ext.is_present()
@@ -214,7 +214,7 @@ function is_ok=check_external_toolbox(external_name,raise_)
                 ext.label(), env, url2str(ext.url), env);
             break;
         end
-        
+
         if ~ext.is_recent()
             error_msg=sprintf(['%s was found on your %s path, but '...
                 'seems out of date. Please download the latest '...
@@ -224,17 +224,17 @@ function is_ok=check_external_toolbox(external_name,raise_)
                 ext.label(), env, url2str(ext.url), env);
             break;
         end
-        
+
         if isfield(ext,'conflicts')
             conflicts=ext.conflicts;
             names=fieldnames(conflicts);
             for k=1:numel(names)
                 name=names{k};
-                
+
                 if ~externals.(name).is_present()
                     continue;
                 end
-                
+
                 conflict=conflicts.(name);
                 if conflict()
                     error_msg=sprintf(['%s conflicts with %s, making %s '...
@@ -250,15 +250,15 @@ function is_ok=check_external_toolbox(external_name,raise_)
                 break;
             end
         end
-        
+
         break;
     end
-    
+
     is_ok=isempty(error_msg);
     if ~is_ok && raise_
         error(error_msg);
     end
-    
+
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     if cosmo_wtf('is_matlab')
         toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
@@ -270,7 +270,7 @@ function is_ok=check_matlab_toolbox(toolbox_name,raise_)
         error('The matlab toolbox ''%s'' seems absent',...
                             toolbox_name);
     end
-       
+
 
 function s=url2str(url)
     if strcmp(cosmo_wtf('environment'),'matlab')
@@ -379,13 +379,13 @@ function externals=get_externals()
     externals.xunit.url=['http://www.mathworks.it/matlabcentral/'...
                     'fileexchange/22846-matlab-xunit-test-framework'];
     externals.xunit.authors={'S. Eddins'};
-    
+
     externals.matlab.is_present=@() cosmo_wtf('is_matlab');
     externals.matlab.is_recent=yes;
     externals.matlab.label=@() sprintf('Matlab %s',cosmo_wtf('version'));
     externals.matlab.url='http://www.mathworks.com';
     externals.matlab.authors={'The Mathworks, Natick, MA, United States'};
-    
+
     externals.octave.is_present=@() cosmo_wtf('is_octave');
     externals.octave.is_recent=yes;
     externals.octave.label=@() sprintf('GNU Octave %s',...
@@ -403,30 +403,30 @@ function externals=get_externals()
                                                 path_of('svmclassify'));
     externals.matlabsvm.label='matlab stats toolbox';
     externals.matlabsvm.url='http://www.mathworks.com';
-    
+
     externals.svm={'libsvm', 'matlabsvm'}; % need either
-    
+
 
 
 function c=add_to_cell(c, v)
     if ~cosmo_match({v},c)
         c{end+1}=v;
     end
-    
+
 
 function citation_str=get_citation_str(cached_present_names)
     % always cite CoSMoMVPA
     present_names=cached_present_names;
-    
+
     present_names=add_to_cell(present_names,'cosmo');
     if cosmo_wtf('is_matlab')
         present_names=add_to_cell(present_names,'matlab');
     end
-    
+
     if cosmo_wtf('is_octave')
         present_names=add_to_cell(present_names,'octave');
     end
-    
+
     externals=get_externals();
 
     n=numel(present_names);
@@ -441,7 +441,7 @@ function citation_str=get_citation_str(cached_present_names)
         end
 
         external=externals.(external_name);
-        
+
         if ~isfield(external,'authors')
             continue;
         end
