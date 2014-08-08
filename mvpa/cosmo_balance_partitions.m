@@ -1,25 +1,92 @@
-function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
+function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 % balances a partition so that each target occurs equally often in each
-% chunk
+% training chunk
 %
-% bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
+% bpartitions=cosmo_balance_partitions(partitions, targets, nsets)
 %
 % Inputs:
 %   partitions        struct with fields:
-%     .train_indices  } Each is a Nx1 cell (for N chunks) containing the
-%     .test_indics    } feature indices for each chunk
+%     .train_indices  } Each is a 1xN cell (for N chunks) containing the
+%     .test_indices   } sample indices for each partition
 %   targets           Px1 vector, or dataset struct with field .sa.targets.
-%   nsets             Number of balanced sets (default: 1)
+%   'nsets',nsets     Number of balanced sets (default: 1). The output will
+%                     have nsets as many partitions as the input set.
+%   'nmin',nmin       Ensure that each target occurs at least
+%                     nmin times in each training set (and some may
+%                     be repeated more often than than).
 %
 % Ouput:
-%   bal_partitions    similar struct as input partitions, except that
-%                     - each field is a (N*nsets)x1 cell
-%                     - each unique target is represented equally often
+%   bpartitions    similar struct as input partitions, except that
+%                  - each field is a 1x(N*nsets) cell
+%                  - each unique target is represented about equally often
+%                  - each target in each training chunk occurs equally
+%                    often
 %
-% Example:
-%  % ds is a dataset with chunks and targets
-%  partitions=cosmo_nchoosek_partitioner(ds, 1); % take-1-fold-out
-%  partitions=cosmo_balance_partitions(partitions, ds);
+% Examples:
+%     % generate a simple dataset with unbalanced partitions
+%     ds=struct();
+%     ds.samples=zeros(9,2);
+%     ds.sa.targets=[1 1 2 2 2 3 3 3 3]';
+%     ds.sa.chunks=[1 2 2 1 1 1 2 2 2]';
+%     p=cosmo_nfold_partitioner(ds);
+%     %
+%     % show original (unbalanced) partitioning
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 2    [ 1
+%     >       3      4
+%     >       7      5
+%     >       8      6 ]
+%     >       9 ]        }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       4      3
+%     >       5      7
+%     >       6 ]    8
+%     >              9 ] }
+%     %
+%     % make standard balancing (nsets=1); some targets are not used
+%     q=cosmo_balance_partitions(p,ds);
+%     cosmo_disp(q);
+%     > .train_indices
+%     >   { [ 2    [ 1
+%     >       3      4
+%     >       7 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       4      3
+%     >       5      7
+%     >       6 ]    8
+%     >              9 ] }
+%     %
+%     % make balancing where each target in each training set is used at
+%     % least once
+%     q=cosmo_balance_partitions(p,ds,'nmin',1);
+%     cosmo_disp(q);
+%     > .train_indices
+%     >   { [ 2    [ 8    [ 9    [ 1    [ 5
+%     >       3      2      2      4      1
+%     >       7 ]    3 ]    3 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1    [ 2    [ 2
+%     >       4      4      4      3      3
+%     >       5      5      5      7      7
+%     >       6 ]    6 ]    6 ]    8      8
+%     >                            9 ]    9 ] }
+%     %
+%     % triple the number of partitions and sample from training indices
+%     q=cosmo_balance_partitions(p,ds,'nrep',3);
+%     cosmo_disp(q);
+%     > .train_indices
+%     >   { [ 2    [ 8    [ 9    [ 1    [ 5    [ 4
+%     >       3      2      2      4      1      1
+%     >       7 ]    3 ]    3 ]    6 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
+%     >       4      4      4      3      3      3
+%     >       5      5      5      7      7      7
+%     >       6 ]    6 ]    6 ]    8      8      8
+%     >                            9 ]    9 ]    9 ] }
 %
 % Notes:
 % - this function is intended for datasets where the number of
@@ -27,81 +94,87 @@ function bal_partitions=cosmo_balance_partitions(partitions, targets, nsets)
 %   application is MEEG datasets.
 % - Using this function means that chance accuracy is equal to the inverse
 %   of the number of unique targets.
+% - This function balances the training indices only, not the test_indices.
+%   Test_indices may be repeated
 %
 % See also: cosmo_nchoosek_partitioner, cosmo_nfold_partitioner
 %
 % NNO Dec 2013
 
-if nargin<3, nsets=1; end
+defaults=struct();
+defaults.nrep=1;
+params=cosmo_structjoin(defaults,varargin);
+
+use_nmin=isfield(params,'nmin');
+if use_nmin
+    if isfield(params,'nsets') && ~isequal(params.nsets,defaults.nsets)
+        error('Options ''nmin'' and ''nsets'' are mutually exclusive');
+    end
+    nmin=params.nmin;
+else
+    nrep=params.nrep;
+end
 
 if isstruct(targets) && isfield(targets,'sa') && ...
                 isfield(targets.sa,'targets')
     targets=targets.sa.targets;
 end
 
+[classes,unused,sample2class]=unique(targets);
+nclasses=numel(classes);
 
+train_indices=partitions.train_indices;
+test_indices=partitions.test_indices;
+
+% allocat space for output
 npar=numel(partitions.train_indices);
+bpar_train=cell(1,npar);
+bpar_test=cell(1,npar);
 
-all_unq_targets=unique(targets);
+pos=0;
+for k=1:npar
+    par_train=train_indices{k};
+    par_test=test_indices{k};
+    ts=sample2class(par_train);
+    nts=numel(ts);
 
-% allocate space for output
-bal_partitions=struct();
+    h=histc(ts,1:nclasses);
+    hmin=min(h);
+    if hmin==0
+        [foo,i]=min(h);
+        error('target %d missing in .train_indices{k}',...
+                    classes(i), k);
+    end
 
-fns={'train_indices','test_indices'};
+    if use_nmin
+        nrep=nmin*ceil(max(h)/min(h));
+    end
 
-% balance train and test indices seperately
-for m=1:numel(fns)
-    fn=fns{m};
-    pos=0;
+    keep_msk=false(nts*nrep,1);
 
-    par=partitions.(fn); % train_indices or test_indices
+    ts_rep=repmat(ts,nrep,1);
+    par_train_rep=repmat(par_train,nrep,1);
+    for c=1:nclasses
 
+        c_idxs=find(ts_rep==c);
+        c_pos=0;
 
-    % allocate space for output
-    bal_par=cell(nsets*npar,1);
-    for k=1:nsets
-        for j=1:npar
-            pos=pos+1;
-
-            parj=par{j};
-            parj_targ=targets(parj,:);
-
-            % ensure that the set of targets in this chunk is the
-            % same as the set of targets in the input (not a subset)
-            unq_targ=unique(parj_targ);
-            if ~isequal(unq_targ, all_unq_targets)
-                delta=setxor(unq_targ,all_unq_targets);
-                error('target mismatch in .%s #%d, partition %d: %d',...
-                            fn, k, j, delta(1));
-            end
-
-            % see how often each target is present in this chunk
-            h=histc(parj_targ, unq_targ);
-
-            % for balance take the minimal count
-            mn=min(h);
-
-            % number of unique targets
-            nunq=numel(unq_targ);
-
-            % allocate space for indices of this chunk
-            balparj=zeros(nunq*mn,1);
-            for u=1:nunq
-                % find indices for u-th target
-                unqidxs=find(parj_targ==unq_targ(u));
-
-                % make random permutation
-                rp=randperm(numel(unqidxs));
-
-                % space for output
-                pidxs=(u-1)*mn+(1:mn);
-
-                % select 'mn' indices randomly
-                balparj(pidxs)=parj(unqidxs(rp(1:mn)));
-            end
-
-            bal_par{pos}=balparj;
+        for j=1:nrep
+            c_idx=c_pos+(1:hmin);
+            keep_msk(c_idxs(c_idx),j)=true;
+            c_pos=c_pos+hmin;
         end
     end
-    bal_partitions.(fn)=bal_par;
+
+    bpar_train_k=cell(nrep,1);
+    for j=1:nrep
+        bpar_train_k{j}=par_train_rep(keep_msk(:,j));
+    end
+
+    bpar_train{k}=bpar_train_k';
+    bpar_test{k}=repmat({par_test},nrep,1)';
 end
+
+bpartitions=struct();
+bpartitions.train_indices=[bpar_train{:}];
+bpartitions.test_indices=[bpar_test{:}];
