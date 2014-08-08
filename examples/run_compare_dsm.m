@@ -55,10 +55,10 @@ end
 models_path=fullfile(study_path,'models');
 load(fullfile(models_path,'v1_model.mat'));
 load(fullfile(models_path,'behav_sim.mat'));
-% add to dsms (hint: use squareform)
+% add to dsms (hint: use comso_squareform)
 % >@@>
-v1_model_sf=squareform(v1_model);
-behav_model_sf=squareform(behav);
+v1_model_sf=cosmo_squareform(v1_model);
+behav_model_sf=cosmo_squareform(behav);
 % ensure row vector because Matlab and Octave return
 % row and column vectors, respectively
 dsms = [dsms; v1_model_sf(:)'; behav_model_sf(:)'];
