@@ -14,6 +14,15 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %   args.partitions     Partition scheme, for example the output from
 %                       cosmo_nfold_partition
 %   args.output         'accuracy' (default) or 'predictions'
+%   args.check_partitions  optional (default: true). If set to false then
+%                          partitions are not checked for being set
+%                          properly.
+%   args.normalization  optional, one of '{zscore,demean,scale_unit}{1,2}'
+%                       to normalize the data prior to classification using
+%                       zscoring, demeaning or scaling to [-1,1] along the
+%                       first or second dimension of ds. Normalization
+%                       parameters are estimated using the training data
+%                       and applied to the testing data.
 %
 % Output
 %    ds_sa        Struct with fields:

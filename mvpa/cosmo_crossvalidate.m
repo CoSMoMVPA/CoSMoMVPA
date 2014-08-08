@@ -16,6 +16,8 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %                       first or second dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%    .check_partitions  optional (default: true). If set to false then
+%                       partitions are not checked for being set properly.
 %
 % Output
 %   pred                Qx1 array with predicted class labels
