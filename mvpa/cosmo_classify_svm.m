@@ -35,7 +35,8 @@ end
 
 path_changed=cosmo_path_changed();
 
-if ~path_changed && (auto_select || strcmp(svm_name, ...
+if ~path_changed && ~isnumeric(cached_classifier_func) && ...
+                        (auto_select || strcmp(svm_name, ...
                                         cached_classifier_name))
     classifier_func=cached_classifier_func;
 else
