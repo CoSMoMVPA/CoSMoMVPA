@@ -29,67 +29,94 @@ function path_changed=cosmo_path_changed(set_stack_counter_)
 %        on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
 %     which will do a 'push' immediately and ensures a 'pop' is done when
 %     leaving the function
-%     
+%
 % NNO Aug 2014
 
-    persistent cached_path_    % path from last call
+    persistent cached_names_
+    persistent cached_paths_    % path from last call
     persistent stack_counter_  % #push minus #pop
     persistent func_me_        % handle to this function
-    
+
     if isempty(stack_counter_)
-        stack_counter_=1;
+        stack_counter_=0;
     end
-    
+
     force_update=false;
-    
+
     if nargin>=1
         allowed_states={'on','off','push','pop','update','not_here'};
         if ~cosmo_match({set_stack_counter_},allowed_states)
             error('Illegal argument value: must be one of: %s.',...
                         cosmo_strjoin(allowed_states,', '));
         end
-        
+
         switch set_stack_counter_
             case 'push'
                 stack_counter_=stack_counter_+1;
             case 'pop'
                 if stack_counter_<=0
-                    error('More pops and pushes');
+                    error('More pops than pushes');
                 end
                 stack_counter_=stack_counter_-1;
             case 'off'
-                stack_counter_=0;
-            case 'on'
                 stack_counter_=1;
+            case 'on'
+                stack_counter_=0;
             case 'update'
                 force_update=true;
             case 'not_here'
                 stack_counter_=stack_counter_+1;
-                
+
                 if isempty(func_me_)
                     func_me_=str2func(mfilename());
                 end
-                
+
                 path_changed=@()func_me_('pop');
                 return
         end
     end
-    
-    if stack_counter_==0 && ~force_update
+
+    if stack_counter_>0 && ~force_update
         path_changed=false;
         return
     end
-    
-    p=path();
-    n=numel(p);
-    path_changed=n~=numel(cached_path_)||~strncmp(p,cached_path_,n);
 
-    if path_changed
-        cached_path_=p;
+    if isnumeric(cached_names_)
+        cached_names_=cell(0);
+        cached_paths_=cell(0);
+    end
+
+    stack=dbstack();
+    n=numel(stack);
+
+    if n==1
+        name='!'; % call from workspace
+    else
+        assert(n>1)
+        name=stack(2).name;
+    end
+
+    m=cosmo_match({name}, cached_names_);
+
+
+    if any(m)
+        i=find(m);
+        assert(numel(i)==1);
+        cached_path=cached_paths_{i};
+
+        p=path();
+        n=numel(p);
+        path_changed=n~=numel(cached_path)||~strncmp(p,cached_path,n);
+        if path_changed
+            cached_paths_{i}=path();
+        end
+    else
+        cached_names_{end+1}=name;
+        cached_paths_{end+1}=path();
+        path_changed=true;
     end
 
 
-    
-    
-    
+
+
 

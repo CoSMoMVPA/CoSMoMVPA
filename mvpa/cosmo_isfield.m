@@ -12,7 +12,7 @@ function tf=cosmo_isfield(s, name, raise)
 %    raise           Optional logical indicating whether an error should be
 %                    raised if any fieldname is not present (default:
 %                    false)
-% 
+%
 % Output:
 %    tf              Nx1 logical array, where N=1 if name is a string and
 %                    N=numel(name) if name is a cell. Each value is true
@@ -46,21 +46,21 @@ function tf=cosmo_isfield(s, name, raise)
 %
 % Notes:
 %  - Unlike the builtin 'isfield' function, this function can check for
-%    multiple fields in one call and can check for the presence of nested 
+%    multiple fields in one call and can check for the presence of nested
 %    structs
 %
 % See also: isfield
-% 
-% NNO Aug 2014       
+%
+% NNO Aug 2014
 
     if ~isstruct(s)
         error('First argument must be a struct');
     end
-    
+
     if nargin<3
         raise=false;
     end
-    
+
     if ischar(name)
         cell_names={name};
     else
@@ -69,14 +69,14 @@ function tf=cosmo_isfield(s, name, raise)
         end
         cell_names=name;
     end
-    
+
     n=numel(cell_names);
     tf=zeros(n,1);
     for k=1:n
         name=cell_names{k};
         keys=cosmo_strsplit(name,'.');
         nkeys=numel(keys);
-        
+
         has_key=true;
         value=s;
         for j=1:nkeys
@@ -89,11 +89,11 @@ function tf=cosmo_isfield(s, name, raise)
                 has_key=false;
                 break;
             end
-            
+
             if j<nkeys
                 value=value.(key);
             end
         end
-        
+
         tf(k)=has_key;
     end

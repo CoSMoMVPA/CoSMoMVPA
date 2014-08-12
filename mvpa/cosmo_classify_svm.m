@@ -41,6 +41,12 @@ if ~path_changed && ~isnumeric(cached_classifier_func) && ...
     classifier_func=cached_classifier_func;
 else
     if auto_select
+        if any(cosmo_check_external({'@stats','@bioinfo'},false))
+            svm_name='matlabsvm';
+        else
+            svm_name='libsvm';
+        end
+
         if cosmo_check_external('libsvm',false)
             svm_name='libsvm';
         elseif cosmo_check_external('matlabsvm',false)
@@ -48,6 +54,8 @@ else
         end
     end
 
+    % let it throw an error if there is a conflict (e.g. matlabsvm with
+    % neuroelf)
     cosmo_check_external(svm_name);
 
     switch svm_name
