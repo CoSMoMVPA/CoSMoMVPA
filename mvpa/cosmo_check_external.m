@@ -91,8 +91,8 @@ function is_ok=cosmo_check_external(external, raise_)
         raise_=true;
     end
     
-    if cosmo_path_changed() || (ischar(external) && ...
-                                        strcmp(external,'-tic'))
+    if cosmo_path_changed() || isnumeric(cached_present_names) || ...
+                    (ischar(external) && strcmp(external,'-tic'))
         % clear cache
         cached_present_names=cell(0);
         cached_absent_names=cell(0);
