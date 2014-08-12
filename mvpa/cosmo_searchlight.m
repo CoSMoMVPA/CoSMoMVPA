@@ -114,6 +114,11 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % be caught after this 'for'-loop)
     % this is a compromise between execution speed and error reporting.
     checked_first_output=false;
+    
+    % little optimization with path checking
+    % it assumes that the measure used will not change the path
+    on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
+    
     for k=1:ncenters
         center_idx=visitorder(k);
         center_id=center_ids(center_idx);

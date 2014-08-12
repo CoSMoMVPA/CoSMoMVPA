@@ -21,7 +21,6 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %
 % See also svmtrain, svmclassify, cosmo_classify_svm
 
-persistent cached_path;
 persistent cached_classifier_func;
 persistent cached_classifier_name;
 
@@ -34,21 +33,12 @@ else
     auto_select=true;
 end
 
-n=numel(cached_path);
-path_changed=true;
-if n>0
-    p=path();
-    path_changed=n~=numel(p) || ~strncmp(p,cached_path,n);
-end
+path_changed=cosmo_path_changed();
 
 if ~path_changed && (auto_select || strcmp(svm_name, ...
                                         cached_classifier_name))
     classifier_func=cached_classifier_func;
 else
-    if path_changed
-        cached_path=path();
-    end
-
     if auto_select
         if cosmo_check_external('libsvm',false)
             svm_name='libsvm';
@@ -71,6 +61,8 @@ else
     cached_classifier_func=classifier_func;
     cached_classifier_name=svm_name;
 end
+
+on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
 
 predicted=classifier_func(samples_train, targets_train, samples_test, opt);
 

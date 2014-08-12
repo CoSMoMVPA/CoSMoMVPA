@@ -90,24 +90,12 @@ function is_ok=cosmo_check_external(external, raise_)
     if nargin<2
         raise_=true;
     end
-
-    current_path=path();
-    if isempty(cached_path)
-        path_has_changed=true;
-    else
-        % use fast strncmp function instead of strcmp
-        n=numel(cached_path);
-        path_has_changed=n~=numel(current_path) || ...
-                            ~strncmp(current_path,cached_path,n);
-    end
-
-    if path_has_changed || (ischar(external) && strcmp(external,'-tic'))
+    
+    if cosmo_path_changed() || (ischar(external) && ...
+                                        strcmp(external,'-tic'))
         % clear cache
         cached_present_names=cell(0);
         cached_absent_names=cell(0);
-
-        % store path
-        cached_path=current_path;
     end
 
     if iscell(external)
@@ -284,6 +272,7 @@ function externals=get_externals()
     externals=struct();
     yes=@() true;
     has=@(x) ~isempty(which(x));
+    has_toolbox=@(x)check_matlab_toolbox(x,false);
     path_of=@(x) fileparts(which(x));
 
     externals.cosmo.is_present=yes;
@@ -393,15 +382,15 @@ function externals=get_externals()
     externals.octave.url='http://www.gnu.org/software/octave/';
     externals.octave.authors={'Octave community'};
 
-    externals.matlabsvm.is_present=@() check_matlab_toolbox('stats',...
-                                                              false) && ...
-                                            has('svmpredict') && ...
-                                            has('svmclassify');
+    externals.matlabsvm.is_present=@() (has_toolbox('stats') || ...
+                                            has_toolbox('bioinfo')) && ...
+                                        has('svmpredict') && ...
+                                        has('svmclassify');
     externals.matlabsvm.is_recent=yes;
     externals.matlabsvm.conflicts.libsvm=@() ~isequal(...
                                                 path_of('svmtrain'),...
                                                 path_of('svmclassify'));
-    externals.matlabsvm.label='matlab stats toolbox';
+    externals.matlabsvm.label='matlab stats or bioinfo toolbox';
     externals.matlabsvm.url='http://www.mathworks.com';
 
     externals.svm={'libsvm', 'matlabsvm'}; % need either
