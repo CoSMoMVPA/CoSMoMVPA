@@ -17,7 +17,10 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
 %    the same name as LIBSVM's version. Use of this function is not
 %    supported when LIBSVM's svmtrain precedes in the matlab path; in
 %    that case, adjust the path or use cosmo_classify_libsvm instead.
-%  -
+%  - for a guide on svm classification, see
+%      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+%    note that cosmo_crossvalidate and cosmo_crossvalidation_measure
+%    provide an option 'normalization' to perform data scaling
 %
 % See also svmtrain, svmclassify, cosmo_classify_svm, cosmo_classify_libsvm
 %
@@ -36,6 +39,13 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
 
     classes=unique(targets_train);
     nclasses=numel(classes);
+
+    if nclasses<2 || nfeatures==0
+        % matlab's svm cannot deal with empty data, so predict all
+        % test samples as the class of the first sample
+        predicted=targets_train(1) * (ones(1,ntest));
+        return
+    end
 
     % number of pair-wise comparisons
     ncombi=nclasses*(nclasses-1)/2;

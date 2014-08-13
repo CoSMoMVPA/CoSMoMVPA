@@ -18,6 +18,19 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 % Notes:
 %  - cosmo_classify_svm can use either libsvm or matlab's svm, whichever is
 %    present
+%  - if both are present, then there is a conflict because 'svmtrain' is
+%    implemented differently by libsvm or matlab's svm. The path setting
+%    determines which svm implementation is used.
+%  - when using libsvm in the standard implementation, it prints output
+%    for each classification step (and will report, incorrectly, zero
+%    percent accuracy). To suppress this output one has to manually edit
+%    the matlab/svmpredict.c function around line 225 which has a mexPrintf
+%    statement. Comment out this statement (by preceding it with '/*' and
+%    following it with '*/') and run make.m to recompile the mex functions.
+%  - for a guide on svm classification, see
+%      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+%    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
+%    provide an option 'normalization' to perform data scaling
 %
 % See also svmtrain, svmclassify, cosmo_classify_svm
 

@@ -3,15 +3,25 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 %
 % predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train, samples_test, opt)
 %
-% Inputs
-% - samples_train      PxR training data for P samples and R features
-% - targets_train      Px1 training data classes
-% - samples_test       QxR test data
-%-  opt                struct with options. supports any option that
+% Inputs:
+%   samples_train      PxR training data for P samples and R features
+%   targets_train      Px1 training data classes
+%   samples_test       QxR test data
+%   opt                struct with options. supports any option that
 %                      svmtrain supports
 %
-% Output
-% - predicted          Qx1 predicted data classes for samples_test
+% Output:
+%   predicted          Qx1 predicted data classes for samples_test
+%
+% Notes:
+%  - this function uses matlab's builtin svmtrain function, which has
+%    the same name as LIBSVM's version. Use of this function is not
+%    supported when LIBSVM's svmtrain precedes in the matlab path; in
+%    that case, adjust the path or use cosmo_classify_libsvm instead.
+%  - for a guide on svm classification, see
+%      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+%    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
+%    provide an option 'normalization' to perform data scaling
 %
 % See also svmtrain, svmclassify, cosmo_classify_matlabsvm
 %
@@ -27,10 +37,19 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
         error('illegal input size');
     end
 
+    if nfeatures==0
+        % matlab's svm cannot deal with empty data, so predict all
+        % test samples as the class of the first sample
+        predicted=samples_train(1) * ones(1,ntrain);
+        return
+    end
+
     classes=unique(targets_train);
-    if numel(classes)~=2
-        error('%s requires 2 classes. Use cosmo_classify_matlabsvm instead',...
-                    mfilename());
+    nclasses=numel(classes);
+    if nclasses~=2
+        error(['%s requires 2 classes, found %d. Consider using '...
+                'cosmo_classify_{matlab,lib}svm instead'],...
+                    nclasses,mfilename());
     end
 
     opt_cell=opt2cell(opt);
