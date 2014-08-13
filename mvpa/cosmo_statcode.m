@@ -119,7 +119,7 @@ function hdr=name_df2hdr(name_df, output_format)
             % ignore if not found or multiple matches
             stat_idxs(k)=idx;
         elseif ~strcmp(name,'none')
-            warning('Unrecognized stat name %s at sample %d', name, k);
+            cosmo_warning('Unrecognized stat name %s at sample %d',name,k);
         end
     end
 
@@ -185,7 +185,8 @@ function hdr=name_df2hdr(name_df, output_format)
 
             if numel(unq_stat_idx)>1 || numel(unique(ndf))>1 || ...
                             size(unq_df,1)>1
-                warning('Multiple stat codes found, unsupported by nifti');
+                cosmo_warning(['Multiple stat codes found, unsupported '...
+                                    'by nifti']);
                 return
             end
 
