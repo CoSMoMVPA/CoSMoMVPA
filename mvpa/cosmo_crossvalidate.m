@@ -20,7 +20,8 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %                       partitions are not checked for being set properly.
 %
 % Output
-%   pred                Qx1 array with predicted class labels
+%   pred                Qx1 array with predicted class labels.
+%                       elements with no predictions have the value NaN.
 %
 % NNO Aug 2013
     if nargin<4,opt=struct(); end
@@ -47,7 +48,7 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     % space for output (one column per partition)
     % the k-th column contains predictions for the k-th partition
     % (with values of zeros if there was no prediction)
-    all_pred=zeros(nsamples,npartitions);
+    all_pred=NaN(nsamples,npartitions);
 
     targets=ds.sa.targets;
 
@@ -89,8 +90,12 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     %   from nchoosek_partitioner(ds, 2) there can be more than one.
     [pred,classes]=cosmo_winner_indices(all_pred);
 
+    % sanity check: missing predictions should be identical to lack of
+    % winners
+    assert(all(isnan(pred)~=test_mask));
+
     % compute accuracies
-    correct_mask=ds.sa.targets(test_mask)==classes(pred(pred>0));
+    correct_mask=ds.sa.targets(test_mask)==classes(pred(test_mask));
     ncorrect = sum(correct_mask);
     ntotal = numel(correct_mask);
 

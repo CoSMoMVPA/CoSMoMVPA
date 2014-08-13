@@ -21,11 +21,8 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
 
 
     if isstruct(targets)
-        if isfield(targets,'sa') && isfield(targets.sa, 'targets')
-            targets=targets.sa.targets;
-        else
-            error('cell without .sa.targets?')
-        end
+        cosmo_isfield(targets,'sa.targets',true);
+        targets=targets.sa.targets;
     end
 
     if numel(targets) ~= numel(predicted)
@@ -33,8 +30,11 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(targets, predicted)
                                 numel(targets), numel(predicted));
     end
 
-    targets=targets(:);
-    predicted=predicted(:);
+    % allow lack of predictions for some of the samples
+    msk=~isnan(predicted);
+
+    targets=targets(msk);
+    predicted=predicted(msk);
 
     classes=unique(targets);
     nclasses=numel(classes);

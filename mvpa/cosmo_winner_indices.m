@@ -5,7 +5,7 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %
 % Input:
 %   pred              PxQ prediction values for Q features and P
-%                     predictions per feature. Values <= 0 are ignored,
+%                     predictions per feature. Values of NaN are ignored,
 %                     i.e. can never be a winner.
 %
 % Output:
@@ -15,14 +15,31 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %   classes           The sorted list of unique predicted values, across
 %                     all non-ignored values in pred.
 %
-% Example:
-%     % given three predictions each for five samples, compute
-%     % which predictions occur most often.
-%     [p, c]=cosmo_winner_indices([4 4 4;4 5 6;4 5 6;4 5 6;6 0 0;0 0 0]);
+% Examples:
+%     % a single prediction, with the third one missing
+%     pred=[4; 4; NaN; 5];
+%     [p, c]=cosmo_winner_indices(pred);
 %     p'
-%     > [1, 1, 2, 3, 3, 0]
+%     > [1 1 NaN 2]
 %     c'
-%     > [4, 5, 6]
+%     > [4, 5]
+%
+%     % one prediction per fold (e.g. using cosmo_nfold_partitioner)
+%     pred=[4 NaN NaN; 6 NaN NaN; NaN 3 NaN; NaN NaN NaN; NaN NaN 3];
+%     [p, c]=cosmo_winner_indices(pred);
+%     p'
+%     > [2, 3, 1, NaN, 1]
+%     c'
+%     > [3 4 6]
+%
+%     % given up to three predictions each for eight samples, compute
+%     % which predictions occur most often. NaNs are ignored.
+%     pred=[4 4 4;4 5 6;6 5 4;5 6 4;4 5 6; NaN NaN NaN; 6 0 0;0 0 NaN];
+%     [p, c]=cosmo_winner_indices(pred);
+%     p'
+%     > [2, 3, 4, 2, 3, NaN, 1, 1]
+%     c'
+%     > [0, 4, 5, 6]
 %
 % Notes:
 % - The typical use case is combining results from multiple classification
@@ -32,82 +49,62 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %   multiple winners. That is, using the present implementation, repeatedly
 %   calling this function with identical input yields identical output,
 %   but unbiased with respect to which class is the 'winner' sample-wise.
-% - Samples with no winner are assigned a value of zero.
+% - Samples with no winner are assigned a value of NaN.
 % - A typical use case is combining results from multiple predictions,
 %   such as in cosmo_classify_matlabsvm and cosmo_crossvalidate.
 %
-% See also: cosmo_classify_matlabsvm, cosmo_crossvalidate.
+% See also: cosmo_classify_matlabsvm, cosmo_crossvalidate
 %
 % NNO Aug 2013
 
     [nsamples,nfeatures]=size(pred);
-    msk=pred>0; % ignore those without predictions
+    pred_msk=~isnan(pred);
 
     % allocate space for output
-    winners=zeros(nsamples,1);
+    winners=NaN(nsamples,1);
 
     if nfeatures==1
-        % special case because histc works differently on singleton dimension
-
-        [classes,unused,pred_winners]=unique(pred(msk));
-        winners(msk)=pred_winners;
+        % single prediction, handle seperately
+        [classes,unused,pred_idxs]=unique(pred(pred_msk));
+        winners(pred_msk)=pred_idxs;
         return
     end
 
-    mx_pred=max(pred(msk));
+    sample_pred_count=sum(pred_msk,2);
+    sample_pred_msk=sample_pred_count>0;
+    if max(sample_pred_count)<=1
+        % only one prediction per sample; set non-predictions to zero and
+        % add them up to get the prediction
+        pred(~pred_msk)=0;
+        pred_merged=sum(pred(sample_pred_msk,:),2);
 
-    counts=histc(pred',1:mx_pred)';
-    % optimization: if all classes in range 1:mx_pred then set classes directly
-    if sum(counts(:))==sum(msk(:)) && all(sum(counts)>0)
-        classes=(1:mx_pred)';
-    else
-        classes=unique(pred(msk)); % see which classes are predicted (slower)
-        counts=histc(pred',classes)'; % how often each class was predicted
+        [classes,unused,pred_idxs]=unique(pred_merged);
+
+        winners(sample_pred_msk)=pred_idxs;
+        return
     end
 
-    % get the first class in each feature that was predicted most often
-    [mx,mxi]=max(counts,[],2);
+    [classes,unused,pred_idxs]=unique(pred(pred_msk));
+    nclasses=numel(classes);
 
-    % mask with classes that are the winners
-    winners_msk=bsxfun(@eq,counts,mx);
+    % see how often each index was predicted
+    counts=histc(pred,classes,2);
 
-    % for each feature the number of winners
-    nwinners=sum(winners_msk,2);
+    [max_count,idx]=max(counts,[],2);
+    nwinners=sum(bsxfun(@eq,max_count,counts),2);
 
-    % optimization: first take features with just one winner
-    one_winner=nwinners==1;
-    winners(one_winner)=mxi(one_winner);
+    % deal with single winners
+    single_winner_msk=nwinners==1;
+    winners(single_winner_msk)=idx(single_winner_msk);
 
-    % now consider the remaning ones - with multiple winners
-    multiple_winners=~one_winner;
-    winners_msk=bsxfun(@and,winners_msk,multiple_winners);
+    % remove the single winners from samples to consider
+    sample_pred_msk(single_winner_msk)=false;
 
-    seed=sum(winners_msk(:)); % get some semi-random number to start with
-
-    % get the rows (which correspond to indices of class winners) and
-    % columns (corresponding to each feature)
-    [unused,wcols]=ind2sub(size(winners_msk),find(winners_msk));
-
-    colpos=1; % referring to wcols - for pseudo-random selection in ties
-    for k=find(multiple_winners)' % treat each feature seperately
-        nwinner=nwinners(k);
-
-        % pseudorandomly update the seed
-        seed=seed+nwinner;
-
-        % indices of winner values
-        wind=colpos+(1:nwinner);
-
-        % select one value randomly in range 1..nwinner
-        idx=mod(seed, nwinner)+2;
-
-        % set the winner accordingly
-        winners(k)=wcols(wind(idx));
-
-        colpos=colpos+nwinner; % update for next iteration
+    seed=0;
+    for k=find(sample_pred_msk)'
+        tied_idxs=find(counts(k,:)==max_count(k));
+        ntied=numel(tied_idxs);
+        seed=seed+1;
+        winners(k)=tied_idxs(mod(seed,ntied)+1);
     end
-
-    no_winner=prod((pred<=0)+0,2)==1;
-    winners(no_winner)=0;
-
 
