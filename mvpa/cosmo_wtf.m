@@ -12,7 +12,7 @@ function s=cosmo_wtf(param)
 %               representation with system information;
 %             - if param is 'is_{octave,matlab}' a boolean is returned
 %             - if param is one of 'computer', 'environment', version',
-%               'matlab_toolboxes', 'cosmo_externals', 'cosmo_files'
+%               'toolboxes', 'cosmo_externals', 'cosmo_files', or 'java',
 %               then the information of that parameter is returned.
 %
 % Notes:
@@ -46,6 +46,7 @@ params2func=struct();
 params2func.computer=@computer_;
 params2func.environment=@environment;
 params2func.version=version_;
+params2func.java=java_;
 params2func.cosmo_externals=@cosmo_externals;
 params2func.toolboxes=@toolboxes;
 params2func.cosmo_files=@cosmo_files;
@@ -103,7 +104,7 @@ function s=java_()
         s=not_in_this_environment();
     end
 
-function s=not_in_this_environments()
+function s=not_in_this_environment();
     s=sprintf('not supported in environment ''%s''',environment());
 
 function s=toolboxes()
