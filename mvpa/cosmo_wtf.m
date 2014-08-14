@@ -138,7 +138,7 @@ function s=cosmo_config()
     end
 
 
-function s=dir2str(d, formatter, to_omit)
+function s=dir2str(d, formatter)
 % d is the result from 'dir' or 'cosmo_dir'
 if nargin<2
     formatter=@(x)sprintf('  %s % 10d %s',x.date,x.bytes,x.name);
