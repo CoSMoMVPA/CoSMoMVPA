@@ -46,8 +46,8 @@ params2func=struct();
 params2func.computer=@computer_;
 params2func.environment=@environment;
 params2func.version=version_;
-params2func.toolboxes=@toolboxes;
 params2func.cosmo_externals=@cosmo_externals;
+params2func.toolboxes=@toolboxes;
 params2func.cosmo_files=@cosmo_files;
 
 has_param=nargin>=1 && ~isempty(param);
@@ -150,6 +150,7 @@ pos=1;
 for k=1:n
     dk=d(k);
 
+    % if any value is empty, replace it by the empty string
     fns=fieldnames(dk);
     for j=1:numel(fns)
         fn=fns{j};
