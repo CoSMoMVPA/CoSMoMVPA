@@ -46,7 +46,7 @@ params2func=struct();
 params2func.computer=@computer_;
 params2func.environment=@environment;
 params2func.version=version_;
-params2func.matlab_toolboxes=@matlab_toolboxes;
+params2func.toolboxes=@toolboxes;
 params2func.cosmo_externals=@cosmo_externals;
 params2func.cosmo_files=@cosmo_files;
 
@@ -96,15 +96,21 @@ function s=version_()
         s=sprintf('%s',version());
     end
 
-function s=matlab_toolboxes()
-    if ~environment_is_matlab()
-        s=sprintf('not supported in environment ''%s''',environment());
-        return
+function s=java_()
+    if environment_is_matlab()
+        s=version('-java');
+    else
+        s=not_in_this_environment();
     end
 
-    d=dir(toolboxdir(''));
-    to_omit={'.','..','matlab','system'};
-    s=dir2str(d,to_omit);
+function s=not_in_this_environments()
+    s=sprintf('not supported in environment ''%s''',environment());
+
+function s=toolboxes()
+    v=ver();
+    formatter=@(x) sprintf('  %s v%s %s [%s]',x.Name,x.Version,...
+                                                x.Release,x.Date);
+    s=dir2str(v,formatter);
 
 function s=cosmo_externals()
     s=cosmo_strjoin(cosmo_check_external('-list'),', ');
@@ -126,14 +132,16 @@ function s=cosmo_config()
             ww{k+1}=sprintf('  %s: %s',fn,c.(fn));
         end
         s=cosmo_strjoin(ww,'\n');
-    catch e
+    catch e;
         s=e.getReport();
     end
 
 
-function s=dir2str(d, to_omit)
+function s=dir2str(d, formatter, to_omit)
 % d is the result from 'dir' or 'cosmo_dir'
-if nargin<2, to_omit=cell(0); end
+if nargin<2
+    formatter=@(x)sprintf('  %s % 10d %s',x.date,x.bytes,x.name);
+end
 
 n=numel(d);
 ww=cell(n+1,1); % allocate space for output
@@ -141,12 +149,18 @@ ww{1}='';       % start with newline
 pos=1;
 for k=1:n
     dk=d(k);
-    name=dk.name;
 
-    if ~any(cosmo_match(to_omit, {name}))
-        pos=pos+1;
-        ww{pos}=sprintf('  %s % 10d %s',dk.date,dk.bytes,dk.name);
+    fns=fieldnames(dk);
+    for j=1:numel(fns)
+        fn=fns{j};
+        v=dk.(fn);
+        if isempty(v)
+            dk.(fn)='';
+        end
     end
+
+    pos=pos+1;
+    ww{pos}=formatter(dk);
 end
 s=cosmo_strjoin(ww(1:pos),'\n');
 
