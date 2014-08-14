@@ -413,24 +413,27 @@ function version=get_libsvm_version()
     svm_h_fn=fullfile(svm_root,'svm.h');
 
     fid=fopen(svm_h_fn);
+
+    if fid<0
+        error('Unable to open %s; cannot determine libsvm version',...
+                                                            svm_h_fn);
+    end
+
     c=onCleanup(@()fclose(fid));
 
     chars=fread(fid,Inf,'char=>char');
     lines=cosmo_strsplit(chars','\n');
 
-    version=[];
-
     for k=1:numel(lines)
         sp=cosmo_strsplit(lines{k},'LIBSVM_VERSION');
         if numel(sp)>1
             version=str2num(sp{end});
-            break;
+            return
         end
     end
 
-    if isempty(version)
-        error('Could not find LIBSVM version in %s', svm_h_fn);
-    end
+    error('Could not find LIBSVM version in %s', svm_h_fn);
+
 
 
 function c=add_to_cell(c, v)
