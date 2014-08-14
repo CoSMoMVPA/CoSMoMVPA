@@ -13,18 +13,13 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %   predicted          Qx1 predicted data classes for samples_test
 %
 % Notes:
-%  - LIBSVM is required: http://www.csie.ntu.edu.tw/~cjlin/libsvm
+%  - this function requires libsvm version 3.18 or later:
+%    https://github.com/cjlin1/libsvm
 %  - by default a linear kernel is used ('-t 0')
 %  - this function uses LIBSVM's svmtrain function, which has the same
 %    name as matlab's builtin version. Use of this function is not
 %    supported when matlab's svmtrain precedes in the matlab path; in
 %    that case, adjust the path or use cosmo_classify_matlabsvm instead.
-%  - when using libsvm in the standard implementation, it prints output
-%    for each classification step (and will report, incorrectly, zero
-%    percent accuracy). To suppress this output one has to manually edit
-%    the matlab/svmpredict.c function around line 225 which has a mexPrintf
-%    statement. Comment out this statement (by preceding it with '/*' and
-%    following it with '*/') and run make.m to recompile the mex functions.
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
@@ -41,7 +36,9 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     [ntest, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
 
-    if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end
+    if nfeatures~=nfeatures_ || ntrain_~=ntrain
+        error('illegal input size');
+    end
 
     % construct options string for svmtrain
     if has_opt
@@ -57,7 +54,8 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     m=svmtrain(targets_train, samples_train, opt_str);
 
     % test
-    predicted=svmpredict(NaN(ntest,1), samples_test, m);
+    % note: quiet option became available in version 3.18
+    predicted=svmpredict(NaN(ntest,1), samples_test, m, '-q');
 
 
 function opt_str=libsvm_opt2str(opt)

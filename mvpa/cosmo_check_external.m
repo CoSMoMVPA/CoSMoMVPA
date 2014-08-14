@@ -335,9 +335,11 @@ function externals=get_externals()
 
     externals.libsvm.is_present=@() has('svmpredict') && ...
                                         has('svmtrain');
-    externals.libsvm.is_recent=yes;
+    % require version 3.18 or later, because it has a 'quiet' option
+    % for svmpredict
+    externals.libsvm.is_recent=@() get_libsvm_version()>=318;
     externals.libsvm.label='LIBSVM toolbox';
-    externals.libsvm.url='http://www.csie.ntu.edu.tw/~cjlin/libsvm';
+    externals.libsvm.url='https://github.com/cjlin1/libsvm';
     externals.libsvm.authors={'C.-C. Chang', 'C.-J. Lin'};
     externals.libsvm.ref=['LIBSVM: '...
                             'a library for support vector machines. '...
@@ -404,6 +406,31 @@ function externals=get_externals()
 
     externals.svm={'libsvm', 'matlabsvm'}; % need either
 
+
+
+function version=get_libsvm_version()
+    svm_root=fileparts(fileparts(which('svmpredict')));
+    svm_h_fn=fullfile(svm_root,'svm.h');
+
+    fid=fopen(svm_h_fn);
+    c=onCleanup(@()fclose(fid));
+
+    chars=fread(fid,Inf,'char=>char');
+    lines=cosmo_strsplit(chars','\n');
+
+    version=[];
+
+    for k=1:numel(lines)
+        sp=cosmo_strsplit(lines{k},'LIBSVM_VERSION');
+        if numel(sp)>1
+            version=str2num(sp{end});
+            break;
+        end
+    end
+
+    if isempty(version)
+        error('Could not find LIBSVM version in %s', svm_h_fn);
+    end
 
 
 function c=add_to_cell(c, v)
