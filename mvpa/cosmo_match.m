@@ -56,7 +56,7 @@ function msk=cosmo_match(haystack, needle, varargin)
 
 
     if nargin<2
-        error('Need at least two input arguments')
+        error('Need at least two input arguments');
     elseif mod(nargin,2) ~= 0
         error('Need an even number of input arguments');
     end

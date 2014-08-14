@@ -92,7 +92,7 @@ function path_changed=cosmo_path_changed(set_stack_counter_)
     if n==1
         name='!'; % call from workspace
     else
-        assert(n>1)
+        assert(n>1);
         name=stack(2).name;
     end
 
