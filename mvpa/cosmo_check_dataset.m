@@ -107,6 +107,17 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
         % break out of loop if msg is set
         if ~isempty(msg), break; end
 
+
+        if cosmo_isfield(ds,'sa.targets') && ~isnumeric(ds.sa.targets)
+            error(['.sa.targets must be numeric '...
+                        '(.sa.labels can be used to store string labels)']);
+        end
+
+        if cosmo_isfield(ds,'sa.chunks') && ~isnumeric(ds.sa.chunks)
+            error('.sa.chunks must be numeric');
+        end
+
+
         % if provided, check for this specific type
         if ~isempty(ds_type)
             msg=check_dim(ds);
