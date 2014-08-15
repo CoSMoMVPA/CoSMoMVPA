@@ -100,7 +100,6 @@ end
 
 % get values in first dimension (the 'head')
 xhead=xs{1};
-nhead=numel(xhead);
 if isnumeric(xhead) || islogical(xhead)
     % put numeric arrays in a cell
     xhead=num2cell(xhead);
