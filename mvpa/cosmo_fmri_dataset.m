@@ -83,12 +83,12 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     % set chunks (e.g. runs) and targets (experimental conditions), and
 %     % use a mask
 %     ds=fmri_dataset('mydata+tlrc', 'chunks', [1 1 1 2 2 2]', ...
-%                                     'targets', [1 2 3 1 2 3]',
+%                                     'targets', [1 2 3 1 2 3]', ...
 %                                     'mask', 'masks/brain_mask+tlrc);
 %
 %     % load BrainVoyager VMR file in directory 'mydata', and apply an
 %     % automask that removes all features (voxels) that are zero or
-%     non-finite for all samples
+%     % non-finite for all samples
 %     ds=fmri_dataset('mydata/mydata.vmr', 'mask', true);
 %
 %     % load two datasets, one for odd runs, the other for even runs, and
@@ -144,7 +144,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         data=double(data); % ensure data stored in double precision
     end
 
-    % see how many diemsions there are, and their size
+    % see how many dimensions there are, and their size
     data_size = size(data);
     ndim = numel(data_size);
 
@@ -206,7 +206,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         elseif isnumeric(p.mask) || islogical(p.mask)
             m = p.mask;
         else
-            error('Weird mask, need string, array, or ''true''');
+            error('Weird mask, need string, array, or true');
         end
 
         mdim = size(m);
