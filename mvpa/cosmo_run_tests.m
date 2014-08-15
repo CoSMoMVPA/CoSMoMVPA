@@ -138,8 +138,6 @@ function did_pass=cosmo_run_tests(varargin)
 
     opt=cosmo_structjoin(defaults,varargin{:});
 
-    did_pass=false;
-
     % store original directory
     orig_pwd=pwd();
 
