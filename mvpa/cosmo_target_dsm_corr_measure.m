@@ -43,7 +43,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     if ~has_sa || ~isfield(ds.sa,'targets')
         error('Missing field .sa.targets');
     elseif ~isequal(ds.sa.targets',1:nsamples)
-        msg('.sa.targets must be (1:%d)''',nsamples);
+        msg=sprintf('.sa.targets must be (1:%d)''',nsamples);
         if isequal(unique(ds.sa.targets),(1:nsamples)');
             msg=sprintf(['%s\nMultiple samples with the same chunks '...
                             'can be averaged using cosmo_fx'],msg);
