@@ -46,7 +46,6 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
         ndim=ndim+1;
         arg=varargin{k};
 
-        expected_dim_labels=[]; % empty by default
         if isstruct(arg)
             nbrhood=arg;
             expected_dim_labels=nbrhood.a.dim.labels;
