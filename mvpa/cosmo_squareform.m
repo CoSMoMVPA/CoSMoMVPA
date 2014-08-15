@@ -40,6 +40,7 @@ end
 
 if isempty(x)
     s=x;
+    return
 end
 
 switch direction
