@@ -84,8 +84,7 @@ function [winners,classes]=cosmo_winner_indices(pred)
         return
     end
 
-    [classes,unused,pred_idxs]=unique(pred(pred_msk));
-    nclasses=numel(classes);
+    classes=unique(pred(pred_msk));
 
     % see how often each index was predicted
     counts=histc(pred,classes,2);
