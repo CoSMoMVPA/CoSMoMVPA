@@ -6,20 +6,32 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                                   ['chunks',chunks])
 %
 % Inputs:
-%   filename     filename for dataset  } It should end with one of:
-%   mask         optional filename for } .nii, .nii.gz        NIFTI
-%                                      } .hdr, .img           ANALYZE
-%                volume mask, or true    +{orig}.{HEAD,BRIK}  AFNI
-%                to apply an automask    .vmr, .vmp, .vtc     } Brain-
-%                                              .glm, .msk     } voyager
-%                                        .mat                 SPM (SPM.mat)
-%                                        .mat:beta            SPM beta
-%                                        .mat:con             SPM contrast
-%                                        .mat:spm             SPM stats
-%   targets      optional Tx1 numeric labels of experimental
+%   filename     filename of fMRI dataset, it should end with one of:
+%                   .nii, .nii.gz                   NIFTI
+%                   .hdr, .img                      ANALYZE
+%                   +{orig,tlrc}.{HEAD,BRIK[.gz]}   AFNI
+%                   .vmr, .vmp, .vtc, .glm, .msk    BrainVoyager
+%                   .mat                            SPM (SPM.mat)
+%                   .mat:beta                       SPM beta
+%                   .mat:con                        SPM contrast
+%                   .mat:spm                        SPM stats
+%   'mask', m    filename for mask to be applied (which must contain a
+%                single volume), or one of:
+%                   '-all'     exclude features where all values are
+%                              nonzero or nonfinite
+%                   '-any'     exclude features where any value is
+%                              nonzero or nonfinite
+%                   '-auto'    require that '-all' and '-any' exclude the
+%                              same features; if not throw an error
+%                   true       equivalent to '-auto'
+%                   false      do not apply a mask
+%                If 'mask' is not given, then no mask is applied and a
+%                warning message (suggesting to use a mask) is printed if
+%                at least 5% of the values are non{zero,finite}.
+%   'targets', t optional Tx1 numeric labels of experimental
 %                conditions (where T is the number of samples (volumes)
 %                in the dataset)
-%   chunks       optional Tx1 numeric labels of chunks, typically indices
+%   'chunks, c   optional Tx1 numeric labels of chunks, typically indices
 %                of runs of data acquisition
 %
 %
