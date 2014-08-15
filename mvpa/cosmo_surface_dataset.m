@@ -40,7 +40,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
 
 
     [data,node_indices,sa]=read(fn);
-    [nsamples, nfeatures]=size(data);
+    nfeatures=size(data,2);
     assert(nfeatures==numel(node_indices));
 
     ds=struct();
@@ -148,7 +148,6 @@ function s=read_niml_dset(fn)
 function [data,node_indices,sa]=build_niml_dset(s)
     data=s.data';
 
-    sa=struct();
     if isfield(s,'node_indices')
         node_indices=s.node_indices+1; % base0 -> base1
     else
