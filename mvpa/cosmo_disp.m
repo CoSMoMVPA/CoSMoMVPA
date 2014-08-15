@@ -245,9 +245,6 @@ function s=cell2str(x, opt)
 
     edgeitems=opt.edgeitems;
     threshold=opt.threshold;
-    precision=opt.precision;
-
-    [ns,nf]=size(x);
 
     % get indices of rows and columns to show
     [r_pre, r_post]=get_mx_idxs(x, edgeitems, threshold, 1);
@@ -322,8 +319,6 @@ function s=matrix2str(x,opt)
     edgeitems=opt.edgeitems;
     threshold=opt.threshold;
     precision=opt.precision;
-
-    [ns,nf]=size(x);
 
     % get indices of rows and columns to show
     [r_pre, r_post]=get_mx_idxs(x, edgeitems, threshold, 1);
