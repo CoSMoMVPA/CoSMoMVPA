@@ -149,7 +149,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     img_formats=get_img_formats();
 
     % read the image
-    [data,vol,img_format,sa]=read_img(filename, img_formats);
+    [data,vol,sa]=read_img(filename, img_formats);
 
     if ~isa(data,'double')
         data=double(data); % ensure data stored in double precision
@@ -169,79 +169,25 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         otherwise
             error('need 3 or 4 dimensions, found %d', ndims);
     end
-    % number of values in 3 spatial + 1 temporal dimension
+
+    % number of values in 1 temporal dimension + 3 spatial
     [unused,ni,nj,nk]=size(data);
 
     % make a dataset
     ds=cosmo_flatten(data,{'i','j','k'},{1:ni,1:nj,1:nk});
     ds.sa=sa;
-
-    %header_name=['hdr_' img_format];
-    %ds.a.(header_name) = hdr; % store header
     ds.a.vol=vol;
 
     % set chunks and targets
-    ds=set_sa_vec(ds,p,'targets');
-    ds=set_sa_vec(ds,p,'chunks');
+    ds=set_sa_vec(ds,params,'targets');
+    ds=set_sa_vec(ds,params,'chunks');
 
-    % deal with the mask
-    % for convenience compute an automask
-    auto_mask=data~=0 & isfinite(data);
-    if numel(size(auto_mask))==4
-        % take as a mask anywhere where all features are zero
-        % (convert boolean to numeric for older matlab versions)
-        auto_mask=squeeze(prod((~auto_mask)+0,1)==0);
-    end
+    % compute mask
+    mask=get_mask(ds,params.mask);
 
-    mask_indices=-1;
-    if isempty(p.mask)
-        % give a warning if there are many empty voxels
-        nzero=sum(~auto_mask(:));
-        ntotal=prod(data_size(1:3));
-        thr=.1;
-        if nzero/ntotal > thr
-            cosmo_warning(['No mask supplied but %.0f%% of the data is',...
-                    ' either zero or non-finite (and thus potentially '...
-                    'useless). To exlude that data ',...
-                    'from the input, use: %s(...,''mask'',true)'],...
-                    100*nzero/ntotal,mfilename());
-        end
-    else
-        % if a mask was supplied, load it
-        if ischar(p.mask)
-            m = read_img(p.mask, img_formats);
-        elseif islogical(p.mask)
-            % if true, use automask
-            % if false, use all features
-            m = bsxfun(@or,auto_mask,~p.mask);
-        elseif isnumeric(p.mask) || islogical(p.mask)
-            m = p.mask;
-        else
-            error('Weird mask, need string, array, or true');
-        end
-
-        mdim = size(m);
-
-        % mask has to be 3D or 4D
-        switch numel(mdim)
-            case 3
-            case 4
-                m=m(:,:,:,1);
-                cosmo_warning('Mask has %d volumes - using first',mdim(4));
-            otherwise
-                error('illegal mask: %d dimensions', mdim);
-        end
-
-        % sanity check to ensure the mask is properly shaped
-        if ~isequal(data_size(1:3), mdim(1:3))
-            error('mask size is different from data size');
-        end
-
-        mask_indices=m~=0;
-    end
-
-    if ~isequal(mask_indices,-1)
-        ds=cosmo_slice(ds, mask_indices(:), 2);
+    if ~isempty(mask)
+        % apply mask
+        ds=cosmo_slice(ds,mask,2);
     end
 
     cosmo_check_dataset(ds, 'fmri'); % ensure all kosher
@@ -352,8 +298,156 @@ function img_format=find_img_format(filename, img_formats)
     end
     error('Could not find image format for "%s"', filename)
 
+function mask=get_mask(ds, mask_param)
+    if isempty(mask_param)
+        % not given; optionally give a suggestion about using an automask
+        compute_auto_mask(ds.samples,'');
+        mask=[];
 
-function [data,vol,img_format,sa]=read_img(fn, img_formats)
+    elseif (islogical(mask_param) && ~mask_param)
+        % mask explicitly switched off
+        mask=[];
+
+    else
+        if islogical(mask_param)
+            assert(mask_param)
+            mask_param='-auto';
+        end
+
+        if ~ischar(mask_param)
+            error('mask must be a string');
+        end
+
+        assert(numel(mask_param)>0);
+        if mask_param(1)=='-'
+            mask=compute_auto_mask(ds.samples,mask_param(2:end));
+        else
+            me=str2func(mfilename()); % make immune to renaming
+
+            % load mask (using recursion)
+            ds_mask=me(mask_param,'mask',false);
+
+            % ensure the mask is compatible with the dataset
+            if ~isequal(ds_mask.fa,ds.fa)
+                error('feature attribute mismatch between data and mask');
+            end
+
+            if ~isequal(ds_mask.a.dim,ds_mask.a.dim)
+                error('dimension mismatch between data and mask');
+            end
+
+            % check voxel-to-world mapping
+            max_delta=1e-4; % allow for minor tolerance
+            delta=max(abs(ds_mask.a.vol.mat(:)-ds.a.vol.mat(:)));
+            if delta>max_delta
+                cosmo_disp(ds_mask.a.vol.mat);
+                cosmo_disp(ds.a.vol.mat);
+
+                error(['voxel dimension mismatch between data and mask:'...
+                            '%.5f > %.5f'],delta,max_delta);
+            end
+
+            % only support single volume
+            nsamples_mask=size(ds_mask.samples,1);
+            if nsamples_mask~=1
+                error('mask must have a single volume, found %d',...
+                                                nsamples_mask);
+            end
+
+            % compute logical mask
+            mask=ds_mask.samples~=0 & isfinite(ds_mask.samples);
+        end
+    end
+
+
+
+function auto_mask=compute_auto_mask(data, mask_type)
+    % mask_type can be 'any', 'all', 'auto', or ''
+    % When using 'auto', 'any' and 'all' should give the same mask
+    % When using '', a warning is shown when the percentage of
+    % non{zero,finite} features exceeds pct_thrshold
+
+    pct_threshold=5;
+
+    to_remove=data==0 | ~isfinite(data);
+
+    % take as a mask anywhere where any feature is nonzero.
+    if cosmo_match({mask_type},{'any','auto',''})
+        to_remove_any=any(to_remove,1);
+    end
+
+    if cosmo_match({mask_type},{'all','auto',''})
+        to_remove_all=all(to_remove,1);
+    end
+
+    switch mask_type
+        case {'auto',''}
+            %
+            any_equals_all=isequal(to_remove_any, to_remove_all);
+
+            n=numel(to_remove_any);
+            n_any=sum(to_remove_any(:));
+            n_all=sum(to_remove_all(:));
+
+            pct_any=100*n_any/n;
+            pct_all=100*n_all/n;
+
+            do_mask_suggestion=pct_any>pct_threshold && ...
+                                strcmp(mask_type,'');
+
+            if any_equals_all
+                if do_mask_suggestion
+                    me_name=mfilename();
+                    msg=sprintf(['%d (%.1f%%) features are non'...
+                                '{zero,finite} in all samples (and no '...
+                                'features have non-{zero,finite} '...
+                                'values in some samples and not '...
+                                'in others)\n'...
+                                'To use a mask excluding these '...
+                                'features: %s(...,''mask'',-auto'')\n'],...
+                                n_all,pct_all,me_name);
+                    cosmo_warning(msg);
+
+                    to_remove=[];
+                else
+                    to_remove=to_remove_any;
+                end
+            else
+                % give error or warning
+                me_name=mfilename();
+
+                msg=sprintf(['%d (%.1f%%) features are non{zero,'...
+                            'finite} in all samples\n'...
+                            '%d (%.1f%%) features are non{zero,'...
+                            'finite} in at least one sample\n'...
+                            'To use a mask excluding '...
+                            'features:\n'...
+                            '- where *all* values are non{zero,finite}:'...
+                            ' %s(...,''mask'',-all'')\n'...
+                            '- where *any* value  is  non{zero,finite}:'...
+                            ' %s(...,''mask'',-any'')\n'],...
+                            n_all,pct_all,n_any,pct_any,me_name,me_name);
+
+                if do_mask_suggestion
+                    % give a warning
+                    cosmo_warning(msg);
+                    % set mask to empty, so that a mask will not be applied
+                    to_remove=[];
+                else
+                    error('automatic mask failed:\n%s',msg);
+                end
+            end
+        case 'any'
+            to_remove=to_remove_any;
+        case 'all'
+            to_remove=to_remove_all;
+        otherwise
+            error('illegal mask specification ''-%s''', mask_type);
+    end
+
+    auto_mask=~to_remove(:)';
+
+function [data,vol,sa]=read_img(fn, img_formats)
     % helper: returns data (3D or 4D), header, and a string indicating the
     % image format. It matches the filename extension with what is stored
     % in img_formats
