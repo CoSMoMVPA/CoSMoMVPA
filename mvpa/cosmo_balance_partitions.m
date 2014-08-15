@@ -131,7 +131,6 @@ npar=numel(partitions.train_indices);
 bpar_train=cell(1,npar);
 bpar_test=cell(1,npar);
 
-pos=0;
 for k=1:npar
     par_train=train_indices{k};
     par_test=test_indices{k};
@@ -141,7 +140,7 @@ for k=1:npar
     h=histc(ts,1:nclasses);
     hmin=min(h);
     if hmin==0
-        [foo,i]=min(h);
+        [unused,i]=min(h);
         error('target %d missing in .train_indices{k}',...
                     classes(i), k);
     end
@@ -155,7 +154,6 @@ for k=1:npar
     ts_rep=repmat(ts,nrep,1);
     par_train_rep=repmat(par_train,nrep,1);
     for c=1:nclasses
-
         c_idxs=find(ts_rep==c);
         c_pos=0;
 
