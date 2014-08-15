@@ -9,10 +9,7 @@ function s=cosmo_structjoin(varargin)
 %                 pairs
 %               - if a struct, then value=arg{X}.(key) for each key in
 %                 fieldnames(arg{X}) is stored as s.(key)=value
-%               - if a string, then:
-%                 * if arg{X}=='!' then the output must contain a subset
-%                   of the fields in arg{X+1}
-%                 * otherwise this stored as s.(arg{X})=arg{X+1}
+%               - if a string, then it is stored as s.(arg{X})=arg{X+1}
 %
 % Returns:
 %   s           Struct with fieldnames and their associated values
@@ -81,12 +78,11 @@ function s=cosmo_structjoin(varargin)
 % Notes:
 %  - this function can be used to parse input arguments (including
 %    varargin in a "'key1',value1,'key2',value2,..." fashion)
-%  - the '!' can be used multiple times; the effect is to use the union of
-%    the fieldnames indicates by the arguments following them.
 %
 % NNO Jan 2014
 
 persistent me; % function handle to current function
+
 if isempty(me)
     me=str2func(mfilename());
 end
@@ -94,20 +90,11 @@ end
 s=struct(); % output
 n=numel(varargin);
 
-q={}; % superset of output fieldnames, or '[]' for no superset
-
 k=0;
 while k<n
     % go over all input arguments
     k=k+1;
     v=varargin{k}; %k-th argument
-
-    check_super=strcmp(v,'!');
-    if check_super
-        % check next input argument
-        k=k+1;
-        v=varargin{k};
-    end
 
     if iscell(v)
         if isempty(v)
@@ -125,31 +112,15 @@ while k<n
             continue;
         end
 
-        % overwrite any values in c
+        % overwrite any values in s
         fns=fieldnames(v);
-        if check_super
-            q=union(q, fns);
-            continue;
-        end
 
         for j=1:numel(fns);
             fn=fns{j};
-            v_fn=v.(fn);
-            if isfield(s,fn) && isstruct(s.(fn)) && isstruct(v.(fn))
-                % recursively update struct
-                s.(fn)=me(s.(fn),v_fn);
-            else
-                s.(fn)=v_fn;
-            end
+            s=update_struct(s, fn, v.(fn), me);
         end
     elseif ischar(v)
         % <key>, <value> pair
-
-        if check_super
-            q=union(q, {v});
-            continue;
-        end
-
         if k+1>n
             % cannot be last argument
             error('Missing argument after key ''%s''', v);
@@ -159,24 +130,17 @@ while k<n
         k=k+1;
         vv=varargin{k};
 
-        % store value
-        if isfield(s,v) && isstruct(s.(v)) && isstruct(vv)
-            % recursively update struct
-            s.(v)=me(s.(v),vv);
-        else
-            s.(v)=vv;
-        end
+        s=update_struct(s, v, vv);
     else
         error(['Illegal input at position %d: expected cell, struct, ',...
                     'or string'], k);
     end
 end
 
-if ~isempty(q)
-    d=setdiff(fieldnames(s), q);
-    if ~isempty(d)
-        error('Illegal key %s - not one of %s', ...
-                        d{1}, cosmo_strjoin(q, ','));
+function s=update_struct(s, fn, v, me)
+    if isfield(s,fn) && isstruct(s.(fn)) && isstruct(v)
+        s.(fn)=me(s.(fn),v);
+    else
+        s.(fn)=v;
     end
-end
 

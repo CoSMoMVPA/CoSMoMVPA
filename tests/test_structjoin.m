@@ -31,13 +31,3 @@ function test_structjoin_
     ar({1});
     ar({ar});
     ar({[]});
-
-    % test shebang
-    ar({'!',{'b'},'b',{1,2}});
-    ar({'!',{'c',3},'b',{1,2}});
-    ar({'!',{'c',3},'b',{1,2}});
-    ar({'!',x_,y_});
-
-
-
-
