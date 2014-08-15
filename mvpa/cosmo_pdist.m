@@ -44,7 +44,7 @@ function d=cosmo_pdist(x, distance)
 
     if nargin<2 || isempty(distance), distance='euclidean'; end
 
-    [ns,nf]=size(x);
+    ns=size(x,1);
     d=zeros(1,ns*(ns-1)/2);
 
     switch distance
