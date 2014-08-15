@@ -34,7 +34,7 @@ function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
 
     % throw an error if any indices with NaN F values
     if any(fs(selected_indices)<0)
-        idx=find(fs(selected_indices)<0);
+        idx=find(fs(selected_indices)<0,1);
         error('Feature %d has NaN Fscore', selected_indices(idx));
     end
 
