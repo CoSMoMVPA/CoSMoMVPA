@@ -104,7 +104,7 @@ function s=java_()
         s=not_in_this_environment();
     end
 
-function s=not_in_this_environment();
+function s=not_in_this_environment()
     s=sprintf('not supported in environment ''%s''',environment());
 
 function s=toolboxes()
@@ -139,62 +139,29 @@ function s=cosmo_config()
 
 
 function s=dir2str(d, formatter)
-% d is the result from 'dir' or 'cosmo_dir'
-if nargin<2
-    formatter=@(x)sprintf('  %s % 10d %s',x.date,x.bytes,x.name);
-end
-
-n=numel(d);
-ww=cell(n+1,1); % allocate space for output
-ww{1}='';       % start with newline
-pos=1;
-for k=1:n
-    dk=d(k);
-
-    % if any value is empty, replace it by the empty string
-    fns=fieldnames(dk);
-    for j=1:numel(fns)
-        fn=fns{j};
-        v=dk.(fn);
-        if isempty(v)
-            dk.(fn)='';
-        end
+    % d is the result from 'dir' or 'cosmo_dir'
+    if nargin<2
+        formatter=@(x)sprintf('  %s % 10d %s',x.date,x.bytes,x.name);
     end
 
-    pos=pos+1;
-    ww{pos}=formatter(dk);
-end
-s=cosmo_strjoin(ww(1:pos),'\n');
+    n=numel(d);
+    ww=cell(n+1,1); % allocate space for output
+    ww{1}='';       % start with newline
+    pos=1;
+    for k=1:n
+        dk=d(k);
 
+        % if any value is empty, replace it by the empty string
+        fns=fieldnames(dk);
+        for j=1:numel(fns)
+            fn=fns{j};
+            v=dk.(fn);
+            if isempty(v)
+                dk.(fn)='';
+            end
+        end
 
-
-function w=append(w,desc,str)
-% helper function to add an element in a cell.
-% the cell size doubles every time the cell becomes filled.
-
-% first empty position in w
-i=find(cellfun(@isempty,w),1);
-
-if isempty(i)
-    % allocate space
-    n=numel(w);
-    w{n*2}=[];
-    i=n+1;
-end
-
-if nargin==3
-    w{i}=sprintf('%s: %s',desc,str);
-else
-    w{i}=desc;
-end
-
-function w=cut(w)
-% remove empty elements in w
-i=find(cellfun(@isempty,w),1);
-if ~isempty(i)
-    w=w(1:(i-1));
-end
-
-
-
-
+        pos=pos+1;
+        ww{pos}=formatter(dk);
+    end
+    s=cosmo_strjoin(ww(1:pos),'\n');
