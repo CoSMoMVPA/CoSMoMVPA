@@ -111,30 +111,6 @@ function img_formats=get_img_formats()
                            '+tlrc.BRIK','+tlrc.BRIK.gz'};
 
 
-function img_format=get_img_format(ds, img_formats)
-
-    fns=fieldnames(img_formats);
-    n=numel(fns);
-
-    count=0;
-    for k=1:n
-        fn=fns{k};
-        if isfield(ds.a, ['hdr_' fn])
-            img_format=fn;
-            count=count+1;
-        end
-    end
-
-    if count~=1
-        error('Found %d image formats, expected 1', count)
-    end
-
-function check_endswith(fn,ext)
-    b=isempty(cosmo_strsplit(fn,ext,-1));
-    if ~b
-        error('%s should end with %s', fn, ext);
-    end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % format-specific helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -319,12 +295,7 @@ function hdr=new_bv_msk(ds)
 
 %% AFNI
 function afni_info=new_afni(ds)
-    vol_data=unflatten(ds);
-    dim=size(vol_data);
-    nsamples=size(ds.samples,1);
-
     a=ds.a;
-    vol=a.vol;
     mat=a.vol.mat;
 
     % deal with orientation
