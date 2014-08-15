@@ -1,4 +1,4 @@
-function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test, opt)
+function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test, unused)
 % naive bayes classifier
 %
 % predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test[, opt])
@@ -13,8 +13,6 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 % - predicted          Qx1 predicted data classes for samples_test
 %
 % NNO Aug 2013
-
-    if nargin<4, opt=struct(); end
 
     [ntrain, nfeatures]=size(samples_train);
     [ntest, nfeatures_]=size(samples_test);
