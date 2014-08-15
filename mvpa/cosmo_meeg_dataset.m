@@ -71,7 +71,7 @@ function ds=cosmo_meeg_dataset(filename, varargin)
     defaults.targets=[];
     defaults.chunks=[];
 
-    params = cosmo_structjoin('!', defaults, varargin);
+    params = cosmo_structjoin(defaults, varargin);
 
     if cosmo_check_dataset(filename,'meeg',false)
         % it is already a dataset, so return it
