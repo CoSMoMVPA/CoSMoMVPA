@@ -73,9 +73,6 @@ me=[]; % in case of recursion, this is set to a handle of this function
 % (the '^' and '$' characters indicate the beginning and end of the string)
 reg_pattern=['^' regexptranslate('wildcard',file_pattern) '$'];
 
-% get file separator
-sep=filesep();
-
 % list of all files in directory
 d=dir(directory);
 
