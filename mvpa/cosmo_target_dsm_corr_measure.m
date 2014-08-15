@@ -60,7 +60,6 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     pd = cosmo_pdist(ds.samples, params.metric);
     % <@@<
 
-    nsamples_pd=numel(pd);
     target_dsm=params.target_dsm;
 
     if isvector(target_dsm)
