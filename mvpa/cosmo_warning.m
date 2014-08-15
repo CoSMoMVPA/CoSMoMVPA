@@ -75,7 +75,11 @@ function varargout=cosmo_warning(message, varargin)
         args=args(2:end);
     end
 
-    full_message=sprintf(message, args{:});
+    if numel(args)>0
+        full_message=sprintf(message, args{:});
+    else
+        full_message=message;
+    end
 
     switch when_show_warning
         case 'once'
@@ -88,9 +92,9 @@ function varargout=cosmo_warning(message, varargin)
 
                 shown_warnings{end+1}=full_message;
                 me=mfilename();
-                postfix=sprintf(['\nThis warning is shown only once, '...
+                postfix=sprintf(['\n\nThis warning is shown only once, '...
                                'but the underlying issue may occur '...
-                               'multiple times. To show the warning:\n'...
+                               'multiple times. To show each warning:\n'...
                                ' - every time:   %s(''on'')\n'...
                                ' - once:         %s(''once'')\n'...
                                ' - never:        %s(''off'')\n'],me,me,me);
@@ -110,9 +114,9 @@ function varargout=cosmo_warning(message, varargin)
         warning('on');
         % avoid extra entry on the stack
         if has_identifier
-            warning(identifier,full_message);
+            warning(identifier,'%s',full_message);
         else
-            warning(full_message);
+            warning('%s',full_message);
         end
         warning(s); % reset state
     end
