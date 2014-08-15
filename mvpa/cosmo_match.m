@@ -121,13 +121,6 @@ function msk=cosmo_match(haystack, needle, varargin)
         msk=msk & other_msk;
     end
 
-function c=just_convert_str2cell(x)
-    % only if x is a string, it is converted to char. otherwise x is returned
-    if ischar(x)
-        c={x};
-    else
-        c=x;
-    end
 
 function n=check_vec(x)
     % checks whether it's a vector, and if so, returns the number of elements
