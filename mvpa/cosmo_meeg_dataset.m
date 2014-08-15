@@ -210,7 +210,7 @@ function ds=convert_ft(ft)
     if isempty(samples_arr), error('Could not find sample data'); end
 
     % get the dimension labels
-    [dim_labels,ndim]=cosmo_strsplit(ft.dimord,'_');
+    [dim_labels,ndim_expected]=cosmo_strsplit(ft.dimord,'_');
 
     % See if the first dimension is a dimension label (chan, freq, time).
     insert_sample_dim=cosmo_match(dim_labels(1),expected_dim_labels);
@@ -234,7 +234,7 @@ function ds=convert_ft(ft)
 
     % get the dim labels - they should match expected_dim_labels
     % if add_dim then start at first label, otherwise at second.
-    dim_labels={dim_labels{1+~insert_sample_dim:end}};
+    dim_labels=dim_labels((1+~insert_sample_dim):end);
 
     % check the labels
     if ~isempty(setdiff(dim_labels,expected_dim_labels))
@@ -243,6 +243,10 @@ function ds=convert_ft(ft)
     end
 
     ndim=numel(size(samples_arr))-1; % number of feature dimensions
+    if ndim~=ndim_expected-1
+        error('Found %d dimensions, expected %d from .dimord (%s)',...
+                    ndim, ndim_expected, ft.dimord);
+    end
 
     % store values for each feature dimensions, e.g. labels of the
     % channels, onets for time, and frequency for freq
@@ -277,8 +281,8 @@ function ds=convert_ft(ft)
     % fields to leave out in output
     % XXX timelock data .var, .dof, .avg are removed - not sure if that is
     % bad.
-    omit_fields={samples_field, 'trialinfo', 'dimord', 'label', ...
-                        'avg','var','dof', 'cumtapcnt', dim_labels{:}};
+    omit_fields=[{samples_field, 'trialinfo', 'dimord', 'label', ...
+                        'avg','var','dof', 'cumtapcnt'} dim_labels];
 
     all_fields=fieldnames(ft);
     keep_field_indices=find(~cosmo_match(all_fields, omit_fields));
@@ -298,7 +302,7 @@ function ds=read_eeglab_txt(fn)
 
     header_line=fgetl(fid); % read header
     chan_labels=cosmo_strsplit(header_line,'\t');
-    chan_labels={chan_labels{2:(end-1)}}; % omit first & last bogus element
+    chan_labels=chan_labels(2:(end-1)); % omit first & last bogus element
 
     nchan=numel(chan_labels);
     data_pat=cosmo_strjoin(repmat({'%n'},1,nchan+1),'\t');
@@ -345,6 +349,7 @@ function ds=read_eeglab_txt(fn)
 
     %%%%%%%%%%%%%%%
     % put the data in 3D array
+    data=zeros(ntrial,nchan,ntime);
     for chan=1:nchan
         chan_data=cell_data{chan+1}; % skip first column as it has timepoints
         data(:,chan,:)=reshape(chan_data,ntime,ntrial)';
