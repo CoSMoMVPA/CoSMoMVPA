@@ -30,7 +30,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
     defaults.targets=[];
     defaults.chunks=[];
 
-    params = cosmo_structjoin('!', defaults, varargin);
+    params = cosmo_structjoin(defaults, varargin);
 
     if cosmo_check_dataset(fn,'surface',false)
         % it is already a dataset, so return it
