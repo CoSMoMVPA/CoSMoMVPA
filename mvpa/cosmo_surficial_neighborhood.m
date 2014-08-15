@@ -252,6 +252,7 @@ nbrhood=struct();
 nbrhood.a.dim.labels={'node_indices'};
 nbrhood.a.dim.values={unq_center_ids};
 nbrhood.fa.node_indices=center_ids_mapping(:)';
+nbrhood.fa.size=d(:)';
 
 % set neighbors while considering the masked nature of the input dataset
 neighbors=cell(ncenters,1);
