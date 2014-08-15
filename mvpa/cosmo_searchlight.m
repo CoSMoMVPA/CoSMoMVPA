@@ -5,45 +5,63 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %   results_map=cosmo_searchlight(dataset, measure, ['args',args]...
 %                           ['radius',radius],['center_ids',center_ids])
 %
-%   Inputs
-%       dataset: an instance of a cosmo_fmri_dataset
-%       measure: a function handle to a dataset measure. A dataset measure has
-%               the function signature: output = measure(dataset, args)
-%       args:   a struct that contains all the fields necessary to the dataset
-%               measure. args get passed directly to the dataset measure.
-%       radius: searchlight radius in voxels. If provided, the neighborhood
-%               function is computed using this radius and the
-%               cosmo_spherical_neighborhood (for fMRI datasets).
-%       center_ids:      vector indicating center ids to be used as a
+% Inputs:
+%   ds                   dataset struct with field .samples
+%   measure              function handle to a dataset measure. A dataset
+%                        measure has the function signature:
+%                          output = measure(dataset, args)
+%                        where output must be a struct with fields .samples
+%                        (as a column vector) and optionally a field .sa
+%                        with sample attributes.
+%   'args', args         struct that contains all the fields necessary
+%                        for the dataset measure. args get passed directly
+%                        to the dataset measure
+%   'radius', r          searchlight radius in voxels, if ds is an fmri
+%                        dataset. Using this option computes the
+%                        neighborhood using cosmo_spherical_neighborhood.
+%                        This option cannot be used together with
+%                        'nbrhood'.
+%   'center_ids', ids    vector indicating center ids to be used as a
 %                        searchlight center. By default all feature ids are
-%                        used
-%       nbrhood:         dataset-like structure but without .sa and
-%                         .samples. Required only if radius is
-%                         not provided. This forms the template for the
-%                         output dataset. It should have the fields:
-%         .a              struct with dataset attributes
-%         .fa             struct with feature attributes. Each field should
-%                         have NF values in the second dimension
-%         .neighbors      cell with NF mappings from center_ids in output
-%                         dataset to feature ids in input dataset.
+%                        used (i.e. ids=1:numel(nbrhood.neighbors). The
+%                        output results_map.samples has size N in the 2nd
+%                        dimension.
+%   'nbrhood', nbrhood   dataset-like structure but without .sa and
+%                        .samples. This forms the template for the
+%                        output dataset. This option cannot be used
+%                        together with 'radius'. nbrhood must have fields:
+%         .a             struct with dataset attributes
+%         .fa            struct with feature attributes. Each field should
+%                        have NF values in the second dimension
+%         .neighbors     cell with NF mappings from center_ids in output
+%                        dataset to feature ids in input dataset.
 %
-%   Returns
-%       results_map:    a dataset struct where the samples
-%                       contain the results of the searchlight analysis.
+% Output:
+%   results_map:         a dataset struct where the samples
+%                        contain the results of the searchlight analysis.
+%                        If measure returns datasets all of size Nx1 and
+%                        there are M center_ids
+%                        (M=numel(nbrhood.neighbors)) if center_ids is not
+%                        provided), then results_map.samples has size MxN.
+%                        If nbrhood has fields .a and .fa, these are part
+%                        of the output (with .fa sliced according to
+%                        center_ids)
 %
-%   Example: Using the searchlight to compute a full-brain nearest neighbor
-%               classification searchlight with n-fold cross validation:
+% Example:
+%     % Using the searchlight to compute a full-brain LDA
+%     % classification searchlight with n-fold cross validation:
 %
-%       ds = cosmo_fmri_dataset('data.nii','mask','brain_mask.nii', ...
+%     ds = cosmo_fmri_dataset('data.nii','mask','brain_mask.nii', ...
 %                                'targets',targets,'chunks',chunks);
-%       m = @cosmo_cross_validation_accuracy_measure;
-%       m_args = struct();
-%       m_args.classifier = @cosmo_classify_nn;
-%       m_args.partitions = cosmo_nfold_partitioner(ds);
-%       results = cosmo_searchlight(ds,m,'args',m_args,'radius',3);
+%     m = @cosmo_cross_validation_accuracy_measure;
+%     m_args = struct();
+%     m_args.classifier = @cosmo_classify_lda;
+%     m_args.partitions = cosmo_nfold_partitioner(ds);
+%     results = cosmo_searchlight(ds,m,'args',m_args,'radius',3);
+%
 % See also: cosmo_spherical_neighborhood
 %
-% ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NN0
+% ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NNO
 
     cosmo_check_dataset(ds);
 
