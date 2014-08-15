@@ -334,9 +334,8 @@ function afni_info=new_afni(ds)
     orient=(idxs-1)*2+offset;
 
     vol_data=unflatten(ds);
-
-
     dim=size(vol_data);
+    nsamples=size(ds.samples,1);
 
     brik_type=1; %functional head
     brik_typestring='3DIM_HEAD_FUNC';
