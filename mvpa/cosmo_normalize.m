@@ -132,8 +132,8 @@ end
 % set dimension along which normalization takes place
 if nargin<3
     % allow '1' or '2' at the end of normtype, e.g. 'zscore1' or 'demean2'
-    [dim_val,is_ok]=str2num(norm_spec(end));
-    if is_ok
+    dim_val=str2double(norm_spec(end));
+    if any(dim_val==[1 2])
         dim=dim_val;
         norm_type=norm_spec(1:(end-1));
     else
