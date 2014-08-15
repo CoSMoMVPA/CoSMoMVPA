@@ -427,7 +427,7 @@ function version=get_libsvm_version()
     for k=1:numel(lines)
         sp=cosmo_strsplit(lines{k},'LIBSVM_VERSION');
         if numel(sp)>1
-            version=str2num(sp{end});
+            version=str2double(sp{end});
             return
         end
     end
