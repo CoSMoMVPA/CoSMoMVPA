@@ -23,12 +23,6 @@ function cosmo_publish_run_scripts(force)
     srcdir=fullfile(medir,'../examples/');
     trgdir=fullfile(medir,'..//doc/source/_static/publish/');
 
-    if isunix()
-        tmpdir='/tmp';
-    else
-        error('Not implemented: temporary directory on non-unix platforms');
-    end
-
     srcpat='*_*';
     srcext='.m';
     trgext='.html';
@@ -124,20 +118,6 @@ function cosmo_publish_run_scripts(force)
     end
     fprintf(fid,'</UL>Back to <A HREF="../../index.html">index</A>.</BODY></HTML>\n');
     fprintf('Index written to %s\n', outputfn);
-
-
-function s=startswith(haystack, needle)
-
-    t=strtrim(haystack);
-    n=numel(needle);
-    if numel(t) < n
-        s=false;
-        return;
-    end
-
-    s=~isempty(strfind(t(1:n), needle));
-
-
 
 
 
