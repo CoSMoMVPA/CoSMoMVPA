@@ -57,7 +57,7 @@ function predicted=cosmo_classify_meta_multiclass(samples_train, targets_train, 
     % find the classes that were predicted most often
     % XXX currently we always take the first one
     counts=histc(all_predicted',classes);
-    [foo,idx]=max(counts);
+    [unused,idx]=max(counts);
 
     predicted=classes(idx);
 
