@@ -619,8 +619,6 @@ function [data,vol,sa]=read_bv_vmp(fn)
 
     vol=get_vol_bv(hdr);
 
-    %bless(hdr); % avoid GC doing unwanted stuff
-
     sa=struct();
     sa.stats=cosmo_statcode(hdr);
     sa.labels=labels;
@@ -692,7 +690,6 @@ function b=isa_bv_vtc(hdr)
 
 function [data,vol,sa]=read_bv_vtc(fn)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vtc);
-    hdr=xff(fn);
     sa=struct();
     data=shiftdim(hdr.VTCData,1);
     vol=get_vol_bv(hdr);
@@ -736,7 +733,7 @@ function vol=get_vol_afni(hdr)
     % origin and basis vectors in world space
     k=[0 0 0;eye(3)];
 
-    [err,i]=AFNI_Index2XYZcontinuous(k,hdr,orient);
+    [unused,i]=AFNI_Index2XYZcontinuous(k,hdr,orient);
 
     % basis vectors in voxel space
     e1=i(2,:)-i(1,:);
@@ -847,7 +844,7 @@ function [data,vol,sa]=read_spm(fn)
             continue;
         end
         vol_fn=fullfile(pth,input_vols(k).fname);
-        if ~exist(vol_fn)
+        if ~exist(vol_fn,'file')
             error('Volume #%d not found: %s',k,vol_fn);
         end
 
