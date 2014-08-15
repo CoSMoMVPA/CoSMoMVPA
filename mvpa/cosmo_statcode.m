@@ -363,7 +363,7 @@ function codes=get_codes(package)
                       'Correl',1;
                       'Correl',1; % "cross-correlation", whatever it means
                       'Ftest',2;
-                      'Zscore',0,
+                      'Zscore',0;
                       '',0; % lots of undefined codes here
                       '',0;
                       '',0
