@@ -526,6 +526,11 @@ function vol=get_vol_nii(hdr, show_warning)
                  'please get in touch with the CoSMoMVPA developers.']);
         end
 
+        edges=[1 1 1 1; dim 1]';
+        orig_xyz=mat*edges;
+        center_xyz=mean(orig_xyz,2);
+        center=mean(edges,2);
+
         % spatial dimension permutation matrix
         permute_dim_mat=zeros(4);
         permute_dim_mat(4,4)=1;
@@ -536,6 +541,7 @@ function vol=get_vol_nii(hdr, show_warning)
             permute_dim_mat(hist.rot_orient(dim_index),dim_index)=1;
             if hist.flip_orient(dim_index)>0
                 flip_mat(dim_index,dim_index)=-1;
+                flip_mat(dim_index,4)=2*center_xyz(dim_index);
             end
         end
 
@@ -547,6 +553,18 @@ function vol=get_vol_nii(hdr, show_warning)
 
         % apply dimension permutation & reflections
         mat=permute_dim_mat*flip_mat*mat;
+
+        new_xyz=mat*edges;
+
+
+
+        all_deltas=bsxfun(@minus,orig_xyz([1:3 5:7]),new_xyz([1:3 5:7])');
+        zero_delta=abs(all_deltas)<1e-6;
+        if ~all(any(~zero_delta,1) | any(~zero_delta,2)')
+            error(['transformation failed - please get in touch with '...
+                    'the CoSMoMVPA developers']);
+        end
+
     end
 
     vol=struct();
