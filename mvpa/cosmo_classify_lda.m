@@ -71,5 +71,5 @@ class_weight=class_mean/class_cov_reg;
 class_offset=sum(class_weight .* class_mean,2);
 class_proj=bsxfun(@plus,-.5*class_offset,class_weight*samples_test');
 
-[foo,class_idxs]=max(class_proj);
+[unused,class_idxs]=max(class_proj);
 predicted=classes(class_idxs);
