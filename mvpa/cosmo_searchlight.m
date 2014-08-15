@@ -116,15 +116,6 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         clock_start=clock();
     end
 
-    % Core searchlight code.
-    %
-    % For each center_id:
-    % - get the indices of its neighbors
-    % - slice the dataset "ds" using these indices
-    % - apply the measure to this sliced dataset with its arguments "args"
-    % - store the result in "res"
-    %
-    % >@@>
     visitorder=randperm(ncenters); % get better progress time estimates
 
     % if measure gave the wrong result one wants to know sooner rather than
@@ -133,20 +124,28 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % this is a compromise between execution speed and error reporting.
     checked_first_output=false;
 
-    % little optimization with path checking
-    % it assumes that the measure used will not change the path
-    on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
 
+    % Core searchlight code.
+    % For each center_id:
+    % - get the indices of its neighbors
+    % - slice the dataset "ds" using these indices
+    % - apply the measure to this sliced dataset with its arguments "args"
+    % - store the result in "res"
+    %
     for k=1:ncenters
+        % >@@>
         center_idx=visitorder(k);
         center_id=center_ids(center_idx);
         neighbor_feature_ids=neighbors{center_id};
 
-        % slice the dataset (with disabled kosherness-check)
-        sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2, false);
+        % slice the dataset (with disabled kosherness-check for every
+        % but the first neighborhood)
+        sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2, ...
+                                        checked_first_output);
 
         % apply the measure
         res=measure(sphere_ds, args);
+        % <@@<
 
         % for efficiency, only check first output
         if ~checked_first_output
@@ -156,6 +155,13 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                        'that is a column vector']);
             end
             checked_first_output=true;
+
+            % little optimization with path checking disabled
+            % after the first call of the measure
+            % (it assumes that the measure used will not change the path)
+            on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
+
+            % another optimization to switch off checking the partitions
             args.check_partitions=false;
         end
 
@@ -168,7 +174,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                             k/ncenters, msg, prev_progress_msg);
         end
     end
-    % <@@<
+
 
     % prepare the output
     results_map=struct();
