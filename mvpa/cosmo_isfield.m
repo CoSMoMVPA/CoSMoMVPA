@@ -45,55 +45,71 @@ function tf=cosmo_isfield(s, name, raise)
 %     > 1
 %
 % Notes:
-%  - Unlike the builtin 'isfield' function, this function can check for
-%    multiple fields in one call and can check for the presence of nested
-%    structs
+%  - Unlike the builtin 'isfield' function
+%    * only structs with at most one element (empty or 1x1) are supported
+%    * this function can check for multiple fields in one call and can
+%      check for the presence of nested structs
+%    * this function accepts non-structs as the first input argument; the
+%      result is then false for every name
 %
 % See also: isfield
 %
 % NNO Aug 2014
-
-    if ~isstruct(s)
-        error('First argument must be a struct');
-    end
 
     if nargin<3
         raise=false;
     end
 
     if ischar(name)
-        cell_names={name};
+        tf=single_isfield(s, name, raise);
+    elseif iscellstr(name)
+        tf=cellfun(@(x)single_isfield(s,x,raise),name);
     else
-        if ~iscellstr(name)
-            error('Second argument must be string or cell with strings');
-        end
-        cell_names=name;
+        error('Second argument must be string or cell with strings');
     end
 
-    n=numel(cell_names);
-    tf=zeros(n,1);
-    for k=1:n
-        name=cell_names{k};
-        keys=cosmo_strsplit(name,'.');
-        nkeys=numel(keys);
 
-        has_key=true;
-        value=s;
-        for j=1:nkeys
-            key=keys{j};
-            if (j>1 && ~isstruct(value)) || ~isfield(value,key)
-                if raise
-                    key_name=cosmo_strjoin(keys(1:(j)),'.');
-                    error('Missing field .%s', key_name);
+function s=key_name(keys, index)
+    s=cosmo_strjoin(keys(1:index),'.');
+
+function has_key=single_isfield(s, name, raise)
+    has_key=false;
+
+    keys=cosmo_strsplit(name,'.');
+    nkeys=numel(keys);
+
+    value=s;
+    for j=1:nkeys
+        if ~isstruct(value)
+            if raise
+                if j==1
+                    error('Input is not a struct');
+                else
+                    error('Not a struct: .%s', key_name(keys,j));
                 end
-                has_key=false;
-                break;
             end
-
-            if j<nkeys
-                value=value.(key);
-            end
+            return;
         end
 
-        tf(k)=has_key;
+        if numel(value)~=1
+            if raise
+                error('Unsupported non-singleton struct');
+            end
+            return
+        end
+
+        key=keys{j};
+
+        if ~isfield(value,key)
+            if raise
+                error('Struct has missing field .%s',key_name(keys,j));
+            end
+            return;
+        end
+
+        if j<nkeys
+            value=value.(key);
+        end
     end
+
+    has_key=true;
