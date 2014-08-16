@@ -161,10 +161,7 @@ function msg=check_dim(ds)
 % helper function
 
     msg='';
-    if ~isfield(ds,'a') || ...
-            ~isfield(ds.a,'dim') || ...
-            ~isfield(ds.a.dim,'labels') || ...
-            ~isfield(ds.a.dim,'values')
+    if ~all(cosmo_isfield(ds,{'a.dim.labels','a.dim.values'}))
         msg='missing field .a.dim.{labels,values}';
         return
     end
