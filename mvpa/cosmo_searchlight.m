@@ -149,8 +149,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 
         % for efficiency, only check first output
         if ~checked_first_output
-            if (~isstruct(res) || ~isfield(res,'samples') || ...
-                    size(res.samples,2)~=1)
+            if ~cosmo_isfield(res, 'samples') || size(res.samples,2)~=1
                 error(['Measure output must be struct with field .samples '...
                        'that is a column vector']);
             end
