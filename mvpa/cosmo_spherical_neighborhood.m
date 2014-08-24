@@ -27,6 +27,60 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 %     .neighbors      Px1 cell so that center2neighbors{k}==nbrs contains
 %                     the feature ids of the neighbors of feature k
 %
+% Example:
+%     ds=cosmo_synthetic_dataset('type','fmri');
+%     radius=1; % radius=3 is typical for 'real-world' searchlights
+%     nbrhood=cosmo_spherical_neighborhood(ds,radius,'progress',false);
+%     cosmo_disp(nbrhood)
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'i'  'j'  'k' }
+%     >     .values
+%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     >   .vol
+%     >     .mat
+%     >       [ 10         0         0         0
+%     >          0        10         0         0
+%     >          0         0        10         0
+%     >          0         0         0         1 ]
+%     >     .dim
+%     >       [ 3         2         1 ]
+%     > .fa
+%     >   .nvoxels
+%     >     [ 3         4         3         3         4         3 ]
+%     >   .radius
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .center_ids
+%     >     [ 1         2         3         4         5         6 ]
+%     >   .i
+%     >     [ 1         2         3         1         2         3 ]
+%     >   .j
+%     >     [ 1         1         1         2         2         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     > .neighbors
+%     >   { [ 1
+%     >       4
+%     >       2 ]
+%     >     [ 2
+%     >       1
+%     >       5
+%     >       3 ]
+%     >     [ 3
+%     >       2
+%     >       6 ]
+%     >     [ 4
+%     >       1
+%     >       5 ]
+%     >     [ 5
+%     >       4
+%     >       2
+%     >       6 ]
+%     >     [ 6
+%     >       5
+%     >       3 ] }
+%
 % NNO Aug 2013
 
     cosmo_check_dataset(ds,'fmri');
