@@ -64,7 +64,7 @@ function test_stacking
 
     fs=cosmo_stack({ds,ds},1);
     assertEqual(es,fs)
-    fs.fa.voxel_indices(1)=0;
+    fs.fa.i(1)=0;
     assertExceptionThrown(@()cosmo_stack({es,fs}),'');
 
     es=cosmo_stack({ds,ds},2);
