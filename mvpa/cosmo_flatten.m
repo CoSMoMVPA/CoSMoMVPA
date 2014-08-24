@@ -179,17 +179,9 @@ function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
         attr.(dim_name)=reshape(rep_values, 1, []);
     end
 
-<<<<<<< Updated upstream
-% store results
-ds.samples=reshape(arr, nsamples, nfeatures);
-ds.a.dim.labels=dim_labels;
-ds.a.dim.values=dim_values;
-ds.fa=fa;
-=======
     % get array and sample sizes
     nsamples=size(arr,1);
     nfeatures=prod(dim_sizes);
->>>>>>> Stashed changes
 
     samples=reshape(arr, nsamples, nfeatures);
 
