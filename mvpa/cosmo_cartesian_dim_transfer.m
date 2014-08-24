@@ -189,7 +189,7 @@ function ds=single_dim_transfer(train_sp, test_sp, dim_label, measure, opt)
     end
 
     ds=cosmo_stack(res,1);
-    if ~cosmo_isfield(ds,{'a.sdim.labels','a.sdim.values'});
+    if ~all(cosmo_isfield(ds,{'a.sdim.labels','a.sdim.values'}));
         ds.a.sdim.labels=cell(0);
         ds.a.sdim.values=cell(0);
     end
