@@ -53,9 +53,10 @@ function ds=cosmo_surface_dataset(fn, varargin)
     ds.fa.node_indices=1:nfeatures;
 
     % set dataset attributes
-    dim.labels={'node_indices'};
-    dim.values={node_indices(:)};
-    ds.a.dim=dim;
+    fdim=struct();
+    fdim.labels={'node_indices'};
+    fdim.values={node_indices(:)};
+    ds.a.fdim=dim;
 
      % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
