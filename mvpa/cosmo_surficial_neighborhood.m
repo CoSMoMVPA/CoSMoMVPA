@@ -86,8 +86,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                   .neighbors       Mx1 cell with .neighbors{k} the
 %                                    indices of features (relative to ds)
 %                                    in the neighborhood of node k
-%                   .a.dim.labels    set to {'node_indices'}
-%                   .a.dim.values    set to {center_ids} with center_ids
+%                   .a.fdim.labels    set to {'node_indices'}
+%                   .a.fdim.values    set to {center_ids} with center_ids
 %                                    Mx1 ids of each neighborhood
 %                   .fa.node_indices identical to center_ids
 %     v_o           NVx3 coordinates for N nodes of the output surface
@@ -138,7 +138,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %     % store surface dataset (in AFNI/SUMA NIML format) with the number of
 %     % features (voxels) for each center node of the output surface
 %     s=struct();
-%     s.node_indices=res.a.dim.values{1}(res.fa.node_indices);
+%     s.node_indices=res.a.fdim.values{1}(res.fa.node_indices);
 %     s.data=res.samples';
 %     surfing_write('voxcount.niml.dset',s);
 %
@@ -164,7 +164,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %
 
 cosmo_check_dataset(ds,'fmri');
-if ~isequal(ds.a.dim.labels,{'i','j','k'})
+if ~isequal(ds.a.fdim.labels,{'i','j','k'})
     error('Unsupported dimension labels, expected fMRI-like dataset');
 end
 
@@ -249,8 +249,8 @@ all2msk_indices(vol_def.mask)=1:nf_mask;
 
 % store neighborhood information
 nbrhood=struct();
-nbrhood.a.dim.labels={'node_indices'};
-nbrhood.a.dim.values={unq_center_ids};
+nbrhood.a.fdim.labels={'node_indices'};
+nbrhood.a.fdim.values={unq_center_ids};
 nbrhood.fa.node_indices=center_ids_mapping(:)';
 nbrhood.fa.size=d(:)';
 
