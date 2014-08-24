@@ -1,6 +1,5 @@
 function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
-% returns a mask indicating matching occurences in two arrays or cells
-% relative to the second array using a dataset
+% return a mask indicating match of dataset dimensions with values
 %
 % msk=cosmo_match(ds, haystack1, needle1[, needle2, haystack2, ...])
 %
@@ -38,11 +37,12 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     > [ 1         2         3  ...  18        19        20 ]@1x6460
 %     msk=cosmo_dim_match(ds,'i',5:10);
 %     ds_sel=cosmo_slice(ds,msk,2);
-%     ds_pruned=cosmo_dim_prune(ds_sel);
-%     cosmo_disp(ds_pruned.a.fdim.values{1});
-%     > [ 5         6         7         8         9        10 ]
-%     cosmo_disp(ds_pruned.fa.i)
-%     > [ 1         2         3  ...  4         5         6 ]@1x1938
+%     % no pruning, so the fdim.values are not changed. A subset fo
+%     % features is selected
+%     cosmo_disp(ds_sel.a.fdim.values{1});
+%     > [ 1         2         3  ...  18        19        20 ]@1x20
+%     cosmo_disp(ds_sel.fa.i)
+%     > [ 5         6         7  ...  8         9        10 ]@1x1938
 %
 %     % For an MEEG dataset, get a selection of some channels
 %     ds=cosmo_synthetic_dataset('type','meeg','size','huge');
@@ -60,6 +60,9 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     % select channels
 %     msk=cosmo_dim_match(ds,'chan',{'MEG1843','MEG2441'});
 %     ds_sel=cosmo_slice(ds,msk,2);
+%     %
+%     % apply pruning, so that the .fa.chan goes from 1:nf, with nf the
+%     % number of channels that were selected
 %     ds_pruned=cosmo_dim_prune(ds_sel);
 %     %
 %     % show result
@@ -68,13 +71,10 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     >   'MEG2441' }
 %     cosmo_disp(ds_pruned.fa.chan)
 %     > [ 1         2         1  ...  2         1         2 ]@1x34
-%
-%     % For an MEEG dataset, get a selection of time points between 0 and
-%     % .3 seconds. A function handle is used to select these timepoints
-%     ds=cosmo_synthetic_dataset('type','meeg','size','huge');
 %     %
-%     % select time points
-%     selector=@(x) 0<=x & x<=.3;
+%     % For the same MEEG dataset, get a selection of time points between 0
+%     % and .3 seconds. A function handle is used to select the timepoints
+%     selector=@(x) 0<=x & x<=.3; % use element-wise logical-and
 %     msk=cosmo_dim_match(ds,'time',selector);
 %     ds_sel=cosmo_slice(ds,msk,2);
 %     ds_pruned=cosmo_dim_prune(ds_sel);
@@ -84,25 +84,34 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     > [ 0      0.05       0.1  ...  0.2      0.25       0.3 ]@1x7
 %     cosmo_disp(ds_pruned.fa.time)
 %     > [ 1         1         1  ...  7         7         7 ]@1x2142
-
-
-%   % in an fmri dataset, get mask for first spatial dimension 'i' with
-%   % values in between 5 and 10 (inclusive)
-%
-%   msk=cosmo_dim_match(ds,'i',5:10);
-%
-%   - get features mask for a few MEEG channels
-%     msk=cosmo_dim_match(ds,'chan',{'PO7','O6'});
-%
-%   - get features mask for features 50 ms before stimulus onset:
-%     msk=cosmo_dim_match(ds,'time',@(x) x<.05);
+%     %
+%     % For the same MEEG dataset, compute a conjunction mask of the
+%     % channels and time points selected above
+%     msk=cosmo_dim_match(ds,'chan',{'MEG1843','MEG2441'},'time',selector);
+%     ds_sel=cosmo_slice(ds,msk,2);
+%     ds_pruned=cosmo_dim_prune(ds_sel);
+%     %
+%     % show result
+%     cosmo_disp(ds_pruned.a.fdim.values); % 'chan' and 'time'
+%     > { { 'MEG1843'    [ 0 0.05 0.1  ...  0.2 0.25 0.3 ]@1x7
+%     >     'MEG2441' }                                         }
+%     cosmo_disp(ds_pruned.fa.chan)
+%     > [ 1         2         1  ...  2         1         2 ]@1x14
+%     cosmo_disp(ds_pruned.fa.time)
+%     > [ 1         1         2  ...  6         7         7 ]@1x14
 %
 % Notes
 %  - when haystack or needle are numeric vectors or cells of strings,
 %    then this function behaves like cosmo_match (and does not consider
 %    information in its first input argument ds).
+%  - to remove dimension elements not included in the mask, use
+%    cosmo_dim_prune. When the dataset is transformed back using
+%    cosmo_map2{meeg,fmri,surface} it will not have these elements.
+%    The only real use case is in MEEG datasets to remove time, channel, or
+%    frequency elements; for fmri or surface datasets it is a bad idea to
+%    use cosmo_dim_prune.
 %
-% See also: cosmo_match
+% See also: cosmo_match, cosmo_dim_prune
 %
 % NNO Oct 2013
     if ~isstruct(ds)
@@ -153,5 +162,6 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
                     size(msk),size(msk_other))
         end
 
+        % conjunction mask
         msk=msk & msk_other;
     end
