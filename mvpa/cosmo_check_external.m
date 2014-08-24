@@ -82,20 +82,16 @@ function is_ok=cosmo_check_external(external, raise_)
 %
 % NNO Sep 2013
 
+    persistent cached_present_names;
 
-    persistent cached_present_names
-    persistent cached_absent_names;
+    if isnumeric(cached_present_names)
+        cached_present_names=cell(0);
+    end
 
     if nargin<2
         raise_=true;
     end
 
-    if cosmo_path_changed() || isnumeric(cached_present_names) || ...
-                    (ischar(external) && strcmp(external,'-tic'))
-        % clear cache
-        cached_present_names=cell(0);
-        cached_absent_names=cell(0);
-    end
 
     if iscell(external)
         % cell input - check for each of them using recursion
@@ -143,28 +139,16 @@ function is_ok=cosmo_check_external(external, raise_)
         return
     end
 
-    if cosmo_match({external},cached_present_names)
-        is_ok=true;
-        return;
-    elseif cosmo_match({external},cached_absent_names) && ~raise_
-        is_ok=false;
-        return;
-    elseif external(1)=='@'
+
+    if external(1)=='@'
         toolbox_name=external(2:end);
         is_ok=check_matlab_toolbox(toolbox_name,raise_);
     else
         is_ok=check_external_toolbox(external,raise_);
     end
 
-    % add if not in cache already
-    if is_ok
-        if ~cosmo_match({external},cached_present_names)
-            cached_present_names{end+1}=external;
-        end
-    else
-        if ~cosmo_match({external},cached_absent_names)
-            cached_absent_names{end+1}=external;
-        end
+    if is_ok && ~cosmo_match({external},cached_present_names)
+        cached_present_names{end+1}=external;
     end
 
 function is_ok=check_external_toolbox(external_name,raise_)

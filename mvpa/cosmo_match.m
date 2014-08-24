@@ -48,9 +48,9 @@ function msk=cosmo_match(haystack, needle, varargin)
 %   - the output of this function can be used with cosmo_slice
 %     to select features or samples of interest
 %   - to select feature dimension values in an fmri or meeg dataset
-%     (e.g., channel selection), see cosmo_feature_dim_match
+%     (e.g., channel selection), see cosmo_dim_match
 %
-% See also: cosmo_slice, cosmo_stack, cosmo_feature_dim_match
+% See also: cosmo_slice, cosmo_stack, cosmo_dim_match
 %
 % NNO Sep 2013
 
@@ -123,10 +123,10 @@ function msk=cosmo_match(haystack, needle, varargin)
 
 
 function n=check_vec(x)
-    % checks whether it's a vector, and if so, returns the number of elements
-    sz=size(x);
-    if numel(sz) ~= 2 || sum(sz>1)>1
+    n=numel(x);
+
+    if n>1 && ~isvector(x)
         error('Input argument is not a vector');
     end
-    n=numel(x);
+
 

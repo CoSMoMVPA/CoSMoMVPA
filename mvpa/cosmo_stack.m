@@ -80,24 +80,32 @@ function ds_stacked=cosmo_stack(datasets,dim,check_)
             for j=1:n
                 ds=datasets{j};
 
-                % check this dataset is kosher
-                if check_
-                    cosmo_check_dataset(ds);
-                end
-
                 % check presence of fieldname
                 if ~isfield(ds.(stack_fn),fn)
-                    error('field name not found for %d-th input: .%s.%s', ...
+                    error('field name missing for %d-th input: .%s.%s', ...
                                         j, stack_fn, fn);
                 end
-                vs{j}=ds.(stack_fn).(fn);
+
+                v=ds.(stack_fn).(fn);
+
+                v_size=size(v, other_dim);
+                if j==1
+                    v_size_expected=v_size;
+                elseif v_size_expected~=v_size;
+                    error('input %d has %d values in dimension %d, ',...
+                            'for %s.%s, first input has %d values',...
+                            j, v_size, other_dim, ...
+                            stack_fn, fn, v_size_expected);
+                end
+
+                vs{j}=v;
             end
-            ds_stacked.(stack_fn).(fn)=cat(dim,vs{:});
+
+            ds_stacked.(stack_fn).(fn)=cat_values(dim,vs);
         end
     end
 
     if check_
-
         % for the other dim, just make sure that the attributes are identical
         if isfield(ds_stacked, merge_fn)
             fns=fieldnames(ds_stacked.(merge_fn));
@@ -135,7 +143,7 @@ function ds_stacked=cosmo_stack(datasets,dim,check_)
     end
 
     if ~all(other_dim_sizes==other_dim_sizes(1))
-        i=find(ther_dim_sizes~=other_dim_sizes(1));
+        i=find(other_dim_sizes~=other_dim_sizes(1));
         error(['size mismatch between elements #%d (%d) and %%d (%d) ' ...
                     'in dimension %d'], ...
                     1, dim_sizes(1), i, dim_sizes(i), otherdim);
@@ -143,3 +151,21 @@ function ds_stacked=cosmo_stack(datasets,dim,check_)
 
     ds_stacked.samples=cat(dim,vs{:});
 
+    if check_
+        cosmo_check_dataset(ds_stacked);
+    end
+
+
+function c=cat_values(dim, vs)
+    if iscell(vs) && ~isempty(vs) && ischar(vs{1})
+        transpose=dim==2;
+
+        vcat=cat(1,vs{:});
+        c=cellstr(vcat);
+
+        if transpose
+            c=c';
+        end
+    else
+        c=cat(dim, vs{:});
+    end

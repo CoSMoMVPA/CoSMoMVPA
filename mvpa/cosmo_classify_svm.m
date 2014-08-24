@@ -25,40 +25,56 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %    https://github.com/cjlin1/libsvm
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+%  - It is usually a good idea to scale the data when using SVM. matlab's
+%    svm does this automatically, libsvm does not.
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
-%    provide an option 'normalization' to perform data scaling
+%    provide an option 'normalization' to perform data scaling.
 %
-% See also svmtrain, svmclassify, cosmo_classify_svm
+% Example:
+%     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',10);
+%     test_chunk=1;
+%     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
+%     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
+%     pred=cosmo_classify_svm(tr.samples,tr.sa.targets,te.samples,struct);
+%     disp(pred)
+%     >      1
+%     >      1
+%     >      5
+%     >      4
+%     >      5
+%
+% See also: svmtrain, svmclassify, cosmo_classify_svm,
+%           cosmo_classify_libsvm, cosmo_crossvalidate,
+%           cosmo_crossvalidation_measure
+%
+% NNO Aug 2014
 
 persistent cached_classifier_func;
 persistent cached_classifier_name;
 
-if nargin>=4 && isfield(opt,'svm')
-    svm_name=opt.svm;
-    auto_select=false;
-    opt=rmfield(opt,'svm');
+auto_select=true;
+
+if nargin>=4
+    if isfield(opt,'svm')
+        svm_name=opt.svm;
+        auto_select=false;
+        opt=rmfield(opt,'svm');
+    end
 else
     opt=struct();
-    auto_select=true;
 end
 
-path_changed=cosmo_path_changed();
-
-if ~path_changed && ~isnumeric(cached_classifier_func) && ...
+if ~isnumeric(cached_classifier_func) && ...
                         (auto_select || strcmp(svm_name, ...
                                         cached_classifier_name))
     classifier_func=cached_classifier_func;
+    classifier_name=cached_classifier_name;
 else
     if auto_select
-        if any(cosmo_check_external({'@stats','@bioinfo'},false))
-            svm_name='matlabsvm';
-        else
-            svm_name='libsvm';
-        end
+        svm_name='libsvm';
 
-        if cosmo_check_external('libsvm',false)
-            svm_name='libsvm';
-        elseif cosmo_check_external('matlabsvm',false)
+        if ~cosmo_check_external(svm_name, false) && ...
+                        cosmo_check_external('matlabsvm',false)
             svm_name='matlabsvm';
         end
     end
@@ -73,15 +89,19 @@ else
         case 'matlabsvm';
             classifier_func=@cosmo_classify_matlabsvm;
         otherwise
-            error('unsupported svm ''%s''', svm_name);
+            error(['unsupported svm ''%s'': must be one of: '...
+                        'matlabsvm, libsvm'], svm_name);
     end
 
-    cached_classifier_func=classifier_func;
     cached_classifier_name=svm_name;
 end
 
-on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
+% ensure that the classifer func is not stored in this function if an error
+% occurs. After sucessful classifcation the classifier_func is restored.
+cached_classifier_func=[];
 
 predicted=classifier_func(samples_train, targets_train, samples_test, opt);
+
+cached_classifier_func=classifier_func;
 
 

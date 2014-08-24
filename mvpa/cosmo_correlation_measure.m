@@ -38,17 +38,62 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %        .half2   } from two halves, with N the number of unique targets.
 %
 % Example:
-%   % assumes 5 classes per half, for example from GLM
-%   half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',1);
-%   half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2);
-%   ds=cosmo_stack({half1,half2});
-%   measure=@cosmo_correlation_measure;
+%     ds=cosmo_synthetic_dataset();
+%     %
+%     % compute on-minus-off diagonal correlations
+%     c=cosmo_correlation_measure(ds);
+%     cosmo_disp(c)
+%     > .samples
+%     >   [ 0.0631 ]
+%     > .sa
+%     >   .labels
+%     >     'corr'
+%     %
+%     % use Spearman correlations
+%     c=cosmo_correlation_measure(ds,'corr_type','Spearman');
+%     cosmo_disp(c)
+%     > .samples
+%     >   [ 0.0573 ]
+%     > .sa
+%     >   .labels
+%     >     'corr'
+%     %
+%     % get raw output
+%     c_raw=cosmo_correlation_measure(ds,'output','raw');
+%     cosmo_disp(c_raw)
+%     > .samples
+%     >   [ 0.386
+%     >     0.239
+%     >     0.238
+%     >     0.596 ]
+%     > .sa
+%     >   .half1
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2 ]
+%     >   .half2
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2 ]
+%     > .a
+%     >   .sdim
+%     >     .labels
+%     >       { 'half1'  'half2' }
+%     >     .values
+%     >       { [ 1    [ 1
+%     >           2 ]    2 ] }
 %
-%   % compute one measure for the whole brain
-%   whole_brain_results=measure(ds);
-%
-%   % run searchlight with this measure
-%   searchlight_results=cosmo_searchlight(ds,measure,'radius',4);
+%     % minimal searchlight example
+%     ds=cosmo_synthetic_dataset('type','fmri');
+%     radius=1; % in voxel units (radius=3 is more typical)
+%     res=cosmo_searchlight(ds,@cosmo_correlation_measure,'radius',radius,'progress',false);
+%     cosmo_disp(res.samples)
+%     > [ 0.314   -0.0537     0.261     0.248     0.129     0.449 ]
+%     cosmo_disp(res.sa)
+%     > .labels
+%     >   'corr'
 %
 % Notes:
 %   - by default the post_corr_func is set to @atanh. This is equivalent to
@@ -56,8 +101,13 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r))
 %   - if multiple samples are present with the same chunk and target, they
 %     are averaged *prior* to computing the correlations
+%   - if multiple partitions are present, then the correlations are
+%     computed separately for each partition, and then averaged
 %
 % NNO May 2014
+
+persistent cached_partitions;
+persistent cached_chunks;
 
 defaults=struct();
 defaults.partitions=[];
@@ -74,12 +124,22 @@ partitions=params.partitions;
 template=params.template;
 merge_func=params.merge_func;
 post_corr_func=params.post_corr_func;
+check_partitions=params.check_partitions;
+
+chunks=ds.sa.chunks;
 
 if isempty(partitions)
-    partitions=cosmo_nchoosek_partitioner(ds,'half');
+    if ~isempty(cached_chunks) && isequal(cached_chunks, chunks)
+        partitions=cached_partitions;
+        check_partitions=false;
+    else
+        partitions=cosmo_nchoosek_partitioner(ds,'half');
+        cached_chunks=ds.sa.chunks;
+        cached_partitions=partitions;
+    end
 end
 
-if params.check_partitions
+if check_partitions
     cosmo_check_partitions(partitions, ds, params);
 end
 
@@ -98,32 +158,11 @@ halves={partitions.train_indices, partitions.test_indices};
 
 pdata=cell(npartitions,1);
 for k=1:npartitions
-    avg_halves_data=cell(1,2);
+    half1=get_data(ds, partitions.train_indices{k}, classes, merge_func);
+    half2=get_data(ds, partitions.test_indices{k}, classes, merge_func);
 
-    % compute average over samples, for each target seperately
-    for h=1:2
-        idxs=halves{h}{k};
-        half_data=cosmo_slice(ds.samples,idxs,1,false);
+    c=cosmo_corr(half1', half2', params.corr_type);
 
-        if isequal(targets(idxs),(1:numel(idxs))')
-            % optimization: no averaging necessary
-            avg_halves_data{h}=half_data;
-        else
-            res=cell(1,nclasses);
-            for j=1:nclasses
-                msk=targets(idxs)==classes(j);
-                if ~any(msk)
-                    error('missing target class %d', classes(j));
-                end
-
-                res{j}=merge_func(half_data(msk,:));
-            end
-
-            avg_halves_data{h}=cat(1,res{:});
-        end
-    end
-
-    c=cosmo_corr(avg_halves_data{1}',avg_halves_data{2}',params.corr_type);
 
     if ~isempty(post_corr_func)
         c=post_corr_func(c);
@@ -144,23 +183,46 @@ end
 ds_sa=struct();
 ds_sa.samples=mean(cat(2,pdata{:}),2);
 
-sa=struct();
 switch params.output
     case 'mean'
-        sa.labels='corr';
+        ds_sa.sa.labels='corr';
     case 'raw'
-        sa.half1=reshape(repmat(classes',nclasses,1),[],1);
-        sa.half2=reshape(repmat(classes,nclasses,1),[],1);
+        ds_sa.sa.half1=reshape(repmat((1:nclasses)',nclasses,1),[],1);
+        ds_sa.sa.half2=reshape(repmat((1:nclasses),nclasses,1),[],1);
+
+        ds_sa.a.sdim=struct();
+        ds_sa.a.sdim.labels={'half1','half2'};
+        ds_sa.a.sdim.values={classes, classes};
+
+        %sa.half1=reshape(repmat(classes',nclasses,1),[],1);
+        %sa.half2=reshape(repmat(classes,nclasses,1),[],1);
 end
 
-ds_sa.sa=sa;
+
+function data=get_data(ds, sample_idxs, classes, merge_func)
+    samples=ds.samples(sample_idxs,:);
+    targets=ds.sa.targets(sample_idxs,:);
+
+    nclasses=numel(classes);
+    nfeatures=size(samples,2);
+    data=zeros(nclasses,nfeatures);
+
+    for k=1:nclasses
+        msk=classes(k)==targets;
+        if ~any(msk)
+            error('missing target class %d', classes(k));
+        end
+
+        data(k,:)=merge_func(samples(msk,:));
+    end
+
 
 
 function samples=mean_sample(samples)
 
-nsamples=size(samples,1);
-if nsamples>1
-    samples=sum(samples,1)/nsamples;
-end
+    nsamples=size(samples,1);
+    if nsamples>1
+        samples=sum(samples,1)/nsamples;
+    end
 
 

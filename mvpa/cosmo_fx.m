@@ -30,7 +30,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %   ds.fa.time_downsamp=ceil(ds.fa.time/downsampling_factor);
 %   ds_downsamp=cosmo_fx(ds, @(x) mean(x,2), {'chan','time_downsamp'}, 2);
 %   % fix the 'time' feature dimension so that map2meeg works properly
-%   ds=cosmo_feature_dim_prune(ds_downsamp);
+%   ds=cosmo_dim_prune(ds_downsamp);
 %
 % See also: cosmo_split, cosmo_stack
 %

@@ -2,13 +2,13 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 % Checks consistency of a dataset. By default throws an error when not.
 %
 %
-% is_ok=cosmo_dataset_check(ds, [ds_type,][,error_if_not_present])
+% is_ok=cosmo_dataset_check(ds, [ds_type,][,error_if_not_ok])
 %
 % Inputs:
 %   ds                     dataset struct.
 %   ds_type                string indicating the specific type of dataset.
 %                          Currently  supports 'fmri' and 'meeg'.
-%   error_if_not_present   if true (the default), an error is raised if the
+%   error_if_not_ok        if true (the default), an error is raised if the
 %                          dataset is not kosher (see below).
 %
 % Returns:
@@ -109,12 +109,27 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 
 
         if cosmo_isfield(ds,'sa.targets') && ~isnumeric(ds.sa.targets)
-            error(['.sa.targets must be numeric '...
-                        '(.sa.labels can be used to store string labels)']);
+            msg=['.sa.targets must be numeric '...
+                        '(.sa.labels can be used to store string labels)'];
+            break;
         end
 
         if cosmo_isfield(ds,'sa.chunks') && ~isnumeric(ds.sa.chunks)
-            error('.sa.chunks must be numeric');
+            msg='.sa.chunks must be numeric';
+            break;
+        end
+
+        if cosmo_isfield(ds,'a.dim')
+            msg=sprintf(['***CoSMoMVPA legacy***\n'...
+                    'Feature dimension information is now stored '...
+                    'in .a.fdim, whereas earlier versions used .a.dim. '...
+                    'To adapt a existing dataset struct ''ds'', run:\n'...
+                    '  ds.a.fdim=ds.a.dim;\n'...
+                    '  ds.a=rmfield(ds.a,''dim'')\n']);
+            if ~error_if_not_ok
+                cosmo_warning(msg);
+            end
+            break;
         end
 
 

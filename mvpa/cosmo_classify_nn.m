@@ -3,14 +3,27 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
 %
 % predicted=cosmo_classify_nn(samples_train, targets_train, samples_test[, opt])
 %
-% Inputs
-% - samples_train      PxR training data for P samples and R features
-% - targets_train      Px1 training data classes
-% - samples_test       QxR test data
-%-  opt                (currently ignored)
+% Inputs:
+%   samples_train      PxR training data for P samples and R features
+%   targets_train      Px1 training data classes
+%   samples_test       QxR test data
+%   opt                (currently ignored)
 %
-% Output
-% - predicted          Qx1 predicted data classes for samples_test
+% Output:
+%   predicted          Qx1 predicted data classes for samples_test
+%
+% Example:
+%     ds=cosmo_synthetic_dataset();
+%     test_chunk=1;
+%     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
+%     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
+%     pred=cosmo_classify_nn(tr.samples,tr.sa.targets,te.samples,struct);
+%     % note: the second sample is misclassified as 1 (instead of 2)
+%     disp(pred)
+%     > 1
+%     > 1
+%
+% See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
 % NNO Aug 2013
 
@@ -29,8 +42,10 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
         % - assign the class label of the feature that is nearest
         % >@@>
         delta=bsxfun(@minus, samples_train, samples_test(k,:));
-        dst=sqrt(sum(delta.^2,2));
-        [unused, i]=min(dst);
+
+        % (sqrt is unnecessary because it is monotonic)
+        squared_distance=sum(delta.^2,2);
+        [unused, i]=min(squared_distance);
         predicted(k)=targets_train(i);
         % <@@<
     end

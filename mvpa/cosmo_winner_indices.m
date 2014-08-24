@@ -10,10 +10,10 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %
 % Output:
 %   winners           Px1 indices of classes that occur most often.
-%                     winners(k)==w means that no value in pred(k,:)
-%                     occurs more often than classes(w).
+%                     winners(k)==w means that no value in
+%                     classes(pred(k,:)) occurs more often than classes(w).
 %   classes           The sorted list of unique predicted values, across
-%                     all non-ignored values in pred.
+%                     all non-ignored (non-NaN) values in pred.
 %
 % Examples:
 %     % a single prediction, with the third one missing
@@ -43,15 +43,14 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %
 % Notes:
 % - The typical use case is combining results from multiple classification
-%   predictions, such as in binary support vector machines (SVMs).
+%   predictions, such as in binary support vector machines (SVMs) and
+%   cosmo_crossvalidate
 % - The current implementation selects a winner pseudo-randomly (but
 %   deterministically) and (presumably) unbiased in case of a tie between
 %   multiple winners. That is, using the present implementation, repeatedly
 %   calling this function with identical input yields identical output,
 %   but unbiased with respect to which class is the 'winner' sample-wise.
 % - Samples with no winner are assigned a value of NaN.
-% - A typical use case is combining results from multiple predictions,
-%   such as in cosmo_classify_matlabsvm and cosmo_crossvalidate.
 %
 % See also: cosmo_classify_matlabsvm, cosmo_crossvalidate
 %

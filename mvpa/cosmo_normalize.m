@@ -94,7 +94,7 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     % and apply these to samples 2 and 5
 %     ds_train=cosmo_slice(ds,[1 3 4]);
 %     ds_test=cosmo_slice(ds,[2 5]);
-%     [dsn_train,params]=cosmo_normalize(ds_train,'scale_unit1');
+%     [dsn_train,params]=cosmo_normalize(ds_train,'scale_unit', 1);
 %     cosmo_disp(dsn_train);
 %     > .samples
 %     >   [    -1        -1        -1
@@ -104,7 +104,14 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     % show estimated parameters (min and max for each column, in this
 %     % case)
 %     cosmo_disp(params);
-%     > { 'scale_unit1'  [ 2 12  22 ]  [ 8 18  28 ] }
+%     > .method
+%     >   'scale_unit'
+%     > .dim
+%     >   [ 1 ]
+%     > .min
+%     >   [ 2        12        22 ]
+%     > .max
+%     >   [ 8        18        28 ]
 %     %
 %     % apply parameters to test dataset
 %     dsn_test=cosmo_normalize(ds_test,params);
@@ -119,29 +126,22 @@ if isempty(params) || (ischar(params) && strcmp(params,'none'))
     return;
 end
 
-apply_params=iscell(params);
-if apply_params;
-    param_estimates=params(2:end);
-    norm_spec=params{1};
-elseif ischar(params)
-    norm_spec=params;
-else
-    error('norm_spec must be cell or string');
-end
+if nargin<3, dim=1; end
 
-% set dimension along which normalization takes place
-if nargin<3
-    % allow '1' or '2' at the end of normtype, e.g. 'zscore1' or 'demean2'
-    dim_val=str2double(norm_spec(end));
-    if any(dim_val==[1 2])
-        dim=dim_val;
-        norm_type=norm_spec(1:(end-1));
-    else
-        error(['no ''dim'' specified, and norm_spec ''%s'' '...
-                    'does not end with 1 or 2'],norm_spec)
+apply_params=isstruct(params);
+if apply_params;
+    method=params.method;
+    if nargin>=3 && params.dim~=dim
+        error('Dim specified as %d, but estimates used %d',dim,params.dim);
     end
+    dim=params.dim;
+elseif ischar(params)
+    method=params;
+    params=struct();
+    params.method=method;
+    params.dim=dim;
 else
-    norm_type=norm_spec;
+    error('norm_spec must be struct or string');
 end
 
 is_ds=isstruct(ds) && isfield(ds,'samples');
@@ -152,49 +152,52 @@ else
     samples=ds;
 end
 
-
-switch norm_type
+switch method
     case 'demean'
         if apply_params
-            mu=param_estimates{1};
+            mu=params.mu;
         else
             mu=mean(samples,dim);
-            param_estimates={mu};
+            params.mu=mu;
         end
         samples=bsxfun(@minus,samples,mu);
 
     case 'zscore'
         if apply_params
-            mu=param_estimates{1};
-            sigma=param_estimates{2};
+            mu=params.mu;
+            sigma=params.sigma;
         else
             mu=mean(samples,dim);
             sigma=std(samples,[],dim);
-            param_estimates={mu,sigma};
+            params.mu=mu;
+            params.sigma=sigma;
         end
         samples=bsxfun(@rdivide,bsxfun(@minus,samples,mu),sigma);
 
     case 'scale_unit'
         if apply_params
-            min_=param_estimates{1};
-            max_=param_estimates{2};
+            min_=params.min;
+            max_=params.max;
         else
             min_=min(samples,[],dim);
             max_=max(samples,[],dim);
-            param_estimates={min_,max_};
-        end
+            params.min=min_;
+            params.max=max_;
 
+        end
         samples=bsxfun(@times,1./(max_-min_),...
                             (bsxfun(@minus,samples,min_)))*2-1;
 
     otherwise
-        error('Unsupported normalization: %s', norm_type);
+        error('Unsupported normalization: %s', method);
 
 end
 
-samples(isnan(samples))=0;
-
-params=[{norm_spec} param_estimates];
+nan_msk=~isfinite(samples);
+if any(nan_msk(:))
+    cosmo_warning('%d samples are NaN or Inf after normalization', ...
+                        sum(nan_msk(:)));
+end
 
 if is_ds
     ds.samples=samples;

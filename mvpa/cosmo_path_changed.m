@@ -44,12 +44,6 @@ function path_changed=cosmo_path_changed(set_stack_counter_)
     force_update=false;
 
     if nargin>=1
-        allowed_states={'on','off','push','pop','update','not_here'};
-        if ~cosmo_match({set_stack_counter_},allowed_states)
-            error('Illegal argument value: must be one of: %s.',...
-                        cosmo_strjoin(allowed_states,', '));
-        end
-
         switch set_stack_counter_
             case 'push'
                 stack_counter_=stack_counter_+1;
@@ -73,6 +67,8 @@ function path_changed=cosmo_path_changed(set_stack_counter_)
 
                 path_changed=@()func_me_('pop');
                 return
+            otherwise
+                error('illegal state %s', set_stack_counter);
         end
     end
 

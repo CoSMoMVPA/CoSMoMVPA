@@ -1,9 +1,9 @@
-function ds_pruned=cosmo_feature_dim_prune(ds, labels)
+function ds_pruned=cosmo_dim_prune(ds, labels)
 
 cosmo_check_dataset(ds);
 
 if nargin<2
-    labels=ds.a.dim.labels;
+    labels=ds.a.fdim.labels;
 elseif ischar(labels)
     labels={labels};
 end
@@ -13,18 +13,18 @@ if ~iscell(labels) && all(cellfun(@ischar,labels))
     error('expected cell with labels, or single string');
 end
 
-% removes the values in ds.a.dim that are not used
+% removes the values in ds.a.fdim that are not used
 
 nlabels=numel(labels);
 ds_pruned=ds; % output
 
 for k=1:nlabels
     label=labels{k};
-    dim=find(cosmo_match(ds.a.dim.labels, label));
+    dim=find(cosmo_match(ds.a.fdim.labels, label));
 
     if numel(dim)~=1, error('Illegal label %s', label); end
 
-    values=ds.a.dim.values{dim};
+    values=ds.a.fdim.values{dim};
     fa=ds.fa.(label);
     [unq_idxs,unused,map_idxs]=unique(fa);
 
@@ -34,5 +34,5 @@ for k=1:nlabels
     else
         values=reshape(values(unq_idxs),1,[]);
     end
-    ds_pruned.a.dim.values{dim}=values;
+    ds_pruned.a.fdim.values{dim}=values;
 end

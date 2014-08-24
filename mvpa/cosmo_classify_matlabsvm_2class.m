@@ -29,6 +29,11 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 
     if nargin<4, opt=struct(); end
 
+    cosmo_warning(sprintf(['Using Matlab''s SVM classifier. This '...
+                    'classifier is **slow**\nFor better '...
+                    'performance, consider using libsvm. Run\n\n'...
+                    '  help cosmo_classify_libsvm\n\nfor details']));
+
     [ntrain, nfeatures]=size(samples_train);
     [unused, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
@@ -54,12 +59,32 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 
     opt_cell=opt2cell(opt);
 
-    % Use svmtrain and svmclassify to get predictions for the testing set.
-    % (Hint: 'opt_cell{:}' allows you to pass the options as varargin)
-    % >@@>
-    s = svmtrain(samples_train, targets_train, opt_cell{:});
-    predicted=svmclassify(s, samples_test);
-    % <@@<
+    % train & test; if it fails, see if this caused by non-functioning
+    % matlabsvm
+
+    try
+        % Use svmtrain and svmclassify to get predictions for the testing set.
+        % (Hint: 'opt_cell{:}' allows you to pass the options as varargin)
+        % >@@>
+        s = svmtrain(samples_train, targets_train, opt_cell{:});
+        predicted=svmclassify(s, samples_test);
+        % <@@<
+    catch me
+        cosmo_check_external('matlabsvm');
+
+        if strcmp(me.identifier,'stats:svmtrain:NoConvergence');
+            error(['SVM training did not converge. Your options are:\n'...
+                   ' 1) increase ''boxconstraint''\n'...
+                   ' 2) increase ''tolkkt''\n'...
+                   ' 3) set ''kktviolationlevel'' to a positive value\n'...
+                   ' 4) use a different classifier\n'...
+                   'If you do not have a strong preference for '...
+                   'either option, you are advised to try option (4) '...
+                   'using cosmo_classify_lda'],'');
+        else
+            rethrow(me);
+        end
+    end
 
     % helper function to convert cell to struct
 function opt_cell=opt2cell(opt)
@@ -85,11 +110,12 @@ function opt_cell=opt2cell(opt)
     fns=fieldnames(opt);
     keep_msk=cosmo_match(fns, to_keep);
     keep_fns=fns(keep_msk);
+    keep_id = find(keep_msk);
 
     n=numel(keep_fns);
     opt_cell=cell(1,2*n);
     for k=1:n
-        fn=fns{k};
+        fn=fns{keep_id(k)};
         opt_cell{k*2-1}=fn;
         opt_cell{k*2}=opt.(fn);
     end

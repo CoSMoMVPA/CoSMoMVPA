@@ -155,12 +155,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
             end
             checked_first_output=true;
 
-            % little optimization with path checking disabled
-            % after the first call of the measure
-            % (it assumes that the measure used will not change the path)
-            on_cleanup_=onCleanup(cosmo_path_changed('not_here'));
-
-            % another optimization to switch off checking the partitions
+            % optimization to switch off checking the partitions
             args.check_partitions=false;
         end
 
@@ -191,6 +186,10 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % if measure returns .sa, add those.
     if isfield(res_stacked,'sa')
         results_map.sa=res_stacked.sa;
+    end
+
+    if cosmo_isfield(res_stacked, 'a.sdim')
+        results_map.a.sdim=res_stacked.a.sdim;
     end
 
     % set center_ids for the output dataset

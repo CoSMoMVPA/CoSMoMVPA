@@ -135,8 +135,14 @@ function did_pass=cosmo_run_tests(varargin)
     defaults=struct();
     defaults.verbose=true;
     defaults.output=1;     % standard out
+    defaults.filename=[];
 
-    opt=cosmo_structjoin(defaults,varargin{:});
+    if ~isempty(varargin) && numel(varargin)==1 && ischar(varargin{1})
+        opt=defaults;
+        opt.filename=varargin{1};
+    else
+        opt=cosmo_structjoin(defaults,varargin{:});
+    end
 
     % store original directory
     orig_pwd=pwd();
@@ -147,6 +153,14 @@ function did_pass=cosmo_run_tests(varargin)
 
     mvpa_dir=fileparts(which(mvpa_func));
     test_dir=fullfile(mvpa_dir,test_subdir);
+
+    if isempty(opt.filename)
+        test_location=test_dir;
+        mvpa_location=mvpa_dir;
+    else
+        test_location=opt.filename;
+        mvpa_location=opt.filename;
+    end
 
     % if opt.output is numeric it's assumed to be a file descriptor;
     % output is written to the corresponding file but the file is not
@@ -167,11 +181,11 @@ function did_pass=cosmo_run_tests(varargin)
     cd(test_dir);
 
     % collect unit tests
-    suite=TestSuite.fromName(test_dir);
+    suite=TestSuite.fromName(test_location);
     fprintf(fid, 'Unit test suite: %d tests\n',suite.numTestCases);
 
     % collect doc tests
-    doc_suite=CosmoDocTestSuite(mvpa_dir);
+    doc_suite=CosmoDocTestSuite(mvpa_location);
     fprintf(fid, 'Doc test suite: %d tests\n',doc_suite.numTestCases);
 
     % combine the tests

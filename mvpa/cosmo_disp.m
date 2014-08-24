@@ -21,7 +21,7 @@ function cosmo_disp(x,varargin)
 %                  beginning and end are shown separated by ' ... '.
 %                  Default: 20
 %     .depth       Maximum recursion depth
-%                  Default: 5
+%                  Default: 6
 %
 % Side effect:     Calling this function caused the representation of x
 %                  to be displayed.
@@ -78,7 +78,7 @@ function cosmo_disp(x,varargin)
 %     % make a cell in a cell in a cell in a cell ...
 %     for k=1:10, m{1}=m; end;
 %     cosmo_disp(m)
-%     > { { { { { <cell> } } } } }
+%     > { { { { { { <cell> } } } } } }
 %     cosmo_disp(m,'depth',8)
 %     > { { { { { { { { <cell> } } } } } } } }
 %     cosmo_disp(m,'depth',Inf)
@@ -116,7 +116,7 @@ function cosmo_disp(x,varargin)
     defaults.edgeitems=3;    % #items at edges in summary style
     defaults.precision=3;    % show floats with 3 decimals
     defaults.strlen=20;      % insert '...' with strings more than 20 chars
-    defaults.depth=5;        % maximal depth
+    defaults.depth=6;        % maximal depth
     defaults.show_size=false;% always show size of matrices
 
     opt=cosmo_structjoin(defaults,varargin);

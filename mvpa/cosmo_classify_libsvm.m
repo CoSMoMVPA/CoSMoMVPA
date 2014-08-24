@@ -8,6 +8,11 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %   targets_train      Px1 training data classes
 %   samples_test       QxR test data
 %   opt                (optional) struct with options for svmtrain
+%     .autoscale       If true (default), z-scoring is done on the training
+%                      set; the test set is z-scored using the mean and std
+%                      estimates from the training set.
+%     ?                any option supported by either libsvm or matlab's
+%                      svmtrain.
 %
 % Output
 %   predicted          Qx1 predicted data classes for samples_test
@@ -22,15 +27,19 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %    that case, adjust the path or use cosmo_classify_matlabsvm instead.
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
-%    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
+%  - By default this function performs z-scoring of the data. To switch
+%    this off, set 'autoscale' to false
+%  - cosmo_crossvalidate and cosmo_crossvalidation_measure
 %    provide an option 'normalization' to perform data scaling
+%
 %
 % See also svmtrain, svmclassify, cosmo_classify_svm, cosmo_classify_matlabsvm
 %
 % NNO Feb 2014
-    cosmo_check_external('libsvm');
 
-    has_opt=nargin>4 && ~isempty(fieldnames(opt));
+    if nargin<4
+        opt=[];
+    end
 
     [ntrain, nfeatures]=size(samples_train);
     [ntest, nfeatures_]=size(samples_test);
@@ -41,30 +50,54 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     end
 
     % construct options string for svmtrain
-    if has_opt
-        default_opt=struct();
-        default_opt.t=0; % linear
-        opt_str=libsvm_opt2str(default_opt,opt);
-    else
-        % build string directly (for faster execution)
-        opt_str='-t 0 -q';
+    opt_str=libsvm_opt2str(opt);
+
+    % auto-scale is the default
+    autoscale=~isstruct(opt)||(isfield(opt,'autoscale') && opt.autoscale);
+
+    % perform autoscale if necessary
+    if autoscale
+        [samples_train, params]=cosmo_normalize(samples_train, ...
+                                                    'zscore', 1);
+        samples_test=cosmo_normalize(samples_test, params);
     end
 
-    % train
-    m=svmtrain(targets_train, samples_train, opt_str);
-
-    % test
-    % note: quiet option became available in version 3.18
-    predicted=svmpredict(NaN(ntest,1), samples_test, m, '-q');
+    % train; if it fails, see if this caused by non-functioning libsvm
+    try
+        model=svmtrain(targets_train, samples_train, opt_str);
+        predicted=svmpredict(NaN(ntest,1), samples_test, model, '-q');
+    catch me
+        cosmo_check_external('libsvm');
+        rethrow(me);
+    end
 
 
 function opt_str=libsvm_opt2str(opt)
+    % always be quiet (no output to terminal window)
+    default_postfix='-q';
+    if isempty(opt)
+        opt_str=default_postfix;
+        return
+    end
+
+    % this function may be called many times. cache the loast opt
+    % that was used so that it can be returned
+    persistent cached_opt
+    persistent cached_opt_str
+
+    if isequal(opt, cached_opt)
+        opt_str=cached_opt_str;
+        return;
+    end
+
 
     % options supported to libsvm
     fns=intersect(fieldnames(opt),{'s','t','d','g','r','c','n','p',...
                                     'm','e','h','n','wi','v'});
 
-    if ~isempty(fns)
+    if isempty(fns)
+        opt_cell=cell(1);
+    else
         n=numel(fns);
         opt_cell=cell(1,2*n+1);
         for k=1:numel(fns)
@@ -78,11 +111,11 @@ function opt_str=libsvm_opt2str(opt)
 
             opt_cell{2*k}=v;
         end
-    else
-        opt_cell=cell(1);
     end
 
-    opt_cell{end}='-q'; % quiet (no output to terminal window)
+    opt_cell{end}=default_postfix;
     opt_str=cosmo_strjoin(opt_cell,' ');
 
+    cached_opt=opt;
+    cached_opt_str=opt_str;
 

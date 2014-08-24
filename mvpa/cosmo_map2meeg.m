@@ -91,6 +91,21 @@ function write_ft(fn,hdr)
     save(fn, '-struct', hdr);
 
 
+function samples_field=ft_detect_samples_field(ds)
+    nfreq=sum(cosmo_match(ds.a.fdim.labels,{'freq'}));
+    ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
+    nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
+    if nchan>=1 && ntime>=1
+        if nfreq>=1
+            samples_field='powspctrm';
+        else
+            samples_field='trial';
+        end
+        return
+    end
+
+    samples_field=ds.a.meeg.samples_field;
+
 function ft=build_ft(ds)
 
     % get fieldtrip-specific fields from header
@@ -98,14 +113,19 @@ function ft=build_ft(ds)
 
     % unflatten the array
     [arr, dim_labels]=cosmo_unflatten(ds);
+    [arr, dim_labels]=cosmo_unflatten(ds,[],NaN);
 
     % store the data
-    samples_field=ds.a.meeg.samples_field;
+    samples_field=ft_detect_samples_field(ds);
     ft.(samples_field)=arr;
 
     % set dimord
     samples_label=ds.a.meeg.samples_label;
-    dimord_labels=[{samples_label} dim_labels];
+
+    underscore2dash=@(x)strrep(x,'_','-');
+
+    dimord_labels=[{samples_label} cellfun(underscore2dash,dim_labels,...
+                                            'UniformOutput',false)];
     ft.dimord=cosmo_strjoin(dimord_labels,'_');
 
     % store each feature attribute dimension value
@@ -129,5 +149,5 @@ function ft=build_ft(ds)
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
                 isequal(ft_datatype(ft),'unknown')
-        error('conversion error - fieldtrip does not approve of this dataset');
+        cosmo_warning('fieldtrip does not approve of this dataset');
     end

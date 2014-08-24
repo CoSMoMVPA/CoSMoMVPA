@@ -25,8 +25,6 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
 % See also svmtrain, svmclassify, cosmo_classify_svm, cosmo_classify_libsvm
 %
 % NNO Aug 2013
-    cosmo_check_external('matlabsvm');
-
     if nargin<4, opt=struct(); end
 
     [ntrain, nfeatures]=size(samples_train);
@@ -74,7 +72,6 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
 
     % find the classes that were predicted most often.
     % ties are handled by cosmo_winner_indices
-
     [winners, test_classes]=cosmo_winner_indices(all_predicted);
 
     predicted=test_classes(winners);

@@ -75,7 +75,11 @@ function s=key_name(keys, index)
 function has_key=single_isfield(s, name, raise)
     has_key=false;
 
-    keys=cosmo_strsplit(name,'.');
+    if all(name~='.')
+        keys={name};
+    else
+        keys=cosmo_strsplit(name,'.');
+    end
     nkeys=numel(keys);
 
     value=s;

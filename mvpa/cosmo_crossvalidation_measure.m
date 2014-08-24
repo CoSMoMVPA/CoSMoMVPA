@@ -59,7 +59,7 @@ switch params.output
     case 'accuracy'
         ds_sa.samples=accuracy;
         ds_sa.sa.labels={'accuracy'};
-    case 'predictions'
+    case {'predictions','raw'}
         ds_sa.sa.targets=ds.sa.targets;
         ds_sa.samples=pred(:);
     otherwise
