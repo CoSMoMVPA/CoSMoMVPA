@@ -47,8 +47,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %                was applied then M (M<=X*Y*Z) is the number of non-zero
 %                voxels in the  mask input dataset.
 %     .a         struct with dataset-relevent data.
-%     .a.dim.labels   dimension labels, set to {'i','j','k'}
-%     .a.dim.values   dimension values, set to {1:X, 1:Y, 1:Z}
+%     .a.fdim.labels   dimension labels, set to {'i','j','k'}
+%     .a.fdim.values   dimension values, set to {1:X, 1:Y, 1:Z}
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
 %     .a.vol.mat 4x4 voxel-to-world transformation matrix (LPI, base-1).
@@ -332,7 +332,7 @@ function mask=get_mask(ds, mask_param)
                 error('feature attribute mismatch between data and mask');
             end
 
-            if ~isequal(ds_mask.a.dim,ds_mask.a.dim)
+            if ~isequal(ds_mask.a.fdim,ds_mask.a.fdim)
                 error('dimension mismatch between data and mask');
             end
 
