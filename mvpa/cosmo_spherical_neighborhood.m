@@ -93,10 +93,10 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 
     show_progress=opt.progress>0;
 
-    ndim=numel(ds.a.dim.values);
+    ndim=numel(ds.a.fdim.values);
     orig_dim=zeros(1,ndim);
     for k=1:ndim
-        orig_dim(k)=numel(ds.a.dim.values{k});
+        orig_dim(k)=numel(ds.a.fdim.values{k});
     end
     orig_nvoxels=prod(orig_dim);
 
