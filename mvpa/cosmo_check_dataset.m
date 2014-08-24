@@ -122,9 +122,9 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
         if cosmo_isfield(ds,'a.dim')
             msg=sprintf(['***CoSMoMVPA legacy***\n'...
                     'Feature dimension information is now stored '...
-                    'in .a.fdim, whereas earlier versions used .a.dim. '...
+                    'in .a.fdim, whereas earlier versions used .a.fdim. '...
                     'To adapt a existing dataset struct ''ds'', run:\n'...
-                    '  ds.a.fdim=ds.a.dim;\n'...
+                    '  ds.a.fdim=ds.a.fdim;\n'...
                     '  ds.a=rmfield(ds.a,''dim'')\n']);
             if ~error_if_not_ok
                 cosmo_warning(msg);
@@ -152,7 +152,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
                     error('Unsupported ds_type=%s', ds_type);
             end
 
-            m=cosmo_match(names,ds.a.dim.labels);
+            m=cosmo_match(names,ds.a.fdim.labels);
             if ~all(m)
                 i=find(~m,1);
                 msg=sprintf('''%s''-dataset has not dim field %s',...
@@ -176,14 +176,14 @@ function msg=check_dim(ds)
 % helper function
 
     msg='';
-    if ~all(cosmo_isfield(ds,{'a.dim.labels','a.dim.values'}))
-        msg='missing field .a.dim.{labels,values}';
+    if ~all(cosmo_isfield(ds,{'a.fdim.labels','a.fdim.values'}))
+        msg='missing field .a.fdim.{labels,values}';
         return
     end
 
-    ndim=numel(ds.a.dim.labels);
-    if numel(ds.a.dim.values)~=ndim
-        msg='size mismatch between .a.dim.labels and .a.dim.values';
+    ndim=numel(ds.a.fdim.labels);
+    if numel(ds.a.fdim.values)~=ndim
+        msg='size mismatch between .a.fdim.labels and .a.fdim.values';
         return
     end
 
@@ -192,7 +192,7 @@ function msg=check_dim(ds)
         return
     end
 
-    names=ds.a.dim.labels;
+    names=ds.a.fdim.labels;
     for k=1:numel(names);
         name=names{k};
         if ~isfield(ds.fa,name)
@@ -201,7 +201,7 @@ function msg=check_dim(ds)
         end
         vs=ds.fa.(name);
 
-        nv=numel(ds.a.dim.values{k});
+        nv=numel(ds.a.fdim.values{k});
         if min(vs)<1 || max(vs>nv) || ~isequal(round(vs),vs)
             msg=sprintf('.fa.%s must have integers in range 1..%d',...
                             name,nv);
