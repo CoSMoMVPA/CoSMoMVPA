@@ -17,6 +17,9 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %                     A function handle is also allowed, in which case the
 %                     value use for needle is the function applied to
 %                     the corresponding value in ds.a.fdim.values.
+%   dim               If the last argument, it sets the dimension along
+%                     which dim_label has to be found. If omitted it
+%                     finds the dimension in the dataset
 %
 % Output:
 %   msk               boolean array of the same size as haystack, with
@@ -122,38 +125,24 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
         cosmo_check_dataset(ds);
     end
 
+    dim=[];
+    has_dim=nargin>3 && mod(nargin,2)==0;
+    if has_dim
+        dim=varargin{end};
+        if ~isnumeric(dim) || (dim~=1 && dim~=2)
+            error(['odd number of arguments; last (dim) argument '...
+                    'must be 1 or 2']);
+        end
+    end
+
     if ischar(dim_label)
-        % get value for needle and haystack
-        cosmo_isfield(ds,{'a.fdim.labels','a.fdim.values'},true);
-
-        dim=cosmo_match(ds.a.fdim.labels,dim_label);
-
-        if isempty(dim)
-            error('Unknown dimension %s in ds.a.fdim.labels', dim_label);
-        end
-
-        vs=ds.a.fdim.values{dim};
-        if isa(dim_values,'function_handle')
-            if isnumeric(vs)
-                match_mask=dim_values(vs);
-            else
-                match_mask=cellfun(dim_values,vs,'UniformOutput',true);
-            end
-        else
-            match_mask=cosmo_match(ds.a.fdim.values{dim},dim_values);
-        end
-
-        % set new value based on indices of the matching mask
-        dim_values=find(match_mask);
-        dim_label=ds.fa.(ds.a.fdim.labels{dim});
+        [dim_label, dim_values]=match_single_dim(ds, dim_label, ...
+                                                    dim_values, dim);
     end
 
     msk=cosmo_match(dim_label, dim_values);
 
     if nargin>3
-        if mod(nargin,2)~=1
-            error('Number of input arguments should be odd')
-        end
         me=str2func(mfilename());
         msk_other=me(ds, varargin{:});
 
@@ -165,3 +154,34 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
         % conjunction mask
         msk=msk & msk_other;
     end
+
+
+function [dim_label, dim_values]=match_single_dim(ds, dim_label, ...
+                                                            dim_values, dim)
+    has_dim=~isempty(dim);
+
+    % get value for needle and haystack
+    [dim_, index, attr_name, dim_name]=cosmo_dim_find(ds, ...
+                                                dim_label, true);
+    if has_dim && dim_~=dim
+        error('dim specified as %d, but found %s in dim %d',...
+                dim, dim_label, dim_);
+    else
+        dim=dim_;
+    end
+
+    vs=ds.a.(dim_name).values{index};
+    if isa(dim_values,'function_handle')
+        if isnumeric(vs)
+            match_mask=dim_values(vs);
+        else
+            match_mask=cellfun(dim_values,vs,'UniformOutput',true);
+        end
+    else
+        match_mask=cosmo_match(vs,dim_values);
+    end
+
+    % set new value based on indices of the matching mask
+    dim_values=find(match_mask);
+    dim_label=ds.fa.(ds.a.fdim.labels{index});
+
