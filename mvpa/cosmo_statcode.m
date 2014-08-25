@@ -366,10 +366,10 @@ function codes=get_codes(package)
                       'Zscore',0;
                       '',0; % lots of undefined codes here
                       '',0;
-                      '',0
                       '',0;
                       '',0;
-                      '',0
+                      '',0;
+                      '',0;
                       '',0;
                       '',0;
                       '',0;
