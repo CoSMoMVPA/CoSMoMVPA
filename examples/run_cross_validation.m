@@ -39,7 +39,7 @@ for k=1:nclassifiers
 
     confusion_matrix=cosmo_confusion_matrix(ds, pred);
     % <@@<
-    figure
+    figure();
     imagesc(confusion_matrix,[0 10])
     title(sprintf('%s: %.3f', strrep(func2str(classifier),'_',' '), accuracy))
 
