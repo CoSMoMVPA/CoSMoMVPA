@@ -47,6 +47,9 @@ ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
 % Combine even and odd runs
 ds_odd_even=cosmo_stack({ds_odd, ds_even});
 
+% remove constant features
+ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
+
 % print dataset
 fprintf('Dataset input:\n');
 cosmo_disp(ds_odd_even);
@@ -90,6 +93,9 @@ for subject_num=1:nsubjects
 
     % Combine even and odd runs
     ds_odd_even=cosmo_stack({ds_odd, ds_even});
+    
+    % remove constant features
+    ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
     ds_corr=cosmo_correlation_measure(ds_odd_even);
 
@@ -170,6 +176,9 @@ for j=1:nmasks
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
+    % remove constant features
+    ds=cosmo_remove_useless_data(ds);                    
+                    
     % print dataset
     fprintf('Dataset input:\n');
     cosmo_disp(ds);
@@ -179,7 +188,7 @@ for j=1:nmasks
 
     % print dataset
     fprintf('Partitions:\n');
-    cosmo_disp(ds_odd_even);
+    cosmo_disp(partitions);
 
     for k=1:nclassifiers
         classifier=classifiers{k};

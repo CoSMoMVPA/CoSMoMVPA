@@ -8,6 +8,8 @@ data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
                      'mask', [data_path '/vt_mask.nii']);
 
+% remove constant features
+ds=cosmo_remove_useless_data(ds);                        
 
 %% set the targets and chunks
 ds.sa.targets = repmat((1:6)',10,1);

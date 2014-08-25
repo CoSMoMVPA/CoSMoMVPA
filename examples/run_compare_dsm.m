@@ -32,8 +32,10 @@ for m = 1:length(masks)
 
         % compute average for each unique target
         ds=cosmo_fx(ds_full, @(x)mean(x,1), 'targets', 1);
-
-
+        
+        
+        % remove constant features
+        ds=cosmo_remove_useless_data(ds);    
 
         % demean
         % Comment this out to see the effects of demeaning vs. not

@@ -25,6 +25,9 @@ ds.sa.chunks=floor(((1:60)-1)'/6)+1;
 
 % <@@<
 
+% remove constant features
+ds=cosmo_remove_useless_data(ds);    
+
 %% Set the sample indices that correspond to primates and bugs
 
 % >@@>

@@ -24,6 +24,10 @@ vt_ds=cosmo_fx(vt_ds, @(x)mean(x,1), 'targets', 1);
 ev_ds=cosmo_fx(ev_ds, @(x)mean(x,1), 'targets', 1);
 
 
+% remove constant features
+vt_ds=cosmo_remove_useless_data(vt_ds);    
+ev_ds=cosmo_remove_useless_data(ev_ds);    
+
 
 % Use pdist with correlation distance to get DSMs
 % >@@>

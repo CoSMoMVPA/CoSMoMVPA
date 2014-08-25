@@ -11,6 +11,9 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'chunks',floor(((1:60)-1)/6)+1);
 
 
+% remove constant features
+ds=cosmo_remove_useless_data(ds);    
+                    
 opt=struct();
 opt.child_classifier=@cosmo_classify_naive_bayes;
 opt.feature_selector=@cosmo_anova_feature_selector;
