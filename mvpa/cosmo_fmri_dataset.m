@@ -296,7 +296,7 @@ function img_format=find_img_format(filename, img_formats)
             end
         end
     end
-    error('Could not find image format for "%s"', filename)
+    error('Could not find image format for "%s"', filename);
 
 function mask=get_mask(ds, mask_param)
     if isempty(mask_param)
@@ -310,7 +310,7 @@ function mask=get_mask(ds, mask_param)
 
     else
         if islogical(mask_param)
-            assert(mask_param)
+            assert(mask_param);
             mask_param='-auto';
         end
 
@@ -548,7 +548,7 @@ function vol=get_vol_nii(hdr, show_warning)
         % after permutation each column and row should have exactly one 1
         one_vec=ones(1,4);
         assert(isequal(sum(permute_dim_mat,1),one_vec) && ...
-                        isequal(sum(permute_dim_mat,2),one_vec'))
+                        isequal(sum(permute_dim_mat,2),one_vec'));
 
 
         % apply dimension permutation & reflections
