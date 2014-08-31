@@ -1,5 +1,5 @@
 function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test, opt)
-% nearest neighbor classifier
+% k-nearest neighbor classifier
 %
 % predicted=cosmo_classify_nn(samples_train, targets_train, samples_test[, opt])
 %
@@ -9,9 +9,13 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
 %   samples_test       QxR test data
 %   opt                struct with field:
 %     .knn             Number of nearest neighbors to be considered
+%     .norm            distance norm (default: 2)
 %
 % Output:
-%   predicted          Qx1 predicted data classes for samples_test
+%   predicted          Qx1 predicted data classes for samples_test. Each
+%                      predicted sample is laballed as having the most
+%                      samples in the training set within the nearest
+%                      opt.knn samples.
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',15);
