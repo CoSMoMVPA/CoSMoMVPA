@@ -22,6 +22,15 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %   - if this function raises an exception for partitions, consider running
 %     partitions=cosmo_balance_partitions(partitions,...).
 %
+% Examples:
+%     ds=struct();
+%     ds.samples=zeros(9,2);
+%     ds.sa.targets=[1 1 2 2 2 3 3 3 3]';
+%     ds.sa.chunks=[1 2 2 1 1 1 2 2 2]';
+%     partitions=cosmo_nfold_partitioner(ds);
+%     cosmo_check_partitions(partitions,ds);
+%     > error
+%
 % See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
 % NNO Jan 2014
@@ -43,11 +52,6 @@ function cosmo_check_partitions(partitions, ds, varargin)
     cosmo_check_dataset(ds);
 
     % ensure it has targets and chunks
-    if ~isfield(ds,'sa') || ~isfield(ds.sa,'targets') || ...
-            ~isfield(ds.sa,'targets')
-        error('dataset requires .sa.{chunks,targets}');
-    end
-
     targets=ds.sa.targets;
     chunks=ds.sa.chunks;
 
