@@ -9,8 +9,8 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %                   characters that are interpreted by sprintf; for
 %                   example '\t', '\n' and '\\' represent a tab, newline
 %                   and backslash character, respectively.
-%                   If omitted, then the string is split based on
-%                   whitespaces occuring in string
+%                   If omitted or equal to [], then the string is split
+%                   based on whitespaces occuring in string
 %
 %   pos             (optional) a single index indicating which split part
 %                   should be returned. If string is split in N elements,
@@ -73,7 +73,7 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %
 % NNO Sep 2013
 
-if nargin<2
+if nargin<2 || isequal(delim,[])
     % split by white-space
     split=regexp(string,'(\S)*','match');
     nsplit=numel(split);
