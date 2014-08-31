@@ -23,6 +23,82 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %   pred                Qx1 array with predicted class labels.
 %                       elements with no predictions have the value NaN.
 %
+% Examples:
+%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
+%     %
+%     % use take-1-chunk for testing crossvalidation
+%     partitions=cosmo_nfold_partitioner(ds);
+%     classifier=@cosmo_classify_naive_bayes;
+%     % run crossvalidation
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
+%     % show targets, predicted labels, and accuracy
+%     disp([ds.sa.targets pred])
+%     >      1     1
+%     >      2     3
+%     >      3     3
+%     >      1     3
+%     >      2     3
+%     >      3     3
+%     >      1     1
+%     >      2     2
+%     >      3     2
+%     >      1     1
+%     >      2     3
+%     >      3     3
+%     disp(accuracy)
+%     >     0.5833
+%     %
+%     % use take-2-chunks out for testing crossvalidation
+%     partitions=cosmo_nchoosek_partitioner(ds,2);
+%     classifier=@cosmo_classify_lda;
+%     % run crossvalidation
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
+%     % show targets, predicted labels, and accuracy
+%     disp([ds.sa.targets pred])
+%     >      1     1
+%     >      2     2
+%     >      3     3
+%     >      1     1
+%     >      2     2
+%     >      3     3
+%     >      1     1
+%     >      2     2
+%     >      3     3
+%     >      1     1
+%     >      2     2
+%     >      3     1
+%     disp(accuracy)
+%     >     0.9167
+%     %
+%     % as the example above, but use z-scoring on each training set
+%     % and apply the estimated mean and std to the test set.
+%     opt=struct();
+%     opt.normalization='zscore';
+%     % run crossvalidation
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions, opt);
+%     % show targets, predicted labels, and accuracy
+%     disp([ds.sa.targets pred])
+%     >      1     1
+%     >      2     2
+%     >      3     3
+%     >      1     2
+%     >      2     2
+%     >      3     3
+%     >      1     1
+%     >      2     2
+%     >      3     2
+%     >      1     1
+%     >      2     2
+%     >      3     1
+%     disp(accuracy)
+%     >     0.7500
+%
+% Notes:
+%   - to apply this to a dataset struct as a measure (for searchlights),
+%     consider using cosmo_crossvalidation_measure
+%
+% See also: cosmo_crossvalidation_measure
+%
 % NNO Aug 2013
     if nargin<4,opt=struct(); end
     if ~isfield(opt, 'normalization'), opt.normalization=[]; end
