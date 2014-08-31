@@ -106,7 +106,7 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 
     if ~isempty(opt.normalization);
         normalization=opt.normalization;
-        opt.autoscale=false; % for {matlab,lib}svm classifiers
+        opt.autoscale=false; % disable for {matlab,lib}svm classifiers
     else
         normalization=[];
     end
