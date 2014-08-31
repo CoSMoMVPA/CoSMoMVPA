@@ -13,7 +13,7 @@ ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
 % <@@<
 
 % remove constant features
-ds=cosmo_remove_useless_data(ds);    
+ds=cosmo_remove_useless_data(ds);
 
 % Set the targets and the chunks
 % >@@>

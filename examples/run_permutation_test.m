@@ -18,8 +18,8 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
 
 
 % remove constant features
-ds=cosmo_remove_useless_data(ds);                        
-                    
+ds=cosmo_remove_useless_data(ds);
+
 % Only consider four classes (otherwise the classifier does extremily well)
 ds=cosmo_slice(ds,ds.sa.targets<=4);
 

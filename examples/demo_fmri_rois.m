@@ -93,7 +93,7 @@ for subject_num=1:nsubjects
 
     % Combine even and odd runs
     ds_odd_even=cosmo_stack({ds_odd, ds_even});
-    
+
     % remove constant features
     ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
@@ -177,8 +177,8 @@ for j=1:nmasks
                         'chunks',floor(((1:60)-1)/6)+1);
 
     % remove constant features
-    ds=cosmo_remove_useless_data(ds);                    
-                    
+    ds=cosmo_remove_useless_data(ds);
+
     % print dataset
     fprintf('Dataset input:\n');
     cosmo_disp(ds);
