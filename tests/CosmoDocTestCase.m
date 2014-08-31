@@ -8,7 +8,7 @@ classdef CosmoDocTestCase < TestCase
 %            evaluating 'expr' after evaluating the expressions in
 %            'preamb'
 %  filename: name of the file in which the doctest was found
-%  line_number: position in tile where the doctest was found
+%  line_number: position in file where the doctest was found
 %
 % Notes:
 %   - Typically test cases are generated using CosmoDocTestSuite, or run
@@ -127,11 +127,25 @@ function run_doctest(preamb, expr, wants, filename, line)
             end
 
             [ve,me]=CosmoDocTestCase__evalc(to_evaluate);
-            if ~isequal(me,[])
+            exception_was_thrown=~isequal(me,[]);
+
+            preamble_exception=~preamble_with_expr && exception_was_thrown;
+            wrong_exception=preamble_with_expr && ...
+                            exception_was_thrown && ...
+                            ~exception_is_wanted(wants);
+
+            if preamble_exception || wrong_exception
                 % exception was thrown
                 failed=true;
-                msg=sprintf('Expression cannot be evaluated:\n%s\n%s',...
-                            to_evaluate,me.getReport);
+                if exception_was_thrown
+                    msg=sprintf(['Expression cannot be evaluated:'...
+                                '\n%s\n%s'],...
+                                to_evaluate,me.getReport);
+                else
+                    msg=sprintf(['Exception not thrown:\n\nExpected:'...
+                                '\n%s\n\nGot:\n%s\n']...
+                                ,wants,to_evaluate);
+                end
                 break;
             end
 
@@ -196,6 +210,11 @@ function cmp=doctest_compare(found, wanted)
     % not-so-stringent comparison of found (output from evaluting an
     % expression) and wanted (an expected output string)
 
+    if isequal(found,[])
+        cmp=exception_is_wanted(wanted);
+        return
+    end
+
     % remove ' ans = ' line if present
     found=without_ans(found);
 
@@ -221,12 +240,22 @@ function cmp=doctest_compare(found, wanted)
     end
 
     [evw,me]=CosmoDocTestCase__evalc(wanted);
-    no_exception_was_thrown=isequal(me,[]);
-    cmp=no_exception_was_thrown && isequal(found,without_ans(evw));
+    exception_was_thrown=~isequal(me,[]);
+
+    cmp=(~exception_was_thrown && isequal(found,without_ans(evw))) || ...
+            exception_was_thrown && exception_is_wanted(wanted);
+
+end
+
+function tf=exception_is_wanted(wanted)
+    prefix=cosmo_strsplit(wanted,[],1,'(',1);
+
+    tf=isequal(strtrim(prefix), 'error');
 end
 
 function t=without_ans(s)
     % remove ' ans = ' string that matlab prints when evaluating an
     % expression with semicolon
+
     t=regexprep(s,sprintf('^\nans = ?\n\n'),'');
 end
