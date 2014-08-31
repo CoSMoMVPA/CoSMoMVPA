@@ -32,6 +32,17 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
 %     >      3     5
 %     >      4     1
 %     >      5     5
+%     %
+%     opt.norm=1; % city-block distance
+%     pred=cosmo_classify_knn(tr.samples,tr.sa.targets,te.samples,opt);
+%     % show targets and predicted labels (40% accuracy)
+%     disp([te.sa.targets pred])
+%     >
+%     >      1     4
+%     >      2     2
+%     >      3     5
+%     >      4     4
+%     >      5     5
 %
 % Notes:
 %   - in the case of knn=1, this function is identical to cosmo_classify_nn
@@ -71,7 +82,7 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
         % >@@>
         delta=bsxfun(@minus, samples_train, samples_test(k,:));
 
-        pow_distance=sum(delta.^norm_,2);
+        pow_distance=sum(abs(delta).^norm_,2);
 
         [unused, i]=sort(pow_distance);
         all_predicted(k, 1:knn)=i(1:knn);
