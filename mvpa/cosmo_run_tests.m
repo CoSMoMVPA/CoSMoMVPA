@@ -151,15 +151,24 @@ function did_pass=cosmo_run_tests(varargin)
     mvpa_func='cosmo_fmri_dataset';
     test_subdir=fullfile('..','tests');
 
-    mvpa_dir=fileparts(which(mvpa_func));
-    test_dir=fullfile(mvpa_dir,test_subdir);
+    doctest_dir=fileparts(which(mvpa_func));
+    unittest_dir=fullfile(doctest_dir,test_subdir);
 
-    if isempty(opt.filename)
-        test_location=test_dir;
-        mvpa_location=mvpa_dir;
+    has_filename=~isempty(opt.filename);
+    if has_filename
+        unittest_location=opt.filename;
+        doctest_location=opt.filename;
+
+        filename_dir=which(opt.filename);
+        is_in_dir=@(parent, fn) ~isempty(strmatch(parent,fileparts(fn)));
+        has_unittest=is_in_dir(unittest_dir,filename_dir);
+        has_doctest=is_in_dir(doctest_dir,filename_dir);
     else
-        test_location=opt.filename;
-        mvpa_location=opt.filename;
+        unittest_location=unittest_dir;
+        doctest_location=doctest_dir;
+
+        has_unittest=true;
+        has_doctest=true;
     end
 
     % if opt.output is numeric it's assumed to be a file descriptor;
@@ -178,18 +187,27 @@ function did_pass=cosmo_run_tests(varargin)
 
     % avoid setting the path for CosmoDocTest{Case,Suite} classes;
     % instead, cd to the tests directory and run the tests from there.
-    cd(test_dir);
+    cd(unittest_dir);
+
+    suite=TestSuite();
 
     % collect unit tests
-    suite=TestSuite.fromName(test_location);
-    fprintf(fid, 'Unit test suite: %d tests\n',suite.numTestCases);
+    if has_unittest
+        unittest_suite=TestSuite.fromName(unittest_location);
+        suite.add(unittest_suite);
+        fprintf(fid, 'Unit test suite: %d tests\n',suite.numTestCases);
+    else
+        fprintf(fid, 'Unit test suite: no tests for %s\n', opt.filename);
+    end
 
     % collect doc tests
-    doc_suite=CosmoDocTestSuite(mvpa_location);
-    fprintf(fid, 'Doc test suite: %d tests\n',doc_suite.numTestCases);
-
-    % combine the tests
-    suite.add(doc_suite);
+    if has_doctest
+        doctest_suite=CosmoDocTestSuite(doctest_location);
+        suite.add(doctest_suite);
+        fprintf(fid, 'Doc test suite: %d tests\n',suite.numTestCases);
+    else
+        fprintf(fid, 'Doc test suite: no tests for %s\n', opt.filename);
+    end
 
     % build unit test monitor
     if opt.verbose
