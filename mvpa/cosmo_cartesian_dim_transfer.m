@@ -15,33 +15,25 @@ function ds_res=cosmo_cartesian_dim_transfer(ds, dim_label, measure, varargin)
     defaults=struct();
     defaults.args=struct();
     defaults.progress=10;
+    defaults.balance_partitions.nsets=1;
     opt=cosmo_structjoin(defaults, varargin);
 
-    sl_measure=@(x,y) dim_transfer_measure_wrapper(x, dim_label, measure, y);
+    % wrapper function that acts like a measure
+    cdt_measure=@(x,y) dim_transfer_measure_wrapper(x, dim_label, measure, y);
 
     if ~isfield(opt, 'nbrhood') || isempty(opt.nbrhood)
         opt.args.progress=opt.progress;
-        ds_res=sl_measure(ds, opt.args);
+        ds_res=cdt_measure(ds, opt.args);
         ds_res.a.fdim.values=cell(0);
         ds_res.a.fdim.labels=cell(0);
         ds_res.fa=struct();
     else
-        ds_res=cosmo_searchlight(ds, sl_measure, opt);
+        ds_res=cosmo_searchlight(ds, cdt_measure, opt);
     end
 
 
 function res=dim_transfer_measure_wrapper(ds, dim_label, measure, opt)
-    [train_sp, test_sp, is_transposed]=get_data_split(ds, dim_label);
-
-    if isfield(opt,'nbrhood') && is_transposed
-        error(['dim_label ''%s'' is a feature dimension, this is '...
-                    'incompatible with the ''nbrhood'' option. To '...
-                    'use the ''nbrhood'' option, use \n\n'...
-                    '  ds_tr=cosmo_dim_transpose(ds, ''%s'', 1)\n\n'...
-                    'and use ds_tr as the input for this function'],...
-                    dim_label, dim_label);
-    end
-
+    [train_sp, test_sp]=get_data_split(ds, dim_label);
     res=single_dim_transfer(train_sp, test_sp, dim_label, measure, opt);
 
 
@@ -60,10 +52,7 @@ function tf=has_dim_label(ds, dim_label, dim)
     tf=any(cosmo_match({dim_label},labels));
 
 function [dst, is_transposed]=ds_with_sdim(ds, dim_label)
-    if has_dim_label(ds, dim_label, 2)
-        dst=cosmo_dim_transpose(ds, dim_label, 1);
-        is_transposed=true;
-    elseif has_dim_label(ds, dim_label, 1)
+    if has_dim_label(ds, dim_label, 1)
         is_transposed=false;
         dst=ds;
     else
@@ -93,10 +82,13 @@ function [train_sp, test_sp, is_transposed]=get_data_split(ds, dim_label)
 
     [train_ds, train_is_transposed]=ds_with_sdim(train_ds, dim_label);
     [test_ds, test_is_transposed]=ds_with_sdim(test_ds, dim_label);
-    is_transposed=train_is_transposed || test_is_transposed;
 
     % see if they are compatible
-    cosmo_stack({cosmo_slice(train_ds,1),cosmo_slice(test_ds,1)});
+    stacked=cosmo_stack({cosmo_slice(train_ds,1),cosmo_slice(test_ds,1)});
+
+    if ~has_dim_label(ds, dim_label, 1)
+        error('missing dimension label %s for samples', dim_label);
+    end
 
     train_chunk=unique_chunk(train_ds);
     test_chunk=unique_chunk(test_ds);
@@ -111,8 +103,8 @@ function [train_sp, test_sp, is_transposed]=get_data_split(ds, dim_label)
     train_sp=cosmo_split(train_ds,dim_label,1);
     test_sp=cosmo_split(test_ds,dim_label,1);
 
-    ensure_same_size(train_sp, dim_label);
-    ensure_same_size(test_sp, dim_label);
+    ensure_splits_have_same_size(train_sp, dim_label);
+    ensure_splits_have_same_size(test_sp, dim_label);
 
 function ds=single_dim_transfer(train_sp, test_sp, dim_label, measure, opt)
     show_progress=isfield(opt,'progress') && ~isempty(progress);
@@ -134,7 +126,6 @@ function ds=single_dim_transfer(train_sp, test_sp, dim_label, measure, opt)
         prev_msg='';
         clock_start=clock();
     end
-
 
     for k=1:ntrain
         x=train_sp{k};
@@ -215,7 +206,7 @@ function unq=unique_chunk(ds)
         error('%d unique values for .sa.chunks found, expected 1', n);
     end
 
-function ensure_same_size(sp, dim_label)
+function ensure_splits_have_same_size(sp, dim_label)
     ns=cellfun(@numel,sp);
     msk=ns~=ns(1);
     if any(msk);
