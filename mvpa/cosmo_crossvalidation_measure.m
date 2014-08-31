@@ -3,7 +3,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %
 % accuracy = cosmo_cross_validation_accuracy_measure(dataset, args)
 %
-% Inputs
+% Inputs:
 %   dataset             struct with fields .samples (PxQ for P samples and
 %                       Q features) and .sa.targets (Px1 labels of samples)
 %   args                struct containing classifier, partitions, and
@@ -24,7 +24,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
 %
-% Output
+% Output:
 %    ds_sa        Struct with fields:
 %      .samples   Scalar with classification accuracy.
 %      .sa        Struct with field:
@@ -34,6 +34,59 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       .targets     } Px1 real and predicted labels of
 %                       .predictions } each sample
 %
+% Examples:
+%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
+%     %
+%     % use take-1-chunk for testing crossvalidation
+%     opt=struct();
+%     opt.partitions=cosmo_nfold_partitioner(ds);
+%     opt.classifier=@cosmo_classify_naive_bayes;
+%     % run crossvalidation and return accuracy (the default)
+%     acc_ds=cosmo_crossvalidation_measure(ds,opt);
+%     cosmo_disp(acc_ds);
+%     > .samples
+%     >   [ 0.583 ]
+%     > .sa
+%     >   .labels
+%     >     { 'accuracy' }
+%     %
+%     % let the measure return predictions instead of accuracy,
+%     % and use take-2-chunks out for testing crossvalidation
+%     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
+%     opt.output='predictions';
+%     pred_ds=cosmo_crossvalidation_measure(ds,opt);
+%     cosmo_disp(pred_ds);
+%     > .sa
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       3
+%     >       :
+%     >       1
+%     >       2
+%     >       3 ]@12x1
+%     > .samples
+%     >   [ 1
+%     >     3
+%     >     2
+%     >     :
+%     >     1
+%     >     3
+%     >     3 ]@12x1
+%     >
+%     %
+%     % return accuracy, but use z-scoring on each training set
+%     % and apply the estimated mean and std to the test set.
+%     opt.output='accuracy';
+%     opt.normalization='zscore';
+%     z_acc_ds=cosmo_crossvalidation_measure(ds,opt);
+%     cosmo_disp(z_acc_ds);
+%     >
+%
+% Notes:
+%   - using this function, crossvalidation can be run using a searchlight
+%
+% See also: cosmo_searchlight
 %
 % ACC. Modified to conform to signature of generic datset 'measure'
 % NNO Aug 2013 made this a wrapper function
