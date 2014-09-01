@@ -1,4 +1,4 @@
-function cosmo_check_partitions(partitions, ds, varargin)
+function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 % check whether partitions are balanced and not double-dippy
 %
 % cosmo_check_partitions(partitions, ds, varargin)
@@ -11,6 +11,8 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %     .unbalanced_partitions_ok    if set to true, then unbalanced
 %                                  partitions (with a different number of
 %                                  targets of each class in a chunk) is ok
+% Output:
+%    is_ok      boolean, true if partitions are ok
 %
 % Throws:
 %   - an error if partitions are double dippy or (unless specified in opt)
@@ -27,13 +29,30 @@ function cosmo_check_partitions(partitions, ds, varargin)
 %     ds.samples=zeros(9,2);
 %     ds.sa.targets=[1 1 2 2 2 3 3 3 3]';
 %     ds.sa.chunks=[1 2 2 1 1 1 2 2 2]';
+%     % make unbalanced partitions
 %     partitions=cosmo_nfold_partitioner(ds);
 %     cosmo_check_partitions(partitions,ds);
-%     > error
+%     > error('Unbalance in partition 1 [...]')
+%     %
+%     % disable unbalanced check
+%     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
+%     > true
+%     %
+%     % balance partitions and check without unbalanced check
+%     partitions=cosmo_balance_partitions(partitions,ds);
+%     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
+%     > true
+%     %
+%     % make the partitions double dippy
+%     partitions.train_indices{1}=partitions.test_indices{1};
+%     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
+%     > error('double dipping in fold 1: chunk 1 is in train and test set')
 %
 % See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
 % NNO Jan 2014
+
+    is_ok=false;
 
     % process input arguments
     defaults=struct();
@@ -95,10 +114,10 @@ function cosmo_check_partitions(partitions, ds, varargin)
                      'Probably a mistake was made setting .sa.chunks '...
                      'or .sa.targets\n'...
                      '(3) you *really* know what you are doing: '...
-                     'you would be comfortable writing your own '...
-                     'bootstrapping algorithm to estimate the cdf of '...
-                     'your measure of interest under some null '...
-                     'hypothesis. You can set '...
+                     'as a litmus test, you would be comfortable '...
+                     'implementing a bootstrapping algorithm to '...
+                     'estimate the cdf of your measure of interest '...
+                     'under some null hypothesis. You can set '...
                      'unbalanced_partitions_ok to true as an option'],...
                       k, classes(1), h(1), classes(idx), h(idx));
             end
@@ -116,3 +135,5 @@ function cosmo_check_partitions(partitions, ds, varargin)
             end
         end
     end
+
+    is_ok=true;
