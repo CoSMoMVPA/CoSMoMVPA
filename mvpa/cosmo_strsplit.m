@@ -76,12 +76,11 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 if nargin<2 || isequal(delim,[])
     % split by white-space
     split=regexp(string,'(\S)*','match');
-    nsplit=numel(split);
-    return
+else
+    pat=regexptranslate('escape',sprintf(delim));
+    split=regexp(string,pat,'split');
 end
 
-pat=regexptranslate('escape',sprintf(delim));
-split=regexp(string,pat,'split');
 nsplit=numel(split);
 
 if nargin>2
