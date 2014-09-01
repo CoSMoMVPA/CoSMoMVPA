@@ -48,7 +48,7 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     disp(accuracy)
 %     >     0.5833
 %     %
-%     % use take-2-chunks out for testing crossvalidation
+%     % use take-2-chunks out for testing crossvalidation, LDA classifier
 %     partitions=cosmo_nchoosek_partitioner(ds,2);
 %     classifier=@cosmo_classify_lda;
 %     % run crossvalidation
