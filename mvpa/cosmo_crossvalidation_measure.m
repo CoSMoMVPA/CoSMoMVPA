@@ -49,11 +49,15 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     > .sa
 %     >   .labels
 %     >     { 'accuracy' }
-%     %
+%
 %     % let the measure return predictions instead of accuracy,
-%     % and use take-2-chunks out for testing crossvalidation
+%     % and use take-2-chunks out for testing crossvalidation;
+%     % use LDA classifer
+%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
+%     opt=struct();
 %     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
 %     opt.output='predictions';
+%     opt.classifier=@cosmo_classify_lda;
 %     pred_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(pred_ds);
 %     > .sa
@@ -67,21 +71,29 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     >       3 ]@12x1
 %     > .samples
 %     >   [ 1
-%     >     3
 %     >     2
+%     >     3
 %     >     :
 %     >     1
-%     >     3
-%     >     3 ]@12x1
+%     >     2
+%     >     1 ]@12x1
 %     >
 %     %
 %     % return accuracy, but use z-scoring on each training set
 %     % and apply the estimated mean and std to the test set.
+%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
+%     opt=struct();
 %     opt.output='accuracy';
 %     opt.normalization='zscore';
+%     opt.classifier=@cosmo_classify_lda;
+%     opt.partitions=cosmo_nchoosek_partitioner(ds,1);
 %     z_acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(z_acc_ds);
-%     >
+%     > .samples
+%     >   [ 0.417 ]
+%     > .sa
+%     >   .labels
+%     >     { 'accuracy' }
 %
 % Notes:
 %   - using this function, crossvalidation can be run using a searchlight
