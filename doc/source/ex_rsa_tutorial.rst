@@ -72,7 +72,7 @@ will need to use matlab's subplot function for this.
 
 Hint: :ref:`run_rsa_visualize_skl`.
 
-Solution: ref:`run_rsa_visualize`.
+Solution: :ref:`run_rsa_visualize`.
 
 Now using the script you wrote to visualize EV and LV, go through the set of
 subjects and see how the patterns change for different subjects. What trends do
