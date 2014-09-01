@@ -8,6 +8,7 @@ CoSMo 2013 Multivariate Pattern Analysis Workshop
 *note: these exercises were presented at the CoSMo 2013 workshop in Kingston, Ontario, Canada*
 
 Contents:
+--------
 
 .. toctree::
     :maxdepth: 2
