@@ -22,6 +22,7 @@ import sys
 from os.path import join, split, getmtime, isfile
 matlab_dir='../mvpa'
 example_dir='../examples'
+test_dir='../tests'
 
 output_root_abs='source'
 output_index_abs=output_root_abs
@@ -161,10 +162,11 @@ class RSTType(object):
     def get_name(self):
         return dict(demo='Demonstrations',
                     run='Runnable examples',
-                    cosmo='CoSMoMVPA functions')[self.prefix]
+                    cosmo='CoSMoMVPA functions',
+                    test='CoSMoMVPA unit tests')[self.prefix]
 
     def get_postfix(self):
-        return '' if self.prefix is 'cosmo' else '_'+self.prefix
+        return '' if self.prefix == 'cosmo' else '_'+self.prefix
 
 
     def needs_full_include(self):
@@ -201,7 +203,8 @@ def is_newer(fn, other_fn):
 
 rst_types=(RSTType('demo',[None]),
            RSTType('run',[None,'skl']),
-           RSTType('cosmo',[None,'hdr','skl']))
+           RSTType('cosmo',[None,'hdr','skl']),
+           RSTType('test',[None]))
 
 def as_table(data):
     lengths=[max(map(len,x)) for x in zip(*data)]
@@ -210,8 +213,9 @@ def as_table(data):
     return '\n'.join([t]+map(' '.join,map(fill,data))+[t])
     
 
+all_input_dirs=[matlab_dir, example_dir, test_dir]
 
-all_fns=sum([glob.glob(join(d,'*.m')) for d in [matlab_dir, example_dir]],[])
+all_fns=sum([glob.glob(join(d,'*.m')) for d in all_input_dirs],[])
 all_fns.sort()
 
 for output in ('hdr','skl',None):
