@@ -28,6 +28,15 @@ Contents:
 
 Matlab outputs: matlab_pb_toc_
 
+Miscellaneous
+-------------
+
+.. toctree::
+    :maxdepth: 1
+
+    modindex_test
+    modindex_demo
+
 Indices and tables
 ==================
 
