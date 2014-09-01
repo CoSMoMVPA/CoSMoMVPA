@@ -13,15 +13,18 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
 %   predicted          Qx1 predicted data classes for samples_test
 %
 % Example:
-%     ds=cosmo_synthetic_dataset();
+%     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',15);
 %     test_chunk=1;
 %     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
 %     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
 %     pred=cosmo_classify_nn(tr.samples,tr.sa.targets,te.samples,struct);
-%     % note: the second sample is misclassified as 1 (instead of 2)
-%     disp(pred)
-%     > 1
-%     > 1
+%     % show targets and predicted labels (40% accuracy)
+%     disp([te.sa.targets pred])
+%     >      1     1
+%     >      2     3
+%     >      3     5
+%     >      4     5
+%     >      5     5
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
