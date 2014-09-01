@@ -37,7 +37,6 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
 %     pred=cosmo_classify_knn(tr.samples,tr.sa.targets,te.samples,opt);
 %     % show targets and predicted labels (40% accuracy)
 %     disp([te.sa.targets pred])
-%     >
 %     >      1     4
 %     >      2     2
 %     >      3     5
