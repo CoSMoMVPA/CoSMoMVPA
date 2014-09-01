@@ -8,3 +8,5 @@ datadb.zip
 .git.bfg-report
 *.md.sw?
 octave-workspace
+git_log.txt
+git_summary.txt

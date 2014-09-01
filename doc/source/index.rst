@@ -51,6 +51,10 @@ CoSMoMVPA
 .. image:: _static/icon_thanks.png
    :target: thanks.html
 
+.. include:: _static/git_summary.txt
+
+
+.. _matlab_pb_toc: _static/publish/index.html
 
 
 Indices and tables
@@ -60,4 +64,3 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. _matlab_pb_toc: _static/publish/index.html
