@@ -213,6 +213,23 @@ class CommitLogEntry(object):
 
         return CommitLogEntry(preamble, message, files_changed, stats)
 
+    def rst_preamble(self):
+        preamble='\n'.join(self.preamble)
+        prefix='commit '
+        if preamble.startswith(prefix):
+            remainder=preamble[len(prefix):]
+            hash_=remainder.split('\n')[0]
+
+            url='https://github.com/CoSMoMVPA/CoSMoMVPA/commit/%s' % hash_
+            ref='`%s <%s>`_' % (hash_, url)
+
+            return prefix+ref+remainder[len(hash_):]
+        else:
+            return preamble
+
+
+
+
     def rst_message(self):
         m='\n'.join(self.message)
         indent_count=len(m)-len(m.lstrip())
@@ -224,7 +241,7 @@ class CommitLogEntry(object):
     def rst_str(self):
         files_lines=[f.rst_str() for f in self.files_changed]
 
-        lines=self.preamble + [''] + \
+        lines=[self.rst_preamble()] + [''] + \
                 [self.rst_message()] + [''] + \
                 files_lines + \
                 self.stats + ['','']
