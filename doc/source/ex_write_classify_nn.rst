@@ -18,12 +18,12 @@ Full solution: :ref:`cosmo_classify_nn`
 
 Extra exercise: write a nearest-mean classifier.
 
-Extra exercise: Try correlation instead of Euclidian distance. 
+Extra exercise: Try correlation instead of Euclidian distance.
 
 Advanced exercise: write a k-nearest neighbor classifier that considers the nearest k neighbors for each test sample. Bonus points if this classifier uses :ref:`cosmo_winner_indices` in case of a tie. (solution: :ref:`cosmo_classify_knn`).
 
- 
-    
+
+
 
 :pb:`classify_naive_bayes`
-    
+

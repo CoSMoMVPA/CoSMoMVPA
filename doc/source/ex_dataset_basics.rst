@@ -10,7 +10,7 @@ Nifti basics
 Set CoSMoMVPA data path
 -----------------------
 Before loading any data, please make sure that your path to the example data is set properly by running ``config=cosmo_config()``,
-and see what the value is for ``config.data_path``. If your data is not stored in that location, then the easiest way to change that is to make a CoSMoMVPA configuration file. To set the configuration, just make a new file in the matlab editor and set it contents to:: 
+and see what the value is for ``config.data_path``. If your data is not stored in that location, then the easiest way to change that is to make a CoSMoMVPA configuration file. To set the configuration, just make a new file in the matlab editor and set it contents to::
 
     data_path=/Path/do/the/example/data
 
@@ -30,19 +30,19 @@ Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - wh
 Display a saggital, axial and coronal slice.
 
 Hint: :ref:`run_nifti_basics_skl`
-    
+
 Solution: :ref:`run_nifti_basics` / :pb:`nifti_basics`
 
 
 Loading datasets with different masks
 +++++++++++++++++++++++++++++++++++++
 Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
-(*glm_T_stats_allruns.nii.gz*) and applying whole brain mask (*brain_mask.nii.gz*). 
+(*glm_T_stats_allruns.nii.gz*) and applying whole brain mask (*brain_mask.nii.gz*).
 
-How many voxels are included in the whole brain mask?  
+How many voxels are included in the whole brain mask?
 
 Now load the same data with the early visual mask (*ev_mask.nii.gz*) and then with the ventral temporal mask
-(*vt_mask.nii.gz*).  How many voxels are included in those masks? 
+(*vt_mask.nii.gz*).  How many voxels are included in those masks?
 
 Hint: :ref:`run_load_datasets_skl`
 
@@ -57,7 +57,7 @@ dataset contains summary statistics (T statistics from the general linear model
 analysis, GLM) for each stimulus for each of ten runs. The runs are vertically
 stacked by run. For example, the first row contains the summary voxel-wise
 responses for monkey in run 1, the second row contains that for lemur in run 1,
-and the seventh row contains monkey from run 2, etc. 
+and the seventh row contains monkey from run 2, etc.
 
 Add samples atributes (dataset.sa) that contain numeric labels for the targets,
 aka stimulus labels, in the samples attribute field dataset.sa.targets, and add

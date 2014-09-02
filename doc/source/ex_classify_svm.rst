@@ -6,16 +6,16 @@ Build wrapper for Matlab's SVM classifier
 Wrapper for two classes
 +++++++++++++++++++++++
 
-*Notes*: 
+*Notes*:
 
 - this exercise is based on Matlab's SVM, and requires the Matlab statistics or bioinfo toolbox.
-- an alternative is using libsvm (using :ref:`cosmo_classify_libsvm`). 
+- an alternative is using libsvm (using :ref:`cosmo_classify_libsvm`).
 - to use either SVM (whichever is present), you can use :ref:`cosmo_classify_svm`.
 
 Matlab_ has an implementation of a support vector machine classifier that supports two classes. Its implementation uses
 two functions: ``svmtrain`` and ``svmclassify``. Have a look at these functions' signatures (``help svmtrain`` and ``help svmclassify``) and then write a wrapper that will have the same function signature as our
 generic classifer, but uses matlab's SVM inside.  Below is the signature and
-function header for our new function. 
+function header for our new function.
 
 Test your solution using the first part of :ref:`run_classify_svm`
 

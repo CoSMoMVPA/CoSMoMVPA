@@ -18,11 +18,11 @@ Hint: :ref:`cosmo_nfold_partitioner_skl`
 
 Solution: :ref:`cosmo_nfold_partitioner`
 
-Extra exercise: write a split half partitioner where there are two partitions only of approximately equal size (for example, using odd and even chunks). 
+Extra exercise: write a split half partitioner where there are two partitions only of approximately equal size (for example, using odd and even chunks).
 
 Hint: :ref:`cosmo_oddeven_partitioner_hdr`
 
 Solution: :ref:`cosmo_oddeven_partitioner`
 
-Extra advanced exercise: write a (K,N)-fold partitioner that returns all partitions for N chunks so that there are K chunks in the test set and (N-K) chunks in the training set.  
+Extra advanced exercise: write a (K,N)-fold partitioner that returns all partitions for N chunks so that there are K chunks in the test set and (N-K) chunks in the training set.
 

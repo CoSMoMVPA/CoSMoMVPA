@@ -1,4 +1,4 @@
-.. _contribute: 
+.. _contribute:
 
 ============================
 Information for contributors
@@ -23,16 +23,16 @@ Meta - naming conventions in the documentation
 ++++++++++++++++++++++++++++++++++++++++++++++
 - Path names are `Unix-like`_-based; ``/`` is the path separation character, rather than ``\`` used on Windows platforms.
 - Directories have ``/`` as the last character, and are relative to the directory where ``CoSMoMVPA`` resides.
-- Sometimes ``${a_name}`` is used, this indicates that `a_name` is a meta-syntactic variable. 
+- Sometimes ``${a_name}`` is used, this indicates that `a_name` is a meta-syntactic variable.
 
 
 Setting the Matlab_ path
 ++++++++++++++++++++++++
-To use ``CoSMoMVPA`` functionality, it is recommended to:
+To use ``CoSMoMVPA`` functionality, it is recommended to set the path using :ref:`cosmo_set_path` (followed by ``savepath``). Alternatively the path can be set manually as follows:
 
 - add the ``mvpa/`` directory to the Matlab_ path.
 - also add ``externals/`` and its subdirectories to the Matlab_ path.
-- do *not* add ``examples/`` or ``tests`` to the Matlab_ path. 
+- do *not* add ``examples/`` or ``tests`` to the Matlab_ path.
     + To run examples, ``cd`` to ``examples/`` and run scripts from there.
     + To run unit tests, ``cd`` to ``tests/`` and run ``run_tests`` from there (this requires the xUnit_ framework).
 
@@ -106,14 +106,14 @@ The instructions below assume a unix-like platform, and the command below should
     + set up a working installation of git_ (see `installing git`_).
     + tell git about your name and email address: ``git config --global user.name "Your full name"`` and ``git config --global user.email "your_email@the_domain.com"``
     + make an account on github_, if you have not done so.
-    + on the github_ project page, `fork the repository`_, and follow the instructions there. 
+    + on the github_ project page, `fork the repository`_, and follow the instructions there.
     + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``
     + change to the directory: ``cd CoSMoMVPA``
     + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``
     + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``
     + to add a new feature or provide a bugfix:
 
-        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}`` 
+        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``
         - make the desired changes, then commit them. `See below for details`.
         - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``
         -  on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
@@ -121,7 +121,7 @@ The instructions below assume a unix-like platform, and the command below should
 
       Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheap; for experimentation, bug fixes or new features please use branches.
 
-There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation. 
+There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation.
 
 .. _`installing git`: http://git-scm.com/book/en/Getting-Started-Installing-Git
 .. _`fork the repository`: https://help.github.com/articles/fork-a-repo
@@ -146,7 +146,7 @@ Notes on committing
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
     + ``LNC``: Indicates that the contributor permits distribution of his changes using the applicable license(s) of CoSMoMVPA. Only needed for a person's first contribution; after the first contribution this permission is assumed. If you made several commits but the first did not contain this tag, just make a new commit containing the text '``LNC: applies to previous commits``'.
     + ``LZY``: 'Apologies for being lazy here but cannot be bothered to describe the changes in detail'. Acceptable in exceptional cases, including after *n* hours of continuous coding, when *n* is large; or when presenting a workshop on CoSMoMVPA_ the very next day (these are not mutually exclusive). If you know what your are doing this can go together with the ``-a`` option in ``git``.
-    + ``MSC``: Miscellaneous changes, not covered by any of the other tags.     
+    + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature.
     + ``OPT``: Optimalization. It should be used when the new code runs faster or uses less memory.
     + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
@@ -163,7 +163,7 @@ Notes on committing
     Tags can be combined, as it may occur that multiple tags apply; use the ``+``-character to concatenate them.
 
     Examples:
-    
+
     + ``git commit -m 'ENH: support two-dimensional cell arrays as feature attributes'``
     + ``git commit -m 'RF: build a lookup table mapping all voxels to those in the dataset``
     + ``git commit -m 'BF+TST: throw an error if partitions are not balanced; added unit test'``
@@ -174,15 +174,15 @@ Notes on committing
 
 Build system
 ^^^^^^^^^^^^
-The build system is used to generate documentation for the web site (or local use). 
+The build system is used to generate documentation for the web site (or local use).
 
 - Matlab files do not require building.
 - Documentation is built as follows:
     + all Matlab files in ``mvpa/`` and ``examples/`` are converted to reStructuredText_ format using the Python_ script ``matlab2rst.py`` in ``source/``. This script generates three reStructuredText_  versions of all Matlab functions and example scripts:
         - Full contents (no suffix), containing the full source code.
         - Header contents (suffix ``_hdr``), containing only the header (i.e. the first line and every subsequent line until the first line that does not start with ``%`` (note: line continuation, explained below, is currently *not* supported).
-        - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >@@>`` and ending line ``% <@@<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.  
-    + Both ``.txt`` files (with the raw contents preceded by an ``include`` statement) and ``.rst`` files (with a title and label) are generated; the latter contain ``include`` statements to include the former. 
+        - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >@@>`` and ending line ``% <@@<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.
+    + Both ``.txt`` files (with the raw contents preceded by an ``include`` statement) and ``.rst`` files (with a title and label) are generated; the latter contain ``include`` statements to include the former.
     + the ``Makefile`` in ``source/``, when used through ``make html``, uses the ``mat2rst.py`` to generate reStructuredText_ Matlab files and then uses Sphinx_ to convert these files to html.
 - The ``build.sh`` script builds the documentation and datasets.
 
@@ -190,7 +190,7 @@ The build system is used to generate documentation for the web site (or local us
 
 .. _download: download.html
 
-- The  ``mvpa/cosmo_publish_run_scripts.m`` function generates the output from all the runnable examples in ``examples/`` as html files and puts them in ``doc/source/_static/publish/``. This function is used to produce output for the web site. 
+- The  ``mvpa/cosmo_publish_run_scripts.m`` function generates the output from all the runnable examples in ``examples/`` as html files and puts them in ``doc/source/_static/publish/``. This function is used to produce output for the web site.
 
 .. _`matlab code guidelines`:
 
@@ -199,7 +199,7 @@ Matlab code guidelines
 The following are guidelines, intended to improve:
 
 + consistency in code layout across contributers, so that the final result is more consistent.
-+ readability, so that less time is spent in understanding how the code works or what it does. 
++ readability, so that less time is spent in understanding how the code works or what it does.
 + performance, so that execution time or memory usage is reduced.
 
 **Note**: None of these guidelines are set in stone. Try to use common sense when considering not to follow them. Indeed, for each guideline there may be a good reason to deviate from it.
@@ -222,7 +222,7 @@ The following are guidelines, intended to improve:
     (Yes, we break this rule occasionely.)
 
 
-- Indentation is 4 spaces, and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. 
+- Indentation is 4 spaces, and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
     **bad:**
 
     .. code-block:: matlab
@@ -245,21 +245,21 @@ The following are guidelines, intended to improve:
     **acceptable:**
 
     .. code-block:: matlab
-    
+
         if nargin<2 || isempty(more_input), more_input=42; end
 
     .. code-block:: matlab
-        
+
         if nsamples~=ntrain, error('Size mismatch: %d ~= %d', nsamples, ntrain); end
 
     **good:**
 
-    .. code-block:: matlab    
+    .. code-block:: matlab
 
         if my_awesome_function(some_input, more_input)>100
-            the_array_value(:)=42; 
-        else 
-            other_array_value(:)=31; 
+            the_array_value(:)=42;
+        else
+            other_array_value(:)=31;
         end
 
     .. code-block:: matlab
@@ -278,14 +278,14 @@ The following are guidelines, intended to improve:
             % this function adds two the input and returns the result.
             y=x+2;
 
-        
+
 - Use lower-case letters for variable names, with underscores (``_``) to separate words.
     **bad:**
 
-    .. code-block:: matlab    
-        
+    .. code-block:: matlab
+
         myVar=0;
-   
+
     .. code-block:: matlab
 
         MyVar=0;
@@ -296,30 +296,30 @@ The following are guidelines, intended to improve:
 
     **good:**
 
-    .. code-block:: matlab  
+    .. code-block:: matlab
 
         my_var=0;
 
-- Crash early, and when doing so, provide informative error messages.  
+- Crash early, and when doing so, provide informative error messages.
 
     **bad:**
 
     .. code-block:: matlab
-        
+
         error('What do you mean?');
 
     .. code-block:: matlab
 
         if ntemplate~=nsamples
             % this is bad because the friggofrag analysis is invalid.
-            % Telling the user that they provided wrong input could harm their self-esteem 
+            % Telling the user that they provided wrong input could harm their self-esteem
             % however, so let's just make up some data that, although completely meaningless,
             % will ensure that the script does not crash.
             samples=randn(ntemplate);
 
     **good:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
 
@@ -327,7 +327,7 @@ The following are guidelines, intended to improve:
 - Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
     **bad:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % NOW RUN THE CROSS-VALIDATION
 
@@ -340,40 +340,40 @@ The following are guidelines, intended to improve:
         fprintf('STARTING ANALYSIS... PLEASE BE PATIENT!!!\n');
 
     .. code-block:: matlab
-        
+
         error('What do you mean?');
 
- 
+
     **acceptable:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % Note: this function is EXPERIMENTAL.
 
     **good:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % Note: this function is *** experimental ***.
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
-        % The function Y=abs(X), where X is NxQ, returns an array Y of size NxQ 
+        % The function Y=abs(X), where X is NxQ, returns an array Y of size NxQ
         % so that, assuming that all elements in X are real, Y==X.*sign(X);
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % NNO Sep 2013
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
-        % TODO: support more than two different chunks.        
+        % TODO: support more than two different chunks.
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % Now run the cross-validation
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
        fprintf('Starting analysis - please be patient...\n');
 
@@ -386,7 +386,7 @@ The following are guidelines, intended to improve:
 
     **bad:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         function [winners,classes]=cosmo_winner_indices(pred)
         % uses a pretty cool hack using bsxfun to decide about the winners!
@@ -398,12 +398,12 @@ The following are guidelines, intended to improve:
 - Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.
     + It also indicates what the size of the output is, which can help in understanding what code does.
-    + This guideline is especially important when large arrays of data are used. 
+    + This guideline is especially important when large arrays of data are used.
 
     **bad:**
 
-    .. code-block:: matlab 
-        
+    .. code-block:: matlab
+
         ndata=size(data,1);
         accs=[]; % start with empty array, then let it grow
         for k=1:ndata;
@@ -412,8 +412,8 @@ The following are guidelines, intended to improve:
         end
 
     **good:**
-        
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         ndata=size(data,1);
         accs=zeros(1,ndata); % allocate space for output
@@ -421,7 +421,7 @@ The following are guidelines, intended to improve:
             acc=a_func(data(k,:)) % compute accuracy
             accs(k)=acc;
         end
-        
+
 - When possible use vectorization rather than a ``for`` or ``while`` loop.
     + Many functions support vectorized functions, where the same function is applied to elements in arrays.
     + Vectorization reduces the number of lines of code.
@@ -430,10 +430,10 @@ The following are guidelines, intended to improve:
 
     **really bad:** (see previous guideline)
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         [nrows,ncols]=size(data);
-    
+
         abs_data=[]; % start with empty array, then let it grow
         for k=1:nrows
             row_abs_data=[]; % absolute data for the k-th row
@@ -445,7 +445,7 @@ The following are guidelines, intended to improve:
 
     **bad:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         [nrows,ncols]=size(data);
 
@@ -459,59 +459,59 @@ The following are guidelines, intended to improve:
         end
 
     **good:**
-        
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         abs_data=abs(data);
-       
+
 - Use clear variable names, aimed at finding a good balance between length and readability. Short variable names are fine if their use is clear (e.g., ``i``, ``j``, ``k`` for loop variables; ``n`` for number of elements, ``f`` for a function). It is recommended to document what a statement does if this cannot be deduced easily from the variable/function names.
 
     *Note:* ``i`` and ``j`` are used in Matlab to indicate the imagery unit (for which it holds that ``i^2==-1``), but for functions that do not use complex numbers (currently all of them) their use as a loop variable is acceptable.
 
     **bad:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         msxs = find(sm)
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         hkrw8ingmuch = max([v,vv,vvv])
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         my_very_long_variable_name_that_describes_something_i_forgot = ...
             apply_function_work(with_a_very_long_argument_name,...
                                 and_another_long_argument_name);
 
-    
+
     **borderline acceptable:**
-    
-    .. code-block:: matlab 
-        
+
+    .. code-block:: matlab
+
         % get the indices of the sample mask
         msxs = find(sm)
 
     .. code-block:: matlab
 
         [ns, nf]=size(ds.samples);
-  
+
 
     **good:**
-        
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         mask_indices=find(sample_mask);
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         max_dimen=max([x_dim, y_dim, z_dim]);
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         sliced_ds=cosmo_dataset(ds, mask_indices);
-    
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         n=size(data,1); % number of samples
         for k=1:n
@@ -524,7 +524,7 @@ The following are guidelines, intended to improve:
 
     **borderline acceptable:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         for j=1:npartitions
             test_indices{j}=find(chunk_idx2count(combis(j,:)));
@@ -532,8 +532,8 @@ The following are guidelines, intended to improve:
 
     **good:**
 
-    .. code-block:: matlab 
-    
+    .. code-block:: matlab
+
         for j=1:npartitions
             combi=combis(j,:);
             sample_count=chunk_idx2count(combi);
@@ -541,29 +541,29 @@ The following are guidelines, intended to improve:
         end
 
 - When formatting strings use ``sprintf`` or ``fprintf``, rather than ``num2str`` and string concatenation. Avoid using disp when printing strings; use ``fprintf`` instead.
-    
+
     **bad:**
-    
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         disp(['Accuracy for ' label ' is ' num2str(mean_value) ' +/-' ...
                     num2str(std_value)]);
 
     **good:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         fprintf('Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
 
-   
+
     *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons an alternative implementation is provided as ``cosmo_strjoin``.
 
-    
+
 - Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
 
     **very bad:**
 
-    .. code-block:: matlab 
+    .. code-block:: matlab
 
         % for even samples apply f_even, for odd ones f_odd
         results=[];
@@ -576,8 +576,8 @@ The following are guidelines, intended to improve:
         end
 
     **bad:**
-        
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         % for even samples apply f_even, for odd ones f_odd
         results=zeros(nsamples,1);
@@ -586,10 +586,10 @@ The following are guidelines, intended to improve:
             f_name=f_names(mod(k+1,2)+1);
             eval(sprintf('results(%d)=%s(data(%d));', k, f_name, k));
         end
-            
+
     **good:**
-        
-    .. code-block:: matlab 
+
+    .. code-block:: matlab
 
         % for even samples apply f_even, for odd ones f_odd
         results=zeros(nsamples,1);

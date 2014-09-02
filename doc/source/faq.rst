@@ -1,4 +1,4 @@
-.. _faq: 
+.. _faq:
 
 --------------------------------------
 Frequently Asked/Anticipated Questions
@@ -11,12 +11,12 @@ Frequently Asked/Anticipated Questions
     + Support for most *fMRI data formats*: AFNI, BrainVoyager, ANALYZE and NIFTI.
     + Various runnable *example scripts* and *exerices*, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer persective).
 
-    For comparison, here is a list of other MVPA toolboxes: 
+    For comparison, here is a list of other MVPA toolboxes:
 
-    + PyMVPA_ is implemented in Python (it provided inspiration for the dataset structure and semantics). Our toolbox implements the most commonly used MVP analyses, but not all of them, in Matlab. Some labs only use Matlab for data analsis, so CoSMoMVPA may be easier for those to use. 
+    + PyMVPA_ is implemented in Python (it provided inspiration for the dataset structure and semantics). Our toolbox implements the most commonly used MVP analyses, but not all of them, in Matlab. Some labs only use Matlab for data analsis, so CoSMoMVPA may be easier for those to use.
     + PRoNTo_ is another Matlab MVPA toolbox, that is much wider in scope and provies a Graphical User Interface. In contrast, our toolbox is more minimalistic and bare-bones, meaning it has much fewer lines of code and is simpler in design. This may make it easier to understand its functions, and to modify.
     + Searchmight_ is aimed at searchlight analyses (and does these very fast). Although our toolbox does support such analyses (albeit slower), it also supports other types of analyses not covered by Searchmight.
-    + `Princeton MVPA`_ toolbox is a sophisticated toolbox but (we think) harder to use, and is currently not under active development. 
+    + `Princeton MVPA`_ toolbox is a sophisticated toolbox but (we think) harder to use, and is currently not under active development.
 
     To our knowledge, the other MVPA toolboxes support fewer data formats; we are neither aware of another toolbox that supports BrainVoyager datasets, nor of one that supports both NIFTI or ANALYZE, and AFNI, natively.
 
@@ -26,7 +26,7 @@ Frequently Asked/Anticipated Questions
 
     + Preprocessing of data. For fMRI data it assumed that the data has been preprocessed and, in most use-case scenarios, has been analyzed using the General Linear Model.
     + Implementations of complicated analyses (such as hyperalignment, nested cross validation, recursive feature elimination). If you want to do these, consider using PyMVPA_.
-    + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing the code to perform the analyses could be considered as more instructive: it requires one to actually *think* about the analysis, rather than just clicking on buttons. 
+    + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing the code to perform the analyses could be considered as more instructive: it requires one to actually *think* about the analysis, rather than just clicking on buttons.
     + Pretty visualization of fMRI data. Although there is basic functionality for showing slices of fMRI data (through ``cosmo_plot_slices``, for better visualization we suggest to use either your preferred fMRI analysis package, or MRIcron_.
 
     Also, it does not make coffee for you.
@@ -37,7 +37,7 @@ CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) 
 **What should I use as input for MVPA**
 Unless you know exactly what you are doing, in fMRI land we would recommend to either:
 
-- Apply the GLM for each run seperately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics. 
+- Apply the GLM for each run seperately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics.
 - Split the data in halves (even and odd) and apply the GLM to each of these (i.e. treat the experiment as consisting of two 'runs'). In this case there are two chunks, and the same number of unique targets as there are experimental conditions.
 
 **Who are the developers of CoSMoMVPA?**

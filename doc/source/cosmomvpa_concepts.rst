@@ -1,4 +1,4 @@
-.. _`cosmomvpa_concepts`: 
+.. _`cosmomvpa_concepts`:
 
 ==================
 CoSMoMVPA concepts
@@ -6,9 +6,9 @@ CoSMoMVPA concepts
 
 .. contents::
     :depth: 2
-    
 
-.. _`cosmomvpa_dataset`: 
+
+.. _`cosmomvpa_dataset`:
 
 Dataset
 ^^^^^^^
@@ -25,26 +25,26 @@ Just the data in the sample-by-feature data matrix not sufficient to be able to 
 - *sample attributes*: contain information about each sample (and is the same across all features). Most MVPA requires at least the following two sample attributes:
 
     * ``.sa.targets``: represent the class of each sample. In the fMRI example above, these would be the category of the stimulus (monkeys, lemurs, ladybugs or lunamoths). In CoSMoMVPA, these are represented numerically; for example, 1=monkey, 2=lemur, 3=ladybug, 4=lunamoth).
-    * ``.sa.chunks``: samples with the same chunks represent a group of samples that is acquired 'independently' from samples in other chunks. Independently is hard to define precisely, but in fMRI it usually refers to a single run of acquisition. In the fMRI example above, there are 10 chunks, each with 4 samples. In a take-one-out cross-validation analysis, for example, one tests a classifier on the samples in one chunk after it has been trained on the samples in the remaining chunks. 
+    * ``.sa.chunks``: samples with the same chunks represent a group of samples that is acquired 'independently' from samples in other chunks. Independently is hard to define precisely, but in fMRI it usually refers to a single run of acquisition. In the fMRI example above, there are 10 chunks, each with 4 samples. In a take-one-out cross-validation analysis, for example, one tests a classifier on the samples in one chunk after it has been trained on the samples in the remaining chunks.
 
     Note that in the example here there is a third sample attribute, ``.sa.labels``, which is a cell containing human-readable descriptions of each sample.
-    
+
 - *feature attributes*: contain information about each feature (and is the same across all samples). These are optional in principal, but in most use cases these are used to specify information where the feature came from.
 
-    * in fMRI: the voxel indices associated with each feature. With three spatial dimensions each feature is associated with three indices, ``.fa.i``, ``.fa.j``, and ``.fa.k``.     
+    * in fMRI: the voxel indices associated with each feature. With three spatial dimensions each feature is associated with three indices, ``.fa.i``, ``.fa.j``, and ``.fa.k``.
     * in MEEG: the indices of SQUID sensor, time-point, or frequency band. For example, data transformed to time-frequency space has three feature attributes: ``.fa.chan``, ``.fa.time``, and ``.fa.freq``.
 
-- *dataset attributes*: contain general information about the whole dataset. 
+- *dataset attributes*: contain general information about the whole dataset.
 
     In fMRI these are typically:
-    
-    * the 'header' information containing information about the spatial layout (voxel size in each dimension, and the mapping from voxel indices to world coordinates). These are required to store data back to a file format that can be read by fMRI packages. 
+
+    * the 'header' information containing information about the spatial layout (voxel size in each dimension, and the mapping from voxel indices to world coordinates). These are required to store data back to a file format that can be read by fMRI packages.
     * The range of indices used in ``.fa.i``, ``.fa.j`` and ``.fa.k``, stored in ``.a.dim.values``.
     * The names of the spatial feature attributes, stored in ``.a.dim.labels``.
 
     In MEEG these are, for a dataset with data in time-frequency space:
 
-    * The names of the feature attribtues ( ``chan``, ``time``, and ``freq``), stored in ``.a.dim.labels`` . 
+    * The names of the feature attribtues ( ``chan``, ``time``, and ``freq``), stored in ``.a.dim.labels`` .
     * SQUID channel names are stored in the field ``.a.dim.values{1}``, time-points in ``.a.dim.values{2}``, and frequencies in ``.a.dim.values{3}``.
 
 .. _`cosmomvpa_targets`:
@@ -57,23 +57,23 @@ The example above showed the sample attribute ``targets``, and its use is not by
     * effector involved in movement planning: left hand or right hand.
     * whether a peri-threshold auditory stimulus was perceived: yes or no.
 
-In CoSMoMVPA_ these conditions are coded in a special *sample attribute* called *targets*, i.e. in a dataset ``ds`` they are in ``ds.sa.targets``. They should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples. 
+In CoSMoMVPA_ these conditions are coded in a special *sample attribute* called *targets*, i.e. in a dataset ``ds`` they are in ``ds.sa.targets``. They should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples.
 
 .. _`cosmomvpa_chunks`:
 
 Chunks
 ++++++
-Another sample attribute illustrated above (that is also important for most MVPA applications) is the concept of *chunks*. Here, a *chunk* is meant to indicate a set of samples that can be considered **independent** from samples in other chunks, whereas samples within a chunk are not necessarily independent. 
+Another sample attribute illustrated above (that is also important for most MVPA applications) is the concept of *chunks*. Here, a *chunk* is meant to indicate a set of samples that can be considered **independent** from samples in other chunks, whereas samples within a chunk are not necessarily independent.
 
 Independency is crucial here, because many core MVP analyses assess generalizability of pattern properties of a subset of chunks to another disjoint subset of chunks. For example,
-    * in split-half correlation analysis, the data is split in two and each half assigned to a different chunk, yielding two chunks. A typical application is computing 'on-diagonal' vs 'off-diagonal' correlations, i.e. the difference of pattern correlations of the same target versus other targets. 
-    * in an ``n``-fold cross-validation scheme, the data is split in ``n`` chunks. A typical application is cross-validated classification, where a classifier is tested on one chunk after being trained on the remaining chunks. 
+    * in split-half correlation analysis, the data is split in two and each half assigned to a different chunk, yielding two chunks. A typical application is computing 'on-diagonal' vs 'off-diagonal' correlations, i.e. the difference of pattern correlations of the same target versus other targets.
+    * in an ``n``-fold cross-validation scheme, the data is split in ``n`` chunks. A typical application is cross-validated classification, where a classifier is tested on one chunk after being trained on the remaining chunks.
 
 Typical chunk assignments are:
-    * in fMRI studies: each run (period of continuous recording) gives rise to a single chunk. Putting samples in a single run in different chunks may violate the independency assumption because of the slow-ness of the BOLD response, unless samples are seperated by a considerable time interval. 
+    * in fMRI studies: each run (period of continuous recording) gives rise to a single chunk. Putting samples in a single run in different chunks may violate the independency assumption because of the slow-ness of the BOLD response, unless samples are seperated by a considerable time interval.
     * in MEEG studies: if trials can be assumed to be independent (which most people in MEEG studies seem to do), then chunks can be assigned randomly (or in a systematic order). This can be done pseudo-randomly using :ref:`cosmo_chunkize`. If the indendency assumption cannot be fullfilled then chunks should be assigned on a run-by-run basis.
 
-As with *targets* above, *chunks* should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples. 
+As with *targets* above, *chunks* should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples.
 
 
 Samples + sample attributes + feature attributes + dataset attributes = dataset
@@ -111,7 +111,7 @@ and ``.a``.
 
     .. code-block:: matlab
 
-            
+
             dim: [1x1 struct]
             hdr_nii: [1x1 struct]
 
@@ -120,7 +120,7 @@ In this case there are M=40 samples and N=43822 features (voxels). Note that the
 
 Datasets can also be 'sliced', i.e. subsets of either samples or targets can be selected, using :ref:`cosmo_slice`. A special case is :ref:`cosmo_split`, which splits a dataset based on unique values of sample- or feature attributes. Different datasets, assuming their feature or sample attributes are identical, can be combined using :ref:`cosmo_stack`.
 
-.. _`cosmomvpa_classifier`: 
+.. _`cosmomvpa_classifier`:
 
 Classifier
 ^^^^^^^^^^
@@ -138,11 +138,11 @@ where the inputs are:
     - ``samples_train`` is a ``PxR`` matrix for ``P`` samples and ``R`` features (i.e. it contains ``P`` patterns).
     - ``targets_train`` a ``Px1`` class label vector for each pattern in ``samples_train``.
     - ``samples_test`` is a ``QxR`` matrix with ``Q`` patterns, with no class labels associated
-    - ``opt`` is an optional struct may contain specific options to be used with a specific classifier. 
-    
+    - ``opt`` is an optional struct may contain specific options to be used with a specific classifier.
+
 The output ``predicted`` is a ``Qx1`` vector containing the predicted class labels for each sample in ``samples_test``. Classification accuracy can be computed by considering how many samples in the test set were predicted, and this can be compared to what may be expected by chance. In the simple case where each chunk contains the same number of *n* samples in each class, change accuracy is *1/n*. For MEEG datasets typically the number of samples in each class is not equal; the function :ref:`cosmo_balance_partitions` can be used to accomplish this.
 
-Examples of classifiers are :ref:`cosmo_classify_nn`, :ref:`cosmo_classify_svm`, :ref:`cosmo_classify_lda`, and :ref:`cosmo_classify_naive_bayes`. 
+Examples of classifiers are :ref:`cosmo_classify_nn`, :ref:`cosmo_classify_svm`, :ref:`cosmo_classify_lda`, and :ref:`cosmo_classify_naive_bayes`.
 
 A classifier is typically used to test how well data in a subset of the data generalizes to another, disjoint, subset of the data. Usually this is done by taking some chunks as a test set, and use the remaining classes as a training set; by repeating this process, each time taking different chunks to form the test set, one or more predictions can be made for each sample in a dataset. Dividing up a dataset in pairs of training and test sets is called *partitioning*, which is facilitated using :ref:`cosmo_nchoosek_partitioner` , and its special case, :ref:`cosmo_nfold_partitioner`). A classifier can be used for cross-validation using :ref:`cosmo_crossvalidate`, or (see below), using a more abstract measure :ref:`cosmo_crossvalidation_measure`.
 
@@ -169,12 +169,12 @@ When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`
 
 Neighborhoods can be generated using :ref:`cosmo_interval_neighborhood` (e.g. MEEG time series searchlight) and  :ref:`cosmo_spherical_neighborhood` (fMRI spherical searchlight). :ref:`cosmo_neighborhood` is a general function that can generate most neighborhoods, and also supports combining multiple neighborhoods. An application of the latter functionality is a time-by-space fMRI searchlight.
 
-.. _`cosmomvpa_measure`: 
+.. _`cosmomvpa_measure`:
 
 Measure
 ^^^^^^^
 
- A dataset measure is a function with the following signature: 
+ A dataset measure is a function with the following signature:
 
     .. code-block:: matlab
 
@@ -190,7 +190,7 @@ For example, the following code defines a 'measure' that returns classification 
         cv_args = struct();
         cv_args.classifier = @cosmo_classify_svm;
         cv_args.partitions = cosmo_nfold_partitioner(ds);
-        sl_dset = cosmo_searchlight(ds,cv,'args',cv_args,'radius',3);  
+        sl_dset = cosmo_searchlight(ds,cv,'args',cv_args,'radius',3);
 
 
 Using classifiers and measures in such an abstract way is a powerful approach to implement new analyses. Any function you write can be used as a dataset measure as long as it use the dataset measure input scheme, and can directly be used with (for example) a searchlight. When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_neighborhood`_ (see above), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.

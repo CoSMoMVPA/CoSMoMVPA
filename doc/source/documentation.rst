@@ -7,13 +7,13 @@ Documentation
 Overview
 --------
 
-.. toctree:: 
+.. toctree::
    :maxdepth: 1
 
    contents_demo
    get_started
    download
-   cosmo2013 
+   cosmo2013
    faq
    contact
    contribute
@@ -22,13 +22,13 @@ Overview
 Detailed
 --------
 
-.. toctree:: 
+.. toctree::
    :maxdepth: 2
 
    contents_demo
    get_started
    download
-   cosmo2013 
+   cosmo2013
    faq
    contact
    contribute
@@ -37,14 +37,14 @@ Detailed
 Full documentation
 ------------------
 
-.. toctree:: 
+.. toctree::
 
    contents_demo
    get_started
    download
-   cosmo2013 
+   cosmo2013
    faq
    contact
    contribute
    thanks
-   
+

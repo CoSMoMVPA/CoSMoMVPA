@@ -12,7 +12,7 @@ our six animals. The v1 model DSM was made by modeling each stimulus image
 (jpeg) with a simple v1 cortical model, and then calculating the vector
 distances between the stimuli using the features of the model.  The behavioral
 DSM was made by having human subjects judge the similarity between every pair of
-animals. 
+animals.
 
 Note that these are ordinary DSMs that have zeros on the diagonal and are
 symmetric about the diagonal. Use matlabs **imagesc** to view each DSM:
@@ -23,10 +23,10 @@ symmetric about the diagonal. Use matlabs **imagesc** to view each DSM:
     load behav_sim;
     subplot(1,2,1); imagesc(v1_model); title('V1 Model DSM');
     subplot(1,2,2); imagesc(behav); title('Behavioral DSM');
-    
+
 
 The categorical structure is obvious in the categorical dissimilarity, but not
-in the v1 model DSM. 
+in the v1 model DSM.
 
 Now use matlab's **linkage** function to do hierarchical clustering on the DSMs.
 **linkage** takes input in the form of the flattered upper triangle of the DSM
@@ -40,8 +40,8 @@ Here is how to do this with the behavioral similarity:
    hclus = linkage(squareform(behav));
    % We also want to have labels on our dendrogram
    labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
-   figure(); 
-   dendrogram(hclus, 'labels',labels); 
+   figure();
+   dendrogram(hclus, 'labels',labels);
    title('Behavioral DSM - linkage');
 
 Now let's use Matlab's classic multidimensional scaling (**cmdscale**) to look at
@@ -50,7 +50,7 @@ dimension and stimulus. To view the first 2 dimensions we can use matlab's
 **text** function:
 
 .. code-block:: matlab
-   
+
    F = cmdscale(behav);
    figure();
    text(F(:,1), F(:,2), labels);
@@ -88,7 +88,7 @@ the same whether you are dealing with 3 voxels or 3 hundred. Remember that our
 fMRI data comes from a time-course analysis that included some estimation of the
 *baseline* activity for each voxel. The statistics we have for our categories
 are estimations of the differences from that baseline.  This means that the
-origin of our vector space corresponds to that *arbitrary* baseline. 
+origin of our vector space corresponds to that *arbitrary* baseline.
 
 Because correlation distance is a measure of the angles between vectors, it is
 sensitive to where the data cloud resides with respect to the origin. Ideally,
@@ -123,7 +123,7 @@ behavioral DSMs to make it a 12x15 matrix. Now compute the cross-correlation
 matrix using **corrcoef**. Visualize the cross-correlation matrix with
 **imagesc**. Try this with demeaning and without demeaning to compare the
 results. Finally, use matlabs **boxplot** function to view the distributions of
-correlations between neural simiilarities and model/behavioral DSMs. 
+correlations between neural simiilarities and model/behavioral DSMs.
 
 Hint: :ref:`run_compare_dsm_skl`.
 

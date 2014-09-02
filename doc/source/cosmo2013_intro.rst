@@ -8,7 +8,7 @@ Goals of the workshop
 
     * Learn the basics of Multivariate Pattern Analysis
     * Get your hands dirty with data manipulation and algorithm implementation
-    * Build a your own data analysis toolkit 
+    * Build a your own data analysis toolkit
 
 
 **Why study brain imaging?**
@@ -19,7 +19,7 @@ Organization of Human Brain Mapping (OHBM) throws great parties.
 .. figure:: _static/hbm.jpg
 
     OHBM 2013 in Seattle rented the Rock and Roll Museum for their "club night" party.
-    
+
 **What is MVPA?**
 
 When applied to **fMRI** data it is multi-*voxel* pattern analysis.
@@ -32,8 +32,8 @@ But multi-*variate* analysis is general, and widely used set of techniques. Vari
     * Electrocorticography (ECoG)
 
 ... or almost anything else you can think of:
-    
-    * Geological data 
+
+    * Geological data
     * *BIG* data culled from internet users
     * etc.
 
@@ -44,13 +44,13 @@ But multi-*variate* analysis is general, and widely used set of techniques. Vari
   * In **practice**, i.e., in **MATLAB**: A pattern is a row vector.
 
 A dataset is a set of patterns over the same features that are vertically
-stacked on one another into a 2-D N x M matrix with N patterns and M features.  
+stacked on one another into a 2-D N x M matrix with N patterns and M features.
 Patterns are sometimes called "observations" or "samples".  In this tutorial we
 will call them samples.
 
 In a simplistic and generic sense, MVPA includes any analysis where the outcome
 is dependent on the variablility of measurements across a a samples by features
-matrix. 
+matrix.
 
 **MATLAB** is an ideal environment for dealing with this sort of data with
 hundreds of function for do MVPA analysis on rectangular matrices, some of which

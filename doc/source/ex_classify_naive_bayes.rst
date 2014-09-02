@@ -18,4 +18,4 @@ Do the accuracies change if you use betas ('glm_betas_perrun.nii.gz') instead of
 T-stats?
 
 What if you use a different mask?
-       
+

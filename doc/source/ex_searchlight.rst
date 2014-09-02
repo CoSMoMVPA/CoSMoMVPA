@@ -9,7 +9,7 @@ thought of as a mini dataset, where the mask that defines the voxels included in
 the dataset is the searchlight sphere. Because we can treat each searchlight as
 a dataset, we can build a searchlight function that will compute any **dataset
 measure** that we specify. This allows us to reuse code, and run searchlights
-for different purposes. 
+for different purposes.
 
 We have provided a couple of helper functions that do some of the heavy lifting
 involved defining the sets of *neighborhood voxels*. For this, use

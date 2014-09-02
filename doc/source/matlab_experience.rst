@@ -1,14 +1,14 @@
-.. _`matlab_experience`: 
+.. _`matlab_experience`:
 
 =================
 Matlab experience
 =================
 
-CoSMoMVPA_ is written with simplicity in mind, and therefore does not require one to be a Matlab expert. However, some minimal knowledge is required. To assess your knowledge of Matlab, below we describe some (subjectively chosen) criteria. 
+CoSMoMVPA_ is written with simplicity in mind, and therefore does not require one to be a Matlab expert. However, some minimal knowledge is required. To assess your knowledge of Matlab, below we describe some (subjectively chosen) criteria.
 
-Using these criteria, we would argue that *using* CoSMoMVPA to analyze your data requires at least the *advanced beginner* level. 
+Using these criteria, we would argue that *using* CoSMoMVPA to analyze your data requires at least the *advanced beginner* level.
 
-In order to understand implementations, and/or contribute code, the *competent* level would be required and the *proficient* level is preferable. 
+In order to understand implementations, and/or contribute code, the *competent* level would be required and the *proficient* level is preferable.
 
 Advanced beginner
 +++++++++++++++++
@@ -48,7 +48,7 @@ In addition, the *proficient* user should be familar with:
 - all there is to know about data structures and their limiations.
 - basic linear algebra.
 - using linear indexing whenever possible.
-- modular design of functions. 
+- modular design of functions.
 - namespaces and closures.
 - profiling.
 - unit testing.

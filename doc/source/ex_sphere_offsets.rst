@@ -26,7 +26,7 @@ If you are up for quite an advanced exercise: write a function that performs vox
 
 .. include:: matlab/cosmo_spherical_neighborhood_hdr.txt
 
-As a start you can ignore the requirement that a negative value for radius should select a certain number of voxels; in other words just focus on positive values for radius. 
+As a start you can ignore the requirement that a negative value for radius should select a certain number of voxels; in other words just focus on positive values for radius.
 
 A more advanced exercise: modify this function so that it also supports negative values for radius, which return neighborhoods of the same size (i.e. same number of voxels) at each location.
 

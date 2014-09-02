@@ -4,7 +4,7 @@ Cross-validation part 3: using a dataset measure
 ================================================
 
 Here we introduce what we refer to as a "dataset measure". A dataset measure
-is a function with the following signature: 
+is a function with the following signature:
 
 .. code-block:: matlab
 
@@ -20,13 +20,13 @@ signature:
 
 This is useful for writing code that can be reused for different purposes. The
 cross-validation dataset measure function is written to work with any generic
-classifier, and returns the classification accuracy. 
+classifier, and returns the classification accuracy.
 This is done by passing a function handle to a classifer in the args struct
 input. For example, the function handle for the nearest neighbor classifer can
 be passed by the args struct by using the @function syntax:
 
 .. code-block:: matlab
-    
+
     args.classifier = @cosmo_classify_nn
 
 In the code for cross validation below, your job is to write the missing for

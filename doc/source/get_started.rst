@@ -24,7 +24,7 @@ Using CoSMoMVPA_ effectively requires:
 - a working installation of Matlab_.
 - the CoSMoMVPA Matlab source code:
 
-    + ``git`` users:: 
+    + ``git`` users::
 
         git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
 

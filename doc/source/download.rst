@@ -1,4 +1,4 @@
-.. _download: 
+.. _download:
 
 =====================
 Download instructions
@@ -8,7 +8,7 @@ CoSMoMVPA code
 ++++++++++++++
 The latest code is available from GitHub_. As this code is under development, it may change rapidly.
 
-- `git` users can clone the repository:: 
+- `git` users can clone the repository::
 
     git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
 
@@ -25,7 +25,7 @@ Note: when CoSMoMVPA is released officially, there will be permanent links, host
 
 External dependencies
 +++++++++++++++++++++
-Certain functionality require certain external toolboxes: 
+Certain functionality require certain external toolboxes:
 
 - BrainVoyager_ files require NeuroElf_ toolbox.
 - AFNI_ files require the ``AFNI Matlab`` library.
@@ -37,7 +37,7 @@ Tutorial data
 +++++++++++++
 The tutorial data can be downloaded in the following ways:
 
-- Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, unzip it, and move the ``datadb`` directory to the CoSMoMVPA root directory. 
+- Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, unzip it, and move the ``datadb`` directory to the CoSMoMVPA root directory.
 
 - more advanced Unix users: ``cd`` to the CoSMoMVPA directory, then run::
 
@@ -47,7 +47,7 @@ The tutorial data can also be stored elsewhere; to do so, specify it in a ``.cos
 
 Developers
 ++++++++++
-Contributions are welcomed! Please see :ref:`contribute`. 
+Contributions are welcomed! Please see :ref:`contribute`.
 
 Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see :ref:`building the documentation`.
 
