@@ -15,7 +15,7 @@ We would like to thank the following people for specific contributions:
 +  **Gunnar Blohm** and **Sara Fabri**: for inviting the developers (ACC and NNO) to speak at the CoSMo 2013 workshop. This invitation formed the basis of CoSMoMVPA.
 +  **Michael Hanke** and **Yaroslav Halchenko**: for their work on PyMVPA, which inspired the semantics and data structure of datasets in CoSMoMVPA.
 +  **Stephania Bracci**: for providing sample datasets in BrainVoyager.
-+  **Jimmy Shen**: for providing a free/open source NIFTI library. 
++  **Jimmy Shen**: for providing a free/open source NIFTI library.
 +  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier.
 +  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing an MEEG dataset.
 +  **S. Eddins** for the MATLAB xUnit_ Test Framework.
@@ -44,4 +44,6 @@ CoSMoMVPA uses external toolboxes to provide certain functionality. If you use c
 + *AFNI fMRI data*: Z. Saad, G. Chen, AFNI Matlab library. available online from http://afni.nimh.nih.gov/afni/matlab/
 + *Surface-based searchlight*: N. N. Oosterhof, T Wiestler, J. Diedrichsen, A comparison of volume-based and surface-based multi-voxel pattern analysis. Neuroimage 56 (2), 593-600. Surfing toolbox available online from http://github.com/nno/surfing
 + *Brainvoyager fMRI data*: J. Weber, NeuroElf toolbox. available online from http://neuroelf.net
+
+.. include:: links.txt
 
