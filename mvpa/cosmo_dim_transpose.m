@@ -99,8 +99,8 @@ function ds=move_dim(ds, dim_labels, dim)
     ds.a.(src_label).values=ds.a.(src_label).values(src_keep_msk);
 
     % move labels and values to target that are in dim_labels
-    ds.a.(trg_label).labels=[ds.a.(trg_label).labels dim_labels];
-    ds.a.(trg_label).values=[ds.a.(trg_label).values move_values];
+    ds.a.(trg_label).labels=[ds.a.(trg_label).labels(:);dim_labels(:)];
+    ds.a.(trg_label).values=[ds.a.(trg_label).values(:);move_values(:)];
 
 
 
