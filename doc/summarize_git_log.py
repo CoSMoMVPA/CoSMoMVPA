@@ -189,6 +189,8 @@ class CommitLogEntry(object):
         files=[]
         stats=[]
 
+        is_commit_line=lambda x:x.startswith('commit ') and len(x)==47
+
         empty_count=0
         outputs=(preamble, message, files)
 
@@ -200,10 +202,12 @@ class CommitLogEntry(object):
                 empty_count+=1
                 if empty_count==len(outputs):
                     break
+            elif empty_count>0 and is_commit_line(line):
+                break
             else:
                 outputs[empty_count].append(line)
 
-        stats=[files.pop()]
+        stats=[files.pop()] if len(files) else []
 
         files_changed=[CommitFileChanged.from_line(line)
                             for line in files]
@@ -224,9 +228,6 @@ class CommitLogEntry(object):
         else:
             return preamble
 
-
-
-
     def rst_message(self):
         m='\n'.join(self.message)
         indent_count=len(m)-len(m.lstrip())
@@ -236,20 +237,26 @@ class CommitLogEntry(object):
 
 
     def rst_str(self):
-        files_lines=[f.rst_str() for f in self.files_changed]
+        if self.has_stats():
+            files_lines=[f.rst_str() for f in self.files_changed] + \
+                        self.stats + ['']
+        else:
+            files_lines=[]
 
-        lines=[self.rst_preamble()] + [''] + \
-                [self.rst_message()] + [''] + \
-                files_lines + \
-                self.stats + ['','']
-    
+        lines=[self.rst_preamble(), '', self.rst_message(), ''] + \
+                files_lines + ['']
+
         return '\n'.join(lines)
 
     def has_tag(self, tag):
         return tag is None or line_has_tag(self.message[0], tag)
 
+    def has_stats(self):
+        return len(self.files_changed)>0
+
     def __len__(self):
-        return 3+len(self.preamble)+len(self.message)+\
+        npad=3 if self.has_stats() else 2
+        return npad+len(self.preamble)+len(self.message)+\
                         len(self.files_changed)+len(self.stats)
         
 class CommitLog(object):
