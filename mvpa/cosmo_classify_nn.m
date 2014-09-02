@@ -40,38 +40,37 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
     predicted=zeros(ntest,1);
 
     for k=1:ntest
-    % for each sample in the test set:
-    %
-    % - compute its squared euclidian distance to each sample in
-    %   the train set, and store this in a vector
-    %   squared_distances (which must have size ntrain x 1).
-    %   For two vectors a=[a_1, a_2, ..., a_N] and b=[b_1, b_2, ..., b_N],
-    %   the squared euclidean distance between a and b is:
-    %       (a_1 - b_1)^2 + (a_2 - b_2)^2 + ... + (a_N - b_N)^2
-    %
-    % - assign the class label of the sample in the training set that has
-    %   the smallest squared distance.
-    %
-    % >@@>
-    % compute difference to each sample in the training set
-    delta=bsxfun(@minus, samples_train, samples_test(k,:));
+        % for each sample in the test set:
+        %
+        % - compute its squared euclidian distance to each sample in
+        %   the train set, and store this in a vector
+        %   squared_distances (which must have size ntrain x 1).
+        %   For two vectors a=[a_1, a_2, ..., a_N] and b=[b_1, b_2, ..., b_N],
+        %   the squared euclidean distance between a and b is:
+        %       (a_1 - b_1)^2 + (a_2 - b_2)^2 + ... + (a_N - b_N)^2
+        %
+        % - assign the class label of the sample in the training set that has
+        %   the smallest squared distance.
+        %
+        % >@@>
+        % compute difference to each sample in the training set
+        delta=bsxfun(@minus, samples_train, samples_test(k,:));
 
-    % compute distance (sqrt is unnecessary because monotonic)
-    squared_distances=sum(delta.^2,2);
+        % compute distance (sqrt is unnecessary because monotonic)
+        squared_distances=sum(delta.^2,2);
 
-    % the following code is equivalent to (but slower than) the code above:
-    %   squared_distances=zeros(ntrain,1);
-    %   for j=1:ntrain
-    %       elementwise_delta=samples_train(j,:)-samples_test(j,:);
-    %       squared_elementwise_delta=elementwise_delta.^2;
-    %       squared_distance=sum(squared_elementwise_delta);
-    %       squared_distances(j)=squared_distance;
-    %   end
+        % the following code is equivalent to (but slower than) the code above:
+        %   squared_distances=zeros(ntrain,1);
+        %   for j=1:ntrain
+        %       elementwise_delta=samples_train(j,:)-samples_test(j,:);
+        %       squared_elementwise_delta=elementwise_delta.^2;
+        %       squared_distance=sum(squared_elementwise_delta);
+        %       squared_distances(j)=squared_distance;
+        %   end
 
-    assert(isequal(squared_distances,squared_distances_))
-    [unused, i]=min(squared_distances);
-    predicted(k)=targets_train(i);
-    % <@@<
-end
+        [unused, i]=min(squared_distances);
+        predicted(k)=targets_train(i);
+        % <@@<
+    end
 
 
