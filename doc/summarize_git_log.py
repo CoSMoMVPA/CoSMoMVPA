@@ -29,9 +29,6 @@ tag2full=dict(RF='refactorings',
 
 show_tags=['BIG','BK','BF',None]
                
-def show_message(s):
-    print s
-
 def build_git_log(log_fn=log_fn, since=git_since):
     '''rebuilds git log if it is out of date'''
     if git_log_out_of_date(log_fn=log_fn):
@@ -43,7 +40,7 @@ def build_git_log(log_fn=log_fn, since=git_since):
         subprocess.check_call(cmd, shell=True)
         print ' done.'
     else:
-        show_message('git log file is up-to-date')
+        print 'git log file is up-to-date'
 
 
 def git_log_out_of_date(log_fn=log_fn):
