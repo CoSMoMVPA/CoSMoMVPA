@@ -164,9 +164,14 @@ class CommitFileChanged(object):
 
     def rst_str(self):
         if self.is_linkable(): 
-            s=' :ref:`%s <%s>` | %s' % (self.filename, 
-                                        self.rst_name(), 
-                                        self.postfix)
+            fn=self.filename
+            padding_length=len(fn)-len(fn.rstrip())
+            padding=' '*padding_length
+
+            s=' :ref:`%s <%s>`%s | %s' % (self.filename,
+                                          self.rst_name(),
+                                          padding,
+                                          self.postfix)
         else:
             s=' %s | %s' % (self.filename, self.postfix)
 
@@ -206,7 +211,6 @@ class CommitLogEntry(object):
                             for line in files]
 
         return CommitLogEntry(preamble, message, files_changed, stats)
-
 
     def rst_str(self):
         files_lines=[f.rst_str() for f in self.files_changed]
