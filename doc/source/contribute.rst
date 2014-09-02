@@ -599,11 +599,12 @@ The following are guidelines, intended to improve:
             f_data=f_handle(data(k));
         end
 
-- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. (Currently the only exception is ``cosmo_publish_run_scripts``, that builds the Matlab_ output from the scripts in ``examples/``).
+- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. Current exceptions are:
 
-- Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using ``cosmo_splithalf_correlation_measure``. Similarly, ``cosmo_dataset_slice`` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
+    + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``).
+    + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail.
 
-
+- Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using :ref:`cosmo_correlation_measure`. Similarly, :ref:`cosmo_slice` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
 
 
 CoSMoMPVA-specific guidelines
@@ -623,6 +624,11 @@ CoSMoMPVA-specific guidelines
             test_indices{k}=find(test_msk)';
             % <@@<
         end
+
++ When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``.
+
+    .. include:: matlab/cosmo_run_tests_hdr.txt
+
 
 Unit tests
 ^^^^^^^^^^
