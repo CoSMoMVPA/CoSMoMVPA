@@ -1,4 +1,4 @@
-function cosmo_publish_run_scripts(force)
+function cosmo_publish_run_scripts(varargin)
 % helper function to publish the run_* scripts of cosmo. Intended for
 % developers only.
 %
@@ -13,6 +13,8 @@ function cosmo_publish_run_scripts(force)
 %
 %
 
+    [force, srcpat]=process_input(varargin{:});
+
     % save original working directory
     pdir=pwd();
     c=onCleanup(@()cd(pdir));
@@ -23,7 +25,6 @@ function cosmo_publish_run_scripts(force)
     srcdir=fullfile(medir,'../examples/');
     trgdir=fullfile(medir,'..//doc/source/_static/publish/');
 
-    srcpat='*_*';
     srcext='.m';
     trgext='.html';
 
@@ -39,6 +40,10 @@ function cosmo_publish_run_scripts(force)
 
     srcfns=dir(fullfile(srcdir,[srcpat srcext]));
     trgfns=dir(fullfile(trgdir,[srcpat trgext]));
+
+    if isempty(srcfns)
+        error('No files found matching %s%s in %s',[srcpat srcext],srcdir);
+    end
 
     nsrc=numel(srcfns);
     ntrg=numel(trgfns);
@@ -121,3 +126,27 @@ function cosmo_publish_run_scripts(force)
 
 
 
+function [force, srcpat]=process_input(varargin)
+    force=false;
+    srcpat=[];
+    n=numel(varargin);
+
+    for k=1:n
+        arg=varargin{k};
+        if ischar(arg)
+            if strcmp(arg,'-force')
+                force=true;
+            elseif ~isempty(srcpat)
+                error('multiple inputs found, this is not supported');
+            else
+                srcpat=arg;
+            end
+        else
+            error('Illegal argument at position %d - expected string', k);
+        end
+    end
+
+
+    if isequal(srcpat,[])
+        srcpat='*_*';
+    end
