@@ -1,7 +1,7 @@
 function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 % generate and join neighborhoods
 %
-% joined_nbrhood=cosmo_neighborhood(ds, [(label, arg)|nbrhood]...)
+% joined_nbrhood=cosmo_neighborhood(ds, [(label, arg)|nbrhood|'-progress',p]...)
 %
 % Inputs:
 %   ds            dataset struct
@@ -17,6 +17,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %                 for example from cosmo_spherical_neighborhood,
 %                 cosmo_meeg_chan_neighborhood, or
 %                 cosmo_interval_neighborhood.
+%   -'progress',p if p is true, then progress is shown
 %
 % Returns:
 %   joined_nbrhood  neighborhood struct with fields .[f]a and .neighbors,
@@ -37,25 +38,33 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     dims.values=cell(1,ndim_max);
     dims.fa=cell(1,ndim_max);
 
-    % progress input
+    show_progress=true;
+
+    % process input
     ndim=0;
     narg=numel(varargin);
     k=0;
     while k<narg
         k=k+1;
-        ndim=ndim+1;
         arg=varargin{k};
 
         if isstruct(arg)
             nbrhood=arg;
-            expected_dim_labels=nbrhood.a.dim.labels;
+            expected_dim_labels=nbrhood.a.fdim.labels;
+            ndim=ndim+1;
         elseif ischar(arg)
             % string of dimension label
             dim_label=arg;
             k=k+1;
 
             nbrhood_args=varargin{k};
-            if ~iscell(arg)
+
+            if strcmp(dim_label,'-progress')
+                show_progress=nbrhood_args;
+                continue
+            end
+
+            if ~iscell(nbrhood_args)
                 % convert to cell
                 nbrhood_args={nbrhood_args};
             end
@@ -80,6 +89,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 
             % compute neighborhood
             nbrhood=nbrhood_fun(ds, nbrhood_args{:});
+            ndim=ndim+1;
         else
             error('Argument #%d not understood - not string or struct', k);
         end
@@ -122,7 +132,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 
 
     % compute conjunctions of neighborhoods
-    [nbr_idxs, nbr_map_idxs]=conj_indices(dims.nbrs, true);
+    [nbr_idxs, nbr_map_idxs]=conj_indices(dims.nbrs, show_progress);
 
     % slice feature attributes
     fa_nbrs=cell(1,ndim);
