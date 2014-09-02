@@ -124,7 +124,8 @@ function ft=build_ft(ds)
 
     underscore2dash=@(x)strrep(x,'_','-');
 
-    dimord_labels=[{samples_label} cellfun(underscore2dash,dim_labels,...
+    dimord_labels=[{samples_label}; ...
+                    cellfun(underscore2dash,dim_labels(:),...
                                             'UniformOutput',false)];
     ft.dimord=cosmo_strjoin(dimord_labels,'_');
 
