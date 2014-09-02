@@ -5,6 +5,7 @@
 import datetime
 import subprocess
 import os
+import textwrap
 
 log_fn='source/_static/git_log.txt'
 summary_fn='source/_static/git_summary.txt'
@@ -212,11 +213,19 @@ class CommitLogEntry(object):
 
         return CommitLogEntry(preamble, message, files_changed, stats)
 
+    def rst_message(self):
+        m='\n'.join(self.message)
+        indent_count=len(m)-len(m.lstrip())
+        width=70
+        return textwrap.fill(m, width=width,
+                                subsequent_indent=' '*(indent_count+4))
+
+
     def rst_str(self):
         files_lines=[f.rst_str() for f in self.files_changed]
 
         lines=self.preamble + [''] + \
-                self.message + [''] + \
+                [self.rst_message()] + [''] + \
                 files_lines + \
                 self.stats + ['','']
     
