@@ -10,9 +10,10 @@
 #    the first line without comment (postfix '_hdr' for header)
 # It also generates seperate toc files for each version
 # 
+# Important: requires sphinx with recent
+#            underscore.js (1.3.1 works, 0.4.4 does not)
+#
 # NNO Aug 2013
-#
-#
 
 
 
