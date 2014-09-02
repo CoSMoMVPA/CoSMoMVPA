@@ -218,7 +218,7 @@ function dim_size=get_dim_size(size_label)
     size2dim.tiny=[2 1 1];
     size2dim.small=[3 2 1];
     size2dim.normal=[3 2 5];
-    size2dim.big=[11 7 5];
+    size2dim.big=[NaN 7 5];
     size2dim.huge=[NaN 17 19];
 
     if ~isfield(size2dim, size_label)

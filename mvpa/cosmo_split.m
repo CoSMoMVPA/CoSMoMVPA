@@ -55,11 +55,11 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %     % dataset has 11 channels, 7 frequencies and 5 time points
 %     cosmo_disp(ds.fa)
 %     > .chan
-%     >   [ 1         2         3  ...  9        10        11 ]@1x385
+%     >   [ 1         2         3  ...  304       305       306 ]@1x10710
 %     > .freq
-%     >   [ 1         1         1  ...  7         7         7 ]@1x385
+%     >   [ 1         1         1  ...  7         7         7 ]@1x10710
 %     > .time
-%     >   [ 1         1         1  ...  5         5         5 ]@1x385
+%     >   [ 1         1         1  ...  5         5         5 ]@1x10710
 %     %
 %     % split by time and frequency. Since splitting is done on the feature
 %     % dimension, the third argument (with value 2) is mandatory
@@ -68,24 +68,24 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %     numel(splits)
 %     > 35
 %     cosmo_disp(cellfun(@(x) size(x.samples,2),splits))
-%     > [ 11        11        11  ...  11        11        11 ]@1x35
+%     > [ 306       306       306  ...  306       306       306 ]@1x35
 %     cosmo_disp(splits{18}.fa)
 %     > .chan
-%     >   [ 1         2         3  ...  9        10        11 ]@1x11
+%     >   [ 1         2         3  ...  304       305       306 ]@1x306
 %     > .freq
-%     >   [ 4         4         4  ...  4         4         4 ]@1x11
+%     >   [ 4         4         4  ...  4         4         4 ]@1x306
 %     > .time
-%     >   [ 3         3         3  ...  3         3         3 ]@1x11
+%     >   [ 3         3         3  ...  3         3         3 ]@1x306
 %     %
 %     % using cosmo_stack brings the split elements together again
 %     humpty_dumpty=cosmo_stack(splits,2);
 %     cosmo_disp(humpty_dumpty.fa)
 %     > .chan
-%     >   [ 1         2         3  ...  9        10        11 ]@1x385
+%     >   [ 1         2         3  ...  304       305       306 ]@1x10710
 %     > .freq
-%     >   [ 1         1         1  ...  7         7         7 ]@1x385
+%     >   [ 1         1         1  ...  7         7         7 ]@1x10710
 %     > .time
-%     >   [ 1         1         1  ...  5         5         5 ]@1x385
+%     >   [ 1         1         1  ...  5         5         5 ]@1x10710
 %
 % Note:
 %   - This function is like the inverse of cosmo_stack; if
