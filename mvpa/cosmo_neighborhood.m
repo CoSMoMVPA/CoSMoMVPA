@@ -9,7 +9,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %                 - 'sphere' (if ds is fmri-like); args is the radius
 %                   for a spherical neighborhood (set to negative to select
 %                   at least (-args) features per neighborhood).
-%                 - otherwise a dimension label (in ds.a.dim.labels);
+%                 - otherwise a dimension label (in ds.a.fdim.labels);
 %                   if 'chan' then args are the arguments for
 %                   cosmo_meeg_chan_neighborhood, otherwise args is half of
 %                   the size of the linear interval around each feature
@@ -109,8 +109,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
         end
 
         dims.nbrs{ndim}=nbrhood.neighbors;
-        dims.values{ndim}=nbrhood.a.dim.values;
-        dims.labels{ndim}=nbrhood.a.dim.labels;
+        dims.values{ndim}=nbrhood.a.fdim.values;
+        dims.labels{ndim}=nbrhood.a.fdim.labels;
         dims.fa{ndim}=nbrhood.fa;
     end
 
@@ -122,11 +122,12 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     dim_values=[dims.values{:}];
 
     % ensure no duplicate or missing labels
-    if ~isequal(sort(dim_labels), unique(dim_labels))
+    if ~isequal(sort(dim_labels), unique(dim_labels)) && ...
+                    ~(isempty(dim_labels))
         error('Duplicate dimension labels in %s', ...
                     cosmo_strjoin(dim_labels,','));
-    elseif ~all(cosmo_match(dim_labels, ds.a.dim.labels))
-        delta=setdiff(dim_labels, ds.a.dim.labels);
+    elseif ~all(cosmo_match(dim_labels, ds.a.fdim.labels))
+        delta=setdiff(dim_labels, ds.a.fdim.labels);
         error('dimension label unknown in dataset: %s', delta{1});
     end
 
@@ -149,9 +150,9 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     joined_nbrhood.neighbors=nbr_idxs;
     joined_nbrhood.fa=cosmo_structjoin(fa_nbrs);
     joined_nbrhood.a=ds.a;
-    joined_nbrhood.a.dim=struct();
-    joined_nbrhood.a.dim.values=dim_values;
-    joined_nbrhood.a.dim.labels=dim_labels;
+    joined_nbrhood.a.fdim=struct();
+    joined_nbrhood.a.fdim.values=dim_values;
+    joined_nbrhood.a.fdim.labels=dim_labels;
 
 
 

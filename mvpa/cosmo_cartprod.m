@@ -121,7 +121,7 @@ else
     ntail=size(ptail,1);
 
     % allocate space for output
-    rows=cell(nhead,1);
+    rows=cell(ntail,1);
     for k=1:ntail
         % merge head and tail
         % ptailk_rep is a repeated version of the k-th tail row
