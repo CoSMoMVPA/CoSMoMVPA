@@ -107,9 +107,11 @@ function samples=generate_samples(ds, class_distance)
         c=onCleanup(@()rng(rng_state));
         rng('default');
     else
+        % Note: this gives a different RNG state than Matlab
+        % For unit and doc testing this may be bad
         rng_state=randn('state');
         c=onCleanup(@()randn('state',rng_state));
-        randn('default');
+        randn('seed',0);
     end
 
     samples=randn(nsamples,nfeatures);
