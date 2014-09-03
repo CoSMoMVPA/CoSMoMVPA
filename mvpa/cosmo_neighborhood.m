@@ -131,8 +131,12 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     end
 
 
+    % optimization: compute conjunctions differently in Matlab and Octave
+    is_matlab=cosmo_wtf('is_matlab');
+
     % compute conjunctions of neighborhoods
-    [nbr_idxs, nbr_map_idxs]=conj_indices(dims.nbrs, show_progress);
+    [nbr_idxs, nbr_map_idxs]=conj_indices(dims.nbrs, ...
+                                        show_progress, is_matlab);
 
     % slice feature attributes
     fa_nbrs=cell(1,ndim);
@@ -151,7 +155,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 
 
 
-function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress)
+function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress, use_fast)
     % computes conjunction indices
     %
     % Input:
@@ -183,7 +187,7 @@ function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress)
     end
 
     % compute indices for remaining dimensions ('tail'), using recursion
-    [tail, tail_map]=conj_indices(dim_idxs(2:end), false);
+    [tail, tail_map]=conj_indices(dim_idxs(2:end), false, use_fast);
     ntail=numel(tail);
 
     % allocate space for output
@@ -204,7 +208,11 @@ function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress)
             pos=pos+1;
             headk=head{k};
 
-            flat_idxs{pos}=fast_intersect(headk, tail{j});
+            if use_fast
+                flat_idxs{pos}=fast_intersect(headk, tail{j});
+            else
+                flat_idxs{pos}=intersect(headk, tail{j});
+            end
 
             map_idxs(1,pos)=head_map(k);
             map_idxs(2:end,pos)=tail_map(:,j);
@@ -230,9 +238,11 @@ function xy=fast_intersect(x,y)
     %         without duplicates and with elements sorted.
     %
     % Notes:
-    %  - this function runs in O(n) compared to O(n*log(n)) with n=max(numel(x),numel(y)) for the
-    %    built-in function 'intersect', as that function sorts the input
-    %    data first.
+    %  - this function runs in O(n) compared to O(n*log(n)) with
+    %    n=max(numel(x),numel(y)) for the built-in function 'intersect',
+    %    as that function sorts the input data first.
+    %  - in matlab it runs a factor 2 or 3 faster
+    %  - in Octave it is very very slow for large inputs
 
     nx=numel(x);
     ny=numel(y);
