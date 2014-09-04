@@ -338,7 +338,8 @@ function externals=get_externals()
 
     externals.surfing.is_present=has('surfing_voxelselection');
     % require recent version with surfing_write
-    externals.surfing.is_recent=~isempty(which('surfing_write'));
+    externals.surfing.is_recent=has('surfing_write') && ...
+                                    has('surfing_nodeselection');
     externals.surfing.label='Surfing toolbox';
     externals.surfing.url='http://github.com/nno/surfing';
     externals.surfing.authors={'N. N. Oosterhof','T. Wiestler',...
