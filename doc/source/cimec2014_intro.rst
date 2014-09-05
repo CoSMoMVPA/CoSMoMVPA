@@ -3,8 +3,8 @@
 Introduction
 ============
 
-Goals of the workshop
-+++++++++++++++++++++
+Goals of this course
+++++++++++++++++++++
 
     * Learn the basics of Multivariate Pattern Analysis
     * Get your hands dirty with data manipulation and algorithm implementation
@@ -12,7 +12,6 @@ Goals of the workshop
 
 
 **Why study brain imaging?**
-
 
 Organization of Human Brain Mapping (OHBM) throws great parties.
 
@@ -78,7 +77,7 @@ Other useful resources:
     * `Numpy for MATLAB users <http://mathesaurus.sourceforge.net/matlab-numpy.html>`_
 
 
-Code for the workshop
+Code for the course
 +++++++++++++++++++++
 
 `Get the code for the workshop here. <http://discovery.dartmouth.edu/~aconnoll/cosmo_mvpa/_static/cosmo_mvpa_scripts.zip>`_
