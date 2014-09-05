@@ -98,26 +98,12 @@ We also have model similarity structures, which you can see here:
 .. image:: _static/sim_sl.png
     :width: 600px
 
-Plan for the day
+Plan for the course
 ++++++++++++++++
 
 #. Learn how to manipulate data as a "**cosmo_fmri_dataset**"
-#. Do several exercises with pattern classification
-    * Split-half correlations
-    * Write your own Nearest-neighbor classifier
-    * Write a wrapper for MATLAB's support vector machine functions to work with
-      dataset
-    * Implement a N-Fold data partitioner for cross-validation
-    * Write an abstraction of cross-validation as a "dataset measure"
-#. Representational Similarity Analysis
-    * Viewing dissimilarity matrices
-    * Comparign dissimilarity matrices
-    * Write an abstraction "RSA dataset measure"
-#. Searchlight analysis
-    * Implement a function to calculate sphere offsets for searchlight
-    * Implement searchlight with cross-validation
-    * Implement RSA searchlight
-    * View searchlight results
+#. TODO
+
 
 In the end we will keep the cosmo_mvpa toolbox in a public repository on
 git-hub.  Here: https://github.com/andycon/cosmo_mvpa You (or any one else) may
