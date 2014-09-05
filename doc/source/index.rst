@@ -42,6 +42,8 @@ CoSMoMVPA
    :target: documentation.html
 .. image:: _static/icon_exercises.png
    :target: cosmo2013.html
+.. image:: _static/icon_exercises.png
+   :target: cimec2014.html
 .. image:: _static/icon_faq.png
    :target: faq.html
 .. image:: _static/icon_contact.png
