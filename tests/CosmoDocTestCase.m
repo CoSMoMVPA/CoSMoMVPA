@@ -138,7 +138,7 @@ function run_doctest(preamb, expr, wants, filename, line)
                 % exception was thrown
                 failed=true;
                 if exception_was_thrown
-                    msg=sprintf(['Expression cannot be evaluated:'...
+                    msg=sprintf(['Expression gave unexpected exception:'...
                                 '\n%s\n%s'],...
                                 to_evaluate,me.getReport);
                 else
@@ -248,8 +248,13 @@ function cmp=doctest_compare(found, wanted)
 end
 
 function tf=exception_is_wanted(wanted)
-    prefix=cosmo_strsplit(wanted,[],1,'(',1);
+    wanted_trimmed=strtrim(wanted);
+    if isempty(wanted_trimmed)
+        tf=false;
+        return
+    end
 
+    prefix=cosmo_strsplit(wanted_trimmed,[],1,'(',1);
     tf=isequal(strtrim(prefix), 'error');
 end
 
