@@ -346,7 +346,7 @@ function externals=get_externals()
                                 'J. Diedrichsen'};
     externals.surfing.ref=['A comparison of volume-based and '...
                             'surface-based multi-voxel pattern '...
-                            'analysis. Neuroimage 56 (2), 593-600'];
+                            'analysis. Neuroimage 56 (2), 593-600, 2011'];
 
     externals.gifti.is_present=@() has('gifti');
     externals.gifti.is_recent=yes;
@@ -390,6 +390,19 @@ function externals=get_externals()
     externals.matlabsvm.url='http://www.mathworks.com';
 
     externals.svm={'libsvm', 'matlabsvm'}; % need either
+
+    externals.distatis.is_present=yes;
+    externals.distatis.is_recent=yes;
+    externals.distatis.label='DISTATIS CoSMoMVPA implementation';
+    externals.distatis.url=externals.cosmo.url;
+    externals.distatis.authors={'Abdi, H.','Valentin, D.',...
+                                        'O''Toole, A. J.','Edelman, B.'};
+    externals.distatis.ref=['DISTATIS: The analysis of multiple '...
+                             'distance matrices. In Proceedings of the '...
+                             'IEEE Computer Society: International '...
+                             'conference on computer vision and '...
+                             'pattern recognition, San Diego, CA, USA '...
+                             '(pp. 42?47), 2005'];
 
 
 
