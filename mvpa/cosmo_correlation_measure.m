@@ -24,7 +24,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %                 The default is 'Pearson'.
 %    .post_corr   Operation performed after correlation. (default: @atanh)
 %    .output      'corr' (default): correlations weighted by template
-%                 'raw': correlations between all classes
+%                 'raw' or 'correlation': correlations between all classes
+%                 'one_minus_correlation': 1 minus correlations
 %
 %
 % Output:
@@ -59,7 +60,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     >     'corr'
 %     %
 %     % get raw output
-%     c_raw=cosmo_correlation_measure(ds,'output','raw');
+%     c_raw=cosmo_correlation_measure(ds,'output','correlation');
 %     cosmo_disp(c_raw)
 %     > .samples
 %     >   [ 0.386
@@ -172,8 +173,10 @@ for k=1:npartitions
         case 'mean'
             pcw=c(template_msk).*template(template_msk);
             pdatak=mean(pcw(:));
-        case 'raw'
+        case {'raw','correlation'}
             pdatak=c(:);
+        case 'one_minus_correlation'
+            pdatak=1-c(:);
         otherwise
             error('Unsupported output %s', params.output);
     end
@@ -186,7 +189,7 @@ ds_sa.samples=mean(cat(2,pdata{:}),2);
 switch params.output
     case 'mean'
         ds_sa.sa.labels='corr';
-    case 'raw'
+    case {'raw','correlation','one_minus_correlation'}
         ds_sa.sa.half1=reshape(repmat((1:nclasses)',nclasses,1),[],1);
         ds_sa.sa.half2=reshape(repmat((1:nclasses),nclasses,1),[],1);
 
