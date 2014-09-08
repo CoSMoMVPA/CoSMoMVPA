@@ -65,6 +65,7 @@ function test_statis_
     opt=struct();
     opt.split_by='subject';
     opt.return='crossproduct';
+    opt.progress=false;
     res=cosmo_distatis(ds,opt);
 
     % note: S_{[+]}[6,2] is reported as -0.01, should be -.100
