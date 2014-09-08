@@ -4,38 +4,49 @@ function res=cosmo_statis(ds, varargin)
 % res=cosmo_statis_measure(ds, opt)
 %
 % Inputs:
-%    ds               dataset struct with dissimilarity measure; usually
+%    ds               dataset struct with dissimilarity values; usually
 %                     the output from @cosmo_dissimilarity_matrix_measure
-%                     applied to each subject followed by cosmo_stack
-%    'return', d      d can be 'distance' (default) or 'crossproduct'
-%    'split_by', s    sample attribute that discriminates subject
-%                     (default: 'subject')
-%    'direction', dr  direction in which squareform is set: either
-%                     'tomatrix' (default) or 'tovector'.
+%                     applied to each subject followed by cosmo_stack. It
+%                     can also be a cell with datasets (one per subject).
+%    'return', d      d can be 'distance' (default) or 'crossproduct'.
+%                     'distance' returns a distance matrix, whereas
+%                     'crossproduct' returns a crossproduct matrix
+%    'split_by', s    sample attribute that discriminates chunks (subjects)
+%                     (default: 'chunks')
+%    'shape', sh      shape of output, 'square' (default) or 'triangle'
 %
 % Returns:
 %    res              result dataset struct with feature-wise optimal
 %                     compromise distance matrix across subjects
-%
-%
+%      .samples
 %
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('nsubjects',5,'nchunks',1,'ntargets',4);
+%     % each subject is a chunk
+%     ds.sa.chunks=ds.sa.subject;
 %     % compute DSM for each subject
 %     opt=struct();
 %     opt.progress=false;
 %     opt.radius=1;
-%     sp=cosmo_split(ds,'subject');
+%     sp=cosmo_split(ds,'chunks');
 %     for k=1:numel(sp)
 %         sp{k}=cosmo_searchlight(sp{k},@cosmo_dissimilarity_matrix_measure,opt);
-%         sp{k}.sa.subject=ones(6,1)*k;
+%         sp{k}.sa.chunks=ones(6,1)*k;
 %     end
 %     % merge results
 %     dsms=cosmo_stack(sp);
 %     %
 %     r=cosmo_distatis(dsms,'return','distance');
 %     cosmo_disp(r);
+%     > .samples
+%     >   [     0         0         0         0         0         0
+%     >     0.558     0.658      1.35     0.837      1.34      1.13
+%     >     0.614      1.44      1.48     0.849      1.07      1.37
+%     >       :         :         :         :         :         :
+%     >     0.577     0.972     0.667     0.362     0.576     0.637
+%     >      1.22      1.04     0.666     0.899      1.04     0.425
+%     >         0         0         0         0         0         0 ]@16x6
 %     > .fa
 %     >   .nvoxels
 %     >     [ 3         4         3         3         4         3 ]
@@ -73,14 +84,6 @@ function res=cosmo_statis(ds, varargin)
 %     >           2      2
 %     >           3      3
 %     >           4 ]    4 ] }
-%     > .samples
-%     >   [     0         0         0         0         0         0
-%     >     0.558     0.658      1.35     0.837      1.34      1.13
-%     >     0.614      1.44      1.48     0.849      1.07      1.37
-%     >       :         :         :         :         :         :
-%     >     0.577     0.972     0.667     0.362     0.576     0.637
-%     >      1.22      1.04     0.666     0.899      1.04     0.425
-%     >         0         0         0         0         0         0 ]@16x6
 %     > .sa
 %     >   .targets1
 %     >     [ 1
@@ -117,8 +120,8 @@ function res=cosmo_statis(ds, varargin)
 cosmo_check_external('distatis');
 
 defaults.return='distance';
-defaults.split_by='subject';
-defaults.direction='tomatrix';
+defaults.split_by='chunks';
+defaults.shape='square';
 defaults.mask_output=[];
 
 opt=cosmo_structjoin(defaults,varargin);
@@ -133,7 +136,7 @@ end
 
 nsubj=numel(subject_cell);
 nfeatures=size(ds.samples,2);
-q=zeros(1,nfeatures);
+quality=zeros(1,nfeatures);
 
 for k=1:nfeatures
     x=zeros(nclasses*nclasses,nsubj);
@@ -159,37 +162,38 @@ for k=1:nfeatures
     end
 
     if k==1
+        % allocat space
         nsamples=zeros(numel(result),nfeatures);
     end
 
     samples(:,k)=result;
-    q(:,k)=v/nsubj;
+    quality(:,k)=v/nsubj;
 end
 
 
 res=struct();
+
+switch opt.shape
+    case 'triangle'
+        [msk,i,j]=distance_matrix_mask(nclasses);
+        res.samples=samples(msk(:),:);
+    case 'square'
+        res.samples=samples;
+        [i,j]=find(ones(nclasses));
+    otherwise
+        error('unsupported direction %s', opt.shape);
+end
+
 if isfield(ds,'fa')
     res.fa=ds.fa;
 end
-res.fa.quality=q;
+res.fa.quality=quality;
 if isfield(ds,'a')
     res.a=ds.a;
 end
 res.a.sdim=struct();
 res.a.sdim.labels=dim_labels;
 res.a.sdim.values=dim_values;
-
-switch opt.direction
-    case 'tovector'
-        msk=triu(repmat(1:nclasses,nclasses,1),1)'>0;
-        res.samples=samples(msk(:),:);
-        [i,j]=find(msk);
-    case 'tomatrix'
-        res.samples=samples;
-        [i,j]=find(ones(nclasses));
-    otherwise
-        error('unsupported mask_output %s', mask_output);
-end
 
 res.sa.(dim_labels{1})=i;
 res.sa.(dim_labels{2})=j;
@@ -234,17 +238,26 @@ function y=ensure_distance_vector(x)
     y=xsq(:);
 
 
-function [dsms,nclasses,dim_labels,dim_values]=get_dsms(sp)
-    nsubj=numel(sp);
+function [dsms,nclasses,dim_labels,dim_values]=get_dsms(data_cell)
+    nsubj=numel(data_cell);
 
+    % allocate
     dsms=cell(nsubj,1);
-    for k=1:numel(sp)
-        [dsm,dim_labels,dim_values]=cosmo_unflatten(sp{k},1);
+    for k=1:numel(data_cell)
+        data=data_cell{k};
+
+        % get data
+        [dsm,dim_labels,dim_values]=get_dsm(data);
+
+        % store data
         dsms{k}=dsm;
+
         if k==1
             nclasses=size(dsm,1);
             first_dim_labels=dim_labels;
             first_dim_values=dim_values;
+
+            data_first=data;
         else
 
             if ~isequal(first_dim_labels,dim_labels)
@@ -255,7 +268,34 @@ function [dsms,nclasses,dim_labels,dim_values]=get_dsms(sp)
             end
 
             % check for compatibility over subjects
-            cosmo_stack({cosmo_slice(sp{k},1),cosmo_slice(sp{1},1)});
+            cosmo_stack({cosmo_slice(data,1),cosmo_slice(data_first,1)});
         end
     end
+
+function [msk,i,j]=distance_matrix_mask(nclasses)
+    msk=triu(repmat(1:nclasses,nclasses,1),1)'>0;
+    [i,j]=find(msk);
+
+function [dsm, dim_labels, dim_values]=get_dsm(data)
+    if isstruct(data)
+        [dsm,dim_labels,dim_values]=cosmo_unflatten(data,1);
+    elseif isnumeric(dsm)
+        n=size(dsm,1);
+
+        side=(1+sqrt(1+8*n))/2;
+        if ~isequal(side, round(side))
+            error(['size %d of input vector is not correct for '...
+                    'the number of elements below diagonal of a '...
+                    'square matrix'], n);
+        end
+
+        dim_labels={'targets1','targets2'};
+        dim_values={1:n,1:n};
+    else
+        error('illegal input: expect dataset struct, or cell with arrays');
+    end
+
+
+
+
 

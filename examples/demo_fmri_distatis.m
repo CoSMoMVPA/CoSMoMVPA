@@ -59,7 +59,9 @@ for subject_num=1:nsubjects
                             'targets',1:6,'chunks',1);
 
     ds_rsm=cosmo_dissimilarity_matrix_measure(ds);
-    ds_rsm.sa.subject=subject_num*ones(size(ds_rsm.samples,1),1);
+
+    % set chunks (one chunk per subject)
+    ds_rsm.sa.chunks=subject_num*ones(size(ds_rsm.samples,1),1);
     ds_rsms{subject_num}=ds_rsm;
 end
 
@@ -103,7 +105,3 @@ end
 
 %% show citation information
 cosmo_check_external('-cite');
-
-
-
-
