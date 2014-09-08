@@ -179,6 +179,10 @@ defaults.subsample_min_ratio=.2;
 defaults.center_ids=[];
 opt=cosmo_structjoin(defaults,varargin{:});
 
+if strcmp(opt.metric,'geodesic')
+    cosmo_check_external('fast_marching');
+end
+
 % get surfaces
 [v1,v2,f,vo,fo]=parse_surfs(surfs);
 
