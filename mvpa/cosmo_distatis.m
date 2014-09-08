@@ -153,6 +153,8 @@ for k=1:nfeatures
     c=cosmo_corr(x);
 
     [e,v]=eigs(c,1);
+    % equivalent, but slower:
+    % [v,e]=fast_eig1(c);
     ew=e/sum(e);
 
     compromise=x*ew;
@@ -227,10 +229,39 @@ function z_vec=distance2crossproduct(x)
     m=e*(1/n);
     ee=eye(n)-e*m';
     y=-.5*ee*(x+x')*ee';
-    z=(1/eigs(y,1))*y(:);
+    z=(1/fast_eig1(y))*y';
+    % equivalent, but slower:
+    % z=(1/eigs(y,1))*y(:);
 
     z_vec=z(:);
 
+function [lambda,pivot]=fast_eig1(x)
+    % compute first (largest) eigenvalue and corresponding eigenvector
+    % using power iteration method; benchmarking suggests this can be up to
+    % five times as fast as using eigs(x,1)
+    n=size(x,1);
+    pivot=ones(n,1);
+    tolerance=1e-8;
+    max_iter=1000;
+
+    old_lambda=NaN;
+    for k=1:max_iter
+        z=x*pivot;
+        pivot=z / norm(z);
+
+        lambda=pivot'*z;
+        if abs(lambda-old_lambda)/lambda<tolerance
+            z=x*pivot;
+            pivot=z / sqrt(sum(z.^2));
+
+            lambda=pivot'*z;
+            return
+        end
+        old_lambda=lambda;
+    end
+
+    % matlab fallback
+    [pivot,lambda]=eigs(x,1);
 
 function y=ensure_distance_vector(x)
     tolerance=1e-8;
