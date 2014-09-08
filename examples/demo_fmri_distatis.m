@@ -71,14 +71,11 @@ all_ds=cosmo_stack(ds_rsms);
 %% Run DISTATIS
 distatis=cosmo_distatis(all_ds);
 
-%% Show results
-
-% show comprimise distance matrix
+%% show comprimise distance matrix
 [compromise_matrix,dim_labels,values]=cosmo_unflatten(distatis,1);
 
 labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
-
-subplot(1,3,1);
+figure();
 imagesc(compromise_matrix)
 title('DSM');
 set(gca,'YTickLabel',labels);
@@ -89,13 +86,13 @@ colorbar
 
 % skip if stats toolbox is not present
 if cosmo_check_external('@stats',false)
+    figure();
     hclus = linkage(compromise_matrix);
-    subplot(1,3,2);
     dendrogram(hclus,'labels',labels,'orientation','left');
     title('dendrogram');
 
+    figure();
     F = cmdscale(squareform(compromise_matrix));
-    subplot(1,3,3);
     text(F(:,1), F(:,2), labels);
     title('2D MDS plot');
     mx = max(abs(F(:)));
