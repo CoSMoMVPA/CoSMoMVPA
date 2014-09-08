@@ -37,7 +37,7 @@ function res=cosmo_statis(ds, varargin)
 %     % merge results
 %     dsms=cosmo_stack(sp);
 %     %
-%     r=cosmo_distatis(dsms,'return','distance');
+%     r=cosmo_distatis(dsms,'return','distance','progress',false);
 %     cosmo_disp(r);
 %     > .samples
 %     >   [     0         0         0         0         0         0
@@ -123,6 +123,7 @@ defaults.return='distance';
 defaults.split_by='chunks';
 defaults.shape='square';
 defaults.mask_output=[];
+defaults.progress=100;
 
 opt=cosmo_structjoin(defaults,varargin);
 
@@ -137,6 +138,10 @@ end
 nsubj=numel(subject_cell);
 nfeatures=size(ds.samples,2);
 quality=zeros(1,nfeatures);
+
+prev_msg='';
+clock_start=clock();
+show_progress=nfeatures>1 && opt.progress;
 
 for k=1:nfeatures
     x=zeros(nclasses*nclasses,nsubj);
@@ -168,6 +173,13 @@ for k=1:nfeatures
 
     samples(:,k)=result;
     quality(:,k)=v/nsubj;
+
+
+    if show_progress && (k<10 || mod(k, opt.progress)==0 || k==nfeatures)
+        status=sprintf('quality=%.3f%% (avg)',mean(quality(1:k)));
+        prev_msg=cosmo_show_progress(clock_start,k/nfeatures,...
+                                                    status,prev_msg);
+    end
 end
 
 
