@@ -159,6 +159,7 @@ end
 
 quality=zeros(1,nfeatures);
 nobservations=zeros(1,nfeatures);
+correlation_warning_shown=false;
 
 prev_msg='';
 clock_start=clock();
@@ -187,19 +188,21 @@ for k=1:nfeatures
     if any(c(:)<0)
         msg=sprintf(['negative correlations found for feature %d '...
                             ' (# %d), minimum=%d'],feature_id,k,min(c(:)));
-
         if opt.abs_correlation
-            msg=sprintf(['%s\nthe absolute value of the correlations '...
+            if ~correlation_warning_shown
+                msg=sprintf(['%s\nthe absolute value of the correlations '...
                         'is taken because .abscorrelation=true, but '...
                         'this feature is ***experimental*** and not '...
                         'properly validated. Interpret results with '...
                         'care'],msg);
-            cosmo_warning(msg);
+                cosmo_warning(msg);
+                correlation_warning_shown=true;
+            end
             c=abs(c);
         else
             msg=sprintf(['%s\nIf you know what you are doing (as a '...
                 'litmus test, you would be able to  '...
-                'implement DISTATIUS), consider to use the option:  '...
+                'implement DISTATIS), consider to use the option:  '...
                 '''abscorrelation'',true'],msg);
             error(msg)
         end
@@ -220,6 +223,7 @@ for k=1:nfeatures
         case 'uniform'
             % all the same
             ew=ones(nkeep,1)/nkeep;
+            v=0;
 
         otherwise
             error('illegal weight %s', opt.weight);
