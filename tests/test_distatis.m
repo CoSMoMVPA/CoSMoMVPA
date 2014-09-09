@@ -65,6 +65,7 @@ function test_statis_
     opt=struct();
     opt.split_by='subject';
     opt.return='crossproduct';
+    opt.progress=false;
     res=cosmo_distatis(ds,opt);
 
     % note: S_{[+]}[6,2] is reported as -0.01, should be -.100
@@ -81,7 +82,7 @@ function test_statis_
     assertElementsAlmostEqual(res.fa.quality(2),.6551,'absolute',.001)
 
     opt.return='distance';
-    opt.direction='tomatrix';
+    opt.shape='square';
     res=cosmo_distatis(ds,opt);
     u=cosmo_unflatten(res,1);
     sq=cosmo_squareform(u(:,:,1));
@@ -89,7 +90,7 @@ function test_statis_
                                   0.4911    0.7112    0.4919    0.5789 ...
                                   0.6203    1.3049    1.2163    1.0512 ...
                                   0.3996  0.5354 0.4400],'absolute',.001);
-    opt.direction='tovector';
+    opt.shape='triangle';
     resvec=cosmo_distatis(ds,opt);
     assertElementsAlmostEqual(resvec.samples(:,1),sq');
 
