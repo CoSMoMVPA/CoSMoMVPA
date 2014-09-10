@@ -78,31 +78,20 @@ as_struct=isstruct(xs);
 
 if as_struct
     % input is a struct; put the values in each field in a cell.
-    s=xs; % make a copy
-    fns=fieldnames(s);
-    ndim=numel(fns);
-    xs=cell(1,ndim); % space for values in each dimension
-    for k=1:ndim
-        xs{k}=s.(fns{k});
-    end
-
-    if ndim==0
-        p=xs;
-        return
-    end
-end
-
-if iscell(xs)
-    ndim=numel(xs);
-else
+    [xs,fns]=struct2cell(xs);
+elseif ~iscell(xs)
     error('Unsupported input: expected a cell or struct');
 end
+
+ndim=numel(xs);
 
 % get values in first dimension (the 'head')
 xhead=xs{1};
 if isnumeric(xhead) || islogical(xhead)
     % put numeric arrays in a cell
     xhead=num2cell(xhead);
+elseif ischar(xhead)
+    xhead={xhead};
 end
 
 % ensure head is a column vector
@@ -136,11 +125,27 @@ end
 
 % if input was a struct, output is a cell with structs
 if as_struct();
+    p=cell2structs(p, fns);
+elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
+    % all values are numeric; convert to numeric matrix
+    p=reshape([p{:}],size(p));
+end
+
+function [c,fns]=struct2cell(xs)
+    fns=fieldnames(xs);
+    ndim=numel(fns);
+    c=cell(1,ndim); % space for values in each dimension
+    for k=1:ndim
+        c{k}=xs.(fns{k});
+    end
+
+function struct_cell=cell2structs(p, fns)
     % number of output
     n=size(p,1);
+    ndim=numel(fns);
 
     % allocate space for structs
-    p_cell=cell(n,1);
+    struct_cell=cell(n,1);
 
     % set values for each struct
     for k=1:n
@@ -149,12 +154,5 @@ if as_struct();
             % use the same fieldnames as in the input
             s.(fns{j})=p{k,j};
         end
-        p_cell{k}=s;
+        struct_cell{k}=s;
     end
-
-    % use value of q in output
-    p=p_cell;
-elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
-    % all values are numeric; convert to numeric matrix
-    p=reshape([p{:}],size(p));
-end
