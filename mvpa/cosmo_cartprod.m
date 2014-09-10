@@ -83,6 +83,11 @@ elseif ~iscell(xs)
     error('Unsupported input: expected a cell or struct');
 end
 
+if isempty(xs)
+    p=cell(1,0);
+    return
+end
+
 ndim=numel(xs);
 
 % get values in first dimension (the 'head')
