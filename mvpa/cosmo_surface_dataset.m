@@ -6,23 +6,93 @@ function ds=cosmo_surface_dataset(fn, varargin)
 % Inputs:
 %   filename          filename of surface data to be loaded. Currently
 %                     supported are '.niml.dset' (AFNI/SUMA NIML) and
-%                     'smp' (BrainVoyager surface maps)
+%                     'smp' (BrainVoyager surface maps). Also supported are
+%                     structs as provied by afni_niml_readsimple or xff
 %   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
 %                     the output as ds.sa.chunks
+% Output:
+%   ds                dataset struct
+%
+% Examples:
+%     % construct AFNI NIML dataset struct
+%     cosmo_check_external('afni');
+%     niml=struct();
+%     niml.data=[1 2; 3 4; 5 6];
+%     niml.node_indices=[1 20 201];
+%     niml.stats={'Ttest(10)','Zscore()'};
+%     %
+%     % make surface dataset
+%     % (a filename of a NIML dataset in ASCII format is supported as well)
+%     ds=cosmo_surface_dataset(niml);
+%     cosmo_disp(ds)
+%     > .samples
+%     >   [ 1         3         5
+%     >     2         4         6 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Ttest(10)'
+%     >       'Zscore()'  }
+%     > .fa
+%     >   .node_indices
+%     >     [ 1         2         3 ]
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'node_indices' }
+%     >     .values
+%     >       { [   2
+%     >            21
+%     >           202 ] }
+%
+%     % construct BrainVoyager surface map
+%     cosmo_check_external('neuroelf');
+%     smp=xff('new:smp');
+%     %
+%     % make surface dataset
+%     % (a filename of a .smp file is supported as well)
+%     ds=cosmo_surface_dataset(smp);
+%     cosmo_disp(ds)
+%     > .samples
+%     >   [ 0         0         0  ...  0         0         0 ]@1x40962
+%     > .sa
+%     >   .labels
+%     >     { 'New Map' }
+%     >   .stats
+%     >     { 'Ttest(249)' }
+%     > .fa
+%     >   .node_indices
+%     >     [ 1         2         3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'node_indices' }
+%     >     .values
+%     >       { [       1
+%     >                 2
+%     >                 3
+%     >              :
+%     >           4.1e+04
+%     >           4.1e+04
+%     >           4.1e+04 ]@40962x1 }
+%
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
 %     one or more values associated with each surface node. It does not
 %     support anatomical surface meshes that contain node coordinates and
 %     faces. To read and write such anatomical meshes, consider the surfing
 %     toolbox, github.com/nno/surfing
+%   - data can be mapped back to a surface file format using
+%     cosmo_map2surface
 %
 % Dependencies:
 %   - for Brainvoyager files (.smp), it requires the NeuroElf
 %     toolbox, available from: http://neuroelf.net
 %   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
 %     Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%
+% See also: cosmo_map2surface
 %
 % NNO May 2014
 
@@ -41,7 +111,10 @@ function ds=cosmo_surface_dataset(fn, varargin)
 
     [data,node_indices,sa]=read(fn);
     nfeatures=size(data,2);
-    assert(nfeatures==numel(node_indices));
+    if nfeatures~=numel(node_indices)
+        error(['The number of features (%d) does not match the number '...
+                'of node indices (%d)'],nfeatures,numel(node_indices));
+    end
 
     ds=struct();
     ds.samples=data;
