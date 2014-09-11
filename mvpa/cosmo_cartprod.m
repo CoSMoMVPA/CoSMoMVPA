@@ -5,10 +5,11 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %
 % Inputs:
 %   xs                   Px1 cell array with values for which the product
-%                        is to be returned. Each element xs{k} should be a
-%                        cell with Qk values; or a numeric array
-%                        [xk_1,...,xk_Qk] which is interpreted as the cell
-%                        {xk_1,...,xk_Qk}.
+%                        is to be returned. Each element xs{k} should be
+%                        - a cell with Qk values
+%                        - a numeric array [xk_1,...,xk_Qk], which is
+%                          interpreted as the cell {xk_1,...,xk_Qk}.
+%                        - or a string s, which is interpreted as {s}.
 %                        Alternatively xs can be a struct with P fieldnames
 %                        where each value is a cell with Qk values.
 %
@@ -45,6 +46,8 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     s.roi={'v1','loc'};
 %     s.hemi={'L','R'};
 %     s.subj=[1 3 9];
+%     s.ana='vis';
+%     s.beta=4;
 %     p=cosmo_cartprod(s)';
 %     cosmo_disp(p);
 %     > { .roi     .roi     .roi    ... .roi     .roi     .roi
@@ -52,7 +55,11 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     >   .hemi    .hemi    .hemi       .hemi    .hemi    .hemi
 %     >     'L'      'L'      'R'         'L'      'R'      'R'
 %     >   .subj    .subj    .subj       .subj    .subj    .subj
-%     >     [ 1 ]    [ 1 ]    [ 1 ]       [ 9 ]    [ 9 ]    [ 9 ]   }@1x12
+%     >     [ 1 ]    [ 1 ]    [ 1 ]       [ 9 ]    [ 9 ]    [ 9 ]
+%     >   .ana     .ana     .ana        .ana     .ana     .ana
+%     >     'vis'    'vis'    'vis'       'vis'    'vis'    'vis'
+%     >   .beta    .beta    .beta       .beta    .beta    .beta
+%     >     [ 4 ]    [ 4 ]    [ 4 ]       [ 4 ]    [ 4 ]    [ 4 ]   }@1x12
 %     %
 %     % print all combinations
 %     for k=1:numel(p),fprintf('#%d:%s%s\n',p{k}.subj,p{k}.hemi,p{k}.roi);end
