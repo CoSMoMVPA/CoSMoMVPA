@@ -56,7 +56,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
     fdim=struct();
     fdim.labels={'node_indices'};
     fdim.values={node_indices(:)};
-    ds.a.fdim=dim;
+    ds.a.fdim=fdim;
 
      % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
@@ -141,7 +141,7 @@ function img_formats=get_img_formats()
     img_formats.bv_smp.externals={'neuroelf'};
 
 function b=isa_niml_dset(x)
-    b=isstruct(x) && isfield(x,'data') && isfield(x,'node_indices');
+    b=isstruct(x) && isfield(x,'data');
 
 function s=read_niml_dset(fn)
     s=afni_niml_readsimple(fn);
