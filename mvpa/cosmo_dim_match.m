@@ -84,7 +84,13 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     %
 %     % show result
 %     cosmo_disp(ds_pruned.a.fdim.values{2}); % 'time' is second dimension
-%     > [ 0      0.05       0.1  ...  0.2      0.25       0.3 ]@1x7
+%     > [    0
+%     >   0.05
+%     >    0.1
+%     >     :
+%     >    0.2
+%     >   0.25
+%     >    0.3 ]@7x1
 %     cosmo_disp(ds_pruned.fa.time)
 %     > [ 1         1         1  ...  7         7         7 ]@1x2142
 %     %
@@ -96,8 +102,13 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     %
 %     % show result
 %     cosmo_disp(ds_pruned.a.fdim.values); % 'chan' and 'time'
-%     > { { 'MEG1843'    [ 0 0.05 0.1  ...  0.2 0.25 0.3 ]@1x7
-%     >     'MEG2441' }                                         }
+%     > { { 'MEG1843'    [    0
+%     >     'MEG2441' }    0.05
+%     >                     0.1
+%     >                      :
+%     >                     0.2
+%     >                    0.25
+%     >                     0.3 ]@7x1 }
 %     cosmo_disp(ds_pruned.fa.chan)
 %     > [ 1         2         1  ...  2         1         2 ]@1x14
 %     cosmo_disp(ds_pruned.fa.time)
