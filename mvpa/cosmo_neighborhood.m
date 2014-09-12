@@ -17,12 +17,42 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %                 for example from cosmo_spherical_neighborhood,
 %                 cosmo_meeg_chan_neighborhood, or
 %                 cosmo_interval_neighborhood.
-%   -'progress',p if p is true, then progress is shown
+%   '-progress',p if p is true, then progress is shown
 %
 % Returns:
 %   joined_nbrhood  neighborhood struct with fields .[f]a and .neighbors,
 %                   constructed by intersecting the neighborhoods from the
 %                   input.
+%
+% Example:
+%     % Illustrate neighborhood by crossing freq and time, with freq
+%     % 5 bins wide and time 3 bins wide. Each neighborhood contains all
+%     % the channels, repeated up to 5*3=15 times (fewer at the border)
+%     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+%     freq_nbrhood=cosmo_interval_neighborhood(ds,'freq',3);
+%     time_nbrhood=cosmo_interval_neighborhood(ds,'time',5);
+%     nbrhood=cosmo_neighborhood(ds, freq_nbrhood, time_nbrhood,...
+%                                                    '-progress',false);
+%     cosmo_disp(nbrhood.a.fdim)
+%     > .values
+%     >   { [ 2         4         6  ...  10        12        14 ]@1x7
+%     >     [ -0.2     -0.15      -0.1     -0.05         0 ]           }
+%     > .labels
+%     >   { 'freq'
+%     >     'time' }
+%     cosmo_disp(nbrhood.fa)
+%     > .freq
+%     >   [ 1         2         3  ...  5         6         7 ]@1x35
+%     > .time
+%     >   [ 1         1         1  ...  5         5         5 ]@1x35
+%     cosmo_disp(nbrhood.neighbors)
+%     > { [ 1         2         3  ...  9.79e+03  9.79e+03  9.79e+03 ]@1x6120
+%     >   [ 1         2         3  ...  1.01e+04  1.01e+04  1.01e+04 ]@1x7650
+%     >   [ 1         2         3  ...  1.04e+04  1.04e+04  1.04e+04 ]@1x9180
+%     >                                    :
+%     >   [ 307       308       309  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x9180
+%     >   [ 613       614       615  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x7650
+%     >   [ 919       920       921  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x6120 }@35x1
 %
 % See also: cosmo_spherical_neighborhood, cosmo_meeg_chan_neighborhood,
 %           cosmo_interval_neighborhood
@@ -109,8 +139,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
         end
 
         dims.nbrs{ndim}=nbrhood.neighbors;
-        dims.values{ndim}=nbrhood.a.fdim.values;
-        dims.labels{ndim}=nbrhood.a.fdim.labels;
+        dims.values{ndim}=nbrhood.a.fdim.values(:);
+        dims.labels{ndim}=nbrhood.a.fdim.labels(:);
         dims.fa{ndim}=nbrhood.fa;
     end
 
@@ -118,8 +148,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     dims=cosmo_slice(dims,1:ndim,2,'struct');
 
     % merge labels and values
-    dim_labels=[dims.labels{:}];
-    dim_values=[dims.values{:}];
+    dim_labels=[dims.labels{:}]';
+    dim_values=[dims.values{:}]';
 
     % ensure no duplicate or missing labels
     if ~isequal(sort(dim_labels), unique(dim_labels)) && ...
@@ -140,7 +170,7 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
                                         show_progress, is_matlab);
 
     % slice feature attributes
-    fa_nbrs=cell(1,ndim);
+    fa_nbrs=cell(ndim,1);
     for k=1:ndim
         fa=dims.fa{k};
         fa_nbrs{k}=cosmo_slice(fa,nbr_map_idxs(k,:),2,'struct');
@@ -249,7 +279,7 @@ function xy=fast_intersect(x,y)
     ny=numel(y);
     n=min(nx,ny); % maximum size possible for output
 
-    xy=zeros(n,1); % allocate space for output
+    xy=zeros(1,n); % allocate space for output
 
     pos=0; % last position where a value was stored in xy
     xi=1;  % position in x
