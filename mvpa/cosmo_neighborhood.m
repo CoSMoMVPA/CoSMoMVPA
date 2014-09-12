@@ -35,11 +35,15 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %                                                    '-progress',false);
 %     cosmo_disp(nbrhood.a.fdim)
 %     > .values
-%     >   { [ 2         4         6  ...  10        12        14 ]@1x7
-%     >     [ -0.2     -0.15      -0.1     -0.05         0 ]           }
+%     >   { [  2        [  -0.2
+%     >        4          -0.15
+%     >        6           -0.1
+%     >        :          -0.05
+%     >       10              0 ]
+%     >       12
+%     >       14 ]@7x1            }
 %     > .labels
-%     >   { 'freq'
-%     >     'time' }
+%     >   { 'freq'  'time' }
 %     cosmo_disp(nbrhood.fa)
 %     > .freq
 %     >   [ 1         2         3  ...  5         6         7 ]@1x35
@@ -148,8 +152,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
     dims=cosmo_slice(dims,1:ndim,2,'struct');
 
     % merge labels and values
-    dim_labels=[dims.labels{:}]';
-    dim_values=[dims.values{:}]';
+    dim_labels=[dims.labels{:}];
+    dim_values=[dims.values{:}];
 
     % ensure no duplicate or missing labels
     if ~isequal(sort(dim_labels), unique(dim_labels)) && ...

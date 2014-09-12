@@ -5,7 +5,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %
 % Inputs:
 %   ds            dataset struct
-%   label         dimension label in ds.a.dim.labels
+%   label         dimension label in ds.a.fdim.labels
 %   radius        neighborhood size
 %
 % Returns:
@@ -27,7 +27,13 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %     > .labels
 %     >   { 'freq' }
 %     > .values
-%     >   { [ 2         4         6  ...  10        12        14 ]@1x7 }
+%     >   { [  2
+%     >        4
+%     >        6
+%     >        :
+%     >       10
+%     >       12
+%     >       14 ]@7x1 }
 %     cosmo_disp(nbrhood.fa.freq)
 %     > [ 1         2         3  ...  5         6         7 ]@1x7
 %     cosmo_disp(nbrhood.neighbors)
@@ -49,7 +55,13 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %     > .labels
 %     >   { 'time' }
 %     > .values
-%     >   { [ -0.2     -0.15      -0.1  ...  0      0.05       0.1 ]@1x7 }
+%     >   { [  -0.2
+%     >       -0.15
+%     >        -0.1
+%     >         :
+%     >           0
+%     >        0.05
+%     >         0.1 ]@7x1 }
 %     cosmo_disp(nbrhood.fa.time)
 %     > [ 1         2         3  ...  5         6         7 ]@1x7
 %     cosmo_disp(nbrhood.neighbors)
@@ -104,7 +116,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 
     a_dim=struct();
     a_dim.labels={label};
-    a_dim.values={dim_values};
+    a_dim.values={dim_values(:)};
     nbrhood.a.(dim_name)=a_dim;
 
     nbrhood.(attr_name)=struct();
