@@ -39,10 +39,10 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %                     .labels{1}=='chan', then .values{1} contains the
 %                     channel labels.
 %     .fa
-%       .{D}          if D==a.dim.labels{K} is the label for the K-th
+%       .{D}          if D==a.fdim.labels{K} is the label for the K-th
 %                     feature dimension, then .{D} contains the
-%                     indices referencing a.dim.values. Thus, all values in
-%                     .{D} are in the range 1:N_K if a.dim.values{K} has
+%                     indices referencing a.fdim.values. Thus, all values in
+%                     .{D} are in the range 1:N_K if a.fdim.values{K} has
 %                     N_K values, and the J-th feature has dimension value
 %                     .dim.values{K}(.{D}(J)) in the K-th dimension.
 %
@@ -167,9 +167,22 @@ function ds=read_ft(filename)
     ft=importdata(filename);
     ds=convert_ft(ft);
 
+function tp=ft_senstype_wrapper(ft)
+    % wrapper to deal with neuromag306
+    tp=ft_senstype(ft);
+    if strcmp(tp,'unknown')
+        labels=ft_senslabel('neuromag306alt_combined');
+        n=numel(labels);
+        if numel(intersect(labels,ft.label))/n >= .4
+            tp='neuromag';
+        end
+    end
+
+
 function ds=convert_ft(ft)
     % ft is a fieldtrip struct
     datatype=ft_datatype(ft);
+    senstype=ft_senstype_wrapper(ft);
 
     % smallish hack: timelock data with 'avg' data is only 2D, but
     % must be transformed to 3D with singleton dimension before
@@ -210,7 +223,7 @@ function ds=convert_ft(ft)
     if isempty(samples_arr), error('Could not find sample data'); end
 
     % get the dimension labels
-    [dim_labels,ndim_expected]=cosmo_strsplit(ft.dimord,'_');
+    dim_labels=cosmo_strsplit(ft.dimord,'_');
 
     % See if the first dimension is a dimension label (chan, freq, time).
     insert_sample_dim=cosmo_match(dim_labels(1),expected_dim_labels);
@@ -235,6 +248,7 @@ function ds=convert_ft(ft)
     % get the dim labels - they should match expected_dim_labels
     % if add_dim then start at first label, otherwise at second.
     dim_labels=dim_labels((1+~insert_sample_dim):end);
+    nfeature_dim_expected=numel(dim_labels);
 
     % check the labels
     if ~isempty(setdiff(dim_labels,expected_dim_labels))
@@ -242,16 +256,16 @@ function ds=convert_ft(ft)
         error('unexpected field %s in .dimord %s', delta{1}, ft.dimord);
     end
 
-    ndim=numel(size(samples_arr))-1; % number of feature dimensions
-    if ndim~=ndim_expected-1
+    nfeature_dim=numel(size(samples_arr))-1; % number of feature dimensions
+    if nfeature_dim~=nfeature_dim_expected
         error('Found %d dimensions, expected %d from .dimord (%s)',...
-                    ndim, ndim_expected, ft.dimord);
+                    nfeature_dim, nfeature_dim_expected, ft.dimord);
     end
 
     % store values for each feature dimensions, e.g. labels of the
     % channels, onets for time, and frequency for freq
-    dim_values=cell(1,ndim);
-    for k=1:ndim
+    dim_values=cell(1,nfeature_dim);
+    for k=1:nfeature_dim
         dim_label=dim_labels{k};
         if strcmp(dim_label,'chan')
             % FT uses label to refer to channel names
@@ -269,6 +283,10 @@ function ds=convert_ft(ft)
     ds.a.meeg.samples_type=datatype;
     ds.a.meeg.samples_label=samples_label;
 
+    if ~strcmp(senstype,'unknown')
+        ds.a.meeg.senstype=senstype;
+    end
+
     ds.sa=sa;
     if isfield(ft,'trialinfo')
         ds.sa.trialinfo=ft.trialinfo;
@@ -278,18 +296,9 @@ function ds=convert_ft(ft)
         ds.sa.cumtapcnt=ft.cumtapcnt;
     end
 
-    % fields to leave out in output
-    % XXX timelock data .var, .dof, .avg are removed - not sure if that is
-    % bad.
-    omit_fields=[{samples_field, 'trialinfo', 'dimord', 'label', ...
-                        'avg','var','dof', 'cumtapcnt'} dim_labels];
 
-    all_fields=fieldnames(ft);
-    keep_field_indices=find(~cosmo_match(all_fields, omit_fields));
-    for k=1:numel(keep_field_indices)
-        fn=all_fields{keep_field_indices(k)};
-        ds.a.hdr_ft.(fn)=ft.(fn);
-    end
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -368,7 +377,6 @@ function ds=read_eeglab_txt(fn)
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type='timelock';
     ds.a.meeg.samples_label='rpt';
-    ds.a.hdr_ft=struct(); % make it look like a fieldtrip structure
 
     % set sample info
     ds.sa.(ds.a.meeg.samples_label)=(1:ntrial)';
