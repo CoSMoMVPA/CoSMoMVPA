@@ -163,7 +163,6 @@ function ds_res=cosmo_cartesian_dim_transfer(ds, dim_label, measure, varargin)
 %     >       'trial'
 %     >     .samples_label
 %     >       'rpt'
-%     >   .hdr_ft
 %     >   .sdim
 %     >     .labels
 %     >       {  }
@@ -243,12 +242,11 @@ function ds_res=cosmo_cartesian_dim_transfer(ds, dim_label, measure, varargin)
 %     >       { 'chan'  'freq' }
 %     >   .meeg
 %     >     .samples_type
-%     >       'timefreq'
+%     >       'freq'
 %     >     .samples_field
 %     >       'powspctrm'
 %     >     .samples_label
 %     >       'rpt'
-%     >   .hdr_ft
 %     >   .sdim
 %     >     .labels
 %     >       { 'train_time'  'test_time' }

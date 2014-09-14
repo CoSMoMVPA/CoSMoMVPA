@@ -113,12 +113,11 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >           'MEG2643' }@306x1    34 ]@17x1      0.7 ]@19x1 }
 %     >   .meeg
 %     >     .samples_type
-%     >       'timefreq'
+%     >       'freq'
 %     >     .samples_field
 %     >       'powspctrm'
 %     >     .samples_label
 %     >       'rpt'
-%     >   .hdr_ft
 %     > .sa
 %     >   .targets
 %     >     [ 1
@@ -252,7 +251,7 @@ function a=dim_labels_values(data_type, chan_type)
                     freq=(2:2:40)';
                     values={chan,freq,time};
                     labels={'chan','freq','time'};
-                    a.meeg.samples_type='timefreq';
+                    a.meeg.samples_type='freq';
                     a.meeg.samples_field='powspctrm';
 
                 otherwise % meeg and timelock
@@ -263,7 +262,6 @@ function a=dim_labels_values(data_type, chan_type)
             end
 
             a.meeg.samples_label='rpt';
-            a.hdr_ft=struct();
 
         case 'surface'
             labels={'node_indices'};
