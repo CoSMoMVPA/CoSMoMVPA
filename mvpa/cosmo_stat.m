@@ -47,8 +47,9 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     % make a simple dataset
 %     ds=struct();
 %     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
-%     cosmo_disp(ds);
-%     > .samples
+%     ds.sa.targets=ones(12,1);
+%     ds.sa.chunks=(1:12)';
+%     cosmo_disp(ds.samples);
 %     >   [ -2         4        -3
 %     >      5        -2         4
 %     >     -1         5        -2
@@ -154,38 +155,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     samples=ds.samples;
     nsamples=size(samples,1);
 
-    % get targets
-    if isfield(ds,'sa') && isfield(ds.sa,'targets')
-        targets=ds.sa.targets;
-    elseif strcmp(stat_name,'t')
-        % one-sample t test is allowed to have missing targets
-        targets=ones(nsamples,1);
-    else
-        % all other stats do require targets
-        error('Missing field .sa.targets');
-    end
-
-    if isfield(ds,'sa') && isfield(ds.sa,'chunks')
-        chunks=ds.sa.chunks;
-    elseif cosmo_match({stat_name},{'t','F'})
-        chunks=[];
-    else
-        error('Missing field .sa.chunks');
-    end
-
-    % ensure that targets has the proper size
-    if numel(targets)~=nsamples
-        error('Targets has %d values, expected %d', ...
-                            numel(targets), nsamples);
-    end
-
-    if ~(isempty(chunks) || isequal(sort(chunks),unique(chunks)))
-        error('Chunks must be unique');
-    end
-
-    % get class information
-    classes=unique(targets);
-    nclasses=numel(classes);
+    [targets,nclasses,chunks,nchunks,type]=get_targets_and_chunks(ds);
 
     % Set label to be used for cdf (in case 'p' or 'z' has to be computed).
     % This is only different from stat_name in the case of 't2'
@@ -194,8 +164,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     % run specified helper function
     switch stat_name
         case 't'
+            if nclasses==2
+                samples=compute_differences(samples,targets,chunks);
+                nclasses=1;
+            end
+
             if nclasses~=1
-                error('%s stat: expected 1 class, found %d',...
+                error('%s stat: expected 1 or 2 classes, found %d',...
                             stat_name, nclasses);
             end
 
@@ -207,8 +182,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                             stat_name, nclasses);
             end
 
-            m1=targets==classes(1);
-            m2=targets==classes(2);
+            if ~strcmp(type,'between')
+                error(['%s stat: each chunk must contain the same '...
+                        'two targets'], stat_name)
+            end
+
+            m1=targets==1;
+            m2=targets==2;
 
             [stat,df]=quick_ttest2(samples(m1,:),...
                                   samples(m2,:));
@@ -227,8 +207,15 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
                 contrast=[];
             end
 
-            [stat,df]=quick_ftest(samples, targets, classes, nclasses, ...
-                                                            contrast);
+            switch type
+                case 'between'
+                    [stat,df]=quick_ftest_between(samples, targets, ...
+                                                nclasses, contrast);
+                case 'within'
+                    [stat,df]=quick_ftest_within(samples, targets, chunks,...
+                                                nclasses, contrast);
+
+            end
             stat_label='Ftest';
 
         otherwise
@@ -287,7 +274,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 % helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
+function [f,df]=quick_ftest_between(samples, targets, nclasses, contrast)
     % one-way ANOVA
     has_contrast=~isempty(contrast);
     contrast_sum=0;
@@ -300,7 +287,7 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
     wss=0; % within-class sum of squares
 
     for k=1:nclasses
-        msk=classes(k)==targets;
+        msk=k==targets;
 
         nsc(k)=sum(msk); % number of samples in this class
         sample=samples(msk,:);
@@ -337,6 +324,43 @@ function [f,df]=quick_ftest(samples, targets, classes, nclasses, contrast)
     wss=wss/df(2);
 
     f=bss./wss;
+
+function [f,df]=quick_ftest_within(samples,targets,chunks,nclasses,contrast)
+    if ~isempty(contrast)
+        error('contrast is not supported for within-subject design');
+    end
+
+    nchunks=max(chunks);
+    nfeatures=size(samples,2);
+    gm=mean(samples,1); % grand mean
+
+    sst=zeros(1,nfeatures);
+    ssw=zeros(1,nfeatures);
+    for k=1:nclasses
+        xk=samples(k==targets,:);
+        n=size(xk,1);
+        mu=mean(xk,1);
+        sst=sst+n*(gm-mu).^2;
+        ssw=ssw+sum(bsxfun(@minus,mu,xk).^2);
+    end
+
+    sss=zeros(1,nfeatures);
+    for k=1:nchunks
+        xk=samples(k==chunks,:);
+        n=size(xk,1);
+        mu=mean(xk,1);
+        sss=sss+n*(gm-mu).^2;
+    end
+
+    df1=(nclasses-1);
+    mst=sst/df1;
+
+    df2=df1*(nchunks-1);
+    sse=ssw-sss;
+    mse=sse/df2;
+    f=mst./mse;
+    df=[df1 df2];
+
 
 
 function [t,df]=quick_ttest(x)
@@ -395,3 +419,23 @@ function check_has_stats_toolbox()
     if cosmo_wtf('is_matlab')
         cosmo_check_external('@stats');
     end
+
+function [t,nt,c,nc,type]=get_targets_and_chunks(ds)
+    [unused,unusued,t]=unique(ds.sa.targets);
+    nt=max(t);
+
+    [unused,unusued,c]=unique(ds.sa.chunks);
+    nc=max(c);
+
+    if isequal(sort(c),unique(c))
+        type='between';
+    else
+        combis=(t-1)*nc+c;
+        if isequal(unique(combis),sort(combis))
+            type='within';
+        else
+            error(['Either all chunks must be unique, or each chunk must '...
+                        'contain the same targets']);
+        end
+    end
+
