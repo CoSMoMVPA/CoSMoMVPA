@@ -189,7 +189,18 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                                         checked_first_output);
 
         % apply the measure
-        res=measure(sphere_ds, args);
+        % (use try/catch/throw to provide both the feature id
+        % that caused the exception, and the original error message)
+        try
+            res=measure(sphere_ds, args);
+        catch mexception
+            % indicate where the error was
+            msg=sprintf(['Searchlight call on feature id %d caused an '...
+                            'exception'],center_id);
+            id_exception=MException('CoSMoMVPA:searchlight',msg);
+            merged=addCause(id_exception,mexception);
+            throw(merged);
+        end
         % <@@<
 
         % for efficiency, only check first output
