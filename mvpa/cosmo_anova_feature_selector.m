@@ -1,6 +1,5 @@
 function selected_indices=cosmo_anova_feature_selector(dataset, how_many)
-% using an anove finds the features that show the most variance between
-% classes
+% find the features that show the most variance between classes
 %
 % selected_indices=cosmo_anova_feature_selector(dataset, how_many)
 %

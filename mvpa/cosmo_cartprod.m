@@ -1,5 +1,5 @@
 function p=cosmo_cartprod(xs, convert_to_numeric)
-% returns the cartesian product with all combinations from values in xs.
+% returns the cartesian product with all combinations of the input
 %
 % p=cosmo_cartprod(xs[, convert_to_numeric])
 %

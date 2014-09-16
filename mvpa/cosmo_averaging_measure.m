@@ -1,5 +1,5 @@
 function ds_avg=cosmo_averaging_measure(ds, varargin)
-% average subsets of samples by unique combinatins of chunks and targets
+% average subsets of samples by unique combinations of chunks and targets
 %
 % ds_avg=cosmo_averaging_measure(ds, 'ratio', ratio, ['nrep',nrep])
 %
