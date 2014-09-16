@@ -22,7 +22,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %  - test_group_by*  } generalizability analyses.
 %                      Pairs of these determine a subsequent level group
 %                      partition scheme. Each group_values can be
-%                      a Px1 vector with the labels for a test group, or,
+%                      a cell with the labels for a test group, or,
 %                      if chunks is a string, the name of a sample
 %                      attribute whose values are used as labels.
 %                      Each test_group_by indicates which values in
@@ -125,6 +125,35 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     > .test_indices
 %     >   { [ 1
 %     >       8 ] }
+%     % test on samples with chunk=[3 4] only using take-one-fold out;
+%     % only samples with chunks=1 or 2 are used for training
+%     p=cosmo_nchoosek_partitioner(ds,1,'chunks',{[3 4]});
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 3    [ 3
+%     >       4      4
+%     >       5      5
+%     >       6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       8 ]    7 ] }
+%     % test separately on samples with chunk=3 and samples with chunk=4;
+%     % in some folds, samples with chunks=1,2,4 are used for training, in
+%     % other folds samples with chunks=1,2,3 are used for training
+%     p=cosmo_nchoosek_partitioner(ds,1,'chunks',{[3],[4]});
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 2    [ 1
+%     >       3      3
+%     >       4      4
+%     >       5      5
+%     >       6      6
+%     >       7 ]    8 ] }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       8 ]    7 ] }
+%     >
+%
 %
 %     % make a slightly more complicated dataset: with three chunks,
 %     % suppose there are two modalities (e.g. (1) visual and (2)
@@ -301,7 +330,9 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
             end
 
             if isempty(test_group_by)
-                test_group_by=unique(group_values);
+                test_group_by=num2cell(unique(group_values));
+            elseif isnumeric(test_group_by)
+                test_group_by={test_group_by};
             end
 
             % update partitions using helper function below
@@ -317,6 +348,7 @@ function partitions=group_by(partitions, group_values, test_group_by)
 
     npartitions=numel(partitions.test_indices);
 
+    assert(iscell(test_group_by));
     % see which values to split on
     ntest_group_by=numel(test_group_by);
 
@@ -326,7 +358,7 @@ function partitions=group_by(partitions, group_values, test_group_by)
 
     % run for each unique value in group_by_values
     for m=1:ntest_group_by
-        test_by=test_group_by(m);
+        test_by=test_group_by{m};
 
         % allocate space for this iteration
         train_indices_cell=cell(1,npartitions);
@@ -340,14 +372,14 @@ function partitions=group_by(partitions, group_values, test_group_by)
             p_test=partitions.test_indices{j};
 
             % see which ones match the group_by_value
-            msk_test=group_values(p_test)==test_by;
+            msk_test=cosmo_match(group_values(p_test),test_by);
 
             % keep just those indices
             p_test_masked=p_test(msk_test);
 
-            % the same for training
+            % the same for training, but different from test_by
             p_train=partitions.train_indices{j};
-            msk_train=group_values(p_train)~=test_by; % must be different
+            msk_train=~cosmo_match(group_values(p_train),test_by);
             p_train_masked=p_train(msk_train);
 
             if ~isempty(p_test_masked) && ~isempty(p_train_masked)

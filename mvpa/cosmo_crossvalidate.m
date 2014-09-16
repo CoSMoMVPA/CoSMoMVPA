@@ -1,4 +1,4 @@
-function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
+function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 % performs cross-validation using a classifier
 %
 % [pred, accuracy] = cosmo_crossvalidate(dataset, classifier, partitions, opt)
@@ -22,6 +22,11 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 % Output
 %   pred                Qx1 array with predicted class labels.
 %                       elements with no predictions have the value NaN.
+%   accuracy            scalar classification accuracy
+%   test_chunks         Qx1 array with chunks of input dataset, if each
+%                       prediction was based using a single classification
+%                       step. Predictions with no or more than one
+%                       classification step are set to NaN
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
@@ -30,21 +35,22 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     partitions=cosmo_nfold_partitioner(ds);
 %     classifier=@cosmo_classify_naive_bayes;
 %     % run crossvalidation
-%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
+%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%                                                       partitions);
 %     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred])
-%     >      1     1
-%     >      2     3
-%     >      3     3
-%     >      1     3
-%     >      2     3
-%     >      3     3
-%     >      1     1
-%     >      2     2
-%     >      3     2
-%     >      1     1
-%     >      2     3
-%     >      3     3
+%     disp([ds.sa.targets pred chunks])
+%     >      1     1     1
+%     >      2     3     1
+%     >      3     3     1
+%     >      1     3     2
+%     >      2     3     2
+%     >      3     3     2
+%     >      1     1     3
+%     >      2     2     3
+%     >      3     2     3
+%     >      1     1     4
+%     >      2     3     4
+%     >      3     3     4
 %     disp(accuracy)
 %     >     0.5833
 %     %
@@ -52,21 +58,22 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     partitions=cosmo_nchoosek_partitioner(ds,2);
 %     classifier=@cosmo_classify_lda;
 %     % run crossvalidation
-%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
+%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%                                                           partitions);
 %     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred])
-%     >      1     1
-%     >      2     2
-%     >      3     3
-%     >      1     1
-%     >      2     2
-%     >      3     3
-%     >      1     1
-%     >      2     2
-%     >      3     3
-%     >      1     1
-%     >      2     2
-%     >      3     1
+%     disp([ds.sa.targets pred chunks])
+%     >      1     1   NaN
+%     >      2     2   NaN
+%     >      3     3   NaN
+%     >      1     1   NaN
+%     >      2     2   NaN
+%     >      3     3   NaN
+%     >      1     1   NaN
+%     >      2     2   NaN
+%     >      3     3   NaN
+%     >      1     1   NaN
+%     >      2     2   NaN
+%     >      3     1   NaN
 %     disp(accuracy)
 %     >     0.9167
 %     %
@@ -74,24 +81,26 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     % and apply the estimated mean and std to the test set.
 %     opt=struct();
 %     opt.normalization='zscore';
+%     partitions=cosmo_oddeven_partitioner(ds);
 %     % run crossvalidation
-%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions, opt);
+%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%                                                        partitions, opt);
 %     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred])
-%     >      1     1
-%     >      2     2
-%     >      3     3
-%     >      1     2
-%     >      2     2
-%     >      3     3
-%     >      1     1
-%     >      2     2
-%     >      3     2
-%     >      1     1
-%     >      2     2
-%     >      3     1
+%     disp([ds.sa.targets pred chunks])
+%     >      1     3     1
+%     >      2     2     1
+%     >      3     3     1
+%     >      1     2     2
+%     >      2     2     2
+%     >      3     3     2
+%     >      1     3     3
+%     >      2     2     3
+%     >      3     3     3
+%     >      1     3     4
+%     >      2     2     4
+%     >      3     1     4
 %     disp(accuracy)
-%     >     0.7500
+%     >     0.5833
 %
 % Notes:
 %   - to apply this to a dataset struct as a measure (for searchlights),
@@ -128,9 +137,14 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     all_pred=NaN(nsamples,npartitions);
 
     targets=ds.sa.targets;
+    chunks=ds.sa.chunks;
 
     % keep track for which samples there has been a prediction
     test_mask=false(nsamples,1);
+
+    % keep track how often a prediction there was made for each chunk
+    test_chunks=NaN(nsamples,1);
+    test_counts=zeros(nsamples,1);
 
     % process each fold
     for k=1:npartitions
@@ -159,6 +173,9 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
         all_pred(test_idxs,k) = p;
         test_mask(test_idxs)=true;
         % <@@<
+
+        test_counts(test_idxs)=test_counts(test_idxs)+1;
+        test_chunks(test_idxs)=chunks(test_idxs);
     end
 
     % combine predictions for multiple partitions
@@ -170,6 +187,10 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
     % sanity check: missing predictions should be identical to lack of
     % winners
     assert(all(isnan(pred)~=test_mask));
+    assert(all(isnan(pred)==isnan(test_chunks)));
+
+    % only chunks with single prediction are not set to NaN
+    test_chunks(test_counts~=1)=NaN;
 
     % compute accuracies
     correct_mask=ds.sa.targets(test_mask)==classes(pred(test_mask));
