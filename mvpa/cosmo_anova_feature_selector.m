@@ -1,40 +1,60 @@
-function selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
+function selected_indices=cosmo_anova_feature_selector(dataset, how_many)
 % using an anove finds the features that show the most variance between
 % classes
 %
-% selected_indices=cosmo_anova_feature_selector(dataset, ratio_to_keep)
+% selected_indices=cosmo_anova_feature_selector(dataset, how_many)
 %
-% Inputs
+% Inputs:
 %  dataset          struct with .samples and .sa.targets
-%  ratio_to_keep    value between 0 and 1
+%  how_many         value between 0 and 1 keeps how_many*100% features;
+%                   values >=1 keeps how_many features
 %
-% Output
+% Output:
 %  selected_indices   feature ids in dataset with most variance between
-%                     classes. len(selected_indices) is approximately
-%                     equal to ratio_to_keep * size(dataset.samples,2)
+%                     classes.
+%
+% Example:
+%     ds=cosmo_synthetic_dataset();
+%     disp(size(ds.samples))
+%     > [ 6 6 ]
+%     cosmo_anova_feature_selector(ds,.45) % find best ~45% of features
+%     > [ 4 5 2 ]
+%     cosmo_anova_feature_selector(ds,4) % find best 4 features
+%     > [ 4 5 2 1 ]
+%
 %
 % NNO Aug 2013
 
-
-
-    fs_ds=cosmo_stat(dataset,'F');
-    fs=fs_ds.samples;
+    fstat=cosmo_stat(dataset,'F');
+    fvalues=fstat.samples;
 
     % ensure that nan values are not selected by setting them to
     % an impossible low F value
-    fs(isnan(fs))=-1;
+    fvalues(isnan(fvalues))=-1;
 
     % sort by F values, largest first
-    [unused, idxs]=sort(fs,'descend');
+    [unused, idxs]=sort(fvalues,'descend');
 
     % determine features to select
     nfeatures=size(dataset.samples,2);
-    n_idxs=round(ratio_to_keep*nfeatures);
-    selected_indices=idxs(1:n_idxs);
+
+    if how_many>=1
+        if round(how_many)~=how_many
+            error('how_many>=1 is not an integer');
+        elseif how_many>nfeatures
+            error('dataset has %d features, cannot return %d',...
+                    nfeatures,how_many);
+        end
+        nkeep=how_many;
+    else
+        nkeep=round(how_many*nfeatures);
+    end
+
+    selected_indices=idxs(1:nkeep);
 
     % throw an error if any indices with NaN F values
-    if any(fs(selected_indices)<0)
-        idx=find(fs(selected_indices)<0,1);
+    if any(fvalues(selected_indices)<0)
+        idx=find(fvalues(selected_indices)<0,1);
         error('Feature %d has NaN Fscore', selected_indices(idx));
     end
 
