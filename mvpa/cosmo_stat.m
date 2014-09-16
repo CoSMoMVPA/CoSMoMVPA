@@ -1,17 +1,20 @@
 function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
-% compute one-sample t, two-sample t, or F statistic
+% compute t-test or F-test (ANOVA) statistic
 %
 % stat_ds=cosmo_stats(ds, stat_name[, output_stat_name])
 %
 % Inputs:
-%   ds                dataset struct with PxQ .samples and Px1 .sa.targets;
-%                     .sa.targets indicate the conditions (levels).
+%   ds                dataset struct with
+%                       .samples PxQ, for P observations on Q features
+%                       .sa.targets Px1 observation conditions (levels)
+%                       .sa.chunks  Px1 observation chunks (e.g. subjects)
 %   stat_name         One of:
-%                     't' : one-sample t-test against zero.
+%                     't' : one-sample t-test against zero, or paired
+%                           t-test
 %                     't2': two-sample t-test with equal variance,
-%                           computing classes(1) minus classes (2), where
-%                           classes=unique(ds.sa.targets).
-%                     'F' : one-way ANOVA.
+%                           contrasting samples with unq(1) minus unq(2)
+%                           where unq=unique(ds.sa.targets)
+%                     'F' : one-way ANOVA or repeated measures ANOVA.
 %   output_stat_name  (optional) 'z', 'p', 'left', 'right', 'both', or
 %                      empty (default).
 %                     - 'z' returns a z-score.
@@ -25,22 +28,9 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     .samples       1xQ statistic value, or (if output_stat_name is
 %                    non-empty) z-score or p-value. See the Notes below
 %                    for interpreting p-values.
-%     .sa.df         if output_stat_name is empty the degrees of freedom
-%                    as scalar (if stat_name is 't' or 't2') or 1x2 vector
-%                    (if stat_name is 'F')
-%     .sa.stats      One of 'Ftest(df1,df2)', 'Ttest(df)', 'Zscore', or
-%                    'Pval'.
-%     .[f]a          identical to ds.[f]a, if present.
-%
-% Notes:
-%  - If output_stat_name is not provided or empty, then this function runs
-%    considerably faster than the builtin matlab functions.
-%  - When output_stat_name=='p' then the p-values returned are the same as
-%    the builtin matlab functions anova1, ttest, and ttest2 with the
-%    default tails.
-%  - For paired-sample t-tests: provide the observation differences
-%    to this function.
-%  - For one-sample t-tests against x, if x~=0: subtract x from ds.samples.
+%     .sa.stats      One of 'Ftest(df1,df2)', 'Ttest(df)', 'Zscore()', or
+%                    'Pval()', where df* are the degrees of freedom
+%     .[f]a          identical to hte input ds.[f]a, if present.
 %
 % Examples:
 %     % one-sample t-test
@@ -74,7 +64,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   [ 2.17      2.73      2.21 ]
 %     > .sa
 %     >   .stats
-%     >     { 'Zscore' }
+%     >     { 'Zscore()' }
 %     %
 %     % compute (two-tailed) p-value of t-test
 %     s=cosmo_stat(ds,'t','p');
@@ -83,7 +73,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   [ 0.03   0.00633    0.0268 ]
 %     > .sa
 %     >   .stats
-%     >     { 'Pval' }
+%     >     { 'Pval()' }
 %     %
 %     % compute left-tailed p-value of t-test
 %     s=cosmo_stat(ds,'t','left');
@@ -92,9 +82,9 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   [ 0.985     0.997     0.987 ]
 %     > .sa
 %     >   .stats
-%     >     { 'Pval' }
+%     >     { 'Pval()' }
 %
-%     % one-way anova
+%     % one-way ANOVA
 %     % each observation is independent and thus each chunk is unique;
 %     % there are three conditions with four observations per condition
 %     ds=struct();
@@ -109,13 +99,13 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     >   .stats
 %     >     { 'Ftest(2,9)' }
 %     % compute z-score
-%     s=cosmo_stat(ds,'F','z');
+%     s=cosmo_stat(ds,'F','z'); % convert to z-score
 %     cosmo_disp(s);
 %     > .samples
 %     >   [ -0.354     -1.54     -1.66 ]
 %     > .sa
 %     >   .stats
-%     >     { 'Zscore' }
+%     >     { 'Zscore()' }
 %
 %
 %     % two-sample t-test
@@ -125,13 +115,37 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.samples=reshape(mod(1:7:(12*3*7),13)',[],3)-3;
 %     ds.sa.targets=repmat(1:2,1,6)';
 %     ds.sa.chunks=(1:12)';
-%     s=cosmo_stat(ds,'t2');
+%     s=cosmo_stat(ds,'t2','p'); % return p-value
 %     cosmo_disp(s);
 %     > .samples
-%     >   [ -2.51      5.55     -6.48 ]
+%     >   [ 0.0307  0.000242  7.07e-05 ]
 %     > .sa
 %     >   .stats
-%     >     { 'Ttest(10)' }
+%     >     { 'Pval()' }
+%     %
+%     % for illustration, this test gives the same p-values as a
+%     % repeated measures ANOVA
+%     s=cosmo_stat(ds,'F','p');
+%     cosmo_disp(s);
+%     > .samples
+%     >   [ 0.0307  0.000242  7.07e-05 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Pval()' }
+%
+% Notes:
+%  - If output_stat_name is not provided or empty, then this function runs
+%    considerably faster than the builtin matlab functions.
+%  - When output_stat_name=='p' then the p-values returned are the same as
+%    the builtin matlab functions anova1, ttest, and ttest2 with the
+%    default tails.
+%  - To run a one-sample t-tests against x (if x~=0), one has to
+%    subtract x from ds.samples before using ds as input to this function
+%  - The .sa.chunks and .sa.targets determine which test is performed:
+%    * statname=='t': all chunks are unique => one-sample t-test
+%                   : each chunk present twice => paired-sample t-test
+%    * statname=='F': all chunks are unique => one-way ANOVA
+%                   : each chunk present N times => repeated measures ANOVA
 %
 % See also: anova1, ttest, ttest2
 %
@@ -139,98 +153,65 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 
     if nargin<3
         output_stat_name='';
-    elseif any(cosmo_match({'left','right','both'},output_stat_name))
-        tail=output_stat_name;
-        output_stat_name='p';
-    elseif strcmp(output_stat_name,'p')
-        switch stat_name
-            case 'F'
-                tail='right'; % show anova1  behaviour w.r.t. p-values
-            otherwise
-                tail='both'; % show ttest[2] "                       "
-        end
     end
 
-
-    samples=ds.samples;
+    [output_stat_name,tail]=get_stat_definition(stat_name,...
+                                                output_stat_name);
+    [samples,targets,chunks,type]=get_descriptors(ds);
     nsamples=size(samples,1);
-
-    [targets,nclasses,chunks,nchunks,type]=get_targets_and_chunks(ds);
 
     % Set label to be used for cdf (in case 'p' or 'z' has to be computed).
     % This is only different from stat_name in the case of 't2'
     cdf_label=stat_name;
 
     % run specified helper function
-    switch stat_name
-        case 't'
-            if nclasses==2
-                samples=compute_differences(samples,targets,chunks);
-                nclasses=1;
-            end
-
-            if nclasses~=1
-                error('%s stat: expected 1 or 2 classes, found %d',...
-                            stat_name, nclasses);
-            end
-
-            [stat,df]=quick_ttest(samples);
-            stat_label='Ttest';
-        case 't2'
-            if nclasses~=2
-                error('%s stat: expected 2 classes, found %d',...
-                            stat_name, nclasses);
-            end
-
-            if ~strcmp(type,'between')
-                error(['%s stat: each chunk must contain the same '...
-                        'two targets'], stat_name)
-            end
-
-            m1=targets==1;
-            m2=targets==2;
-
-            [stat,df]=quick_ttest2(samples(m1,:),...
-                                  samples(m2,:));
-            cdf_label='t';
-            stat_label='Ttest';
-
-        case 'F'
-            if nclasses<2
-                error('%s stat: expected >=2 classes, found %d',...
-                            stat_name, nclasses);
-            end
-
-            if isfield(ds.sa,'contrast')
-                contrast=ds.sa.contrast;
-            else
-                contrast=[];
-            end
-
-            switch type
-                case 'between'
-                    [stat,df]=quick_ftest_between(samples, targets, ...
-                                                nclasses, contrast);
-                case 'within'
-                    [stat,df]=quick_ftest_within(samples, targets, chunks,...
-                                                nclasses, contrast);
-
-            end
-            stat_label='Ftest';
-
-        otherwise
-            error('illegal statname %s', stat_name);
+    if isfield(ds.sa,'contrast')
+        contrast=ds.sa.contrast;
+    else
+        contrast=[];
     end
 
-    % transform output is required
+    stat_func=get_stat_func(stat_name);
+
+    [stat,df,stat_label]=stat_func(samples,targets,chunks,type,contrast);
+
+    [stat,stat_label]=compute_output_stat(stat,df,stat_label,...
+                                                tail,output_stat_name);
+
+    % store output
+    stat_ds=struct();
+    if isfield(ds,'a'), stat_ds.a=ds.a; end
+    if isfield(ds,'fa'), stat_ds.fa=ds.fa; end
+    stat_ds.samples=stat;
+    stat_ds.sa.stats={stat_label};
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% helper functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function f=get_stat_func(stat_name)
+    stat_name2func=struct();
+    stat_name2func.t=@ttest1_wrapper;
+    stat_name2func.t2=@ttest2_wrapper;
+    stat_name2func.F=@ftest_wrapper;
+
+    if ~isfield(stat_name2func,stat_name)
+        error('illegal statname %s, supported are:%s',stat_name,...
+                    cosmo_strjoin(fieldnames(stat_name2func),', '));
+    end
+
+    f=stat_name2func.(stat_name);
+
+function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
+                                                 tail,output_stat_name)
+% transform output is required
     if isempty(output_stat_name)
-        output_stat_name=stat_name;
+        stat_label=stat_name;
     else
         % transform to left-tailed p-value
         df_cell=num2cell(df);
-        stat=cdf_wrapper(cdf_label,stat,df_cell{:});
+        stat=cdf_wrapper(stat_name,stat,df_cell{:});
 
-        % reset degrees of freedom
+        % reset degrees of freedom, because z-score or p value have none
         df=[];
 
         switch output_stat_name
@@ -257,27 +238,83 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
         end
     end
 
-    if ~isempty(df)
-        df_str=cellfun(@(x) sprintf('%d',x), num2cell(df),...
+    df_str=cellfun(@(x) sprintf('%d',x), num2cell(df),...
                     'UniformOutput',false);
-        stat_label=sprintf('%s(%s)',stat_label,cosmo_strjoin(df_str,','));
+    stat_label=sprintf('%s(%s)',stat_label,cosmo_strjoin(df_str,','));
+
+function [stat,df,stat_label]=ttest1_wrapper(samples,targets,chunks,...
+                                                           type,contrast)
+    if ~isempty(contrast)
+        error('contrast is not supported for t-stat');
     end
 
-    % store output
-    stat_ds=struct();
-    if isfield(ds,'a'), stat_ds.a=ds.a; end
-    if isfield(ds,'fa'), stat_ds.fa=ds.fa; end
-    stat_ds.samples=stat;
-    stat_ds.sa.stats={stat_label};
+    nclasses=max(targets);
+    if nclasses==2
+        samples=pairwise_differences(samples,targets,chunks);
+        nclasses=1;
+    end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% helper functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if nclasses~=1
+        error('t-stat: expected 1 or 2 classes, found %d',...
+                    stat_name, nclasses);
+    end
 
-function [f,df]=quick_ftest_between(samples, targets, nclasses, contrast)
+    [stat,df]=quick_ttest(samples);
+    stat_label='Ttest';
+
+function [stat,df,stat_label]=ttest2_wrapper(samples,targets,chunks,...
+                                                           type,contrast)
+    if ~isempty(contrast)
+        error('contrast is not supported for t-stat');
+    end
+
+    nclasses=max(targets);
+
+    if nclasses~=2
+        error('%s stat: expected 2 classes, found %d',...
+                    stat_name, nclasses);
+    end
+
+    if ~strcmp(type,'between')
+        error(['%s stat: each chunk must contain the same '...
+                'two targets'], stat_name)
+    end
+
+    m1=targets==1;
+    m2=targets==2;
+
+    [stat,df]=quick_ttest2(samples(m1,:),...
+                          samples(m2,:));
+    cdf_label='t';
+    stat_label='Ttest';
+
+function [stat,df,stat_label]=ftest_wrapper(samples,targets,chunks,...
+                                                            type,contrast)
+    nclasses=max(targets);
+
+    if nclasses<2
+        error('%s stat: expected >=2 classes, found %d',...
+                    stat_name, nclasses);
+    end
+
+    switch type
+        case 'between'
+            [stat,df]=quick_ftest_between(samples, targets, ...
+                                        chunks,contrast);
+        case 'within'
+            [stat,df]=quick_ftest_within(samples, targets, ...
+                                        chunks,contrast);
+
+    end
+    stat_label='Ftest';
+
+
+function [f,df]=quick_ftest_between(samples,targets,chunks,contrast)
     % one-way ANOVA
     has_contrast=~isempty(contrast);
     contrast_sum=0;
+
+    nclasses=max(targets);
 
     [ns,nf]=size(samples);
     mu=sum(samples,1)/ns; % grand mean
@@ -325,12 +362,15 @@ function [f,df]=quick_ftest_between(samples, targets, nclasses, contrast)
 
     f=bss./wss;
 
-function [f,df]=quick_ftest_within(samples,targets,chunks,nclasses,contrast)
+function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
+    % repeated measures anova
     if ~isempty(contrast)
         error('contrast is not supported for within-subject design');
     end
 
     nchunks=max(chunks);
+    nclasses=max(targets);
+
     nfeatures=size(samples,2);
     gm=mean(samples,1); % grand mean
 
@@ -395,12 +435,12 @@ function [t,df]=quick_ttest2(x,y)
     t=(mux-muy) .* sqrt(scaling./ss);
 
 function y=cdf_wrapper(name, x, df1, df2)
-    check_has_stats_toolbox()
-    switch lower(name)
-        case 't'
+    ensure_has_stats_toolbox()
+    switch name
+        case 'Ttest'
             assert(nargin==3);
             y=tcdf(x, df1);
-        case 'f'
+        case 'Ftest'
             assert(nargin==4);
             y=fcdf(x, df1, df2);
         otherwise
@@ -409,10 +449,10 @@ function y=cdf_wrapper(name, x, df1, df2)
 
 
 function y=norminv_wrapper(x)
-    check_has_stats_toolbox()
+    ensure_has_stats_toolbox()
     y=norminv(x);
 
-function check_has_stats_toolbox()
+function ensure_has_stats_toolbox()
     % - Octave has the required functionality in the octave-forge
     %   statistics toolbox and will raise an error if it is not installed.
     % - Matlab needs checking for the toolbox
@@ -420,22 +460,62 @@ function check_has_stats_toolbox()
         cosmo_check_external('@stats');
     end
 
-function [t,nt,c,nc,type]=get_targets_and_chunks(ds)
-    [unused,unusued,t]=unique(ds.sa.targets);
-    nt=max(t);
+function [samples,targets,chunks,type]=get_descriptors(ds)
+    samples=ds.samples;
 
-    [unused,unusued,c]=unique(ds.sa.chunks);
-    nc=max(c);
+    % unique targets
+    [unused,unusued,targets]=unique(ds.sa.targets);
+    nt=max(targets);
 
-    if isequal(sort(c),unique(c))
+    % unique chunks
+    [unused,unusued,chunks]=unique(ds.sa.chunks);
+    nc=max(chunks);
+
+    if isequal(sort(chunks),unique(chunks))
         type='between';
     else
-        combis=(t-1)*nc+c;
+        combis=(targets-1)*nc+chunks;
         if isequal(unique(combis),sort(combis))
             type='within';
         else
-            error(['Either all chunks must be unique, or each chunk must '...
-                        'contain the same targets']);
+            error(['Either all chunks must be unique, or each chunk '...
+                        'must contain the same targets']);
         end
+    end
+
+function delta=pairwise_differences(samples,targets,chunks)
+    % for one-sample t-test: compute differences between first and second
+    % chunk
+    n=size(samples,1);
+    assert(numel(targets)==n);
+    assert(numel(chunks)==n);
+
+    assert(mod(n,2)==0);
+    n2=n/2;
+
+    idxs=zeros(n2,2);
+    for k=1:n
+        assert(idxs(targets(k),chunks(k))==0);
+        idxs(targets(k),chunks(k))=k;
+    end
+    assert(isequal(size(idxs),[n2,2]));
+    assert(all(idxs(:)>0));
+
+    delta=samples(idxs(:,1))-samples(idxs(:,2));
+
+function [output_stat_name,tail]=get_stat_definition(stat_name,...
+                                                    output_stat_name)
+    if any(cosmo_match({'left','right','both'},output_stat_name))
+        tail=output_stat_name;
+        output_stat_name='p';
+    elseif strcmp(output_stat_name,'p')
+        switch stat_name
+            case 'F'
+                tail='right'; % show anova1  behaviour w.r.t. p-values
+            otherwise
+                tail='both'; % show ttest[2] "                       "
+        end
+    else
+        tail='both';
     end
 
