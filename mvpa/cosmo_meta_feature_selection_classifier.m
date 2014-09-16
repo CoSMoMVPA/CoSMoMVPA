@@ -28,6 +28,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
     ds=struct();
     ds.samples=samples_train;
     ds.sa.targets=targets_train;
+    ds.sa.chunks=1:size(targets_train,1)'; % assume all independent
     feature_idxs=feature_selector(ds, ratio_to_keep);
 
     % select data with the 'best' features
