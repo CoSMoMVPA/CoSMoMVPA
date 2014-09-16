@@ -461,6 +461,8 @@ function ensure_has_stats_toolbox()
     end
 
 function [samples,targets,chunks,type]=get_descriptors(ds)
+    cosmo_isfield(ds,{'samples','sa.chunks','sa.targets'},true);
+
     samples=ds.samples;
 
     % unique targets
