@@ -453,8 +453,6 @@ for output in ('hdr','skl',None):
         fns=rst_type.matching(output, all_fns)
         if not len(fns):
             continue
-        if rst_type.prefix=='test': ##!!
-            break
 
         base_names=[]
         rebuild_toc=False
@@ -505,7 +503,7 @@ for output in ('hdr','skl',None):
                 rebuild_toc=True
 
             base_names.append((b,parts[1]))
-        if rebuild_toc or True: ##!!
+        if rebuild_toc:
             toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
             title='%s - %s' % (rst_type.get_name(), rst_type.type2name(output))
             header='.. _`%s`:\n\n.. toctree::\n    :maxdepth: 2\n    :hidden:\n\n' % (
