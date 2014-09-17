@@ -22,7 +22,22 @@ function ds_chunks=cosmo_chunkize(ds_targets,nchunks)
 %                  possible (i.e., does not differ by more than one).
 %
 %
-% Note:
+% Example:
+%     % ds is an MEEG dataset with 48 samples
+%     ds=cosmo_synthetic_dataset('type','timelock','nreps',8);
+%     % Assign chunks randomly in the range 1:4
+%     ds=cosmo_chunkize(ds,4);
+%     % Show result
+%     cosmo_disp(ds.sa.chunks)
+%     > [ 1
+%     >   1
+%     >   2
+%     >   :
+%     >   3
+%     >   4
+%     >   4 ]@48x1
+%
+% Notes:
 %  - This function should only be used for MEEG datasets, or other datasets
 %    where each trial can be assumed to be 'independant' of other trials.
 %  - When this function is used prior to classification using partitioning
@@ -32,13 +47,6 @@ function ds_chunks=cosmo_chunkize(ds_targets,nchunks)
 %  - Usage for fMRI datasets is not recommended, unless you really know
 %    what you are doing. Rather, for fMRI datasets usually the chunks are
 %    assigned manually so that each run has a different chunk value.
-%
-%
-% Example:
-%  - % ds is a dataset struct with field .sa.targets (class labels of each
-%    % sample). Assign chunks randomly in the range 1:5.
-%  >> ds=cosmo_chunkize(ds, 5);
-%
 %
 % NNO Oct 2013
 
