@@ -28,13 +28,13 @@ tag2full=dict(RF='refactorings',
                BLD='changes in build system')
 
 show_tags=['BIG','BK','BF',None]
-               
+
 def build_git_log(log_fn=log_fn, since=git_since):
     '''rebuilds git log if it is out of date'''
     if git_log_out_of_date(log_fn=log_fn):
         cmd='git log --since="%s" --full-history --stat > %s' % (since, log_fn)
 
-        print ('rebuilding git log file: commits were ' 
+        print ('rebuilding git log file: commits were '
                         'made since last update . . .'),
 
         subprocess.check_call(cmd, shell=True)
@@ -93,7 +93,7 @@ def get_ack(lines, tag='ACK'):
         if line_has_tag(line, tag):
             parts=line.split('#')
             acks.update(set(parts[1:-1:2]))
-    
+
     if not acks:
         return None
 
@@ -102,16 +102,16 @@ def get_ack(lines, tag='ACK'):
 
 def as_title(header, rep='^'):
     return '%s\n%s\n' % (header, rep*len(header))
-    
+
 
 def element(header, body_parts, sep='\n'):
     '''formats a header with body parts'''
     parts=[as_title(header), '.. parsed-literal::\n\n']
-    
+
     body=sep+(sep.join(body_parts) \
                     if isinstance(body_parts, (set, list)) \
                     else body_parts)
-        
+
     parts.append(indent(body))
     return ''.join(parts) + '\n'
 
@@ -145,7 +145,7 @@ class CommitFileChanged(object):
 
         subdir=path_elements[0]
         allowed_prefixes=subdirs2prefix[subdir]
-        
+
         name=path_elements[-1]
         has_prefix=allowed_prefixes is None or \
                         any(name.startswith(ap) for ap in allowed_prefixes)
@@ -161,7 +161,7 @@ class CommitFileChanged(object):
         return self.filename.split(os.path.sep)[-1].rstrip()[:-2]
 
     def rst_str(self):
-        if self.is_linkable(): 
+        if self.is_linkable():
             fn=self.filename
             padding_length=len(fn)-len(fn.rstrip())
             padding=' '*padding_length
@@ -182,7 +182,7 @@ class CommitLogEntry(object):
         self.files_changed=files_changed
         self.stats=stats
 
-    @staticmethod 
+    @staticmethod
     def from_lines(lines, skip=0):
         preamble=[]
         message=[]
@@ -258,7 +258,7 @@ class CommitLogEntry(object):
         npad=3 if self.has_stats() else 2
         return npad+len(self.preamble)+len(self.message)+\
                         len(self.files_changed)+len(self.stats)
-        
+
 class CommitLog(object):
     def __init__(self, entries):
         self.entries=entries
@@ -284,7 +284,7 @@ if __name__=='__main__':
     log_lines=get_log_lines()
     summary=get_summary(log_lines)
     ack=get_ack(log_lines)
-    
+
 
     print "Building git log summary . . .",
     with open(summary_fn,'w') as f:
@@ -296,7 +296,7 @@ if __name__=='__main__':
             f.write('%s\n' % ack)
 
         c=CommitLog.from_lines(log_lines)
-        
+
         for tag in show_tags:
             header='all changes' if tag is None else tag2full[tag]
             c=CommitLog.from_lines(log_lines)
