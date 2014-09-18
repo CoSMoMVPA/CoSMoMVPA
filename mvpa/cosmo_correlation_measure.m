@@ -150,7 +150,7 @@ else
     defaults=struct();
     defaults.partitions=[];
     defaults.template=[];
-    defaults.merge_func=@mean_sample;
+    defaults.merge_func=[];
     defaults.corr_type='Pearson';
     defaults.post_corr_func=@atanh;
     defaults.output='mean';
@@ -302,24 +302,37 @@ function data=get_data(ds, sample_idxs, class_ids, merge_func)
 
     nclasses=max(class_ids);
 
+    merge_by_averaging=isempty(merge_func);
+    if isequal(target_ids',1:nclasses) && merge_by_averaging
+        % optimize standard case of one sample per class and normal
+        % averaging over samples
+        data=samples;
+        return
+    end
+
     nfeatures=size(samples,2);
     data=zeros(nclasses,nfeatures);
 
     for k=1:nclasses
         msk=target_ids==k;
-        if ~any(msk)
-            error('missing target class %d', class_ids(k));
+
+        n=sum(msk);
+
+        class_samples=samples(msk,:);
+
+        if merge_by_averaging
+            if n==1
+                data(k,:)=class_samples;
+            else
+                data(k,:)=sum(class_samples,1)/n;
+            end
+        else
+            data(k,:)=merge_func(class_samples);
         end
 
-        data(k,:)=merge_func(samples(msk,:));
-    end
-
-
-function samples=mean_sample(samples)
-
-    nsamples=size(samples,1);
-    if nsamples>1
-        samples=sum(samples,1)/nsamples;
+        if n==0
+            error('missing target class %d', class_ids(k));
+        end
     end
 
 
