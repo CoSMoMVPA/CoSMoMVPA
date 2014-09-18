@@ -81,66 +81,71 @@ function s=cosmo_structjoin(varargin)
 %
 % NNO Jan 2014
 
-persistent me; % function handle to current function
+    % use a wrapper so that recursive calls can be forwarded to the wrapper
+    % without using mfilename
+    s=structjoin_wrapper(varargin{:});
 
-if isempty(me)
-    me=str2func(mfilename());
-end
+function s=structjoin_wrapper(varargin)
 
-s=struct(); % output
-n=numel(varargin);
+    s=struct(); % output
+    n=numel(varargin);
 
-k=0;
-while k<n
-    % go over all input arguments
-    k=k+1;
-    v=varargin{k}; %k-th argument
-
-    if iscell(v)
-        if isempty(v)
-            continue;
-        end
-
-        v=me(v{:});
-    end
-
-    if isstruct(v)
-        if isempty(v)
-            continue;
-        elseif isempty(s)
-            s=v;
-            continue;
-        end
-
-        % overwrite any values in s
-        fns=fieldnames(v);
-
-        for j=1:numel(fns);
-            fn=fns{j};
-            s=update_struct(s, fn, v.(fn), me);
-        end
-    elseif ischar(v)
-        % <key>, <value> pair
-        if k+1>n
-            % cannot be last argument
-            error('Missing argument after key ''%s''', v);
-        end
-
-        % move forward to next argument and get value
+    k=0;
+    while k<n
+        % go over all input arguments
         k=k+1;
-        vv=varargin{k};
+        v=varargin{k}; %k-th argument
 
-        s=update_struct(s, v, vv);
-    else
-        error(['Illegal input at position %d: expected cell, struct, ',...
-                    'or string'], k);
-    end
-end
+        if iscell(v)
+            if isempty(v)
+                continue;
+            end
 
-function s=update_struct(s, fn, v, me)
-    if isfield(s,fn) && isstruct(s.(fn)) && isstruct(v)
-        s.(fn)=me(s.(fn),v);
-    else
-        s.(fn)=v;
+            % use recursion
+            v=structjoin_wrapper(v{:});
+        end
+
+        if isstruct(v)
+            if isempty(v)
+                continue;
+            elseif isempty(s)
+                s=v;
+                continue;
+            end
+
+            % overwrite any values in s
+            fns=fieldnames(v);
+
+            for j=1:numel(fns);
+                fn=fns{j};
+                v_fn=v.(fn);
+
+                if isstruct(v_fn) && isfield(s,fn) && isstruct(s.(fn))
+                    s.(fn)=structjoin_wrapper(s.(fn),v_fn);
+                else
+                    s.(fn)=v_fn;
+                end
+            end
+        elseif ischar(v)
+            % <key>, <value> pair
+            if k+1>n
+                % cannot be last argument
+                error('Missing argument after key ''%s''', v);
+            end
+
+            % move forward to next argument and get value
+            k=k+1;
+            vv=varargin{k};
+
+            if isstruct(vv) && isfield(s,v) && isstruct(s.(v))
+                s.(v)=structjoin_wrapper(s.(v),vv);
+            else
+                s.(v)=vv;
+            end
+        else
+            error(['Illegal input at position %d: expected cell, struct, ',...
+                        'or string'], k);
+        end
     end
+
 
