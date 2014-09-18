@@ -99,15 +99,38 @@ function cosmo_disp(x,varargin)
 %     > [ 3.1416      6.2832 ]
 %     > [ 3.141593      6.283185 ]
 %
+%     % illustrate n-dimensional arrays
+%     x=zeros([1 2 1 2 3]);
+%     x(:)=2*(1:numel(x));
+%     cosmo_disp(x)
+%     > <double>@1x2x1x2x3
+%     >    (:,:,1,1,1) =
+%     >        [ 2         4 ]
+%     >    (:,:,1,2,1) =
+%     >        [ 6         8 ]
+%     >    (:,:,1,1,2) =
+%     >        [ 10        12 ]
+%     >    (:,:,1,2,2) =
+%     >        [ 14        16 ]
+%     >    (:,:,1,1,3) =
+%     >        [ 18        20 ]
+%     >    (:,:,1,2,3) =
+%     >        [ 22        24 ]
+%     cosmo_disp(reshape(char(65:72),[2 2 2]))
+%     > <char>@2x2x2
+%     >    (:,:,1) =
+%     >        'AC
+%     >         BD'
+%     >    (:,:,2) =
+%     >        'EG
+%     >         FH'
+%
+%
 %
 % Notes:
 %   - Unlike the builtin 'disp' function, this function shows the contents
 %     of x using recursion. For example if a cell contains a struct, then
 %     the contents of that struct is shown as well
-%   - Limitations:
-%     * no support for structures with more than two dimensions
-%     * structs must be singleton (of size 1x1)
-%     * character arrays must be of size 1xP
 %   - A use case is displaying dataset structs
 %
 % NNO Jan 2014
@@ -133,35 +156,101 @@ function s=disp_helper(x, opt)
     % for recursion
     depth=opt.depth;
     if depth<=0
-        s=surround_with(true,'<',class(x),'>',size(x));
+        s=any2summary_str(x);
         return
     end
 
     opt.depth=depth-1;
 
-    if iscell(x)
-        check_is_2d(x);
-        s=cell2str(x,opt);
-    elseif isnumeric(x) || islogical(x)
-        check_is_2d(x);
-        s=matrix2str(x,opt);
-    elseif ischar(x)
-        check_is_2d(x);
-        s=string2str(x,opt);
-    elseif isa(x, 'function_handle')
-        s=function_handle2str(x,opt);
+    if ~has_size(x)
+        s=any2summary_str(x,opt);
     elseif isstruct(x)
-        check_is_singleton(x);
-        s=struct2str(x,opt);
+        s=nd_struct2str(x,opt);
     else
-        s=sprintf('<%s>',class(x));
+        s=nd_any2str(x,opt);
     end
 
-function check_is_2d(s)
-    ndim=numel(size(s));
-    if ndim~=2
-        error('Element with %d dimensions, only 2 are supported',ndim);
+function s=any2summary_str(x,opt)
+    if has_size(x)
+        sz=size(x);
+    else
+        sz=[1 1];
     end
+    s=surround_with(true,'<',class(x),'>',sz);
+
+function y=nd_struct2str(x,opt)
+    sz=size(x);
+    ndim=numel(sz);
+
+    if ndim==2
+        y=struct2str(x,opt);
+        return;
+    end
+
+    fns=fieldnames(x);
+    n=numel(fns);
+    r=cell(n+1,1);
+    r{1}=sprintf('%s with fields:',any2summary_str(x));
+    for k=1:n
+        r{k+1}=['   ' string2str(fns{k},opt)];
+    end
+    y=strcat_(r);
+
+function tf=has_size(x)
+    % helper, because some classes have no 'size'
+    try
+        size(x);
+        tf=true;
+    catch me
+        tf=false;
+    end
+
+function y=nd_any2str(x,opt)
+    sz=size(x);
+    ndim=numel(sz);
+
+    if ndim==2
+        if iscell(x)
+            y=cell2str(x,opt);
+        elseif isnumeric(x) || islogical(x)
+            y=matrix2str(x,opt);
+        elseif ischar(x)
+            y=string2str(x,opt);
+        elseif isa(x, 'function_handle')
+            y=function_handle2str(x,opt);
+        else
+            y=any2summary_str(x,opt);
+        end
+        return
+    end
+
+    sz_rest=sz(3:end);
+    ndim_rest=numel(sz_rest);
+    n_rest=prod(sz_rest);
+
+    parts=cell(ndim_rest,1);
+    for k=1:ndim_rest
+        parts{k}=num2cell(1:sz_rest(k));
+    end
+
+    p=cosmo_cartprod(parts);
+    xflat=reshape(x,[sz(1:2) n_rest]);
+
+    s=cell(n_rest*2+1,1);
+    s{1}=any2summary_str(x);
+    for k=1:n_rest
+        v=xflat(:,:,k);
+        v_str=disp_helper(v,opt);
+        idx_str=sprintf(',%d',p(k,:));
+        s{k*3-1}=sprintf('   (:,:%s) =',idx_str);
+        s{k*3}=strcat_({'       ',v_str});
+    end
+
+    y=strcat_(s);
+
+function tf=is_2d(s)
+    tf=numel(size(s))==2;
+
 
 function check_is_singleton(s)
     n=numel(s);
@@ -218,9 +307,6 @@ function y=struct2str(x,opt)
     end
     y=strcat_(r);
 
-
-
-
 function s=function_handle2str(x,opt)
     s_with_quotes=string2str(func2str(x),opt);
     s=['@' s_with_quotes(2:(end-1))];
@@ -228,16 +314,18 @@ function s=function_handle2str(x,opt)
 
 function s=string2str(x, opt)
     if ~ischar(x), error('expected a char'); end
-    if size(x,1)>1, error('string has to be a single row'); end
+    [nrows,ncols]=size(x);
 
-    infix=' ... ';
 
-    n=numel(x);
-    if n>opt.strlen
+    if ncols>opt.strlen
+        infix=' ... ';
         h=floor((opt.strlen-numel(infix))/2);
-        x=[x(1:h), infix ,x(n+((1-h):0))];
+        x=strcat_({x(:,1:h), infix ,x(:,ncols+((1-h):0))});
     end
-    s=['''' x ''''];
+    quote='''';
+    pre=quote;
+    post=[repmat(' ',nrows-1,1);quote];
+    s=strcat_({pre,x,post});
 
 
 function s=cell2str(x, opt)
@@ -304,9 +392,13 @@ function s=cell2str(x, opt)
 
 function pre_infix_post=surround_with(show_size, pre, infix, post, matrix_sz)
     % surround infix by pre and post, doing
-    if show_size && prod(matrix_sz)~=1
+    n=prod(matrix_sz);
+    if show_size && n~=1
         size_str=sprintf('x%d',matrix_sz);
         size_str(1)='@';
+        if n==0
+            size_str=[size_str ' (empty)'];
+        end
     else
         size_str='';
     end
