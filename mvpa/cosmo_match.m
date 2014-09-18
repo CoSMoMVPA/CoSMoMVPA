@@ -65,55 +65,14 @@ function msk=cosmo_match(haystack, needle, varargin)
         needle={needle};
     end
 
-    if isnumeric(haystack) && isnumeric(needle) && numel(needle)==1
-        % optimization for most standard case: vector and scalar
-        check_vec(haystack);
-        msk=needle==haystack;
-    elseif ~iscell(needle) && ~ischar(needle) && ~isnumeric(needle) && ...
-                                            isa(needle,'function_handle')
-        if iscell(haystack)
-            msk=cellfun(needle,haystack,'UniformOutput',true);
-        else
-            msk=needle(haystack);
-        end
-    else
-        nrows=check_vec(needle);
-        ncols=check_vec(haystack);
+    msk=match(needle,haystack);
 
-        if isnumeric(needle) && isnumeric(haystack)
-            matches=bsxfun(@eq, needle(:), haystack(:)');
-        elseif iscell(needle) && iscell(haystack)
-            matches=false(nrows,ncols);
-
-            for k=1:ncols
-                if ~ischar(haystack{k})
-                    error('cell must contain strings');
-                end
-            end
-
-            for k=1:nrows
-                needlek=needle{k};
-                if ~ischar(needlek)
-                    error('cell must contain strings');
-                end
-                match_indices=strcmp(needlek,haystack);
-                matches(k, match_indices)=true;
-            end
-        else
-            error(['Illegal inputs %s and %s: need numeric arrays or '...
-                    'cell with strings'],class(needle),class(haystack));
-        end
-
-        msk=reshape(sum(matches,1)>0,size(haystack));
-    end
-
-    if nargin>2
-        me=str2func(mfilename()); % immune to renaming
-        other_msk=me(varargin{:});  % use recursion
+    for argpos=3:2:nargin
+        other_msk=match(varargin{argpos+[0,1]});
 
         % check the size is the same
         if numel(msk) ~= numel(other_msk)
-            error('Cannot make conjunction: masks have %d ~= %d elements',...
+            error('Illegal conjunction: masks have %d ~= %d elements',...
                     numel(msk), numel(other_msk));
         end
 
@@ -121,11 +80,72 @@ function msk=cosmo_match(haystack, needle, varargin)
         msk=msk & other_msk;
     end
 
+function msk=match(needle,haystack)
+    % wrapper function that calls match_{scalar,functio_handle,vectors}
+    if isnumeric(haystack) && isnumeric(needle) && numel(needle)==1
+        % optimization for most standard case: vector and scalar
+        msk=match_numeric_scalar(needle,haystack);
+    elseif ~iscell(needle) && ~ischar(needle) && ~isnumeric(needle) && ...
+                                            isa(needle,'function_handle')
+        % function handle
+        msk=match_function_handle(needle, haystack);
+    else
+        msk=match_vectors(needle, haystack);
+    end
 
-function n=check_vec(x)
+
+function msk=match_numeric_scalar(needle,haystack)
+    % needle is a numeric scalar
+    check_vec_or_empty(haystack);
+    msk=needle==haystack;
+
+function msk=match_function_handle(func, data)
+    check_vec_or_empty(data);
+    if iscell(haystack)
+        msk=cellfun(func,data,'UniformOutput',true);
+    else
+        msk=data(data);
+    end
+
+    if ~islogical(msk)
+        error('function %s should return boolean array',func2str(func));
+    end
+
+function msk=match_vectors(needle, haystack)
+    nrows=check_vec_or_empty(needle);
+    ncols=check_vec_or_empty(haystack);
+
+    if isnumeric(needle) && isnumeric(haystack)
+        matches=bsxfun(@eq, needle(:), haystack(:)');
+    elseif iscell(needle) && iscell(haystack)
+        matches=false(nrows,ncols);
+
+        for k=1:ncols
+            if ~ischar(haystack{k})
+                error('cell must contain strings');
+            end
+        end
+
+        for k=1:nrows
+            needlek=needle{k};
+            if ~ischar(needlek)
+                error('cell must contain strings');
+            end
+            match_indices=strcmp(needlek,haystack);
+            matches(k, match_indices)=true;
+        end
+    else
+        error(['Illegal inputs %s and %s: need numeric arrays or '...
+                'cell with strings'],class(needle),class(haystack));
+    end
+
+    msk=reshape(sum(matches,1)>0,size(haystack));
+
+function n=check_vec_or_empty(x)
+    % this function returns the number of elements of the input
+    % it returns true if x is a vector or if x is empty
     n=numel(x);
-
-    if n>1 && ~isvector(x)
+    if n>0 && ~isvector(x)
         error('Input argument is not a vector');
     end
 
