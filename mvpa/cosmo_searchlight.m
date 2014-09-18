@@ -186,7 +186,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         % slice the dataset (with disabled kosherness-check for every
         % but the first neighborhood)
         sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2, ...
-                                        checked_first_output);
+                                        ~checked_first_output);
 
         % apply the measure
         % (use try/catch/throw to provide both the feature id
