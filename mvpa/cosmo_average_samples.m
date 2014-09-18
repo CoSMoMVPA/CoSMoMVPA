@@ -1,5 +1,5 @@
-function ds_avg=cosmo_averaging_measure(ds, varargin)
-% average subsets of samples by unique combinatins of chunks and targets
+function ds_avg=cosmo_average_samples(ds, varargin)
+% average subsets of samples by unique combinations of chunks and targets
 %
 % ds_avg=cosmo_averaging_measure(ds, 'ratio', ratio, ['nrep',nrep])
 %
@@ -26,15 +26,42 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %      .fa,.a       Same as in ds (if present).
 %
 % Examples:
-%  - % for each unique target-chunk combination, select 40% of the samples
-%    % randomly and average these.
-%    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.4);
-%
-%  - % for each unique target-chunk combination, select 50% of the samples
-%    % randomly and average these; repeat the random selection process 4
-%    % times. Each sample in 'ds' is used twice (=.5*4)as an element
-%    % to compute an average.
-%    >> ds_avg=cosmo_averaging_measure(ds,'ratio',.5,'nrep',4);
+%     % generate simple dataset with 3 times (2 targets x 3 chunks)
+%     ds=cosmo_synthetic_dataset('nreps',3);
+%     size(ds.samples)
+%     > [ 18 6 ]
+%     cosmo_disp([ds.sa.targets ds.sa.chunks])
+%     > [ 1         1
+%     >   2         1
+%     >   1         2
+%     >   :         :
+%     >   2         2
+%     >   1         3
+%     >   2         3 ]@18x2
+%     %
+%     % for each unique target-chunk combination, select 60% of the samples
+%     % randomly and average these. The output has 6 samples.
+%     ds_avg=cosmo_average_samples(ds,'ratio',.6);
+%     cosmo_disp([ds_avg.sa.targets ds_avg.sa.chunks]);
+%     > [ 1         1
+%     >   1         2
+%     >   1         3
+%     >   2         1
+%     >   2         2
+%     >   2         3 ]
+%     % for each unique target-chunk combination, select 50% of the samples
+%     % randomly and average these; repeat the random selection process 4
+%     % times. Each sample in 'ds' is used twice (=.5*4) as an element
+%     % to compute an average. The output has 24 samples
+%     ds_avg2=cosmo_average_samples(ds,'ratio',.5,'nrep',4);
+%     cosmo_disp([ds_avg2.sa.targets ds_avg2.sa.chunks]);
+%     > [ 1         1
+%     >   1         2
+%     >   1         3
+%     >   :         :
+%     >   2         1
+%     >   2         2
+%     >   2         3 ]@24x2
 %
 % Notes:
 %  - this function averages feature-wise; the output has the same features
@@ -44,6 +71,8 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
 %  - as a result the number of trials in each chunk and target is
 %    identical, so balancing of partitions is not necessary for data from
 %    this function.
+%
+% See also: cosmo_balance_partitions
 %
 % NNO Jan 2014
 
@@ -85,7 +114,8 @@ function ds_avg=cosmo_averaging_measure(ds, varargin)
         % generate 'nset' random permutations of 1:n and concatenate these.
         % this ensures that the numbers of times specific samples are
         % selected differ by 1 at most.
-        rp_cells=cellfun(@randperm,repmat({n},1,nrep),'UniformOutput',false);
+        rp_cells=cellfun(@randperm,repmat({n},1,nrep),...
+                                    'UniformOutput',false);
         rp=[rp_cells{:}];
 
         % select random indices

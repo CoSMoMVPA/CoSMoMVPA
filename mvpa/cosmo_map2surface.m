@@ -4,8 +4,33 @@ function s=cosmo_map2surface(ds, fn)
 % Usage 1: s=cosmo_map2surface(ds, '-{FMT}) returns a struct s
 % Usage 2: cosmo_map2surface(ds, fn) saves a dataset to a file.
 %
-% In Usage 1, {FMT} can be one of 'niml_dset' or 'smp'
+% In Usage 1, {FMT} can be one of 'niml_dset' or 'bv_smp'
 % In Usage 2, fn should end with '.niml.dset' or '.smp'
+%
+% Examples:
+%     ds=cosmo_synthetic_dataset('type','surface');
+%     %
+%     % convert to AFNIML NIML format
+%     % (to store a file to disc, use a filename as the second argument)
+%     niml=cosmo_map2surface(ds,'-niml_dset');
+%     cosmo_disp(niml);
+%     > .node_indices
+%     >   [ 0         1         2 ]
+%     > .data
+%     >   [   3.27      1.83     0.472     0.862      3.05     -1.31
+%     >     -0.434      3.07      3.58       5.5     -1.35      5.77
+%     >      0.725   -0.0631     0.715    -0.205    -0.124      1.49 ]
+%
+%     ds=cosmo_synthetic_dataset('type','surface');
+%     % convert to bv smp xff struct
+%     % (to store a file to disc, use a filename as the second argument)
+%     bv_smp=cosmo_map2surface(ds,'-bv_smp')
+%     >           FileVersion: 5
+%     >          NrOfVertices: 3
+%     >              NrOfMaps: 6
+%     >     NameOfOriginalSRF: 'untitled.srf'
+%     >                   Map: [1x6 struct]
+%     >           RunTimeVars: [1x1 struct]
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
@@ -13,12 +38,15 @@ function s=cosmo_map2surface(ds, fn)
 %     support anatomical surface meshes that contain node coordinates and
 %     faces. To read and write such anatomical meshes, consider the surfing
 %     toolbox, github.com/nno/surfing
+%   - To load surface datasets, use cosmo_surface_dataset
 %
 % Dependencies:
 %   - for Brainvoyager files (.smp), it requires the NeuroElf
 %     toolbox, available from: http://neuroelf.net
 %   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
 %     Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%
+% See also: cosmo_surface_dataset
 %
 % NNO May 2014
 

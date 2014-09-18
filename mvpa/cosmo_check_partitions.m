@@ -18,12 +18,6 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 %   - an error if partitions are double dippy or (unless specified in opt)
 %     not balanced
 %
-% Notes:
-%   - the reason to require balancing by default is that chance level is
-%     1/nclasses, which is useful for many subsequent analyses.
-%   - if this function raises an exception for partitions, consider running
-%     partitions=cosmo_balance_partitions(partitions,...).
-%
 % Examples:
 %     ds=struct();
 %     ds.samples=zeros(9,2);
@@ -40,13 +34,34 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 %     %
 %     % balance partitions and check without unbalanced check
 %     partitions=cosmo_balance_partitions(partitions,ds);
-%     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
+%     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',false)
 %     > true
 %     %
 %     % make the partitions double dippy
 %     partitions.train_indices{1}=partitions.test_indices{1};
 %     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
 %     > error('double dipping in fold 1: chunk 1 is in train and test set')
+%     %
+%     % make partitions empty
+%     partitions.train_indices{1}=[];
+%     cosmo_check_partitions(partitions,ds);
+%     > error('partition 1: .train_indices are empty')
+%     %
+%     % partitions have values outside range
+%     partitions.train_indices{1}=100;
+%     cosmo_check_partitions(partitions,ds);
+%     > error('partition 1: .train_indices are outside range 1..9');
+%     %
+%     % use non-integers
+%     partitions.train_indices{1}=1.5;
+%     cosmo_check_partitions(partitions,ds);
+%     > error('partition 1: .train_indices are not integers');
+%
+% Notes:
+%   - the reason to require balancing by default is that chance level is
+%     1/nclasses, which is useful for many subsequent analyses.
+%   - if this function raises an exception for partitions, consider running
+%     partitions=cosmo_balance_partitions(partitions,...).
 %
 % See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
@@ -88,9 +103,14 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
                     npartitions,numel(test_indices));
     end
 
+    nsamples=numel(targets);
+
     for k=1:npartitions
         train_idxs=train_indices{k};
         test_idxs=test_indices{k};
+
+        check_range(train_idxs,nsamples,k,'train');
+        check_range(test_idxs,nsamples,k,'test');
 
         if check_balance
             % counts of number of samples in each each class must be the
@@ -137,3 +157,17 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     end
 
     is_ok=true;
+
+function check_range(idxs,nsamples,partition,label)
+    msg='';
+    if isempty(idxs)
+        msg='empty';
+    elseif ~isequal(idxs,round(idxs))
+        msg='not integers';
+    elseif min(idxs)<1 || max(idxs)>nsamples
+        msg=sprintf('outside range 1..%d',nsamples);
+    end
+
+    if ~isempty(msg)
+        error('partition %d: .%s_indices are %s',partition,label,msg);
+    end

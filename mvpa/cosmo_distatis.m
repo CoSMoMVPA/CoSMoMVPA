@@ -171,57 +171,21 @@ for k=1:nfeatures
     subj_msk=false(1,nsubj);
     for j=1:nsubj
         dsm=dsms{j}(:,:,feature_id);
-        cp=distance2crossproduct(dsm, opt.autoscale);
-        all_finite=all(isfinite(cp));
-        subj_msk(j)=all_finite;
-        if all_finite
-            x(:,j)=cp;
-        end
+        x(:,j)=distance2crossproduct(dsm, opt.autoscale);
     end
 
-    x=x(:,subj_msk);
+    [x,subj_msk]=cosmo_remove_useless_data(x);
     nkeep=sum(subj_msk);
-
-
-    c=cosmo_corr(x);
-
-    if any(c(:)<0)
-        msg=sprintf(['negative correlations found for feature %d '...
-                            ' (# %d), minimum=%d'],feature_id,k,min(c(:)));
-        if opt.abs_correlation
-            if ~correlation_warning_shown
-                msg=sprintf(['%s\nthe absolute value of the correlations '...
-                        'is taken because .abscorrelation=true, but '...
-                        'this feature is ***experimental*** and not '...
-                        'properly validated. Interpret results with '...
-                        'care'],msg);
-                cosmo_warning(msg);
-                correlation_warning_shown=true;
-            end
-            c=abs(c);
-        else
-            msg=sprintf(['%s\nIf you know what you are doing (as a '...
-                'litmus test, you would be able to  '...
-                'implement DISTATIS), consider to use the option:  '...
-                '''abscorrelation'',true'],msg);
-            error(msg)
-        end
-    end
 
     % equivalent, but slower:
     % [e,v]=eigs(c,1);
 
     switch opt.weights
         case 'eig'
-            [v,e]=fast_eig1(c);
-            assert(all(e>0));
-            assert(v>0);
-
-            % normalize first eigenvector
-            ew=e/sum(e);
+            [ew,v]=eigen_weights(x, feature_id, opt);
 
         case 'uniform'
-            % all the same
+            % all the same (allowing for comparison with 'eig')
             ew=ones(nkeep,1)/nkeep;
             v=0;
 
@@ -285,6 +249,43 @@ res.sa.(dim_labels{1})=i;
 res.sa.(dim_labels{2})=j;
 
 cosmo_check_dataset(res);
+
+function [ew,v]=eigen_weights(x, feature_id, opt)
+    persistent correlation_warning_shown
+
+    c=cosmo_corr(x);
+
+    if any(c(:)<0)
+        msg=sprintf(['negative correlations found for feature %d '...
+                            ', minimum=%d'],feature_id,min(c(:)));
+        if opt.abs_correlation
+            if isempty(correlation_warning_shown)
+                msg=sprintf(['%s\nthe absolute value of the correlations '...
+                        'is taken because .abscorrelation=true, but '...
+                        'this feature is ***experimental*** and not '...
+                        'properly validated. Interpret results with '...
+                        'care'],msg);
+                cosmo_warning(msg);
+                correlation_warning_shown=true;
+            end
+            c=abs(c);
+        else
+            msg=sprintf(['%s\nIf you know what you are doing (as a '...
+                'litmus test, you would be able to  '...
+                'implement DISTATIS), consider to use the option:  '...
+                '''abs_correlation'',true'],msg);
+            error(msg)
+        end
+    end
+
+    [v,e]=fast_eig1(c);
+    assert(all(e>0));
+    assert(v>0);
+
+    % normalize first eigenvector
+    ew=e/sum(e);
+
+
 
 % currently unused
 % function r=rc_coefficient(x)

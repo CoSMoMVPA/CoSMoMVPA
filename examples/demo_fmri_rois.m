@@ -101,6 +101,11 @@ for subject_num=1:nsubjects
 
     % <<< identical up to here
 
+    % set targets and chunks for the output, so that cosmo_stat can be used
+    % below
+    ds_corr.sa.targets=1;
+    ds_corr.sa.chunks=subject_num;
+
     ds_corrs{subject_num}=ds_corr;
 end
 

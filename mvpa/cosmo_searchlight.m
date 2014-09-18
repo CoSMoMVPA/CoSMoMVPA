@@ -48,16 +48,61 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %                        center_ids)
 %
 % Example:
-%     % Using the searchlight to compute a full-brain LDA
-%     % classification searchlight with n-fold cross validation:
-%
-%     ds = cosmo_fmri_dataset('data.nii','mask','brain_mask.nii', ...
-%                                'targets',targets,'chunks',chunks);
-%     m = @cosmo_cross_validation_accuracy_measure;
-%     m_args = struct();
-%     m_args.classifier = @cosmo_classify_lda;
-%     m_args.partitions = cosmo_nfold_partitioner(ds);
-%     results = cosmo_searchlight(ds,m,'args',m_args,'radius',3);
+%     % use a minimal dataset with 6 voxels
+%     ds=cosmo_synthetic_dataset('nchunks',5);
+%     %
+%     % define neighborhood (progress is set to false to suppress output)
+%     radius=1; % radius=3 is typical for fMRI datasets
+%     nbrhood=cosmo_spherical_neighborhood(ds,radius,'progress',false);
+%     %
+%     % define measure and its arguments; here crossvalidation with LDA
+%     % classifier to compute classification accuracies
+%     args=struct();
+%     args.classifier = @cosmo_classify_lda;
+%     args.partitions = cosmo_nfold_partitioner(ds);
+%     measure=@cosmo_crossvalidation_measure;
+%     %
+%     % run searchlight
+%     result=cosmo_searchlight(ds,measure,'args',args,'nbrhood',nbrhood,...
+%                                                 'progress',0);
+%     %
+%     % show results:
+%     % - .samples contains classification accuracy
+%     % - .fa.nvoxels is the number of voxels in each searchlight
+%     % - .fa.radius is the radius of each searchlight
+%     cosmo_disp(result)
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'i'  'j'  'k' }
+%     >     .values
+%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     >   .vol
+%     >     .mat
+%     >       [ 10         0         0         0
+%     >          0        10         0         0
+%     >          0         0        10         0
+%     >          0         0         0         1 ]
+%     >     .dim
+%     >       [ 3         2         1 ]
+%     > .fa
+%     >   .nvoxels
+%     >     [ 3         4         3         3         4         3 ]
+%     >   .radius
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .center_ids
+%     >     [ 1         2         3         4         5         6 ]
+%     >   .i
+%     >     [ 1         2         3         1         2         3 ]
+%     >   .j
+%     >     [ 1         1         1         2         2         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     > .samples
+%     >   [ 0.7       0.8       0.9       0.6       0.7       0.6 ]
+%     > .sa
+%     >   .labels
+%     >     { 'accuracy' }
 %
 % See also: cosmo_spherical_neighborhood
 %
@@ -141,10 +186,21 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         % slice the dataset (with disabled kosherness-check for every
         % but the first neighborhood)
         sphere_ds=cosmo_slice(ds, neighbor_feature_ids, 2, ...
-                                        checked_first_output);
+                                        ~checked_first_output);
 
         % apply the measure
-        res=measure(sphere_ds, args);
+        % (use try/catch/throw to provide both the feature id
+        % that caused the exception, and the original error message)
+        try
+            res=measure(sphere_ds, args);
+        catch mexception
+            % indicate where the error was
+            msg=sprintf(['Searchlight call on feature id %d caused an '...
+                            'exception'],center_id);
+            id_exception=MException('CoSMoMVPA:searchlight',msg);
+            merged=addCause(id_exception,mexception);
+            throw(merged);
+        end
         % <@@<
 
         % for efficiency, only check first output

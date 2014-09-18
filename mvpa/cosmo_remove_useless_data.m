@@ -1,4 +1,4 @@
-function ds_useful=cosmo_remove_useless_data(ds, dim, type)
+function [ds_useful,msk]=cosmo_remove_useless_data(ds, dim, type)
 % remove 'useless' (constant and/or non-finite) samples or features
 %
 % ds_useful=cosmo_remove_useless_data(ds[, dim][, type)]
@@ -41,13 +41,16 @@ function ds_useful=cosmo_remove_useless_data(ds, dim, type)
 %     >       7         7         7
 %     >    2.02      3.09      1.63 ]
 %     %
-%     % remove all features that are constant
-%     ds_variable=cosmo_remove_useless_data(ds,1,'variable');
+%     % remove all features that are constant, and get the logical mask
+%     % of the kept features
+%     [ds_variable,msk]=cosmo_remove_useless_data(ds,1,'variable');
 %     cosmo_disp(ds_variable.samples);
 %     > [ 0.319      3.58    -0.124     0.671
 %     >   0.367       Inf      3.16     -1.21
 %     >       7         7         7         7
 %     >    2.02      3.03      3.09      1.63 ]
+%     cosmo_disp(msk)
+%     > [ false true true false true true ]
 %     %
 %     % remove all features that are not finite
 %     ds_finite=cosmo_remove_useless_data(ds,1,'finite');
@@ -61,6 +64,11 @@ function ds_useful=cosmo_remove_useless_data(ds, dim, type)
 %     ds_finite_features=cosmo_remove_useless_data(ds,2);
 %     cosmo_disp(ds_finite_features.samples);
 %     > [ 0.862      2.02      3.03         7      3.09      1.63 ]
+%     %
+%     % illustrate that this function also works on an array directly
+%     samples_finite_features=cosmo_remove_useless_data(ds.samples,2);
+%     cosmo_disp(samples_finite_features);
+%     > [ 0.862      2.02      3.03         7      3.09      1.63 ]
 %
 % Notes:
 %  - by default, this function removes useless features
@@ -73,22 +81,29 @@ function ds_useful=cosmo_remove_useless_data(ds, dim, type)
 if nargin<3 || isempty(type), type='all'; end
 if nargin<2 || isempty(dim), dim=1; end;
 
-data=ds.samples;
+if isstruct(ds)
+    data=ds.samples;
+elseif isnumeric(ds) || islogical(ds)
+    data=ds;
+else
+    error('illegal input: expect array or dataset struct');
+end
+
 n=size(data,1);
 
 switch type
     case 'finite'
-        m=finite(data, dim);
+        msk=finite(data, dim);
     case 'variable'
-        m=variable(data, dim);
+        msk=variable(data, dim);
     case 'all'
-        m=finite(data, dim) & variable(data, dim);
+        msk=finite(data, dim) & variable(data, dim);
     otherwise
         error('illegal type %s', type);
 end
 
 other_dim=3-dim;
-ds_useful=cosmo_slice(ds, m, other_dim);
+ds_useful=cosmo_slice(ds, msk, other_dim);
 
 function tf=finite(d, dim)
     tf=all(isfinite(d),dim);
@@ -101,6 +116,6 @@ function tf=variable(d, dim)
             d_first=d(:,1);
     end
 
-tf=sum(bsxfun(@ne, d_first, d), dim)>0 & ~any(isnan(d),dim);
+    tf=sum(bsxfun(@ne, d_first, d), dim)>0 & ~any(isnan(d),dim);
 
 

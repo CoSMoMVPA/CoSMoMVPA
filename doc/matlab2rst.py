@@ -2,14 +2,14 @@
 # converts matlab to rst files
 #
 # This code reads all matlab .m files and then generates multiple versions:
-# 
+#
 # 1) the full file, but with lines '% >@@>' and '<<' removed
 # 2) the file with code in between '% >>' and '<<' replaced by
 #    a comment saying 'your code here' (postfix '_skl' for skeleton)
 # 3) the file with only the header (first line plus all lines up to
 #    the first line without comment (postfix '_hdr' for header)
 # It also generates seperate toc files for each version
-# 
+#
 # Important: requires sphinx with recent
 #            underscore.js (1.3.1 works, 0.4.4 does not)
 #
@@ -85,11 +85,11 @@ def remove_trailing_percent(data):
     for d in data:
         if not d in ' %':
             is_percent=False
-        
+
         r.append(' ' if is_percent else d)
-        
+
     return ''.join(r)
-    
+
 
 def matlab2parts(data):
     '''Converts data to tuple (function sepc, first doc line, other doc lines, body)'''
@@ -108,7 +108,7 @@ def matlab2parts(data):
             stage+=1
         next_stage=False
         is_continuation=line.endswith('...')
-        
+
         if stage==0:
             next_stage=True
         elif stage==1:
@@ -118,7 +118,7 @@ def matlab2parts(data):
                 line=None
         elif stage==2:
             line=remove_trailing_percent(line)
-        
+
         parts[stage].append(line)
 
         if next_stage and not is_continuation:
@@ -131,9 +131,9 @@ def matlab2parts(data):
         rs.append(sep.join([p for p in part if p is not None]))
 
     return tuple(rs)
-            
-            
-            
+
+
+
 
 
 class RSTType(object):
@@ -181,13 +181,13 @@ class RSTprop(object):
     def __init__(self):
         pass
 
-    
+
 
 
 def base_name(fn, ext=None):
     if ext is None:
         ext='.m'
-    
+
     p, base_fn=split(fn)
 
     if not base_fn.endswith(ext):
@@ -197,22 +197,250 @@ def base_name(fn, ext=None):
 
 
 def is_newer(fn, other_fn):
-    return not isfile(other_fn) or getmtime(fn)>getmtime(other_fn) 
+    return not isfile(other_fn) or getmtime(fn)>getmtime(other_fn)
     # return True if fn is newer than other_fn
     # and other_fn exists
-    return 
+    return
+
+class RSTTable(object):
+    def __init__(self):
+        self.elements=[]
+
+    def add(self, element):
+        self.elements.append(element)
+
+    def __len__(self):
+        return len([e for e in self.elements if isinstance(e, RSTModRef)])
+
+    def widths(self):
+        widths=None
+        for element in self.elements:
+            if isinstance(element,RSTModRef):
+                ws=element.widths()
+                if widths is None:
+                    widths=ws
+                else:
+                    assert(len(widths)==len(ws))
+                    for i, w in enumerate(ws):
+                        if w>widths[i]:
+                            widths[i]=w
+        return widths
+
+    def names(self):
+        return [e.name for e in self.elements if isinstance(e, RSTModRef)]
+
+    def __str__(self):
+        widths=self.widths()
+        h=self.hline()
+        lines=[h]+[element.to_lines(widths) for element in self.elements]+[h]
+        return ''.join(lines)
+
+    def hline(self):
+        widths=self.widths()
+        return ' '.join(['='*w for w in widths])+'\n'
+
+
+class RSTHeader(object):
+    def __init__(self,name):
+        self.name=name
+    def to_lines(self, widths):
+        hline=' '.join(['-'*w for w in widths])+'\n'
+        nm='**%s**' % self.name
+        return hline+nm+'\n'+hline
+
+class RSTModRef(object):
+    def __init__(self,name,desc):
+        self.name=name
+        self.desc=desc
+
+    def ref_name(self):
+        return ':ref:`%s`' % self.name
+
+    def widths(self):
+        return map(len,(self.ref_name(),self.desc))
+
+    def to_lines(self, widths):
+        assert(len(widths)==2)
+        line=''
+        for i, (s, w) in enumerate(zip((self.name,self.desc),widths)):
+            ss=self.ref_name() if i==0 else s
+            n=w-len(ss)
+            assert(n>=0)
+            line+='%s%s '%(ss,' '*n)
+        return line+'\n'
+
+
+class CoSMoModules(object):
+    _name2funcs=dict(
+        classification=['classify_knn',
+                     'classify_lda',
+                     'classify_libsvm',
+                     'classify_matlabsvm',
+                     'classify_matlabsvm_2class',
+                     'classify_naive_bayes',
+                     'classify_nn',
+                     'classify_selective_naive_bayes',
+                     'classify_svm',
+                     'meta_feature_selection_classifier',
+                     'crossvalidate',
+                     'crossvalidation_measure',
+                     'winner_indices',
+                     'confusion_matrix'
+                     ],
+
+        operations=['slice',
+                    'dataset_slice_fa',
+                    'dataset_slice_sa',
+                    'stack',
+                    'split',
+                    'dim_prune',
+                    'dim_transpose',
+                    'dim_rename'],
+
+        processing=['randomize_targets',
+                    'fx',
+                    'normalize',
+                    'average_samples',
+                    'remove_useless_data',
+                    'meeg_baseline_correct',
+                    ],
+
+        helpers=['dir',
+                 'set_path',
+                 'type',
+                 'warning',
+                 'config',
+                 'show_progress',
+                 'config',
+                 'flatten',
+                 'unflatten',
+                 'check_external',
+                 ],
+
+        utils=[  'strsplit',
+                 'strjoin',
+                 'structjoin',
+                 'match',
+                 'dim_match',
+                 'dim_find',
+                 'isfield',
+                 'cartprod',
+                 ],
+
+
+        neighborhood=['spherical_neighborhood',
+                      'interval_neighborhood',
+                      'surficial_neighborhood',
+                      'sphere_offsets',
+                      'searchlight',
+                      'neighborhood',
+                      ],
+
+        develop=['run_tests',
+                 'publish_run_scripts',
+                 'wtf'
+                 ],
+
+        visualization=['disp',
+                       'plot_slices'
+                       ],
+
+
+        datasets=['fmri_dataset',
+                  'map2fmri',
+                  'meeg_dataset',
+                  'map2meeg',
+                  'surface_dataset',
+                  'map2surface',
+                  'synthetic_dataset',
+                  'check_dataset'
+                  ],
+
+        stats=['statcode',
+               'stat',
+               'anova_feature_selector'
+               ],
+
+        correlations=['correlation_measure',
+                      'corr'
+                      ],
+
+        rsa=        ['target_dsm_corr_measure',
+                     'dissimilarity_matrix_measure',
+                     'pdist',
+                     'squareform',
+                     'distatis'
+                     ],
+
+        partitions= ['balance_partitions',
+                     'nchoosek_partitioner',
+                     'nfold_partitioner',
+                     'check_partitions',
+                     'oddeven_partitioner',
+                     'chunkize',
+                     'check_partitions'
+                     ]
+        )
+
+    _name2full= [('datasets','Dataset input/output'),
+                ('operations','Dataset operations'),
+                ('processing','Dataset processing'),
+                ('visualization','Data visualuzation'),
+                ('correlations','Correlations'),
+                ('classification','Classification and cross-validation'),
+                ('rsa','Representational similarity analysis'),
+                ('partitions','Partitioning (for cross-validation)'),
+                ('neighborhood','Neighborhoods and searchlight'),
+                ('stats','Statistics'),
+                ('utils','Utility functions'),
+                ('helpers','Misceleanous helper functions'),
+                ('develop','Developer functions')]
+
+    def __init__(self, source_dir='../mvpa',prefix='cosmo_',ext='.m'):
+        self.source_dir=source_dir
+        self.prefix=prefix
+        self.ext=ext
+
+    def as_table(self, data):
+        # data is a list of tuples (name, description)
+        name2desc=dict(data)
+        visited_func_names=set()
+
+        table=RSTTable()
+
+        for cat, catfull in self._name2full:
+            table.add(RSTHeader(catfull))
+            for func_name in self._name2funcs[cat]:
+                full_name=self.prefix+func_name
+                if full_name in name2desc:
+                    table.add(RSTModRef(full_name,name2desc[full_name]))
+                #else:
+                #    print func_name, name2desc
+
+        if len(table):
+            missed=set(name2desc)-set(table.names())
+            if len(missed):
+                table.add(RSTHeader('Other functions (possibly experimental)'))
+                for name in missed:
+                    table.add(RSTModRef(name, name2desc[name]))
+        else:
+            table=RSTTable()
+            table.add(RSTHeader('All functions'))
+            for name in sorted(name2desc):
+                table.add(RSTModRef(name,name2desc[name]))
+
+
+        return table.__str__()
+
+modules=CoSMoModules()
+
+
 
 rst_types=(RSTType('demo',[None]),
            RSTType('run',[None,'skl']),
            RSTType('cosmo',[None,'hdr','skl']),
            RSTType('test',[None]))
 
-def as_table(data):
-    lengths=[max(map(len,x)) for x in zip(*data)]
-    t=' '.join(['='*length for length in lengths])
-    fill=lambda xs:[x+' '*(lengths[i]+len(x)) for i,x in enumerate(xs)]
-    return '\n'.join([t]+map(' '.join,map(fill,data))+[t])
-    
 
 all_input_dirs=[matlab_dir, example_dir, test_dir]
 
@@ -232,12 +460,12 @@ for output in ('hdr','skl',None):
         print ("matlab2rst %s %s: " % (rst_type.prefix, output or '')),
         for fn in fns:
             [p,b]=base_name(fn)
-        
+
             b+=infix
 
             # make a text file that can be 'included' in sphinx
             trg_fn=join(output_mat_abs,'%s.txt' % b)
-            
+
             with open(fn) as f:
                 mat=f.read()
 
@@ -247,10 +475,10 @@ for output in ('hdr','skl',None):
             if is_newer(fn, trg_fn):
                 remake_rst=True
                 rst=matlab2rst(mat, output)
-                
+
                 with open(trg_fn,'w') as f:
                     f.write(rst)
-            
+
             if rst_type.needs_pb(output):
                 pb_path=join(output_root_abs, publish_rel)
                 pb_fn=join(pb_path,b+'.html')
@@ -273,27 +501,23 @@ for output in ('hdr','skl',None):
                     f.write(header+body)
 
                 rebuild_toc=True
- 
-            base_names.append((b,parts[1]))
 
+            base_names.append((b,parts[1]))
         if rebuild_toc:
             toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
             title='%s - %s' % (rst_type.get_name(), rst_type.type2name(output))
             header='.. _`%s`:\n\n.. toctree::\n    :maxdepth: 2\n    :hidden:\n\n' % (
                         toc_base_name)
 
-            
+
             trg_fn=join(output_root_abs,'%s.rst' % toc_base_name)
             with open(trg_fn,'w') as f:
                 f.write(header)
                 f.write('\n'.join('    %s/%s' % (output_mat_rel,b) for b,_ in base_names))
                 f.write('\n\n%s\n%s\n\n' % (title, '+' * len(title)))
 
-                ref_base_names=[[':ref:`%s`' % s if i==0 else s for i,s in enumerate(bs)]
-                                        for bs in base_names]
-                f.write(as_table(ref_base_names))
+                f.write(modules.as_table(base_names))
 
-                
 
             if rst_type.needs_full_include():
                 include_base_name='contents%s.rst' % rst_type.get_postfix()

@@ -1,5 +1,5 @@
 function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
-% Checks consistency of a dataset. By default throws an error when not.
+% Check consistency of a dataset.
 %
 %
 % is_ok=cosmo_dataset_check(ds, [ds_type,][,error_if_not_ok])

@@ -83,9 +83,15 @@ end
 %% compute t statistic and print the result
 % run one-sample t-test again zero
 
-% Using cosmo_stats - convert to dataset struct
+% Using cosmo_stats - convert to dataset struct.
+% The targets are chunks are set to indicate that all samples are from the
+% same class (condition), and each observation is independent from the
+% others
 mean_weighted_zs_ds=struct();
 mean_weighted_zs_ds.samples=mean_weighted_zs;
+mean_weighted_zs_ds.sa.targets=ones(nsubjects,1);
+mean_weighted_zs_ds.sa.chunks=(1:nsubjects)';
+
 
 ds_t=cosmo_stat(mean_weighted_zs_ds,'t');     % t-test against zero
 ds_p=cosmo_stat(mean_weighted_zs_ds,'t','p'); % convert to p-value

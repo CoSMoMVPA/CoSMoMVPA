@@ -91,15 +91,20 @@ function write_ft(fn,hdr)
     save(fn, '-struct', hdr);
 
 
-function samples_field=ft_detect_samples_field(ds)
+function samples_field=ft_detect_samples_field(ds, is_single_sample)
     nfreq=sum(cosmo_match(ds.a.fdim.labels,{'freq'}));
     ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
     nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
+
     if nchan>=1 && ntime>=1
         if nfreq>=1
             samples_field='powspctrm';
         else
-            samples_field='trial';
+            if is_single_sample
+                samples_field='avg';
+            else
+                samples_field='trial';
+            end
         end
         return
     end
@@ -109,34 +114,47 @@ function samples_field=ft_detect_samples_field(ds)
 function ft=build_ft(ds)
 
     % get fieldtrip-specific fields from header
-    ft=ds.a.hdr_ft;
+    ft=struct();
 
     % unflatten the array
-    [arr, dim_labels]=cosmo_unflatten(ds);
     [arr, dim_labels]=cosmo_unflatten(ds,[],NaN);
 
+    is_single_sample=size(ds.samples,1)==1;
+    if is_single_sample
+        arr_size=size(arr);
+        arr=reshape(arr,arr_size(2:end));
+        samples_label=cell(0);
+    else
+        samples_label={ds.a.meeg.samples_label};
+    end
+
     % store the data
-    samples_field=ft_detect_samples_field(ds);
+    samples_field=ft_detect_samples_field(ds, is_single_sample);
+
     ft.(samples_field)=arr;
 
     % set dimord
-    samples_label=ds.a.meeg.samples_label;
-
     underscore2dash=@(x)strrep(x,'_','-');
 
-    dimord_labels=[{samples_label}; ...
+    dimord_labels=[samples_label; ...
                     cellfun(underscore2dash,dim_labels(:),...
                                             'UniformOutput',false)];
+
     ft.dimord=cosmo_strjoin(dimord_labels,'_');
 
     % store each feature attribute dimension value
     ndim=numel(dim_labels);
     for dim=1:ndim
         dim_label=dim_labels{dim};
-        if strcmp(dim_label,'chan')
-            dim_label='label';
+        dim_value=ds.a.fdim.values{dim};
+        switch dim_label
+            case 'chan'
+                dim_label='label';
+            case 'time'
+                % fieldtrip will puke with column vector
+                dim_value=dim_value(:)';
         end
-        ft.(dim_label)=ds.a.dim.values{dim};
+        ft.(dim_label)=dim_value;
     end
 
     if isfield(ds.sa,'trialinfo')
@@ -145,6 +163,10 @@ function ft=build_ft(ds)
 
     if isfield(ds.sa,'cumtapcnt')
         ft.cumtapcnt=ds.sa.cumtapcnt;
+    end
+
+    if isfield(ds.a.meeg,'senstype')
+        ft.type=ds.a.meeg.senstype;
     end
 
     % if fieldtrip is present

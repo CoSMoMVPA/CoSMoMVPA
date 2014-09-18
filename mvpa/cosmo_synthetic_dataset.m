@@ -34,7 +34,115 @@ function ds=cosmo_synthetic_dataset(varargin)
 %                           attribute.
 %
 % Examples:
+%    ds=cosmo_synthetic_dataset();
+%    cosmo_disp(ds);
+%     > .samples
+%     >   [   2.21    -0.434     0.725      3.08     0.489     0.888
+%     >       1.83      2.02   -0.0631      1.42      2.71     -1.15
+%     >     -0.585      3.58     0.715      2.35     0.727     -1.07
+%     >      0.862      4.44    -0.205     -1.21      1.37    -0.809
+%     >       1.99     -1.35    -0.124      2.39     0.294     -2.94
+%     >      -1.31      4.71      1.49      1.63     0.887      1.44 ]
+%     > .fa
+%     >   .i
+%     >     [ 1         2         3         1         2         3 ]
+%     >   .j
+%     >     [ 1         1         1         2         2         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'i'  'j'  'k' }
+%     >     .values
+%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     >   .vol
+%     >     .mat
+%     >       [ 10         0         0         0
+%     >          0        10         0         0
+%     >          0         0        10         0
+%     >          0         0         0         1 ]
+%     >     .dim
+%     >       [ 3         2         1 ]
+%     > .sa
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2
+%     >       1
+%     >       2 ]
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2
+%     >       3
+%     >       3 ]
 %
+%     ds=cosmo_synthetic_dataset('sigma',5,'type','timefreq',...
+%                                'nchunks',5,'ntargets',4,'size','huge',...
+%                                'nsubjects',10);
+%     cosmo_disp(ds)
+%     > .samples
+%     >   [ 0.972     0.183      0.27  ...  -0.477     -1.12     0.127
+%     >      1.83    -0.595     0.494  ...  -0.663     0.517    -0.167
+%     >     -2.26     0.949     -1.05  ...    0.67    -0.449    -0.511
+%     >       :         :         :            :         :         :
+%     >     0.467      1.04     0.551  ...  -0.557      1.01     0.211
+%     >     -0.21    -0.118      1.12  ...  -0.454     -1.12        -1
+%     >     0.625     0.699      1.17  ...   -1.93    0.0967     0.606 ]@200x98838
+%     > .fa
+%     >   .chan
+%     >     [ 1         2         3  ...  304       305       306 ]@1x98838
+%     >   .freq
+%     >     [ 1         1         1  ...  17        17        17 ]@1x98838
+%     >   .time
+%     >     [ 1         1         1  ...  19        19        19 ]@1x98838
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'chan'  'freq'  'time' }
+%     >     .values
+%     >       { { 'MEG0111'          [  2         [  -0.2
+%     >           'MEG0112'             4           -0.15
+%     >           'MEG0113'             6            -0.1
+%     >              :                  :             :
+%     >           'MEG2641'            30             0.6
+%     >           'MEG2642'            32            0.65
+%     >           'MEG2643' }@306x1    34 ]@17x1      0.7 ]@19x1 }
+%     >   .meeg
+%     >     .samples_type
+%     >       'freq'
+%     >     .samples_field
+%     >       'powspctrm'
+%     >     .samples_label
+%     >       'rpt'
+%     > .sa
+%     >   .targets
+%     >     [ 1
+%     >       2
+%     >       3
+%     >       :
+%     >       2
+%     >       3
+%     >       4 ]@200x1
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       :
+%     >       5
+%     >       5
+%     >       5 ]@200x1
+%     >   .subject
+%     >     [  1
+%     >        1
+%     >        1
+%     >        :
+%     >       10
+%     >       10
+%     >       10 ]@200x1
 %
 % NNO Aug 2014
 
@@ -136,14 +244,14 @@ function a=dim_labels_values(data_type, chan_type)
             % simulate full neuromag 306 system
             chan=get_neuromag_chan(chan_type);
 
-            time=-.2:.05:1.3;
+            time=(-.2:.05:1.3)';
 
             switch data_type
                 case 'timefreq'
-                    freq=2:2:40;
+                    freq=(2:2:40)';
                     values={chan,freq,time};
                     labels={'chan','freq','time'};
-                    a.meeg.samples_type='timefreq';
+                    a.meeg.samples_type='freq';
                     a.meeg.samples_field='powspctrm';
 
                 otherwise % meeg and timelock
@@ -154,7 +262,6 @@ function a=dim_labels_values(data_type, chan_type)
             end
 
             a.meeg.samples_label='rpt';
-            a.hdr_ft=struct();
 
         case 'surface'
             labels={'node_indices'};

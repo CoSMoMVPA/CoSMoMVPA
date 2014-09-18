@@ -51,14 +51,17 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     >     { 'accuracy' }
 %
 %     % let the measure return predictions instead of accuracy,
-%     % and use take-2-chunks out for testing crossvalidation;
+%     % and use take-1-chunks out for testing crossvalidation;
 %     % use LDA classifer
 %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
 %     opt=struct();
-%     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
+%     opt.partitions=cosmo_nchoosek_partitioner(ds,1);
 %     opt.output='predictions';
 %     opt.classifier=@cosmo_classify_lda;
 %     pred_ds=cosmo_crossvalidation_measure(ds,opt);
+%     %
+%     % show results. Because each sample was predicted just once,
+%     % .sa.chunks contains the chunks of the original input
 %     cosmo_disp(pred_ds);
 %     > .sa
 %     >   .targets
@@ -69,28 +72,37 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     >       1
 %     >       2
 %     >       3 ]@12x1
+%     >   .chunks
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       :
+%     >       4
+%     >       4
+%     >       4 ]@12x1
 %     > .samples
 %     >   [ 1
-%     >     2
 %     >     3
+%     >     1
 %     >     :
 %     >     1
-%     >     2
-%     >     1 ]@12x1
+%     >     1
+%     >     2 ]@12x1
 %     >
 %     %
 %     % return accuracy, but use z-scoring on each training set
 %     % and apply the estimated mean and std to the test set.
+%     % Use take-2-chunks out for corssvalidation
 %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
 %     opt=struct();
 %     opt.output='accuracy';
 %     opt.normalization='zscore';
 %     opt.classifier=@cosmo_classify_lda;
-%     opt.partitions=cosmo_nchoosek_partitioner(ds,1);
+%     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
 %     z_acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(z_acc_ds);
 %     > .samples
-%     >   [ 0.417 ]
+%     >   [ 0.75 ]
 %     > .sa
 %     >   .labels
 %     >     { 'accuracy' }
@@ -115,7 +127,8 @@ partitions=params.partitions;
 
 params=rmfield(params,'classifier');
 params=rmfield(params,'partitions');
-[pred, accuracy]=cosmo_crossvalidate(ds,classifier,partitions,params);
+[pred, accuracy,chunks]=cosmo_crossvalidate(ds,classifier,...
+                                        partitions,params);
 % <@@<
 
 ds_sa=struct();
@@ -126,6 +139,7 @@ switch params.output
         ds_sa.sa.labels={'accuracy'};
     case {'predictions','raw'}
         ds_sa.sa.targets=ds.sa.targets;
+        ds_sa.sa.chunks=chunks;
         ds_sa.samples=pred(:);
     otherwise
         error('Illegal output parameter %s', params.output);
