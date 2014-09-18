@@ -89,7 +89,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     % minimal searchlight example
 %     ds=cosmo_synthetic_dataset('type','fmri');
 %     radius=1; % in voxel units (radius=3 is more typical)
-%     res=cosmo_searchlight(ds,@cosmo_correlation_measure,'radius',radius,'progress',false);
+%     res=cosmo_searchlight(ds,@cosmo_correlation_measure,..
+%                               'radius',radius,'progress',false);
 %     cosmo_disp(res.samples)
 %     > [ 0.314   -0.0537     0.261     0.248     0.129     0.449 ]
 %     cosmo_disp(res.sa)
@@ -135,7 +136,7 @@ if isempty(partitions)
         check_partitions=false;
     else
         partitions=cosmo_nchoosek_partitioner(ds,'half');
-        cached_chunks=ds.sa.chunks;
+        cached_chunks=chunks;
         cached_partitions=partitions;
     end
 end
