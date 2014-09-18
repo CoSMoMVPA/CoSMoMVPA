@@ -100,30 +100,30 @@ function cosmo_disp(x,varargin)
 %     > [ 3.141593      6.283185 ]
 %
 %     % illustrate n-dimensional arrays
-%     x=zeros([1 2 1 2 3]);
+%     x=zeros([2 2 1 2 3]);
 %     x(:)=2*(1:numel(x));
 %     cosmo_disp(x)
-%     > <double>@1x2x1x2x3
-%     >    (:,:,1,1,1) =
-%     >        [ 2         4 ]
-%     >    (:,:,1,2,1) =
-%     >        [ 6         8 ]
-%     >    (:,:,1,1,2) =
-%     >        [ 10        12 ]
-%     >    (:,:,1,2,2) =
-%     >        [ 14        16 ]
-%     >    (:,:,1,1,3) =
-%     >        [ 18        20 ]
-%     >    (:,:,1,2,3) =
-%     >        [ 22        24 ]
+%     > <double>@2x2x1x2x3
+%     >    (:,:,1,1,1) =  [ 2         6
+%     >                     4         8 ]
+%     >    (:,:,1,2,1) =  [ 10        14
+%     >                     12        16 ]
+%     >    (:,:,1,1,2) =  [ 18        22
+%     >                     20        24 ]
+%     >    (:,:,1,2,2) =  [ 26        30
+%     >                     28        32 ]
+%     >    (:,:,1,1,3) =  [ 34        38
+%     >                     36        40 ]
+%     >    (:,:,1,2,3) =  [ 42        46
+%     >                     44        48 ]
 %     cosmo_disp(reshape(char(65:72),[2 2 2]))
 %     > <char>@2x2x2
-%     >    (:,:,1) =
-%     >        'AC
-%     >         BD'
-%     >    (:,:,2) =
-%     >        'EG
-%     >         FH'
+%     >    (:,:,1) = 'AC
+%     >               BD'
+%     >    (:,:,2) = 'EG
+%     >               FH'
+%     cosmo_disp(zeros([2 3 5 7 0 2]))
+%     > <double>@2x3x5x7x0x2 (empty)
 %
 %
 %
@@ -236,14 +236,14 @@ function y=nd_any2str(x,opt)
     p=cosmo_cartprod(parts);
     xflat=reshape(x,[sz(1:2) n_rest]);
 
-    s=cell(n_rest*2+1,1);
-    s{1}=any2summary_str(x);
+    s=cell(n_rest*2+1,2);
+    s{1,1}=any2summary_str(x);
     for k=1:n_rest
         v=xflat(:,:,k);
         v_str=disp_helper(v,opt);
         idx_str=sprintf(',%d',p(k,:));
-        s{k*3-1}=sprintf('   (:,:%s) =',idx_str);
-        s{k*3}=strcat_({'       ',v_str});
+        s{k+1,1}=sprintf('   (:,:%s) = ',idx_str);
+        s{k+1,2}=v_str;
     end
 
     y=strcat_(s);
