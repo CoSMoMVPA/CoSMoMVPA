@@ -112,82 +112,54 @@ function ds_splits=cosmo_split(ds, split_by, dim)
         error('dim should be 1 or 2');
     end
 
-    size_dim=size(ds.samples,dim);
-
-    % empty split, so return just the dataset itself
+    % if empty split return just the dataset itself
     if isempty(split_by)
         ds_splits={ds};
         return
     end
 
+    % ensure that split_by is a cell of strings
     if ischar(split_by)
         split_by={split_by};
     elseif ~iscellstr(split_by)
         error('split_by must be string or cell of strings');
     end
 
+    % get values to split by
+    split_values=get_attr_values(ds, split_by, dim);
 
-    % delegate to helper function
-    ds_splits=split_recursively(ds, split_by, dim);
+    % get indices of unique parts
+    split_idxs=cosmo_index_unique(split_values);
+
+    % allocate space for output
+    n=numel(split_idxs);
+    ds_splits=cell(1,n);
+
+    % slice for each unique part
+    for k=1:n
+        ds_splits{k}=cosmo_slice(ds,split_idxs{k},dim);
+    end
 
 
-function ds_splits=split_single(ds, split_by, dim)
+
+function values=get_attr_values(ds, split_by, dim)
     attrs_fns={'sa','fa'};
     attrs_fn=attrs_fns{dim};
+    attrs=ds.(attrs_fn);
 
-    % ensure the field is there
-    if ~isfield(ds, attrs_fn) || ~isfield(ds.(attrs_fn), split_by)
-        error('missing field .%s.%s', attrs_fn, split_by);
-    end
+    n=numel(split_by);
+    values=cell(n,1);
+    for k=1:n
+        key=split_by{k};
+        % check field is present
+        cosmo_isfield(attrs,key,true);
 
-    values=ds.(attrs_fn).(split_by);
-
-    % ensure splitting based on values in a vector
-    if ~isvector(values) || numel(values)~=size(ds.samples,dim);
-        selector_str=sprintf('field %s.%s', attrs_fn, split_by);
-        error('%s must be vector with length %d', ...
-                    selector_str,size_dim);
-    end
-
-    % get unique values
-    split_values=unique(values);
-    nsplits=numel(split_values);
-
-    if nsplits==1
-        % singleton element - little optimization
-        ds_splits={ds};
-    else
-        % allocate space for output
-        ds_splits=cell(1,nsplits);
-
-        % slice for each unique value seperately
-        for k=1:nsplits
-            ds_splits{k}=cosmo_slice(ds, values==split_values(k), ...
-                                                        dim, false);
+        value=attrs.(key);
+        if ~is_1d(value)
+            error('value for ''.%s.%s'' must be 1D',attrs_fn,key);
         end
+        values{k}=value;
     end
 
-function ds_splits=split_recursively(ds, split_by, dim)
-    % split by first fieldname
-    split_head=split_single(ds, split_by{1}, dim);
-
-    if numel(split_by)==1
-        ds_splits=split_head;
-        return;
-    end
-
-    % allocate space for remaining splits
-    nhead=numel(split_head);
-    split_all=cell(1,nhead);
-
-    % remaining fieldnames
-    split_by_tail=split_by(2:end);
-
-    % split each of them
-    for k=1:nhead
-        split_all{k}=split_recursively(split_head{k}, split_by_tail, dim);
-    end
-
-    % join results
-    ds_splits=[split_all{:}];
-
+function tf=is_1d(x)
+    tf=sum(size(x)>1)<=1;
