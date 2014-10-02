@@ -4,24 +4,95 @@
 Download instructions
 =====================
 
-CoSMoMVPA code
-++++++++++++++
-The latest code is available from GitHub_. As this code is under development, it may change rapidly.
 
-- `git` users can clone the repository::
+.. _`get_code_and_example_data`:
 
-    git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Get the code and example data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  To update a (local) already existing repository (i.e. after the clone) to the latest version on hithub, run::
+The Matlab code is required for analyses in CoSMoMVPA_; the example data is required to run the exercises and the :ref:`demos <contents_demo.rst>`.
+
+* Get the CoSMoMVPA_ source code:
+
+    + ``git`` users::
+
+        git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+
+    + everybody else: download the `zip archive`_.
+
+* Add the source code directories to the Matlab_ / Octave_ path, by changing the directory to the CoSMoMVPA_ ``/mvpa`` directory, then running
+
+    .. code-block:: matlab
+
+        cosmo_set_path
+
+    (alternatively, add the ``mvpa`` and ``external`` directories, and their subdirectories to the path).
+
+    Then run
+
+    .. code-block:: matlab
+
+        save_path
+
+    to store the new path permanently.
+
+    To check that things are working, run:
+
+    .. code-block:: matlab
+
+        cosmo_wtf
+
+    which should provide a report of available system information.
+
+* Download the tutorial data:
+
+    - Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
+    - Advanced Unix users: ``cd`` to the CoSMoMVPA directory, then run::
+
+        wget http://cosmomvpa.org/datadb.zip && unzip datadb.zip && rm datadb.zip
+
+    You can move the directory to another location on your file system, if desired.
+
+
+* Set the location of the tutorial data in a text file named ``.cosmomvpa.cfg`` (in a directory that is in the matlab path), as described in the *Notes* section of :ref:`cosmo_config_hdr`.
+
+    + If you do not know where to store the file, just close and start Matlab afresh (so that it starts in a location that is in the Matlab path), and run
+
+        .. code-block:: matlab
+
+            edit .cosmomvpa.cfg
+
+Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
+
+* To verify that everything works, run the following in Matlab:
+
+    .. code-block:: matlab
+
+        config=cosmo_config();
+        data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+        ds=cosmo_fmri_dataset(fullfile(data_path,'vt_mask.nii'),'mask',true);
+        cosmo_map2fmri(ds,fullfile(config.output_data_path,'test.nii'));
+
+    (Running these commands may give a warning message ``flip_orient field found``, which can safely be ignored.)
+
+    If no errors are raised and a file ``test.nii`` is created in the output_data_path, then you are good to go.
+
+.. _`keep_code_up_to_date`:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Keep your code up to date
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+CoSMoMVPA_ code may change rapidly. To stay up to date:
+
+* ``git`` users (assuming you followed the :ref:`instructions to get the code <get_code_and_example_data>`)::
 
     git checkout master
     git pull origin master
 
-- Others can download and extract the `zip archive`_.
+* everybody else: you would have to re-download the `zip archive`_ and update your local Matlab files. (At the moment we do not provide automatic detection of code that is out of date.)
 
-To use CoSMoMVPA_ in Matlab_, run ``cosmo_set_path`` (in ``mvpa/``) followed by ``savepath``. Alternatively you can manually add the ``mvpa`` and ``external`` directories (and their subdirectories) to the Matlab path.
-
-Note: when CoSMoMVPA is released officially, there will be permanent links, hosted on the website, containing official, feature-stable, releases.
 
 External dependencies
 +++++++++++++++++++++
@@ -33,26 +104,16 @@ Certain functionality require certain external toolboxes:
 - LIBSVM_'s Support Vector Machine (SVM) classifier (accessed through  :ref:`cosmo_classify_libsvm`) requires the LIBSVM_ toolbox.
 - MEEG data requires FieldTrip_ for almost all MEEG-related functions.
 
+For operations that require external toolboxes, CoSMoMVPA_ will check their presence. If a required external toolbox is not available, an error message is given with download instructions.
+
 .. _download_tutorial_data:
-
-Tutorial data
-+++++++++++++
-The tutorial data can be downloaded in the following ways:
-
-- Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, unzip it, and move the ``datadb`` directory to the CoSMoMVPA root directory.
-
-- more advanced Unix users: ``cd`` to the CoSMoMVPA directory, then run::
-
-    wget http://cosmomvpa.org/datadb.zip && unzip datadb.zip && rm datadb.zip
-
-The tutorial data can also be stored elsewhere; to do so, specify it in a ``.cosmomvpa.cfg`` configuration file as decribed in the *Notes* section of :ref:`cosmo_config_hdr`.
 
 Developers
 ++++++++++
 Contributions are welcomed! Please see :ref:`contribute`.
 
-Our current build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see :ref:`building the documentation`.
+We use a build system for generating documentation. This build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see :ref:`building the documentation`.
 
-Unit tests require the xUnit_ toolbox.
+Unit and doc tests tests require the xUnit_ toolbox.
 
 .. include:: links.txt
