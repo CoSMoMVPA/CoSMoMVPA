@@ -15,22 +15,43 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %               f to each unique combiniation of attribtues in split_by
 %
 % Example:
-%   % ds is a dataset with several repeats of each target. Compute the
-%   % average sample value for each unique target:
-%   f_ds=cosmo_fx(ds, @(x) mean(x,1), 'targets', 1)
+%     % ds is a dataset with several repeats of each target. Compute the
+%     % average sample value for each unique target:
+%     ds=cosmo_synthetic_dataset();
+%     f_ds=cosmo_fx(ds, @(x)mean(x,1), 'targets');
+%     cosmo_disp(f_ds.samples)
+%     > [  1.21     0.598     0.439      2.61     0.503     -1.04
+%     >   0.463      3.72     0.407     0.613      1.66    -0.173 ]
+%     cosmo_disp(f_ds.sa)
+%     > .targets
+%     >   [ 1
+%     >     2 ]
+%     > .chunks
+%     >   [ 1
+%     >     1 ]
 %
-%   % Compute the average sample value for each unique combination
-%   % of targets and chunks:
-%   f_ds=cosmo_fx(ds, @(x) mean(x,1), {'targets','chunks'}, 1)
+%     % Compute the average sample value for each unique combination
+%     % of targets and chunks:
+%     ds=cosmo_synthetic_dataset('nreps',4);
+%     size(ds.samples)
+%     > 24 6
+%     f_ds=cosmo_fx(ds, @(x)mean(x,1), {'targets','chunks'});
+%     size(f_ds.samples)
+%     > 6 6
 %
-%   % ds is an MEEG timelocked dataset with feature attributes 'time' and
-%   % 'chan'. Downsample the data by a factor of three over the time
-%   % dimension by binning the data in bins of three and averaging each bin
-%   downsampling_factor=3
-%   ds.fa.time_downsamp=ceil(ds.fa.time/downsampling_factor);
-%   ds_downsamp=cosmo_fx(ds, @(x) mean(x,2), {'chan','time_downsamp'}, 2);
-%   % fix the 'time' feature dimension so that map2meeg works properly
-%   ds=cosmo_dim_prune(ds_downsamp);
+%     % Downsample MEEG data by a factor of two
+%     ds=cosmo_synthetic_dataset('type','meeg','size','small');
+%     size(ds.samples)
+%     > 6 6
+%     downsampling_factor=2;
+%     ds.fa.time_downsamp=ceil(ds.fa.time/downsampling_factor);
+%     %
+%     % compute average for each unique combination of channel and
+%     % time_downsamp
+%     ds_downsamp=cosmo_fx(ds, @(x) mean(x,2), {'chan','time_downsamp'}, 2);
+%     ds_downsamp=cosmo_dim_prune(ds_downsamp); % update dim attributes
+%     size(ds_downsamp.samples)
+%     >  6 3
 %
 % See also: cosmo_split, cosmo_stack
 %
