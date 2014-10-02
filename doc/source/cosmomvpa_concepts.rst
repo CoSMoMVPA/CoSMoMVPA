@@ -118,7 +118,50 @@ and ``.a``.
 
 In this case there are M=40 samples and N=43822 features (voxels). Note that the sample attributes have M values in the first dimension, and feature attributes have N values in the second dimension. The information in the ``.fa`` and ``.a`` fields is used when the dataset is back to a volumetric dataset in :ref:`cosmo_map2fmri`.
 
-Datasets can also be 'sliced', i.e. subsets of either samples or targets can be selected, using :ref:`cosmo_slice`. A special case is :ref:`cosmo_split`, which splits a dataset based on unique values of sample- or feature attributes. Different datasets, assuming their feature or sample attributes are identical, can be combined using :ref:`cosmo_stack`.
+.. _`cosmomvpa_dataset_operations`:
+
+Dataset operations
+^^^^^^^^^^^^^^^^^^
+
+Slicing
+-------
+Slicing refers to selecting data in a dataset struct, either along the rows or columns. It is provided by the :ref:`cosmo_slice` function, which takes three arguments: the dataset ``ds``, indices or a mask indicating what ``to_select``, and a ``dim`` argument indicating whether to slice along rows or colums.
+
+- Slicing samples (``dim=1``; this is the default value) means that the specified *rows* are selected, both in ``.samples`` and each field in ``.sa`` (such as ``.sa.targets`` and ``.sa.chunks``.
+
+    Use cases include:
+
+    * Select only samples for certain conditions (targets)
+    * Select only samples in certain chunks; this is useful for:
+
+        + cross-validation: data is tested using data in, say, one chunk after training on data in the remaining chunks (see :ref:`cosmo_nfold_partitioner` and :ref:`cosmo_nchoosek_partitioner`).
+        + split-half correlations: when half of the data (in one (set of) chunks) is correlated with data in the other half (see :ref:`cosmo_oddeven_partitioner` and `cosmo_correlation_measure`).
+
+    .. figure:: _static/slice_sa.png
+
+        Illustration of slicing rows (samples)
+
+- Slicing features (``dim=2``) means that the specified *columns* are selected, both in ``.samples`` and each field in ``.fa`` (such as ``.fa.i``, ``fa.j`` and ``fa.k`` in an fMRI-dataset, which indicate the voxel indices). Use cases include:
+
+    * Select only certain voxels in a region of interest
+    * Running a searchlight, which consists of doing the analyses many regions of interest.
+
+    .. figure:: _static/slice_fa.png
+
+        Illustration of slicing columns (features).
+
+Slicing-related functions
+-------------------------
+
+Related functions are:
+    - :ref:`cosmo_split` splits datasets along one or more attributes (such as ``.sa.chunks`` and ``.sa.targets``).
+    - :ref:`cosmo_stack` stacks dataset along the first or second dimension. In a way it is the inverse of ;ref:`cosmo_split`, but it can also be used to stack other sets of datasets.
+    - :ref:`cosmo_fx` splits the dataset using :ref:`cosmo_split`, applies a function to each element, and stacks the results. It can be used to average data for each value of ``.sa.targets`` seperately, for each unique value of ``.sa.chunks``, or for each unique combination of ``.sa.targets`` and ``.sa.chunks``.
+
+     .. figure:: _static/split_and_stack.png
+
+        Illustration of splitting and stacking rows (samples).
+
 
 .. _`cosmomvpa_classifier`:
 
