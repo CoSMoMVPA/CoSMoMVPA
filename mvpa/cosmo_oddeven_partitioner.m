@@ -1,15 +1,20 @@
-function partitions = cosmo_oddeven_partitioner(chunks)
+function partitions = cosmo_oddeven_partitioner(chunks, type)
 % generates an odd-even partition scheme
 %
-% partitions=cosmo_splithalf_partitioner(chunks)
+% partitions=cosmo_oddeven_partitioner(chunks,[type])
 %
 % Input
 %  - chunks          Px1 chunk indices for P samples. It can also be a
 %                    dataset with field .sa.chunks
+%  - type            One of:
+%                    - 'full': two partitions are returned, training on odd
+%                       and testing on even and vice versa (default)
+%                    - 'half': a single partition is returned, training on
+%                       odd and testing on even only.
 %
 % Output:
 %  - partitions      A struct with fields .train_indices and .test_indices.
-%                    Each of these is an 2x1 cell (for 2 partitions), where
+%                    Each of these is an Nx1 cell (for N partitions), where
 %                    .train_indices{k} and .test_indices{k} contain the
 %                    sample indices for the sets of unique chunks
 %                    alternatingly
@@ -23,20 +28,32 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %     % even chunks, as 6 [7] is the third [fourth] unique value of chunks.
 %     cosmo_disp(p);
 %     > .train_indices
-%     >   { [ 3    [ 1
-%     >       4      2
-%     >       6      5
-%     >       7 ]    8 ] }
-%     > .test_indices
 %     >   { [ 1    [ 3
 %     >       2      4
 %     >       5      6
 %     >       8 ]    7 ] }
+%     > .test_indices
+%     >   { [ 3    [ 1
+%     >       4      2
+%     >       6      5
+%     >       7 ]    8 ] }
 %     >
+%     %
+%     % only half-partition (for correlation-based analysis)
+%     p=cosmo_oddeven_partitioner(ds,'half');
+%     cosmo_disp(p);
+%     > .train_indices
+%     >   { [ 1
+%     >       2
+%     >       5
+%     >       8 ] }
+%     > .test_indices
+%     >   { [ 3
+%     >       4
+%     >       6
+%     >       7 ] }
 %
 % Notes:
-% - For splithalf correlation measures it is recommended to use
-%   cosmo_nchoosek_partitioner(chunks,'half').
 % - More generally, this function is intended as an exercise. If
 %   chunks is different from 1:K for all K, then it may yield non-optimal
 %   partitions.
@@ -46,21 +63,28 @@ function partitions = cosmo_oddeven_partitioner(chunks)
 %
 % NNO Aug 2013
 
-    if isstruct(chunks)
-        if isfield(chunks,'sa') && isfield(chunks.sa,'chunks')
-            chunks=chunks.sa.chunks;
-        else
-            error('illegal input')
-        end
+    chunks=get_chunks(chunks);
+
+    if nargin<2
+        type='full';
     end
 
-    [classes,unused,chunk_indices]=unique(chunks);
-    if numel(classes)<2
-        error('Need >=2 classes, found %d', numel(classes));
+    switch type
+        case 'full'
+            do_half_partition=false;
+        case 'half'
+            do_half_partition=true;
     end
 
-    % there are two partitions
-    npartitions=2;
+
+    indices=cosmo_index_unique(chunks);
+    if numel(indices)<2
+        error('Need >=2 chunks, found %d', numel(indices));
+    end
+
+    % there are two partitions, unless do_half_partition in which case
+    % there is one
+    npartitions=2-do_half_partition;
 
     % allocate space for output
     train_indices=cell(1,npartitions);
@@ -69,24 +93,38 @@ function partitions = cosmo_oddeven_partitioner(chunks)
     % Make partitions using even and odd chunks
     % >@@>
 
-    % generate a mask with even indices
-    even_mask=mod(chunk_indices,2)==0;
-
     % find the indices of even and odd chunks
-    even_indices=find(even_mask);
-    odd_indices=find(~even_mask);
+    odd_indices=cat(1,indices{1:2:end});
+    even_indices=cat(1,indices{2:2:end});
 
     % set the train and test indices
-    train_indices{1}=even_indices;
-    train_indices{2}=odd_indices;
+    train_indices{1}=odd_indices;
+    test_indices{1}=even_indices;
 
-    test_indices{1}=odd_indices;
-    test_indices{2}=even_indices;
+    if ~do_half_partition
+        train_indices{2}=even_indices;
+        test_indices{2}=odd_indices;
+    end
 
     % <@@<
 
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;
 
+
+
+function chunks=get_chunks(chunks)
+    if isnumeric(chunks) && isvector(chunks)
+        % all good
+        return
+    elseif isstruct(chunks)
+        if cosmo_isfield(chunks,'sa.chunks')
+            chunks=chunks.sa.chunks;
+            return
+        end
+    end
+
+    error(['illegal input: expected dataset struct with field '...
+                '.sa.chunks, or numeric vector']);
 
 
