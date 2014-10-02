@@ -83,6 +83,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %
 % NNO Feb 2014
 
+
     cosmo_check_dataset(ds);
 
     % find dimension index
@@ -96,19 +97,42 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
     % get feature attribute values
     fa_values=ds.(attr_name).(label);
 
-    % compute neighborhood
+    % get unique feature attributes
+    [fa_idxs,fa_unq]=cosmo_index_unique(fa_values');
+    nunq=numel(fa_unq);
+
+    % cosmo_index_unique should return a sorted array of values
+    assert(issorted(fa_unq));
+
+    % allocate space for output
     neighbors=cell(nvalues,1);
-    for k=1:nvalues
 
-        % deal with indices near borders
-        mn=max(1,ceil(k-radius));
-        mx=min(nvalues,floor(k+radius));
+    % go over all dimension values and find the neighborhood.
+    % first_pos and last_pos point to the position in fa_idxs.
+    % this works because fa_unq is sorted, so a window can be taken that
+    % moves from left to right
+    first_pos=1;
+    last_pos=1;
 
-        ival=mn:mx;
-        msk=cosmo_match(fa_values,ival);
+    for center_id=1:nvalues
+        % find left edge
+        while first_pos<nunq && fa_unq(first_pos)<center_id-radius
+            first_pos=first_pos+1;
+        end
 
-        neighbors{k}=find(msk);
+        % find right edge
+        while last_pos<nunq && fa_unq(last_pos)<center_id+radius
+            last_pos=last_pos+1;
+        end
+        if fa_unq(last_pos)>center_id+radius
+            % avoid getting over the edge
+            last_pos=last_pos-1;
+        end
+
+        % merge all indices in the neighborhood
+        neighbors{center_id}=sort(cat(1,fa_idxs{first_pos:last_pos}))';
     end
+
 
     % store results
     nbrhood=struct();

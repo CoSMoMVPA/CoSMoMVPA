@@ -139,6 +139,6 @@ function ds=prune_single_dim(ds, labels, dim)
 
             ds.(attr_name).(label)=in_shape(map_idxs);
             values=values(unq_idxs);
-            ds.a.fdim.values{index}=values;
+            ds.a.(dim_name).values{index}=values;
         end
     end
