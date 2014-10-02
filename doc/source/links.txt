@@ -18,6 +18,7 @@
 .. _MRIcron: http://www.nitrc.org/projects/mricron
 .. _NeuroElf: http://neuroelf.net
 .. _NIFTI: http://www.nitrc.org/projects/nifti
+.. _Octave: https://www.gnu.org/software/octave/
 .. _`Princeton MVPA`: http://code.google.com/p/princeton-mvpa-toolbox/)
 .. _PRoNTo: http://www.mlnl.cs.ucl.ac.uk/pronto)
 .. _PyMVPA: http://pymvpa.org
