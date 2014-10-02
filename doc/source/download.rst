@@ -33,6 +33,8 @@ Certain functionality require certain external toolboxes:
 - LIBSVM_'s Support Vector Machine (SVM) classifier (accessed through  :ref:`cosmo_classify_libsvm`) requires the LIBSVM_ toolbox.
 - MEEG data requires FieldTrip_ for almost all MEEG-related functions.
 
+.. _download_tutorial_data:
+
 Tutorial data
 +++++++++++++
 The tutorial data can be downloaded in the following ways:
