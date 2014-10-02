@@ -177,22 +177,20 @@ function is_ok=check_external_toolbox(external_name,raise_)
     % simulate goto statement
     while true
         if ~ext.is_present()
+            suffix=ext_get_what_to_do_message(ext);
             error_msg=sprintf(['%s is required, but it was not '...
                 'found in the %s path. If it is not present on your '...
-                'system, obtain it from:\n\n    %s\n\nthen, if '...
-                'applicable, add the necessary directories '...
-                'to the %s path.'], ...
-                ext.label(), env, url2str(ext.url), env);
+                'system, obtain it from:\n\n    %s\n\nthen, %s.'], ...
+                ext.label(), env, url2str(ext.url), suffix);
             break;
         end
 
         if ~ext.is_recent()
+            suffix=ext_get_what_to_do_message(ext);
             error_msg=sprintf(['%s was found on your %s path, but '...
                 'seems out of date. Please download the latest '...
-                'version from:\n\n %s\n\nthen, if '...
-                'applicable, add the necessary directories '...
-                'to the %s path.'], ...
-                ext.label(), env, url2str(ext.url), env);
+                'version from:\n\n %s\n\nthen, %s.'], ...
+                ext.label(), env, url2str(ext.url), suffix);
             break;
         end
 
@@ -234,6 +232,14 @@ function is_ok=check_external_toolbox(external_name,raise_)
         error(error_msg);
     end
 
+function msg=ext_get_what_to_do_message(ext)
+    if isfield(ext, 'what_to_do')
+        msg=ext.what_to_do();
+    else
+        msg=sprintf(['if applicable, add the necessary directories '...
+                'to the %s path.'], cosmo_wtf('environment'));
+    end
+
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     if cosmo_wtf('is_matlab')
         toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
@@ -261,8 +267,10 @@ function externals=get_externals()
     has=@(x) ~isempty(which(x));
     has_toolbox=@(x)check_matlab_toolbox(x,false);
     path_of=@(x) fileparts(which(x));
+    is_in_path=@(x)has(x) && cosmo_match({path_of(x)},...
+                    cosmo_strsplit(path(),pathsep()));
 
-    externals.cosmo.is_present=yes;
+    externals.cosmo.is_present=@()is_in_path(mfilename());
     externals.cosmo.is_recent=yes;
     externals.cosmo.label='CoSMoMVPA toolbox';
     externals.cosmo.url='http://cosmomvpa.org';
