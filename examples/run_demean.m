@@ -39,7 +39,7 @@ for k=1:nsplits
     %     d.samples=d.samples-repmat(mu,nsamples,1);
     %
     d.samples=bsxfun(@minus,d.samples,mu);
-    % >@@>
+    % <@@<
 
     % store output
     outputs{k}=d;
