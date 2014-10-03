@@ -18,10 +18,65 @@ function ds_stacked=cosmo_stack(datasets,dim,check_)
 %                the feature [sample] attributes.
 %
 % Example:
-%  % Inputs have 5 samples each; combine them for split-half analysis
-%  half1=cosmo_fmri_dataset('glm1.nii','targets',1:5,'chunks',ones(1,5));
-%  half2=cosmo_fmri_dataset('glm2.nii','targets',1:5,'chunks',2*ones(1,5));
-%  ds=cosmo_stack({half1,half2}); % output has 10 samples
+%     % Build example data for split-half analysis
+%     % Normally, half1 and half2 could be from real brain data
+%     % that is imported using, e.g., cosmo_fmri_dataset
+%     ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',3);
+%     half1=cosmo_slice(ds,ds.sa.chunks==1); % .samples is 3x6
+%     half2=cosmo_slice(ds,ds.sa.chunks==2); % .samples is 3x6
+%     %
+%     % join the data in the two halves, over samples.
+%     % stacking makes .samples a (3+3)x6 matrix
+%     merged=cosmo_stack({half1,half2});
+%     cosmo_disp(merged.samples)
+%     > [  2.21    -0.434     0.725      1.41      2.16     0.888
+%     >    1.83      2.02   -0.0631      1.42      1.03     0.527
+%     >   -2.26      3.58      2.39     0.671     0.727     -1.07
+%     >    2.54      2.77    -0.205     -1.21      1.37    -0.809
+%     >   0.319     0.324    -0.124     0.717     0.294     -1.27
+%     >   -1.31      3.03      3.16      1.63    -0.787      1.44 ]
+%     cosmo_disp(merged.sa)
+%     > .targets
+%     >   [ 1
+%     >     2
+%     >     3
+%     >     1
+%     >     2
+%     >     3 ]
+%     > .chunks
+%     >   [ 1
+%     >     1
+%     >     1
+%     >     2
+%     >     2
+%     >     2 ]
+%     %
+%     % data can also be merged over features, by using dim=2
+%     % here generated data simulates two (tiny) regions of interest
+%     roi1=cosmo_slice(ds,[1 3],2);    % .samples is 6x2
+%     roi2=cosmo_slice(ds,[2 4 5],2);  % .samples is 6x3
+%     % stacking makes .samples a 6x(2+3) matrix
+%     roi_both=cosmo_stack({roi1,roi2},2);
+%     cosmo_disp(roi_both.samples)
+%     > [  2.21     0.725    -0.434      1.41      2.16
+%     >    1.83   -0.0631      2.02      1.42      1.03
+%     >   -2.26      2.39      3.58     0.671     0.727
+%     >    2.54    -0.205      2.77     -1.21      1.37
+%     >   0.319    -0.124     0.324     0.717     0.294
+%     >   -1.31      3.16      3.03      1.63    -0.787 ]
+%     cosmo_disp(roi_both.fa)
+%     > .i
+%     >   [ 1         3         2         1         2 ]
+%     > .j
+%     >   [ 1         1         1         2         2 ]
+%     > .k
+%     >   [ 1         1         1         1         1 ]
+%     %
+%     % stacking incompatible datasets gives an error
+%     cosmo_stack({roi1,half1})
+%     > error('value mismatch: .fa.i')
+%     cosmo_stack({roi1,half1},2)
+%     > error('value mismatch: .sa.targets')
 %
 % Note:
 %   this function is like the inverse of cosmo_split, in the sense that if
