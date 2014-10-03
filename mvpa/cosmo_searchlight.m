@@ -196,31 +196,32 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                                         ~checked_first_output);
 
         % apply the measure
-        % (use try/catch/throw to provide both the feature id
-        % that caused the exception, and the original error message)
+        % (try/catch can be used to provide an error message indicating
+        %  which feature id caused an error)
         try
             res=measure(sphere_ds, args);
+
+            % for efficiency, only check first output
+            if ~checked_first_output
+                checked_first_output=true;
+
+                % optimization to switch off checking the partitions,
+                % because they don't change
+                args.check_partitions=false;
+
+                cosmo_check_dataset(res);
+                if size(res.samples,2)~=1
+                    error('Measure output must yield a column vector');
+                end
+            end
         catch mexception
             % indicate where the error was
             msg=sprintf(['Searchlight call on feature id %d caused an '...
-                            'exception'],center_id);
-            id_exception=MException('CoSMoMVPA:searchlight',msg);
-            merged=addCause(id_exception,mexception);
-            throw(merged);
+                            'exception:\n\n%s'],...
+                            center_id,mexception.getReport());
+            error(msg);
         end
         % <@@<
-
-        % for efficiency, only check first output
-        if ~checked_first_output
-            if ~cosmo_isfield(res, 'samples') || size(res.samples,2)~=1
-                error(['Measure output must be struct with field .samples '...
-                       'that is a column vector']);
-            end
-            checked_first_output=true;
-
-            % optimization to switch off checking the partitions
-            args.check_partitions=false;
-        end
 
         res_cell{center_idx}=res;
 
