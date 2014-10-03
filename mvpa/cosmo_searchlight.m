@@ -13,6 +13,10 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %                        where output must be a struct with fields .samples
 %                        (as a column vector) and optionally a field .sa
 %                        with sample attributes.
+%                        Typical measures are:
+%                        - cosmo_correlation_measure
+%                        - cosmo_crossvalidation_measure
+%                        - cosmo_target_dsm_corr_measure
 %   'args', args         struct that contains all the fields necessary
 %                        for the dataset measure. args get passed directly
 %                        to the dataset measure
@@ -37,7 +41,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %                        dataset to feature ids in input dataset.
 %
 % Output:
-%   results_map:         a dataset struct where the samples
+%   results_map          a dataset struct where the samples
 %                        contain the results of the searchlight analysis.
 %                        If measure returns datasets all of size Nx1 and
 %                        there are M center_ids
@@ -104,7 +108,10 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %     >   .labels
 %     >     { 'accuracy' }
 %
-% See also: cosmo_spherical_neighborhood
+% See also: cosmo_spherical_neighborhood, cosmo_correlation_measure,
+%           cosmo_crossvalidation_measure,
+%           cosmo_dissimilarity_matrix_measure,
+%           cosmo_neighborhood
 %
 % ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NNO
 
@@ -244,6 +251,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         results_map.sa=res_stacked.sa;
     end
 
+    % if it returns sample attribute dimensions, add those
     if cosmo_isfield(res_stacked, 'a.sdim')
         results_map.a.sdim=res_stacked.a.sdim;
     end
@@ -251,4 +259,5 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % set center_ids for the output dataset
     results_map.fa.center_ids=center_ids(:)';
 
+    % sanity check of the output
     cosmo_check_dataset(results_map);
