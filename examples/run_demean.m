@@ -4,6 +4,17 @@
 %% Generate random dataset
 ds=cosmo_synthetic_dataset('nchunks',4,'ntargets',3);
 
+% add some constant to all data
+ds.samples=ds.samples+2;
+
+% show dataset
+subplot(2,2,1);
+imagesc(ds.samples,[-4 4])
+title('before demeaning');
+subplot(2,2,2);
+hist(ds.samples(:),10)
+xlim([-6 6]);
+
 %% Split the dataset by chunks
 % >@@>
 splits=cosmo_split(ds,{'chunks'},1);
@@ -36,7 +47,17 @@ end
 
 ds_demeaned=cosmo_stack(outputs);
 
+% show dataset
+subplot(2,2,3);
+imagesc(ds_demeaned.samples,[-4 4])
+title('after demeaning');
+subplot(2,2,4);
+hist(ds_demeaned.samples(:),10);
+xlim([-6 6]);
+
 %% Alternative approach to demeaning
 
+% note: the samples in the output are in a different order than the input,
+% but otherwise the same
 demeaner=@(x)bsxfun(@minus,x,mean(x,1)); % function handle as helper
 ds_demeaned_alt=cosmo_fx(ds,demeaner,'chunks');
