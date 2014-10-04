@@ -95,7 +95,7 @@ Operations on datasets
 
 Now that you are familiar with the dataset, let's play around a little. Load the
 "perrun" data with the VT mask for any subject. Now slice the dataset into
-datasets: one that has all the primates restuls (monkey and lemur) and on that
+datasets: one that has all the primates results (monkey and lemur) and on that
 has only the bugs data (ladybug and lunamoth). Calculate the average pattern for
 primates and the average pattern for bugs. Now subtract bugs from primates. Save
 the result as a dataset. Now convert the dataset into a nifti format using the
