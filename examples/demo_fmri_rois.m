@@ -199,7 +199,7 @@ for j=1:nmasks
         classifier=classifiers{k};
         [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
-        confusion_matrix=cosmo_confusion_matrix(ds, pred);
+        confusion_matrix=cosmo_confusion_matrix(ds.sa.targets,pred);
         figure
         imagesc(confusion_matrix,[0 10])
         cfy_label=underscore2space(func2str(classifier));
