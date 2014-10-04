@@ -1,4 +1,4 @@
-%% Dataset Basics
+%% Dataset Basics (setting sample attributes)
 % Set the targets and the chunks
 %
 % There are 10 runs with 6 volumes per run. The runs are vertically stacked one
@@ -11,19 +11,25 @@
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
-%% Load the dataset
+%% Load the dataset 'glm_T_stats_perrun.nii' masked with 'brain_mask.nii'
 % >@@>
-
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
-                        'mask', [data_path '/brain_mask.nii']);
+mask_fn = fullfile(data_path, 'brain_mask.nii');
+data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
+ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 % <@@<
 %% set targets
+%remember that targets are part of ds.sa and that they are stored in a
+%column vector
 % >@@>
-ds.sa.targets = repmat([1:6]',10,1);
+ds.sa.targets = repmat(1:6, [1, 10])'; %10 times labels 1 to 6, column vector
 % <@@<
 %% set chunks
+%remember that chunks are part of ds.sa and that they are stored in a
+%column vector
 % >@@>
-ds.sa.chunks = floor(((1:60)-1)/6)'+1;
+chunks = repmat(1:10, [6, 1]);
+chunks = chunks(:); %flatten matrix to a column vector
+ds.sa.chunks = chunks;
 % <@@<
 
 %% Show the results
@@ -34,7 +40,8 @@ cosmo_disp(ds)
 
 %% print the sample attributes
 fprintf('\nSample attributes (in full):\n')
-cosmo_disp(ds.sa,'edgeitems',Inf);
+cosmo_disp(ds.sa,'edgeitems',Inf); %'edgeitems determine how much of a 
+                                   % matrix is displayed. Try different values.
 
 %% print targets and chunks next to each other
 fprintf('\nTargets and chunks attributes (in full):\n')

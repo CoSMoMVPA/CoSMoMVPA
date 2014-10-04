@@ -1,51 +1,41 @@
-%% Dataset Basics
-% Set the targets and the chunks
-%
-% There are 10 runs with 6 volumes per run. The runs are vertically stacked one
-% above the other. The six volumes in each run correspond to the stimuli:
-% 'monkey','lemur','mallard','warbler','ladybug','lunamoth', in that order. Add
-% numeric targets labels (samples atribute) such that 1 corresponds to 'monkey',
-% 2 corresponds to 'lemur', etc. Then add numeric chunks (another samples
-% attribute) so that 1 corresponds to run1, 2 corresponds to run2, etc.
+%% Dataset basics
+% Set data path, load dataset, set targets and chunks, and add labels as
+% sample attributes
 
+% Set the data path
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
-%% Load the dataset 'glm_T_stats_perrun.nii' masked with 'brain_mask.nii'
+% Load dataset (and supply a mask file for 'vt')
 % >@@>
-mask_fn = fullfile(data_path, 'brain_mask.nii');
-data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
-ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
+ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
+                         'mask', [data_path '/vt_mask.nii']);
 % <@@<
-%% set targets
-%remember that targets are part of ds.sa and that they are stored in a
-%column vector
+
+% remove constant features
+ds=cosmo_remove_useless_data(ds);
+
+% Set the targets and the chunks
 % >@@>
-ds.sa.targets = repmat(1:6, [1, 10])'; %10 times labels 1 to 6, column vector
-% <@@<
-%% set chunks
-%remember that chunks are part of ds.sa and that they are stored in a
-%column vector
-% >@@>
-chunks = repmat(1:10, [6, 1]);
-chunks = chunks(:); %flatten matrix to a column vector
+ds.sa.targets = repmat([1:6]',10,1);
+chunks = []; for i=1:10 chunks = [chunks; repmat(i,6,1)]; end
 ds.sa.chunks = chunks;
 % <@@<
 
-%% Show the results
+% Add labels as sample attributes
+% >@@>
+labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
+ds.sa.labels = repmat(labels,10,1);
+% <@@<
 
-%% print the dataset
-fprintf('\nDataset:\n')
+%% Overview of the dataset
+fprintf('\nOverview of dataset:\n');
 cosmo_disp(ds)
 
-%% print the sample attributes
-fprintf('\nSample attributes (in full):\n')
-cosmo_disp(ds.sa,'edgeitems',Inf); %'edgeitems determine how much of a 
-                                   % matrix is displayed. Try different values.
+%% Overview of sample attributes (targets, chunks, and labels, in this case):
+fprintf('\nOverview of sample attributes\n');
+cosmo_disp(ds.sa,'edgeitems',10)
 
-%% print targets and chunks next to each other
-fprintf('\nTargets and chunks attributes (in full):\n')
-nsamples=size(ds.samples,1);
-fprintf('sample #   target   chunk\n');
-index_target_chunks=[(1:nsamples)', ds.sa.targets,ds.sa.chunks];
-cosmo_disp(index_target_chunks,'edgeitems',Inf);
+%% Overview of feature attributes (the voxel indices, in this case):
+fprintf('\nOverview of feature attributes\n');
+cosmo_disp(ds.fa,'edgeitems',10)
