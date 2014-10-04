@@ -33,7 +33,7 @@ The Matlab code is required for analyses in CoSMoMVPA_; the example data is requ
 
     .. code-block:: matlab
 
-        save_path
+        savepath
 
     to store the new path permanently.
 

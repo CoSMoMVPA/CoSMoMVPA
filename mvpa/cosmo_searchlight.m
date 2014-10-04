@@ -13,6 +13,10 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %                        where output must be a struct with fields .samples
 %                        (as a column vector) and optionally a field .sa
 %                        with sample attributes.
+%                        Typical measures are:
+%                        - cosmo_correlation_measure
+%                        - cosmo_crossvalidation_measure
+%                        - cosmo_target_dsm_corr_measure
 %   'args', args         struct that contains all the fields necessary
 %                        for the dataset measure. args get passed directly
 %                        to the dataset measure
@@ -37,7 +41,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %                        dataset to feature ids in input dataset.
 %
 % Output:
-%   results_map:         a dataset struct where the samples
+%   results_map          a dataset struct where the samples
 %                        contain the results of the searchlight analysis.
 %                        If measure returns datasets all of size Nx1 and
 %                        there are M center_ids
@@ -104,7 +108,10 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %     >   .labels
 %     >     { 'accuracy' }
 %
-% See also: cosmo_spherical_neighborhood
+% See also: cosmo_spherical_neighborhood, cosmo_correlation_measure,
+%           cosmo_crossvalidation_measure,
+%           cosmo_dissimilarity_matrix_measure,
+%           cosmo_neighborhood
 %
 % ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NNO
 
@@ -189,31 +196,32 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                                         ~checked_first_output);
 
         % apply the measure
-        % (use try/catch/throw to provide both the feature id
-        % that caused the exception, and the original error message)
+        % (try/catch can be used to provide an error message indicating
+        %  which feature id caused an error)
         try
             res=measure(sphere_ds, args);
+
+            % for efficiency, only check first output
+            if ~checked_first_output
+                checked_first_output=true;
+
+                % optimization to switch off checking the partitions,
+                % because they don't change
+                args.check_partitions=false;
+
+                cosmo_check_dataset(res);
+                if size(res.samples,2)~=1
+                    error('Measure output must yield a column vector');
+                end
+            end
         catch mexception
             % indicate where the error was
             msg=sprintf(['Searchlight call on feature id %d caused an '...
-                            'exception'],center_id);
-            id_exception=MException('CoSMoMVPA:searchlight',msg);
-            merged=addCause(id_exception,mexception);
-            throw(merged);
+                            'exception:\n\n%s'],...
+                            center_id,mexception.getReport());
+            error(msg);
         end
         % <@@<
-
-        % for efficiency, only check first output
-        if ~checked_first_output
-            if ~cosmo_isfield(res, 'samples') || size(res.samples,2)~=1
-                error(['Measure output must be struct with field .samples '...
-                       'that is a column vector']);
-            end
-            checked_first_output=true;
-
-            % optimization to switch off checking the partitions
-            args.check_partitions=false;
-        end
 
         res_cell{center_idx}=res;
 
@@ -244,6 +252,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         results_map.sa=res_stacked.sa;
     end
 
+    % if it returns sample attribute dimensions, add those
     if cosmo_isfield(res_stacked, 'a.sdim')
         results_map.a.sdim=res_stacked.a.sdim;
     end
@@ -251,4 +260,5 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     % set center_ids for the output dataset
     results_map.fa.center_ids=center_ids(:)';
 
+    % sanity check of the output
     cosmo_check_dataset(results_map);
