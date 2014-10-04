@@ -7,26 +7,19 @@
 
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+mask_fn = fullfile(data_path, 'vt_mask.nii');
+data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
+ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
+
+ds.sa.targets = repmat((1:6)',10,1);
 
 % >@@>
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
-                        'mask', [data_path '/vt_mask.nii']);
-
-% set targets
-ds.sa.targets = repmat([1:6]',10,1);
-
-% set chunks
-% equivalent code would be:
-%   chunks=zeros(60,1);
-%   for k=1:10
-%       chunks((k-1)*6+(1:6))=k;
-%   end
-ds.sa.chunks=floor(((1:60)-1)'/6)+1;
-
-% <@@<
-
+chunks = repmat(1:10, [6, 1]);
+chunks = chunks(:);
+ds.sa.chunks = chunks;
 % remove constant features
 ds=cosmo_remove_useless_data(ds);
+% <@@<
 
 %% Set the sample indices that correspond to primates and bugs
 
@@ -46,6 +39,7 @@ bug_ds = cosmo_slice(ds, bug_idx);
 %% Subtract mean pattern
 % Find the mean pattern for primates and bugs and subtract the bug pattern from
 % the primate pattern
+
 % >@@>
 primates_mean = mean(primate_ds.samples, 1);
 bugs_mean = mean(bug_ds.samples, 1);
@@ -53,20 +47,32 @@ primates_minus_bugs = primates_mean - bugs_mean;
 % <@@<
 
 %% Store and visualize the results
-% Finally save the result as a dataset with the original header
+% Finally save the result as a dataset with the original header.
 % Just replace ds.samples with the result and remove the sample attributes.
 % Then convert back to nifti and save it using cosmo_map2fmri function.
-
+ 
 % >@@>
 ds.samples = primates_minus_bugs;
 ds.sa=struct();
-ni = cosmo_map2fmri(ds, [data_path '/primates_minus_bugs.nii']);
-
-% View the result using AFNI, FSL, or Matlab's imagesc
-
-imagesc(ni.img(:,:,4));
-
+cosmo_check_dataset(ds); %good practice
+ni = cosmo_map2fmri(ds, fullfile(data_path, 'primates_minus_bugs.nii'));
 % <@@<
 
-%% Plot slices using cosmo_plot_slices
-cosmo_plot_slices(ni.img)
+%% Plot results
+figure
+%... using cosmo_plot_slices
+
+% >@@>
+cosmo_plot_slices(ds)
+% <@@<
+
+% ... using AFNI, FSL, or Matlab's imagesc
+figure
+
+% >@@>
+imagesc(rot90(ni.img(:,:,4)));
+title('Primates minus Bugs')
+box off
+ylabel('P <-  y  ->  A'),
+xlabel('L <-  x  ->  R')
+% <@@<
