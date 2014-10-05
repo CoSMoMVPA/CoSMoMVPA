@@ -45,7 +45,7 @@ fprintf(['Average correlation difference between matching and '...
             'non-matching categories in %s for %s is %.3f\n'],...
             mask_label, subject_id, ds_corr.samples);
 
-        
+
 % Part 2: compute the raw Fisher-transformed correlation matrix
 % Hint: use a struct 'args' with args.output='correlation' as second
 % argument for cosmo_correlation_measure
@@ -80,14 +80,14 @@ ds_corrs=cell(nsubjects,1); % allocate space for output
 %   * .sa.chunks : the subject number
 %   * .sa.targets: 1 (for each subject)
 % - store the result of the k-th subject in ds_corrs{k}
-% 
+%
 for subject_num=1:nsubjects
     subject_id=subject_ids{subject_num};
-    
+
     % apply correlation measure for this subject, and store
     % the result in 'ds_corr'
     % >@@>
-    
+
     % set path for this subject
     data_path=fullfile(study_path,subject_id);
 
@@ -128,7 +128,7 @@ ds_all=cosmo_stack(ds_corrs);
 
 % run one-sample t-test again zero to compute the t-value and p-values
 % against the null hypothesis of a mean of zero.
-% 
+%
 % hint: use matlab stats toolbox's ttest (if present), or
 %       use cosmo_stat:
 %       * for t-statistics, use 't' as second argument
@@ -143,7 +143,7 @@ fprintf(['correlation difference in %s at group level: '...
            '%.3f +/- %.3f, %s=%.3f, p=%.5f (using cosmo_stat)\n'],...
             mask_label,mean(samples),std(samples),...
             ds_t.sa.stats{1},ds_t.samples,ds_p.samples);
-% <@@<        
+% <@@<
 
 % Using matlab's stat toolbox (if present)
 if cosmo_check_external('@stats',false)
