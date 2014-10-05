@@ -33,5 +33,5 @@ For this exercise, load a dataset using subject ``s01``'s T-statistics for every
 
 Template: :ref:`run_nfold_crossvalidate_skl`
 
-Check your answers here: :ref:`run_nfold_crossvalidate_lda` / :pb:`nfold_crossvalidate`
+Check your answers here: :ref:`run_nfold_crossvalidate` / :pb:`nfold_crossvalidate`
 
