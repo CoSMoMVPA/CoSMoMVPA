@@ -13,7 +13,7 @@ Contents:
     ex_dataset_operations
     ex_splithalf_correlations
     ex_classify_lda
-    ex_write_classify_nn
+    ex_nfold_crossvalidation
     ex_classify_svm
     ex_nfold_partitioner
     ex_crossvalidate
