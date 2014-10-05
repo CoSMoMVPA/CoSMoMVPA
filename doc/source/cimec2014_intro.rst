@@ -6,9 +6,10 @@ Introduction
 Prerequisites
 +++++++++++++
 
-    * Basic experience with fMRI analysis
-    * Basic experience with Matlab
-    * Working Matlab installation
+    * Matlab / Octave :ref:`Advanced beginner level <matlab_experience>`.
+    * fMRI analysis `:ref:`advanced beginner level <cogneuro_experience>`.
+    * Working Matlab_ or Octave_ installation.
+    *  :ref:`the source code and the example data <get_code_and_example_data>`.
 
 
 Goals of this course
@@ -25,65 +26,13 @@ Not covered in this course
 --------------------------
 
     * Preprocessing of fMRI data
-    * Learning to use Matlab
+    * Learning to use Matlab / Octave
     * Other dataset types than volumetric fMRI data (MEEG, surface-based fMRI)
     * How to become a CoSMoMVPA developer
 
 
 Code and data needed for this workshop
-++++++++++++++++++++++++++++++++++++++
-
-* First, get both the source code and the example data:
-
-    - the CoSMoMVPA Matlab source code:
-
-        + ``git`` users::
-
-            git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
-
-        + everybody else: download the `zip archive`_.
-
-    - the tutorial data, available :ref:`here <download_tutorial_data>`. Unzip the archive and put the data in a directory of choice
-
-* Add the CoSMoMVPA directories to your path, running
-
-    .. code-block:: matlab
-
-        cosmo_set_path
-
-    followed by
-
-    .. code-block:: matlab
-
-        save_path
-
-    to store the new path permanently.
-
-* Set the location of the tutorial data in a text file named ``.cosmomvpa.cfg`` (in a directory that is in the matlab path), as described in the *Notes* section of :ref:`cosmo_config_hdr`. If you don't now where to store the file, just start Matlab afresh (so that it starts in a location that is in the Matlab path), run
-
-    .. code-block:: matlab
-
-        edit .cosmomvpa.cfg
-
-    add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
-
-    (Why use a configuration file? Because it allows different users to store data in different locations, while they can still use the same Matlab code).
-
-* To verify that everything works, run the following in Matlab:
-
-    .. code-block:: matlab
-
-        config=cosmo_config();
-        data_path=fullfile(config.tutorial_data_path,'ak6','s01');
-        ds=cosmo_fmri_dataset(fullfile(data_path,'vt_mask.nii'));
-        cosmo_map2fmri(ds,fullfile(config.output_data_path,'test.nii'));
-
-
-    If no errors are raised and a file ``test.nii`` is created in the output_data_path, then you are good to go.
-
-
-
-
+--------------------------------------
 
 Sample Dataset
 ++++++++++++++
@@ -124,25 +73,25 @@ Also present are model similarity structures, which you can see here:
     :width: 600px
 
 This data is stored in the ``models`` directory::
+
     - models
        - behav_sim.mat          Matlab file with behavioural similarity ratings.
        - v1_model.mat           Matlab file with similarity values based on
                                 low-level visual properties of the stimuli.
 
-There is one behavioural similarity structure
 
 To cover in this course
 +++++++++++++++++++++++
 
-- CoSMoMVPA dataset structure
-- Operate on datasets
-- Common MVPA measures:
+- CoSMoMVPA concepts and dataset structure.
+- Basic operations on datasets.
+- Introduction to common MVPA measures:
 
     + correlation difference
     + classification accuracy
     + representational similarity matching
 
-- Common MVPA techniques
+- Common MVPA techniques:
 
     + ROI analysis
     + Searchlight analysis
