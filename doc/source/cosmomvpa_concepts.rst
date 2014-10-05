@@ -140,7 +140,7 @@ Dataset operations
 ^^^^^^^^^^^^^^^^^^
 
 Slicing
--------
++++++++
 Slicing refers to selecting data in a dataset struct, either along the rows or columns. It is provided by the :ref:`cosmo_slice` function, which takes three arguments: the dataset ``ds``, indices or a mask indicating what ``to_select``, and a ``dim`` argument indicating whether to slice along rows or colums.
 
 - Slicing samples (``dim=1``; this is the default value) means that the specified *rows* are selected, both in ``.samples`` and each field in ``.sa`` (such as ``.sa.targets`` and ``.sa.chunks``).
@@ -167,8 +167,8 @@ Slicing refers to selecting data in a dataset struct, either along the rows or c
         Illustration of slicing columns (features). In the masks, white elements are selected and black elements are not selected.
 
 
-Slicing-related functions
--------------------------
+Slicing+related functions
++++++++++++++++++++++++++
 
 Related functions are:
     - :ref:`cosmo_split` splits datasets along one or more attributes (such as ``.sa.chunks`` and ``.sa.targets``).
