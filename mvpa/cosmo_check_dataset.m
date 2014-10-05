@@ -337,6 +337,11 @@ function msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str)
         end
         v=attrs.(label);
 
+        % empty vectors are allowed (in empty datasets)
+        if isempty(v)
+            continue
+        end
+
         vmax=numel(values{dim});
         if ~is_int_vector(v) || min(v)<1 || max(v)>vmax
             msg=sprintf(['.%s.%s must be vector with integers in '...
