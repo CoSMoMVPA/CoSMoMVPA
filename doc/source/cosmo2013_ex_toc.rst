@@ -1,4 +1,4 @@
-.. _ex_toc:
+.. _ex_toc_cosmo2013:
 
 Exercises
 =========
