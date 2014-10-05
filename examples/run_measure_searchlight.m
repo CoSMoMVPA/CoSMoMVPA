@@ -20,13 +20,31 @@ ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
 % >@@>
 measure = @cosmo_crossvalidation_measure;
 measure_args = struct();
-measure_args.classifier = @cosmo_classify_nn;
+measure_args.classifier = @cosmo_classify_lda;
 measure_args.partitions = cosmo_oddeven_partitioner(ds);
-
 % <@@<
 
+%% Define neighborhood
+radius=3; % 3 voxels
+% define a neighborhood using cosmo_spherical_neighborhood
+% >@@>
+nbrhood=cosmo_spherical_neighborhood(ds,radius);
+% <@@<
+
+% show a histogram of the number of voxels in each searchlight
+% >@@>
+count=cellfun(@numel,nbrhood.neighbors);
+hist(count,100);
+% <@@<
+%%
+
+
 %% Run the searchlight
-results = cosmo_searchlight(ds,measure,'args',measure_args,'radius',3);
+% hint: use cosmo_searchlight with the measure, args and nbrhood
+% >@@>
+results = cosmo_searchlight(ds,measure,'args',measure_args,...
+                'nbrhood',nbrhood);
+% <@@<
 
 % the following command would store the results to disk:
 % >> cosmo_map2fmri(results, [data_path 'measure_searchlight.nii']);
