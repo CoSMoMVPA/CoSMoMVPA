@@ -5,7 +5,7 @@ CoSMoMVPA philosophy
 ====================
 
 .. contents::
-    :depth: 1
+    :depth: 2
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Uniform representation of data
