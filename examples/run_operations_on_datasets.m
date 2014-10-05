@@ -50,7 +50,7 @@ primates_minus_bugs = primates_mean - bugs_mean;
 % Finally save the result as a dataset with the original header.
 % Just replace ds.samples with the result and remove the sample attributes.
 % Then convert back to nifti and save it using cosmo_map2fmri function.
- 
+
 % >@@>
 ds.samples = primates_minus_bugs;
 ds.sa=struct();

@@ -11,7 +11,7 @@ roi='vt'; % 'vt' or 'ev' or 'brain'
 config=cosmo_config();
 study_path=fullfile(config.tutorial_data_path,'ak6');
 
-%% Computations 
+%% Computations
 data_path=fullfile(study_path, subject_id);
 
 % file locations for both halves

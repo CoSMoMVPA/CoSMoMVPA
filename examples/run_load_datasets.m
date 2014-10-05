@@ -20,10 +20,10 @@ data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 % -In order not to get overwhelmed, solve a simple problem first and then
 % generalize from it.
 %   -First write some code in which you load data with full brain mask.
-% Generalization:  
+% Generalization:
 %   -Next, you could just copy and alter that code such that you do the
 %   same thing with the other masks
-%   -A more elegant solution would be to put the three mask names into a 
+%   -A more elegant solution would be to put the three mask names into a
 %   cell array and to write a loop that performs the same set of operations
 %   on the members of the cell array (i.e. the three different mask names
 

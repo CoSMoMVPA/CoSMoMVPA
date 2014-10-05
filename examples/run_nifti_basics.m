@@ -31,7 +31,7 @@ box off
 % plot a sagital, coronal and axial slice
 % at voxel positions (80,150,80) using squeeze and tranpose ("'") where
 % necessary.
-% (bonus points for axis labels and proper orientations, i.e. in the 
+% (bonus points for axis labels and proper orientations, i.e. in the
 % sagittal view the front of the brain is on the left and the back
 % is on the right)
 ii=80;

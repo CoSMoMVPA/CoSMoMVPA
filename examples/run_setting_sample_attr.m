@@ -40,7 +40,7 @@ cosmo_disp(ds)
 
 %% print the sample attributes
 fprintf('\nSample attributes (in full):\n')
-cosmo_disp(ds.sa,'edgeitems',Inf); %'edgeitems determine how much of a 
+cosmo_disp(ds.sa,'edgeitems',Inf); %'edgeitems determine how much of a
                                    % matrix is displayed. Try different values.
 
 %% print targets and chunks next to each other

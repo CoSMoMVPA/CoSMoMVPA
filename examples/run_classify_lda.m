@@ -1,4 +1,4 @@
-%% classification with LDA classifier
+%% odd-even classification with LDA classifier
 
 %% Define data
 config=cosmo_config();
@@ -61,7 +61,7 @@ cosmo_disp(ds_odd_birds);
 % train on even, test on odd
 
 % Use cosmo_classify_lda to get predicted labels for the odd runs when
-% training on the even runs. 
+% training on the even runs.
 % (hint: use .samples and .sa.targets from both ds_even_mm and ds_odd_mm)
 % >@@>
 train_samples=ds_even_birds.samples;
@@ -87,7 +87,7 @@ disp([test_targets test_pred])
 accuracy = mean(test_pred==test_targets);
 % <@@<
 fprintf('\nLDA birds even-odd: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be .9 
+% Answer: accuracy should be .9
 
 % compare with naive bayes classification
 % (hint: do classification as above, but use cosmo_classify_naive_bayes)
@@ -146,7 +146,7 @@ assert(isequal(unique(test_targets),(1:6)'));
 
 % in confusion matrix, the i-th row and j-th column should contain
 % the number of times that a sample with test_targets==i was predicted as
-% test_pred==j. Use a nested for-loop (a for-loop in a for-loop) to count 
+% test_pred==j. Use a nested for-loop (a for-loop in a for-loop) to count
 % this for all combinations of i (1 to 6) and j (1 to 6)
 % >@@>
 for predicted=1:nclasses
