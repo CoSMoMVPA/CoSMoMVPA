@@ -1,4 +1,4 @@
-.. _`ex_classify_lda`:
+.. _`ex_measures`:
 
 Using CoSMoMVPA *measures*
 ==========================
