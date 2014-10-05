@@ -37,58 +37,26 @@ Solution: :ref:`run_nifti_basics` / :pb:`nifti_basics`
 Loading datasets with different masks
 +++++++++++++++++++++++++++++++++++++
 Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
-(*glm_T_stats_allruns.nii.gz*) and applying whole brain mask (*brain_mask.nii.gz*).
+(*glm_T_stats_allruns.nii.gz*).
 
-How many voxels are included in the whole brain mask?
+- Set the ``.sa.targets``, ``.sa.chunks`` and ``.sa.labels``:
 
-Now load the same data with the early visual mask (*ev_mask.nii.gz*) and then with the ventral temporal mask
-(*vt_mask.nii.gz*).  How many voxels are included in those masks?
+    + The stimulus labels for each run of the fMRI study were monkey, lemur, mallard, warbler, ladybug, and lunamoth -- in that order. This dataset contains summary statistics (T statistics from the general linear model analysis, GLM) for each stimulus for each of ten runs. The runs are vertically stacked by run. For example, the first row contains the summary voxel-wise responses for monkey in run 1, the second row contains that for lemur in run 1, and the seventh row contains monkey from run 2, etc.
 
-Hint: :ref:`run_load_datasets_skl`
+    + Add samples atributes (dataset.sa) that contain
+    
+        # numeric labels for the targets,aka stimulus labels, in the samples attribute field dataset.sa.targets
+        # add another sample attribute for the chunks, aka run labels, in the field dataset.sa.chunks.
+        # optional: add a third sample attribute with labels (string representation) showing human-readable labels of the conditions.
 
-Solution: :ref:`run_load_datasets` / :pb:`load_datasets`
+- Load the VT mask, find where there are non-zero values in the mask, and apply it to the dataset using :ref:`cosmo_slice`.
 
-Setting sample attributes: targets and chunks
-+++++++++++++++++++++++++++++++++++++++++++++
-Now load the dataset that has data for each run (*glm_T_stats_perrun.nii.gz*)
-using any mask you like. The stimulus labels for each run of the fMRI study were
-monkey, lemur, mallard, warbler, ladybug, and lunamoth -- in that order. This
-dataset contains summary statistics (T statistics from the general linear model
-analysis, GLM) for each stimulus for each of ten runs. The runs are vertically
-stacked by run. For example, the first row contains the summary voxel-wise
-responses for monkey in run 1, the second row contains that for lemur in run 1,
-and the seventh row contains monkey from run 2, etc.
+- Now use :ref:`cosmo_fmri_dataset`  with the ``mask``, ``targets`` and ``chunks`` parameters, and verify you get the same as before.
 
-Add samples atributes (dataset.sa) that contain numeric labels for the targets,
-aka stimulus labels, in the samples attribute field dataset.sa.targets, and add
-another samples attribute for the chunks, aka run labels, in the field
-dataset.sa.chunks.
+- Slice samples in various ways:
 
-Hint: :ref:`run_setting_sample_attr_skl`
-
-Solution: :ref:`run_setting_sample_attr` / :pb:`setting_sample_attr`
-
-Slice by samples
-++++++++++++++++
-Write a function with the following signature.
-
-.. include:: matlab/cosmo_dataset_slice_sa_hdr.txt
-
-Hint: :ref:`cosmo_dataset_slice_sa_skl`
-
-Solution: :ref:`cosmo_dataset_slice_sa`
-
-Slice by features
-+++++++++++++++++
-Write another function with the signature.
-
-.. include::  matlab/cosmo_dataset_slice_fa_hdr.txt
-
-Hint: :ref:`cosmo_dataset_slice_fa_skl`
-
-Solution: :ref:`cosmo_dataset_slice_fa`
-
-*Robust* Solution 2: :ref:`cosmo_slice` (note that third argument must be set to ``2`` in order to slice the features).
+    + Get data in chunks 1 and 2
+    + Get data in conditions 1 and 3 (monkeys and mallards)
 
 Operations on datasets
 ++++++++++++++++++++++
