@@ -40,7 +40,7 @@ for k=1:nclassifiers
     % >@@>
     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
-    confusion_matrix=cosmo_confusion_matrix(ds, pred);
+    confusion_matrix=cosmo_confusion_matrix(ds.sa.targets, pred);
     % <@@<
     figure();
     imagesc(confusion_matrix,[0 10])
