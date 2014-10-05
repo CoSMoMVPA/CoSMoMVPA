@@ -47,15 +47,24 @@ Then compute the correlation information for each subject, and perform a t-test 
 
 Template: :ref:`run_correlation_measure_skl`
 
-Check your answers here: :ref:`run_correlation_measure_skl` / :pb:`correlation_measure_skl`
+Check your answers here: :ref:`run_correlation_measure` / :pb:`correlation_measure`
 
 
 Classifier with cross-validation using a measure
 ++++++++++++++++++++++++++++++++++++++++++++++++
 As a second exercise, load a dataset using subject ``s01``'s T-statistics for every run
-('glm_T_stats_perrun.nii') and the VT mask.
+(``glm_T_stats_perrun.nii``) and the VT mask.
 
-Assign targets and chunks, then use the LDA classifier (:ref:`cosmo_classify_lda`) and n-fold partitioning (:ref:`cosmo_nfold_partitioner`) to perform classification accuracy using n-fold cross-validation.
+Assign targets and chunks, then use the LDA classifier (:ref:`cosmo_classify_lda`) and n-fold partitioning (:ref:`cosmo_nfold_partitioner`) to compute classification accuracy using n-fold cross-validation, using :ref:`cosmo_crossvalidation_measure`.
+
+Then compute confusion matrices using different classifiers, such as :ref:`cosmo_classify_lda`, :ref:`cosmo_classify_nn`, and `cosmo_classify_naive_bayes`. If LIBSVM or the `Matlab statistics` toolbox are available, you can also use :ref:`cosmo_classify_svm`.
+
+Template: :ref:`run_crossvalidation_measure_skl`
+
+Check your answers here: :ref:`run_crossvalidation_measure` / :pb:`crossvalidation_measure`
+
+
+
 
 
 
