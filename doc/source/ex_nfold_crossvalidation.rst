@@ -9,7 +9,7 @@ Background
 In the :ref:`ex_classify_lda` exercise, data was split in even and odd runs, and a classifier trained and tested on these (respectively). In this exercise the use of cross-validation is shown using a dataset with ``N=10`` chunks.
 
     - data in a single chunk (here, the first run) is used as the test set
-    - all other data is used for the train set. 
+    - all other data is used for the train set.
     - the previous two steps are repeated for each of the ``N=10`` chunks:
 
         + for the ``i``-th repetion, the ``i``-th chunk is used for testing after training on all other chunks
@@ -25,7 +25,7 @@ Single subject, n-fold cross-validation classification
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 For this exercise, load a dataset using subject ``s01``'s T-statistics for every run
-('glm_T_stats_perrun.nii') and the VT mask. 
+('glm_T_stats_perrun.nii') and the VT mask.
 
 - Implement ``n-fold`` crossvalidation as described above, using the :ref:`LDA classifier <cosmo_classify_lda>`.
 - Compute classification accuracy
