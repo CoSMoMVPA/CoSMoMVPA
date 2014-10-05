@@ -23,7 +23,7 @@ mask_fn=fullfile(data_path,'brain_mask.nii');
 half1_ds=cosmo_fmri_dataset(half1_fn,'mask',mask_fn);
 half2_ds=cosmo_fmri_dataset(half2_fn,'mask',mask_fn);
 
-half1_ds.sa.labels = {'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'}';
+half1_ds.sa.labels = {'monkey'; 'lemur'; 'mallard'; 'warbler'; 'ladybug'; 'lunamoth'};
 cosmo_check_dataset(half1_ds);
 nClasses = numel(half1_ds.sa.labels);
 
