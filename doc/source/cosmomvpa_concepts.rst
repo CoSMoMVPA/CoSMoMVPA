@@ -264,6 +264,12 @@ For example, the following code defines a 'measure' that returns classification 
 
 Using classifiers and measures in such an abstract way is a powerful approach to implement new analyses. Any function you write can be used as a dataset measure as long as it uses the dataset measure input scheme, and can directly be used with (for example) a searchlight. When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_neighborhood`_ (see above), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
 
+Examples of measures include:
+
+    + :ref:`split-half correlation <cosmo_correlation_measure>`.
+    + :ref:`classification with cross-validation <cosmo_crossvalidation_measure>`.
+    + :ref:`representational similarity analysis <cosmo_dissimilarity_matrix_measure>`.
+
 
 .. include:: links.txt
 
