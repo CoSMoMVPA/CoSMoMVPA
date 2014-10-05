@@ -243,13 +243,13 @@ Neighborhoods can be generated using :ref:`cosmo_interval_neighborhood` (e.g. ME
 Measure
 ^^^^^^^
 
- A dataset measure is a function with the following signature:
+A dataset measure is a function with the following signature:
 
     .. code-block:: matlab
 
         output = dataset_measure(dataset, args)
 
-where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight seperately. The output should be a ``struct`` with fields ``.samples`` (in column vector format) and optionally a field ``.sa`` - but no fields ``.fa`` or ``.a``.
+where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight seperately. The output should be a ``struct`` with fields ``.samples`` (in column vector format) and optionally a field ``.sa`` - but no fields ``.fa`` and usually no field ``.a`` (except for a possible ``.a.sdim`` field, if the measure returns data in a dimensional format) .
 
 For example, the following code defines a 'measure' that returns classification accuracy based ona support vector machine classifier that uses n-fold cross-validation. The measure is then used in a searchlight with a radius of 3 voxels; the input is an fMRI dataset ``ds`` with chunks and targets set, the output an fMRI dataset with one sample containing classification accuracies.
 
