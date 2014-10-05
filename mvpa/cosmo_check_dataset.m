@@ -338,7 +338,7 @@ function msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str)
         v=attrs.(label);
 
         vmax=numel(values{dim});
-        if min(v)<1 || max(v)>vmax || ~is_int_vector(v);
+        if ~is_int_vector(v) || min(v)<1 || max(v)>vmax
             msg=sprintf(['.%s.%s must be vector with integers in '...
                             'range 1..%d'],attrs_str,label,vmax);
             return
