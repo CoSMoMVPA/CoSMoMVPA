@@ -11,15 +11,23 @@ mask_fn = fullfile(data_path, 'vt_mask.nii');
 data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
 ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 
+% set ds.sa.targets (trial conditions) to the 60x1 column vector:
+% [ 1 2 3 4 5 6 1 2 3 ... 5 6 ]'
+% >@@>
 ds.sa.targets = repmat((1:6)',10,1);
+% <@@<
 
+% set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
+% [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
 chunks = repmat(1:10, [6, 1]);
 chunks = chunks(:);
 ds.sa.chunks = chunks;
-% remove constant features
-ds=cosmo_remove_useless_data(ds);
 % <@@<
+
+% This particular ROI has a few constant features due to
+% not-so-agressive masking, so remove constant features
+ds=cosmo_remove_useless_data(ds);
 
 %% Set the sample indices that correspond to primates and bugs
 
@@ -28,8 +36,10 @@ primate_idx = ds.sa.targets <= 2;
 bug_idx = ds.sa.targets > 4;
 % <@@<
 
+
+
 %% Slice the dataset
-% use the indices as input to the dataset slicer
+% use the indices as input to cosmo_slice
 
 % >@@>
 primate_ds = cosmo_slice(ds, primate_idx);
@@ -52,10 +62,14 @@ primates_minus_bugs = primates_mean - bugs_mean;
 % Then convert back to nifti and save it using cosmo_map2fmri function.
 
 % >@@>
-ds.samples = primates_minus_bugs;
-ds.sa=struct();
-cosmo_check_dataset(ds); %good practice
-ni = cosmo_map2fmri(ds, fullfile(data_path, 'primates_minus_bugs.nii'));
+ds_primates_minus_bugs=ds; % make a copy
+ds_primates_minus_bugs.samples = primates_minus_bugs;
+ds_primates_minus_bugs.sa=struct();
+cosmo_check_dataset(ds_primates_minus_bugs); %good practice
+
+% store to disc
+output_fn=fullfile(data_path, 'primates_minus_bugs.nii');
+ni = cosmo_map2fmri(ds_primates_minus_bugs, output_fn);
 % <@@<
 
 %% Plot results
@@ -63,7 +77,7 @@ figure
 %... using cosmo_plot_slices
 
 % >@@>
-cosmo_plot_slices(ds)
+cosmo_plot_slices(ds_primates_minus_bugs)
 % <@@<
 
 % ... using AFNI, FSL, or Matlab's imagesc
