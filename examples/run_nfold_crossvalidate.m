@@ -52,20 +52,19 @@ for fold=1:nfolds
     % <@@<
 end
 
-% the following code tests the code above (because it should give
-% identical output), and also shows how n-fold crossvalidation can be
-% done in simpler manner using CoSMoMVPA functions
-measure=@cosmo_crossvalidation_measure;
-args=struct();
-args.classifier=@cosmo_classify_lda;
-args.partitions=cosmo_nfold_partitioner(ds);
-args.output='predictions';
+expected_pred=[ 1 1 1 2 1 1 2 1 1 1
+                2 1 2 2 2 2 2 2 2 2
+                4 3 1 3 3 4 3 3 3 3
+                4 4 2 4 4 4 4 4 3 2
+                5 5 5 5 5 6 5 5 5 5
+                6 6 6 6 6 6 6 6 6 6];
 
-ds_all_pred_alt=measure(ds, args);
-all_pred_alt=ds_all_pred_alt.samples;
+
+% the following code tests the code above (because it should give
+% identical output)
 
 % check that the output is as expected
-if ~isequal(all_pred_alt,all_pred)
+if ~isequal(expected_pred(:),all_pred)
     error('expected predictions to be row-vector with [%s]''',...
             sprintf('%d ',all_pred_alt));
 end
@@ -74,7 +73,7 @@ end
 accuracy=mean(all_pred==ds.sa.targets);
 fprintf('\nLDA all categories n-fold: accuracy %.3f\n', accuracy);
 
-%% Compute confusion matrix
+%% Show confusion matrix
 
 % hint: use cosmo_confusion_matrix
 % >@@>
