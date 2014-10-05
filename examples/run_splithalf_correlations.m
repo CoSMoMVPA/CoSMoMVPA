@@ -23,26 +23,26 @@ for iRoi = 1:numel(rois)
     %% Computations for each subject
     for j=1:nsubjects
         subject_id=subject_ids{j};
-        
+
         data_path=fullfile(study_path, subject_id);
-        
+
         % file locations for both halves
         half1_fn=fullfile(data_path,'glm_T_stats_odd.nii');
         half2_fn=fullfile(data_path,'glm_T_stats_even.nii');
-        
+
         %mask name for given subject and roi
         mask_fn=fullfile(data_path,[rois{iRoi},'_mask.nii']);
-        
+
         % load two halves as CoSMoMVPA dataset structs.
         half1_ds=cosmo_fmri_dataset(half1_fn,'mask',mask_fn);
         half2_ds=cosmo_fmri_dataset(half2_fn,'mask',mask_fn);
-        
+
         % get the sample data
         % each half has six samples:
         % monkey, lemur, mallard, warbler, ladybug, lunamoth.
         half1_samples=half1_ds.samples;
         half2_samples=half2_ds.samples;
-        
+
         % compute all correlation values between the two halves, resulting
         % in a 6x6 matrix. Store this matrix in a variable 'rho'.
         % Hint: use cosmo_corr
@@ -54,13 +54,13 @@ for iRoi = 1:numel(rois)
             rho_sum(:, :, iRoi)=rho_sum(:, :, iRoi)+rho;%for the advanced exercise: sum up all individual correlation matrices
         end
         % <@@<
-        
+
         % To make these correlations more 'normal', apply a Fisher
         % transformation and store this in a variable 'z' (use atanh).
         % >@@>
         z=atanh(rho);
         % <@@<
-        
+
         % visualize the matrix 'z'
         subplot(3,3,j);
         % >@@>
@@ -68,33 +68,33 @@ for iRoi = 1:numel(rois)
         colorbar()
         title(subject_id)
         % <@@<
-        
+
         % define in a variable 'contrast_matrix' how correlations values
         % are going to be weighted.
         % The matrix must have a mean of zero, positive values on diagonal,
         % negative elsewhere.
         contrast_matrix=eye(6)-1/6;
-        
+
         if abs(mean(contrast_matrix(:)))>1e-14
             error('illegal contrast matrix');
         end
-        
+
         % Weigh the values in the matrix 'z' by those in the contrast_matrix
         % and then average them (hint: use the '.*' operator for element-wise
         % multiplication). Store the results in a variable 'mean_weighted_z'.
         % >@@>
         weighted_z=z.*contrast_matrix;
-        
+
         mean_weighted_z=mean(weighted_z(:));
         % <@@<
-        
+
         % store the result for this subject
         mean_weighted_zs(j)=mean_weighted_z;
     end
-    
+
     %% compute t statistic and print the result
     % run one-sample t-test again zero
-    
+
     % Using cosmo_stats - convert to dataset struct.
     % The targets are chunks are set to indicate that all samples are from the
     % same class (condition), and each observation is independent from the
@@ -103,16 +103,16 @@ for iRoi = 1:numel(rois)
     mean_weighted_zs_ds.samples=mean_weighted_zs;
     mean_weighted_zs_ds.sa.targets=ones(nsubjects,1);
     mean_weighted_zs_ds.sa.chunks=(1:nsubjects)';
-    
-    
+
+
     ds_t=cosmo_stat(mean_weighted_zs_ds,'t');     % t-test against zero
     ds_p=cosmo_stat(mean_weighted_zs_ds,'t','p'); % convert to p-value
-    
+
     fprintf(['correlation difference in %s at group level: '...
         '%.3f +/- %.3f, %s=%.3f, p=%.5f (using cosmo_stat)\n'],...
         rois{iRoi},mean(mean_weighted_zs),std(mean_weighted_zs),...
         ds_t.sa.stats{1},ds_t.samples,ds_p.samples);
-    
+
     % Using matlab's stat toolbox (if present)
     if cosmo_check_external('@stats',false)
         [h,p,ci,stats]=ttest(mean_weighted_zs);
@@ -124,7 +124,7 @@ for iRoi = 1:numel(rois)
     else
         fprintf('Matlab stats toolbox not available\n');
     end
-    
+
 end
 
 %advanced exercise: plot an image of the correlation matrix averaged over
@@ -135,15 +135,15 @@ for iRoi = 1:numel(rois)
     figure
     axh(iRoi) = gca;
     % >@@>
-    
+
     imagesc(rho_sum(:, :, iRoi)/nsubjects)
     set(gca, 'xtick', 1:numel(labels), 'xticklabel', labels)
     set(gca, 'ytick', 1:numel(labels), 'yticklabel', labels)
-    
+
     colorbar
     title(sprintf('Average splithalf correlation across subjects in mask ''%s''', rois{iRoi}))
     % <@@<
-    
+
     colorLims(:, :, iRoi) = get(gca, 'clim');
 end
 %give all figures the same color limits such that correlations can be
