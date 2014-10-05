@@ -1,4 +1,4 @@
-.. ex_classify_lda
+.. _`ex_classify_lda`:
 
 Classification with Linear Discriminant Analysis
 ================================================
