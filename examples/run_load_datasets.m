@@ -12,33 +12,54 @@
 
 %% Set the datapath
 %
-
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 %% Compute number of voxels in each mask
-% First load data with full brain mask
+% Hints:
+% -In order not to get overwhelmed, solve a simple problem first and then
+% generalize from it.
+%   -First write some code in which you load data with full brain mask.
+% Generalization:  
+%   -Next, you could just copy and alter that code such that you do the
+%   same thing with the other masks
+%   -A more elegant solution would be to put the three mask names into a 
+%   cell array and to write a loop that performs the same set of operations
+%   on the members of the cell array (i.e. the three different mask names
 
+% Let's start with the simple approach
 % >@@>
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
-                        'mask', [data_path '/brain_mask.nii']);
-[nsamples, nfeatures] = size(ds.samples);
-% <@@<
-
+mask_fn = fullfile(data_path, 'brain_mask.nii');
+data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
+ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
+[~, nfeatures] = size(ds.samples);
 fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
+% <@@<
 
 % Now do the same with the EV and VT masks.
-
 % >@@>
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
-                        'mask', [data_path '/ev_mask.nii']);
+mask_fn = fullfile(data_path, 'vt_mask.nii');
+ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
+[~, nfeatures] = size(ds.samples);
+fprintf('There are %d voxels in the ventral-temporal mask\n', nfeatures);
+
+mask_fn = fullfile(data_path, 'ev_mask.nii');
+ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 [nsamples, nfeatures] = size(ds.samples);
+fprintf('There are %d voxels in the early-visual brain mask\n', nfeatures);
 
-fprintf('There are %d voxels in the EV mask\n', nfeatures);
-
-ds = cosmo_fmri_dataset([data_path '/glm_T_stats_perrun.nii'], ...
-                        'mask', [data_path '/vt_mask.nii']);
-[nsamples, nfeatures] = size(ds.samples);
-
-fprintf('There are %d voxels in the VT mask\n', nfeatures);
 % <@@<
+%
+% And here is space for the more elegant solution in which you define a
+% list of mask names and apply the operation in a loop for all masks in the
+% list
+maskNames = {'brain_mask.nii', 'vt_mask.nii', 'ev_mask.nii'};
+data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
+
+for iMask=1:numel(maskNames)
+    % >@@>
+    ds=cosmo_fmri_dataset(data_fn, 'mask', fullfile(data_path, maskNames{iMask}));
+    [~, nfeatures] = size(ds.samples);
+    fprintf('There are %6d voxels in the mask ''%s''\n', nfeatures, maskNames{iMask});
+    % <@@<
+end
