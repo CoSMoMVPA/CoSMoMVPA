@@ -10,7 +10,6 @@ Contents:
     :titlesonly:
 
     ex_dataset_basics
-    ex_dataset_operations
     ex_splithalf_correlations
     ex_classify_lda
     ex_nfold_crossvalidation
