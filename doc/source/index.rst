@@ -21,10 +21,12 @@ CoSMoMVPA
 .. toctree::
    :hidden:
 
+   philosophy
    get_started
    download
    documentation
-   cosmo2013
+   cimec2014
+   tips
    faq
    contact
    contribute
@@ -32,6 +34,8 @@ CoSMoMVPA
 
 .. image:: _static/icon_demos.png
    :target: contents_demo.html
+.. image:: _static/icon_philosophy.png
+   :target: philosophy.html
 .. image:: _static/icon_get_started.png
    :target: get_started.html
 .. image:: _static/icon_download.png
@@ -41,9 +45,9 @@ CoSMoMVPA
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
-   :target: cosmo2013.html
-.. image:: _static/icon_exercises.png
    :target: cimec2014.html
+.. image:: _static/icon_tips.png
+   :target: tips.html
 .. image:: _static/icon_faq.png
    :target: faq.html
 .. image:: _static/icon_contact.png
