@@ -153,18 +153,18 @@ Slicing refers to selecting data in a dataset struct, either along the rows or c
         + cross-validation: data is tested using data in, say, one chunk after training on data in the remaining chunks (see :ref:`cosmo_nfold_partitioner` and :ref:`cosmo_nchoosek_partitioner`).
         + split-half correlations: when half of the data (in one (set of) chunks) is correlated with data in the other half (see :ref:`cosmo_oddeven_partitioner` and `cosmo_correlation_measure`).
 
-    .. figure:: _static/slice_sa.png
+.. figure:: _static/slice_sa.png
 
-        Illustration of slicing rows (samples). In the masks, white elements are selected and black elements are not selected.
+    Illustration of slicing rows (samples). In the masks, white elements are selected and black elements are not selected.
 
 - Slicing features (``dim=2``) means that the specified *columns* are selected, both in ``.samples`` and each field in ``.fa`` (such as ``.fa.i``, ``fa.j`` and ``fa.k`` in an fMRI-dataset, which indicate the voxel indices). Use cases include:
 
     * Select only certain voxels in a region of interest
     * Running a searchlight, which consists of doing the analyses many regions of interest.
 
-    .. figure:: _static/slice_fa.png
+.. figure:: _static/slice_fa.png
 
-        Illustration of slicing columns (features). In the masks, white elements are selected and black elements are not selected.
+    Illustration of slicing columns (features). In the masks, white elements are selected and black elements are not selected.
 
 
 Slicing+related functions
@@ -184,9 +184,9 @@ Related functions are:
 
     - :ref:`cosmo_fx` splits the dataset using :ref:`cosmo_split`, applies a function to each element, and stacks the results. It can be used to average data for each value of ``.sa.targets`` seperately, for each unique value of ``.sa.chunks``, or for each unique combination of ``.sa.targets`` and ``.sa.chunks``.
 
-     .. figure:: _static/split_and_stack.png
+.. figure:: _static/split_and_stack.png
 
-        Illustration of splitting and stacking rows (samples).
+    Illustration of splitting and stacking rows (samples).
 
 
 .. _`cosmomvpa_classifier`:
