@@ -1,3 +1,5 @@
+.. _`ex_splithalf_correlations`:
+
 Split-half correlation-based MVPA with group analysis
 =====================================================
 
