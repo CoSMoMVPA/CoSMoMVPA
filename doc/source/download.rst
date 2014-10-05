@@ -45,6 +45,8 @@ The Matlab code is required for analyses in CoSMoMVPA_; the example data is requ
 
     which should provide a report of available system information.
 
+.. _`get_tutorial_data`:
+
 * Download the tutorial data:
 
     - Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
@@ -55,6 +57,8 @@ The Matlab code is required for analyses in CoSMoMVPA_; the example data is requ
     You can move the directory to another location on your file system, if desired.
 
 
+.. _`set_cosmovmpa_cfg`:
+
 * Set the location of the tutorial data in a text file named ``.cosmomvpa.cfg`` (in a directory that is in the matlab path), as described in the *Notes* section of :ref:`cosmo_config_hdr`.
 
     + If you do not know where to store the file, just close and start Matlab afresh (so that it starts in a location that is in the Matlab path), and run
@@ -63,7 +67,9 @@ The Matlab code is required for analyses in CoSMoMVPA_; the example data is requ
 
             edit .cosmomvpa.cfg
 
-Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
+        Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
+
+.. _`test_local_setup`:
 
 * To verify that everything works, run the following in Matlab:
 
