@@ -21,9 +21,11 @@ We would like to thank the following people for specific contributions:
 +  **S. Eddins** for the MATLAB xUnit_ Test Framework.
 +  **T. Smith** for inspiration for the doctest functionality.
 +  **J. Shen** for providing the NIfTI toolbox.
++  **Jens Scharzbac** for help with improving and adding exercises.
 
-The following people have provided valuable suggestions, advice, support, or code to PyMVPA:
+The following people have provided valuable suggestions, advice, support, or code to CoSMoMVPA:
 
++ Sarah Belinda Aimee Degosciu
 + Thomas Hartmann
 + James Haxby
 + Daniel Kaiser
