@@ -80,14 +80,6 @@ fprintf('\nLDA all categories n-fold: accuracy %.3f\n', accuracy);
 confusion_matrix=cosmo_confusion_matrix(ds.sa.targets,all_pred);
 % <@@<
 
-% the following code tests the code above (because it should give
-% identical output), and also shows how a confusion matrix can be
-% made in simpler manner using CoSMoMVPA functions
-confusion_matrix_alt=cosmo_confusion_matrix(ds_all_pred_alt);
-if ~isequal(confusion_matrix,confusion_matrix_alt)
-    error('your confusion matrix does not match the expected output');
-end
-
 % make a pretty figure
 figure
 imagesc(confusion_matrix,[0 10])
