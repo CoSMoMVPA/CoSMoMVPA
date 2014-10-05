@@ -5,6 +5,8 @@ CIMeC 2014 Advanced Neural Decoding
 
 *to be presented at CIMeC 2014 by Jens Schwarzbach and Nick Oosterhof*
 
+(in 2013, earlier versions of some exercises were presented at the :ref:`CoSMo 2013 Multivariate Pattern Analysis Workshop <cosmo2013>`).
+
 Contents
 --------
 
