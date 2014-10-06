@@ -6,7 +6,7 @@
 
 %% Set analysis parameters
 subject_id='s01';
-roi='vt'; % 'vt' or 'ev' or 'brain'
+roi_label='vt'; % 'vt' or 'ev' or 'brain'
 
 config=cosmo_config();
 study_path=fullfile(config.tutorial_data_path,'ak6');
@@ -17,14 +17,28 @@ data_path=fullfile(study_path, subject_id);
 % file locations for both halves
 half1_fn=fullfile(data_path,'glm_T_stats_odd.nii');
 half2_fn=fullfile(data_path,'glm_T_stats_even.nii');
-mask_fn=fullfile(data_path,'brain_mask.nii');
+mask_fn=fullfile(data_path,[roi_label '_mask.nii']);
 
 % load two halves as CoSMoMVPA dataset structs.
-half1_ds=cosmo_fmri_dataset(half1_fn,'mask',mask_fn);
-half2_ds=cosmo_fmri_dataset(half2_fn,'mask',mask_fn);
+half1_ds=cosmo_fmri_dataset(half1_fn,'mask',mask_fn,...
+                                     'targets',(1:6)',...
+                                     'chunks',repmat(1,6,1));
+half2_ds=cosmo_fmri_dataset(half2_fn,'mask',mask_fn,...
+                                     'targets',(1:6)',...
+                                     'chunks',repmat(2,6,1));
 
-half1_ds.sa.labels = {'monkey'; 'lemur'; 'mallard'; 'warbler'; 'ladybug'; 'lunamoth'};
+labels={'monkey'; 'lemur'; 'mallard'; 'warbler'; 'ladybug'; 'lunamoth'};
+half1_ds.sa.labels = labels;
+half2_ds.sa.labels = labels;
+
 cosmo_check_dataset(half1_ds);
+cosmo_check_dataset(half2_ds);
+
+% Some sanity checks to ensure that the data has matching features (voxels)
+% and matching targets (conditions)
+assert(isequal(half1_ds.fa,half2_ds.fa));
+assert(isequal(half1_ds.sa.targets,half2_ds.sa.targets));
+
 nClasses = numel(half1_ds.sa.labels);
 
 % get the sample data
@@ -35,7 +49,8 @@ half2_samples=half2_ds.samples;
 
 % compute all correlation values between the two halves, resulting
 % in a 6x6 matrix. Store this matrix in a variable 'rho'.
-% Hint: use cosmo_corr
+% Hint: use cosmo_corr (or builtin corr, if the matlab stats toolbox
+%       is avaible) after transposing the samples in the two halves.
 % >@@>
 rho=cosmo_corr(half1_samples',half2_samples');
 % <@@<
@@ -60,17 +75,30 @@ title(subject_id)
 % Set up a contrast matrix to test whether the element in the diagonal
 % (i.e. a within category correlation) is higher than the average of all
 % other elements in the same row (i.e. the average between-category
-% correlations). For testing the split half correlation of n classes one has
-% an n x n matrix. Set the diagonals to n, and the off diagonals to 1/n.
-% H0 is that within class correlations are equal to the average
-% between-class correlations.
-% Results in:
-% row mean zero, positive on diagonal, negative elsewhere.
-% The matrix should have a mean of zero
-contrast_matrix=eye(nClasses)-1/nClasses;
+% correlations). For testing the split half correlation of n classes one
+% has an n x n matrix (here, n=6).
+%
+% To compute the difference between the average of the on-diagonal and the
+% average of the off-diagonal elements, consider that there are
+% n on-diagonal elements and n*(n-1) off-diagonal elements.
+% Therefore, set
+% - the on-diagonal elements to 1/n           [positive]
+% - the off-diagonal elements to -1/(n*(n-1)) [negative]
+% This results in a contrast matrix with weights for each element in
+% the correlation matrix, with positive and equal values on the diagonal,
+% negative and equal values off the diagonal, and a mean value of zero.
+%
+% Under the null hypothesis one would expect no difference between the
+% average on the on- and off-diagonal, hence correlations weighted by the
+% contrast matrix has an expected mean of zero. A postive value for
+% the weighted correlations would indicate more similar patterns for
+% patterns in the same condition (across the two halves) than in different
+% conditions.
+contrast_matrix=(eye(nClasses)-1/nClasses)/nClasses;
 
-if abs(mean(contrast_matrix(:)))>1e-14
-    error('illegal contrast matrix');
+% sanity check: ensure the matrix has a sum of zero
+if abs(sum(contrast_matrix(:)))>1e-14
+    error('illegal contrast matrix: it must have a sum of zero');
 end
 
 %visualize the contrast matrix
@@ -84,12 +112,12 @@ title('Contrast Matrix')
 % multiplication). Store the results in a variable 'mean_weighted_z'.
 % >@@>
 weighted_z=z .* contrast_matrix;
-mean_weighted_z=mean(weighted_z(:)); %Expected value under H0 is 0
+sum_weighted_z=sum(weighted_z(:)); %Expected value under H0 is 0
 % <@@<
 
 %visualize weighted normalized correlation matrix
 figure
 imagesc(weighted_z)
 colorbar
-title(sprintf('Weighted Contrast Matrix m = %5.3f', mean_weighted_z))
+title(sprintf('Weighted Contrast Matrix m = %5.3f', sum_weighted_z))
 
