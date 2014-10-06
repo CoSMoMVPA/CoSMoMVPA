@@ -37,6 +37,7 @@ Before starting this exercise, please make sure you have read about:
 - :ref:`cosmomvpa_dataset`
 - :ref:`cosmomvpa_targets`
 - :ref:`cosmomvpa_chunks`
+- :ref:`cosmomvpa_dataset_operations`
 
 Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 (``glm_T_stats_perrun.nii``).
