@@ -20,7 +20,7 @@ ds.sa.chunks = floor(((1:60)-1)/6)'+1;
 classes = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
 ds.sa.labels = repmat(classes,1,10)';
 
-%%
+%% Part 1: 'manual' crossvalidation
 
 nsamples=size(ds.samples,1);
 
@@ -90,3 +90,46 @@ ylabel('target');
 xlabel('predicted');
 colorbar
 
+%% Part 2: use cosmo_nfold_partitioner
+
+% Make nfold partitioning scheme, and assign to the variable 'partitions'
+% Hint: use cosmo_nfold_partitioner
+% >@@>
+partitions=cosmo_nfold_partitioner(ds);
+% <@@<
+
+% Show partitions
+fprintf('\nPartitions\n:');
+cosmo_disp(partitions)
+
+% Count how many folds there are, and assign to the variable 'nfolds'
+% >@@>
+nfolds=numel(partitions.train_indices);
+% <@@<
+
+% allocate space for output
+all_pred=zeros(nsamples,1);
+
+for fold=1:nfolds
+    % implement cross-validation and store predicted labels in 'all_pred';
+    % use the contents of partitions to slice the dataset in train and test
+    % sets for each fold
+    % >@@>
+    train_idxs=partitions.train_indices{fold};
+    test_idxs=partitions.test_indices{fold};
+
+    ds_train=cosmo_slice(ds,train_idxs);
+    ds_test=cosmo_slice(ds,test_idxs);
+
+    pred=cosmo_classify_lda(ds_train.samples,ds_train.sa.targets,...
+                                    ds_test.samples);
+    all_pred(test_idxs)=pred;
+    % <@@<
+end
+
+accuracy=mean(all_pred==ds.sa.targets);
+fprintf(['\nLDA all categories n-fold (with partitioner): '...
+            'accuracy %.3f\n'], accuracy);
+
+% Note: cosmo_crossvalidation_measure can perform the above operations as
+% well, but using that function is not part of this exercise
