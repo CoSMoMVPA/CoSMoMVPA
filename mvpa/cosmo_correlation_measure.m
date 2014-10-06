@@ -48,7 +48,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds);
 %     cosmo_disp(c)
 %     > .samples
-%     >   [ 0.0631 ]
+%     >   [ 0.252 ]
 %     > .sa
 %     >   .labels
 %     >     'corr'
@@ -57,7 +57,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds,'corr_type','Spearman');
 %     cosmo_disp(c)
 %     > .samples
-%     >   [ 0.0573 ]
+%     >   [ 0.229 ]
 %     > .sa
 %     >   .labels
 %     >     'corr'
@@ -103,10 +103,10 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds,'output','by_partition',...
 %                         'partitions',partitions);
 %     cosmo_disp(c.samples);
-%     > [ 0.142
-%     >   0.298
-%     >   0.264
-%     >   0.183 ]
+%     > [ 0.567
+%     >    1.19
+%     >    1.05
+%     >   0.731 ]
 %     cosmo_disp(c.sa);
 %     > .partition
 %     >   [ 1
@@ -120,7 +120,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     res=cosmo_searchlight(ds,@cosmo_correlation_measure,...
 %                               'radius',radius,'progress',false);
 %     cosmo_disp(res.samples)
-%     > [ 0.314   -0.0537     0.261     0.248     0.129     0.449 ]
+%     > [ 1.26    -0.215      1.05      0.99     0.515       1.8 ]
 %     cosmo_disp(res.sa)
 %     > .labels
 %     >   'corr'
