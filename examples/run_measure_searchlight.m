@@ -41,6 +41,7 @@ hist(count,100);
 
 %% Run the searchlight
 % hint: use cosmo_searchlight with the measure, args and nbrhood
+
 % >@@>
 results = cosmo_searchlight(ds,measure,'args',measure_args,...
                 'nbrhood',nbrhood);
@@ -50,7 +51,9 @@ results = cosmo_searchlight(ds,measure,'args',measure_args,...
 % >> cosmo_map2fmri(results, [data_path 'measure_searchlight.nii']);
 
 %% Make a histogram of classification accuracies
+figure()
 hist(results.samples,47)
 
 %% Plot a map
+figure();
 cosmo_plot_slices(results);
