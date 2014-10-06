@@ -1,7 +1,7 @@
 .. _`ex_classify_lda`:
 
-Classification with Linear Discriminant Analysis
-================================================
+Classification analysis
+=======================
 
 Background
 ++++++++++
@@ -40,9 +40,14 @@ Classification performance can be assessed by considering how many predictions f
         - If a set of patterns an a region of interest actually contains information about the conditions (i.e, is an informative region), *and* the classifier is able to use this information, then classification performance would be above chance level.
         - If a group of participants all show classification accuracy above chance consistently, one can claim that the region of interest contains information about the the conditions. A simple one-sample t-test against chance level can be used to obtain a statistic and associated p-value.
 
+A single classification step can be visualized as follows (more advanced cross-validation is part of :ref:`another exercise <ex_nfold_crossvalidation>`):
+
+.. figure:: _static/splithalf_correlation.png
+
+    *Illustration of (single-fold) classification*. A dataset (left) is split in a train dataset (top dataset) and a test set (bottom dataset), which must have no chunks in common. For training, a classifier (indicated by *f*) takes ``.samples`` and ``.sa.targets`` from the train dataset (horizontal arrow into *f*) and predicts, for the ``.samples`` in the test set (horizontal arrow into *f*), the targets of the test set (U-turn arrow). Classification accuracy can be assessed by computing how many samples in the test set were predicted correctly.
 
 Single subject, single fold split-half classification
-=====================================================
++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 For this exercise, load a dataset using subject ``s01``'s T-statistics for every run
 ('glm_T_stats_perrun.nii') and the VT mask.
@@ -54,7 +59,7 @@ Part 1:
     - Slice the odd and even runs again so that there are only two categories: warblers and mallards.
     - Train and test a LDA (linear discriminant analyses; :ref:`cosmo_classify_lda`) classifier,  training on the even-runs data and testing on the odds.
     - Compute classification accuracy
-    - Repeat the previous two steps using  :ref:`cosmo_classify_naive_bayes`)
+    - Repeat the previous two steps using  :ref:`cosmo_classify_naive_bayes`
 
     Advanced exercises:
 
@@ -64,7 +69,7 @@ Part 1:
 Part 2:
 
     - Use the data from all six categories to train on even runs and test on odd runs, and compute the classification accuracu
-    - As the previous step, but now test on odd runs and test on even runs
+    - As the previous step, but now test on odd runs and test on even runs.
 
 Part 3:
 
