@@ -57,7 +57,7 @@ As a second exercise, load a dataset using subject ``s01``'s T-statistics for ev
 
 Assign targets and chunks, then use the LDA classifier (:ref:`cosmo_classify_lda`) and n-fold partitioning (:ref:`cosmo_nfold_partitioner`) to compute classification accuracy using n-fold cross-validation, using :ref:`cosmo_crossvalidation_measure`.
 
-Then compute confusion matrices using different classifiers, such as :ref:`cosmo_classify_lda`, :ref:`cosmo_classify_nn`, and `cosmo_classify_naive_bayes`. If LIBSVM or the `Matlab statistics` toolbox are available, you can also use :ref:`cosmo_classify_svm`.
+Then compute confusion matrices using different classifiers, such as :ref:`cosmo_classify_lda`, :ref:`cosmo_classify_nn`, and :ref:`cosmo_classify_naive_bayes`. If LIBSVM or the `Matlab statistics` toolbox are available, you can also use :ref:`cosmo_classify_svm`.
 
 Template: :ref:`run_crossvalidation_measure_skl`
 
