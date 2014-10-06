@@ -49,6 +49,7 @@ Template: :ref:`run_correlation_measure_skl`
 
 Check your answers here: :ref:`run_correlation_measure` / :pb:`correlation_measure`
 
+.. _`ex_measures_crossvalidation`:
 
 Classifier with cross-validation using a measure
 ++++++++++++++++++++++++++++++++++++++++++++++++
