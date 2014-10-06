@@ -15,7 +15,8 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
 % remove constant features
 ds=cosmo_remove_useless_data(ds);
 
-%% Use cosmo_crossvalidation_measure for LDA classifier using n-fold cross-validation
+%% Part 1: Use single classifier
+
 % Use a function handle to the cosmo_crossvalidation_measure,
 % and assign to the variable 'measure'
 % >@@>
@@ -45,7 +46,7 @@ fprintf('\nOutput dataset (with accuracy)\n');
 cosmo_disp(ds_accuracy);
 % <@@<
 
-%% Define classifiers in a cell and visualize confusion matrices
+%% %% Part 2: Compare multiple classifiers
 
 % Put function handles to cosmo_classify_nn, cosmo_classify_naive_bayes and
 % cosmo_classify_lda in a cell, and assign to 'classifiers'
@@ -105,3 +106,8 @@ for k=1:nclassifiers
     xlabel('predicted');
     colorbar
 end
+
+% Note: poor performance by some classifiers does not mean that they are
+% useless, just that they were unable to capture the distinctions between
+% the patterns of different conditions because these distinctions were not
+% captured by the classifier's model.
