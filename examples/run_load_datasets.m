@@ -27,10 +27,19 @@ data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 %   cell array and to write a loop that performs the same set of operations
 %   on the members of the cell array (i.e. the three different mask names
 
-% Let's start with the simple approach
+% Let's start with the simple approach.
+% Set the filename
 % >@@>
 mask_fn = fullfile(data_path, 'brain_mask.nii');
+% <@@<
+
+% Load the dataset and store in struct 'ds'
+% >@@>
 ds=cosmo_fmri_dataset(mask_fn);
+% <@@<
+
+% Compute number of features that are greater than zero
+% hint: use ds.samples
 nfeatures=sum(ds.samples>0);
 
 fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
