@@ -106,7 +106,7 @@ for subject_num=1:nsubjects
     % Combine even and odd runs
     ds_odd_even=cosmo_stack({ds_odd, ds_even});
 
-    % remove constant features
+    % remove constant features (due to liberal masking)
     ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
     % apply cosmo_correlation_measure
