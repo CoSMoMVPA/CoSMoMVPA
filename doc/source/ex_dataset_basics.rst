@@ -56,7 +56,7 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 
 - Now use :ref:`cosmo_fmri_dataset`  with the ``mask``, ``targets`` and ``chunks`` parameters, and verify you get the same as before.
 
-- Slice samples in various ways:
+- Slice samples in various ways (using :ref:`cosmo_slice`):
 
     + Get data in chunks 1 and 2
     + Get data in conditions 1 and 3 (monkeys and mallards)
