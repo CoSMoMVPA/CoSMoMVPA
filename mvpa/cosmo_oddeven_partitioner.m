@@ -1,19 +1,19 @@
-function partitions = cosmo_oddeven_partitioner(chunks, type)
+function partitions = cosmo_oddeven_partitioner(ds, type)
 % generates an odd-even partition scheme
 %
 % partitions=cosmo_oddeven_partitioner(chunks,[type])
 %
 % Input
-%  - chunks          Px1 chunk indices for P samples. It can also be a
-%                    dataset with field .sa.chunks
-%  - type            One of:
+%    ds              dataset struct with field .ds.chunks, or Px1 chunk
+%                    indices (for P samples).
+%    type            One of:
 %                    - 'full': two partitions are returned, training on odd
 %                       and testing on even and vice versa (default)
 %                    - 'half': a single partition is returned, training on
 %                       odd and testing on even only.
 %
 % Output:
-%  - partitions      A struct with fields .train_indices and .test_indices.
+%    partitions      A struct with fields .train_indices and .test_indices.
 %                    Each of these is an Nx1 cell (for N partitions), where
 %                    .train_indices{k} and .test_indices{k} contain the
 %                    sample indices for the sets of unique chunks
@@ -63,9 +63,9 @@ function partitions = cosmo_oddeven_partitioner(chunks, type)
 %
 % NNO Aug 2013
 
-    chunks=get_chunks(chunks);
+    chunks=get_chunks(ds);
 
-    if nargin<2
+    if nargin<2 || isempty(type)
         type='full';
     end
 
@@ -74,17 +74,25 @@ function partitions = cosmo_oddeven_partitioner(chunks, type)
             do_half_partition=false;
         case 'half'
             do_half_partition=true;
+        otherwise
+            error('illegal type: must be ''full'' or ''half''');
     end
 
 
     indices=cosmo_index_unique(chunks);
-    if numel(indices)<2
+    nparts=numel(indices);
+    if nparts<2
         error('Need >=2 chunks, found %d', numel(indices));
     end
 
     % there are two partitions, unless do_half_partition in which case
     % there is one
-    npartitions=2-do_half_partition;
+
+    if do_half_partition && mod(nparts,2)==0
+        npartitions=1;
+    else
+        npartitions=2;
+    end
 
     % allocate space for output
     train_indices=cell(1,npartitions);
@@ -101,7 +109,7 @@ function partitions = cosmo_oddeven_partitioner(chunks, type)
     train_indices{1}=odd_indices;
     test_indices{1}=even_indices;
 
-    if ~do_half_partition
+    if npartitions==2
         train_indices{2}=even_indices;
         test_indices{2}=odd_indices;
     end
@@ -113,13 +121,13 @@ function partitions = cosmo_oddeven_partitioner(chunks, type)
 
 
 
-function chunks=get_chunks(chunks)
-    if isnumeric(chunks) && isvector(chunks)
-        % all good
+function ds=get_chunks(ds)
+    if isnumeric(ds) && isvector(ds)
+        % direct numeric
         return
-    elseif isstruct(chunks)
-        if cosmo_isfield(chunks,'sa.chunks')
-            chunks=chunks.sa.chunks;
+    elseif isstruct(ds)
+        if cosmo_isfield(ds,'sa.chunks')
+            ds=ds.sa.chunks;
             return
         end
     end
