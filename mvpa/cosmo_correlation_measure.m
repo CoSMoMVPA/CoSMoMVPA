@@ -12,7 +12,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %    .template    QxQ matrix for Q classes in each chunk. This matrix
 %                 weights the correlations across the two halves. It should
 %                 have a mean of zero. If omitted, it has positive values
-%                 of 1-1/Q on the diagonal and -1/Q off the diagonal.
+%                 of (1/Q) on the diagonal and (-1/(Q*(Q-1)) off the
+%                 diagonal.
 %                 (Note: this can be used to test for representational
 %                 similarity matching)
 %    .merge_func  A function handle used to merge data from matching
@@ -89,7 +90,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     >           2 ]    2 ] }
 %     %
 %     % convert to matrix form (N x N x P, with N the number of classes and
-%     % M=1)
+%     % P=1)
 %     matrices=cosmo_unflatten(c_raw,1);
 %     cosmo_disp(matrices)
 %     > [ 0.386     0.238
@@ -190,15 +191,18 @@ end
 targets=ds.sa.targets;
 nsamples=size(targets,1);
 
-% use custom-written unique function, which has up to 3-fold speed increase
-% [classes,unused,class_ids]=unique(targets);
-%
 [classes,unused,class_ids]=fast_unique(targets);
 nclasses=numel(classes);
 
 if isempty(template)
-    template=eye(nclasses)-1/nclasses;
+    template=(eye(nclasses)-1/nclasses)/(nclasses-1);
+else
+    max_tolerance=1e-8;
+    if abs(sum(template(:)))>max_tolerance
+        error('Template matrix does not have a sum of zero');
+    end
 end
+
 
 template_msk=isfinite(template);
 
@@ -274,7 +278,7 @@ function agg_c=aggregate_correlations(c,template,template_msk,output)
     switch output
         case {'mean','by_partition'}
             pcw=c(template_msk).*template(template_msk);
-            agg_c=mean(pcw(:));
+            agg_c=sum(pcw(:));
         case {'raw','correlation'}
             agg_c=c(:);
         case 'one_minus_correlation'
