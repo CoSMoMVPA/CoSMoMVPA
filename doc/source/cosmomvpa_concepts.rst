@@ -94,42 +94,71 @@ As with *targets* above, *chunks* should be coded as integer values in a ``Px1``
 
 Samples + sample attributes + feature attributes + dataset attributes = dataset
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Taken the above together, a CoSMoMVPA dataset contains four ingredients: 'samples' (the sample x features data matrix), 'sample attributes', 'feature attributes', and 'dataset attributes'. These are implemented, in Matlab, using a ``struct``, with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``. For example an fMRI dataset can be instantiated using :ref:`cosmo_fmri_dataset` and might look as follows:
+Taken the above together, a CoSMoMVPA dataset contains four ingredients: 'samples' (the sample x features data matrix), 'sample attributes', 'feature attributes', and 'dataset attributes'. These are implemented, in Matlab, using a ``struct``, with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``. For example an fMRI dataset can be instantiated using :ref:`cosmo_fmri_dataset` and might contain:
+
+``.samples``,
 
     .. code-block:: matlab
 
-        samples: [40x43822 double]
-              a: [1x1 struct]
-             fa: [1x1 struct]
-             sa: [1x1 struct]
+        [ 0.568       3.9      4.11  ...   0.732     0.473      2.37
+           1.45      3.71      4.86  ...  -0.265     0.846     0.544
+           2.23      1.31      2.76  ...   0.314     0.485    -0.335
+            :         :         :            :        :          :
+           2.06      1.46      3.52  ...  -0.162  -0.00311     0.488
+          0.596      1.96      3.93  ...   0.147      1.16      3.14
+          -1.35     0.511    -0.116  ...  -0.628     0.756     0.628 ]@40x298
 
-with ``.sa``,
+``.sa``,
 
-        .. code-block:: matlab
+    .. code-block:: matlab
 
-
-            targets: [40x1 double]
-             chunks: [40x1 double]
-             labels: {40x1 cell}
+        .targets
+          [ 1
+            2
+            3
+            :
+            2
+            3
+            4 ]@40x1
+        .chunks
+          [  1
+             1
+             1
+             :
+            10
+            10
+            10 ]@40x1
 
 
 ``.fa``,
 
     .. code-block:: matlab
 
+        .i
+          [ 44        42        43  ...  43        40        41 ]@1x298
+        .j
+          [ 15        15        15  ...  16        19        19 ]@1x298
+        .k
+          [ 3         4         4  ...  13        13        13 ]@1x298
 
-            i: [1x43822 double]
-            j: [1x43822 double]
-            k: [1x43822 double]
 
-
-and ``.a``.
+and ``.a``:
 
     .. code-block:: matlab
 
-
-            dim: [1x1 struct]
-            hdr_nii: [1x1 struct]
+        .fdim
+          .labels
+            { 'i'  'j'  'k' }
+          .values
+            { [ 1         2         3  ...  78        79        80 ]@1x80  [ 1         2         3  ...  78        79        80 ]@1x80  [ 1         2         3  ...  41        42        43 ]@1x43 }
+        .vol
+          .mat
+            [ 3         0         0      -122
+              0         3         0      -114
+              0         0         3     -11.1
+              0         0         0         1 ]
+          .dim
+            [ 80        80        43 ]
 
 
 In this case there are M=40 samples and N=43822 features (voxels). Note that the sample attributes have M values in the first dimension, and feature attributes have N values in the second dimension. The information in the ``.fa`` and ``.a`` fields is used when the dataset is back to a volumetric dataset in :ref:`cosmo_map2fmri`.
