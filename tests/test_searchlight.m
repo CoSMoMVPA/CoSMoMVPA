@@ -29,4 +29,5 @@ function test_searchlight_
     m=cosmo_searchlight(ds, measure,'nbrhood',nbrhood,...
                             'center_ids',[100 201],'progress',0);
 
-    assertVectorsAlmostEqual(m.samples,[0.0014 0.0204],'relative',.001);
+    assertVectorsAlmostEqual(m.samples, [0.0075    0.1088]...
+                                        ,'relative',.001);
