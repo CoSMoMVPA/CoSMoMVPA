@@ -6,10 +6,14 @@
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
+% Set the filename to the glm_T_stats_perrun NIFTI file
 % >@@>
 fn=fullfile(data_path,'glm_T_stats_perrun.nii');
-ds = cosmo_fmri_dataset(fn);
+% <@@<
 
+% >@@>
+% Load data using cosmo_fmri_dataset
+ds = cosmo_fmri_dataset(fn);
 % <@@<
 
 % set ds.sa.targets (trial conditions) to the 60x1 column vector:

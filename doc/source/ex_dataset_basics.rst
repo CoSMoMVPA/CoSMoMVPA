@@ -39,7 +39,7 @@ Before starting this exercise, please make sure you have read about:
 - :ref:`cosmomvpa_chunks`
 
 Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
-(``glm_T_stats_allruns.nii``).
+(``glm_T_stats_perrun.nii``).
 
 - Set the ``.sa.targets``, ``.sa.chunks`` and ``.sa.labels``:
 
