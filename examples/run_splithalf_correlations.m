@@ -82,7 +82,7 @@ for iRoi = 1:nrois
         % >@@>
         imagesc(z);
         colorbar()
-        title(subject_id)
+        title([subject_id ' ' rois{iRoi}]);
         % <@@<
 
         % define in a variable 'contrast_matrix' how correlations values
@@ -151,8 +151,10 @@ for iRoi = 1:nrois
 
 end
 
-%advanced exercise: plot an image of the correlation matrix averaged over
-%participants (one for each roi)
+%% advanced exercise
+
+% plot an image of the correlation matrix averaged over
+% participants (one for each roi)
 
 % allocate space for axis handles, so that later all plots can be set to
 % have the same color limits
