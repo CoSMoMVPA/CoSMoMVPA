@@ -2,7 +2,7 @@
 % Load datasets using cosmo_fmri_dataset
 %
 % This function loads data stored in a nifti file and return a dataset struct
-% where the data are store in the 2-D array in field dataset.samples
+% where the data are stored in the 2-D array in field dataset.samples
 %
 % For each of the three masks ('brain','ev','vt'),
 % print the number of voxels when loading the dataset with that mask.
@@ -30,22 +30,23 @@ data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 % Let's start with the simple approach
 % >@@>
 mask_fn = fullfile(data_path, 'brain_mask.nii');
-data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
-ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
-[~, nfeatures] = size(ds.samples);
+ds=cosmo_fmri_dataset(mask_fn);
+nfeatures=sum(ds.samples>0);
+
 fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
 % <@@<
 
 % Now do the same with the EV and VT masks.
 % >@@>
 mask_fn = fullfile(data_path, 'vt_mask.nii');
-ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
-[~, nfeatures] = size(ds.samples);
+ds=cosmo_fmri_dataset(mask_fn);
+nfeatures=sum(ds.samples>0);
+
 fprintf('There are %d voxels in the ventral-temporal mask\n', nfeatures);
 
 mask_fn = fullfile(data_path, 'ev_mask.nii');
-ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
-[nsamples, nfeatures] = size(ds.samples);
+ds=cosmo_fmri_dataset(mask_fn);
+nfeatures=sum(ds.samples>0);
 fprintf('There are %d voxels in the early-visual brain mask\n', nfeatures);
 
 % <@@<
@@ -58,8 +59,9 @@ data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
 
 for iMask=1:numel(maskNames)
     % >@@>
-    ds=cosmo_fmri_dataset(data_fn, 'mask', fullfile(data_path, maskNames{iMask}));
-    [~, nfeatures] = size(ds.samples);
+    mask_fn=fullfile(data_path, maskNames{iMask});
+    ds=cosmo_fmri_dataset(mask_fn);
+    nfeatures=sum(ds.samples>0);
     fprintf('There are %6d voxels in the mask ''%s''\n', nfeatures, maskNames{iMask});
     % <@@<
 end
