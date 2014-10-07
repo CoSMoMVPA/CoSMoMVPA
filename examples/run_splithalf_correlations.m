@@ -94,8 +94,9 @@ for iRoi = 1:nrois
         % sanity check; in this example there are 6 conditions
         assert(nclasses==6);
 
-        % set contrast matrix
-        contrast_matrix=(eye(nclasses)-1/nclasses)/nclasses;
+        % set contrast matrix. It has a mean of zero, the diagonal elements
+        % sum to 1, and the non-diagonal element sum to -1
+        contrast_matrix=(eye(nclasses)-1/nclasses)/(nclasses-1);
 
         if abs(mean(contrast_matrix(:)))>1e-14
             error('illegal contrast matrix');
