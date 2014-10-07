@@ -25,7 +25,7 @@ Using :ref:`cosmo_fmri_dataset`, load the t stats for 'odd' and 'even' runs for 
 
 Using :ref:`cosmo_spherical_neighborhood`, define a spherical neighborhood with a radius of 3 voxels for each feature (voxel) in ``ds``. Show a histogram of the number of features (voxels) in each element in the neighborhood.
 
-Then, using  :ref:`cosmo_correlation_measure` and the `:ref:cosmo_searchlight` function, compute a whole-brain information map, visualize the result using :ref:`cosmo_slice`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`. The NIFTI file can be visualized with any fMRI analysis package; one simple program is MRIcron_.
+Then, using  :ref:`cosmo_correlation_measure` and the :ref:`cosmo_searchlight` function, compute a whole-brain information map, visualize the result using :ref:`cosmo_slice`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`. The NIFTI file can be visualized with any fMRI analysis package; one simple program is MRIcron_.
 
 Hint: :ref:`run_splithalf_correlations_searchlight_skl`
 
@@ -38,7 +38,7 @@ Load the dataset with subject ``s01``'s t-statistic for every run (``glm_T_stats
 
 Using :ref:`cosmo_spherical_neighborhood`, define a spherical neighborhood with at least 100 voxels for each feature (voxel) in ``ds``.
 
-Use :ref:`cosmo_oddeven_partitioner` to define a cross-validation scheme, and use :ref:`cosmo_crossvalidation_measure` and the `:ref:cosmo_searchlight` function to compute a whole-brain information map with classification accuracies, visualize the result using :ref:`cosmo_slice`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`.
+Use :ref:`cosmo_oddeven_partitioner` to define a cross-validation scheme, and use :ref:`cosmo_crossvalidation_measure` and the :ref:`cosmo_searchlight` function to compute a whole-brain information map with classification accuracies, visualize the result using :ref:`cosmo_slice`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`.
 
 Hint: :ref:`run_crossvalidation_searchlight_skl`
 
