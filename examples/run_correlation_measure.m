@@ -1,6 +1,13 @@
 %% Exercise with cosmo_correlation_measure
+% Split-half correlation analysis using cosmo_correlation_measure
+
 
 %% Single subject analysis over all categories in VT
+
+% Set the data path
+config=cosmo_config();
+study_path=fullfile(config.tutorial_data_path,'ak6');
+
 subject_id='s01';
 mask_label='vt_mask';
 data_path=fullfile(study_path,subject_id); % data from subject s01
