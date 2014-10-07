@@ -42,7 +42,7 @@ Classification performance can be assessed by considering how many predictions f
 
 A single classification step can be visualized as follows (more advanced cross-validation is part of :ref:`another exercise <ex_nfold_crossvalidation>`):
 
-.. figure:: _static/splithalf_correlation.png
+.. figure:: _static/single_classification.png
 
     *Illustration of (single-fold) classification*. A dataset (left) is split in a train dataset (top dataset) and a test set (bottom dataset), which must have no chunks in common. For training, a classifier (indicated by *f*) takes ``.samples`` and ``.sa.targets`` from the train dataset (horizontal arrow into *f*) and predicts, for the ``.samples`` in the test set (horizontal arrow into *f*), the targets of the test set (U-turn arrow). Classification accuracy can be assessed by computing how many samples in the test set were predicted correctly.
 
