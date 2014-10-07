@@ -31,7 +31,7 @@ ds_even=cosmo_fmri_dataset(data_even_fn,'mask',mask_fn,...
 ds_odd_even=cosmo_stack({ds_odd, ds_even});
 % <@@<
 
-% remove constant features
+% remove constant features (due to liberal masking)
 ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
 % print dataset
@@ -41,7 +41,8 @@ cosmo_disp(ds_odd_even);
 % Part 1: compute correlation difference
 % Hint: - apply cosmo_correlation_measure to ds_odd_even
 %       - because correlation difference and split-half correlations
-%         are the defaults, no optional arguments are required
+%         are the defaults, no second argument (options) is required
+%         for cosmo_correlation_measure.
 % >@@>
 ds_corr=cosmo_correlation_measure(ds_odd_even);
 % <@@<
@@ -64,12 +65,14 @@ c_raw=cosmo_correlation_measure(ds_odd_even,args);
 fprintf('\nDataset output (Fisher-transformed correlations):\n');
 cosmo_disp(c_raw)
 
-% The data can be put in matrix form using cosmo_unflatten
+% Because a measure returns .samples as a column vector, the
+% confusion matrix is returned in a flattened form.
+% The data can be put back in matrix form using cosmo_unflatten.
 matrices=cosmo_unflatten(c_raw,1);
 imagesc(matrices);
 colorbar();
 
-%% Group analysis over all categories in VT
+%% Group analysis over all categories in VT using correlation measure
 
 % Compute correlation measure for each subject individually.
 subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};
@@ -77,7 +80,8 @@ nsubjects=numel(subject_ids);
 
 mask_label='vt_mask';
 
-ds_corrs=cell(nsubjects,1); % allocate space for output
+% allocate a cell for the output of the measure for each subject
+ds_corrs=cell(nsubjects,1);
 
 % Apply correlation measure for each subject using
 % cosmo_correlation_measure.
@@ -87,13 +91,9 @@ ds_corrs=cell(nsubjects,1); % allocate space for output
 %   * .sa.chunks : the subject number
 %   * .sa.targets: 1 (for each subject)
 % - store the result of the k-th subject in ds_corrs{k}
-%
+
 for subject_num=1:nsubjects
     subject_id=subject_ids{subject_num};
-
-    % apply correlation measure for this subject, and store
-    % the result in 'ds_corr'
-    % >@@>
 
     % set path for this subject
     data_path=fullfile(study_path,subject_id);
@@ -116,20 +116,27 @@ for subject_num=1:nsubjects
     % remove constant features (due to liberal masking)
     ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
-    % apply cosmo_correlation_measure
+    % apply correlation measure for this subject, and store
+    % the result in 'ds_corr'
+    % >@@>
     ds_corr=cosmo_correlation_measure(ds_odd_even);
-
     % <@@<
     % set targets and chunks for the output, so that cosmo_stat can be used
     % below
     ds_corr.sa.targets=1;
     ds_corr.sa.chunks=subject_num;
 
+    % store result in ds_corr at the 'subject_num'-th position
+    % >@@>
     ds_corrs{subject_num}=ds_corr;
+    % <@@<
 end
 
-% combine the data from all subjects
+% combine the data from all subjects (in 'ds_corrs') into one dataset
+% using cosmo_stack, and assign the result to a variable 'ds_all'
+% >@@>
 ds_all=cosmo_stack(ds_corrs);
+% <@@<
 
 %% Compute group-level statistics
 
