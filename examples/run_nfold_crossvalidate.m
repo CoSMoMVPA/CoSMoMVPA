@@ -37,7 +37,7 @@ all_pred=zeros(nsamples,1);
 % required for the remainder of this exercise.
 assert(isequal(ds.sa.chunks,floor(((1:60)-1)/6)'+1));
 
-nfolds=numel(unq_folds); % should be 10
+nfolds=numel(unique(ds.sa.chunks)); % should be 10
 
 % run n-fold cross-validation
 % in the k-th fold (k ranges from 1 to 10), test the LDA classifier on
