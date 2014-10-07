@@ -34,6 +34,43 @@ where:
         + it should not have fields ``.fa``.
         + usually it has no field ``.a`` (except for some complicated cases where it can have an ``.a.sdim`` field, if the measure returns data in a dimensional format).
 
+Function handles
+++++++++++++++++
+For measures in generally (and in other parts of CoSMoMVPA_), *function handles* are used. These are references to functions, and can be assigned to a variable, and then the function can be called by using the name of the variable.
+
+For example,
+
+    .. code-block:: matlab
+
+        do_magic = @sin;
+
+means that
+
+    .. code-block:: matlab
+
+        y=do_magic(x)
+
+is equivalent to
+
+    .. code-block:: matlab
+
+        y=sin(x)
+
+When using this for measures,
+
+    .. code-block:: matlab
+
+        measure=@cosmo_crossvalidation_measure;
+
+allows using different measures (i.e. functions) by just changing one line of code, for example to
+
+    .. code-block:: matlab
+
+        measure=@my_funky_new_measuer_no_one_knows;
+
+which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measures` but also for searchlight analyses described :ref:`later <ex_searchlight_measure>`.
+
+
 Split-half correlations using a measure
 +++++++++++++++++++++++++++++++++++++++
 As a first exercise, load two datasets using subject ``s01``'s T-statistics for odd and even runs
