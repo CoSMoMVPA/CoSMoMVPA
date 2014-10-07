@@ -15,7 +15,7 @@ Previous exercises discussed how to compute both split-half correlations (:ref:`
         + for split-half correlations, these could be how to normalize the correlations (the default is a Fisher-transform using the ``atanh`` function)
         + for cross-validation, these are the partitioning scheme for cross-validation (e.g. odd-even or n-fold) and the classifier (e.g. LDA, SVM, or Naive Bayes) to use.
 
-This pattern is captured by the CoSMoMVPA dataset *measure* concept. An important reason for using measures is that it allows for a flexible implementation of *searchlights*, which involve the repeated application of the same measure to subsets of features.
+This pattern is captured by the CoSMoMVPA dataset *measure* concept. An important reason for using measures is that it allows for a flexible implementation of :ref:`searchlights <searchlight>`, which involve the repeated application of the same measure to subsets of features.
 
 The measure concept
 +++++++++++++++++++
@@ -68,8 +68,9 @@ allows using different measures (i.e. functions) by just changing one line of co
 
         measure=@my_funky_new_measuer_no_one_knows;
 
-which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measures` but also for searchlight analyses described :ref:`later <ex_searchlight_measure>`.
+which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measures>` but also for searchlight analyses described :ref:`later <ex_searchlight_measure>`.
 
+For more information about function handles, run in Matlab: ``help function_handle``
 
 Split-half correlations using a measure
 +++++++++++++++++++++++++++++++++++++++
@@ -101,13 +102,5 @@ Template: :ref:`run_crossvalidation_measure_skl`
 
 Check your answers here: :ref:`run_crossvalidation_measure` / :pb:`crossvalidation_measure`
 
-
-
-
-
-
-
-
-
-
+.. include:: links.txt
 

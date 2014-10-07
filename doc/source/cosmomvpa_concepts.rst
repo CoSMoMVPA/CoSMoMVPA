@@ -282,6 +282,8 @@ Examples of measures include:
 
 .. _`cosmomvpa_neighborhood`:
 
+.. _`searchlight`:
+
 Neighborhood
 ^^^^^^^^^^^^
 The tradional (volume-based fMRI) searchlight was introduced by Kriegskorte et al (2006) as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.

@@ -16,7 +16,7 @@ In this exercise we integrate concepts and techniques described during previous 
 
     - the generic :ref:`neighborhood <cosmomvpa_neighborhood>` concept (:ref:`exercise <ex_roi_neighborhood>`).
 
-to compute a whole brain *information map* that indicates where in the brain, locally, regions contain information about the conditions of interest (``.sa.targets``).
+to compute a whole brain *information map* using a :ref:`searchlight` that indicates where in the brain, locally, regions contain information about the conditions of interest (``.sa.targets``).
 
 Part 1
 ++++++
