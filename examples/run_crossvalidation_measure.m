@@ -1,6 +1,8 @@
 %% Cross validation measure example
-% This example runs cross validation using a classifer and shows
-% the confusion matrices using multiple classifiers
+% This example runs cross validation with the
+% cosmo_crossvalidation_measure function, using a classifier with n-fold
+% crossvalidation.
+% It shows the confusion matrices using multiple classifiers
 
 %% Define data
 config=cosmo_config();
@@ -16,8 +18,11 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
 ds=cosmo_remove_useless_data(ds);
 %% Part 1: Use single classifier
 
-% Use a function handle to the cosmo_crossvalidation_measure,
-% and assign to the variable 'measure'
+% Assign a function handle to the cosmo_crossvalidation_measure
+% function to the variable 'measure'
+% Hint: a function handle is a reference to a function. A function
+%       handle to the function named 'foo' is expressed by: @foo
+%       For more information, run: help function_handle
 % >@@>
 measure=@cosmo_crossvalidation_measure;
 % <@@<
@@ -39,38 +44,82 @@ cosmo_disp(measure,'strlen',Inf); % avoid string truncation
 fprintf('\nUsing the following measure arguments:\n');
 cosmo_disp(args);
 
-% Apply the measure to ds, with args as second argument
+% Apply the measure to ds, with args as second argument. Assign the result
+% to the variable 'ds_accuracy'.
 % >@@>
 ds_accuracy=measure(ds,args);
-fprintf('\nOutput dataset (with accuracy)\n');
+% <@@<
+
+% Show the result
+fprintf('\nOutput dataset (with classification accuracy)\n');
+% Show the contents of 'ds_accuracy' using 'cosmo_disp'
+% >@@>
 cosmo_disp(ds_accuracy);
 % <@@<
 
 %% %% Part 2: Compare multiple classifiers
 
-% Put function handles to cosmo_classify_nn, cosmo_classify_naive_bayes and
-% cosmo_classify_lda in a cell, and assign to 'classifiers'
+% This exercise shows how multiple classifiers can be run on the same
+% data.
+
+% As a cell can contain data of any type, it also supports storage of
+% function handles. The syntax is the same as for other types; to put
+% handles to the functions named 'foo','bar' and 'baz' in a cell,
+% use {@foo, @bar, @baz}
+%
+% For this exercise, put function handles to cosmo_classify_nn,
+% cosmo_classify_naive_bayes and cosmo_classify_lda in a cell,
+% and assign the result to a variable
+% named 'classifiers'
+% (if the SVM classifier is present, it can also be put in this cell)
 % >@@>
 classifiers={@cosmo_classify_nn,...
              @cosmo_classify_naive_bayes,...
              @cosmo_classify_lda};
 
 % if svm classifier is present (either libsvm or matlab's svm), use that
-% too
+% too. The solution presented here is system-independent because it is
+% checked first that an svm classifier is present
 if cosmo_check_external('svm',false)
     classifiers{end+1}=@cosmo_classify_svm;
 end
 % <@@<
-nclassifiers=numel(classifiers);
 
-% set output of crossvalidation to predictions
+% Print which classifiers are used
+nclassifiers=numel(classifiers);
+classifier_names=cellfun(@func2str,classifiers,'UniformOutput',false);
+fprintf('\n\nUsing %d classifiers: %s\n', nclassifiers, ...
+            cosmo_strjoin(classifier_names, ', '));
+
+% Set the measure (again) to a function handle to
+% cosmo_crossvalidation_measure, and assign the result to a variable named
+% 'measure'
+% >@@>
+measure=@cosmo_crossvalidation_measure;
+% <@@<
+
+% Make a struct containing the arguments for the measure:
+% - partitions: the output of cosmo_nfold_partitioner applied to the
+% - output:     set to 'predictions' to get the predictions from the
+%               classifier
+%               (without the 'output' field the output defaults to
+%               classification accuracy)
+% (Below, in the for-loop, the field 'classifier' is set for each function
+%  handle in the cell 'classifiers')
+
+% >@@>
+args=struct();
+args.partitions=cosmo_nfold_partitioner(ds);
 args.output='predictions';
+% <@@<
 
 %% Run classifications
 % Compute the accuracy and predictions for each classifier, and plot the
 % confusion matrix
 for k=1:nclassifiers
-    % assign args.classifier to the k-th classifier
+    % Set the classifier function here:
+    % assign args.classifier to the k-th classifier in the cell
+    % 'classifiers'
     % >@@>
     args.classifier=classifiers{k};
     % <@@<
@@ -85,19 +134,22 @@ for k=1:nclassifiers
     confusion_matrix=cosmo_confusion_matrix(predicted_ds);
     % <@@<
 
-    % compute accuracy
+    % compute accuracy, and store the result in a variable called
+    % 'accuracy'
     % >@@>
     sum_diag=sum(diag(confusion_matrix));
     sum_total=sum(confusion_matrix(:));
     accuracy=sum_diag/sum_total;
     % <@@<
 
-    % visualize confusion matrix
+    % visualize confusion matrix and show classification accuracy in the
+    % title
     figure();
     imagesc(confusion_matrix,[0 10])
-    classifier_name=strrep(func2str(args.classifier),'_',' ');
+    classifier_name=strrep(classifier_names{k},'_',' '); % no underscores
     desc=sprintf('%s: accuracy %.1f%%', classifier_name, accuracy*100);
     title(desc)
+
 
     classes = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
     set(gca,'XTickLabel',classes);
@@ -105,6 +157,9 @@ for k=1:nclassifiers
     ylabel('target');
     xlabel('predicted');
     colorbar
+
+    % print classificationa accuracy in terminal window
+    fprintf('%s\n',desc);
 end
 
 % Note: poor performance by some classifiers does not mean that they are
