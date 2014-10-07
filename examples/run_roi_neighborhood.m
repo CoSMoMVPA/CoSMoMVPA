@@ -1,8 +1,7 @@
-%% Cross validation measure example
-% This example runs cross validation with the
-% cosmo_crossvalidation_measure function, using a classifier with n-fold
-% crossvalidation.
-% It shows the confusion matrices using multiple classifiers
+%% ROI neighborhood example
+%
+% This example shows how to define and use neighborhoods, and shows
+% how they can be used with the cosmo_searchlight function
 
 %% Load data (without mask)
 config=cosmo_config();
@@ -200,6 +199,14 @@ cosmo_disp(full_output_alt2);
 % As in Part 2, set the options for the searchlight in a struct 'opt'
 % Because the cosmo_correlation_measure returns correlation differences by
 % default, no 'args' field is required
+%
+% Note: this dataset has 10 chunks. The correlation measure will,
+% by default, *not* do a 'simple' odd-even partitioning, but instead will
+% use all possible splits of the 10 chunks in two groups of 5, yielding
+% nchoosek(10,5) = 10! / (5!*5!) = 252 splits. Correlation diffences are
+% computed for each split and then averaged.
+% (to override this, you can specify a 'partitions' argument with, for
+% example, the output of cosmo_oddeven_partitioner(ds,'half') ).
 % >@@>
 opt=struct();
 opt.nbrhood=nbrhood;
