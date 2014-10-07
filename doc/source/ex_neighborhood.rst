@@ -26,7 +26,10 @@ As a preparation for a whole-brain spherical searchlight, this exercise will mak
 
 Part 1 requires the *manual* application of a measure to features indexed by the neighborhood; Parts 2, 3 and 4 show how a :ref:`cosmo_searchlight` can be used to achieve the same.
 
-Note: this exercise requires familiarity with the :ref:`measure <cosmomvpa_measure>` concept (:ref:`exercise <ex_measures>`).
+Notes:
+
+    - this exercise requires familiarity with the :ref:`measure <cosmomvpa_measure>` concept (:ref:`exercise <ex_measures>`).
+    - understanding the concept of a neighborhood is important for another exercise about whole-brain searchlights.
 
 Part 1
 ######
