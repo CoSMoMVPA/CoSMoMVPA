@@ -61,8 +61,9 @@ cosmo_disp(ds_odd_birds);
 
 % train on even, test on odd
 
-% Use cosmo_classify_lda to get predicted labels for the odd runs when
-% training on the even runs.
+% Use cosmo_classify_lda to get predicted targets for the odd runs when
+% training on the even runs, and assign these predictions to
+% a variable 'test_pred'.
 % (hint: use .samples and .sa.targets from both ds_even_birds and
 %        ds_odd_birds)
 % >@@>
@@ -73,17 +74,16 @@ test_samples=ds_odd_birds.samples;
 test_pred=cosmo_classify_lda(train_samples,train_targets,...
                                     test_samples);
 
+% Assign the real tagets of the odd runs to a variable 'test_targets'
 test_targets=ds_odd_birds.sa.targets;
 % <@@<
 
 % show real and predicted labels
-% >@@>
 fprintf('\ntarget predicted\n');
 disp([test_targets test_pred])
-% <@@<
 
 % compare the predicted labels for the odd
-% runs with the actual data to compute the accuracy. Store the accuracy
+% runs with the actual targets to compute the accuracy. Store the accuracy
 % in a variable 'accuracy'.
 % >@@>
 accuracy = mean(test_pred==test_targets);
@@ -94,11 +94,11 @@ fprintf('\nLDA birds even-odd: accuracy %.3f\n', accuracy);
 % compare with naive bayes classification
 % (hint: do classification as above, but use cosmo_classify_naive_bayes)
 % >@@>
-test_pred=cosmo_classify_naive_bayes(train_samples,train_targets,...
+test_pred_nb=cosmo_classify_naive_bayes(train_samples,train_targets,...
                                      test_samples);
 
 test_targets=ds_odd_birds.sa.targets;
-accuracy = mean(test_pred==test_targets);
+accuracy = mean(test_pred_nb==test_targets);
 % <@@<
 fprintf('\nNaive Bayes birds even-odd: accuracy %.3f\n', accuracy);
 % Answer: accuracy should be 0.6
@@ -107,7 +107,10 @@ fprintf('\nNaive Bayes birds even-odd: accuracy %.3f\n', accuracy);
 %% Part 2: all categories; train/test on even/odd runs and vice versa
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% train on even, test on odd
+% This is as above, but without slicing to get the samples with bird
+% species. In other words, just use 'ds_even' and 'ds_odd'
+%
+% First, train on even, test on odd
 % >@@>
 train_samples=ds_even.samples;
 train_targets=ds_even.sa.targets;
@@ -121,7 +124,7 @@ accuracy = mean(test_pred==test_targets);
 fprintf('\nLDA all categories even-odd: accuracy %.3f\n', accuracy);
 % Answer: accuracy should be 0.767
 
-% train on odd, test on even
+% Now train on odd, test on even
 % >@@>
 train_samples=ds_odd.samples;
 train_targets=ds_odd.sa.targets;
