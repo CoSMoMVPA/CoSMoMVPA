@@ -12,9 +12,8 @@ ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
                         'targets',repmat(1:6,1,10),...
                         'chunks',floor(((1:60)-1)/6)+1);
 
-% remove constant features
+% remove constant features (due to liberal masking)
 ds=cosmo_remove_useless_data(ds);
-
 %% Part 1: Use single classifier
 
 % Use a function handle to the cosmo_crossvalidation_measure,
@@ -27,6 +26,7 @@ measure=@cosmo_crossvalidation_measure;
 % - classifier: a function handle to cosmo_classify_lda
 % - partitions: the output of cosmo_nfold_partitioner applied to the
 %               dataset
+% Assign the struct to the variable 'args'
 % >@@>
 args=struct();
 args.classifier=@cosmo_classify_lda;
@@ -34,10 +34,10 @@ args.partitions=cosmo_nfold_partitioner(ds);
 % <@@<
 
 fprintf('Using the following measure:\n');
-cosmo_disp(measure);
+cosmo_disp(measure,'strlen',Inf); % avoid string truncation
 
 fprintf('\nUsing the following measure arguments:\n');
-cosmo_disp(measure);
+cosmo_disp(args);
 
 % Apply the measure to ds, with args as second argument
 % >@@>
