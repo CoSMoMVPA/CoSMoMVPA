@@ -94,7 +94,7 @@ title(subject_id)
 % the weighted correlations would indicate more similar patterns for
 % patterns in the same condition (across the two halves) than in different
 % conditions.
-contrast_matrix=(eye(nClasses)-1/nClasses)/nClasses;
+contrast_matrix=(eye(nClasses)-1/nClasses)/(nClasses-1);
 
 % sanity check: ensure the matrix has a sum of zero
 if abs(sum(contrast_matrix(:)))>1e-14
