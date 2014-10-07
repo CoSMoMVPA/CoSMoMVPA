@@ -1,4 +1,4 @@
-.. ex_searchlight_measure
+.. _`ex_searchlight_measure`:
 
 Use the searchlight with a neighborhood and a measure
 =====================================================
