@@ -15,7 +15,7 @@ Previous exercises discussed how to compute both split-half correlations (:ref:`
         + for split-half correlations, these could be how to normalize the correlations (the default is a Fisher-transform using the ``atanh`` function)
         + for cross-validation, these are the partitioning scheme for cross-validation (e.g. odd-even or n-fold) and the classifier (e.g. LDA, SVM, or Naive Bayes) to use.
 
-This pattern is captured by the CoSMoMVPA dataset *measure* concept. An important reason for using measures is that it allows for a flexible implementation of :ref:`searchlights <searchlight>`, which involve the repeated application of the same measure to subsets of features.
+This pattern is captured by the CoSMoMVPA dataset :ref:`measure <cosmomvpa_measure>` concept. An important reason for using measures is that it allows for a flexible implementation of :ref:`searchlights <searchlight>`, which involve the repeated application of the same measure to subsets of features.
 
 The measure concept
 +++++++++++++++++++
