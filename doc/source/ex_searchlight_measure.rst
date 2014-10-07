@@ -3,7 +3,7 @@
 Use the searchlight with a neighborhood and a measure
 =====================================================
 
-'I like it when a plan comes together'
+'I love it when a plan comes together'
 ++++++++++++++++++++++++++++++++++++++
 
 In this exercise we integrate concepts and techniques described during previous exercises:
