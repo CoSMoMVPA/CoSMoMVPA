@@ -4,11 +4,18 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 % predicted=cosmo_classify_lda(samples_train, targets_train, samples_test[,opt])
 %
 % Inputs:
-%   samples_train      PxR training data for P samples and R features
-%   targets_train      Px1 training data classes
-%   samples_test       QxR test data
-%   opt                Optional struct with optional field:
-%    .regularization   Used to regularize covariance matrix. Default .01
+%   samples_train       PxR training data for P samples and R features
+%   targets_train       Px1 training data classes
+%   samples_test        QxR test data
+%   opt                 Optional struct with optional field:
+%    .regularization    Used to regularize covariance matrix. Default .01
+%    .max_feature_count Used to set the maximum number of features,
+%                       defaults to 5000. If R is larger than this
+%                       value, an error is raised. This is a (conservative)
+%                       safety limit to avoid huge memory consumption
+%                       for large values of R, because training the
+%                       classifier typically requires in the order of 8*R^2
+%                       bytes of memory
 %
 % Output:
 %   predicted          Qx1 predicted data classes for samples_test
@@ -27,16 +34,19 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 %     >      4     4
 %     >      5     5
 %
-% Note:
+% Notes:
 % - this classifier does not support a prior, that is it assumes that all
 %   classes have the same number of samples. If that is not the case an
 %   error is thrown.
+% - a safety limit of
 %
 % Joern Diedrichsen, Tobias Wiestler, NNO Nov 2008; NNO updated Aug 2013
 
-    if nargin<4 || isempty(opt) || ~isfield(opt, 'regularization')
-        opt.regularization=.01;
+    if nargin<4 || isempty(opt)
+        opt=struct();
     end
+    if ~isfield(opt, 'regularization'), opt.regularization=.01; end
+    if ~isfield(opt, 'max_feature_count'), opt.max_feature_count=5000; end
 
     persistent cached_targets_train;
     persistent cached_samples_train;
@@ -62,7 +72,34 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
         ntrain_=numel(targets_train);
 
         if ntrain_~=ntrain
-            error('size mismatch');
+            error(['size mismatch: samples_train has %d rows, '...
+                    'targets_train has %d values'],ntrain,ntrain_);
+        end
+
+        if nfeatures>opt.max_feature_count
+            % compute size requirements for numbers.
+            % tyically this is 8 bytes per number, unless single precision
+            % is used.
+            w=whos('samples_train');
+            size_per_number=w.bytes/numel(samples_train);
+
+            % the covariance matrix is nfeatures x nfeatures
+            mem_required=nfeatures^2*size_per_number;
+            mem_required_mb=round(mem_required)/1e6; % in megabytes
+
+            error(['A large number of features (%d) was found, '...
+                    'exceeding the safety limit max_feature_count=%d '...
+                    'for the %s function.\n'...
+                    'This limit is imposed because computing the '...
+                    'covariance matrix will require in the order of '...
+                    '%.0f MB of memory, and inverting it may take '...
+                    'a long time.\n'...
+                    'The safety limit can be changed by setting '...
+                    'the ''max_feature_count'' option to another '...
+                    'value, but large values ***may freeze or crash '...
+                    'the machine***.'],...
+                    nfeatures,opt.max_feature_count,...
+                    mfilename(),mem_required_mb);
         end
 
         classes=unique(targets_train);
@@ -86,7 +123,9 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
                 nfirst=n; % keep track of number of samples
             elseif nfirst~=n
                 error(['Different number of classes (%d and %d) - this is '...
-                        'not supported'], n, nfirst);
+                        'not supported. When using partitions, '...
+                        'consider using cosmo_balance_partitions'], ...
+                         n, nfirst);
             end
 
             class_samples=samples_train(msk,:);
@@ -116,7 +155,8 @@ function predicted=test(model, samples_test)
     classes=model.classes;
 
     if size(samples_test,2)~=size(class_weight,2)
-        error('size mismatch');
+        error('test set has %d features, train set has %d',...
+                size(class_weight,2),size(samples_test,2));
     end
 
     class_proj=bsxfun(@plus,-.5*class_offset,class_weight*samples_test');
