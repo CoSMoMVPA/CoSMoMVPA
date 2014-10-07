@@ -48,6 +48,9 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
     if ~isfield(opt, 'regularization'), opt.regularization=.01; end
     if ~isfield(opt, 'max_feature_count'), opt.max_feature_count=5000; end
 
+    % support repeated testing on different data after training every time
+    % on the same data. This is achieved by caching the training data
+    % and associated model
     persistent cached_targets_train;
     persistent cached_samples_train;
     persistent cached_opt;
@@ -56,18 +59,28 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
     if isequal(cached_targets_train, targets_train) && ...
             isequal(cached_opt, opt) && ...
             isequal(cached_samples_train, samples_train)
+        % use cache
         model=cached_model;
     else
+        % train classifier
         model=train(samples_train, targets_train, opt);
+
+        % store model
         cached_targets_train=targets_train;
         cached_samples_train=samples_train;
         cached_opt=opt;
         cached_model=model;
     end
 
+    % test classifier
     predicted=test(model, samples_test);
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % helper functions
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     function model=train(samples_train, targets_train, opt)
+        % train LDA classifier
+
         [ntrain, nfeatures]=size(samples_train);
         ntrain_=numel(targets_train);
 
@@ -150,6 +163,8 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
         model.classes=classes;
 
 function predicted=test(model, samples_test)
+    % test LDA classifier
+
     class_offset=model.class_offset;
     class_weight=model.class_weight;
     classes=model.classes;
