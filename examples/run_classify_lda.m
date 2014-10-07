@@ -39,9 +39,10 @@ ds_odd = cosmo_slice(ds,odd_msk);
 categories={'mallard','warbler'};
 
 % select samples where .sa.labels match on of the categories
-% for the even and odd runs seperately. Store the result in ds_even_mm and
-% ds_odd_mm
-% (use cosmo_match to define a mask, then cosmo_slice to select the data)
+% for the even and odd runs seperately. Store the result in ds_even_birds
+% and ds_odd_birds
+% (use cosmo_match with .sa.labels and categories to to define a mask,
+% then cosmo_slice to select the data)
 % >@@>
 msk_even_birds=cosmo_match(ds_even.sa.labels,categories);
 ds_even_birds=cosmo_slice(ds_even,msk_even_birds);
@@ -62,7 +63,8 @@ cosmo_disp(ds_odd_birds);
 
 % Use cosmo_classify_lda to get predicted labels for the odd runs when
 % training on the even runs.
-% (hint: use .samples and .sa.targets from both ds_even_mm and ds_odd_mm)
+% (hint: use .samples and .sa.targets from both ds_even_birds and
+%        ds_odd_birds)
 % >@@>
 train_samples=ds_even_birds.samples;
 train_targets=ds_even_birds.sa.targets;
