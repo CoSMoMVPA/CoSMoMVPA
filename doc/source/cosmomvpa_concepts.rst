@@ -282,9 +282,13 @@ Examples of measures include:
 
 .. _`cosmomvpa_neighborhood`:
 
+.. _`searchlight`:
+
 Neighborhood
 ^^^^^^^^^^^^
-A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses (:ref:`cosmo_searchlight`), where the concept of a traditional fMRI volumetric searchlight is generalized to other types of datasets as well. For example:
+The tradional (volume-based fMRI) searchlight was introduced by Kriegskorte et al (2006) as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.
+
+CoSMoMVPA_ overloads the *searchlight* concept through a more versatile *neighborhood* concept. A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses (:ref:`cosmo_searchlight`), where the concept of a traditional fMRI volumetric searchlight is generalized to other types of datasets as well. For example:
 
     - for a traditional volume-based fMRI searchlight, the features in the source and target domain are the same, and consist of the voxels.
     - for a surface-based fMRI searchlight, the features in the source domain are the voxels in the volume, whereas the features in the target domain are the nodes on the surface.

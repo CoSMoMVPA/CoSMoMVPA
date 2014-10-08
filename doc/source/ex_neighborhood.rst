@@ -1,7 +1,7 @@
 .. _`ex_roi_neighborhood`:
 
-Using CoSMoMVPA *neighborhoods*
-===============================
+Using CoSMoMVPA *neighborhoods* for regions of interest
+=======================================================
 
 Rationale
 +++++++++
@@ -26,14 +26,16 @@ As a preparation for a whole-brain spherical searchlight, this exercise will mak
 
 Part 1 requires the *manual* application of a measure to features indexed by the neighborhood; Parts 2, 3 and 4 show how a :ref:`cosmo_searchlight` can be used to achieve the same.
 
-Note: this exercise requires familiarity with the :ref:`measure <cosmomvpa_measure>` concept (:ref:`exercise <ex_measures>`).
+Notes:
+
+    - this exercise requires familiarity with the :ref:`measure <cosmomvpa_measure>` concept (:ref:`exercise <ex_measures>`).
+    - understanding the concept of a neighborhood is important for :ref:`another exercise <ex_searchlight_measure>` about whole-brain :ref:`searchlights <searchlight>`.
 
 Part 1
 ######
 
 Load the dataset with subject ``s01``'s t-statistic for every run (``glm_T_stats_perrun.nii``), but do not apply a mask.
-Then load each of the two masks (``vt``, ``ev``), and define a neighborhood where the ``.neighbors`` is a cell with two elements, each containing the features indices of the respective masks. Use :ref:`cosmo_slice` to apply
-Apply the :ref:`cosmo_crossvalidation_measure` measure with the :ref:`cosmo_classify_lda` classifier and partitions from `cosmo_nfold_partitioner` to compute classification accuracies for each of the mask.
+Then load each of the two masks (``vt``, ``ev``), and define a neighborhood where the ``.neighbors`` is a cell with two elements, each containing the features indices of the respective masks. Use :ref:`cosmo_slice` to slice the dataset along features (once for each mask), then apply the :ref:`cosmo_crossvalidation_measure` measure with the :ref:`cosmo_classify_lda` classifier and partitions from :ref:`cosmo_nfold_partitioner` to compute classification accuracies for each of the masks.
 
 Part 2
 ######
@@ -44,7 +46,7 @@ Using the neighborhood structure defined in Part 1, use the :ref:`cosmo_searchli
 Part 3
 ######
 
-Using the same neighborhood structure, compute the split-half correlation measure (difference between Fisher-transformed on-diagonal versus off-diagonal elements).
+Using the same neighborhood structure, compute the split-half correlation measure (difference between Fisher-transformed on-diagonal versus off-diagonal elements) using :ref:`cosmo_correlation_measure`.
 
 Part 4 (advanced)
 #################
@@ -55,3 +57,4 @@ Template: :ref:`run_roi_neighborhood_skl`
 
 Check your answers here: :ref:`run_roi_neighborhood` / :pb:`roi_neighborhood`
 
+.. include:: links.txt
