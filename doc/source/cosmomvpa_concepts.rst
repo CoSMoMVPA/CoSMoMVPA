@@ -246,26 +246,6 @@ A classifier is typically used to test how well data in a subset of the data gen
 
 Note that, unless a :ref:`measure <cosmomvpa_measure>`, classifier functions are rather bare-bone as data structure; they do not operate on a dataset ``struct`` directly.
 
-.. _`cosmomvpa_neighborhood`:
-
-Neighborhood
-^^^^^^^^^^^^
-A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses. For example:
-
-- for a traditional volume-based fMRI searchlight, the features in the source and target domain are the same, and consist of the voxels.
-- for a surface-based fMRI searchlight, the features in the source domain are the voxels in the volume, whereas the features in the target domain are the nodes on the surface.
-- for an MEG-based searchlight with magnetometers in the time-locked domain, the source and target domain are the set of all combinations of magnetometers and time points.
-- for an MEG-based searchlight with planar gradiometers (``planar``) but with output as combined (``cmb``) sensors, sensors in the source domain are the planar gradiometers and sensors in the target domain are the combined sensors.
-
-A neighborhood is a ``struct`` with fields:
-
-- ``.neighbors``: an ``Nx1`` cell for N neighborhoods, where ``.neighbors{k}`` is the list of features in the source domain associated with the ``k``-th neighborhood
-- (optional) ``.fa`` the feature attributes for the target domain. Each field element ``.fa.field`` should have ``N`` elements in the second (i.e. feature) dimension.
-- (optional) ``.a`` the dataset attributes for the target domain.
-
-When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`_ (see below), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
-
-Neighborhoods can be generated using :ref:`cosmo_interval_neighborhood` (e.g. MEEG time series searchlight) and  :ref:`cosmo_spherical_neighborhood` (fMRI spherical searchlight). :ref:`cosmo_neighborhood` is a general function that can generate most neighborhoods, and also supports combining multiple neighborhoods. An application of the latter functionality is a time-by-space fMRI searchlight.
 
 .. _`cosmomvpa_measure`:
 
@@ -298,6 +278,42 @@ Examples of measures include:
     + :ref:`split-half correlation <cosmo_correlation_measure>`.
     + :ref:`classification with cross-validation <cosmo_crossvalidation_measure>`.
     + :ref:`representational similarity analysis <cosmo_dissimilarity_matrix_measure>`.
+
+
+.. _`cosmomvpa_neighborhood`:
+
+Neighborhood
+^^^^^^^^^^^^
+A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses (:ref:`cosmo_searchlight`), where the concept of a traditional fMRI volumetric searchlight is generalized to other types of datasets as well. For example:
+
+    - for a traditional volume-based fMRI searchlight, the features in the source and target domain are the same, and consist of the voxels.
+    - for a surface-based fMRI searchlight, the features in the source domain are the voxels in the volume, whereas the features in the target domain are the nodes on the surface.
+    - for an MEG-based searchlight with magnetometers in the time-locked domain, the source and target domain are the set of all combinations of magnetometers and time points.
+    - for an MEG-based searchlight with planar gradiometers (``planar``) but with output as combined (``cmb``) sensors, sensors in the source domain are the planar gradiometers and sensors in the target domain are the combined sensors.
+
+A neighborhood is a ``struct`` with fields:
+
+    - ``.neighbors``: an ``Nx1`` cell for N neighborhoods, where ``.neighbors{k}`` is a vector with features indices in the *source* domain associated with the ``k``-th neighborhood.
+    - (optional) ``.fa`` the feature attributes for the target domain. Each field element ``.fa.field`` should have ``N`` elements in the second (i.e. feature) dimension.
+    - (optional) ``.a`` the dataset attributes for the target domain.
+
+When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`_ (see below), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
+
+Neighborhood-related functions include:
+
+    - :ref:`cosmo_spherical_neighborhood`: fMRI spherical volume-based searchlight (c.f. Kriegeskorte et al 2006).
+    - :ref:`cosmo_surficial_neighborhood`: fMRI surface-based searchlight (c.f. Oosterhof et al 2011).
+    - :ref:`cosmo_interval_neighborhood`: MEEG searchlight for time or frequency domain.
+    - Currently under development (not present in ``master``-branch):
+
+        + *cosmo_meeg_chan_neighborhood*: MEEG searchlight over sensors.
+        + *cosmo_meeg_source_neighborhood*: MEEG searchlight over source space.
+
+The general :ref:`cosmo_neighborhood` functions can *cross* different neighborhoods, which provides functionality for:
+
+    - fMRI time-space searchlight, if multiple time points are associated with each trial condition; achieved by crossing a spherical or surficial neighborhood with an interval neighborhood (for the time dimension).
+    - MEEG time-space searchlight; achieved by crossing a an interval neighborhood (for the time dimension) with a channel or source MEEG neighorhood.
+    - MEEG time-space-frequency searchlight: achieved by crossing two interval neighborhoods (for the time and frequency dimensions) with a channel or source MEEG neighborhood.
 
 
 .. include:: links.txt
