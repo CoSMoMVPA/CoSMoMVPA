@@ -176,6 +176,24 @@ function ni=new_nii(ds)
 function write_nii(fn, hdr)
     save_nii(hdr, fn);
 
+    %% BrainVoyager helper
+function mat=neuroelf_bvcoordconv_wrapper(varargin)
+    % converts BV bounding box to affine transformation matrix
+    % helper functions that deals with both new neuroelf (version 1.0)
+    % and older versions.
+    % the old version provides a 'bvcoordconv' .m file
+    % the new version privides this function in the neuroelf class
+    has_bvcoordconv=~isempty(which('bvcoordconv'));
+
+    % set function handle
+    if has_bvcoordconv
+        f=@bvcoordconv;
+    else
+        n=neuroelf();
+        f=@n.bvcoordconv;
+    end
+
+    mat=f(varargin{:});
 
     %% Brainvoyager VMP
 function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
@@ -200,7 +218,8 @@ function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
     % deal with offset at (.5, .5, .5) [CHECKME]
     mat(1:3,4)=mat(1:3,4)-mat(1:3,1:3)*.5*[1 1 1]';
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
-    bv_coords=bvcoordconv(tal_coords(1:3,:), 'tal2bvs',hdr.BoundingBox);
+    bv_coords=neuroelf_bvcoordconv_wrapper(tal_coords(1:3,:), ...
+                                        'tal2bvs',hdr.BoundingBox);
 
     switch bv_type
         case {'vmp','msk'}
