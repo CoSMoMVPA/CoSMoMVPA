@@ -126,7 +126,8 @@ for subject_num=1:nsubjects
     ds_corr.sa.targets=1;
     ds_corr.sa.chunks=subject_num;
 
-    % store result in ds_corr at the 'subject_num'-th position
+    % store result in the cell array 'ds_corrs' at the 'subject_num'-th
+    % position
     % >@@>
     ds_corrs{subject_num}=ds_corr;
     % <@@<
