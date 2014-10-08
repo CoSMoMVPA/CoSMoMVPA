@@ -586,7 +586,7 @@ function z=xff_struct(x)
 function vol=get_vol_bv(hdr)
     % bv vol info
     bbox=hdr.BoundingBox;
-    mat=bvcoordconv([],'bvx2tal',bbox);
+    mat=neuroelf_bvcoordconv_wrapper([],'bvx2tal',bbox);
     dim=bbox.DimXYZ;
 
     % deal with offset at (.5, .5, .5) [CHECKME]
@@ -595,6 +595,25 @@ function vol=get_vol_bv(hdr)
     vol=struct();
     vol.mat=mat;
     vol.dim=dim;
+
+function mat=neuroelf_bvcoordconv_wrapper(varargin)
+    % converts BV bounding box to affine transformation matrix
+    % helper functions that deals with both new neuroelf (version 1.0)
+    % and older versions.
+    % the old version provides a 'bvcoordconv' .m file
+    % the new version privides this function in the neuroelf class
+    has_bvcoordconv=~isempty(which('bvcoordconv'));
+
+    % set function handle
+    if has_bvcoordconv
+        f=@bvcoordconv;
+    else
+        n=neuroelf();
+        f=@n.bvcoordconv;
+    end
+
+    mat=f(varargin{:});
+
 
 % BV volumetric map
 function b=isa_bv_vmp(hdr)
