@@ -31,6 +31,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Daniel Kaiser
 + James Keidel
 + Nicholas Peatfield
++ Liuba Papeo
 + Jia Hou Poh
 + Reshanne Reader
 + Jens Schwarzbach
