@@ -13,56 +13,60 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                    selected around each node
 %    surfs         cell with specification of surfaces. The following
 %                  formats are valid options:
-%                  * Single surface (Caret, BrainVoyager)
-%                    - {fn, [start,stop]}
-%                    - {fn, [start,stop], niter}
-%                    - {v,f}
-%                    - {v,f,[start,stop], niter}
-%                    where
-%                       + fn is the filename of a single surface
-%                       + start and stop are distances towards and away
-%                         from the center of a hemisphere. For example,
-%                         if surface coordinates are in mm (which is
-%                         typical), start=-3 and stop=2 means selecting
-%                         voxels that are 3 mm or closer to the surface on
-%                         the white-matter side, up to voxels that are 2 mm
-%                         from the surface on the pial matter side
-%                       + niter is the number of subsampling (mesh
-%                         decimation) iterations to use for the output
-%                         surface.
-%                       + v are Px3 coordinates for P nodes
-%                       + f are Qx3 node indices for Q faces
-%                  * Twin surface (FreeSurfer)
-%                    - {fn1, fn2}
-%                    - {fn1, fn2,         fn_o}
-%                    - {fn1, fn2,         niter}
-%                    - {v1,v2,f}
-%                    - {v1,v2,f,v_o,f_o}
-%                    - {v1,v2,f,niter}
-%                    where
-%                       + fn{1,2} are filenames for pial and white
-%                         surfaces
-%                       + fn_o is the filename of an intermediate
-%                         (node-wise average of a pial and white
-%                         surface) output surface, and can be of a lower
-%                         resolution than the pial and white surfaces. This
-%                         can be achieved by using MapIcosahedron to
-%                         generate meshes of different densities, e.g.
-%                         ld=64 for the pial and white surface and ld=16
-%                         for the intermediate surface. It is required that
-%                         for every node in the intermediate surface there
-%                         is a corresponding node (at the same spatial
-%                         location) on the node-wise average of the pial
-%                         and white surface.
-%                       + v{1,2} are Px3 coordinates for P nodes of the
-%                         pial and white surfaces
-%                       + f are Qx3 node indices for Q faces on the pial
-%                         and white surfaces
-%                       + v_o and f_o are the nodes and vertices of an
-%                         intermediate output surface
-%                       + niter is the number of subsampling (mesh
-%                         decimation) iterations to use for the output
-%                         surface.
+%                  # Volumetric datasets:
+%                    * Single surface (Caret, BrainVoyager)
+%                      - {fn, [start,stop]}
+%                      - {fn, [start,stop], niter}
+%                      - {v,f,[start,stop], niter}
+%                      where
+%                         + fn is the filename of a single surface
+%                         + start and stop are distances towards and away
+%                           from the center of a hemisphere. For example,
+%                           if surface coordinates are in mm (which is
+%                           typical), start=-3 and stop=2 means selecting
+%                           voxels that are 3 mm or closer to the surface on
+%                           the white-matter side, up to voxels that are
+%                           2 mm from the surface on the pial matter side
+%                         + niter is the number of subsampling (mesh
+%                           decimation) iterations to use for the output
+%                           surface.
+%                         + v are Px3 coordinates for P nodes
+%                         + f are Qx3 node indices for Q faces
+%                    * Twin surface (FreeSurfer)
+%                      - {fn1, fn2}
+%                      - {fn1, fn2,         fn_o}
+%                      - {fn1, fn2,         niter}
+%                      - {v1,v2,f}
+%                      - {v1,v2,f,v_o,f_o}
+%                      - {v1,v2,f,niter}
+%                      where
+%                         + fn{1,2} are filenames for pial and white
+%                           surfaces
+%                         + fn_o is the filename of an intermediate
+%                           (node-wise average of a pial and white
+%                           surface) output surface, and can be of a lower
+%                           resolution than the pial and white surfaces.
+%                           This  can be achieved by using MapIcosahedron
+%                           to generate meshes of different densities, e.g.
+%                           ld=64 for the pial and white surface and ld=16
+%                           for the intermediate surface. It is required
+%                           that for every node in the intermediate surface
+%                           there is a corresponding node (at the same
+%                           spatial location) on the node-wise average of
+%                           the pial and white surface.
+%                         + v{1,2} are Px3 coordinates for P nodes of the
+%                           pial and white surfaces
+%                         + f are Qx3 node indices for Q faces on the pial
+%                           and white surfaces
+%                         + v_o and f_o are the nodes and vertices of an
+%                           intermediate output surface
+%                         + niter is the number of subsampling (mesh
+%                           decimation) iterations to use for the output
+%                           surface.
+%                  # Surface-based datasets:
+%                    - {fn}
+%                    - {fn, niter}
+%                    - {v, f, niter}
 %    'metric',metric     distance metric along cortical surface. One of
 %                        'geodesic' (default), 'dijkstra' or 'euclidian'.
 %    'line_def',line_def definition of lines from inner to outer surface
@@ -86,8 +90,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                   .neighbors       Mx1 cell with .neighbors{k} the
 %                                    indices of features (relative to ds)
 %                                    in the neighborhood of node k
-%                   .a.fdim.labels    set to {'node_indices'}
-%                   .a.fdim.values    set to {center_ids} with center_ids
+%                   .a.fdim.labels   set to {'node_indices'}
+%                   .a.fdim.values   set to {center_ids} with center_ids
 %                                    Mx1 ids of each neighborhood
 %                   .fa.node_indices identical to center_ids
 %     v_o           NVx3 coordinates for N nodes of the output surface
@@ -163,11 +167,6 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 % See also: surfing, surfing_nodeidxs2coords, cosmo_searchlight
 %
 
-cosmo_check_dataset(ds,'fmri');
-if ~isequal(ds.a.fdim.labels,{'i','j','k'})
-    error('Unsupported dimension labels, expected fMRI-like dataset');
-end
-
 cosmo_check_external('surfing');
 
 defaults=struct();
@@ -179,14 +178,17 @@ defaults.subsample_min_ratio=.2;
 defaults.center_ids=[];
 opt=cosmo_structjoin(defaults,varargin{:});
 
+ds_type=get_ds_type(ds);
+
 if strcmp(opt.metric,'geodesic')
     cosmo_check_external('fast_marching');
 end
 
 % get surfaces
-[v1,v2,f,vo,fo]=parse_surfs(surfs);
+[v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type);
+ds_is_surface=strcmp(ds_type, 'surface');
 
-one_surface=numel(v2)==2;
+one_surface=numel(v2)==2 || (ds_is_surface && isempty(v2));
 
 % define intermediate high-res surface
 if one_surface
@@ -209,13 +211,6 @@ end
 % if they are identical then low2high is the identity
 out2in=surfing_maplow2hires(vo', vi');
 
-% set volume definition
-if isempty(opt.vol_def)
-    vol_def=ds.a.vol;
-else
-    vol_def=opt.vol_def;
-end
-
 if radius<0
     % fixed number of voxels
     circle_def=[10, -radius];
@@ -224,55 +219,102 @@ else
     circle_def=radius;
 end
 
-% define voxel mask based on features in dataset
-ds_one=cosmo_slice(ds,1);          % arbitrary sample
-ds_one.samples(:)=1;               % all set to one
-ds_unflat=cosmo_unflatten(ds_one); % missing features have value of zero
-vol_def.mask=ds_unflat~=0;          % define mask
-
+% set center ids
 center_ids=opt.center_ids;
 if isempty(opt.center_ids)
     center_ids=1:size(vo,1);
 else
     out2in=out2in(center_ids);
 end
-[n2v,unused,unused_,d]=surfing_voxelselection(v1',v2',f',circle_def,...
-                                         vol_def,out2in,opt.line_def,...
-                                         opt.metric,opt.progress_step);
 
-ncenters=numel(center_ids);
-assert(ncenters==numel(n2v));
-% determine unique center ids used
-[unq_center_ids,unused,center_ids_mapping]=unique(center_ids);
+% either surface or volumetric input dataset
+ds_is_surface=cosmo_check_dataset(ds,'surface',false);
+ds_is_volume=cosmo_check_dataset(ds,'fmri',false);
 
-% find mapping from features
-nf_full=numel(vol_def.mask);
-nf_mask=sum(vol_def.mask(:));
-all2msk_indices=zeros(1,nf_full);
-all2msk_indices(vol_def.mask)=1:nf_mask;
-
-% store neighborhood information
-nbrhood=struct();
-nbrhood.a.fdim.labels={'node_indices'};
-nbrhood.a.fdim.values={unq_center_ids};
-nbrhood.fa.node_indices=center_ids_mapping(:)';
-nbrhood.fa.size=d(:)';
-
-% set neighbors while considering the masked nature of the input dataset
-neighbors=cell(ncenters,1);
-for k=1:ncenters
-    msk_indices=all2msk_indices(double(n2v{k}));
-    assert(all(msk_indices>0))
-    neighbors{k}=msk_indices;
+if sum([ds_is_surface, ds_is_volume])~=1
+    error('Unsupported dataset: expected surface or fmri dataset');
 end
-nbrhood.neighbors=neighbors;
+
+if ds_is_surface
+    % todo: use out2in to allow for subset of node indices as center
+    %       (the current implementation computes neighborhoods for all
+    %       nodes)
+    nfeatures=size(ds.samples,2);
+    feature_ids=(1:nfeatures)';
+    if ~isequal(feature_ids,ds.fa.node_indices') || ...
+                 ~isequal(feature_ids,ds.a.fdim.values{1}(:))
+        error('Only full datasets (no missing nodes) are supported for now');
+    end
+
+    [n2ns,radii]=surfing_nodeselection(v1',f',circle_def,opt.metric);
+    ncenters=numel(n2ns);
+
+    nbrhood=struct();
+    nbrhood.a.fdim.labels={'node_indices'};
+    nbrhood.a.fdim.values={1:ncenters};
+    nbrhood.fa.node_indices=(1:ncenters);
+    nbrhood.fa.radius=radii(:)';
+    nbrhood.neighbors=n2ns;
+
+elseif ds_is_volume
+    % set volume definition
+    if isempty(opt.vol_def)
+        vol_def=ds.a.vol;
+    else
+        vol_def=opt.vol_def;
+    end
 
 
-function [v1,v2,f,vo,fo]=parse_surfs(surfs)
+
+    % define voxel mask based on features in dataset
+    ds_one=cosmo_slice(ds,1);          % arbitrary sample
+    ds_one.samples(:)=1;               % all set to one
+    ds_unflat=cosmo_unflatten(ds_one); % missing features have value of zero
+    vol_def.mask=ds_unflat~=0;          % define mask
+
+
+    [n2v,vmin,vmax,d]=surfing_voxelselection(v1',v2',f',circle_def,vol_def,...
+                                             out2in,opt.line_def,...
+                                             opt.metric,opt.progress_step);
+
+    ncenters=numel(center_ids);
+    assert(ncenters==numel(n2v));
+    % determine unique center ids used
+    [unq_center_ids,unused,center_ids_mapping]=unique(center_ids);
+
+    % find mapping from features
+    nf_full=numel(vol_def.mask);
+    nf_mask=sum(vol_def.mask(:));
+    all2msk_indices=zeros(1,nf_full);
+    all2msk_indices(vol_def.mask)=1:nf_mask;
+
+    % store neighborhood information
+    nbrhood=struct();
+    nbrhood.a.fdim.labels={'node_indices'};
+    nbrhood.a.fdim.values={unq_center_ids};
+    nbrhood.fa.node_indices=center_ids_mapping(:)';
+
+    % set neighbors while considering the masked nature of the input dataset
+    neighbors=cell(ncenters,1);
+    for k=1:ncenters
+        msk_indices=all2msk_indices(double(n2v{k}));
+        assert(all(msk_indices>0))
+        neighbors{k}=msk_indices;
+    end
+    nbrhood.neighbors=neighbors;
+
+else
+    assert(false,'this should never happen');
+end
+
+
+function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
     % helper function to get surfaces
     if ~iscell(surfs)
         error('surfs argument must be a cell');
     end
+
+    ds_is_surface=strcmp(ds_type,'surface');
 
     n=numel(surfs);
 
@@ -291,7 +333,7 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
             if isempty(v1)
                 v1=c;
                 f=f_;
-            elseif isempty(v2)
+            elseif isempty(v2) && ~ds_is_surface
                 if ~isequal(f_,f)
                     error('Topology mismatch between the two surfaces');
                 end
@@ -322,22 +364,31 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
         end
     end
 
-    if isempty(v1) || isempty(v2) || isempty(f)
-        error('Not enough arguments for two surfaces and topology');
+    if numel(v2)~=2 && (numel(f)==2 || isempty(f))
+        % swap position
+        temp=f;
+        f=v2;
+        v2=temp;
     end
+
+    if isempty(v1) || (isempty(v2) && ~ds_is_surface) || isempty(f)
+        error('Not enough arguments for surfaces and topology');
+    end
+
+
 
     % c2 can be vector with two elements indicating the size of the curved
     % cylinder with a circle as basis; if not, it should be a surface with
     % the same size as c1
     one_surface=numel(v2)==2;
 
-    if ~(one_surface || isequal(size(v1),size(v2)))
+    if ~(one_surface || ds_is_surface || isequal(size(v1),size(v2)))
         error('Size mismatch between surfaces: %dx%d != %dx%d',...
                     size(v1), size(v2));
     end
 
     surfing_check_surface(v1,f);
-    if ~one_surface
+    if ~(one_surface || ds_is_surface)
         surfing_check_surface(v2,f);
     end
 
@@ -351,3 +402,19 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs)
     end
 
 
+function ds_type=get_ds_type(ds)
+
+    supported_ds_types={'surface','fmri'};
+
+    ds_type=[];
+    for k=1:numel(supported_ds_types)
+        ds_type=supported_ds_types{k};
+        if cosmo_check_dataset(ds,ds_type,false)
+            return
+        end
+    end
+
+    if isempty(ds_type)
+        error('Unknown dataset type, supported are: %s.', ...
+                    cosmo_strjoin(supported_ds_types,', '));
+    end
