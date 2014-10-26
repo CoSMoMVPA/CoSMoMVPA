@@ -171,13 +171,18 @@ function is_ok=check_external_toolbox(external_name,raise_)
         return
     end
 
-    env=cosmo_wtf('environment');
+    if isempty(cosmo_strsplit(external_name,'_bin',-1))
+        % binary package
+        env='system';
+    else
+        env=cosmo_wtf('environment');
+    end
     error_msg=[];
 
     % simulate goto statement
     while true
         if ~ext.is_present()
-            suffix=ext_get_what_to_do_message(ext);
+            suffix=ext_get_what_to_do_message(ext,env);
             error_msg=sprintf(['%s is required, but it was not '...
                 'found in the %s path. If it is not present on your '...
                 'system, obtain it from:\n\n    %s\n\nthen, %s.'], ...
@@ -186,7 +191,7 @@ function is_ok=check_external_toolbox(external_name,raise_)
         end
 
         if ~ext.is_recent()
-            suffix=ext_get_what_to_do_message(ext);
+            suffix=ext_get_what_to_do_message(ext,env);
             error_msg=sprintf(['%s was found on your %s path, but '...
                 'seems out of date. Please download the latest '...
                 'version from:\n\n %s\n\nthen, %s.'], ...
@@ -232,12 +237,12 @@ function is_ok=check_external_toolbox(external_name,raise_)
         error(error_msg);
     end
 
-function msg=ext_get_what_to_do_message(ext)
+function msg=ext_get_what_to_do_message(ext,env)
     if isfield(ext, 'what_to_do')
         msg=ext.what_to_do();
     else
         msg=sprintf(['if applicable, add the necessary directories '...
-                'to the %s path.'], cosmo_wtf('environment'));
+                'to the %s path'], env);
     end
 
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
