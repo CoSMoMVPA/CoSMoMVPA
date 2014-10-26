@@ -57,6 +57,7 @@ cosmo_disp(ds_odd_even);
 % compute correlations
 ds_corr=cosmo_correlation_measure(ds_odd_even);
 
+% show result
 fprintf(['Average correlation difference between matching and '...
             'non-matching categories in %s for %s is %.3f\n'],...
             mask_label, subject_id, ds_corr.samples);
@@ -195,6 +196,7 @@ for j=1:nmasks
     fprintf('Partitions:\n');
     cosmo_disp(partitions);
 
+    % show result for each classifier
     for k=1:nclassifiers
         classifier=classifiers{k};
         [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
