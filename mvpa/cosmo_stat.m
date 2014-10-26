@@ -357,10 +357,10 @@ function [f,df]=quick_ftest_between(samples,targets,chunks,contrast)
 
     df=[df1,ns-nclasses];
 
-    bss=bss/df(1);
-    wss=wss/df(2);
+    mbss=bss/df(1);
+    mwss=wss/df(2);
 
-    f=bss./wss;
+    f=mbss./mwss;
 
 function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     % repeated measures anova
