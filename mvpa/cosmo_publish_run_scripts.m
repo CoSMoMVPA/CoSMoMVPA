@@ -1,8 +1,7 @@
 function cosmo_publish_run_scripts(varargin)
-% helper function to publish the run_* scripts of cosmo. Intended for
-% developers only.
+% helper function to publish example scripts (for developers)
 %
-% cosmo_publish_build_html([force])
+% cosmo_publish_build_html([force|fn])
 %
 % Inputs:
 %   force        boolean; indicates whether to always rebuild the output
@@ -10,8 +9,16 @@ function cosmo_publish_run_scripts(varargin)
 %                only run_* scripts that are newer than the output are
 %                published again. If true, all run_* scripts are published
 %                (rebuilt)
+%   fn           filename of matlab file to build
 %
+% Notes:
+%  - this function is intended for developers (to build the website)
+%  - it requires
+%    * a Unix-like system
+%    * a working installation of git
+%    * CoSMoMVPA code present in a git repository
 %
+% NNO Sep 2014
 
     [force, srcpat]=process_input(varargin{:});
 
@@ -39,14 +46,12 @@ function cosmo_publish_run_scripts(varargin)
     end
 
     srcfns=dir(fullfile(srcdir,[srcpat srcext]));
-    trgfns=dir(fullfile(trgdir,[srcpat trgext]));
 
     if isempty(srcfns)
         error('No files found matching %s%s in %s',[srcpat srcext],srcdir);
     end
 
     nsrc=numel(srcfns);
-    ntrg=numel(trgfns);
 
     outputs=cell(nsrc,1);
 
@@ -62,24 +67,23 @@ function cosmo_publish_run_scripts(varargin)
         update=true;
         srcfn=fullfile(srcdir,srcfns(k).name);
         [srcpth,srcnm,unused]=fileparts(srcfn);
-        for j=1:ntrg
-            [unused,trgnm,unused]=fileparts(trgfns(j).name);
-            if ~force && strcmp(srcnm, trgnm) && ...
-                        srcfns(k).datenum < trgfns(j).datenum
-                update=false;
-                fprintf('skipping %s%s (%s%s)\n',...
-                            trgnm,trgext,srcnm,srcext);
-                output_pos=output_pos+1;
-                outputs{output_pos}=srcnm;
-                break;
-            end
+        trgfn=fullfile(trgdir,[srcnm trgext]);
+        if ~force && ~needs_update(srcfn,trgfn);
+            update=false;
+            fprintf('skipping %s%s\n',...
+                        srcnm,srcext);
+            output_pos=output_pos+1;
+            outputs{output_pos}=srcnm;
         end
+
 
         if ~update
             continue;
         end
 
+
         fprintf('building: %s ...', srcnm);
+
         cd(srcpth);
         is_built=false;
         try
@@ -97,6 +101,7 @@ function cosmo_publish_run_scripts(varargin)
         cd(medir);
 
         if ~is_built
+            fprintf(' !! building failed\n');
             continue
         end
         fprintf(' done\n');
@@ -114,14 +119,15 @@ function cosmo_publish_run_scripts(varargin)
     c_=onCleanup(@()fclose(fid));
     fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
             '>\n']);
-    fprintf(fid,'<HTML><HEAD><TITLE>Index of matlab outputs</TITLE></HEAD>\n');
-    fprintf(fid,'<BODY>Matlab output<UL>\n');
+    fprintf(fid,['<HTML><HEAD><TITLE>Index of matlab outputs</TITLE>'...
+                    '</HEAD>\n<BODY>Matlab output<UL>\n']);
 
     for k=1:output_pos
         nm=outputs{k};
         fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
     end
-    fprintf(fid,'</UL>Back to <A HREF="../../index.html">index</A>.</BODY></HTML>\n');
+    fprintf(fid,['</UL>Back to <A HREF="../../index.html">index</A>.'...
+                    '</BODY></HTML>\n']);
     fprintf('Index written to %s\n', outputfn);
 
 
@@ -150,3 +156,69 @@ function [force, srcpat]=process_input(varargin)
     if isequal(srcpat,[])
         srcpat='*_*';
     end
+
+function tf=needs_update(srcfn,trgfn)
+    % helper function to see if html is out of date
+    [unused,root,unused]=fileparts(srcfn);
+    [unused,root_alt,unused]=fileparts(trgfn);
+    assert(isequal(root,root_alt));
+
+    t_trg=time_last_changed(trgfn);
+    if isnan(t_trg)
+        % does not exist, so needs update
+        tf=true;
+        return;
+    end
+
+    t_src=time_last_commit(srcfn);
+    if isnan(t_src) || is_in_staging(srcfn) || is_untracked(srcfn)
+        % does not exist, or in staging, or untracked
+        t_src=time_last_changed(srcfn);
+    end
+
+    % needs update if source file date unknown, or newer than html
+    tf=isnan(t_src) || t_trg<t_src;
+
+
+function t=time_last_changed(fn)
+    d=dir(fn);
+    if isempty(d)
+        t=NaN;
+        return
+    end
+    assert(numel(d)==1);
+    t=(d.datenum-datenum(1970,1,1))*86400;
+
+function r=run_git(args)
+    prefix='export TERM=ansi; git ';
+    cmd=[prefix args];
+
+    [e,r]=unix(cmd);
+
+    if e
+        fprintf(2,'Unable to run git, or an error was produced\n');
+        error(r);
+    end
+
+function tf=is_untracked(srcfn)
+    untracked=run_git('ls-files . --exclude-standard --others');
+    tf=cosmo_match({srcfn},untracked);
+
+
+function t=time_last_commit(srcfn)
+    cmd=sprintf('log -n 1 --pretty=format:%%ct -- %s',srcfn);
+    r=run_git(cmd);
+
+    t=str2num(regexp(r,'(\d*)','match','once'));
+
+    if isempty(t)
+        t=NaN;
+    end
+
+
+function tf=is_in_staging(fn)
+    in_staging_str=run_git('diff HEAD  --name-only | xargs basename');
+    in_staging=cosmo_strsplit(in_staging_str,'\n');
+
+    tf=cosmo_match({cosmo_strsplit(fn,filesep,-1)},in_staging);
+
