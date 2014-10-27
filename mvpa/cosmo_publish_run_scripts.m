@@ -242,5 +242,5 @@ function tf=is_in_staging(fn)
     in_staging=cosmo_strsplit(in_staging_str,'\n');
 
     basefn=cosmo_strsplit(fn,filesep,-1);
-    tf=cosmo_match(basefn,in_staging);
+    tf=cosmo_match({basefn},in_staging);
 
