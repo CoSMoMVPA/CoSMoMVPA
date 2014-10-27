@@ -31,9 +31,11 @@ function cosmo_publish_run_scripts(varargin)
     pdir=pwd();
     cleaner1=onCleanup(@()cd(pdir));
 
+    % run from CoSMoMVPA directory
     medir=fileparts(which(mfilename()));
     cd(medir);
 
+    % set paths, relative to the location of this function
     srcdir=fullfile(medir,'../examples/');
     trgdir=fullfile(medir,'..//doc/source/_static/publish/');
 
@@ -88,12 +90,12 @@ function cosmo_publish_run_scripts(varargin)
                 publish(srcnm, struct('outputDir',trgdir,'catchError',false));
                 is_built=true;
             catch me
-                fnout=fullfile(trgdir,[srcnm trgext]);
-                if exist(fnout,'file')
-                    delete(fnout);
+                if exist(trgfn,'file')
+                    delete(trgfn);
                 end
 
-                warning('Unable to build %s%s: %s', srcnm, srcext, me.message);
+                warning('Unable to build %s%s: %s',srcnm,srcext,...
+                                                me.message);
                 fprintf('%s\n', me.getReport);
             end
             clock_end=clock();
@@ -184,10 +186,12 @@ function [tf,msg]=target_needs_update(srcfn,trgfn)
     end
 
     if is_in_staging(srcfn) || is_untracked(srcfn)
+        % changes since last commit, see when changes were made
         t_src=time_last_changed(srcfn);
         tf=isnan(t_src) || t_trg<t_src;
         msg=sprintf('modified: %s', srcname);
     else
+        % no changes since last commit, see when last commit was made
         t_src=time_last_commit(srcfn);
         tf=isnan(t_src) || t_trg<t_src;
         msg=sprintf('recent commit: %s',srcname);
@@ -226,16 +230,17 @@ function t=time_last_commit(srcfn)
     cmd=sprintf('log -n 1 --pretty=format:%%ct -- %s',srcfn);
     r=run_git(cmd);
 
-    t=str2num(regexp(r,'(\d*)','match','once'));
+    t=str2double(regexp(r,'(\d*)','match','once'));
 
     if isempty(t)
         t=NaN;
     end
-
+    assert(numel(t)==1);
 
 function tf=is_in_staging(fn)
     in_staging_str=run_git('diff HEAD  --name-only | xargs basename');
     in_staging=cosmo_strsplit(in_staging_str,'\n');
 
-    tf=cosmo_match({cosmo_strsplit(fn,filesep,-1)},in_staging);
+    basefn=cosmo_strsplit(fn,filesep,-1);
+    tf=cosmo_match(basefn,in_staging);
 
