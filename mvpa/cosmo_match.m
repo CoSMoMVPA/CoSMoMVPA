@@ -9,7 +9,7 @@ function msk=cosmo_match(haystack, needle, varargin)
 %                     also allowed and interpreted as the name of a feature
 %                     dimension ('i','j' or 'k' in fmri datasets; 'chan',
 %                     'time', or 'freq' in MEEG datasets), and its
-%                     respective values (from ds.a.dim.values{dim}, where
+%                     respective values (from ds.a.fdim.values{dim}, where
 %                     dim is the dimension corresponding to haystack) as
 %                     indexed by ds.fa.(haystack) are used as haystack.
 %   needle*           numeric vector, or cell with strings. A string is
@@ -101,10 +101,10 @@ function msk=match_numeric_scalar(needle,haystack)
 
 function msk=match_function_handle(func, data)
     check_vec_or_empty(data);
-    if iscell(haystack)
+    if iscell(data)
         msk=cellfun(func,data,'UniformOutput',true);
     else
-        msk=data(data);
+        msk=func(data);
     end
 
     if ~islogical(msk)

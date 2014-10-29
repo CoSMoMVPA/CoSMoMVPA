@@ -256,7 +256,7 @@ function [stat,df,stat_label]=ttest1_wrapper(samples,targets,chunks,...
 
     if nclasses~=1
         error('t-stat: expected 1 or 2 classes, found %d',...
-                    stat_name, nclasses);
+                    nclasses);
     end
 
     [stat,df]=quick_ttest(samples);
