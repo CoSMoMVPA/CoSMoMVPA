@@ -1,8 +1,8 @@
 %% Classification using svm
 %
 
-if ~cosmo_check_external('matlabsvm',false)
-    fprintf('Matlab toolbox ''stats'' not present, skipping\n');
+if ~cosmo_check_external('svm',false)
+    fprintf('No SVM implementation is available, skipping\n');
     return
 end
 
@@ -25,13 +25,12 @@ ds_2class=cosmo_slice(ds, ds.sa.targets==2 | ds.sa.targets==5);
 ds_2class_train=cosmo_slice(ds_2class,ds_2class.sa.chunks<=5);
 ds_2class_test=cosmo_slice(ds_2class,ds_2class.sa.chunks>5);
 
-% predict using 2 class svm
-pred2=cosmo_classify_matlabsvm_2class(ds_2class_train.samples,...
+pred2=cosmo_classify_svm(ds_2class_train.samples,...
                                 ds_2class_train.sa.targets,...
                                 ds_2class_test.samples);
 
 fprintf('2-class accuracy %.3f\n', sum(pred2==ds_2class_test.sa.targets)/numel(pred2));
-mx=cosmo_confusion_matrix(ds_2class_test,pred2);
+mx=cosmo_confusion_matrix(ds_2class_test.sa.targets,pred2);
 imagesc(mx);
 colorbar();
 
@@ -41,12 +40,12 @@ ds_4class=cosmo_slice(ds, ds.sa.targets>=2 & ds.sa.targets<=5);
 ds_4class_train=cosmo_slice(ds_4class,ds_4class.sa.chunks<=5);
 ds_4class_test=cosmo_slice(ds_4class,ds_4class.sa.chunks>5);
 
-pred4=cosmo_classify_matlabsvm(ds_4class_train.samples,...
+pred4=cosmo_classify_svm(ds_4class_train.samples,...
                         ds_4class_train.sa.targets,...
                         ds_4class_test.samples);
 
 fprintf('4-class: accuracy %.3f\n', sum(pred4==ds_4class_test.sa.targets)/numel(pred4));
 
-mx=cosmo_confusion_matrix(ds_4class_test,pred4);
+mx=cosmo_confusion_matrix(ds_4class_test.sa.targets,pred4);
 imagesc(mx);
 colorbar();
