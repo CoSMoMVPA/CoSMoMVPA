@@ -76,9 +76,6 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 
     [targets,predicted,is_ds]=get_data(ds,varargin{:});
 
-    % allow lack of predictions for some of the samples
-    msk=~isnan(predicted);
-
     % see which classes there are
     [class_indices,classes]=cosmo_index_unique(targets);
     nclasses=numel(class_indices);
