@@ -29,8 +29,8 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                       classification step are set to NaN
 %
 % Examples:
-%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
-%     %
+%     % generate dataset with 3 targets and 4 chunks, first target is 3
+%     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4,'target1',3);
 %     % use take-1-chunk for testing crossvalidation
 %     partitions=cosmo_nfold_partitioner(ds);
 %     classifier=@cosmo_classify_naive_bayes;
@@ -39,18 +39,18 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                                                       partitions);
 %     % show targets, predicted labels, and accuracy
 %     disp([ds.sa.targets pred chunks])
-%     >      1     1     1
-%     >      2     3     1
 %     >      3     3     1
-%     >      1     3     2
-%     >      2     3     2
-%     >      3     3     2
-%     >      1     1     3
-%     >      2     2     3
-%     >      3     2     3
-%     >      1     1     4
-%     >      2     3     4
+%     >      4     5     1
+%     >      5     5     1
+%     >      3     5     2
+%     >      4     5     2
+%     >      5     5     2
+%     >      3     3     3
+%     >      4     4     3
+%     >      5     4     3
 %     >      3     3     4
+%     >      4     5     4
+%     >      5     5     4
 %     disp(accuracy)
 %     >     0.5833
 %     %
@@ -61,19 +61,21 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
 %                                                           partitions);
 %     % show targets, predicted labels, and accuracy
+%     % (chunks are set to NaN because there is no unique chunk for
+%     %  each prediction)
 %     disp([ds.sa.targets pred chunks])
-%     >      1     1   NaN
-%     >      2     2   NaN
 %     >      3     3   NaN
-%     >      1     1   NaN
-%     >      2     2   NaN
+%     >      4     4   NaN
+%     >      5     5   NaN
 %     >      3     3   NaN
-%     >      1     1   NaN
-%     >      2     2   NaN
+%     >      4     4   NaN
+%     >      5     5   NaN
 %     >      3     3   NaN
-%     >      1     1   NaN
-%     >      2     2   NaN
-%     >      3     1   NaN
+%     >      4     4   NaN
+%     >      5     5   NaN
+%     >      3     3   NaN
+%     >      4     4   NaN
+%     >      5     3   NaN
 %     disp(accuracy)
 %     >     0.9167
 %     %
@@ -87,18 +89,18 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                                                        partitions, opt);
 %     % show targets, predicted labels, and accuracy
 %     disp([ds.sa.targets pred chunks])
-%     >      1     3     1
-%     >      2     2     1
-%     >      3     3     1
-%     >      1     2     2
-%     >      2     2     2
-%     >      3     3     2
-%     >      1     3     3
-%     >      2     2     3
-%     >      3     3     3
-%     >      1     3     4
-%     >      2     2     4
-%     >      3     1     4
+%     >      3     5     1
+%     >      4     4     1
+%     >      5     5     1
+%     >      3     4     2
+%     >      4     4     2
+%     >      5     5     2
+%     >      3     5     3
+%     >      4     4     3
+%     >      5     5     3
+%     >      3     5     4
+%     >      4     4     4
+%     >      5     3     4
 %     disp(accuracy)
 %     >     0.5833
 %
@@ -182,18 +184,21 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     % - in the case of nfold-crossvalidation there is just one prediction
     %   for each sample, but with other cross validation schemes such as
     %   from nchoosek_partitioner(ds, 2) there can be more than one.
-    [pred,classes]=cosmo_winner_indices(all_pred);
+    [pred_indices,classes]=cosmo_winner_indices(all_pred);
 
     % sanity check: missing predictions should be identical to lack of
     % winners
-    assert(all(isnan(pred)~=test_mask));
-    assert(all(isnan(pred)==isnan(test_chunks)));
+    assert(all(isnan(pred_indices)~=test_mask));
+    assert(all(isnan(pred_indices)==isnan(test_chunks)));
 
     % only chunks with single prediction are not set to NaN
     test_chunks(test_counts~=1)=NaN;
 
+    % set predictions
+    pred=classes(pred_indices);
+
     % compute accuracies
-    correct_mask=ds.sa.targets(test_mask)==classes(pred(test_mask));
+    correct_mask=ds.sa.targets(test_mask)==pred(test_mask);
     ncorrect = sum(correct_mask);
     ntotal = numel(correct_mask);
 
