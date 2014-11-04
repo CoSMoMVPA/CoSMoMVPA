@@ -24,6 +24,7 @@ function ds=cosmo_synthetic_dataset(varargin)
 %   'nmodalities', nm       number of unique modalities (default: [])
 %   'nsubjects', ns         number of unique subjects (default: [])
 %   'nreps', nr             number of sample repeats (default: [])
+%   'target1'               index of first target (default: 1)
 %
 % Output:
 %    ds                     dataset struct according to parameters.
@@ -159,6 +160,7 @@ function ds=cosmo_synthetic_dataset(varargin)
     default.nsubjects=[];
     default.chunks=[];
     default.targets=[];
+    default.target1=1;
 
     % for MEEG
     default.chan='all';
@@ -183,6 +185,8 @@ function ds=cosmo_synthetic_dataset(varargin)
 
     ds.samples=generate_samples(ds, class_distance);
     ds=assign_sa(ds, opt, {'chunks','targets'});
+
+    ds.sa.targets=ds.sa.targets+opt.target1-1;
 
     cosmo_check_dataset(ds);
 
