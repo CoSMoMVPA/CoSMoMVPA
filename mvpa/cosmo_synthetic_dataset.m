@@ -9,11 +9,13 @@ function ds=cosmo_synthetic_dataset(varargin)
 %   'type', t               type of dataset. One of 'fmri', 'meeg',
 %                           'timelock', 'timefreq', 'surface'. 'meeg' is
 %                           equivalent to 'timelock'
-%   'chan', c               for meeg datasets ('time{lock}, 'meeg'), this
-%                           sets which channels from the neuromag system
-%                           are used. One of 'all', 'planar', 'mag',
-%                           'combined', or 'mag+combined'.
-%
+%   'sens', c               for meeg datasets ('time{lock}, 'meeg'), this
+%                           sets which sensor type is used. Supported are
+%                           - neuromag306{all,planar,combined,mag}
+%                           - ctf151
+%                           - 4d{1,2}48[planar]
+%                           - yokogawa{64,160}[planar]
+%                           - eeg1020
 %   'sigma', sigma          parameter to influence class distance. The
 %                           larger this value, the more discrimable the
 %                           classes are.
@@ -24,7 +26,6 @@ function ds=cosmo_synthetic_dataset(varargin)
 %   'nmodalities', nm       number of unique modalities (default: [])
 %   'nsubjects', ns         number of unique subjects (default: [])
 %   'nreps', nr             number of sample repeats (default: [])
-%   'target1'               index of first target (default: 1)
 %
 % Output:
 %    ds                     dataset struct according to parameters.
@@ -145,6 +146,22 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >       10
 %     >       10 ]@200x1
 %
+%     % example of MEEG dataset with ctf151 layout
+%     ds=cosmo_synthetic_dataset('type','meeg',...
+%                                   'sens','ctf151','size','huge');
+%     % show labels and values for feature dimensions
+%     cosmo_disp(ds.a.fdim)
+%     > .labels
+%     >   { 'chan'  'time' }
+%     > .values
+%     >   { { 'MLC11'          [  -0.2
+%     >       'MLC12'            -0.15
+%     >       'MLC13'             -0.1
+%     >         :                  :
+%     >       'MZP02'              0.5
+%     >       'SCALE'             0.55
+%     >       'COMNT' }@153x1      0.6 ]@17x1 }
+%
 % NNO Aug 2014
 
     default=struct();
@@ -160,14 +177,13 @@ function ds=cosmo_synthetic_dataset(varargin)
     default.nsubjects=[];
     default.chunks=[];
     default.targets=[];
-    default.target1=1;
 
     % for MEEG
-    default.chan='all';
+    default.sens='neuromag306all';
 
     opt=cosmo_structjoin(default,varargin);
 
-    [ds, nfeatures]=get_fdim_fa(opt.type, opt.size, opt.chan);
+    [ds, nfeatures]=get_fdim_fa(opt);
 
     sa_labels_pl={'ntargets','nchunks','nmodalities','nsubjects','nreps'};
     cp=cosmo_cartprod(cellfun(@(x)1:max([opt.(x) 1]),sa_labels_pl,...
@@ -185,8 +201,6 @@ function ds=cosmo_synthetic_dataset(varargin)
 
     ds.samples=generate_samples(ds, class_distance);
     ds=assign_sa(ds, opt, {'chunks','targets'});
-
-    ds.sa.targets=ds.sa.targets+opt.target1-1;
 
     cosmo_check_dataset(ds);
 
@@ -228,12 +242,15 @@ function samples=generate_samples(ds, class_distance)
 
     samples=randn(nsamples,nfeatures);
 
-    for k=1:nfeatures
-        class_msk=mod(k-targets, nclasses+1)==0;
-        samples(class_msk,k)=samples(class_msk,k)+class_distance;
-    end
+    add_msk=mod(bsxfun(@minus,1:nclasses+1,targets),nclasses+1)==0;
+    add_msk_full=repmat(add_msk,1,ceil(nfeatures/(nclasses+1)));
+    add_msk_full=add_msk_full(:,1:nfeatures);
+    samples(add_msk_full)=samples(add_msk_full)+class_distance;
 
-function a=dim_labels_values(data_type, chan_type)
+function a=dim_labels_values(opt)
+    data_type=opt.type;
+    sens_type=opt.sens;
+
     a=struct();
 
     switch data_type
@@ -246,7 +263,7 @@ function a=dim_labels_values(data_type, chan_type)
 
         case {'meeg','timelock','timefreq'}
             % simulate full neuromag 306 system
-            chan=get_neuromag_chan(chan_type);
+            chan=get_meeg_channels(sens_type);
 
             time=(-.2:.05:1.3)';
 
@@ -278,6 +295,109 @@ function a=dim_labels_values(data_type, chan_type)
     a.fdim.values=values;
     a.fdim.labels=labels;
 
+function labels=get_meeg_channels(sens_type)
+
+    % mapping from name to helper function
+    % each name is prefixed with 'T' to allow names that start with a digit
+    sens2func=struct();
+    sens2func.Tneuromag306=@get_neuromag_chan;
+    sens2func.Tctf151=@get_CTF151_chan;
+    sens2func.T4d148=@get_4d148_chan;
+    sens2func.T4d248=@get_4d248_chan;
+    sens2func.Teeg1020=@get_eeg1020_chan;
+    sens2func.Tyokogawa64=@get_yokogawa64_chan;
+    sens2func.Tyokogawa160=@get_yokogawa160_chan;
+
+    key=['T' sens_type];
+    supported_sens=fieldnames(sens2func);
+    for k=1:numel(supported_sens)
+        sp=cosmo_strsplit(key,supported_sens{k});
+        if isempty(sp{1})
+            chan_type=sp{2};
+
+            func=sens2func.(supported_sens{k});
+            labels=func(chan_type);
+            return
+        end
+    end
+
+    supported_labels=cellfun(@(x)[x(2:end) '*'],supported_sens,...
+                        'UniformOutput',false);
+    error('Unsupported sens_type %s, supported are: ',...
+            cosmo_strjoin(supported_labels, ', '));
+
+
+function labels=get_eeg1020_chan(chan_type)
+    assert(isempty(chan_type));
+    labels={ 'Fp1'  'Fpz'  'Fp2'  'F7'  'F3'  'Fz'  'F4'  'F8'...
+               'T7'  'C3'  'Cz'  'C4'  'T8'  'P7'  'P3'  'Pz' ...
+               'P4'  'P8'  'O1'  'Oz'  'O2'}';
+
+function labels=get_4d248_chan(chan_type)
+    labels=get_4dX48_chan_helper(chan_type,248);
+
+function labels=get_4d148_chan(chan_type)
+    labels=get_4dX48_chan_helper(chan_type,148);
+
+function labels=get_yokogawa64_chan(chan_type)
+    labels=get_yokogawaX_chan_helper(chan_type,64);
+
+function labels=get_yokogawa160_chan(chan_type)
+    labels=get_yokogawaX_chan_helper(chan_type,160);
+
+function labels=get_yokogawaX_chan_helper(chan_type,nchan)
+    labels=get_general_chan_helper(chan_type,nchan,...
+                        'AG%03d','AG%03d_dH','AG%03d_dV');
+
+
+
+function labels=get_4dX48_chan_helper(chan_type,nchan)
+    labels=get_general_chan_helper(chan_type,nchan,...
+                        'A%d','A%d_dH','A%d_dV');
+
+function labels=get_general_chan_helper(chan_type,nchan,...
+                        pat_combined, pat_planar1, pat_planar2)
+    idxs=num2cell(1:nchan);
+    generate=@(pat) cellfun(@(x)sprintf(pat,x),idxs,...
+                        'UniformOutput',false);
+    switch chan_type
+        case {'','combined'}
+            labels=generate(pat_combined)';
+        case 'planar'
+            labels=[generate(pat_planar1) generate(pat_planar2)]';
+        otherwise
+            error('illegal chan type %s', chan_type);
+    end
+
+function labels=get_CTF151_chan(chan_type)
+    assert(isempty(chan_type));
+    lats='LRZ';   % lateralities
+    locs='CFOPT'; % brain part
+    counts=[repmat({{[0,5,4,3,3],[0,2,3,4,5,2],[0,2,2,3,3],...
+                            [0,3,2,4],[0,6,6,5,4]}},2,1);...
+                    {{2,3,2,2}}];
+
+    labels=cell(151,1);
+    pos=0;
+    for i=1:numel(lats)
+        lat=lats(i);
+        count=counts{i};
+        for k=1:numel(count)
+            loc=locs(k);
+            cs=count{k};
+            for j=1:numel(cs)
+                for m=1:cs(j)
+                    label=sprintf('M%s%s%d%d',lat,loc,j-1,m);
+                    pos=pos+1;
+                    labels{pos}=label;
+                end
+            end
+        end
+    end
+
+
+
+
 function labels=get_neuromag_chan(chan_type)
     % get channels for neuromag system
     all_chan_idxs=cosmo_cartprod(cellfun(@num2cell,...
@@ -304,9 +424,9 @@ function labels=get_neuromag_chan(chan_type)
     for k=1:numel(types)
         tp=types{k};
         switch tp
-            case 'all'
+            case {'all',''}
                 keep_col([1 2 3])=true;
-            case {'cmb','combined'}
+            case {'combined'}
                 keep_col(4)=true;
             case 'planar'
                 keep_col([2 3])=true;
@@ -342,9 +462,12 @@ function dim_size=get_dim_size(size_label)
     dim_size=size2dim.(size_label);
 
 
-function [ds, nfeatures]=get_fdim_fa(data_type, size_label, chan_type)
+function [ds, nfeatures]=get_fdim_fa(opt)
+    data_type=opt.type;
+    size_label=opt.size;
+
     % get dimension labels
-    a=dim_labels_values(data_type, chan_type);
+    a=dim_labels_values(opt);
     labels=a.fdim.labels;
     values=a.fdim.values;
     a=rmfield(a,'fdim');
