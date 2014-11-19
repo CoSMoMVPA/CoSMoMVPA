@@ -112,6 +112,8 @@ function ds_splits=cosmo_split(ds, split_by, dim)
         error('dim should be 1 or 2');
     end
 
+    cosmo_check_dataset(ds);
+
     % if empty split return just the dataset itself
     if isempty(split_by)
         ds_splits={ds};
@@ -137,7 +139,7 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 
     % slice for each unique part
     for k=1:n
-        ds_splits{k}=cosmo_slice(ds,split_idxs{k},dim);
+        ds_splits{k}=cosmo_slice(ds,split_idxs{k},dim,false);
     end
 
 
