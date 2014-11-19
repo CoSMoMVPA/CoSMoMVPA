@@ -10,8 +10,8 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %   opt                struct with the following fields:
 %      .child_classifier                  handle to classifier to use (e.g.
 %                                         @cosmo_classify_matlabsvm).
-%      .feature_selector                  handle to featur selector (e.g.
-%                                         @cosmo_anove_feature_selector).
+%      .feature_selector                  handle to feature selector (e.g.
+%                                         @cosmo_anova_feature_selector).
 %      .feature_selection_ratio_to_keep   ratio of how many features to
 %                                         keep. Should be in between 0 and
 %                                         1.
@@ -28,7 +28,7 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
     ds=struct();
     ds.samples=samples_train;
     ds.sa.targets=targets_train;
-    ds.sa.chunks=1:size(targets_train,1)'; % assume all independent
+    ds.sa.chunks=(1:size(targets_train,1))'; % assume all independent
     feature_idxs=feature_selector(ds, ratio_to_keep);
 
     % select data with the 'best' features
@@ -36,7 +36,8 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
     selected_samples_test=samples_test(:,feature_idxs);
 
     % use the classifier to predict it on that data
-    predicted=classifier(selected_samples_train, targets_train, selected_samples_test, opt);
+    predicted=classifier(selected_samples_train, targets_train, ...
+                            selected_samples_test, opt);
 
 
 
