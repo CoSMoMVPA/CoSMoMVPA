@@ -122,7 +122,9 @@ function ft=build_ft(ds)
     is_single_sample=size(ds.samples,1)==1;
     if is_single_sample
         arr_size=size(arr);
-        arr=reshape(arr,arr_size(2:end));
+        if numel(arr_size)>2
+            arr=reshape(arr,arr_size(2:end));
+        end
         samples_label=cell(0);
     else
         samples_label={ds.a.meeg.samples_label};
