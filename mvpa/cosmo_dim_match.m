@@ -194,5 +194,5 @@ function [dim_label, dim_values]=match_single_dim(ds, dim_label, ...
 
     % set new value based on indices of the matching mask
     dim_values=find(match_mask);
-    dim_label=ds.fa.(ds.a.fdim.labels{index});
+    dim_label=ds.(attr_name).(ds.a.(dim_name).labels{index});
 
