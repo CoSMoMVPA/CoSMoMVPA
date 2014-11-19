@@ -89,7 +89,6 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
     % find dimension index
     [dim,index,attr_name,dim_name]=cosmo_dim_find(ds,label);
 
-
     % get dimension values
     dim_values=ds.a.(dim_name).values{index};
     nvalues=numel(dim_values);
@@ -120,6 +119,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
             first_pos=first_pos+1;
         end
 
+        last_pos=first_pos;
         % find right edge
         while last_pos<nunq && fa_unq(last_pos)<center_id+radius
             last_pos=last_pos+1;
