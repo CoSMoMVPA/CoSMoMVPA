@@ -73,7 +73,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     if numel(pd) ~= numel(target_dsm_vec),
         error(['Sample size mismatch between dataset (%d) '...
                     'and target dsm in vector form (%d)'], ...
-                        numel(pd) ~= numel(target_dsm_vec));
+                        numel(pd), numel(target_dsm_vec));
     end
 
     % >@@>
