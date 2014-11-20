@@ -1,5 +1,5 @@
 function cosmo_disp(x,varargin)
-% converts data to a string representation
+% display the input as a string representation
 %
 % cosmo_disp(x,opt)
 %
@@ -129,8 +129,8 @@ function cosmo_disp(x,varargin)
 %
 % Notes:
 %   - Unlike the builtin 'disp' function, this function shows the contents
-%     of x using recursion. For example if a cell contains a struct, then
-%     the contents of that struct is shown as well
+%     of the input using recursion. For example if a cell contains a
+%     struct, then the contents of that struct is shown as well
 %   - A use case is displaying dataset structs
 %
 % NNO Jan 2014
@@ -236,27 +236,41 @@ function y=nd_any2str(x,opt)
     p=cosmo_cartprod(parts);
     xflat=reshape(x,[sz(1:2) n_rest]);
 
-    s=cell(n_rest*2+1,2);
-    s{1,1}=any2summary_str(x);
+    [pre,post]=get_mx_idxs(xflat, opt.edgeitems, opt.threshold, 3);
+
+    header=any2summary_str(x);
+    s_pre=nd_any2str_helper(xflat,p, pre,opt);
+
+    if isempty(post)
+        s_post={'',''};
+        s_dots='';
+    else
+        s_post=nd_any2str_helper(xflat,p, post,opt);
+        s_dots=cell(1,2);
+        for k=1:2
+            szs=cellfun(@(x)size(x,2),s_post(:,k));
+            pos=round(max(szs)/2);
+            s_dots{k}=[repmat(' ',1,pos) ':'];
+        end
+    end
+
+    s_all=cat(1,s_pre,s_dots,s_post);
+
+    y=strcat_({header;strcat_(s_all)});
+
+
+function s=nd_any2str_helper(xflat, p, idxs, opt)
+    n_rest=numel(idxs);
+    s=cell(n_rest,2);
     for k=1:n_rest
-        v=xflat(:,:,k);
+        idx=idxs(k);
+        v=xflat(:,:,idx);
         v_str=disp_helper(v,opt);
-        idx_str=sprintf(',%d',p(k,:));
-        s{k+1,1}=sprintf('   (:,:%s) = ',idx_str);
-        s{k+1,2}=v_str;
+        idx_str=sprintf(',%d',p(idx,:));
+        s{k,1}=sprintf('   (:,:%s) = ',idx_str);
+        s{k,2}=v_str;
     end
 
-    y=strcat_(s);
-
-function tf=is_2d(s)
-    tf=numel(size(s))==2;
-
-
-function check_is_singleton(s)
-    n=numel(s);
-    if n>1
-        error('Non-singleton elements (found %d values) not supported',n);
-    end
 
 function y=strcat_(xs)
     if isempty(xs)
