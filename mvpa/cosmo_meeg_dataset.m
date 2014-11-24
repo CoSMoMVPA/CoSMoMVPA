@@ -171,9 +171,10 @@ function tp=ft_senstype_wrapper(ft)
     % wrapper to deal with neuromag306
     tp=ft_senstype(ft);
     if strcmp(tp,'unknown')
-        labels=ft_senslabel('neuromag306alt_combined');
-        n=numel(labels);
-        if numel(intersect(labels,ft.label))/n >= .4
+        label=ft.label;
+        m=~cellfun(@isempty,regexp(label,'MEG.\d\d\d'));
+
+        if mean(m)>.4
             tp='neuromag';
         end
     end
