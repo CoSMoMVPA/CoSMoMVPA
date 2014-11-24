@@ -168,9 +168,9 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     > .labels
 %     >   { 'chan'  'time' }
 %     > .values
-%     >   { { 'A1_dH'    [  -0.2
-%     >       'A2_dH'      -0.15 ]
-%     >       'A3_dH' }            }
+%     >   { { 'A148_dH'    [  -0.2
+%     >       'A147_dH'      -0.15 ]
+%     >       'A146_dH' }            }
 %
 % NNO Aug 2014
 
@@ -368,7 +368,7 @@ function labels=get_general_chan_helper(chan_type,chan_vals,...
 
     % if chan_vals is a scalar, it indicates the number of channels
     if isnumeric(chan_vals) && numel(chan_vals)==1
-        chan_vals=num2cell(1:chan_vals);
+        chan_vals=num2cell(chan_vals:-1:1);
     end
 
     generate=@(pat) cellfun(@(x)sprintf(pat,x),chan_vals,...
