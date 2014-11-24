@@ -3,8 +3,9 @@ function test_suite = test_meeg_baseline_correct
 
 function test_meeg_baseline_correct_ft_comparison()
     interval=[-.15 -.05];
-    methods={'relative','absolute','relchange','db'};
-    ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+    methods={'relative','absolute','relchange'};
+    ds=cosmo_synthetic_dataset('type','timefreq','size','big',...
+                                    'senstype','neuromag306_planar');
     ds.sa=struct();
     ds.sa.rpt=(1:size(ds.samples,1))';
     msk=ds.fa.chan<=4 & ds.fa.freq<=2;
@@ -33,6 +34,7 @@ function test_meeg_baseline_correct_ft_comparison()
 
         ds_ft_msk=ds_ft_bl.fa.chan==3 & ds_ft_bl.fa.freq==2;
         d_ft=cosmo_slice(ds_ft_bl,ds_ft_msk,2);
+        d_ft.a.meeg=rmfield(d_ft.a.meeg,'senstype');
 
         for j=1:2
             if j==1
