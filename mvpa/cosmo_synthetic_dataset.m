@@ -178,6 +178,8 @@ function ds=cosmo_synthetic_dataset(varargin)
     default.chunks=[];
     default.targets=[];
 
+    default.target1=1;
+
     % for MEEG
     default.sens='neuromag306all';
 
@@ -201,6 +203,8 @@ function ds=cosmo_synthetic_dataset(varargin)
 
     ds.samples=generate_samples(ds, class_distance);
     ds=assign_sa(ds, opt, {'chunks','targets'});
+
+    ds.sa.targets=ds.sa.targets+opt.target1-1;
 
     cosmo_check_dataset(ds);
 
