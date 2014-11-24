@@ -158,9 +158,9 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >       'MLC12'            -0.15
 %     >       'MLC13'             -0.1
 %     >         :                  :
-%     >       'MZP02'              0.5
-%     >       'SCALE'             0.55
-%     >       'COMNT' }@153x1      0.6 ]@17x1 }
+%     >       'MZO02'              0.5
+%     >       'MZP01'             0.55
+%     >       'MZP02' }@151x1      0.6 ]@17x1 }
 %
 % NNO Aug 2014
 
