@@ -158,9 +158,9 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >       'MLC12'            -0.15
 %     >       'MLC13'             -0.1
 %     >         :                  :
-%     >       'MZO02'              0.5
-%     >       'MZP01'             0.55
-%     >       'MZP02' }@151x1      0.6 ]@17x1 }
+%     >       'MZP02'              0.5
+%     >       'SCALE'             0.55
+%     >       'COMNT' }@153x1      0.6 ]@17x1 }
 %
 % NNO Aug 2014
 
@@ -179,7 +179,7 @@ function ds=cosmo_synthetic_dataset(varargin)
     default.targets=[];
 
     % for MEEG
-    default.sens='neuromag306all';
+    default.sens='neuromag306_all';
 
     opt=cosmo_structjoin(default,varargin);
 
@@ -308,23 +308,19 @@ function labels=get_meeg_channels(sens_type)
     sens2func.Tyokogawa64=@get_yokogawa64_chan;
     sens2func.Tyokogawa160=@get_yokogawa160_chan;
 
-    key=['T' sens_type];
-    supported_sens=fieldnames(sens2func);
-    for k=1:numel(supported_sens)
-        sp=cosmo_strsplit(key,supported_sens{k});
-        if isempty(sp{1})
-            chan_type=sp{2};
-
-            func=sens2func.(supported_sens{k});
-            labels=func(chan_type);
-            return
-        end
+    sp=cosmo_strsplit(['T' sens_type],'_');
+    key=sp{1};
+    if ~isfield(sens2func,key)
+        supported_sens=fieldnames(sens2func);
+        supported_labels=cellfun(@(x)[x(2:end) '*'],supported_sens,...
+                        'UniformOutput',false);
+        error('Unsupported sens_type %s, supported are: %s ',...
+                    key(2:end),cosmo_strjoin(supported_labels, ', '));
     end
 
-    supported_labels=cellfun(@(x)[x(2:end) '*'],supported_sens,...
-                        'UniformOutput',false);
-    error('Unsupported sens_type %s, supported are: ',...
-            cosmo_strjoin(supported_labels, ', '));
+    func=sens2func.(key);
+    chan_type=[cosmo_strjoin(sp(2:end),'_') '']; % ensure string
+    labels=func(chan_type);
 
 
 function labels=get_eeg1020_chan(chan_type)
@@ -349,19 +345,22 @@ function labels=get_yokogawaX_chan_helper(chan_type,nchan)
     labels=get_general_chan_helper(chan_type,nchan,...
                         'AG%03d','AG%03d_dH','AG%03d_dV');
 
-
-
 function labels=get_4dX48_chan_helper(chan_type,nchan)
     labels=get_general_chan_helper(chan_type,nchan,...
                         'A%d','A%d_dH','A%d_dV');
 
-function labels=get_general_chan_helper(chan_type,nchan,...
+function labels=get_general_chan_helper(chan_type,chan_vals,...
                         pat_combined, pat_planar1, pat_planar2)
-    idxs=num2cell(1:nchan);
-    generate=@(pat) cellfun(@(x)sprintf(pat,x),idxs,...
+
+    % if chan_vals is a scalar, it indicates the number of channels
+    if isnumeric(chan_vals) && numel(chan_vals)==1
+        chan_vals=num2cell(1:chan_vals);
+    end
+
+    generate=@(pat) cellfun(@(x)sprintf(pat,x),chan_vals,...
                         'UniformOutput',false);
     switch chan_type
-        case {'','combined'}
+        case {'','planar_combined'}
             labels=generate(pat_combined)';
         case 'planar'
             labels=[generate(pat_planar1) generate(pat_planar2)]';
@@ -370,7 +369,12 @@ function labels=get_general_chan_helper(chan_type,nchan,...
     end
 
 function labels=get_CTF151_chan(chan_type)
-    assert(isempty(chan_type));
+    chan_vals=get_CTF151_chan_prefixes();
+    labels=get_general_chan_helper(chan_type,chan_vals,...
+                        '%s','%s_dH','%s_dV');
+
+function labels=get_CTF151_chan_prefixes()
+    % get channels for CTF151
     lats='LRZ';   % lateralities
     locs='CFOPT'; % brain part
     counts=[repmat({{[0,5,4,3,3],[0,2,3,4,5,2],[0,2,2,3,3],...
@@ -426,7 +430,7 @@ function labels=get_neuromag_chan(chan_type)
         switch tp
             case {'all',''}
                 keep_col([1 2 3])=true;
-            case {'combined'}
+            case 'planar_combined'
                 keep_col(4)=true;
             case 'planar'
                 keep_col([2 3])=true;
