@@ -162,6 +162,16 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >       'MZP01'             0.55
 %     >       'MZP02' }@151x1      0.6 ]@17x1 }
 %
+%     % example of MEEG dataset with 4d148 layout (3 channels only)
+%     ds=cosmo_synthetic_dataset('type','meeg','sens','4d148_planar');
+%     cosmo_disp(ds.a.fdim)
+%     > .labels
+%     >   { 'chan'  'time' }
+%     > .values
+%     >   { { 'A1_dH'    [  -0.2
+%     >       'A2_dH'      -0.15 ]
+%     >       'A3_dH' }            }
+%
 % NNO Aug 2014
 
     default=struct();
@@ -181,7 +191,7 @@ function ds=cosmo_synthetic_dataset(varargin)
     default.target1=1;
 
     % for MEEG
-    default.sens='neuromag306all';
+    default.sens='neuromag306_all';
 
     opt=cosmo_structjoin(default,varargin);
 
@@ -385,7 +395,7 @@ function labels=get_CTF151_chan_prefixes()
                             [0,3,2,4],[0,6,6,5,4]}},2,1);...
                     {{2,3,2,2}}];
 
-    labels=cell(151,1);
+    labels=cell(1,151);
     pos=0;
     for i=1:numel(lats)
         lat=lats(i);
