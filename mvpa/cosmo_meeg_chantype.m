@@ -59,7 +59,7 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
     % quality scores of match between labels and senstype
     defaults.label_threshold=.25;
     defaults.layout_threshold=.3;
-    defaults.both_threshold=.4;
+    defaults.both_threshold=.1;
     opt=cosmo_structjoin(defaults,varargin);
 
 
@@ -109,7 +109,7 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
         all_idx=keep_idxs(idx(i));
 
         hit_msk=cosmo_match(labels,all_sens_labels{all_idx});
-        chantypes(hit_msk)=sens_chantypes(k);
+        chantypes(~visited_msk & hit_msk)=sens_chantypes(k);
         visited_msk=visited_msk|hit_msk;
 
         senstype_mapping.(sens_chantypes{k})=keys{all_idx};
@@ -122,12 +122,22 @@ function [keep_idxs,quality]=get_best_idxs(all_quality, opt)
     qs=[all_quality, mean(all_quality,2)];
     thrs=[opt.label_threshold, opt.layout_threshold opt.both_threshold];
 
+    nsens=size(qs,1);
+    keep_msk=true(nsens,1);
+
     for j=1:3
         quality=qs(:,j);
-        keep_idxs=find(quality>thrs(j));
-        if ~isempty(keep_idxs)
-            return
+        exceed_thr=quality>thrs(j);
+
+        if any(exceed_thr)
+            keep_msk=keep_msk & exceed_thr;
         end
+
+    end
+
+    if any(keep_msk)
+        keep_idxs=find(keep_msk);
+        return
     end
 
     error('Could not identify channel type');
