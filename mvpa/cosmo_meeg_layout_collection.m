@@ -98,7 +98,7 @@ function db=read_all_layouts()
     for k=1:nlay
         lay_name=layout_names{k};
         lay_fn=fullfile(lay_dir,lay_name);
-        lay=read_sinlge_layout(lay_fn);
+        lay=read_single_layout(lay_fn);
         lay.name=lay_name;
         layouts{k}=lay;
     end
@@ -106,7 +106,7 @@ function db=read_all_layouts()
     db=layouts;
 
 
-function layout=read_sinlge_layout(fn)
+function layout=read_single_layout(fn)
     % read FT layout (.lay) file
 
     fid=fopen(fn);
