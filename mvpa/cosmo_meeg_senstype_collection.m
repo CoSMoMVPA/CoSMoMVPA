@@ -113,6 +113,7 @@ function senstypes=get_senstypes()
                     @fix_yokogawa440_planar_old_fieldtrip,...
                     @fix_egiX_channels_old_fieldtrip,...
                     @fix_neuromag122_planar_name,...
+                    @fix_eeg10XX_senstype,...
                     @add_modalities,...
                     @check_siblings,...
                     };
@@ -325,6 +326,17 @@ function senstypes=fix_yokogawa440_planar_old_fieldtrip(senstypes)
         end
     end
 
+function senstypes=fix_eeg10XX_senstype(senstypes)
+    % set
+    keys={'eeg1005','eeg1010','eeg1020'};
+    for j=1:numel(keys)
+        key=keys{j};
+        if isfield(senstypes,key)
+            senstypes.(key).sens='ext1020';
+        end
+    end
+
+
 function senstypes=fix_eeg10XX_channels_old_fieldtrip(senstypes)
     % newer versions of fieldtrip add 8 channels to the eeg10XX series
     keys={'eeg1005','eeg1010','eeg1020'};
@@ -367,8 +379,10 @@ function senstypes=check_siblings(senstypes)
     % checks that "siblings" (different elements in senstypes with the same
     % 'sens' value) have the same number of sensor locations
 
-    % no idea why, but has different number of channels across its siblings
-    skip_test_for={'yokogawa440'};
+
+    skip_test_for={'yokogawa440',... % has different number of
+                                 ... % channels across its siblings
+                    'ext1020'}; % for eeg1005, eeg1010, eeg1020
 
     [keys,labels]=get_keys_sens(senstypes);
     [idxs,unq_labels]=cosmo_index_unique({labels});
