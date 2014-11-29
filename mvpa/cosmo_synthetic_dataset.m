@@ -349,10 +349,10 @@ function labels=get_eeg1005_chan(chan_type)
     labels=get_eeg10XX_chan_helper(chan_type,'1005');
 
 
-
 function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
     assert(isempty(chan_type));
 
+    % build mapping from prefix to postfixes
     ch=struct();
     switch sens_type
         case '1020'
@@ -366,6 +366,7 @@ function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
             ch.M={ '1' '2' };
 
         case '1010'
+            ch.CP={ '1' '2' '3' '4' '5' '6' 'z' };
             ch.Fp={ '1' '2' 'z' };
             ch.AF={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
             ch.F={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
@@ -374,7 +375,6 @@ function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
             ch.T={ '10' '3' '4' '5' '6' '7' '8' '9' };
             ch.C={ '1' '2' '3' '4' '5' '6' 'z' };
             ch.TP={ '10' '7' '8' '9' };
-            ch.CP={ '1' '2' '3' '4' '5' '6' 'z' };
             ch.P={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
             ch.PO={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
             ch.O={ '1' '2' 'z' };
@@ -383,6 +383,8 @@ function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
             ch.M={ '1' '2' };
 
         case '1005'
+            ch.FCC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
+                    '6h' 'z' };
             ch.F={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
                     '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' ...
                     'p1' 'p1h' 'p2' 'p2h' 'pz' 'z' };
@@ -413,8 +415,6 @@ function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
             ch.FFC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
                     '6h' 'z' };
             ch.FTT={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
-            ch.FCC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
-                    '6h' 'z' };
             ch.TTP={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
             ch.CCP={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
                     '6h' 'z' };
@@ -558,7 +558,7 @@ function labels=get_neuromag_chan(chan_type)
                 keep_col(4)=true;
             case 'planar'
                 keep_col([2 3])=true;
-            case 'mag'
+            case 'axial'
                 keep_col(1)=true;
             otherwise
                 error('Unsupported channel type %s', tp);
