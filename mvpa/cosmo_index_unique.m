@@ -80,7 +80,10 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
     cell_sizes=[diff([unq_pos;(nidxs+1)])];
 
     % convert to cell representation
-    cell_indices=mat2cell(i,cell_sizes,1);
+    %cell_indices=mat2cell(i,cell_sizes,1);
+    cell_indices=quick_mat2cell_vec(i,cell_sizes);
+    %assertEqual(cell_indices,cell_indices2);
+
     singleton_idx=i(unq_pos);
 
     if return_unique_values
@@ -88,26 +91,16 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
                                                 input_is_array);
     end
 
-function [cell_indices, singleton_idx]=unq_idxs2cell(unq_idxs)
-    nunq=max(unq_idxs);
-    nelems=histc(unq_idxs,1:nunq);
-    cum_nelems=cumsum(nelems);
-    first_pos=[0;cum_nelems(1:(end-1))];
-
-    nidxs=numel(unq_idxs);
-    singleton_idx=zeros(nunq,1);
-    elems=zeros(nidxs,1);
-    for k=1:nidxs
-        unq_idx=unq_idxs(k);
-        pos=first_pos(unq_idx)+1;
-        if pos==cum_nelems(unq_idx)
-            singleton_idx(unq_idx)=k;
-        end
-        elems(pos)=k;
-        first_pos(unq_idx)=pos;
+function c=quick_mat2cell_vec(i, cell_sizes)
+    n=numel(cell_sizes);
+    c=cell(n,1);
+    pos=0;
+    for k=1:n
+        ncell=cell_sizes(k);
+        c{k}=i(pos+(1:ncell));
+        pos=pos+ncell;
     end
 
-    cell_indices=mat2cell(elems,nelems,1);
 
 
 function unique_values=get_unique_values(values,first_idx,input_is_array)
