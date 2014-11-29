@@ -115,7 +115,7 @@ function props=get_senstype_properties()
     %     opt=struct();
     %     opt.sens=sens;
     %     opt.type='meeg';
-    %     opt.size={'big'};%{'tiny','big'};
+    %     opt.size='big';
     %
     %     cp=cosmo_cartprod(opt);
     %     for j=1:numel(cp)
