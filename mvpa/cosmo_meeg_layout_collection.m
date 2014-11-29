@@ -103,7 +103,34 @@ function db=read_all_layouts()
         layouts{k}=lay;
     end
 
-    db=layouts;
+    db=fix_elec1020_old_fieldtrip(layouts);
+
+function db=fix_elec1020_old_fieldtrip(db)
+    % old fieldtrip had channel locations differently;
+    % fix that there so that the unit tests pass
+    i=find_layout(db,'elec1020.lay');
+    lay=db{i};
+    if isequal(lay.pos(1,:),[-0.308949 0.951110]) && ...
+                isequal(unique(lay.width),.75)
+        suffix=cellfun(@(x)x(end),lay.label)';
+
+        suffix1=suffix=='1';
+        suffix2=suffix=='2';
+
+        assert(isequal(lay.label(suffix1),{'Fp1','O1'}'));
+        assert(isequal(lay.label(suffix2),{'Fp2','O2'}'));
+
+        lay.pos(suffix1,:)=[-.38 .89111; -.38 -.89111];
+        lay.pos(suffix2,:)=[.38  .891004; .38 -.891004];
+        lay.width(:)=.35;
+        lay.height(:)=.25;
+        db{i}=lay;
+    end
+
+function i=find_layout(db,name)
+    names=cellfun(@(x)x.name,db,'UniformOutput',false);
+    i=find(cosmo_match(names,name));
+    assert(numel(i)==1);
 
 
 function layout=read_single_layout(fn)
