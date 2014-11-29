@@ -15,7 +15,7 @@ function ds=cosmo_synthetic_dataset(varargin)
 %                           - ctf151
 %                           - 4d{1,2}48[planar]
 %                           - yokogawa{64,160}[planar]
-%                           - eeg1020
+%                           - eeg10{05,10,20}
 %   'sigma', sigma          parameter to influence class distance. The
 %                           larger this value, the more discrimable the
 %                           classes are.
@@ -319,6 +319,8 @@ function labels=get_meeg_channels(sens_type)
     sens2func.T4d148=@get_4d148_chan;
     sens2func.T4d248=@get_4d248_chan;
     sens2func.Teeg1020=@get_eeg1020_chan;
+    sens2func.Teeg1010=@get_eeg1010_chan;
+    sens2func.Teeg1005=@get_eeg1005_chan;
     sens2func.Tyokogawa64=@get_yokogawa64_chan;
     sens2func.Tyokogawa160=@get_yokogawa160_chan;
 
@@ -338,10 +340,117 @@ function labels=get_meeg_channels(sens_type)
 
 
 function labels=get_eeg1020_chan(chan_type)
+    labels=get_eeg10XX_chan_helper(chan_type,'1020');
+
+function labels=get_eeg1010_chan(chan_type)
+    labels=get_eeg10XX_chan_helper(chan_type,'1010');
+
+function labels=get_eeg1005_chan(chan_type)
+    labels=get_eeg10XX_chan_helper(chan_type,'1005');
+
+
+
+function labels=get_eeg10XX_chan_helper(chan_type,sens_type)
     assert(isempty(chan_type));
-    labels={ 'Fp1'  'Fpz'  'Fp2'  'F7'  'F3'  'Fz'  'F4'  'F8'...
-               'T7'  'C3'  'Cz'  'C4'  'T8'  'P7'  'P3'  'Pz' ...
-               'P4'  'P8'  'O1'  'Oz'  'O2'}';
+
+    ch=struct();
+    switch sens_type
+        case '1020'
+            ch.Fp={ '1' '2' 'z' };
+            ch.F={ '3' '4' '7' '8' 'z' };
+            ch.T={ '3' '4' '5' '6' '7' '8' };
+            ch.C={ '3' '4' 'z' };
+            ch.P={ '3' '4' '7' '8' 'z' };
+            ch.O={ '1' '2' 'z' };
+            ch.A={ '1' '2' };
+            ch.M={ '1' '2' };
+
+        case '1010'
+            ch.Fp={ '1' '2' 'z' };
+            ch.AF={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
+            ch.F={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
+            ch.FT={ '10' '7' '8' '9' };
+            ch.FC={ '1' '2' '3' '4' '5' '6' 'z' };
+            ch.T={ '10' '3' '4' '5' '6' '7' '8' '9' };
+            ch.C={ '1' '2' '3' '4' '5' '6' 'z' };
+            ch.TP={ '10' '7' '8' '9' };
+            ch.CP={ '1' '2' '3' '4' '5' '6' 'z' };
+            ch.P={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
+            ch.PO={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
+            ch.O={ '1' '2' 'z' };
+            ch.I={ '1' '2' 'z' };
+            ch.A={ '1' '2' };
+            ch.M={ '1' '2' };
+
+        case '1005'
+            ch.F={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
+                    '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' ...
+                    'p1' 'p1h' 'p2' 'p2h' 'pz' 'z' };
+            ch.AF={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
+                    '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' ...
+                    'p1' 'p10' 'p10h' 'p1h' 'p2' 'p2h' 'p3' 'p3h' ...
+                    'p4' 'p4h' 'p5' 'p5h' 'p6' 'p6h' 'p7' 'p7h' ...
+                    'p8' 'p8h' 'p9' 'p9h' 'pz' 'z' };
+            ch.FT={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.FC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h'...
+                    '6' '6h' 'z' };
+            ch.T={ '10' '10h' '3' '4' '5' '6' '7' '7h' '8' '8h'...
+                    '9' '9h' };
+            ch.C={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h'...
+                    '6' '6h' 'z' };
+            ch.TP={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.CP={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h'...
+                    '6' '6h' 'z' };
+            ch.P={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
+                    '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' 'z' };
+            ch.PO={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
+                    '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' 'z' };
+            ch.O={ '1' '1h' '2' '2h' 'z' };
+            ch.I={ '1' '1h' '2' '2h' 'z' };
+            ch.AFF={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h'...
+                    '5' '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' 'z' };
+            ch.FFT={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.FFC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
+                    '6h' 'z' };
+            ch.FTT={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.FCC={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
+                    '6h' 'z' };
+            ch.TTP={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.CCP={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
+                    '6h' 'z' };
+            ch.TPP={ '10' '10h' '7' '7h' '8' '8h' '9' '9h' };
+            ch.CPP={ '1' '1h' '2' '2h' '3' '3h' '4' '4h' '5' '5h' '6'...
+                    '6h' 'z' };
+            ch.PPO={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h' '5'...
+                    '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' 'z' };
+            ch.POO={ '1' '10' '10h' '1h' '2' '2h' '3' '3h' '4' '4h' '5'...
+                    '5h' '6' '6h' '7' '7h' '8' '8h' '9' '9h' 'z' };
+            ch.OI={ '1' '1h' '2' '2h' 'z' };
+            ch.A={ '1' '2' };
+            ch.M={ '1' '2' };
+
+        otherwise
+            error('illegal senstype %s',sens_type);
+    end
+
+    prefixes=fieldnames(ch);
+    nprefix=numel(prefixes);
+    label_cell=cell(nprefix,1);
+    for k=1:nprefix
+        prefix=prefixes{k};
+        postfixes=ch.(prefix);
+        npostfix=numel(postfixes);
+        prefix_labels=cell(npostfix,1);
+        for j=1:npostfix
+            postfix=postfixes{j};
+            prefix_labels{j}=[prefix postfix];
+        end
+        label_cell{k}=prefix_labels;
+    end
+    labels=cat(1,label_cell{:});
+
+
+
 
 function labels=get_4d248_chan(chan_type)
     labels=get_4dX48_chan_helper(chan_type,248);
@@ -368,6 +477,7 @@ function labels=get_general_chan_helper(chan_type,chan_vals,...
 
     % if chan_vals is a scalar, it indicates the number of channels
     if isnumeric(chan_vals) && numel(chan_vals)==1
+        % take the last channels
         chan_vals=num2cell(chan_vals:-1:1);
     end
 
