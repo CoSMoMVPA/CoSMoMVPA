@@ -142,41 +142,10 @@ function [keep_idxs,quality]=get_best_idxs(all_quality, opt)
 
     error('Could not identify channel type');
 
-
 function quality=compute_overlap(x,ys)
-    % x is a cellstring
-    % y is a cell with cellstrings
+    [q1,q2]=cosmo_overlap(ys,{x});
+    quality=[q1 q2];
 
-    nx=numel(x);
-    ny=numel(ys);
-    nys=zeros(ny,1);
-
-    ntotal_cell=cell(ny+1,1);
-    strs_cell=cell(ny+1,1);
-
-    ntotal_cell{1}=ones(nx,1);
-    strs_cell{1}=x;
-    for k=1:ny
-        nys(k)=numel(ys{k});
-        ntotal_cell{k+1}=ones(nys(k),1)*(k+1);
-        strs_cell{k+1}=ys{k};
-    end
-    idxs=cat(1,ntotal_cell{:});
-    strs=cat(1,strs_cell{:});
-
-    [ii,unq_cell]=cosmo_index_unique({strs});
-    unq=unq_cell{1};
-
-    nunq=numel(unq);
-    h=zeros(ny,1);
-    for k=1:nunq
-        vs=idxs(ii{k});
-        if vs(1)==1
-            h(vs(2:end)-1)=h(vs(2:end)-1)+1;
-        end
-    end
-
-    quality=[h./nx,h./nys];
 
 
 function chan_labels=get_channel_labels(ds)
