@@ -247,7 +247,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
             elseif v_size~=expected_size
                 error(['Size mismatch for %s: expected %d but found %d',...
                         ' elements in dimension %d'],...
-                                v_size, expected_size, dim);
+                                name, v_size, expected_size, dim);
             end
 
             y.(fn)=slice_array(v, to_select, dim, do_check);
