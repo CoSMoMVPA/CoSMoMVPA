@@ -239,6 +239,7 @@ function senstypes=fix_alt_name_senstypes(senstypes)
     end
 
 function senstypes=fix_neuromag122_planar_name(senstypes)
+    % add '_planar' suffix to neuromag122
     [keys,sens]=get_keys_sens(senstypes);
     idxs=find(cosmo_match(sens,'neuromag122'));
     for k=1:numel(idxs)
@@ -355,9 +356,8 @@ function senstypes=fix_eeg10XX_channels_old_fieldtrip(senstypes)
     end
 
 function senstypes=fix_egiX_channels_old_fieldtrip(senstypes)
-    % newer versions of fieldtrip add 8 channels to the eeg10XX series
-    nchans=2.^[5:8]+1;
-    last_chan={'OI2','I2','O2'};
+    % newer versions of fieldtrip add 8 channels to the egiX series
+    nchans=2.^(5:8)+1;
     for j=1:numel(nchans)
         nchan=nchans(j);
         key=sprintf('egi%d',nchan-1);
