@@ -63,7 +63,7 @@ function db=cosmo_meeg_layout_collection()
 %   - the output from this function is similar to FieldTrip's
 %     ft_prepare_layout, but positions are not scaled as in FieldTrip
 %   - this function caches previously read layouts, for optimization
-%     reasons. run "clear functions" to reset the cahce.
+%     reasons. run "clear functions" to reset the cache.
 %
 % NNO Nov 2014
 
