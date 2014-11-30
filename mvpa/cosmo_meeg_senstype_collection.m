@@ -114,6 +114,7 @@ function senstypes=get_senstypes()
                     @fix_egiX_channels_old_fieldtrip,...
                     @fix_neuromag122_planar_name,...
                     @fix_eeg10XX_senstype,...
+                    @add_biosemiXXX_abc_names,...
                     @add_modalities,...
                     @check_siblings,...
                     };
@@ -122,6 +123,8 @@ function senstypes=get_senstypes()
             processor=processors{k};
             senstypes=processor(senstypes);
         end
+
+        senstypes=orderfields(senstypes);
 
         cached_senstypes=senstypes;
     else
@@ -252,6 +255,77 @@ function senstypes=fix_neuromag122_planar_name(senstypes)
             senstypes=rmfield(senstypes,key);
         end
     end
+
+function senstypes=add_biosemiXXX_abc_names(senstypes)
+    % adds the 10/20 labels for biosemi16, 32, 64
+
+    for nch=[16 32 64]
+        chs=struct();
+        switch nch
+            case 16
+                chs.C={ '3' '4' 'z' };
+                chs.F={ '3' '4' 'z' };
+                chs.Fp={ '1' '2' };
+                chs.O={ '1' '2' 'z' };
+                chs.P={ '3' '4' 'z' };
+                chs.T={ '7' '8' };
+
+            case 32
+                chs.AF={ '3' '4' };
+                chs.C={ '3' '4' 'z' };
+                chs.CP={ '1' '2' '5' '6' };
+                chs.F={ '3' '4' '7' '8' 'z' };
+                chs.FC={ '1' '2' '5' '6' };
+                chs.Fp={ '1' '2' };
+                chs.O={ '1' '2' 'z' };
+                chs.P={ '3' '4' '7' '8' 'z' };
+                chs.PO={ '3' '4' };
+                chs.T={ '7' '8' };
+
+            case 64
+                chs.AF={ '3' '4' '7' '8' 'z' };
+                chs.C={ '1' '2' '3' '4' '5' '6' 'z' };
+                chs.CP={ '1' '2' '3' '4' '5' '6' 'z' };
+                chs.F={ '1' '2' '3' '4' '5' '6' '7' '8' 'z' };
+                chs.FC={ '1' '2' '3' '4' '5' '6' 'z' };
+                chs.FT={ '7' '8' };
+                chs.Fp={ '1' '2' 'z' };
+                chs.I={ 'z' };
+                chs.O={ '1' '2' 'z' };
+                chs.P={ '1' '10' '2' '3' '4' '5' '6' '7' '8' '9' 'z' };
+                chs.PO={ '3' '4' '7' '8' 'z' };
+                chs.T={ '7' '8' };
+                chs.TP={ '7' '8' };
+        end
+
+        key=sprintf('biosemi%d', nch);
+        if ~isfield(senstypes,key) || cosmo_overlap(...
+                        {senstypes.(key).label},{{'A1','A2','A3'}})==1
+            prefixes=fieldnames(chs);
+            nprefix=numel(prefixes);
+            label_cell=cell(nprefix,1);
+            for k=1:nprefix
+                prefix=prefixes{k};
+                postfixes=chs.(prefix);
+                npostfix=numel(postfixes);
+                prefix_labels=cell(npostfix,1);
+                for j=1:npostfix
+                    postfix=postfixes{j};
+                    prefix_labels{j}=[prefix postfix];
+                end
+                label_cell{k}=prefix_labels;
+            end
+            labels=cat(1,label_cell{:});
+            alt_key=sprintf('biosemi%dalt',nch);
+
+            senstype=struct();
+            senstype.type='eeg';
+            senstype.sens=key;
+            senstype.label=labels;
+            senstypes.(alt_key)=senstype;
+        end
+    end
+
 
 
 function senstypes=fix_neuromag306_planar_combinations(senstypes)
