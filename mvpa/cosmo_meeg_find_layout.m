@@ -1,105 +1,210 @@
 function layout=cosmo_meeg_find_layout(ds, varargin)
-    defaults.senstype=[];
+% finds an MEEG channel layout associated with a dataset
+%
+% layout=cosmo_meeg_find_layout(ds, varargin)
+%
+% Inputs:
+%   'chantype', ct     string indicating the channel type (if the dataset
+%                      has channel labels that allow for different types of
+%                      channels. Depending on the dataset, possible options
+%                      are:
+%                      - 'meg_planar'               pairs of planar MEG
+%                      - 'meg_axial'                axial MEG
+%                      - 'meg_planar_combined'      combined planar MEG
+%                      - 'meg_combined_from_planar' pairs of planar MEG [*]
+%                      - 'eeg'                      eeg channels
+%
+% Output:
+%   layout             MEG channel layout with fields
+%                      .pos     Nx2 x and y coordinates (for N channels)
+%                      .width   Nx1 channel widths
+%                      .height  Nx1 channel heights
+%                      .label   Nx1 cell with channel labels
+%                      .name    string with name of layout
+%                      [*] when chantype is set to
+%                      'meg_combined_from_planar', layout also contains a
+%                      field .parent which is a layout in itself for the
+%                      'meg_planar_combined channels'. In that case,
+%                      layout.parent has the .pos, .width, .height, .label
+%                      and .name fields (all of size Mx1 or Mx2 for M
+%                      planar-combined channels, and in addition a cell
+%                      .child_label (of size Mx1) which contains the
+%                      channel labels in layout.name.
+%
+% Examples:
+%     % generate neuromag306 dataset
+%     ds=cosmo_synthetic_dataset('type','meeg','sens','neuromag306_all');
+%     % get layout for the planar channels
+%     planar_layout=cosmo_meeg_find_layout(ds,'chantype','meg_planar');
+%     cosmo_disp(planar_layout,'strlen',inf);
+%     > .pos
+%     >   [ -73.4      33.4
+%     >     -73.4      38.4
+%     >     -59.6      38.5
+%     >       :         :
+%     >      65.5     -35.3
+%     >      61.2     -25.4
+%     >      61.2     -20.4 ]@204x2
+%     > .width
+%     >   [ 5
+%     >     5
+%     >     5
+%     >     :
+%     >     5
+%     >     5
+%     >     5 ]@204x1
+%     > .height
+%     >   [ 4.8
+%     >     4.8
+%     >     4.8
+%     >      :
+%     >     4.8
+%     >     4.8
+%     >     4.8 ]@204x1
+%     > .label
+%     >   { 'MEG0113'
+%     >     'MEG0112'
+%     >     'MEG0122'
+%     >        :
+%     >     'MEG2632'
+%     >     'MEG2642'
+%     >     'MEG2643' }@204x1
+%     > .name
+%     >   'neuromag306planar.lay'
+%     %
+%     % get layout for axial (magnetometer) channels
+%     mag_layout=cosmo_meeg_find_layout(ds,'chantype','meg_axial');
+%     cosmo_disp(mag_layout.label);
+%     > { 'MEG0111'
+%     >   'MEG0121'
+%     >   'MEG0131'
+%     >      :
+%     >   'MEG2621'
+%     >   'MEG2631'
+%     >   'MEG2641' }@102x1
+%     %
+%     % get layout for planar channels, but add a 'parent' layout which has the
+%     % combined_planar channels
+%     combined_from_planar_layout=cosmo_meeg_find_layout(ds,'chantype',...
+%                                             'meg_combined_from_planar');
+%     cosmo_disp(combined_from_planar_layout.label);
+%     > { 'MEG0113'
+%     >   'MEG0112'
+%     >   'MEG0122'
+%     >      :
+%     >   'MEG2632'
+%     >   'MEG2642'
+%     >   'MEG2643' }@204x1
+%     cosmo_disp(combined_from_planar_layout.parent.label);
+%     > { 'MEG0112+0113'
+%     >   'MEG0122+0123'
+%     >   'MEG0132+0133'
+%     >         :
+%     >   'MEG2622+2623'
+%     >   'MEG2632+2633'
+%     >   'MEG2642+2643' }@102x1
+%     cosmo_disp(combined_from_planar_layout.parent.child_label);
+%     > { { 'MEG0112'  'MEG0113' }
+%     >   { 'MEG0122'  'MEG0123' }
+%     >   { 'MEG0132'  'MEG0133' }
+%     >              :
+%     >   { 'MEG2622'  'MEG2623' }
+%     >   { 'MEG2632'  'MEG2633' }
+%     >   { 'MEG2642'  'MEG2643' } }@102x1
+%
+% NNO Nov 2014
+
+
+
+
+
+    defaults.chantype=[];
     defaults.min_coverage=.2;
     opt=cosmo_structjoin(defaults, varargin);
 
     % get the sensor labels and channel types applicable to this dataset
-    senstype2label=get_supported_senstypes(ds,opt);
+    chantype2senstype=get_dataset_senstypes(ds);
 
-    % get the single sensortype based on the input and available channels
-    ds_senstype=get_base_senstype(senstype2label,opt);
+    % get the single channel type based on the input and available channels
+    ds_chantype=get_base_chantype(chantype2senstype,opt);
 
-    % find initial layout
-    label=senstype2label.(ds_senstype);
-    layout=find_layout(label);
+    % get the sensor type corresponding with the channel type
+    senstype=chantype2senstype.(ds_chantype);
 
-    ds_label=get_dataset_channel_labels(ds);
-    coverage=label_coverage(ds_label, layout.label(:));
+    % use the mapping from senstype to layout to get the layout
+    senstype2layout=cosmo_meeg_senstype2layout_mapping();
+    layout=senstype2layout.(senstype);
 
-    if coverage==0
-        % no coverage, possibly planar channels for which the corresponding
-        % layout is not available. try to get the corresponding
-        % planar_combined layout and use its channel positions
-        [layout,label]=infer_planar_from_combined(senstype2label, label);
-        coverage=label_coverage(ds_label(:),layout.label(:));
-    end
+    % ensure that enough labels are covered in the dataset
+    ds_label=get_dataset_channel_label(ds);
+    coverage=label_coverage(ds_label(:),layout.label(:));
 
     % no coverage, throw an error
     if coverage<opt.min_coverage
         error('channel coverage %.1f%% < 100%% for %s', ...
-                    100*coverage, ds_senstype);
+                    100*coverage, ds_chantype);
     end
 
     % in case of planar channels with senstype set to
     % meg_combined_from_planar, add a parent layout that maps to the
     % original layout
-    is_planar_layout=size(label,2)>1;
-    if is_planar_layout && strcmp(opt.senstype,'meg_combined_from_planar')
-        [parent_layout,parent_label]=find_combined_layout(...
-                                        senstype2label);
+    is_planar_layout=isempty(cosmo_strsplit(ds_chantype,'_planar',-1));
+    if is_planar_layout && strcmp(opt.chantype,'meg_combined_from_planar')
+        parent_senstype=chantype2senstype.meg_combined_from_planar;
+        parent_layout=senstype2layout.(parent_senstype);
+
+        sens_label=get_senstype_label(senstype);
+        parent_sens_label=get_senstype_label(parent_senstype);
+
         nlabels=numel(parent_layout.label);
-        assert(nlabels==size(label,1));
         parent_layout.child_label=cell(nlabels,1);
+        all_child_labels=cell(nlabels,1);
         for k=1:nlabels
-            i=find(cosmo_match(parent_label,parent_layout.label{k}));
-            assert(numel(i)==1);
-            parent_layout.child_label{k}=label(i,:);
+            i=find(cosmo_match(parent_sens_label,parent_layout.label(k)));
+            if numel(i)~=1
+                continue;
+            end
+
+            child_label=sens_label(i,:);
+            all_child_labels{k}=child_label(:);
+            parent_layout.child_label{k}=child_label;
         end
+
+        % sanity check
+        assert(cosmo_overlap({sens_label(:)},...
+                    {cat(1,all_child_labels{:})})==1);
 
         layout.parent=parent_layout;
     end
 
+function label=get_senstype_label(senstype)
+    sc=cosmo_meeg_senstype_collection();
+    label=sc.(senstype).label;
 
+function senstype_mapping=get_dataset_senstypes(ds)
+    % helper function to get supported senstypes
+    [unused,senstype_mapping]=cosmo_meeg_chantype(ds);
+    keys=fieldnames(senstype_mapping);
 
-function [layout,planar_labels]=infer_planar_from_combined(...
-                                          senstype2label,layout_labels)
+    if cosmo_match({'meg_planar'},keys)
+        planar_senstype=senstype_mapping.meg_planar;
+        planar_combined_senstype=[planar_senstype '_combined'];
 
-    combined_layout=find_combined_layout(senstype2label);
-    nlabels=size(combined_layout.pos,1);
-    assert(size(layout_labels,1)==nlabels);
-    combined2planar_idxs=reshape(repmat(1:nlabels,2,1),[],1);
-    layout=slice_layout(combined_layout,combined2planar_idxs);
-
-    planar_labels=senstype2label.meg_planar;
-    layout.label=reshape(planar_labels',[],1);
-
-
-function [combined_layout,combined_labels]=find_combined_layout(...
-                                senstype2label)
-    key='meg_combined_from_planar';
-    if ~isfield(senstype2label,key);
-        error('could not infer planar from combined layout');
+        sc=cosmo_meeg_senstype_collection();
+        if isfield(sc,planar_combined_senstype)
+            senstype_mapping.meg_combined_from_planar=...
+                                        planar_combined_senstype;
+        end
     end
 
-    combined_labels=senstype2label.(key);
-
-    % get layout
-    combined_layout=find_layout(combined_labels);
-
-
-function lay=find_layout(label)
-    lay_coll=cosmo_meeg_layout_collection();
-    lay_label=cellfun(@(x)x.label,lay_coll,'UniformOutput',false);
-    %coverages=cellfun(@(x)mean(cosmo_match(label(:),x.label)),lay_coll);
-    coverages=cosmo_overlap(lay_label,{label});
-    [unused,i]=max(coverages);
-    lay=lay_coll{i};
-
-    % select only channels present in label
-    m=cosmo_match(lay.label,label(:));
-    lay=slice_layout(lay,m);
-
-function lay=slice_layout(lay, to_select)
-    name=lay.name;
-    lay=rmfield(lay,'name');
-    lay=cosmo_slice(lay,to_select,1,'struct');
-    lay.name=name;
 
 function c=label_coverage(x,y)
+    % helper function to compute coverage of labels by a layout
     c=mean(cosmo_match(x(:),y(:)));
 
 
-function chan_labels=get_dataset_channel_labels(ds)
+function chan_labels=get_dataset_channel_label(ds)
+    % helper function to get labels from dataset
     if iscellstr(ds)
         chan_labels=ds;
     else
@@ -108,75 +213,40 @@ function chan_labels=get_dataset_channel_labels(ds)
     end
 
 
-function senstype=get_base_senstype(senstype2label, opt)
-    has_senstype=ischar(opt.senstype) && ~isempty(opt.senstype);
-    senstypes=fieldnames(senstype2label);
-    has_key=@(key)cosmo_match({key},senstypes);
+function chantype=get_base_chantype(chantype2senstype, opt)
+    % helper function to get the base (i.e. the one
+    % returned in layout) channel type.
+    % (this is not the parent type)
+    has_chantype=ischar(opt.chantype) && ~isempty(opt.chantype);
+    chantypes=fieldnames(chantype2senstype);
+    has_key=@(key)cosmo_match({key},chantypes);
 
     error_msg='';
-    if has_senstype
-        if strcmp(opt.senstype,'meg_combined_from_planar')
+    if has_chantype
+        if strcmp(opt.chantype,'meg_combined_from_planar')
             if has_key('meg_planar')
-                senstype='meg_planar';
+                chantype='meg_planar';
             else
                 error_msg=sprintf(['Cannot use senstype ''%s'' because'...
-                                    'planar channels were not found'],...
-                                        opt.senstype);
+                                    'meg_planar not available'],...
+                                        opt.chantype);
             end
-        elseif ~has_key(opt.senstype);
-            error_msg=sprintf('senstype ''%s'' is not supported',...
-                                    opt.senstype);
+        elseif ~has_key(opt.chantype);
+            error_msg=sprintf('chantype ''%s'' is not supported',...
+                                    opt.chantype);
         else
-            senstype=opt.senstype;
+            chantype=opt.chantype;
         end
     else
-        if numel(senstypes)>1
-            error_msg=['''senstype'' argument is not provided, but '...
+        if numel(chantypes)>1
+            error_msg=['''chantype'' argument is not provided, but '...
                         'multiple types are available'];
         else
-            senstype=senstypes{1};
+            chantype=chantypes{1};
         end
     end
 
     if ~isempty(error_msg)
-        error('%s. Set the ''senstype'' argument to one of: ''%s.''',...
-                error_msg,cosmo_strjoin(senstypes, ''', '''));
+        error('%s. Set the ''chantype'' argument to one of: ''%s''.',...
+                error_msg,cosmo_strjoin(chantypes, ''', '''));
     end
-
-
-function senstype2label=get_supported_senstypes(ds,opt)
-    [unused,senstype_mapping]=cosmo_meeg_chantype(ds);
-    keys=fieldnames(senstype_mapping);
-
-    % get all supported acquistion systems
-    sens_db=cosmo_meeg_senstype_collection();
-
-    senstype2label=struct();
-    for k=1:numel(keys)
-        key=keys{k};
-        senstype2label.(key)=sens_db.(senstype_mapping.(key)).label;
-    end
-
-    % see if any senstype is of planar type
-    i=find(cosmo_match(keys,{'meg_planar'}));
-    has_planar=numel(i)>0;
-
-    if ~has_planar
-        return
-    end
-
-    % if there is a planar type, see if there is a matching
-    % planar_combined type as well. If that is the case, add this to the
-    % supported sensor types
-    planar_key=senstype_mapping.(keys{i});
-    combined_key=regexprep(planar_key,'planar$','planar_combined');
-    if isfield(sens_db, combined_key)
-        combined_label=sens_db.(combined_key).label;
-        senstype2label.meg_combined_from_planar=combined_label;
-    end
-
-
-
-
-
-
