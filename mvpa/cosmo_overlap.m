@@ -63,8 +63,10 @@ function [y_in_x,x_in_y]=cosmo_overlap(xs,ys)
     % space for histogram
     h=zeros(nx,ny);
 
-    nxs_sum=sum(nxs);
+    % position of index of last value in xs
+    xs_pos_last=sum(nxs);
 
+    % because string comparisons are slow, use their indices instead
     [unq,unused,idxs]=unique(xyc);
     nunq=numel(unq);
     [idxs_sorted,i_sorted]=sort(idxs);
@@ -73,26 +75,33 @@ function [y_in_x,x_in_y]=cosmo_overlap(xs,ys)
     unq_start_end_pos=[find(msk); 1+numel(msk)];
 
     for j=1:nunq
-        start_pos=unq_start_end_pos(j);
-        end_pos=unq_start_end_pos(j+1)-1;
-        i=i_sorted(start_pos:(end_pos));
+        % more readible, but slower:
+        %    start_pos=unq_start_end_pos(j);
+        %    end_pos=unq_start_end_pos(j+1)-1;
+        %    if i_sorted(start_pos)>xs_pos_last [...]
+        if i_sorted(unq_start_end_pos(j))<=xs_pos_last && ...
+                i_sorted(unq_start_end_pos(j+1)-1)>xs_pos_last
 
-        % little otimization
-        if i(end)<=nxs_sum
-            continue;
+            start_pos=unq_start_end_pos(j);
+            end_pos=unq_start_end_pos(j+1)-1;
+
+            i=i_sorted(start_pos:(end_pos));
+
+            first_y=find_first_greater_than(i,xs_pos_last);
+            px=xyi(i(1:(first_y-1)));
+            py=xyi(i(first_y:end))-nx;
+
+            h(px,py)=h(px,py)+1;
         end
-
-        first_y=find_first_greater_than(i,nxs_sum);
-        px=xyi(i(1:(first_y-1)));
-        py=xyi(i(first_y:end))-nx;
-
-        h(px,py)=h(px,py)+1;
     end
 
     x_in_y=bsxfun(@rdivide,h,nxs);
     y_in_x=bsxfun(@rdivide,h,nys');
 
 function i=find_first_greater_than(sorted_vs,thr)
+    % using binary search, find the first position i in sorted_vs
+    % so that sorted(vs)>thr
+    % it is assumed that sorted_vs is sorted
     if sorted_vs(end)<=thr
         i=numel(sorted_vs)+1;
         return
@@ -110,10 +119,8 @@ function i=find_first_greater_than(sorted_vs,thr)
         end
     end
     i=first;
-    assert(sorted_vs(i)>thr);
-    assert(i==1 || sorted_vs(i-1)<=thr);
-
-
+    %assert(sorted_vs(i)>thr);
+    %assert(i==1 || sorted_vs(i-1)<=thr);
 
 
 function [xs_vec,n,c,i]=get_counts(xs)
