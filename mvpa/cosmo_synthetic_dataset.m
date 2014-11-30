@@ -548,7 +548,7 @@ function labels=get_neuromag_chan(chan_type)
     labels(:,1)=cellstr([meg infix one]);
     labels(:,2)=cellstr([meg infix two]);
     labels(:,3)=cellstr([meg infix three]);
-    labels(:,4)=cellstr([meg infix two plus_ meg infix three]);
+    labels(:,4)=cellstr([meg infix two plus_ infix three]);
 
     keep_col=false(1,4);
     types=cosmo_strsplit(chan_type,'+');
