@@ -30,8 +30,9 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
                     100*coverage, ds_senstype);
     end
 
-    % in case of planar channels with senstype set to planar_combined,
-    % add a parent layout that maps to the original layout
+    % in case of planar channels with senstype set to
+    % meg_combined_from_planar, add a parent layout that maps to the
+    % original layout
     is_planar_layout=size(label,2)>1;
     if is_planar_layout && strcmp(opt.senstype,'meg_combined_from_planar')
         [parent_layout,parent_label]=find_combined_layout(...
