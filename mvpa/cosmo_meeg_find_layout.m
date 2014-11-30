@@ -165,7 +165,7 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
                 continue;
             end
 
-            child_label=sens_label(i,:);
+            child_label=sort(sens_label(i,:));
             all_child_labels{k}=child_label(:);
             parent_layout.child_label{k}=child_label;
         end
