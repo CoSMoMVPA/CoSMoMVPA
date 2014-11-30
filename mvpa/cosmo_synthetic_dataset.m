@@ -528,24 +528,27 @@ function labels=get_CTF151_chan_prefixes()
 
 function labels=get_neuromag_chan(chan_type)
     % get channels for neuromag system
-    all_chan_idxs=cosmo_cartprod(cellfun(@num2cell,...
-                                   {1:26,1:4},'UniformOutput',false));
+    all_chan_idxs=[repmat((1:26)',4,1) kron((1:4)',ones(26,1))];
     remove_msk=cosmo_match(all_chan_idxs(:,1), 8) & ...
                         cosmo_match(all_chan_idxs(:,2),[3 4]);
     chan_idxs=all_chan_idxs(~remove_msk,:);
     nloc=size(chan_idxs,1);
     assert(nloc==102);
 
-    % columns are: mag, planar1, planar2, combined
+    infix=reshape(sprintf('%02d%d',chan_idxs'),3,[])';
+    as_column=@(x) repmat(x,nloc,1);
+
+    meg=as_column('MEG');
+    one=as_column('1');
+    two=as_column('2');
+    three=as_column('3');
+    plus_=as_column('+');
+
     labels=cell(nloc,4);
-    for k=1:nloc
-        chan_idx=chan_idxs(k,:);
-        for j=1:3
-            labels{k,j}=sprintf('MEG%02d%d%d',chan_idx,j);
-        end
-        labels{k,4}=sprintf('MEG%02d%d%d+%02d%d%d',...
-                                chan_idx,2,chan_idx,3);
-    end
+    labels(:,1)=cellstr([meg infix one]);
+    labels(:,2)=cellstr([meg infix two]);
+    labels(:,3)=cellstr([meg infix three]);
+    labels(:,4)=cellstr([meg infix two plus_ meg infix three]);
 
     keep_col=false(1,4);
     types=cosmo_strsplit(chan_type,'+');
