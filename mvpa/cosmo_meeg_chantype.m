@@ -56,9 +56,11 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 % NNO Nov 2014
 
     persistent cached_opt;
-    persistent cached_ds;
+    persistent cached_ds_labels;
     persistent cached_chantypes;
     persistent cached_senstype_mapping
+
+    ds_labels=get_channel_labels(ds);
 
     defaults=struct();
     % quality scores of match between labels and senstype
@@ -68,18 +70,18 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
     defaults.both_threshold=.1;
     opt=cosmo_structjoin(defaults,varargin);
 
-    if ~(isequal(opt, cached_opt) && isequal(cached_ds,ds))
-        [cached_chantypes,cached_senstype_mapping]=get_meeg_chantype(ds,...
-                                                                    opt);
+
+    if ~(isequal(opt, cached_opt) && isequal(cached_ds_labels,ds_labels))
+        [cached_chantypes,cached_senstype_mapping]=get_meeg_chantype(...
+                                                    ds_labels,opt);
         cached_opt=opt;
-        cached_ds=ds;
+        cached_ds_labels=ds_labels;
     end
     chantypes=cached_chantypes;
     senstype_mapping=cached_senstype_mapping;
 
 
-function [chantypes,senstype_mapping]=get_meeg_chantype(ds,opt);
-    labels=get_channel_labels(ds);
+function [chantypes,senstype_mapping]=get_meeg_chantype(labels,opt)
     nlabels=numel(labels);
 
     senstype_collection=cosmo_meeg_senstype_collection();
