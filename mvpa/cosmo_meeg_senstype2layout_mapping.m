@@ -57,7 +57,8 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     >   'neuromag306planar.lay'
 %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
-%     % get layout for neuromag306 MEG combined planar (combined gradiometers)
+%     % get layout for neuromag306 MEG combined planar
+%     % (combined gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar_combined;
 %     cosmo_disp(layout,'strlen',inf);
 %     > .pos
@@ -144,6 +145,9 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     reasons. run "clear functions" to reset the cache.
 %   - this function uses cosmo_meeg_layout_collection and
 %     cosmo_meeg_senstype_collection to match sensor types with layouts
+%   - this function does not provide layouts for all sensor types; if you
+%     find a layout of interest is missing, please get in touch with the
+%     developers
 %
 % See also: cosmo_meeg_layout_collection, cosmo_meeg_senstype_collection
 %
@@ -291,6 +295,7 @@ function planar_lay=infer_planar_layout_from_combined(planar_name,opt)
     end
 
 function lay=slice_layout(lay, to_select)
+    % helper function to select a subset of channels
     name=lay.name;
     lay=rmfield(lay,'name');
     lay=cosmo_slice(lay,to_select,1,'struct');
