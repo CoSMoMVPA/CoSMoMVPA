@@ -20,121 +20,69 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for neuromag306 MEG planar (gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar;
-%     cosmo_disp(layout,'strlen',inf);
-%     > .pos
-%     >   [ -73.4      33.4
-%     >     -73.4      38.4
-%     >     -59.6      38.5
-%     >       :         :
-%     >      65.5     -35.3
-%     >      61.2     -25.4
-%     >      61.2     -20.4 ]@204x2
-%     > .width
-%     >   [ 5
-%     >     5
-%     >     5
-%     >     :
-%     >     5
-%     >     5
-%     >     5 ]@204x1
-%     > .height
-%     >   [ 4.8
-%     >     4.8
-%     >     4.8
+%     cosmo_disp(layout.label)
+%     > { 'MEG0113'
+%     >   'MEG0112'
+%     >   'MEG0122'
 %     >      :
-%     >     4.8
-%     >     4.8
-%     >     4.8 ]@204x1
-%     > .label
-%     >   { 'MEG0113'
-%     >     'MEG0112'
-%     >     'MEG0122'
-%     >        :
-%     >     'MEG2632'
-%     >     'MEG2642'
-%     >     'MEG2643' }@204x1
-%     > .name
-%     >   'neuromag306planar.lay'
+%     >   'MEG2643'
+%     >   'COMNT'
+%     >   'SCALE'   }@206x1
+%     cosmo_disp([layout.pos layout.width layout.height])
+%     > [ -0.408     0.253    0.0323    0.0332
+%     >   -0.408     0.284    0.0323    0.0332
+%     >   -0.328     0.285    0.0323    0.0332
+%     >      :         :         :         :
+%     >    0.373    -0.082    0.0323    0.0332
+%     >    -0.45     -0.45    0.0323    0.0332
+%     >     0.45     -0.45    0.0323    0.0332 ]@206x4
+%     layout.name
+%     > neuromag306planar.lay
 %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for neuromag306 MEG combined planar
 %     % (combined gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar_combined;
-%     cosmo_disp(layout,'strlen',inf);
-%     > .pos
-%     >   [ -67.4      35.9
-%     >     -53.6        41
-%     >       -62      21.2
-%     >       :         :
-%     >      79.8     -14.8
-%     >      71.5     -37.8
-%     >      67.2     -22.9 ]@102x2
-%     > .width
-%     >   [ 10
-%     >     10
-%     >     10
-%     >      :
-%     >     10
-%     >     10
-%     >     10 ]@102x1
-%     > .height
-%     >   [ 10
-%     >     10
-%     >     10
-%     >      :
-%     >     10
-%     >     10
-%     >     10 ]@102x1
-%     > .label
-%     >   { 'MEG0112+0113'
-%     >     'MEG0122+0123'
-%     >     'MEG0132+0133'
-%     >           :
-%     >     'MEG2622+2623'
-%     >     'MEG2632+2633'
-%     >     'MEG2642+2643' }@102x1
-%     > .name
-%     >   'neuromag306cmb.lay'
-%     >
+%     cosmo_disp(layout.label)
+%     > { 'MEG0112+0113'
+%     >   'MEG0122+0123'
+%     >   'MEG0132+0133'
+%     >         :
+%     >   'MEG2642+2643'
+%     >   'COMNT'
+%     >   'SCALE'        }@104x1
+%     cosmo_disp([layout.pos layout.width layout.height])
+%     > [ -0.408     0.273    0.0645    0.0712
+%     >   -0.328     0.306    0.0645    0.0712
+%     >   -0.377     0.179    0.0645    0.0712
+%     >      :         :         :         :
+%     >    0.373    -0.104    0.0645    0.0712
+%     >    -0.45     -0.45    0.0645    0.0712
+%     >     0.45     -0.45    0.0645    0.0712 ]@104x4
+%     layout.name
+%     > neuromag306cmb.lay
 %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for EEG elec1020
 %     layout=senstype2layout.eeg1020;
-%     cosmo_disp(layout,'strlen',inf);
-%     > .pos
-%     >   [    -0.38     0.891
-%     >     0.000121         1
-%     >         0.38     0.891
-%     >         :          :
-%     >        -0.38    -0.891
-%     >     0.000121        -1
-%     >         0.38    -0.891 ]@21x2
-%     > .width
-%     >   [ 0.35
-%     >     0.35
-%     >     0.35
-%     >       :
-%     >     0.35
-%     >     0.35
-%     >     0.35 ]@21x1
-%     > .height
-%     >   [ 0.25
-%     >     0.25
-%     >     0.25
-%     >       :
-%     >     0.25
-%     >     0.25
-%     >     0.25 ]@21x1
-%     > .label
-%     >   { 'Fp1'
-%     >     'Fpz'
-%     >     'Fp2'
-%     >      :
-%     >     'O1'
-%     >     'Oz'
-%     >     'O2'  }@21x1
-%     > .name
-%     >   'elec1020.lay'
+%     cosmo_disp(layout.label)
+%     > { 'Fp1'
+%     >   'Fpz'
+%     >   'Fp2'
+%     >     :
+%     >   'O2'
+%     >   'COMNT'
+%     >   'SCALE' }@23x1
+%     cosmo_disp([layout.pos layout.width layout.height])
+%     > [ -0.139     0.428     0.125    0.0938
+%     >        0      0.45     0.125    0.0938
+%     >    0.139     0.428     0.125    0.0938
+%     >      :         :         :         :
+%     >    0.139    -0.428     0.125    0.0938
+%     >    -0.45      0.45     0.125    0.0938
+%     >     0.45      0.45     0.125    0.0938 ]@23x4
+%     layout.name
+%     > EEG1020.lay
 %
 % Notes:
 %   - this function requires FieldTrip, as it uses its collection of
@@ -296,10 +244,15 @@ function planar_lay=infer_planar_layout_from_combined(planar_name,opt)
 
 function lay=slice_layout(lay, to_select)
     % helper function to select a subset of channels
-    name=lay.name;
-    lay=rmfield(lay,'name');
-    lay=cosmo_slice(lay,to_select,1,'struct');
-    lay.name=name;
+    nrows=size(lay.pos,1);
+    keys=fieldnames(lay);
+    for k=1:numel(keys)
+        key=keys{k};
+        value=lay.(key);
+        if size(value,1)==nrows
+            lay.(key)=value(to_select,:);
+        end
+    end
 
 
 function lay=find_layout_from_label(label,opt)

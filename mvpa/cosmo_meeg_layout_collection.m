@@ -21,47 +21,31 @@ function db=cosmo_meeg_layout_collection()
 %     i=find(cosmo_match(names,'neuromag306cmb.lay'));
 %     %
 %     % show neuromag306 combined planar layout (with 102 channels)
-%     cosmo_disp(layouts{i})
-%     > .pos
-%     >   [ -67.4      35.9
-%     >     -53.6        41
-%     >       -62      21.2
-%     >       :         :
-%     >      79.8     -14.8
-%     >      71.5     -37.8
-%     >      67.2     -22.9 ]@102x2
-%     > .width
-%     >   [ 10
-%     >     10
-%     >     10
-%     >      :
-%     >     10
-%     >     10
-%     >     10 ]@102x1
-%     > .height
-%     >   [ 10
-%     >     10
-%     >     10
-%     >      :
-%     >     10
-%     >     10
-%     >     10 ]@102x1
-%     > .label
-%     >   { 'MEG0112+0113'
-%     >     'MEG0122+0123'
-%     >     'MEG0132+0133'
-%     >           :
-%     >     'MEG2622+2623'
-%     >     'MEG2632+2633'
-%     >     'MEG2642+2643' }@102x1
-%     > .name
-%     >   'neuromag306cmb.lay'
+%     pl_layout=layouts{i};
+%     cosmo_disp(pl_layout.label)
+%     > { 'MEG0112+0113'
+%     >   'MEG0122+0123'
+%     >   'MEG0132+0133'
+%     >         :
+%     >   'MEG2642+2643'
+%     >   'COMNT'
+%     >   'SCALE'        }@104x1
+%     cosmo_disp([pl_layout.pos pl_layout.width pl_layout.height])
+%     > [ -0.408     0.273    0.0645    0.0712
+%     >   -0.328     0.306    0.0645    0.0712
+%     >   -0.377     0.179    0.0645    0.0712
+%     >      :         :         :         :
+%     >    0.373    -0.104    0.0645    0.0712
+%     >    -0.45     -0.45    0.0645    0.0712
+%     >     0.45     -0.45    0.0645    0.0712 ]@104x4
+%     pl_layout.name
+%     > neuromag306cmb.lay
 %
 % Note:
 %   - this function requires FieldTrip, as it uses its collection of
 %     layouts
 %   - the output from this function is similar to FieldTrip's
-%     ft_prepare_layout, but positions are not scaled as in FieldTrip
+%     ft_prepare_layout.
 %   - this function caches previously read layouts, for optimization
 %     reasons. run "clear functions" to reset the cache.
 %
@@ -76,7 +60,7 @@ function db=cosmo_meeg_layout_collection()
     end
     db=cached_layout_db;
 
-function db=read_all_layouts()
+function layouts=read_all_layouts()
     cosmo_check_external('fieldtrip');
 
     % see where fieldtrip is
@@ -103,7 +87,16 @@ function db=read_all_layouts()
         layouts{k}=lay;
     end
 
-    db=fix_elec1020_old_fieldtrip(layouts);
+    layouts=apply_fixers(layouts);
+
+function layouts=apply_fixers(layouts)
+    fixers={@fix_elec1020_old_fieldtrip,...
+            @fix_make_ft_compatible};
+    for j=1:numel(fixers)
+        fixer=fixers{j};
+        layouts=fixer(layouts);
+    end
+
 
 function db=fix_elec1020_old_fieldtrip(db)
     % old fieldtrip had channel locations differently;
@@ -145,7 +138,7 @@ function layout=read_single_layout(fn)
     pat=['(\d+)\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+)\s+'...
             '([\w\s\+]+\w)\s*' sprintf('\n')];
 
-    matches=regexp(lay_string,pat,'tokens');
+    matches=regexp(sprintf('%s\n',lay_string),pat,'tokens');
 
     % convert to (nchannel x 6) matrix
     layout_matrix=cat(1,matches{:});
@@ -160,3 +153,92 @@ function layout=read_single_layout(fn)
     layout.width  = num_values(:,4);
     layout.height = num_values(:,5);
     layout.label  = layout_matrix(:,6);
+
+
+function layouts=fix_make_ft_compatible(layouts)
+    for j=1:numel(layouts)
+        layouts{j}=make_single_ft_compatible(layouts{j});
+    end
+
+function layout=make_single_ft_compatible(layout)
+    processors={@layout_ft_add_outline,...
+                @layout_ft_scale,...
+                @layout_ft_add_misc_labels};
+
+    for k=1:numel(processors)
+        processor=processors{k};
+        layout=processor(layout);
+    end
+
+function layout=layout_ft_add_outline(layout)
+    % add outline and mask to the layout
+    alpha=(0:.01:1)'*(2*pi);
+    head=[cos(alpha) sin(alpha)]*.5;
+    nose=[0.09  0.496;
+          0     0.575;
+          -0.09 0.496];
+    right_ear=[ 0.4970    0.0555
+                0.5100    0.0775
+                0.5180    0.0783
+                0.5299    0.0746
+                0.5419    0.0555
+                0.5400   -0.0055
+                0.5470   -0.0932
+                0.5320   -0.1313
+                0.5100   -0.1384
+                0.4890   -0.1199 ];
+    left_ear=bsxfun(@times,[-1 1],right_ear);
+
+    layout.outline={head, nose, right_ear, left_ear};
+    layout.mask={head};
+
+function layout=layout_ft_scale(layout)
+    % do not consider the COMNT and SCALE channels
+    chan_msk=~cosmo_match(layout.label,{'COMNT','SCALE'});
+
+    chan_pos=layout.pos(chan_msk,:);
+    extent=(max(chan_pos)-min(chan_pos));
+
+    % put everything in circle around origin with radius .45
+    layout.pos=(bsxfun(@rdivide,bsxfun(@minus,...
+                    layout.pos,min(chan_pos)),extent))*.9-.45;
+    layout.width=layout.width/extent(1);
+    layout.height=layout.height/extent(2);
+
+function stacked_layout=stack_channels(layouts)
+    % helper function to stack the channels
+    % if any element is empty it is just ignored
+    keys={'pos','width','height','label'};
+    nlayout=numel(layouts);
+    nkeys=numel(keys);
+
+    stacked_layout=layouts{1};
+    for k=1:nkeys
+        key=keys{k};
+        values_cell=cell(nlayout,1);
+        for j=1:nlayout
+            layout=layouts{j};
+            if ~isempty(layout)
+                values_cell{j}=layout.(key);
+            end
+        end
+        stacked_layout.(key)=cat(1,values_cell{:});
+    end
+
+function layout=layout_ft_add_misc_labels(layout)
+    comnt_layout=get_single_label(layout,'COMNT',[-.45 -.45]);
+    scale_layout=get_single_label(layout,'SCALE',[ .45 -.45]);
+    layout=stack_channels({layout,comnt_layout,scale_layout});
+
+function y=get_single_label(x,label,pos)
+    % return a layout
+    if cosmo_match({label},x.label);
+        y=[];
+    else
+        y.width=mean(x.width,1);
+        y.height=mean(x.height,1);
+        y.label={label};
+        y.pos=pos;
+    end
+
+
