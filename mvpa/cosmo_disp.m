@@ -182,7 +182,7 @@ function y=nd_struct2str(x,opt)
     sz=size(x);
     ndim=numel(sz);
 
-    if ndim==2
+    if numel(x)==1
         y=struct2str(x,opt);
         return;
     end
