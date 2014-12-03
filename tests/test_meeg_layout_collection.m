@@ -4,21 +4,25 @@ function test_suite=test_meeg_layout_collection
 
 function test_fieldtrip_correspondence
     lc=cosmo_meeg_layout_collection();
-    rp=randperm(numel(lc));
+    rp_lay=randperm(numel(lc));
 
-    ntest_layout=3;
-    ntest_chan=10;
+    ntest_layout=2;
+    ntest_chan_max=10;
 
     % may or may not be present
     ignore_labels={'COMNT','SCALE'};
+
+    % temporarily switch off warnings (emitted by fieldtrip)
+    warning_state=warning('query','all');
+    cleaner=onCleanup(@()warning(warning_state));
+    warning('off','all');
 
     % shorter form
     tolerance=1e-4;
     aeae=@(x,y)max(abs(x(:)-y(:)))<tolerance && isequal(size(x),size(y));
 
-    for ii=rp(1:ntest_layout)
-
-        layout=lc{ii};
+    for ii=1:ntest_layout
+        layout=lc{rp_lay(ii)};
 
         cfg=struct();
         cfg.layout=layout.name;
@@ -41,10 +45,10 @@ function test_fieldtrip_correspondence
                         sort(layout_ft.label(keep_ft_idxs)));
 
         % test positions
-        ntest_chan=numel(keep_idxs);
-        rp=randperm(numel(keep_idxs));
+        ntest_chan=min(numel(keep_idxs),ntest_chan_max);
+        rp_chan=randperm(numel(keep_idxs));
         for jj=1:ntest_chan
-            test_label_idx=keep_idxs(rp(jj));
+            test_label_idx=keep_idxs(rp_chan(jj));
             label=layout.label{test_label_idx};
             if strcmp(layout_ft.label{test_label_idx},label)
                 % little optimization
