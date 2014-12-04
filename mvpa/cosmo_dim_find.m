@@ -1,4 +1,4 @@
-function [dim, index, attr_name, dim_name]=cosmo_dim_find(ds, dim_label, raise)
+function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label, raise)
 % find dimension attribute in dataset
 %
 % [dim, index, attr_name, dim_name]=cosmo_dim_find(ds, dim_label[, raise])
@@ -16,31 +16,35 @@ function [dim, index, attr_name, dim_name]=cosmo_dim_find(ds, dim_label, raise)
 %                     ds.a.(dim_name).values{index}==dim_label
 %   attr_name       'sa' if dim==1, 'fa' if dim==2
 %   dim_name        'sdim' if dim==1, 'fdim' if dim==2
+%   values          the values associated with the dimension
 %
 % Examples:
-%     % fMRI dataset, find third voxel dimension
+%     % fMRI dataset, find first voxel dimension
 %     ds=cosmo_synthetic_dataset('type','fmri');
-%     [dim, index, attr_name, dim_name]=cosmo_dim_find(ds,'k')
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'i')
 %     > dim = 2
-%     > index = 3
+%     > index = 1
 %     > attr_name = fa
 %     > dim_name = fdim
+%     > values = 1 2 3
 %
 %     % MEEG time-frequency dataset, find 'time' dimension
-%     ds=cosmo_synthetic_dataset('type','timefreq');
-%     [dim, index, attr_name, dim_name]=cosmo_dim_find(ds,'time')
+%     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'time')
 %     > dim = 2
 %     > index = 3
 %     > attr_name = fa
 %     > dim_name = fdim
+%     > values = -0.2000 -0.1500 -0.1000 -0.0500 0
 %     %
 %     % move 'time' from feature to sample dimension
 %     dst=cosmo_dim_transpose(ds,'time',1);
-%     [dim, index, attr_name, dim_name]=cosmo_dim_find(dst,'time')
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(dst,'time')
 %     > dim = 1
 %     > index = 1
 %     > attr_name = sa
 %     > dim_name = sdim
+%     > values = -0.2000 -0.1500 -0.1000 -0.0500 0
 %
 % NNO Aug 2014
 
@@ -67,7 +71,7 @@ for dim=1:numel(infixes)
                 % not all fields present
 
             else
-                % all good
+                values=ds.a.(dim_name).values{index};
                 return
             end
         end
@@ -78,6 +82,7 @@ dim=[];
 index=[];
 attr_name=[];
 dim_name=[];
+values=[];
 
 if raise
     error('Not found: dimension label %s', dim_label);
