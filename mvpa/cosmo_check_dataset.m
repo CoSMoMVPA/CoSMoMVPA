@@ -6,22 +6,22 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %
 % Inputs:
 %   ds                     dataset struct.
-%   ds_type                string indicating the specific type of dataset.
-%                          Currently  supports 'fmri' and 'meeg'.
+%   ds_type                optional string indicating the specific type
+%                          of dataset, one of 'fmri, 'meeg', 'surface'
 %   error_if_not_ok        if true (the default), an error is raised if the
 %                          dataset is not kosher (see below).
 %
 % Returns:
 %   is_ok                  boolean indicating kosherness of ds.
-%                          It is consider ok if:
+%                          It is considered ok if:
 %                          - it has a field .samples with a PxQ array.
-%                          - if it has a field .features [.samples], then
+%                          - if it has a field .fa [.sa], then
 %                            it should be a struct, and each field in it
 %                            should have P [Q] elements along the first
 %                            [second] dimension or be empty.
 %                          - .sa.{targets,chunks} are numeric vectors with
 %                            integers (if present)
-%                          - if ds_type is provided, then some more tests
+%                          If ds_type is provided, then some more tests
 %                            (depending on ds_type) are performed.
 %
 % Examples:
@@ -106,12 +106,12 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
     end
 
     % list check functions
-    checkers={@check_samples,
-              @check_targets,
-              @check_chunks,
-              @check_attributes,
-              @check_dim_legacy,
-              @check_dim,
+    checkers={@check_samples,...
+              @check_targets,...
+              @check_chunks,...
+              @check_attributes,...
+              @check_dim_legacy,...
+              @check_dim,...
               []}; % space for check_with_type
 
     if ~isempty(ds_type)
@@ -281,19 +281,29 @@ function msg=check_dim(ds)
     % (i.e., .a.{s,f}dim is present)
     msg='';
 
+    if ~isfield(ds,'a')
+        return;
+    end
+
     suffixes='sf';
+    dsa=ds.a;
 
     for dim=1:2
         suffix=suffixes(dim);
-        dim_attrs_str=sprintf('a.%sdim',suffix);
-
-        if ~cosmo_isfield(ds,dim_attrs_str)
+        attr_key=[suffix 'dim'];
+        if ~isfield(dsa,attr_key)
             continue;
         end
 
         attrs_str=[suffix 'a'];
+        if ~isfield(ds,attrs_str)
+            msg=sprintf('missing field .%s', attrs_str);
+            return
+        end
+
         attrs=ds.(attrs_str);
-        dim_attrs=ds.a.([suffix 'dim']);
+        dim_attrs=ds.a.(attr_key);
+        dim_attrs_str=['.a.' attr_key];
         msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str);
 
         if ~isempty(msg)
@@ -306,6 +316,16 @@ function msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str)
     msg='';
     % attrs is from .sa or .fa; dim_attrs from .a.sdim or .a.fdim
     % the *_str arguments contain a string representation
+    if ~isfield(dim_attrs,'labels')
+        msg=sprintf('Missing field .%s.%s',attrs_str,'labels');
+        return;
+    end
+
+    if ~isfield(dim_attrs,'values')
+        msg=sprintf('Missing field .%s.%s',attrs_str,'values');
+        return;
+    end
+
     if ~cosmo_isfield(dim_attrs,{'labels','values'})
         msg=sprintf('Missing field .%s.{labels,values}',dim_attrs_str);
     end
