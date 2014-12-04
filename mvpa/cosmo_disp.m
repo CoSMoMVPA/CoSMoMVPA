@@ -183,7 +183,7 @@ function s=disp_helper(x, opt)
     % for recursion
     depth=opt.depth;
     if depth<=0
-        s=any2summary_str(x);
+        s=any2summary_str(x,opt);
         return
     end
 
@@ -202,24 +202,6 @@ function s=any2summary_str(x,opt)
         sz=[1 1];
     end
     s=surround_with(true,'<',class(x),'>',sz);
-
-function y=nd_struct2str(x,opt)
-    sz=size(x);
-    ndim=numel(sz);
-
-    if numel(x)==1
-        y=struct2str(x,opt);
-        return;
-    end
-
-    fns=fieldnames(x);
-    n=numel(fns);
-    r=cell(n+1,1);
-    r{1}=sprintf('%s with fields:',any2summary_str(x));
-    for k=1:n
-        r{k+1}=['   ' string2str(fns{k},opt)];
-    end
-    y=strcat_(r);
 
 function tf=has_size(x)
     % helper, because some classes have no 'size'
@@ -274,7 +256,7 @@ function y=multi_any2string(x,ndim_post,opt)
 
     [pre,post]=get_mx_idxs(xflat,opt.edgeitems,opt.threshold,ndim_post+1);
 
-    header=any2summary_str(x);
+    header=any2summary_str(x,opt);
     s_pre=nd_any2str_helper(xflat,p, pre,opt);
 
     if isempty(post)
@@ -286,7 +268,7 @@ function y=multi_any2string(x,ndim_post,opt)
         for k=1:2
             szs=cellfun(@(x)size(x,2),s_post(:,k));
             pos=round(max(szs)/2);
-            s_dots{k}=[repmat(' ',1,pos) ':'];
+            s_dots{k}=[spaces(1,pos) ':'];
         end
     end
 
@@ -377,6 +359,12 @@ function y=spaces(nx,ny)
         y(nx,ny)=' ';
         y(:)=' ';
     else
+        if nx<0
+            nx=0;
+        end
+        if ny<0
+            ny=0;
+        end
         y=reshape('',nx,ny);
     end
 
@@ -396,7 +384,7 @@ function y=struct2str(x,opt)
             fn=fns{k};
             r{k*2-1}=['.' fn];
             d=disp_helper(x.(fn),opt);
-            r{k*2}=[repmat(' ',size(d,1),2) d];
+            r{k*2}=[spaces(size(d,1),2) d];
         end
         y=strcat_(r);
     end
@@ -418,7 +406,7 @@ function s=string2str(x, opt)
     end
     quote='''';
     pre=quote;
-    post=[repmat(' ',nrows-1,1);quote];
+    post=[spaces(nrows-1,1);quote];
     s=strcat_({pre,x,post});
 
 
@@ -470,8 +458,8 @@ function s=cell2str(x, opt)
 
                 if rpart==2
                     max_length=max(cellfun(@numel,sinfix(:,trgc)));
-                    spaces=repmat(' ',1,floor(max_length/2-1));
-                    sinfix{rpos,cpos+ci*2}=[spaces ':'];
+                    pre_spaces=spaces(1,floor(max_length/2-1));
+                    sinfix{rpos,cpos+ci*2}=[pre_spaces ':'];
                 end
             end
             rpos=rpos+nr+1;
@@ -496,7 +484,7 @@ function pre_infix_post=surround_with(show_size, pre, infix, post, matrix_sz)
     else
         size_str='';
     end
-    post=strcat_({repmat(' ',size(infix,1)-1,1); [post size_str]});
+    post=strcat_({spaces(size(infix,1)-1,1); [post size_str]});
     pre_infix_post=strcat_({pre, infix, post});
 
 
@@ -547,7 +535,7 @@ function s=matrix2str(x,opt)
         row_blocks{1,1}=s;
     else
         % insert ':' for each column
-        line=repmat(' ',1,nc_col);
+        line=spaces(1,nc_col);
         for k=1:max(col_index)
             idxs=find(col_index==k);
             median_pos=round(mean(idxs));
