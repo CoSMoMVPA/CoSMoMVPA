@@ -91,7 +91,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
         % for now just repeat values from the first sample/feature
         % XXX should be more fancy, e.g. string concatenation?
         idxs=ones(1,size(res_k_samples,dim));
-        res_k=cosmo_slice(ds_k,idxs,dim);
+        res_k=cosmo_slice(ds_k,idxs,dim,false);
 
         % store sample results
         res_k.samples=res_k_samples;
@@ -99,6 +99,6 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
     end
 
     % join the results
-    f_ds=cosmo_stack(res,dim);
+    f_ds=cosmo_stack(res,dim,false);
 
 
