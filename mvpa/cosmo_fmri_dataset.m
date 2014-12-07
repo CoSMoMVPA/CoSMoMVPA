@@ -129,7 +129,10 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %
 % See also: cosmo_map2fmri
 %
-% ACC, NNO Aug, Sep 2013
+% part of the NIFTI code is ported from Pascal to Matlab based on MRICron,
+% copyright 2006 Chris Rorden, BSD license
+%
+% ACC, NNO Aug, Sep 2013, 2014
 
     % Input parsing stuff
     defaults.mask=[];
@@ -146,7 +149,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     end
 
     % get the supported image formats use the helper defined below
-    img_formats=get_img_formats();
+    img_formats=get_img_formats(params);
 
     % read the image
     [data,vol,sa]=read_img(filename, img_formats);
@@ -196,7 +199,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function img_formats=get_img_formats()
+function img_formats=get_img_formats(params)
 
     % define which formats are supports
     % .exts indicates the extensions
@@ -207,7 +210,7 @@ function img_formats=get_img_formats()
 
     img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
     img_formats.nii.matcher=@isa_nii;
-    img_formats.nii.reader=@read_nii; % this is a wrapper defined below
+    img_formats.nii.reader=@(fn)read_nii(fn,params);
     img_formats.nii.externals={'nifti'};
 
     img_formats.bv_vmp.exts={'.vmp'};
@@ -237,7 +240,7 @@ function img_formats=get_img_formats()
 
     img_formats.spm.exts={'.mat','mat:con','mat:beta','mat:spm'};
     img_formats.spm.matcher=@isa_spm;
-    img_formats.spm.reader=@read_spm;
+    img_formats.spm.reader=@(fn)read_spm(fn,params);
     img_formats.spm.externals=img_formats.nii.externals;
 
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
@@ -485,91 +488,234 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
 
-function [data,vol,sa]=read_nii(fn, show_warning)
-    if nargin<2
-        % show_warning is used by read_spm for each volume separately.
-        % This parameter allows read_spm to show warning messages just once
-        % instead of for each volume
-        show_warning=true;
-    end
+function [data,vol,sa]=read_nii(fn, params)
+    hdr = load_untouch_header_only(fn);
 
-    hdr=get_and_check_data(fn, @load_nii, @isa_nii);
+    % get original affine matrix
+    mat=get_nifti_affine_matrix(hdr, params);
 
-    data=hdr.img;
-    sa=struct();
-    vol=get_vol_nii(hdr, show_warning);
-
-function vol=get_vol_nii(hdr, show_warning)
-    if nargin<2
-        show_warning=true;
-    end
-    % nifti volume info
-    hdr=hdr.hdr;
+    % image dimensions
     dim=hdr.dime.dim(2:4);
 
-    hist=hdr.hist;
-    mat=[hist.srow_x; hist.srow_y; hist.srow_z; 0 0 0 1];
+    % get scaling factor
+    scaling=nifti_get_scaling_factor(hdr);
+    data=nifti_load_img(fn);
 
-    % make base1 friendly
-    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
-
-    % try to deal with old analyze-style files with flipped orientations.
-    % this code is experimental and has been tried only on a few
-    % nifti/analyze files, hence for now a warning is printed
-    if isfield(hist, 'flip_orient') && ~isempty(hist.flip_orient)
-        assert(isfield(hist,'rot_orient') && ~isempty(hist.rot_orient));
-        if show_warning
-            cosmo_warning(['flip_orient field found - will flip '...
-                 'orientation and/or swap spatial dimensions. This '...
-                 'operation is *experimental*. You are advised to check'...
-                 ' your results visually. If the orientation is off, '...
-                 'please get in touch with the CoSMoMVPA developers.']);
+    % apply scaling
+    if ~isempty(scaling)
+        if numel(size(data))==4
+            data(:,:,:,:)=scaling(1)+scaling(2)*data(:,:,:,:);
+        else
+            data(:,:,:)=scaling(1)+scaling(2)*data(:,:,:);
         end
-
-        edges=[1 1 1 1; dim 1]';
-        orig_xyz=mat*edges;
-        center_xyz=mean(orig_xyz,2);
-        center=mean(edges,2);
-
-        % spatial dimension permutation matrix
-        permute_dim_mat=zeros(4);
-        permute_dim_mat(4,4)=1;
-
-        % dimension flip (reflection) matrix
-        flip_mat=eye(4);
-        for dim_index=1:3
-            permute_dim_mat(hist.rot_orient(dim_index),dim_index)=1;
-            if hist.flip_orient(dim_index)>0
-                flip_mat(dim_index,dim_index)=-1;
-                flip_mat(dim_index,4)=2*center_xyz(dim_index);
-            end
-        end
-
-        % after permutation each column and row should have exactly one 1
-        one_vec=ones(1,4);
-        assert(isequal(sum(permute_dim_mat,1),one_vec) && ...
-                        isequal(sum(permute_dim_mat,2),one_vec'));
-
-
-        % apply dimension permutation & reflections
-        mat=permute_dim_mat*flip_mat*mat;
-
-        new_xyz=mat*edges;
-
-
-
-        all_deltas=bsxfun(@minus,orig_xyz([1:3 5:7]),new_xyz([1:3 5:7])');
-        zero_delta=abs(all_deltas)<1e-6;
-        if ~all(any(~zero_delta,1) | any(~zero_delta,2)')
-            error(['transformation failed - please get in touch with '...
-                    'the CoSMoMVPA developers']);
-        end
-
     end
 
-    vol=struct();
+    % make matrix base1 friendly
+    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
+
     vol.mat=mat;
     vol.dim=dim;
+    sa=struct();
+
+function mx=get_nifti_affine_matrix(hdr, varargin)
+    % Get LPI affine transformation from NIFTI file
+    %
+    % Input:
+    %   fn          nifti filename
+    %
+    % Output:
+    %   lpi_mx      4x4 affine transformation matrix from voxel to world
+    %               coordinates. voxel indices as base0, not base1 as in
+    %               CoSMoMVPA
+    %
+    % Notes:
+    %  - this function is experimental
+    %  - at the moment it relies on the quaternion values in the NIFTI header,
+    %    and ignores srow* fields. (support for srow is future work)
+    %  - initial testing suggests agreement with MRIcron
+    %  - part of the code is ported from Pascal to Matlab based on MRICron,
+    %    copyright 2006 Chris Rorden, BSD license
+    %  - to convert voxel coordinates (i,j,k) to (x,y,z), compute
+    %    lpi_mx*[x y z 1]'. For the reverse, compute inv(lpi_mx)*[i j k 1]'
+    %
+    %
+    % NNO Dec 2014
+
+    defaults.nifti_form=[];
+    opt=cosmo_structjoin(defaults,varargin);
+
+    if isempty(opt.nifti_form)
+        mx=nifti_matrix_from_auto(hdr);
+    else
+        mx=nifti_matrix_using_method(hdr,opt.nifti_form);
+    end
+
+
+function mx=nifti_matrix_from_auto(hdr)
+    % get matrix automatically, assumes that qform and sform (if present)
+    % are identical
+    max_delta_s_and_q=1e-3; % maximum allowed difference between s and q
+
+    if hdr.hist.qform_code>0
+        mx=nifti_matrix_using_method(hdr,'qform');
+
+        if hdr.hist.sform_code>0
+            mx_s=nifti_matrix_using_method(hdr,'sform');
+
+            max_diff=max(abs(mx(:)-mx_s(:)));
+            if max_diff>max_delta_s_and_q
+                str_mx=matrix2string(mx);
+                str_mx_s=matrix2string(mx_s);
+                url=['http://nifti.nimh.nih.gov/nifti-1/documentation/'...
+                        'nifti1fields/nifti1fields_pages/qsform.html'];
+                error(['the affine matrices mapping voxel-to-world '...
+                        'coordinates according to the sform and qform '...
+                        'in the NIFTI header differ '...
+                        'by %d, exceeding the treshold %d.\n\n'...
+                        'The sform matrix is:\n\n%s\n\n',...
+                        'The qform matrix is:\n\n%s\n\n'...
+                        'To resolve this, set the ''nifti_form'' '...
+                        'option to either:\n'...
+                        '  ''pixdim'' (method 1), or\n'...
+                        '  ''qform''  (method 2), or\n'...
+                        '  ''sform''  (method 3).\n\n'...
+                        'For more information, see:\n  %s\n\n',...
+                        'If you have absolutely no idea what to use, '...
+                        'try ''sform''\n\n'],...
+                        max_diff, max_delta_s_and_q,...
+                        str_mx_s, str_mx, url);
+            end
+        end
+    elseif hdr.hist.sform_code>0
+        mx=nifti_matrix_using_method(hdr,'sform');
+    else
+        mx=nifti_matrix_using_method(hdr,'pixdim');
+    end
+
+
+function s=matrix2string(mx)
+    float_pat='%6.3f';
+    line_pat=repmat([float_pat ' '],1,4);
+    line_pat(end)=sprintf('\n');
+    mx_pat=repmat(line_pat,1,3);
+    mx_3x4=mx(1:3,1:4);
+    s=sprintf(mx_pat,mx_3x4');
+
+
+
+function mx=nifti_matrix_using_method(hdr, method)
+
+    switch method
+        case 'pixdim'
+            mx=nifti_matrix_from_pixdim(hdr);
+        case 'qform'
+            mx=nifti_matrix_from_qform(hdr);
+        case 'sform'
+            mx=nifti_matrix_from_sform(hdr);
+        otherwise
+            error('illegal method %s', method);
+    end
+
+    assert(isequal(size(mx),[4 4]));
+
+function mx=nifti_matrix_from_pixdim(hdr)
+    mx=[diag(hdr.dime.pixdim(2:4)) 0;
+             [0 0 0 1]];
+
+
+function mx=nifti_matrix_from_qform(hdr)
+
+    % convert quaternion to affine matrix
+    qfac=hdr.dime.pixdim(1);
+    dx=hdr.dime.pixdim(2);
+    dy=hdr.dime.pixdim(3);
+    dz=hdr.dime.pixdim(4);
+    qb=hdr.hist.quatern_b;
+    qc=hdr.hist.quatern_c;
+    qd=hdr.hist.quatern_d;
+    qx=hdr.hist.qoffset_x;
+    qy=hdr.hist.qoffset_y;
+    qz=hdr.hist.qoffset_z;
+
+    % ported from MRIcron
+    b=qb;
+    c=qc;
+    d=qd;
+    a=1-(b^2+c^2+d^2);
+
+    if a<1e-7
+        a=1/sqrt(b^2+c^2+d^2);
+        b=b*a;
+        c=c*a;
+        d=d*a;
+        a=0;
+    else
+        a=sqrt(a);
+    end
+
+    if dx>0
+        xd=dx;
+    else
+        xd=1;
+    end
+
+    if dy>0
+        yd=dy;
+    else
+        yd=1;
+    end
+
+    if dz>0
+        zd=dz;
+    else
+        zd=1;
+    end
+
+    if qfac<0
+        zd=-zd;
+    end
+
+    % construct initial affine matrix
+    mx=zeros(4,4);
+    mx(1,1)=     (a*a+b*b-c*c-d*d) * xd ;
+    mx(1,2)= 2 * (b*c-a*d        ) * yd ;
+    mx(1,3)= 2 * (b*d+a*c        ) * zd ;
+    mx(2,1)= 2 * (b*c+a*d        ) * xd ;
+    mx(2,2)=     (a*a+c*c-b*b-d*d) * yd ;
+    mx(2,3)= 2 * (c*d-a*b        ) * zd ;
+    mx(3,1)= 2 * (b*d-a*c        ) * xd ;
+    mx(3,2)= 2 * (c*d+a*b        ) * yd ;
+    mx(3,3)=     (a*a+d*d-c*c-b*b) * zd ;
+    mx(1,4)=qx;
+    mx(2,4)=qy;
+    mx(3,4)=qz;
+    mx(4,:)=[0 0 0 1];
+
+function mx=nifti_matrix_from_sform(hdr)
+    % set the srow values
+    mx=[hdr.hist.srow_x;
+        hdr.hist.srow_y;
+        hdr.hist.srow_z;
+        [0 0 0 1]];
+
+function scaling=nifti_get_scaling_factor(hdr)
+    % get scaling factor, if present for this dataset
+    % scaling=[intercept slope] if present, otherwise []
+    is_datatype=any(hdr.dime.datatype==[2,4,8,16,64,256,512,768]);
+    is_nonidentity=hdr.dime.scl_inter~=0 || hdr.dime.scl_slope~=1;
+    is_nonzero=hdr.dime.scl_slope~=0;
+
+    if is_datatype && is_nonidentity && is_nonzero
+        scaling=[hdr.dime.scl_inter hdr.dime.scl_slope];
+    else
+        scaling=[];
+    end
+
+function img=nifti_load_img(fn)
+    nii=load_untouch_nii(fn);
+    img=double(nii.img);
+
+
 
 %% Brainvoyager
 
@@ -778,7 +924,7 @@ function b=isa_spm(hdr)
     b=isstruct(hdr) && isfield(hdr,'xX') && isfield(hdr.xX,'X') && ...
                 isnumeric(hdr.xX.X) && isfield(hdr,'SPMid');
 
-function [data,vol,sa]=read_spm(fn)
+function [data,vol,sa]=read_spm(fn,params)
     if ischar(fn)
         pth=fileparts(fn);
 
@@ -868,9 +1014,7 @@ function [data,vol,sa]=read_spm(fn)
         end
 
         % show at most one warning, only at the beginning
-        show_warning=sample_counter==0;
-
-        [vol_data_k, vol_k]=read_nii(vol_fn, show_warning);
+        [vol_data_k, vol_k]=read_nii(vol_fn, params);
 
         if sample_counter==0
             % first volume
@@ -895,4 +1039,3 @@ function [data,vol,sa]=read_spm(fn)
     end
 
     assert(sample_counter==nsamples);
-
