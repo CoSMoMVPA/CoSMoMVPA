@@ -51,7 +51,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %     .a.fdim.values   dimension values, set to {1:X, 1:Y, 1:Z}
 %     .a.vol.dim 1x3 vector indicating the number of voxels in the 3
 %                spatial dimensions.
-%     .a.vol.mat 4x4 voxel-to-world transformation matrix (LPI, base-1).
+%     .a.vol.mat 4x4 voxel-to-world transformation matrix (base-1).
 %     .a.vol.dim 1x3 number of voxels in each spatial dimension
 %     .sa        struct for holding sample attributes (e.g., sa.targets,
 %                sa.chunks)
@@ -330,6 +330,12 @@ function mask=get_mask(ds, mask_param)
             % load mask (using recursion)
             ds_mask=me(mask_param,'mask',false);
 
+            % if necessary, bring in the same space
+            ds_orient=cosmo_fmri_orientation(ds);
+            if ~isequal(ds_orient, cosmo_fmri_orientation(ds_mask))
+                ds_mask=cosmo_fmri_reorient(ds_mask, ds_orient);
+            end
+
             % ensure the mask is compatible with the dataset
             if ~isequal(ds_mask.fa,ds.fa)
                 error('feature attribute mismatch between data and mask');
@@ -488,45 +494,51 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
 
-function [data,vol,sa]=read_nii(fn, params)
-    hdr = load_untouch_header_only(fn);
+function nii=load_nii_helper(fn)
+    nii=struct();
+    nii.hdr=load_untouch_header_only(fn);
+    nii.img=nifti_load_img(fn);
 
-    % get original affine matrix
-    mat=get_nifti_affine_matrix(hdr, params);
+
+function [data,vol,sa]=read_nii(fn, params)
+    nii=get_and_check_data(fn, @load_nii_helper, @isa_nii);
+    hdr=nii.hdr;
+    data=nii.img;
 
     % image dimensions
     dim=hdr.dime.dim(2:4);
 
     % get scaling factor
     scaling=nifti_get_scaling_factor(hdr);
-    data=nifti_load_img(fn);
 
     % apply scaling
     if ~isempty(scaling)
-        if numel(size(data))==4
-            data(:,:,:,:)=scaling(1)+scaling(2)*data(:,:,:,:);
-        else
-            data(:,:,:)=scaling(1)+scaling(2)*data(:,:,:);
-        end
+        data(:)=scaling(1)+scaling(2)*data(:);
     end
+
+
+     % get original affine matrix
+    [mat, xform]=get_nifti_transform(hdr, params);
 
     % make matrix base1 friendly
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[-1 -1 -1]';
 
     vol.mat=mat;
+    vol.xform=xform;
     vol.dim=dim;
     sa=struct();
 
-function mx=get_nifti_affine_matrix(hdr, varargin)
+function [mx, xform]=get_nifti_transform(hdr, varargin)
     % Get LPI affine transformation from NIFTI file
     %
     % Input:
     %   fn          nifti filename
     %
     % Output:
-    %   lpi_mx      4x4 affine transformation matrix from voxel to world
+    %   mx          4x4 affine transformation matrix from voxel to world
     %               coordinates. voxel indices as base0, not base1 as in
     %               CoSMoMVPA
+    %   xform       string with xform based on sform or qform code
     %
     % Notes:
     %  - this function is experimental
@@ -545,53 +557,69 @@ function mx=get_nifti_affine_matrix(hdr, varargin)
     opt=cosmo_structjoin(defaults,varargin);
 
     if isempty(opt.nifti_form)
-        mx=nifti_matrix_from_auto(hdr);
+        [mx, nifti_form]=nifti_matrix_from_auto(hdr);
     else
-        mx=nifti_matrix_using_method(hdr,opt.nifti_form);
+        [mx, nifti_form]=nifti_matrix_using_method(hdr,opt.nifti_form);
     end
 
+    % prioritize sformch
+    switch nifti_form
+        case 'sform'
+            key=hdr.hist.sform_code;
+        case 'qform'
+            key=hdr.qform.qform_code;
+        otherwise
+            key=0;
+    end
 
-function mx=nifti_matrix_from_auto(hdr)
+    xform=cosmo_fmri_convert_xform('nii',key);
+
+
+function [mx, nifti_form]=nifti_matrix_from_auto(hdr)
     % get matrix automatically, assumes that qform and sform (if present)
     % are identical
     max_delta_s_and_q=1e-3; % maximum allowed difference between s and q
 
-    if hdr.hist.qform_code>0
-        mx=nifti_matrix_using_method(hdr,'qform');
+    has_sform=hdr.hist.sform_code>0;
+    has_qform=hdr.hist.qform_code>0;
 
-        if hdr.hist.sform_code>0
-            mx_s=nifti_matrix_using_method(hdr,'sform');
-
-            max_diff=max(abs(mx(:)-mx_s(:)));
-            if max_diff>max_delta_s_and_q
-                str_mx=matrix2string(mx);
-                str_mx_s=matrix2string(mx_s);
-                url=['http://nifti.nimh.nih.gov/nifti-1/documentation/'...
-                        'nifti1fields/nifti1fields_pages/qsform.html'];
-                error(['the affine matrices mapping voxel-to-world '...
-                        'coordinates according to the sform and qform '...
-                        'in the NIFTI header differ '...
-                        'by %d, exceeding the treshold %d.\n\n'...
-                        'The sform matrix is:\n\n%s\n\n',...
-                        'The qform matrix is:\n\n%s\n\n'...
-                        'To resolve this, set the ''nifti_form'' '...
-                        'option to either:\n'...
-                        '  ''pixdim'' (method 1), or\n'...
-                        '  ''qform''  (method 2), or\n'...
-                        '  ''sform''  (method 3).\n\n'...
-                        'For more information, see:\n  %s\n\n',...
-                        'If you have absolutely no idea what to use, '...
-                        'try ''sform''\n\n'],...
-                        max_diff, max_delta_s_and_q,...
-                        str_mx_s, str_mx, url);
-            end
-        end
-    elseif hdr.hist.sform_code>0
-        mx=nifti_matrix_using_method(hdr,'sform');
+    if has_sform;
+        nifti_form='sform';
+    elseif has_qform
+        nifti_form='qform';
     else
-        mx=nifti_matrix_using_method(hdr,'pixdim');
+        nifti_form='pixdim';
     end
 
+    mx=nifti_matrix_using_method(hdr,nifti_form);
+
+    if has_sform && has_qform
+        mx_q=nifti_matrix_using_method(hdr,'qform');
+
+        max_diff=max(abs(mx(:)-mx_q(:)));
+        if max_diff>max_delta_s_and_q
+            str_mx=matrix2string(mx);
+            str_mx_s=matrix2string(mx_q);
+            url=['http://nifti.nimh.nih.gov/nifti-1/documentation/'...
+                    'nifti1fields/nifti1fields_pages/qsform.html'];
+            error(['the affine matrices mapping voxel-to-world '...
+                    'coordinates according to the sform and qform '...
+                    'in the NIFTI header differ '...
+                    'by %d, exceeding the treshold %d.\n\n'...
+                    'The sform matrix is:\n\n%s\n\n',...
+                    'The qform matrix is:\n\n%s\n\n'...
+                    'To resolve this, set the ''nifti_form'' '...
+                    'option to either:\n'...
+                    '  ''pixdim'' (method 1), or\n'...
+                    '  ''qform''  (method 2), or\n'...
+                    '  ''sform''  (method 3).\n\n'...
+                    'For more information, see:\n  %s\n\n',...
+                    'If you have absolutely no idea what to use, '...
+                    'try ''sform''\n\n'],...
+                    max_diff, max_delta_s_and_q,...
+                    str_mx_s, str_mx, url);
+        end
+    end
 
 function s=matrix2string(mx)
     float_pat='%6.3f';
@@ -603,7 +631,7 @@ function s=matrix2string(mx)
 
 
 
-function mx=nifti_matrix_using_method(hdr, method)
+function [mx, method]=nifti_matrix_using_method(hdr, method)
 
     switch method
         case 'pixdim'
@@ -619,8 +647,7 @@ function mx=nifti_matrix_using_method(hdr, method)
     assert(isequal(size(mx),[4 4]));
 
 function mx=nifti_matrix_from_pixdim(hdr)
-    mx=[diag(hdr.dime.pixdim(2:4)) 0;
-             [0 0 0 1]];
+    mx=[[diag(hdr.dime.pixdim(2:4)); 0 0 0] [0;0;0;1]];
 
 
 function mx=nifti_matrix_from_qform(hdr)
@@ -741,6 +768,7 @@ function vol=get_vol_bv(hdr)
     vol=struct();
     vol.mat=mat;
     vol.dim=dim;
+    vol.xform=cosmo_fmri_convert_xform('bv',NaN);
 
 function mat=neuroelf_bvcoordconv_wrapper(varargin)
     % converts BV bounding box to affine transformation matrix
@@ -874,7 +902,7 @@ function [data,vol,sa]=read_afni(fn)
 
     sa=struct();
 
-    if isfield(hdr,'BRICK_LABS')
+    if isfield(hdr,'BRICK_LABS') && ~isempty(hdr.BRICK_LABS);
         % if present, get labels
         labels=cosmo_strsplit(hdr.BRICK_LABS,'~');
         nsamples=hdr.DATASET_RANK(2);
@@ -884,7 +912,7 @@ function [data,vol,sa]=read_afni(fn)
         sa.labels=labels(:);
     end
 
-    if isfield(hdr,'BRICK_STATAUX')
+    if isfield(hdr,'BRICK_STATAUX') && ~isempty(hdr.BRICK_STATAUX);
         % if present, get stat codes
         sa.stats=cosmo_statcode(hdr);
     end
@@ -917,6 +945,7 @@ function vol=get_vol_afni(hdr)
     vol=struct();
     vol.mat=mat;
     vol.dim=hdr.DATASET_DIMENSIONS(1:3);
+    vol.xform=cosmo_fmri_convert_xform('afni',hdr.SCENE_DATA(1));
 
 
 %% SPM

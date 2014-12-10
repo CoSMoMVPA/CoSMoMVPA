@@ -19,16 +19,16 @@ function [orient,cano_rot]=cosmo_fmri_orientation(ds)
 %     >            0 1 0 0
 %     >            0 0 1 0
 %     >            0 0 0 1
-% 
+%
 % Notes:
 %   - there are 3!*3^2 valid orientations, these are:
-%         'SAR'  'SAL'  'SPR'  'SPL'  'IAR'  'IAL'  'IPR'  'IPL'  
-%         'SRA'  'SLA'  'SRP'  'SLP'  'IRA'  'ILA'  'IRP'  'ILP'  
-%         'ASR'  'ASL'  'PSR'  'PSL'  'AIR'  'AIL'  'PIR'  'PIL'  
-%         'ARS'  'ALS'  'PRS'  'PLS'  'ARI'  'ALI'  'PRI'  'PLI'  
-%         'RAS'  'LAS'  'RPS'  'LPS'  'RAI'  'LAI'  'RPI'  'LPI'  
+%         'SAR'  'SAL'  'SPR'  'SPL'  'IAR'  'IAL'  'IPR'  'IPL'
+%         'SRA'  'SLA'  'SRP'  'SLP'  'IRA'  'ILA'  'IRP'  'ILP'
+%         'ASR'  'ASL'  'PSR'  'PSL'  'AIR'  'AIL'  'PIR'  'PIL'
+%         'ARS'  'ALS'  'PRS'  'PLS'  'ARI'  'ALI'  'PRI'  'PLI'
+%         'RAS'  'LAS'  'RPS'  'LPS'  'RAI'  'LAI'  'RPI'  'LPI'
 %         'RSA'  'LSA'  'RSP'  'LSP'  'RIA'  'LIA'  'RIP'  'LIP'
-%     For example, 'LPI' (used in Talairach/MNI) means that 
+%     For example, 'LPI' (used in Talairach/MNI) means that
 %       * the first dimension goes from left to right
 %       * the second dimension goes from posterior to anterior
 %       * the second dimension goes from inferior to superior

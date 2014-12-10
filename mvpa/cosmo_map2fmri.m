@@ -134,7 +134,7 @@ function ni=new_nii(ds)
     dime=struct();
     dime.datatype=16; %single
     dime.dim=[4 dim(:)' 1 1 1];
-    dime.pixdim=[1 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
+    dime.pixdim=[0 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
 
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
@@ -157,8 +157,16 @@ function ni=new_nii(ds)
     hdr.hk=hk;
 
     hist=struct();
-    hist.sform_code=2; % Tal space - TODO allow other spaces
-    hist.originator=[1 1 1 1 0];
+
+    if isfield(ds.a.vol,'xform')
+        xform=ds.a.vol.xform;
+    else
+        xform=''; % unknown
+    end
+    xform_code=cosmo_fmri_convert_xform('nii',xform);
+
+    hist.sform_code=xform_code;
+    % hist.originator=[1 1 1 1 0];
     hist=set_all(hist,{'descrip','aux_file','intent_name'},'');
     hist=set_all(hist,{'qform_code','quatern_b',...
                         'quatern_d',...
@@ -167,7 +175,8 @@ function ni=new_nii(ds)
     hist.srow_x=mat(1,:);
     hist.srow_y=mat(2,:);
     hist.srow_z=mat(3,:);
-    hist.quatern_c=1;
+    hist.quatern_c=0;
+    hist.originator=round(dim(:)'/2); % otherwise complaints with hdr/img
     hdr.hist=hist;
 
     ni.img=single(vol_data);
@@ -175,6 +184,7 @@ function ni=new_nii(ds)
 
 function write_nii(fn, hdr)
     save_nii(hdr, fn);
+
 
     %% BrainVoyager helper
 function mat=neuroelf_bvcoordconv_wrapper(varargin)
@@ -280,7 +290,7 @@ function write_bv(fn, hdr)
     hdr.SaveAs(fn);
 
 
-    %% Brainvoyager GLM
+    %% Brainvoyager VMR
 function hdr=new_bv_vmr(ds)
     hdr=xff('new:vmr');
     hdr=add_bv_mat_hdr(hdr,ds,'vmr');
@@ -295,7 +305,7 @@ function hdr=new_bv_vmr(ds)
 
     % scale to 0..255
     vol_data=(unflatten(ds)-mn)*255*(mx-mn);
-    hdr.VMRData=uint8(vol_data(:,:,:,1));
+    hdr.VMRData=scale_uint8(vol_data(:,:,:,1));
 
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
@@ -308,7 +318,19 @@ function hdr=new_bv_msk(ds)
     end
 
     vol_data=unflatten(ds);
-    hdr.Mask=uint8(vol_data(:,:,:,1));
+    vol_data_binary=0+(vol_data(:,:,:,1)~=0);
+    hdr.Mask=scale_uint8(vol_data_binary);
+
+function scaled_data=scale_uint8(data)
+    mn=min(data(:));
+    mx=max(data(:));
+    if mn<0 || mx>255 || ~isequal(round(data),data)
+        cosmo_warning(['.samples does not fit integer range 0..255 ',...
+                            'data will be rescaled']);
+        data=255*(data-mn)/(mx-mn);
+    end
+
+    scaled_data=uint8(data);
 
 
 
