@@ -191,9 +191,9 @@ function msg=check_dim_legacy(ds)
     if cosmo_isfield(ds,'a.dim')
         msg=sprintf(['***CoSMoMVPA legacy***\n'...
                 'Feature dimension information is now stored '...
-                'in .a.fdim, whereas earlier versions used .a.fdim. '...
+                'in .a.fdim, whereas earlier versions used .a.dim. '...
                 'To adapt a existing dataset struct ''ds'', run:\n'...
-                '  ds.a.fdim=ds.a.fdim;\n'...
+                '  ds.a.fdim=ds.a.dim;\n'...
                 '  ds.a=rmfield(ds.a,''dim'')\n']);
         return;
     end
@@ -328,11 +328,13 @@ function msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str)
 
     if ~cosmo_isfield(dim_attrs,{'labels','values'})
         msg=sprintf('Missing field .%s.{labels,values}',dim_attrs_str);
+        return;
     end
+
     labels=dim_attrs.labels;
     values=dim_attrs.values;
 
-    if ~iscell(labels)
+    if ~iscellstr(labels)
         msg=sprintf('.%s.labels must be a cell', dim_attrs_str);
         return
     end
