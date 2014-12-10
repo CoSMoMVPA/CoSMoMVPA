@@ -6,7 +6,6 @@ function ds_plumb=cosmo_fmri_deoblique(ds)
 %
 % Output:
 %
-%
 % Example:
 %     % start with a simple dataset
 %     x=cosmo_synthetic_dataset('size','huge','ntargets',1,'nchunks',1);
@@ -43,6 +42,14 @@ function ds_plumb=cosmo_fmri_deoblique(ds)
 %     z=cosmo_fmri_deoblique(y);
 %     isequal(y,z)
 %     > true
+%
+% Notes:
+%   - Using this function changes the location of the voxels in
+%     world-space, that is world coordinates (x, y, z).
+%   - This function is intended for AFNI and BrainVoyager, as these
+%     programs prefer 'plump' (non-oblique) volumes.
+%   - When using this function, it is recommended to inspect the result
+%     visually.
 %
 % NNO Dec 2014
 
