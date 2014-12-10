@@ -60,12 +60,14 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
 %     >   .vol
 %     >     .mat
-%     >       [ 10         0         0         0
-%     >          0        10         0         0
-%     >          0         0        10         0
-%     >          0         0         0         1 ]
+%     >       [ 2         0         0        -3
+%     >         0         2         0        -3
+%     >         0         0         2        -3
+%     >         0         0         0         1 ]
 %     >     .dim
 %     >       [ 3         2         1 ]
+%     >     .xform
+%     >       'scanner_anat'
 %     > .sa
 %     >   .targets
 %     >     [ 1
@@ -270,7 +272,11 @@ function a=dim_labels_values(opt)
     switch data_type
         case 'fmri'
             a.vol.mat=eye(4);
-            a.vol.mat(1:3,1:3)=a.vol.mat(1:3,1:3)*10;
+            a.vol.mat(1:3,1:3)=a.vol.mat(1:3,1:3)*2;
+
+            % ensure negative origin, so that MRIcron displays
+            % the matrix correctly
+            a.vol.mat(1:3,4)=-3;
 
             labels={'i','j','k'};
             values={1:20,1:20,1:20};
@@ -619,6 +625,7 @@ function [ds, nfeatures]=get_fdim_fa(opt)
     ds.a=cosmo_structjoin(ds.a,a);
     if strcmp(data_type,'fmri')
         ds.a.vol.dim=dim_sizes;
+        ds.a.vol.xform='scanner_anat';
     end
 
     nfeatures=prod(dim_sizes);
