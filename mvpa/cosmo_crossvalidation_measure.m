@@ -107,6 +107,31 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     >   .labels
 %     >     { 'accuracy' }
 %
+%     % illustrate accuracy for partial test set
+%     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',5);
+%     %
+%     % use take-1-chunk for testing crossvalidation, but only test on
+%     % chunks 1 and 4
+%     opt=struct();
+%     opt.partitions=cosmo_nchoosek_partitioner(ds,1,'chunks',[1 4]);
+%     opt.classifier=@cosmo_classify_naive_bayes;
+%     % run crossvalidation and return accuracy (the default)
+%     acc_ds=cosmo_crossvalidation_measure(ds,opt);
+%     % show accuracy
+%     cosmo_disp(acc_ds.samples)
+%     > 0.75
+%     % show predictions
+%     opt.output='predictions';
+%     pred_ds=cosmo_crossvalidation_measure(ds,opt);
+%     cosmo_disp([pred_ds.samples pred_ds.sa.targets pred_ds.sa.chunks]);
+%     > [   2         1         1
+%     >     2         2         1
+%     >   NaN         1       NaN
+%     >    :          :        :
+%     >     2         2         4
+%     >   NaN         1       NaN
+%     >   NaN         2       NaN ]@10x3
+%
 % Notes:
 %   - using this function, crossvalidation can be run using a searchlight
 %
@@ -130,7 +155,6 @@ params=rmfield(params,'partitions');
 [pred, accuracy,chunks]=cosmo_crossvalidate(ds,classifier,...
                                         partitions,params);
 % <@@<
-
 ds_sa=struct();
 
 switch params.output

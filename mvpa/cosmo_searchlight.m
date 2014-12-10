@@ -216,12 +216,14 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
                     error('Measure output must yield a column vector');
                 end
             end
-        catch mexception
+        catch parent_exception
             % indicate where the error was
-            msg=sprintf(['Searchlight call on feature id %d caused an '...
-                            'exception:\n\n%s'],...
-                            center_id,mexception.getReport());
-            error(msg);
+            child_exception=MException('',['Searchlight call on feature'...
+                                        ' id %d caused an exception'],...
+                                            center_id);
+            exception=addCause(parent_exception,child_exception);
+
+            rethrow(exception);
         end
         % <@@<
 
