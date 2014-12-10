@@ -1,4 +1,4 @@
-function hdr=cosmo_map2fmri(dataset, fn)
+function hdr=cosmo_map2fmri(dataset, fn, varargin)
 % maps a dataset structure to a NIFTI, AFNI, or BV structure or file
 %
 % Usage 1: hdr=cosmo_map2fmri(dataset, '-{FMT}) returns a header structure
@@ -10,6 +10,9 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %             '+orig.BRIK.gz','+tlrc','+tlrc.HEAD','+tlrc.BRIK', or
 %             '+tlrc.BRIK.gz'.
 %
+% Use cosmo_map2fmri(...,'deoblique',true) to de-oblique the dataset. For
+% information on this option, see cosmo_fmri_deoblique
+%
 % - for NIFTI files, it requires the following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 %   (note that his toolbox is included in CoSMoMVPA in /externals)
@@ -18,7 +21,12 @@ function hdr=cosmo_map2fmri(dataset, fn)
 % - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
+% See also: cosmo_fmri_deoblique
+%
 % NNO Aug 2013, updated Feb 2014
+    defaults=struct();
+    defaults.deoblique=false;
+    opt=cosmo_structjoin(defaults,varargin{:});
 
     cosmo_check_dataset(dataset, 'fmri');
 
@@ -44,6 +52,11 @@ function hdr=cosmo_map2fmri(dataset, fn)
     cosmo_check_external(externals);
 
     creator=methods.creator;
+
+    % preprocess the data (de-oblique if necessary)
+    dataset=preprocess(dataset,opt);
+
+    % build header structure
     hdr=creator(dataset);
 
     if save_to_file
@@ -54,6 +67,32 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function ds=preprocess(ds,opt)
+    if opt.deoblique
+        ds=cosmo_fmri_deoblique(ds);
+    end
+
+function check_plump_orientation(ds)
+    rot=ds.a.vol.mat(1:3,1:3);
+    nonzero=rot~=0;
+    is_oblique=any(sum(nonzero,1)~=1) || any(sum(nonzero,2)~=1);
+    if is_oblique
+        error(['Dataset has oblique orientation, and the specified '...
+                'output format does not support this. Options are:\n\n'...
+                '(1) use %s(...,''deoblique'',true) to deoblique the '...
+                'dataset automatically when writing it\n'...
+                '(2) use cosmo_fmri_deoblique to deoblique the dataset '...
+                'manually\n'...
+                '(3) store the dataset in another file format (such as '...
+                'NIFTI)\n\n'...
+                'For options (1) and (2), the spatial location of the '...
+                'voxels will change. It is recommended to inspect the '...
+                'results visually when using one of these options.'],...
+                mfilename())
+    end
+
+
+
 function unfl_ds=unflatten(ds)
     % puts the time dimension last, instead of first
     unfl_ds=shiftdim(cosmo_unflatten(ds),1);
@@ -206,7 +245,15 @@ function mat=neuroelf_bvcoordconv_wrapper(varargin)
     mat=f(varargin{:});
 
     %% Brainvoyager VMP
-function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
+function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
+    % ensure dataset is plump
+    check_plump_orientation(ds);
+
+    % automatically set orientation to ARS
+    if ~strcmp(cosmo_fmri_orientation(ds),'ASR')
+        ds=cosmo_fmri_reorient(ds,'ASR');
+    end
+
     % helper to set matrix in header
     mat=ds.a.vol.mat;
 
@@ -257,7 +304,7 @@ function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
 function hdr=new_bv_vmp(ds)
     hdr=xff('new:vmp');
 
-    hdr=add_bv_mat_hdr(hdr,ds,'vmp');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmp');
 
     % Store the data
 
@@ -293,7 +340,7 @@ function write_bv(fn, hdr)
     %% Brainvoyager VMR
 function hdr=new_bv_vmr(ds)
     hdr=xff('new:vmr');
-    hdr=add_bv_mat_hdr(hdr,ds,'vmr');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
 
     nsamples=size(ds.samples,1);
     if nsamples~=1,
@@ -310,7 +357,7 @@ function hdr=new_bv_vmr(ds)
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
     hdr=xff('new:msk');
-    hdr=add_bv_mat_hdr(hdr,ds,'msk');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
 
     nsamples=size(ds.samples,1);
     if nsamples~=1,
@@ -336,6 +383,8 @@ function scaled_data=scale_uint8(data)
 
 %% AFNI
 function afni_info=new_afni(ds)
+    check_plump_orientation(ds);
+
     a=ds.a;
     mat=a.vol.mat;
 
@@ -343,6 +392,7 @@ function afni_info=new_afni(ds)
     idxs=zeros(1,3);
     m=zeros(1,3);
 
+    % this part should be necessary
     for k=1:3
         % for each spatial dimension, find which row transforms it
         idx=find(mat(1:3,k));
