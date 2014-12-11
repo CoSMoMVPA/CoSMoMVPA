@@ -21,7 +21,7 @@ function test_fmri_io_base
 function assert_samples_equal(xs,ys,ext)
     switch ext
         case '.msk'
-            assertEqual(xs~=0,ys~=0)
+            assert(cosmo_corr(xs',ys')>.999);
         case '.vmr'
             assert(cosmo_corr(xs',ys')>.999);
         otherwise
@@ -59,11 +59,7 @@ function s=rmfield_if_present(s, f)
 function x=get_base_dataset()
     x=cosmo_synthetic_dataset('size','big');
     x=cosmo_fmri_reorient(x,'ASR');
-    p_cell=cosmo_index_unique({x.fa.k,x.fa.j,x.fa.i});
-    p=[p_cell{:}];
-    x=cosmo_slice(x,p,2);
     x=cosmo_slice(x,1);
-
 
 function ds_again=save_and_load(ds,ext)
     pat=['tmp%d' ext];

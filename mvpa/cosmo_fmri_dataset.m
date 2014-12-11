@@ -872,7 +872,7 @@ function [data,vol,sa]=read_bv_msk(fn)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_msk);
 
     sa=struct();
-    data=hdr.Mask>0;
+    data=hdr.Mask;
     vol=get_vol_bv(hdr);
 
 
@@ -891,13 +891,23 @@ function [data,vol,sa]=read_bv_vtc(fn)
 
 %% AFNI
 function b=isa_afni(hdr)
-    b=iscell(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
+    b=isstruct(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
             isfield(hdr,'DATASET_RANK');
 
 function [data,vol,sa]=read_afni(fn)
-    [err,data,hdr,err_msg]=BrikLoad(fn);
-    if err
-        error('Error reading afni file: %s', err_msg);
+    if isa_afni(fn)
+        if isfield(fn,'img')
+            data=fn.img;
+            hdr=fn;
+            hdr=rmfield(hdr,'img');
+        else
+            error('AFNI struct has missing image data (field .img)');
+        end
+    else
+        [err,data,hdr,err_msg]=BrikLoad(fn);
+        if err
+            error('Error reading afni file: %s', err_msg);
+        end
     end
 
     sa=struct();

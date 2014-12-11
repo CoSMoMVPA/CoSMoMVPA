@@ -93,9 +93,27 @@ function check_plump_orientation(ds)
 
 
 
-function unfl_ds=unflatten(ds)
+function unfl_ds_timelast=unflatten(ds)
     % puts the time dimension last, instead of first
-    unfl_ds=shiftdim(cosmo_unflatten(ds),1);
+    unfl_ds=cosmo_unflatten(ds);
+
+    % make time dimension last instead of first
+    unfl_ds_timelast=shiftdim(unfl_ds,1);
+
+    % deal with singleton dimension
+    sz=size(unfl_ds);
+    dim_size=ones(1,4);
+    dim_size(4)=sz(1);
+    dim_size(1:(numel(sz)-1))=sz(2:end);
+
+    nsamples=size(ds.samples,1);
+    assert(isequal([ds.a.vol.dim nsamples],dim_size));
+
+    if ~isequal(size(unfl_ds_timelast),dim_size)
+        unfl_ds_timelast=reshape(unfl_ds_timelast,dim_size);
+    end
+
+
 
 
 function b=ends_with(end_str, str)
@@ -325,6 +343,7 @@ function hdr=new_bv_vmp(ds)
             map=cosmo_structjoin(map, stats{k});
         end
         maps{k}=map;
+        empty_hdr.ClearObject();
     end
 
     hdr.Map=cat(2,maps{:});
@@ -335,6 +354,7 @@ function hdr=new_bv_vmp(ds)
 function write_bv(fn, hdr)
     % general storage function
     hdr.SaveAs(fn);
+    hdr.ClearObject();
 
 
     %% Brainvoyager VMR
@@ -351,7 +371,7 @@ function hdr=new_bv_vmr(ds)
     mx=max(ds.samples);
 
     % scale to 0..255
-    vol_data=(unflatten(ds)-mn)*255*(mx-mn);
+    vol_data=unflatten(ds);
     hdr.VMRData=scale_uint8(vol_data(:,:,:,1));
 
     %% Brainvoyager mask
@@ -365,8 +385,7 @@ function hdr=new_bv_msk(ds)
     end
 
     vol_data=unflatten(ds);
-    vol_data_binary=0+(vol_data(:,:,:,1)~=0);
-    hdr.Mask=scale_uint8(vol_data_binary);
+    hdr.Mask=scale_uint8(vol_data);
 
 function scaled_data=scale_uint8(data)
     mn=min(data(:));
@@ -424,14 +443,25 @@ function afni_info=new_afni(ds)
     offset=(1-sign(m).*lpi2orient(idxs))/2;
     orient=(idxs-1)*2+offset;
 
+    [nsamples,nfeatures]=size(ds.samples);
+
     vol_data=unflatten(ds);
-    dim=size(vol_data);
-    nsamples=size(ds.samples,1);
+    dim=ds.a.vol.dim(:)';
+    assert(prod(dim)==nfeatures);
+
 
     brik_type=1; %functional head
     brik_typestring='3DIM_HEAD_FUNC';
     brik_func=11; % FUNC_BUCK_TYPE
-    brik_view=0; % default to +orig, but overriden by writer
+
+    if isfield(ds.a.vol,'xform')
+        xform=ds.a.vol.xform;
+    else
+        xform=''; % unknown
+    end
+    xform_code=cosmo_fmri_convert_xform('afni',xform);
+
+    brik_view=xform_code; % default to +orig, but overriden by writer
 
     afni_info=struct();
     afni_info.SCENE_DATA=[brik_view, brik_func, brik_type];
@@ -442,8 +472,8 @@ function afni_info=new_afni(ds)
     afni_info.DATASET_RANK=[3 nsamples];      % number of volumes
     afni_info.DATASET_DIMENSIONS=dim(1:3);
     afni_info.ORIENT_SPECIFIC=orient;
-    afni_info.DELTA=delta;
-    afni_info.ORIGIN=origin;
+    afni_info.DELTA=delta(:)';
+    afni_info.ORIGIN=origin(:)';
     afni_info.SCALE=0;
 
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
