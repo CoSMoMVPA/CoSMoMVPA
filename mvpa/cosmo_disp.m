@@ -371,6 +371,12 @@ function y=spaces(nx,ny)
 
 
 function y=struct2str(x,opt)
+    if numel(x)==0
+        show_size=opt.show_size;
+        y=[surround_with(show_size,'', 'struct', '', size(x)) ' (empty)'];
+        return;
+    end
+
     assert(numel(x)==1)
     fns=fieldnames(x);
     n=numel(fns);
