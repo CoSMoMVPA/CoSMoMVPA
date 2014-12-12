@@ -1,4 +1,4 @@
-function hdr=cosmo_map2fmri(dataset, fn)
+function hdr=cosmo_map2fmri(dataset, fn, varargin)
 % maps a dataset structure to a NIFTI, AFNI, or BV structure or file
 %
 % Usage 1: hdr=cosmo_map2fmri(dataset, '-{FMT}) returns a header structure
@@ -10,6 +10,9 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %             '+orig.BRIK.gz','+tlrc','+tlrc.HEAD','+tlrc.BRIK', or
 %             '+tlrc.BRIK.gz'.
 %
+% Use cosmo_map2fmri(...,'deoblique',true) to de-oblique the dataset. For
+% information on this option, see cosmo_fmri_deoblique
+%
 % - for NIFTI files, it requires the following toolbox:
 %   http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 %   (note that his toolbox is included in CoSMoMVPA in /externals)
@@ -18,7 +21,12 @@ function hdr=cosmo_map2fmri(dataset, fn)
 % - for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
 %   Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
 %
+% See also: cosmo_fmri_deoblique
+%
 % NNO Aug 2013, updated Feb 2014
+    defaults=struct();
+    defaults.deoblique=false;
+    opt=cosmo_structjoin(defaults,varargin{:});
 
     cosmo_check_dataset(dataset, 'fmri');
 
@@ -44,6 +52,11 @@ function hdr=cosmo_map2fmri(dataset, fn)
     cosmo_check_external(externals);
 
     creator=methods.creator;
+
+    % preprocess the data (de-oblique if necessary)
+    dataset=preprocess(dataset,opt);
+
+    % build header structure
     hdr=creator(dataset);
 
     if save_to_file
@@ -54,9 +67,53 @@ function hdr=cosmo_map2fmri(dataset, fn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function unfl_ds=unflatten(ds)
+function ds=preprocess(ds,opt)
+    if opt.deoblique
+        ds=cosmo_fmri_deoblique(ds);
+    end
+
+function check_plump_orientation(ds)
+    rot=ds.a.vol.mat(1:3,1:3);
+    nonzero=rot~=0;
+    is_oblique=any(sum(nonzero,1)~=1) || any(sum(nonzero,2)~=1);
+    if is_oblique
+        error(['Dataset has oblique orientation, and the specified '...
+                'output format does not support this. Options are:\n\n'...
+                '(1) use %s(...,''deoblique'',true) to deoblique the '...
+                'dataset automatically when writing it\n'...
+                '(2) use cosmo_fmri_deoblique to deoblique the dataset '...
+                'manually\n'...
+                '(3) store the dataset in another file format (such as '...
+                'NIFTI)\n\n'...
+                'For options (1) and (2), the spatial location of the '...
+                'voxels will change. It is recommended to inspect the '...
+                'results visually when using one of these options.'],...
+                mfilename())
+    end
+
+
+
+function unfl_ds_timelast=unflatten(ds)
     % puts the time dimension last, instead of first
-    unfl_ds=shiftdim(cosmo_unflatten(ds),1);
+    unfl_ds=cosmo_unflatten(ds);
+
+    % make time dimension last instead of first
+    unfl_ds_timelast=shiftdim(unfl_ds,1);
+
+    % deal with singleton dimension
+    sz=size(unfl_ds);
+    dim_size=ones(1,4);
+    dim_size(4)=sz(1);
+    dim_size(1:(numel(sz)-1))=sz(2:end);
+
+    nsamples=size(ds.samples,1);
+    assert(isequal([ds.a.vol.dim nsamples],dim_size));
+
+    if ~isequal(size(unfl_ds_timelast),dim_size)
+        unfl_ds_timelast=reshape(unfl_ds_timelast,dim_size);
+    end
+
+
 
 
 function b=ends_with(end_str, str)
@@ -134,7 +191,7 @@ function ni=new_nii(ds)
     dime=struct();
     dime.datatype=16; %single
     dime.dim=[4 dim(:)' 1 1 1];
-    dime.pixdim=[1 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
+    dime.pixdim=[0 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
 
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
@@ -157,8 +214,16 @@ function ni=new_nii(ds)
     hdr.hk=hk;
 
     hist=struct();
-    hist.sform_code=2; % Tal space - TODO allow other spaces
-    hist.originator=[1 1 1 1 0];
+
+    if isfield(ds.a.vol,'xform')
+        xform=ds.a.vol.xform;
+    else
+        xform=''; % unknown
+    end
+    xform_code=cosmo_fmri_convert_xform('nii',xform);
+
+    hist.sform_code=xform_code;
+    % hist.originator=[1 1 1 1 0];
     hist=set_all(hist,{'descrip','aux_file','intent_name'},'');
     hist=set_all(hist,{'qform_code','quatern_b',...
                         'quatern_d',...
@@ -167,7 +232,8 @@ function ni=new_nii(ds)
     hist.srow_x=mat(1,:);
     hist.srow_y=mat(2,:);
     hist.srow_z=mat(3,:);
-    hist.quatern_c=1;
+    hist.quatern_c=0;
+    hist.originator=round(dim(:)'/2); % otherwise complaints with hdr/img
     hdr.hist=hist;
 
     ni.img=single(vol_data);
@@ -175,6 +241,7 @@ function ni=new_nii(ds)
 
 function write_nii(fn, hdr)
     save_nii(hdr, fn);
+
 
     %% BrainVoyager helper
 function mat=neuroelf_bvcoordconv_wrapper(varargin)
@@ -196,7 +263,15 @@ function mat=neuroelf_bvcoordconv_wrapper(varargin)
     mat=f(varargin{:});
 
     %% Brainvoyager VMP
-function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
+function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
+    % ensure dataset is plump
+    check_plump_orientation(ds);
+
+    % automatically set orientation to ARS
+    if ~strcmp(cosmo_fmri_orientation(ds),'ASR')
+        ds=cosmo_fmri_reorient(ds,'ASR');
+    end
+
     % helper to set matrix in header
     mat=ds.a.vol.mat;
 
@@ -247,7 +322,7 @@ function hdr=add_bv_mat_hdr(hdr,ds,bv_type)
 function hdr=new_bv_vmp(ds)
     hdr=xff('new:vmp');
 
-    hdr=add_bv_mat_hdr(hdr,ds,'vmp');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmp');
 
     % Store the data
 
@@ -268,6 +343,7 @@ function hdr=new_bv_vmp(ds)
             map=cosmo_structjoin(map, stats{k});
         end
         maps{k}=map;
+        empty_hdr.ClearObject();
     end
 
     hdr.Map=cat(2,maps{:});
@@ -278,12 +354,13 @@ function hdr=new_bv_vmp(ds)
 function write_bv(fn, hdr)
     % general storage function
     hdr.SaveAs(fn);
+    hdr.ClearObject();
 
 
-    %% Brainvoyager GLM
+    %% Brainvoyager VMR
 function hdr=new_bv_vmr(ds)
     hdr=xff('new:vmr');
-    hdr=add_bv_mat_hdr(hdr,ds,'vmr');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
 
     nsamples=size(ds.samples,1);
     if nsamples~=1,
@@ -294,13 +371,13 @@ function hdr=new_bv_vmr(ds)
     mx=max(ds.samples);
 
     % scale to 0..255
-    vol_data=(unflatten(ds)-mn)*255*(mx-mn);
-    hdr.VMRData=uint8(vol_data(:,:,:,1));
+    vol_data=unflatten(ds);
+    hdr.VMRData=scale_uint8(vol_data(:,:,:,1));
 
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
     hdr=xff('new:msk');
-    hdr=add_bv_mat_hdr(hdr,ds,'msk');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
 
     nsamples=size(ds.samples,1);
     if nsamples~=1,
@@ -308,12 +385,25 @@ function hdr=new_bv_msk(ds)
     end
 
     vol_data=unflatten(ds);
-    hdr.Mask=uint8(vol_data(:,:,:,1));
+    hdr.Mask=scale_uint8(vol_data);
+
+function scaled_data=scale_uint8(data)
+    mn=min(data(:));
+    mx=max(data(:));
+    if mn<0 || mx>255 || ~isequal(round(data),data)
+        cosmo_warning(['.samples does not fit integer range 0..255 ',...
+                            'data will be rescaled']);
+        data=255*(data-mn)/(mx-mn);
+    end
+
+    scaled_data=uint8(data);
 
 
 
 %% AFNI
 function afni_info=new_afni(ds)
+    check_plump_orientation(ds);
+
     a=ds.a;
     mat=a.vol.mat;
 
@@ -321,6 +411,7 @@ function afni_info=new_afni(ds)
     idxs=zeros(1,3);
     m=zeros(1,3);
 
+    % this part should be necessary
     for k=1:3
         % for each spatial dimension, find which row transforms it
         idx=find(mat(1:3,k));
@@ -352,14 +443,25 @@ function afni_info=new_afni(ds)
     offset=(1-sign(m).*lpi2orient(idxs))/2;
     orient=(idxs-1)*2+offset;
 
+    [nsamples,nfeatures]=size(ds.samples);
+
     vol_data=unflatten(ds);
-    dim=size(vol_data);
-    nsamples=size(ds.samples,1);
+    dim=ds.a.vol.dim(:)';
+    assert(prod(dim)==nfeatures);
+
 
     brik_type=1; %functional head
     brik_typestring='3DIM_HEAD_FUNC';
     brik_func=11; % FUNC_BUCK_TYPE
-    brik_view=0; % default to +orig, but overriden by writer
+
+    if isfield(ds.a.vol,'xform')
+        xform=ds.a.vol.xform;
+    else
+        xform=''; % unknown
+    end
+    xform_code=cosmo_fmri_convert_xform('afni',xform);
+
+    brik_view=xform_code; % default to +orig, but overriden by writer
 
     afni_info=struct();
     afni_info.SCENE_DATA=[brik_view, brik_func, brik_type];
@@ -370,8 +472,8 @@ function afni_info=new_afni(ds)
     afni_info.DATASET_RANK=[3 nsamples];      % number of volumes
     afni_info.DATASET_DIMENSIONS=dim(1:3);
     afni_info.ORIENT_SPECIFIC=orient;
-    afni_info.DELTA=delta;
-    afni_info.ORIGIN=origin;
+    afni_info.DELTA=delta(:)';
+    afni_info.ORIGIN=origin(:)';
     afni_info.SCALE=0;
 
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
