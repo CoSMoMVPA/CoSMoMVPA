@@ -405,16 +405,72 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
 function ds_type=get_ds_type(ds)
 
     supported_ds_types={'surface','fmri'};
+    n=numel(supported_ds_types);
 
-    ds_type=[];
-    for k=1:numel(supported_ds_types)
-        ds_type=supported_ds_types{k};
-        if cosmo_check_dataset(ds,ds_type,false)
+    for k=1:n
+        supported_ds_type=supported_ds_types{k};
+        if cosmo_check_dataset(ds,supported_ds_type,false)
+            ds_type=supported_ds_type;
             return
         end
     end
 
-    if isempty(ds_type)
-        error('Unknown dataset type, supported are: %s.', ...
-                    cosmo_strjoin(supported_ds_types,', '));
+    % maybe it is not a dataset at all, check this possibility
+    cosmo_check(dataset(ds));
+
+    % it is a valid dataset but not fmri or surface;
+    % try to give an appropriate error message
+    for k=1:n
+        supported_ds_type=supported_ds_types{k};
+        if is_ds_type_like(ds, supported_ds_type)
+            % let it throw an error
+            cosmo_check_dataset(ds,supported_ds_type);
+        end
     end
+
+    error('Unknown dataset type, supported are: %s.', ...
+                    cosmo_strjoin(supported_ds_types,', '));
+
+
+function tf=is_ds_type_like(ds, type)
+    tf=false;
+
+    switch type
+        case 'surface'
+            if cosmo_isfield(ds,'fa.node_indices')
+                tf=true;
+                return;
+            end
+
+            if cosmo_isfield(ds,'a.fdim.values') && ...
+                        cosmo_match({'node_indices'},ds.a.fdim.values)
+                tf=true;
+                return;
+            end
+
+        case 'fmri'
+            if any(cosmo_isfield(ds,{'fa.i','fa.j','fa.k'}))
+                tf=true;
+                return;
+            end
+
+            if cosmo_isfield(ds,'a.fdim.values') && ...
+                        any(cosmo_match({'i','j','k'},ds.a.fdim.values))
+                tf=true;
+                return
+            end
+
+        otherwise
+            error('unsupported type %s', type);
+    end
+
+
+
+
+
+
+
+
+
+
+
