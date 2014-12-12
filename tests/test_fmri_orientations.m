@@ -3,7 +3,7 @@ function test_suite = test_fmri_orientations
 
 
 function test_orientations()
-    has_afni=~run_afni_command('afni -version > /dev/null');
+    has_afni=run_afni_command('afni -version > /dev/null', false);
 
     % make dataset
     ds=cosmo_synthetic_dataset('size','big');
@@ -47,6 +47,10 @@ function test_orientations()
             assertElementsAlmostEqual(ds.samples(:,orient_idx),...
                                       ds_rs.samples(:,idx_rs),...
                                       'absolute',1e-5);
+
+
+        elseif k==1
+            warning('Skipping i/o test with AFNI binaries');
         end
 
         % verify equality with re-orirented dataset
@@ -117,13 +121,8 @@ function [success,output]=run_afni_command(cmd,raise)
     setenv('DYLD_FALLBACK_LIBRARY_PATH',...
                 [getenv('DYLD_FALLBACK_LIBRARY_PATH') ':/sw/lib']);
 
-    if ~cosmo_check_external('afni_bin')
-        success=false;
-        output='Unable to run afni binaries';
-    else
-        [s,output]=unix(cmd);
-        success=s==0;
-    end
+    [s,output]=unix(cmd);
+    success=s==0;
 
     if ~success && raise
         error(output);
