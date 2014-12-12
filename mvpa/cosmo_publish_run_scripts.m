@@ -74,7 +74,7 @@ function cosmo_publish_run_scripts(varargin)
 
         [needs_update,build_msg]=target_needs_update(srcfn,trgfn);
         if force
-            build_msg=sprintf('update forced: %s%s',srcname,srcext);
+            build_msg=sprintf('update forced: %s',srcfn);
         end
 
         fprintf(build_msg);

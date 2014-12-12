@@ -128,7 +128,7 @@ function ni=new_nii(ds)
 
     mat=vol.mat;
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[1 1 1]';
-    pix_dim=vol.mat(1:3,1:3)*[1 1 1]';
+    pix_dim=sqrt(sum(mat(1:3,1:3).^2,1));
     hdr=struct();
 
     dime=struct();

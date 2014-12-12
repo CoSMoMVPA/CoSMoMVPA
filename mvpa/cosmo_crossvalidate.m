@@ -195,7 +195,8 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     test_chunks(test_counts~=1)=NaN;
 
     % set predictions
-    pred=classes(pred_indices);
+    pred=NaN(nsamples,1);
+    pred(test_mask)=classes(pred_indices(test_mask));
 
     % compute accuracies
     correct_mask=ds.sa.targets(test_mask)==pred(test_mask);
