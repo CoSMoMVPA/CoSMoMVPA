@@ -36,8 +36,7 @@ function [lay,label]=get_layout(ds, opt)
             case 'dataset'
                 use_label=get_dataset_channel_label(ds);
             otherwise
-                error('illegal label %s, use one of: layout, dataset',...
-                    label);
+                error('illegal label %s, use one of: layout, dataset');
         end
     elseif iscellstr(opt.label)
         use_label=opt.label;
@@ -73,7 +72,7 @@ function lay=slice_layout(lay, to_keep)
         switch nvalue
             case nlabel
                 lay.(key)=value(to_keep,:);
-            case 1
+            case {0,1}
                 % ok
             otherwise
                 error('layout field %s has %d values, must be 1 or %d',...
@@ -128,6 +127,8 @@ function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
         direct_nbrs=0+pairwise_delaunay_direct_neighbors(pos);
         for k=1:steps
             connectivity=connectivity*(self_connectivity+direct_nbrs);
+
+            % avoid large values
             connectivity(connectivity>0)=1;
         end
     end
@@ -137,6 +138,23 @@ function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
 
 
 function nbrs_msk=pairwise_delaunay_direct_neighbors(pos)
+    [idxs,unq_pos]=cosmo_index_unique(pos);
+    unq_nbrs_msk=pairwise_delaynay_direct_neighbors_unique(unq_pos);
+
+    n=size(pos,1);
+    nbrs_msk=false(n);
+
+    nunq=numel(idxs);
+    assert(isequal([1 1]*nunq,size(unq_nbrs_msk)));
+
+    for k=1:nunq
+        for j=1:nunq
+            nbrs_msk(idxs{k},idxs{j})=unq_nbrs_msk(k,j);
+        end
+    end
+
+
+function nbrs_msk=pairwise_delaynay_direct_neighbors_unique(pos)
     f=delaunay(pos);
     f_x=delaunay(bsxfun(@times,pos,[1 2]));
     f_y=delaunay(bsxfun(@times,pos,[2 1]));
