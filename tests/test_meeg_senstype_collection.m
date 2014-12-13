@@ -2,7 +2,7 @@ function test_suite=test_meeg_senstype_collection
     initTestSuite;
 
 function test_meeg_senstype_collection_
-    
+
     % get senstype properties
     % order is:
     % - senstype name
@@ -11,9 +11,9 @@ function test_meeg_senstype_collection_
     % - number of rows in channels
     % - number of columns in channels
     % - first and last channel label
-    
+
     senstype_props=get_senstype_properties();
-    
+
     % test each one
     n=numel(senstype_props);
     stc=cosmo_meeg_senstype_collection();
@@ -21,7 +21,7 @@ function test_meeg_senstype_collection_
         prop=senstype_props{k};
         key=prop{1};
         is_required=numel(prop)>=7 && prop{7};
-        
+
         if isfield(stc,key)
             sens=prop{2};
             type=prop{3};
@@ -39,10 +39,10 @@ function test_meeg_senstype_collection_
             error('Missing key %s',key);
         end
     end
-        
-    
+
+
 function props=get_senstype_properties()
-    
+
     props={{ 'biosemi64',...
                     'biosemi64','eeg',...
                     64,1,{'A1','B32'}},...
@@ -181,7 +181,7 @@ function props=get_senstype_properties()
     %
     % sc=cosmo_meeg_senstype_collection();
     % names=fieldnames(sc);
-    % 
+    %
     % names={'biosemi64','biosemi128','biosemi256',...
     %         'bti148','bti148_planar','bti148_planar_combined',...
     %         'bti248','bti248_planar','bti248_planar_combined',...
@@ -212,4 +212,4 @@ function props=get_senstype_properties()
     %                 '%d,%d,{''%s'',''%s''}},...\n'],...
     %             name,s.sens,s.type,size(s.label),s.label{1},s.label{end})
     % end
-    % 
+    %
