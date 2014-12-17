@@ -1,4 +1,140 @@
 function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
+% find neighbors of MEEG channels
+%
+% neighbors=cosmo_meeg_chan_neighbors(ds, ...)
+%
+% Inputs:
+%   ds                  MEEG dataset struct
+%   'label', lab        Labels to return in output, one of:
+%                       'layout'    : determine neighbors based on layout
+%                                     associated with ds (default). All
+%                                     labels in the layout are used as
+%                                     center labels.
+%                       'dataset'   : determine neighbors based on labels
+%                                     present in ds. Only labels present in
+%                                     ds are used as center labels
+%                       {x1,...,xn} : use labels x1 ... xn
+%   'chantype', tp      (optional) channel type of neighbors, can be one of
+%                       'eeg', 'meg_planar', 'meg_axial', or
+%                       'meg_combined_from_planar'. If there is only one
+%                       channel type associated with lab, then this
+%                       argument is not required.
+%   'radius', r         } select neighbors either within radius r, grow
+%   'count', c          } the radius to get neighbors are c locations,
+%   'delauney', true    } or use Delauney triangulation to find direct
+%                       } neighbors for each channel.
+%                       } These three options are mutually exclusive
+%
+%
+% Output:
+%   neighbors           Kx1 struct for K center labels, with fields:
+%     .label            center label
+%     .neighblabel      cell with labels of neighbors
+%
+% Examples:
+%     % get neighbors within radius of .1 for EEG dataset
+%     ds=cosmo_synthetic_dataset('type','meeg','sens','eeg1010');
+%     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3);
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@86x1
+%     >    (1,1) .label
+%     >            'Fp1'
+%     >          .neighblabel
+%     >            { 'Fp1'
+%     >               :
+%     >              'FC1' }@21x1
+%     >      :           :
+%     >    (86,1).label
+%     >            'I2'
+%     >          .neighblabel
+%     >            { 'P2'
+%     >               :
+%     >              'I2' }@18x1
+%     %
+%     % print labels
+%     cosmo_disp(ds.a.fdim.values{1});
+%     > { 'TP10'
+%     >   'TP7'
+%     >   'TP8'  }
+%     %
+%     % since the dataset has only 3 channels, using the dataset's
+%     % labels only returns the labels of the dataset
+%     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.1,'label','dataset');
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@3x1
+%     >    (1,1).label
+%     >           'TP7'
+%     >         .neighblabel
+%     >           { 'TP7' }
+%     >    (2,1).label
+%     >           'TP8'
+%     >         .neighblabel
+%     >           { 'TP8'
+%     >             'TP10' }
+%     >    (3,1).label
+%     >           'TP10'
+%     >         .neighblabel
+%     >           { 'TP8'
+%     >             'TP10' }
+%
+%     % get neighbors at 4 neighboring sensor location for
+%     % planar neuromag306 channels
+%     ds=cosmo_synthetic_dataset('type','meeg');
+%     nbrs=cosmo_meeg_chan_neighbors(ds,...
+%                     'chantype','meg_planar','count',4);
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@204x1
+%     >    (1,1)  .label
+%     >             'MEG0113'
+%     >           .neighblabel
+%     >             { 'MEG0113'
+%     >               'MEG0112'
+%     >               'MEG0122'
+%     >               'MEG0133' }
+%     >      :            :
+%     >    (204,1).label
+%     >             'MEG2643'
+%     >           .neighblabel
+%     >             { 'MEG2423'
+%     >               'MEG2422'
+%     >               'MEG2642'
+%     >               'MEG2643' }
+%
+%     % get neighbors at 4 neighboring sensor location for
+%     % planar neuromag306 channels, but with the center labels
+%     % the set of combined planar channels
+%     % (there are 8 channels
+%     ds=cosmo_synthetic_dataset('type','meeg');
+%     nbrs=cosmo_meeg_chan_neighbors(ds,...
+%                     'chantype','meg_combined_from_planar','count',4);
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@102x1
+%     >    (1,1)  .label
+%     >             'MEG0112+0113'
+%     >           .neighblabel
+%     >             { 'MEG0112'
+%     >                  :
+%     >               'MEG0343' }@8x1
+%     >      :              :
+%     >    (102,1).label
+%     >             'MEG2642+2643'
+%     >           .neighblabel
+%     >             { 'MEG2422'
+%     >                  :
+%     >               'MEG2643' }@8x1
+%
+% Notes:
+%  - this function returns a struct similar to FieldTrip's
+%    ft_prepare_neighbors, but not identical:
+%    * a center labels is neighbor of itself
+%    * the neighbors are similar but not identical to FieldTrip's
+%      ft_prepare_neighbors
+%
+% See also: cosmo_meeg_chantype, ft_prepare_neighbors
+%
+% NNO Dec 2014
+
+
     default.label='layout';
     opt=cosmo_structjoin(default,varargin);
 
@@ -138,6 +274,7 @@ function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
 
 
 function nbrs_msk=pairwise_delaunay_direct_neighbors(pos)
+    % avoid duplicate sensor positions
     [idxs,unq_pos]=cosmo_index_unique(pos);
     unq_nbrs_msk=pairwise_delaynay_direct_neighbors_unique(unq_pos);
 
@@ -156,11 +293,12 @@ function nbrs_msk=pairwise_delaunay_direct_neighbors(pos)
 
 function nbrs_msk=pairwise_delaynay_direct_neighbors_unique(pos)
     f=delaunay(pos);
+
+    % act a bit like fieldtrip by stretching the coordinates (twice)
     f_x=delaunay(bsxfun(@times,pos,[1 2]));
     f_y=delaunay(bsxfun(@times,pos,[2 1]));
 
     f_all=[f; f_x; f_y];
-
 
     n=size(pos,1);
     nbrs_msk=diag(1:n)>0;
