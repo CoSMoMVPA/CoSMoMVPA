@@ -16,9 +16,13 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %                       {x1,...,xn} : use labels x1 ... xn
 %   'chantype', tp      (optional) channel type of neighbors, can be one of
 %                       'eeg', 'meg_planar', 'meg_axial', or
-%                       'meg_combined_from_planar'. If there is only one
-%                       channel type associated with lab, then this
-%                       argument is not required.
+%                       'meg_combined_from_planar'.
+%                       Use 'all' to use all channel types associated with
+%                       lab, and 'all_combined' to use
+%                       'meg_combined_from_planar' with all other channel
+%                       types in ds except for 'meg_planar'.
+%                       If there is only one channel type associated with
+%                       lab, then this argument is not required.
 %   'radius', r         } select neighbors either within radius r, grow
 %   'count', c          } the radius to get neighbors are c locations,
 %   'delauney', true    } or use Delauney triangulation to find direct
@@ -103,7 +107,8 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels, but with the center labels
 %     % the set of combined planar channels
-%     % (there are 8 channels
+%     % (there are 8 channels in the .neighblabel fields, because
+%     %  there are two planar channels per combined channel)
 %     ds=cosmo_synthetic_dataset('type','meeg');
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                     'chantype','meg_combined_from_planar','count',4);
@@ -123,6 +128,56 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     >                  :
 %     >               'MEG2643' }@8x1
 %
+%     % As above, but now use both the axial and planar channels.
+%     % Here the axial channels only have axial neighbors, and the planar
+%     % channels only have planar neighbors
+%     ds=cosmo_synthetic_dataset('type','meeg');
+%     nbrs=cosmo_meeg_chan_neighbors(ds,...
+%                            'chantype','all','count',4);
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@306x1
+%     >    (1,1)  .label
+%     >             'MEG0111'
+%     >           .neighblabel
+%     >             { 'MEG0111'
+%     >               'MEG0121'
+%     >               'MEG0131'
+%     >               'MEG0341' }
+%     >      :            :
+%     >    (306,1).label
+%     >             'MEG2643'
+%     >           .neighblabel
+%     >             { 'MEG2423'
+%     >               'MEG2422'
+%     >               'MEG2642'
+%     >               'MEG2643' }
+%
+%     % As above, but now use both the axial and planar channels with
+%     % center labels for the planar channels from the combined_planar set.
+%     % Here the axial center channels have 4 axial neighbors each, while
+%     % the planar_combined channels have 8 planar (uncombined) neigbors
+%     % each.
+%     ds=cosmo_synthetic_dataset('type','meeg');
+%     nbrs=cosmo_meeg_chan_neighbors(ds,...
+%                            'chantype','all_combined','count',4);
+%     cosmo_disp(nbrs,'edgeitems',1);
+%     > <struct>@204x1
+%     >    (1,1)  .label
+%     >             'MEG0111'
+%     >           .neighblabel
+%     >             { 'MEG0111'
+%     >               'MEG0121'
+%     >               'MEG0131'
+%     >               'MEG0341' }
+%     >      :              :
+%     >    (204,1).label
+%     >             'MEG2642+2643'
+%     >           .neighblabel
+%     >             { 'MEG2422'
+%     >                  :
+%     >               'MEG2643' }@8x1
+%
+%
 % Notes:
 %  - this function returns a struct similar to FieldTrip's
 %    ft_prepare_neighbors, but not identical:
@@ -138,6 +193,47 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
     default.label='layout';
     opt=cosmo_structjoin(default,varargin);
 
+    chan_types=get_chantypes(ds,opt);
+    if isempty(chan_types)
+        neighbors=get_chantype_neighbors(ds,opt);
+    else
+        n=numel(chan_types);
+        neighbors_cell=cell(n,1);
+        for k=1:n
+            opt.chantype=chan_types{k};
+            neighbors_cell{k}=get_chantype_neighbors(ds,opt);
+        end
+
+        neighbors=cat(1,neighbors_cell{:});
+    end
+
+
+function chan_types=get_chantypes(ds,opt)
+    if ~isfield(opt,'chantype')
+        chan_types=[];
+        return;
+    end
+
+    chan_types={opt.chantype};
+
+    switch opt.chantype
+        case 'all'
+            chan_types=unique(cosmo_meeg_chantype(ds));
+        case 'all_combined'
+            % replace meg_planar by meg_planar_combined
+            chan_types=unique(cosmo_meeg_chantype(ds));
+            i=find(cosmo_match(chan_types,'meg_planar'));
+            if numel(i)~=1
+                error(['dataset has no planar channels, therefore '...
+                        '''%s'' is an invalid chantype'],...
+                            opt,chan_type);
+            end
+            chan_types{i}='meg_combined_from_planar';
+    end
+
+
+
+function neighbors=get_chantype_neighbors(ds,opt)
     [layout,label_keep]=get_layout(ds,opt);
     nbr_msk=pairwise_neighbors(layout.pos,opt);
 
@@ -186,7 +282,7 @@ function [lay,label]=get_layout(ds, opt)
 
     if isfield(base_lay,'parent')
         child_label=base_lay.parent.child_label;
-        overlap=cosmo_overlap(child_label,{base_lay.label});
+        overlap=cosmo_overlap(child_label,{use_label});
         keep_parent_msk=overlap>0;
         lay=slice_layout(base_lay.parent,keep_parent_msk);
         label=base_lay.label(keep_msk);
