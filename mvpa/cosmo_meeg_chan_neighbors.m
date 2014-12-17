@@ -181,14 +181,20 @@ function nbrs_msk=pairwise_delaynay_direct_neighbors_unique(pos)
 
 
 function nbrs_msk=nearest_neighbors_from_distance(d,count)
+    % d is an n x n matrix with distances
     n=size(d,1);
     nbrs_msk=false(n);
+
+    if count>n
+        error('Cannot select %d channels: only %d are present',...
+                    count,n);
+    end
 
     [sd,i]=sort(d);
     for k=1:n
         last_row=count;
         radius=sd(last_row,k);
-        while sd(last_row+1,k)==radius
+        while last_row < n && sd(last_row+1,k)==radius
             last_row=last_row+1;
         end
         nbrs_msk(i(1:last_row,k),k)=true;
