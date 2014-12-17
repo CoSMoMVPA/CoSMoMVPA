@@ -2,7 +2,7 @@ function test_suite=test_meeg_chan_neighbors()
     initTestSuite;
 
 function test_neighbors()
-
+    % note: this tests assumes that meeg_chan_neighbors works properly
     test_step=10;
 
     ds=cosmo_synthetic_dataset('type','meeg','size','big');
@@ -50,7 +50,7 @@ function test_neighbors()
     nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
     n=numel(nh.neighbors);
     assertEqual(n, numel(ds.a.fdim.values{1}));
-
+    assertEqual(1:n, nh.fa.chan);
     ds_label=ds.a.fdim.values{1};
     nh_label=nh.a.fdim.values{1};
 

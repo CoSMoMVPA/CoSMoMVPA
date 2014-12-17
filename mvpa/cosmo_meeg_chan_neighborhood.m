@@ -1,15 +1,16 @@
 function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
+
+
     [unused,unused,attr_name,dim_name,ds_label]=cosmo_dim_find(ds,...
                                                         'chan',true);
     nbrs=get_neighbors(ds,varargin{:});
-
 
     ds_chan=ds.(attr_name).chan;
     [nbrs_label,chan_idxs]=get_neighbor_indices(nbrs,ds_label,ds_chan);
 
     nbrhood=struct();
     nbrhood.neighbors=chan_idxs;
-    nbrhood.(attr_name).chan=numel(nbrs);
+    nbrhood.(attr_name).chan=1:numel(nbrs);
     nbrhood.a.(dim_name).labels={'chan'};
     nbrhood.a.(dim_name).values={nbrs_label};
 
