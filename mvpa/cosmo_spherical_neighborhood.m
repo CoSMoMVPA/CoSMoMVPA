@@ -62,27 +62,12 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 %     >   .k
 %     >     [ 1         1         1         1         1         1 ]
 %     > .neighbors
-%     >   { [ 1
-%     >       4
-%     >       2 ]
-%     >     [ 2
-%     >       1
-%     >       5
-%     >       3 ]
-%     >     [ 3
-%     >       2
-%     >       6 ]
-%     >     [ 4
-%     >       1
-%     >       5 ]
-%     >     [ 5
-%     >       4
-%     >       2
-%     >       6 ]
-%     >     [ 6
-%     >       5
-%     >       3 ] }
-%
+%     >   { [ 1         4         2 ]
+%     >     [ 2         1         5         3 ]
+%     >     [ 3         2         6 ]
+%     >     [ 4         1         5 ]
+%     >     [ 5         4         2         6 ]
+%     >     [ 6         5         3 ]           }
 % NNO Aug 2013
 
     cosmo_check_dataset(ds,'fmri');
@@ -211,7 +196,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 
 
         % store results
-        neighbors{k}=around_feature_ids;
+        neighbors{k}=around_feature_ids';
         nvoxels(k)=numel(around_feature_ids);
         if use_fixed_radius
             final_radius(k)=radius;
@@ -238,3 +223,5 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
     nbrhood.fa.k=ds.fa.k(center_ids);
 
     nbrhood.neighbors=neighbors;
+
+    cosmo_check_neighborhood(nbrhood);

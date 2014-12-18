@@ -146,3 +146,5 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
     nbrhood.(attr_name)=struct();
     nbrhood.(attr_name).(label)=1:nvalues;
     nbrhood.neighbors=neighbors;
+
+    cosmo_check_neighborhood(nbrhood);
