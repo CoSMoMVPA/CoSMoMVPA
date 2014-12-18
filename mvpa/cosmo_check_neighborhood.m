@@ -42,7 +42,7 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %     nbrhood.neighbors{2}=[1];
 %     nbrhood.fa.chan=[3 2 1];
 %     cosmo_check_neighborhood(nbrhood)
-%     > error('fa.chan has 3 values in dimension 2, expected 21')
+%     > error('fa.chan has 3 values in dimension 2, expected 6')
 %
 % See also: cosmo_spherical_neighborhood, surfing_interval_neighborhood
 %           cosmo_surficial_neighborhood, cosmo_meeg_chan_neighborhood
