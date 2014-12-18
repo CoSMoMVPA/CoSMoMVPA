@@ -36,8 +36,37 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     .neighblabel      cell with labels of neighbors
 %
 % Examples:
-%     % get neighbors within radius of .1 for EEG dataset
-%     ds=cosmo_synthetic_dataset('type','meeg','sens','eeg1010');
+%     % get neighbors within radius of .3 for EEG dataset
+%     ds=cosmo_synthetic_dataset('type','meeg',...
+%                                        'sens','eeg1010','size','big');
+%     % show all channel labels
+%     cosmo_disp(ds.a.fdim.values{1});
+%     > { 'TP10'
+%     >   'TP7'
+%     >   'TP8'
+%     >     :
+%     >   'A2'
+%     >   'M1'
+%     >   'M2'   }@94x1
+%     %
+%     % simulate the case where some channels are missing; here, every 7-th
+%     % channels is removed
+%     ds=cosmo_dim_slice(ds,mod(ds.fa.chan,7)~=2,2);
+%     %
+%     % show remaining channel labels
+%     cosmo_disp(ds.a.fdim.values{1});
+%     > { 'TP10'
+%     >   'TP8'
+%     >   'TP9'
+%     >     :
+%     >   'A1'
+%     >   'A2'
+%     >   'M2'   }@80x1
+%     %
+%     % get neighbors for the channel layout associated with this
+%     % dataset. This layout ('EEG1010.lay') has 88 channel positions,
+%     % of which the last two are ignored because they are 'COMNT' and
+%     % 'SCALE'
 %     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3);
 %     cosmo_disp(nbrs,'edgeitems',1);
 %     > <struct>@86x1
@@ -51,39 +80,34 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     >    (86,1).label
 %     >            'I2'
 %     >          .neighblabel
-%     >            { 'P2'
+%     >            { 'P4'
 %     >               :
-%     >              'I2' }@18x1
+%     >              'I2' }@16x1
 %     %
-%     % print labels
-%     cosmo_disp(ds.a.fdim.values{1});
-%     > { 'TP10'
-%     >   'TP7'
-%     >   'TP8'  }
-%     %
-%     % since the dataset has only 3 channels, using the dataset's
-%     % labels only returns the labels of the dataset
-%     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.1,'label','dataset');
+%     % since the dataset has only 74 channels, using the dataset's
+%     % labels only (with the 'labels' argument) returns
+%     % only neighbors for channels in the dataset
+%     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3,...
+%                                         'label','dataset');
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@3x1
-%     >    (1,1).label
-%     >           'TP7'
-%     >         .neighblabel
-%     >           { 'TP7' }
-%     >    (2,1).label
-%     >           'TP8'
-%     >         .neighblabel
-%     >           { 'TP8'
-%     >             'TP10' }
-%     >    (3,1).label
-%     >           'TP10'
-%     >         .neighblabel
-%     >           { 'TP8'
-%     >             'TP10' }
+%     > <struct>@74x1
+%     >    (1,1) .label
+%     >            'Fp1'
+%     >          .neighblabel
+%     >            { 'Fp1'
+%     >               :
+%     >              'FC1' }@21x1
+%     >      :           :
+%     >    (74,1).label
+%     >            'I2'
+%     >          .neighblabel
+%     >            { 'P4'
+%     >               :
+%     >              'I2' }@16x1
 %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels
-%     ds=cosmo_synthetic_dataset('type','meeg');
+%     ds=cosmo_synthetic_dataset('type','meeg','size','big');
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                     'chantype','meg_planar','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
@@ -109,7 +133,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     % the set of combined planar channels
 %     % (there are 8 channels in the .neighblabel fields, because
 %     %  there are two planar channels per combined channel)
-%     ds=cosmo_synthetic_dataset('type','meeg');
+%     ds=cosmo_synthetic_dataset('type','meeg','size','big');
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                     'chantype','meg_combined_from_planar','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
@@ -131,7 +155,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     % As above, but now use both the axial and planar channels.
 %     % Here the axial channels only have axial neighbors, and the planar
 %     % channels only have planar neighbors
-%     ds=cosmo_synthetic_dataset('type','meeg');
+%     ds=cosmo_synthetic_dataset('type','meeg','size','big');
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                            'chantype','all','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
@@ -157,7 +181,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     % Here the axial center channels have 4 axial neighbors each, while
 %     % the planar_combined channels have 8 planar (uncombined) neigbors
 %     % each.
-%     ds=cosmo_synthetic_dataset('type','meeg');
+%     ds=cosmo_synthetic_dataset('type','meeg','size','big');
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                            'chantype','all_combined','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
@@ -195,13 +219,13 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 
     chan_types=get_chantypes(ds,opt);
     if isempty(chan_types)
-        neighbors=get_chantype_neighbors(ds,opt);
+        neighbors=get_neighbors_with_chantype(ds,opt);
     else
         n=numel(chan_types);
         neighbors_cell=cell(n,1);
         for k=1:n
             opt.chantype=chan_types{k};
-            neighbors_cell{k}=get_chantype_neighbors(ds,opt);
+            neighbors_cell{k}=get_neighbors_with_chantype(ds,opt);
         end
 
         neighbors=cat(1,neighbors_cell{:});
@@ -233,9 +257,17 @@ function chan_types=get_chantypes(ds,opt)
 
 
 
-function neighbors=get_chantype_neighbors(ds,opt)
+function neighbors=get_neighbors_with_chantype(ds,opt)
     [layout,label_keep]=get_layout(ds,opt);
-    nbr_msk=pairwise_neighbors(layout.pos,opt);
+
+    ds_label=get_dataset_channel_label(ds);
+    if isempty(label_keep)
+        pos_msk=cosmo_match(layout.label, ds_label);
+    else
+        pos_msk=cosmo_overlap({ds_label},layout.child_label)>0;
+    end
+
+    nbr_msk=pairwise_neighbors(layout.pos,pos_msk,opt);
 
     has_child=isfield(layout,'child_label');
 
@@ -315,7 +347,9 @@ function lay=slice_layout(lay, to_keep)
 
 
 
-function nbrs_msk=pairwise_neighbors(pos,opt)
+function nbrs_msk=pairwise_neighbors(pos,msk,opt)
+    assert(size(pos,1)==numel(msk));
+
     metric2func=struct();
     metric2func.radius=@pairwise_euclidean_neighbors;
     metric2func.count=@pairwise_nearest_neighbors;
@@ -330,17 +364,19 @@ function nbrs_msk=pairwise_neighbors(pos,opt)
 
     metric=metrics{metric_msk};
     func=metric2func.(metric);
-    nbrs_msk=func(pos,opt.(metric));
+    nbrs_msk=func(pos,msk,opt.(metric));
 
-function nbrs_msk=pairwise_euclidean_neighbors(pos,radius)
+
+function nbrs_msk=pairwise_euclidean_neighbors(pos,msk,radius)
     d=pairwise_euclidean_distance(pos);
     nbrs_msk=d<=radius;
+    nbrs_msk(~msk,:)=false;
 
-function nbrs_msk=pairwise_nearest_neighbors(pos,count)
+function nbrs_msk=pairwise_nearest_neighbors(pos,msk,count)
     d=pairwise_euclidean_distance(pos);
-    nbrs_msk=nearest_neighbors_from_distance(d,count);
+    nbrs_msk=nearest_neighbors_from_distance(d,msk,count);
 
-function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
+function nbrs_msk=pairwise_delaunay_neighbors(pos,msk,steps)
     % compute steps-th order neighbors
     if size(pos,2)~=3 && ~ismatrix(pos)
         error('positions must be in Mx2 matrix');
@@ -350,18 +386,19 @@ function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
         steps=0+steps;
     end
 
-    n=size(pos,1);
-    self_connectivity=eye(n);
+    self_connectivity=0+diag(msk>0);
     connectivity=self_connectivity;
 
     if steps>0
         % compute sum_{k=1:steps} direct_nbrs.^k
-        direct_nbrs=0+pairwise_delaunay_direct_neighbors(pos);
+        direct_nbrs=0+pairwise_delaunay_direct_neighbors(pos,msk);
         for k=1:steps
             connectivity=connectivity*(self_connectivity+direct_nbrs);
 
             % avoid large values
             connectivity(connectivity>0)=1;
+
+            connectivity(~msk,:)=0;
         end
     end
     nbrs_msk=connectivity>0;
@@ -369,10 +406,10 @@ function nbrs_msk=pairwise_delaunay_neighbors(pos,steps)
 
 
 
-function nbrs_msk=pairwise_delaunay_direct_neighbors(pos)
+function nbrs_msk=pairwise_delaunay_direct_neighbors(pos,msk)
     % avoid duplicate sensor positions
     [idxs,unq_pos]=cosmo_index_unique(pos);
-    unq_nbrs_msk=pairwise_delaynay_direct_neighbors_unique(unq_pos);
+    unq_nbrs_msk=pairwise_delaunay_direct_neighbors_unique(unq_pos,msk);
 
     n=size(pos,1);
     nbrs_msk=false(n);
@@ -387,14 +424,22 @@ function nbrs_msk=pairwise_delaunay_direct_neighbors(pos)
     end
 
 
-function nbrs_msk=pairwise_delaynay_direct_neighbors_unique(pos)
-    f=delaunay(pos);
 
+function nbrs_msk=pairwise_delaunay_direct_neighbors_unique(pos,msk)
     % act a bit like fieldtrip by stretching the coordinates (twice)
-    f_x=delaunay(bsxfun(@times,pos,[1 2]));
-    f_y=delaunay(bsxfun(@times,pos,[2 1]));
+    stretch=[1 .5 2];
 
-    f_all=[f; f_x; f_y];
+    % delaunay without applying the mask
+    f_pos=delaunay_with_stretch(pos,stretch);
+
+    % delaunay with applying the mask
+    idx=find(msk);
+    pos_msk=pos(idx,:);
+    f_msk=delaunay_with_stretch(pos_msk,stretch);
+    f_msk_pos=idx(f_msk);
+
+    % combine them
+    f_all=[f_pos; f_msk_pos];
 
     n=size(pos,1);
     nbrs_msk=diag(1:n)>0;
@@ -413,41 +458,57 @@ function nbrs_msk=pairwise_delaynay_direct_neighbors_unique(pos)
     nbrs_msk=nbrs_msk | nbrs_msk';
 
 
+function d=delaunay_with_stretch(pos, stretches)
+    n=numel(stretches);
+    ds=cell(n,1);
+    for k=1:n
+        stretch_pos=bsxfun(@times,pos,[1 stretches(k)]);
+        ds{k}=delaunay(stretch_pos(:,1),stretch_pos(:,2));
+    end
+    d=cat(1,ds{:});
 
-function nbrs_msk=nearest_neighbors_from_distance(d,count)
+
+
+function nbrs_msk=nearest_neighbors_from_distance(d,msk,count)
     % d is an n x n matrix with distances
     n=size(d,1);
     nbrs_msk=false(n);
 
-    if count>n
-        error('Cannot select %d channels: only %d are present',...
-                    count,n);
-    end
+    d_msk=d;
+    d_msk(~msk,:)=Inf;
 
-    [sd,i]=sort(d);
+    [sd,i]=sort(d_msk);
     for k=1:n
-        last_row=count;
+        last_row=min(n,count);
+
         radius=sd(last_row,k);
         while last_row < n && sd(last_row+1,k)==radius
             last_row=last_row+1;
         end
+
+        if last_row<count || isinf(sd(last_row,k))
+            error('Cannot select %d channels: only %d are present',...
+                    count,sum(msk));
+        end
+
         nbrs_msk(i(1:last_row,k),k)=true;
     end
 
-    assert(all(diag(nbrs_msk)));
-
-    not_sym=nbrs_msk~=nbrs_msk';
-    max_asymetry=.1;
-
-    assert(sum(not_sym(:))>max_asymetry,'unexpected assymetry');
+    assert(all(diag(nbrs_msk)==msk(:)));
+    assert(all(sum(nbrs_msk,1)>=count));
 
 
 function d=pairwise_euclidean_distance(pos)
-    if size(pos,2)~=3 && ~ismatrix(pos)
+    two=size(pos,2);
+    if two~=2 && ~ismatrix(pos)
         error('positions must be in Mx2 matrix');
     end
-    dx=bsxfun(@minus,pos(:,1),pos(:,1)');
-    dy=bsxfun(@minus,pos(:,2),pos(:,2)');
+
+    px=pos(:,1);
+    py=pos(:,2);
+    dx=bsxfun(@minus,px,px');
+    dy=bsxfun(@minus,py,py');
+
     d=sqrt(dx.^2+dy.^2);
 
 

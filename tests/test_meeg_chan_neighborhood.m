@@ -63,5 +63,19 @@ function test_neighbors()
         assertEqual(overlap,1);
     end
 
+    % test for number of channels
+    nbrs=cosmo_meeg_chan_neighbors(ds,'count',5,...
+                        'chantype','meg_combined_from_planar');
+    nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
+    assertEqual(numel(nh.neighbors),102);
+    h=cellfun(@numel,nh.neighbors)/7;
+    assert(all(h>=5 & h<=10));
+
+    nbrs=cosmo_meeg_chan_neighbors(ds,'count',5,'chantype','meg_planar');
+    nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
+    assertEqual(numel(nh.neighbors),204);
+    h=cellfun(@numel,nh.neighbors)/7;
+    assert(all(h==5));
+
 
 

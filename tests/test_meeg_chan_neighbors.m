@@ -14,7 +14,9 @@ function test_meeg_neighbors()
     % test a subset
     ntest=round(n*.5);
 
+
     % test a subset for fieldtrip
+    % (fieldtrip is very slow, so testing all would take too long)
     ntest_fieldtrip=1;
 
     % visit in random order
