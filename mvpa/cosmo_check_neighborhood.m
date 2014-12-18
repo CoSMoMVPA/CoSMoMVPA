@@ -17,9 +17,8 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %
 %
 % Examples:
-%     ds=cosmo_synthetic_dataset('type','meeg','sens','eeg1020',...
-%                                                    'size','huge');
-%     nbrhood=cosmo_meeg_chan_neighborhood(ds,'count',10);
+%     ds=cosmo_synthetic_dataset();
+%     nbrhood=cosmo_spherical_neighborhood(ds,1,'progress',false);
 %     cosmo_check_neighborhood(nbrhood)
 %     > true
 %     %
