@@ -18,7 +18,7 @@ function test_neighbors()
     nbrs=cosmo_meeg_chan_neighbors(ds,'chantype','meg_planar','radius',0);
     nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
 
-    assertEqual(nh.a.fdim.values,{{nbrs.label}});
+    assertEqual(nh.a.fdim.values,{{nbrs.label}'});
     assertEqual(nh.a.fdim.labels,{'chan'});
 
     n=numel(nh.neighbors);

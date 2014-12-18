@@ -84,8 +84,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     >               :
 %     >              'I2' }@16x1
 %     %
-%     % since the dataset has only 74 channels, using the dataset's
-%     % labels only (with the 'labels' argument) returns
+%     % since the dataset has only 80 channels, 74 of which are in the
+%     % layout, using the dataset's labels only (with the 'labels'
+%     % argument) returns
 %     % only neighbors for channels in the dataset
 %     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3,...
 %                                         'label','dataset');
@@ -205,11 +206,14 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 % Notes:
 %  - this function returns a struct similar to FieldTrip's
 %    ft_prepare_neighbors, but not identical:
-%    * a center labels is neighbor of itself
+%    * a center labels can be a neighbor of itself
 %    * the neighbors are similar but not identical to FieldTrip's
 %      ft_prepare_neighbors
+%  - for searchlight and clustering purposes, use
+%    cosmo_meeg_chan_neighborhood
 %
-% See also: cosmo_meeg_chantype, ft_prepare_neighbors
+% See also: cosmo_meeg_chantype, ft_prepare_neighbours,
+%           cosmo_meeg_chan_neighborhood
 %
 % NNO Dec 2014
 
