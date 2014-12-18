@@ -1,8 +1,10 @@
-function test_suite=test_meeg_chan_neighbors()
+function test_suite=test_meeg_chan_neighborhood()
     initTestSuite;
 
 function test_neighbors()
     % note: this tests assumes that meeg_chan_neighbors works properly
+
+    % only test every test_step-th channel
     test_step=10;
 
     ds=cosmo_synthetic_dataset('type','meeg','size','big');
@@ -70,6 +72,8 @@ function test_neighbors()
     assertEqual(numel(nh.neighbors),102);
     h=cellfun(@numel,nh.neighbors)/7;
     assert(all(h>=5 & h<=10));
+    mh=mean(h);
+    assert(mh>6 && mh<9);
 
     nbrs=cosmo_meeg_chan_neighbors(ds,'count',5,'chantype','meg_planar');
     nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
