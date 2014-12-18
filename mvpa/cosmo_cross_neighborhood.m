@@ -1,26 +1,19 @@
-function joined_nbrhood=cosmo_neighborhood(ds, varargin)
-% generate and join neighborhoods
+function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
+% cross neighborhoods along dataset dimensions
 %
-% joined_nbrhood=cosmo_neighborhood(ds,nbrhoods,opt)
+% crossed_nbrhood=cosmo_cross_neighborhood(ds,nbrhoods,...)
 %
 % Inputs:
 %   ds            dataset struct
-%   label*, args* label must be a string, either:
-%                 - 'sphere' (if ds is fmri-like); args is the radius
-%                   for a spherical neighborhood (set to negative to select
-%                   at least (-args) features per neighborhood).
-%                 - otherwise a dimension label (in ds.a.fdim.labels);
-%                   if 'chan' then args are the arguments for
-%                   cosmo_meeg_chan_neighborhood, otherwise args is half of
-%                   the size of the linear interval around each feature
-%   nbrhood*      a neighborhood struct with fields .[f]a and .neighbors,
-%                 for example from cosmo_spherical_neighborhood,
-%                 cosmo_meeg_chan_neighborhood, or
+%   nbrhoods      1xK cell with neighborhood structs. Each element can be
+%                 the output from cosmo_spherical_neighborhood,
+%                 cosmo_meeg_chan_neighborhood,
+%                 cosmo_surficial_neighborhood, or
 %                 cosmo_interval_neighborhood.
-%   '-progress',p if p is true, then progress is shown
+%   'progress',p  if p is true, then progress is shown
 %
 % Returns:
-%   joined_nbrhood  neighborhood struct with fields .[f]a and .neighbors,
+%   crossed_nbrhood neighborhood struct with fields .[f]a and .neighbors,
 %                   constructed by intersecting the neighborhoods from the
 %                   input.
 %
@@ -31,8 +24,8 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
 %     freq_nbrhood=cosmo_interval_neighborhood(ds,'freq',3);
 %     time_nbrhood=cosmo_interval_neighborhood(ds,'time',5);
-%     nbrhood=cosmo_neighborhood(ds, freq_nbrhood, time_nbrhood,...
-%                                                    '-progress',false);
+%     nbrhood=cosmo_cross_neighborhood(ds, {freq_nbrhood, time_nbrhood},...
+%                                                    'progress',false);
 %     cosmo_disp(nbrhood.a.fdim)
 %     > .values
 %     >   { [  2        [  -0.2
@@ -62,116 +55,44 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
 %           cosmo_interval_neighborhood
 %
 % NNO Feb 2014
+    check_nbrhoods(nbrhoods);
+
+    default.progress=true;
+    opt=cosmo_structjoin(default, varargin{:});
 
 
-    ndim_max=numel(varargin);
+    ndim=numel(nbrhoods);
 
     dims=struct();
-    dims.nbrs=cell(1,ndim_max);
-    dims.labels=cell(1,ndim_max);
-    dims.values=cell(1,ndim_max);
-    dims.fa=cell(1,ndim_max);
+    dims.nbrs=cell(1,ndim);
+    dims.labels=cell(1,ndim);
+    dims.values=cell(1,ndim);
+    dims.fa=cell(1,ndim);
 
-    show_progress=true;
+    for k=1:ndim
+        nbrhood=ensure_sorted(nbrhoods{k});
 
-    % process input
-    ndim=0;
-    narg=numel(varargin);
-    k=0;
-    while k<narg
-        k=k+1;
-        arg=varargin{k};
-
-        if isstruct(arg)
-            nbrhood=arg;
-            expected_dim_labels=nbrhood.a.fdim.labels;
-            ndim=ndim+1;
-        elseif ischar(arg)
-            % string of dimension label
-            dim_label=arg;
-            k=k+1;
-
-            nbrhood_args=varargin{k};
-
-            if strcmp(dim_label,'-progress')
-                show_progress=nbrhood_args;
-                continue
-            end
-
-            if ~iscell(nbrhood_args)
-                % convert to cell
-                nbrhood_args={nbrhood_args};
-            end
-
-            % expected dimension label.
-            % reset to 'i','j','k' for special case of spherical neighborhood
-            expected_dim_labels={dim_label};
-
-            % set neighborhood parameters
-            switch dim_label
-                case 'sphere'
-                    nbrhood_fun=@cosmo_spherical_neighborhood;
-                    expected_dim_labels={'i','j','k'};
-                case 'chan'
-                    nbrhood_fun=@cosmo_meeg_chan_neighborhood;
-                otherwise
-                    nbrhood_fun=@cosmo_interval_neighborhood;
-
-                    % insert dimension label
-                    nbrhood_args=[{dim_label}, nbrhood_args(:)];
-            end
-
-            % compute neighborhood
-            nbrhood=nbrhood_fun(ds, nbrhood_args{:});
-            ndim=ndim+1;
-        else
-            error('Argument #%d not understood - not string or struct', k);
-        end
-
-        if ~isequal(sort(expected_dim_labels(:)),sort(fieldnames(nbrhood.fa)))
-            error('Neighborhood labels %s; expected %s',...
-                    cosmo_strjoin(expected_dim_labels,', '),...
-                    cosmo_strjoin(fieldnames(nbrhood.fa),', '));
-        end
-
-        % ensure everything is sorted, as the helper function
-        % 'conj_indices' requires that
-        for j=1:numel(nbrhood.neighbors)
-            if ~issorted(nbrhood.neighbors{j})
-                nbrhood.neighbors{j}=sort(nbrhood.neighbors{j});
-            end
-        end
-
-        dims.nbrs{ndim}=nbrhood.neighbors;
-        dims.values{ndim}=nbrhood.a.fdim.values(:);
-        dims.labels{ndim}=nbrhood.a.fdim.labels(:);
-        dims.fa{ndim}=nbrhood.fa;
+        dims.nbrs{k}=nbrhood.neighbors;
+        dims.values{k}=nbrhood.a.fdim.values(:);
+        dims.labels{k}=nbrhood.a.fdim.labels(:);
+        dims.fa{k}=nbrhood.fa;
     end
-
-    % keep only values for used dimensions
-    dims=cosmo_slice(dims,1:ndim,2,'struct');
 
     % merge labels and values
     dim_labels=[dims.labels{:}];
     dim_values=[dims.values{:}];
 
-    % ensure no duplicate or missing labels
-    if ~isequal(sort(dim_labels), unique(dim_labels)) && ...
-                    ~(isempty(dim_labels))
-        error('Duplicate dimension labels in %s', ...
-                    cosmo_strjoin(dim_labels,','));
-    elseif ~all(cosmo_match(dim_labels, ds.a.fdim.labels))
-        delta=setdiff(dim_labels, ds.a.fdim.labels);
-        error('dimension label unknown in dataset: %s', delta{1});
-    end
+    ds_labels=ds.a.fdim.labels;
 
+    % check labels
+    check_labels(dim_labels,ds_labels);
 
     % optimization: compute conjunctions differently in Matlab and Octave
     is_matlab=cosmo_wtf('is_matlab');
 
     % compute conjunctions of neighborhoods
     [nbr_idxs, nbr_map_idxs]=conj_indices(dims.nbrs, ...
-                                        show_progress, is_matlab);
+                                        opt.progress, is_matlab);
 
     % slice feature attributes
     fa_nbrs=cell(ndim,1);
@@ -180,15 +101,45 @@ function joined_nbrhood=cosmo_neighborhood(ds, varargin)
         fa_nbrs{k}=cosmo_slice(fa,nbr_map_idxs(k,:),2,'struct');
     end
 
-    joined_nbrhood=struct();
-    joined_nbrhood.neighbors=nbr_idxs;
-    joined_nbrhood.fa=cosmo_structjoin(fa_nbrs);
-    joined_nbrhood.a=ds.a;
-    joined_nbrhood.a.fdim=struct();
-    joined_nbrhood.a.fdim.values=dim_values;
-    joined_nbrhood.a.fdim.labels=dim_labels;
+    crossed_nbrhood=struct();
+    crossed_nbrhood.neighbors=nbr_idxs;
+    crossed_nbrhood.fa=cosmo_structjoin(fa_nbrs);
+    crossed_nbrhood.a=ds.a;
+    crossed_nbrhood.a.fdim=struct();
+    crossed_nbrhood.a.fdim.values=dim_values;
+    crossed_nbrhood.a.fdim.labels=dim_labels;
 
 
+function check_nbrhoods(nbrhoods)
+    if ~iscell(nbrhoods)
+        error(['second argument must a be cell of the form '...
+                '{nbrhood1, nbrhood2, ...}, where each nbrhood* '...
+                'is a neighborhood structure']);
+    end
+
+    for k=1:numel(nbrhoods)
+        cosmo_check_neighborhood(nbrhoods{k});
+    end
+
+function nbrhood=ensure_sorted(nbrhood)
+    % ensure everything is sorted, as the helper function
+    % 'conj_indices' requires that
+    for j=1:numel(nbrhood.neighbors)
+        if ~issorted(nbrhood.neighbors{j})
+            nbrhood.neighbors{j}=sort(nbrhood.neighbors{j});
+        end
+    end
+
+function check_labels(dim_labels,ds_labels)
+    % ensure no duplicate or missing labels
+    if ~isequal(sort(dim_labels), unique(dim_labels)) && ...
+                    ~(isempty(dim_labels))
+        error('Duplicate dimension labels in %s', ...
+                    cosmo_strjoin(dim_labels,','));
+    elseif ~all(cosmo_match(dim_labels, ds_labels))
+        delta=setdiff(dim_labels, ds_labels);
+        error('dimension label unknown in dataset: %s', delta{1});
+    end
 
 function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress, use_fast)
     % computes conjunction indices
@@ -304,11 +255,3 @@ function xy=fast_intersect(x,y)
     end
 
     xy=xy(1:pos); % only keep stored elements
-
-
-
-
-
-
-
-
