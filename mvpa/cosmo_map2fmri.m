@@ -447,7 +447,9 @@ function afni_info=new_afni(ds)
 
     vol_data=unflatten(ds);
     dim=ds.a.vol.dim(:)';
-    assert(prod(dim)==nfeatures);
+    vol_dim=[size(vol_data) 1]; % in case of singleton in last dimension
+    assert(isequal(vol_dim(1:3),dim));
+    assert(prod(dim)>=nfeatures);
 
 
     brik_type=1; %functional head

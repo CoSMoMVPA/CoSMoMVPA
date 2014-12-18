@@ -307,6 +307,18 @@ else
     assert(false,'this should never happen');
 end
 
+% compatibility wrapper for the surfing toolbox
+nbrhood=ensure_neighbors_row_vectors(nbrhood);
+
+cosmo_check_neighborhood(nbrhood);
+
+function nbrhood=ensure_neighbors_row_vectors(nbrhood)
+    % compatibility wrapper for the surfing toolbox
+    for k=1:numel(nbrhood.neighbors)
+        if ~isrow(nbrhood.neighbors{k})
+            nbrhood.neighbors{k}=nbrhood.neighbors{k}';
+        end
+    end
 
 function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
     % helper function to get surfaces
