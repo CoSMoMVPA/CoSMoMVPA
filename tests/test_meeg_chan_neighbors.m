@@ -87,6 +87,14 @@ function test_meeg_neighbors()
             end
             y=ft_prepare_neighbours(cfg);
 
+            % reorder the labels if necessary
+            nbrs_cell=cellfun(@(x){x},{nbrs.label},'UniformOutput',false);
+            y_cell=cellfun(@(x){x},{y.label},'UniformOutput',false);
+
+            p=cosmo_overlap(nbrs_cell,y_cell);
+            [i,j]=find(p==1);
+            y=y(i);
+
             assertEqual({nbrs.label},{y.label});
 
             [p,q]=cosmo_overlap({nbrs.neighblabel},{y.neighblabel});
