@@ -221,30 +221,82 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
     default.label='layout';
     opt=cosmo_structjoin(default,varargin);
 
-    chan_types=get_chantypes(ds,opt);
-    if isempty(chan_types)
-        neighbors=get_neighbors_with_chantype(ds,opt);
-    else
-        n=numel(chan_types);
+    if isfield(opt,'chantype')
+        chantype=opt.chantype;
+        chantypes=get_chantypes(ds, chantype);
+        n=numel(chantypes);
         neighbors_cell=cell(n,1);
         for k=1:n
-            opt.chantype=chan_types{k};
+            opt.chantype=chantypes{k};
             neighbors_cell{k}=get_neighbors_with_chantype(ds,opt);
         end
 
         neighbors=cat(1,neighbors_cell{:});
+
+        if strcmp(chantype,'all')
+            neighbors=add_missing_channels(ds,neighbors);
+        end
+
+    else
+        neighbors=get_neighbors_with_chantype(ds,opt);
     end
 
+    neighbors=reorder_neighbors(ds,neighbors);
 
-function chan_types=get_chantypes(ds,opt)
-    if ~isfield(opt,'chantype')
-        chan_types=[];
+
+function full_neighbors=add_missing_channels(ds,neighbors)
+    ds_label=get_dataset_channel_label(ds);
+    nbr_label={neighbors.label};
+
+    missing=setdiff(ds_label,nbr_label);
+    n=numel(missing);
+    if n==0
+        full_neighbors=neighbors;
         return;
     end
 
-    chan_types={opt.chantype};
 
-    switch opt.chantype
+    label=missing(:);
+    neighblabel=cell(n,1);
+    for k=1:n
+        neighblabel{k}=cell(1,0);
+    end
+
+    missing_neighbors=struct('label',label,'neighblabel',neighblabel);
+    full_neighbors=cat(1,neighbors,missing_neighbors);
+
+
+function neighbors=reorder_neighbors(ds,neighbors)
+    ds_label=get_dataset_channel_label(ds);
+    nbr_label={neighbors.label};
+
+    if numel(ds_label)~=numel(nbr_label)
+        return;
+    end
+
+    ds_cell=cellfun(@(x){x},ds_label,'UniformOutput',false);
+    nbr_cell=cellfun(@(x){x},nbr_label,'UniformOutput',false);
+
+    overlap=cosmo_overlap(ds_cell,nbr_cell);
+    assert(all(sum(overlap,1)) &&all(sum(overlap,2)))
+
+    [i,j]=find(overlap);
+    n=numel(i);
+    assert(all(j'==1:n));
+
+    % invert mapping
+    ii=i;
+    ii(i)=1:n;
+
+    neighbors=neighbors(ii);
+    assert(isequal({neighbors.label}',ds_label))
+
+
+
+function chan_types=get_chantypes(ds, chantype)
+    chan_types={chantype};
+
+    switch chantype
         case 'all'
             chan_types=unique(cosmo_meeg_chantype(ds));
         case 'all_combined'
