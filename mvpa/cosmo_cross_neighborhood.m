@@ -55,11 +55,11 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
 %           cosmo_interval_neighborhood
 %
 % NNO Feb 2014
-    check_nbrhoods(nbrhoods);
+    cosmo_check_dataset(ds);
+    check_nbrhoods(nbrhoods,ds);
 
     default.progress=true;
     opt=cosmo_structjoin(default, varargin{:});
-
 
     ndim=numel(nbrhoods);
 
@@ -110,16 +110,33 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
     crossed_nbrhood.a.fdim.labels=dim_labels;
 
 
-function check_nbrhoods(nbrhoods)
+function check_nbrhoods(nbrhoods,ds)
     if ~iscell(nbrhoods)
         error(['second argument must a be cell of the form '...
                 '{nbrhood1, nbrhood2, ...}, where each nbrhood* '...
                 'is a neighborhood structure']);
     end
 
+    nfeatures=size(ds.samples,2);
+
     for k=1:numel(nbrhoods)
-        cosmo_check_neighborhood(nbrhoods{k});
+        nbrhood=nbrhoods{k};
+        cosmo_check_neighborhood(nbrhood);
+
+        is_ok=@(x) isempty(x) || ...
+                    (min(x)>=1 && max(x)<=nfeatures && all(round(x)==x));
+
+        ok_msk=cellfun(is_ok,nbrhood.neighbors);
+        if any(~ok_msk)
+            i=find(~ok_msk,1);
+            error(['%d-th neighborhood .neighbors{%d} is not '...
+                    'in range 1..%d or not all integer'],...
+                    k, i);
+        end
     end
+
+
+
 
 function nbrhood=ensure_sorted(nbrhood)
     % ensure everything is sorted, as the helper function
