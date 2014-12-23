@@ -82,6 +82,9 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 % See also: cosmo_neighborhood, cosmo_searchlight
 %
 % NNO Feb 2014
+    if ~isscalar(radius) || radius<0
+        error('radius must be positive scalar');
+    end
 
 
     cosmo_check_dataset(ds);
