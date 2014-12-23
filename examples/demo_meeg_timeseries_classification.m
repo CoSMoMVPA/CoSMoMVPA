@@ -48,11 +48,18 @@ data_tl=load(data_fn);
 ds_tl=cosmo_meeg_dataset(data_tl);
 
 % set the target (trial condition)
-ds_tl.sa.targets=ds_tl.sa.trialinfo; % 1=pre, 2=post
+ds_tl.sa.targets=ds_tl.sa.trialinfo(:,1); % 1=pre, 2=post
+
+% set the chunks (independent measurements)
+% in this dataset, the first half of the samples (in order)
+% are the post-trials;
+% the second half the pre-trials
+ds_tl.sa.chunks=[(1:145) (1:145)]';
+
 
 % in addition give a label to each trial
 index2label={'pre','post'}; % 1=pre, 2=peri/post
-ds_tl.sa.labels=cellfun(@(x)index2label(x),num2cell(ds_tl.sa.trialinfo));
+ds_tl.sa.labels=cellfun(@(x)index2label(x),num2cell(ds_tl.sa.targets));
 
 % just to check everything is ok
 cosmo_check_dataset(ds_tl);
@@ -60,7 +67,7 @@ cosmo_check_dataset(ds_tl);
 %% Prepare MVPA
 % reset chunks: use four chunks
 nchunks=4;
-ds_tl=cosmo_chunkize(ds_tl,nchunks);
+ds_tl.sa.chunks=cosmo_chunkize(ds_tl,nchunks);
 
 % do a take-one-fold out cross validation.
 % except when using a splithalf correlation measure it is important that
@@ -103,14 +110,16 @@ for k=1:nchantypes
     % find feature indices of channels matching the parent_type
     chantype_idxs=find(cosmo_match(ds_chantypes,parent_type));
 
-    % define mask with those features
+    % define mask with channels matching those feature indices
     chan_msk=cosmo_match(ds_tl.fa.chan,chantype_idxs);
 
-
+    % slice the dataset to select only the channels matching the channel
+    % types
     ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, time_radius);
 
-    % define neighborhood over time; for each time point only the time
-    % point itself is incldued
+    % define neighborhood over time; for each time point the time
+    % point itself is included, as well as the two time points before and
+    % the two time points after it
     nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',2);
 
     % run the searchlight using the measure, measure arguments, and

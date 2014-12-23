@@ -1,45 +1,69 @@
-function ds_chunks=cosmo_chunkize(ds_targets,nchunks)
+function chunks=cosmo_chunkize(ds,nchunks)
 % assigns chunks that are as balanced as possible based on targets.
-% in most cases this should only be used for MEEG datasets.
 %
-% ds_chunks=cosmo_chunkize(ds_targets,nchunks)
+% chunks=cosmo_chunkize(ds_targets,nchunks)
 %
 % Inputs:
-%   ds_targets     A dataset struct with Px1 numeric field .sa.targets
-%                  indicating the class labels for P samples.
-%                  Alternatively it can be an Px1 vector with class labels.
+%   ds             A dataset struct with fields:
+%    .sa.targets   Px1 targets with class labels for P samples
+%    .sa.chunks    Px1 initial chunks for P samples; different values mean
+%                  that the corresponding data can be assumed to be
+%                  independent
 %   nchunks        scalar indicating how many different chunks should be
 %                  assigned.
 %
 % Output:
-%   ds_chunks      If the input was a dataset struct, then the output is
-%                  the same dataset struct but with the field .sa.chunks
-%                  set to a Px1 vector with chunk labels, all in the range
-%                  1:nchunks. If the input was a vector, then the output is
-%                  a vector as well with these values.
-%                  For each target value in 'targets', the number of
-%                  samples  associated with each chunk is as balanced as
-%                  possible (i.e., does not differ by more than one).
+%   chunks         Px1 chunks assigned, in the range 1:nchunks. It is
+%                  required that N=numel(unique(ds.sa.targets)) is greater
+%                  than or equal to nchunks.
 %
 %
 % Example:
 %     % ds is an MEEG dataset with 48 samples
 %     ds=cosmo_synthetic_dataset('type','timelock','nreps',8);
-%     % Assign chunks randomly in the range 1:4
-%     ds=cosmo_chunkize(ds,4);
+%     %
+%     % with no chunks set, this function gives an error
+%     ds.sa=rmfield(ds.sa,'chunks');
+%     cosmo_chunkize(ds)
+%     > error('dataset has no field .sa.chunks. ...');
+%     %
+%     % set chunks so that all samples are assumed to be independent
+%     ds.sa.chunks=(1:size(ds.samples,1))';
+%     %
+%     % show initial dataset targets and chunks
+%     cosmo_disp([ds.sa.targets ds.sa.chunks])
+%     > [ 1         1
+%     >   2         2
+%     >   1         3
+%     >   :         :
+%     >   2        46
+%     >   1        47
+%     >   2        48 ]@48x2
+%     %
+%     % Re-assign chunks pseudo-randomly in the range 1:4.
+%     % samples (rows) with the same chunk original chunk value
+%     % will still have the same chunk value (but the reverse is not
+%     % necessarily true)
+%     ds.sa.chunks=cosmo_chunkize(ds,4);
+%     %
+%     % sanity check
+%     cosmo_check_dataset(ds);
 %     % Show result
-%     cosmo_disp(ds.sa.chunks)
-%     > [ 1
-%     >   1
-%     >   2
-%     >   :
-%     >   3
-%     >   4
-%     >   4 ]@48x1
+%     cosmo_disp([ds.sa.targets ds.sa.chunks])
+%     > [ 1         1
+%     >   2         2
+%     >   1         3
+%     >   :         :
+%     >   2         2
+%     >   1         3
+%     >   2         4 ]@48x2
 %
 % Notes:
-%  - This function should only be used for MEEG datasets, or other datasets
+%  - This function is indended for MEEG datasets, or other datasets
 %    where each trial can be assumed to be 'independant' of other trials.
+%  - To indicate independence between all trials in a dataset ds, use:
+%      ds.sa.chunks=(1:size(ds.samples,1));
+%    prior to using this function
 %  - When this function is used prior to classification using partitioning
 %    (with cosmo_nchoosek_partitioner or cosmo_nfold_paritioner),
 %    it is recommended to apply cosmo_balance_partitions to
@@ -50,32 +74,41 @@ function ds_chunks=cosmo_chunkize(ds_targets,nchunks)
 %
 % NNO Oct 2013
 
-is_ds=isstruct(ds_targets);
-if is_ds
-    ds=ds_targets;
-    cosmo_check_dataset(ds);
-    if ~isfield(ds,'sa') || ~isfield(ds.sa,'targets')
-        error('Missing field .sa.targets');
+    check_input(ds);
+
+    nsamples=size(ds.samples,1);
+
+    [idxs,unq_cell]=cosmo_index_unique({ds.sa.chunks});
+    unq_chunks=unq_cell{1};
+
+    nunq=numel(unq_chunks);
+
+    if nchunks>nunq
+        error('Cannot make %d chunks, only %d are present',...
+                    nchunks,nunq);
     end
-    ds_targets=ds.sa.targets;
-end
 
-unq=unique(ds_targets);
-nclasses=numel(unq);
+    chunks=zeros(nsamples,1);
 
-nsamples=numel(ds_targets);
-ds_chunks=zeros(nsamples,1);
+    for k=1:nunq
+        chunks(idxs{k})=mod(k-1,nchunks)+1;
+    end
 
-for k=1:nclasses
-    target=unq(k);
-    msk=target==ds_targets;
 
-    n=sum(msk);
-    ds_chunks(msk)=mod((1:n)-1,nchunks)+1;
-end
+function check_input(ds)
+    cosmo_check_dataset(ds);
 
-if is_ds
-    % return a dataset
-    ds.sa.chunks=ds_chunks;
-    ds_chunks=ds;
-end
+    if ~cosmo_isfield(ds,'sa.chunks')
+        error(['dataset has no field .sa.chunks. The chunks are '...
+               'required for this function; they should indicate (in)'...
+               '-dependence between trials, so that samples with '...
+               'different chunk values can be assumed independent.\n'...
+               'If you do not know how to set the .sa.chunks, consider '...
+               'the following:\n'...
+               '- for an fmri dataset, each samples'' '...
+               '  chunk can be set to its run number\n'...
+               '- for an meeg dataset, if each trial can be assumed '...
+               'to be independent, the chunks can be set to (1:N),'...
+               'where N is the number of samples'...
+               '(i.e. N=size(ds.samples,1) for a dataset struct ds']);
+    end
