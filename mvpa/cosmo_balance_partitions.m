@@ -141,7 +141,7 @@ for k=1:npar
     hmin=min(h);
     if hmin==0
         [unused,i]=min(h);
-        error('target %d missing in .train_indices{k}',...
+        error('target %d missing in .train_indices{%d}',...
                     classes(i), k);
     end
 
