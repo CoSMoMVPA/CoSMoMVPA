@@ -13,8 +13,8 @@
 %   analyses the targets should be based on different trial conditions, for
 %   example as set a FieldTrip .trialinfo field.
 % * assignment of chunks (parts of the data that are assumed to be
-%   independent) is done randomly. In typical analyses they can be based on
-%   different runs, with one chunk value per run.
+%   independent) is based on a trial-by-trial basis. For cross-validation,
+%   the number of chunks is reduced to four to speed up the analysis.
 % * the time window used for analyses is rather small. This means that in
 %   particular for time-freq analysis a lot of data is missing, especially
 %   for early and late timepoints in the lower frequency bands. For typical
