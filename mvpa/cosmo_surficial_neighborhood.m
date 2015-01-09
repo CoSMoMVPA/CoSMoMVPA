@@ -1,16 +1,10 @@
-function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, varargin)
+function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin)
 % neighborhood definition for surface-based searchlight
 %
 % [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, ...)
 %
 % Inputs:
 %    ds            fMRI-like volumetric dataset
-%    radius        searchlight radius.
-%                  - if radius>0, then voxels are selected around each node
-%                    if the associated neighboring nodes are within a
-%                    distance less than or equal to readius
-%                  - if radius<0, then the nearest (-radius) voxels are
-%                    selected around each node
 %    surfs         cell with specification of surfaces. The following
 %                  formats are valid options:
 %                  # Volumetric datasets:
@@ -67,6 +61,11 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %                    - {fn}
 %                    - {fn, niter}
 %                    - {v, f, niter}
+%    'radius', r         } select neighbors either within radius r, grow
+%    'count', c          } the radius to get neighbors are c locations,
+%    'direct', true      } or get direct neighbors only (nodes who share an
+%                        } edge)
+%                        } These three options are mutually exclusive
 %    'metric',metric     distance metric along cortical surface. One of
 %                        'geodesic' (default), 'dijkstra' or 'euclidian'.
 %    'line_def',line_def definition of lines from inner to outer surface
@@ -111,7 +110,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %     fprintf('Input surface has %d nodes and %d faces\n',size(v,1),size(f,1))
 %
 %     % define neighborhood parameters
-%     radius=-100; % 100 voxels per searchlight
+%     count=100; % 100 voxels per searchlight
 %     niter=10;    % 10 mesh decimation algorithms
 %
 %     % surface definition; voxels are selected that are 3 mm or closer to the
@@ -121,7 +120,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 %     % Note: for FreeSurfer surfaces one could use
 %     %       {surf_white_fn, surf_pial_fn [,niter]}
 %     surfs={surf_fn,[-3 1],niter};
-%     [nbrhood,vo,fo]=cosmo_surficial_neighborhood(ds,radius,surfs);
+%     [nbrhood,vo,fo]=cosmo_surficial_neighborhood(ds,surfs,'radius',radius);
 %     fprintf('Neighborhood has %d elements\n', numel(nbrhood.neighbors))
 %     fprintf('Output surface has %d nodes and %d faces\n',size(vo,1),size(fo,1))
 %
@@ -169,6 +168,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, 
 
 cosmo_check_external('surfing');
 
+check_input(surfs, varargin{:});
+
 defaults=struct();
 defaults.metric='geodesic';
 defaults.line_def=[10 0 1];
@@ -211,13 +212,8 @@ end
 % if they are identical then low2high is the identity
 out2in=surfing_maplow2hires(vo', vi');
 
-if radius<0
-    % fixed number of voxels
-    circle_def=[10, -radius];
-else
-    % fixed metric distance
-    circle_def=radius;
-end
+% get circle definition
+circle_def=get_circle_def(opt);
 
 % set center ids
 center_ids=opt.center_ids;
@@ -445,6 +441,7 @@ function ds_type=get_ds_type(ds)
 
 
 function tf=is_ds_type_like(ds, type)
+    % helper function that uses heuristics to find type of dataset
     tf=false;
 
     switch type
@@ -476,7 +473,45 @@ function tf=is_ds_type_like(ds, type)
             error('unsupported type %s', type);
     end
 
+function check_input(surfs, varargin)
+    % give deprecation notice
+    if isnumeric(surfs)
+        error(['Second argument must be a cell with a surface '...
+                'definition (as of Jan 2015, the syntax for this '...
+                'function has changed)']);
+    end
 
+
+function circle_def=get_circle_def(opt)
+    metric2circle_def_func=struct();
+    metric2circle_def_func.radius=@(x)x;
+    metric2circle_def_func.count=@(x)[0 x]; % fixed initial radius
+    metric2circle_def_func.direct=@get_direct_circle_def;
+
+    % options are mutually exclusive
+    metrics=fieldnames(metric2circle_def_func);
+    metric_msk=cosmo_isfield(opt,metrics);
+    if sum(metric_msk)~=1
+        error('Use one of these arguments to define neighbors: %s',...
+                cosmo_strjoin(metrics, ', '));
+    end
+
+    metric=metrics{metric_msk};
+    func=metric2circle_def_func.(metric);
+    param=opt.(metric);
+    if ~isscalar(param) || param<0
+        error('value for ''%s'' must be a scalar not less than zero',...
+                metric);
+    end
+    circle_def=func(opt.(metric));
+
+function circle_def=get_direct_circle_def(radius)
+    % false or 0 give a zero radius, otherwise NaN
+    if isnan(radius) || radius
+        circle_def=NaN;
+    else
+        circle_def=0;
+    end
 
 
 

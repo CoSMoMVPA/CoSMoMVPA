@@ -87,9 +87,11 @@ inflated_fn=fullfile(digit_study_path,...
 % Set parameters
 
 % Searchlight radius: select 100 features in each searchlight
-% (to use a fixed radius of 8mm, set radius=8)
+% (to use a fixed radius of 8mm, use:
+%    cosmo_surficial_neighborhood(...,'radius',8)
+% in the code below)
 
-radius=-100;
+feature_count=100;
 
 % Single surface case: select voxels that are 3 mm or closer to the surface
 % on the white-matter side, up to voxels that are 2 mm from the surface on
@@ -199,8 +201,8 @@ for one_surf=[true,false]
         % - vo and fo are vertices and faces of the output surface
         % - out2in is the mapping from output to input surface
         fprintf('Defining neighborhood with %s\n', desc);
-        [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius,...
-                                                            surf_def);
+        [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds,surf_def,...
+                                                    'count',feature_count);
 
         % print neighborhood
         fprintf('Searchlight neighborhood definition:\n');
