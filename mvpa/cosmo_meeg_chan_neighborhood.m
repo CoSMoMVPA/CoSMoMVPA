@@ -24,7 +24,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %                       If there is only one channel type associated with
 %                       lab, then this argument is not required.
 %   'radius', r         } select neighbors either within radius r, grow
-%   'count', c          } the radius to get neighbors are c locations,
+%   'count', c          } the radius to get neighbors at c locations,
 %   'delaunay', true    } or use Delaunay triangulation to find direct
 %                       } neighbors for each channel.
 %                       } These three options are mutually exclusive
