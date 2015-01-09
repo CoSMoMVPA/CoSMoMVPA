@@ -25,7 +25,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %                       lab, then this argument is not required.
 %   'radius', r         } select neighbors either within radius r, grow
 %   'count', c          } the radius to get neighbors are c locations,
-%   'delauney', true    } or use Delauney triangulation to find direct
+%   'delaunay', true    } or use Delaunay triangulation to find direct
 %                       } neighbors for each channel.
 %                       } These three options are mutually exclusive
 %
