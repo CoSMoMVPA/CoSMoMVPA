@@ -48,11 +48,11 @@ data_tl=load(data_fn);
 ds_tl=cosmo_meeg_dataset(data_tl);
 
 % set the target (trial condition)
-ds_tl.sa.targets=ds_tl.sa.trialinfo; % 1=pre, 2=post
+ds_tl.sa.targets=ds_tl.sa.trialinfo(:,1); % 1=pre, 2=post
 
 % in addition give a label to each trial
 index2label={'pre','post'}; % 1=pre, 2=peri/post
-ds_tl.sa.labels=cellfun(@(x)index2label(x),num2cell(ds_tl.sa.trialinfo));
+ds_tl.sa.labels=cellfun(@(x)index2label(x),num2cell(ds_tl.sa.targets));
 
 % just to check everything is ok
 cosmo_check_dataset(ds_tl);
