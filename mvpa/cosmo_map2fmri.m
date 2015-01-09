@@ -26,6 +26,7 @@ function hdr=cosmo_map2fmri(dataset, fn, varargin)
 % NNO Aug 2013, updated Feb 2014
     defaults=struct();
     defaults.deoblique=false;
+    defaults.bv_force_fit=[];
     opt=cosmo_structjoin(defaults,varargin{:});
 
     cosmo_check_dataset(dataset, 'fmri');
@@ -72,6 +73,31 @@ function ds=preprocess(ds,opt)
         ds=cosmo_fmri_deoblique(ds);
     end
 
+    if opt.bv_force_fit
+        ds=bv_force_fit(ds);
+    end
+
+function ds=bv_force_fit(ds)
+
+    mat=ds.a.vol.mat;
+
+    dim=[ds.a.vol.dim(:);1];
+    rot=mat(1:3,1:3);
+    vox_size=sqrt(sum(rot.^2,1)); %.*sign(sum(rot,1));
+    resolution=1/round(mean(abs(vox_size)));
+
+    % put the center defined by the original matrix close to the center
+    % defined by the new matrix
+    old_center=mat*(dim+1)/2;
+    mat(1:3,1:3)=bsxfun(@times,mat(1:3,1:3),resolution./vox_size);
+
+    new_center=mat*(dim+1)/2;
+    mat(:,4)=round(mat(:,4)+old_center-new_center)+.5;
+
+    ds.a.vol.mat=mat;
+
+
+
 function check_plump_orientation(ds)
     rot=ds.a.vol.mat(1:3,1:3);
     nonzero=rot~=0;
@@ -90,6 +116,27 @@ function check_plump_orientation(ds)
                 'results visually when using one of these options.'],...
                 mfilename())
     end
+
+function check_isotropic_voxels(ds)
+    rot=ds.a.vol.mat(1:3,1:3);
+    vox_size=sqrt(sum(rot.^2,1));
+
+    max_delta=1e-5;
+    delta=max(vox_size)-min(vox_size);
+
+    if delta>max_delta
+        error(['Dataset has non-isotropic voxels, and the specified '...
+                'output format does not support this. Options are:\n\n'...
+                '(1) use %s(...,''bv_force_fit'',true) to set the '...
+                'voxel size to be isotropic\n'...
+                '(2) store the dataset in another file format (such as '...
+                'NIFTI)\n\n'...
+                'For option (1), the spatial location of the '...
+                'voxels will change. It is recommended to inspect the '...
+                'results visually when using one of these options.'],...
+                mfilename())
+    end
+
 
 
 
@@ -276,17 +323,12 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     mat=ds.a.vol.mat;
 
     % ensure proper VMP/VMR orientation
-    dg=mat(1:3,1:3)*[0 0 -1; -1 0 0; 0 -1 0]';
+    rot_asr=mat(1:3,1:3)*[0 0 -1; -1 0 0; 0 -1 0]';
 
-    if ~isequal(dg,diag(diag(dg)))
+    if ~isequal(rot_asr,diag(diag(rot_asr)))
+        % should never get here because of the ASR orientation
+        % forced earlier
         error('Unsupported orientation: need ARS');
-    end
-    resolution=unique(diag(dg));
-    if numel(resolution)~=1
-        error('Multiple element sizes: %s', sprintf('%d ', resolution));
-    end
-    if resolution<0
-        error('Resolution cannot be negative, found %d', resolution);
     end
 
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
@@ -298,21 +340,28 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
 
     switch bv_type
         case {'vmp','msk'}
+            % require voxels to be isotropic
+            check_isotropic_voxels(ds);
+            dg=diag(rot_asr);
+            resolution=prod(dg)^(1/3);
+
             labels={'ZStart','ZEnd','XStart','XEnd','YStart','YEnd'};
             for k=1:numel(labels)
                 label=labels{k};
                 hdr.(label)=bv_coords(k);
             end
+
             hdr.Resolution=resolution;
 
         case 'vmr'
             % this *should* be a 256^3 volume
             % XXX check for this?
             labels={'X','Y','Z'};
+            dg=diag(rot_asr);
             for k=1:3
                 label=labels{k};
-                hdr.(['VoXRes' label])=resolution;
-                hdr.(['Dim' label])=bv_coords(2,k);
+                hdr.(['VoXRes' label])=dg(k);
+                hdr.(['Dim' label])=round(bv_coords(2,k));
             end
 
         otherwise
