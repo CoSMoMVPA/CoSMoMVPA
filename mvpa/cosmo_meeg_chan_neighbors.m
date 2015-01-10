@@ -217,7 +217,6 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %
 % NNO Dec 2014
 
-
     default.label='layout';
     opt=cosmo_structjoin(default,varargin);
 
