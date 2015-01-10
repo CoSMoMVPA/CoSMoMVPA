@@ -3,6 +3,7 @@ function test_suite = test_spherical_neighborhood
 
 
 function test_simple_neighborhood
+    ds=cosmo_synthetic_dataset();
     nh1=cosmo_spherical_neighborhood(ds,'radius',0,'progress',false);
     assertEqual(nh1.a,ds.a);
     assertEqual(nh1.fa.i,ds.fa.i);
@@ -49,6 +50,7 @@ function test_simple_neighborhood
                                  [ 6 5 3 2 ] });
 
 function test_exceptions
+    ds=cosmo_synthetic_dataset();
     aet=@(x)assertExceptionThrown(@()...
                 cosmo_spherical_neighborhood(x{:}),'');
     aet({ds});
