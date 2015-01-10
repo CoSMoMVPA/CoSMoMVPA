@@ -27,7 +27,7 @@ ds=cosmo_remove_useless_data(ds);
 %% Define spherical neighborhood for each feature (voxel)
 
 radius=3; % saerchlight radius in voxels
-nbrhood=cosmo_spherical_neighborhood(ds,radius);
+nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius);
 
 % Compute the number of elements in each element of nbrhood.neighbors,
 % and assign the result to a variable 'roi_sizes'

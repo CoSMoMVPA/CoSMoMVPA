@@ -79,7 +79,7 @@ nvoxels_per_searchlight=100;
 % neighborhood and call
 % cosmo_searchlight(...,'radius',-nvoxels_per_searchlight)
 fprintf('Defining neighborhood for each feature\n');
-nbrhood=cosmo_spherical_neighborhood(ds,-nvoxels_per_searchlight);
+nbrhood=cosmo_spherical_neighborhood(ds,'count',nvoxels_per_searchlight);
 
 % print neighborhood
 fprintf('Searchlight neighborhood definition:\n');

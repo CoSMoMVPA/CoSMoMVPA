@@ -25,7 +25,8 @@ function test_searchlight_
     % bit of a smoke test
     measure=@cosmo_correlation_measure;
 
-    nbrhood=cosmo_spherical_neighborhood(ds,3,cosmo_structjoin('progress',0));
+    nbrhood=cosmo_spherical_neighborhood(ds,'radius',3,...
+                                cosmo_structjoin('progress',0));
     m=cosmo_searchlight(ds, measure,'nbrhood',nbrhood,...
                             'center_ids',[100 201],'progress',0);
 

@@ -1,21 +1,14 @@
-function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
+function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 % computes neighbors for a spherical searchlight
 %
-% nbrhood=cosmo_spherical_neighborhood(ds, radius, opt)
+% nbrhood=cosmo_spherical_neighborhood(ds, opt)
 %
 % Inputs
-%   ds            a dataset struct (from fmri_dataset)
-%   radius        - If positive, it indicates the sphere radius (in voxel
-%                 units).
-%                  - If negative then (-radius) indicates the
-%                    minimum number of voxels that is selected
-%                    in each searchlight. 'minimum' means that at least
-%                    (-radius) voxels are selected, and that the voxels
-%                    that are not selected are all further away from the
-%                    center than those that are selected.
-%   opt          optional struct with options
-%     .progress  if set, show progress every .progress steps (default:
-%                1000).
+%   ds             a dataset struct (from fmri_dataset)
+%   'radius', r    } either use a radius of r voxels, or select
+%   'count', c     } approximately c voxels per searchlight
+%                  These two options are mutually exclusive
+%   'progress', p  show progress every p features (default: 1000)
 %
 % Outputs
 %   nbrhood           dataset-like struct without .sa or .samples, with:
@@ -30,7 +23,8 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 % Example:
 %     ds=cosmo_synthetic_dataset('type','fmri');
 %     radius=1; % radius=3 is typical for 'real-world' searchlights
-%     nbrhood=cosmo_spherical_neighborhood(ds,radius,'progress',false);
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius,...
+%                                             'progress',false);
 %     cosmo_disp(nbrhood)
 %     > .a
 %     >   .fdim
@@ -70,47 +64,57 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 %     >     [ 6         5         3 ]           }
 % NNO Aug 2013
 
-    cosmo_check_dataset(ds,'fmri');
-    nfeatures=size(ds.samples,2);
+    check_input(varargin{:});
 
-    center_ids=1:nfeatures;
-
+    defaults=struct();
     defaults.progress=1000;
     opt=cosmo_structjoin(defaults,varargin);
 
-    show_progress=opt.progress>0;
+    [use_fixed_radius,radius,voxel_count]=get_selection_params(opt);
+    cosmo_check_dataset(ds,'fmri');
 
-    ndim=numel(ds.a.fdim.values);
-    orig_dim=zeros(1,ndim);
-    for k=1:ndim
-        orig_dim(k)=numel(ds.a.fdim.values{k});
+    nfeatures=size(ds.samples,2);
+    if nfeatures<voxel_count
+        error('Cannot select %d features: only %d are present',...
+                    voxel_count, nfeatures);
     end
+
+    center_ids=1:nfeatures;
+
+
+    orig_dim=cellfun(@numel,ds.a.fdim.values);
     orig_nvoxels=prod(orig_dim);
 
     % mapping from all linear voxel indices to feature indices
     map2full=zeros(orig_nvoxels,1);
-    lin=sub2ind(orig_dim, ds.fa.i, ds.fa.j, ds.fa.k);
-    map2full(lin)=1:nfeatures;
+    lin_ids=fast_sub2ind(orig_dim, ds.fa.i, ds.fa.j, ds.fa.k);
+    [idxs,unq_lin_ids_cell]=cosmo_index_unique({lin_ids});
+    unq_lin_ids=unq_lin_ids_cell{1};
 
-    % offsets in i,j,k direction for searchlight sphere
-    use_fixed_radius=radius>0;
-    if ~use_fixed_radius
-        fixed_voxel_count=-radius;
-        if fixed_voxel_count>nfeatures
-            error('Cannot select %d voxels: dataset has % features',...
-                    fixed_voxel_count, nfeatures);
-        end
-        radius=1; % starting point; increase when necessary (below).
+    %unq_map2full=zeros(orig_nvoxels,1);
+    %unq_map2full(unq_lin_ids)=1:numel(unq_ids);
+
+    % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
+    % corresponds to features i1,...iN
+    lin2feature_ids=cell(orig_nvoxels,1);
+    for k=1:numel(unq_lin_ids)
+        lin_id=unq_lin_ids(k);
+        lin2feature_ids{lin_id}=idxs{k};
+
     end
 
+
     % compute voxel offsets relative to origin
-    [sphere_offsets, o_distances]=cosmo_sphere_offsets(radius);
+
+    [sphere_offsets, o_distances]=get_sphere_offsets(radius);
 
     % allocate space for output
     ncenters=numel(center_ids);
     neighbors=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
     final_radius=zeros(1,ncenters);
+
+    show_progress=opt.progress>0;
 
     if show_progress
         if opt.progress<1
@@ -135,17 +139,17 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
         %   iteration.
         while true
             % add offsets to center
-            around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
+            all_around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
 
             % see which ones are outside the volume
-            outside_msk=around_ijk<=0 | ...
-                            bsxfun(@minus,orig_dim,around_ijk)<0;
+            outside_msk=all_around_ijk<=0 | ...
+                            bsxfun(@minus,orig_dim,all_around_ijk)<0;
 
             % collapse over 3 dimensions
             feature_outside_msk=sum(outside_msk,2)>0;
 
             % get rid of those outside the volume
-            around_ijk=around_ijk(~feature_outside_msk,:);
+            around_ijk=all_around_ijk(~feature_outside_msk,:);
 
             % if using variable radius, keep track of those
             if ~use_fixed_radius
@@ -153,12 +157,12 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
             end
 
             % convert to linear indices
-            around_lin=sub2ind(orig_dim,around_ijk(:,1), ...
+            around_lin=fast_sub2ind(orig_dim,around_ijk(:,1), ...
                                         around_ijk(:,2), ...
                                         around_ijk(:,3));
 
             % convert linear to feature ids
-            around_feature_ids=map2full(around_lin);
+            around_feature_ids=[lin2feature_ids{around_lin}];
 
             % also exclude those that were not mapped (outside the mask)
             feature_mask=around_feature_ids>0;
@@ -166,37 +170,38 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
 
             if use_fixed_radius
                 break; % we're done selecting voxels
-            elseif numel(around_feature_ids)<fixed_voxel_count
+            elseif numel(around_feature_ids)<voxel_count
                 % the current radius is too small.
                 % increase the radius by half a voxel and recompute new
                 % offsets, then try again in the next iteration.
                 radius=radius+.5;
-                [sphere_offsets, o_distances]=cosmo_sphere_offsets(radius);
+                [sphere_offsets, o_distances]=get_sphere_offsets(radius);
                 continue
             end
+
+            % apply the feature_id mask to distances
+            distances=distances(feature_mask);
 
             % coming here, the radius is variable and enough features
             % were selected. Now decide which voxels to keep,
             % and also compute the metric radius, then leave the while
             % loop.
 
-            % apply the feature_id mask to distances
-            distances=distances(feature_mask);
+            nselect=with_approx(around_feature_ids,...
+                                                distances,voxel_count);
+            around_feature_ids=around_feature_ids(1:nselect);
 
-            % see how big the searchlight is (in metric distance)
-            variable_radius=distances(fixed_voxel_count);
-
-            % keep all voxels with exactly the same distance
-            % (and those of smaller distances as well)
-            last_index=fixed_voxel_count-1+find(...
-                    variable_radius==distances(fixed_voxel_count:end),1,'last');
-            around_feature_ids=around_feature_ids(1:last_index,:);
+            if nselect>0
+                variable_radius=distances(nselect);
+            else
+                variable_radius=NaN;
+            end
             break; % we're done
         end
 
 
         % store results
-        neighbors{k}=around_feature_ids';
+        neighbors{k}=around_feature_ids(:)';
         nvoxels(k)=numel(around_feature_ids);
         if use_fixed_radius
             final_radius(k)=radius;
@@ -225,3 +230,98 @@ function nbrhood=cosmo_spherical_neighborhood(ds, radius, varargin)
     nbrhood.neighbors=neighbors;
 
     cosmo_check_neighborhood(nbrhood);
+
+
+function lin=fast_sub2ind(sz, i, j, k)
+    lin=sz(1)*(sz(2)*(k-1)+(j-1))+i;
+
+function pos=with_approx(ids, distances, voxel_count)
+    if voxel_count<=0
+        pos=0;
+        return
+    end
+
+    max_distance=distances(voxel_count);
+    first=find(distances<max_distance,1,'last')+1;
+    last=find(distances>max_distance,1,'first')-1;
+
+    if isempty(first)
+        first=1;
+    end
+
+    if isempty(last)
+        last=numel(distances);
+    end
+
+    delta_first=voxel_count-first;
+    delta_last=last-voxel_count;
+
+    if delta_first==delta_last
+        % select pseudo-randomly
+        if delta_first==0 || mod(sum(ids)+numel(distances),2)==0
+            pos=first;
+        else
+            pos=last;
+        end
+    elseif delta_first<delta_last
+        pos=first;
+    else
+        pos=last;
+    end
+
+
+
+
+
+function [sphere_offsets, o_distances]=get_sphere_offsets(radius)
+    % return offsets and euclidean (and a bit manhattan) distance
+    % from origin
+    [sphere_offsets, norm2_distances]=cosmo_sphere_offsets(radius);
+
+    % compute manhattan distance
+    norm1_distances=sum(abs(sphere_offsets),2);
+
+    % add a tiny bit of manhattan to make distances more varied
+    norm12_distances=norm2_distances+1e-5*norm1_distances;
+
+    % ensure distances are sorted
+    [o_distances,i]=sort(norm12_distances);
+    sphere_offsets=sphere_offsets(i,:);
+
+
+function check_input(varargin)
+    if numel(varargin)<1 || isscalar(varargin{1})
+        % change in parameters
+        raise_parameter_error();
+    end
+
+function [use_fixed_radius,radius,voxel_count]=get_selection_params(opt)
+    if isfield(opt,'radius')
+        if isfield(opt,'count')
+            raise_parameter_error();
+        elseif isscalar(opt.radius) && opt.radius>=0
+            use_fixed_radius=true;
+            radius=opt.radius;
+            voxel_count=NaN;
+            return
+        end
+    elseif isfield(opt,'count') && isscalar(opt.count) && opt.count>=0
+        use_fixed_radius=false;
+        radius=1; % starting point
+        voxel_count=opt.count;
+        return;
+    end
+
+    raise_parameter_error();
+
+
+
+function raise_parameter_error()
+    name=mfilename();
+    error(['Illegal parameters, use one of:\n',...
+        '- %s(...,''radius'',r) to use a radius of r voxels\n',...
+        '- %s(...,''count'',c) to select c voxels per searchlight\n',...
+        '(As of January 2014 the syntax of this function has changed)'],...
+            name,name);
+
+

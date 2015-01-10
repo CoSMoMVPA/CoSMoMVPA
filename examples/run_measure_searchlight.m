@@ -28,7 +28,7 @@ measure_args.partitions = cosmo_oddeven_partitioner(ds);
 radius=3; % 3 voxels
 % define a neighborhood using cosmo_spherical_neighborhood
 % >@@>
-nbrhood=cosmo_spherical_neighborhood(ds,radius);
+nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius);
 % <@@<
 
 % show a histogram of the number of voxels in each searchlight
