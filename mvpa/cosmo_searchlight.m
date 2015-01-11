@@ -57,7 +57,8 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %     %
 %     % define neighborhood (progress is set to false to suppress output)
 %     radius=1; % radius=3 is typical for fMRI datasets
-%     nbrhood=cosmo_spherical_neighborhood(ds,radius,'progress',false);
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius,...
+%                                               'progress',false);
 %     %
 %     % define measure and its arguments; here crossvalidation with LDA
 %     % classifier to compute classification accuracies
@@ -138,7 +139,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         error('need either radius or nbrhood, exclusively');
     elseif isempty(nbrhood)
         if cosmo_check_dataset(ds,'fmri',false)
-            nbrhood=cosmo_spherical_neighborhood(ds, radius, params);
+            nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius, params);
         else
             error(['Cannot determine dataset type, and no neighborhood '...
                      'specified in nbrhood']);
