@@ -88,13 +88,12 @@ fprintf('# test samples:%s\n', sprintf(' %d', cellfun(@numel, ...
 % here a simple naive baysian classifier is used.
 % Alternative are @cosmo_classify_{svm,nn,lda}.
 measure=@cosmo_crossvalidation_measure;
+measure_args=struct();
 measure_args.classifier=@cosmo_classify_naive_bayes;
 measure_args.partitions=partitions;
 
 %% Run time-series searchlight on magneto- and gradio-meters seperately
-% compute and plot accuracies for magnetometers and gradiometers separately
-% (because we collapse of channels (nbrhoof_nf(1)==0) no need for
-% planar2cmb
+% compute and plot accuracies for magnetometers and gradiometers separatelyplanar2cmb
 chantypes={'meg_axial','meg_planar'};
 
 % in the time searchlight analysis, select the time-point itself, the two
@@ -115,17 +114,16 @@ for k=1:nchantypes
 
     % slice the dataset to select only the channels matching the channel
     % types
-    ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, time_radius);
+    ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, 2);
 
     % define neighborhood over time; for each time point the time
     % point itself is included, as well as the two time points before and
     % the two time points after it
-    nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',2);
+    nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',time_radius);
 
     % run the searchlight using the measure, measure arguments, and
     % neighborhood defined above.
-    sl_map=cosmo_searchlight(ds_tl_sel,measure,'nbrhood',nbrhood,'args',...
-                                                        measure_args);
+    sl_map=cosmo_searchlight(ds_tl_sel,nbrhood,measure,measure_args);
     fprintf('The output has feature dimensions: %s\n', ...
                     cosmo_strjoin(sl_map.a.fdim.labels,', '));
 
