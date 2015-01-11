@@ -118,11 +118,11 @@ function msg=check_neighbors(nbrhood)
         return;
     end
 
-    m=cellfun(@is_positive_int_row_vector,nbrs);
-    if any(~m)
-        i=find(~m,1);
-        msg=sprintf('.neighbors{%d} is not a row vector with integers',i);
-        return;
+    for j=1:numel(nbrs)
+        if ~is_positive_int_row_vector(nbrs{j})
+            msg=sprintf('.neighbors{%d} is not an integer row vector',j);
+            return;
+        end
     end
 
 
