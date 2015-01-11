@@ -35,9 +35,9 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %     > true
 %     %
 %     % run a searchlight with tiny radius of 1 voxel (3 is more common)
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     measure=@cosmo_crossvalidation_measure;
-%     sl_ds=cosmo_searchlight(ds,measure,'args',args,...
-%                              'radius',1,'progress',false);
+%     sl_ds=cosmo_searchlight(ds,nbrhood,measure,args,'progress',false);
 %     %
 %     % the confusion matrix is 3x3x6, that is 6 3x3 confusion
 %     % matrices. Here the dataset is passed directly

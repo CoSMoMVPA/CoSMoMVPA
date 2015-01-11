@@ -129,8 +129,7 @@ measure_args.partitions=cosmo_nchoosek_partitioner(ds_tf,'half');
 
 
 %% run searchlight
-sl_tf_ds=cosmo_searchlight(ds_tf,measure,'nbrhood',nbrhood,...
-                                      'args',measure_args,...
+sl_tf_ds=cosmo_searchlight(ds_tf,nbrhood,measure,measure_args,...
                                       'center_ids',center_ids);
 %% visualize results
 

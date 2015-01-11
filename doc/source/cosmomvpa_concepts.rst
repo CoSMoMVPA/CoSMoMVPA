@@ -196,7 +196,7 @@ Slicing refers to selecting data in a dataset struct, either along the rows or c
     Illustration of slicing columns (features). In the masks, white elements are selected and black elements are not selected.
 
 
-Slicing+related functions
+Slicing-related functions
 +++++++++++++++++++++++++
 
 Related functions are:
@@ -238,7 +238,7 @@ where the inputs are:
     - ``samples_test`` is a ``QxR`` matrix with ``Q`` patterns, with no class labels associated
     - ``opt`` is an optional struct may contain specific options to be used with a specific classifier.
 
-The output ``predicted`` is a ``Qx1`` vector containing the predicted class labels for each sample in ``samples_test``. Classification accuracy can be computed by considering how many samples in the test set were predicted, and this can be compared to what may be expected by chance. In the simple case where each chunk contains the same number of *n* samples in each class, change accuracy is *1/n*. For MEEG datasets typically the number of samples in each class is not equal; the function :ref:`cosmo_balance_partitions` can be used to accomplish this.
+The output ``predicted`` is a ``Qx1`` vector containing the predicted class labels for each sample in ``samples_test``. Classification accuracy can be computed by considering how many samples in the test set were predicted, and this can be compared to what may be expected by chance. In the simple case where each chunk contains the same number of *n* samples in each class, chance accuracy is *1/n*. For MEEG datasets typically the number of samples in each class is not equal; the function :ref:`cosmo_balance_partitions` can be used to accomplish this.
 
 Examples of classifiers are :ref:`cosmo_classify_nn`, :ref:`cosmo_classify_svm`, :ref:`cosmo_classify_lda`, and :ref:`cosmo_classify_naive_bayes`.
 
@@ -264,11 +264,12 @@ For example, the following code defines a 'measure' that returns classification 
 
     .. code-block:: matlab
 
+        nbrhood = cosmo_spherical_neighborhood(ds,'radius',3);
         cv = @cosmo_cross_validation_accuracy_measure;
         cv_args = struct();
         cv_args.classifier = @cosmo_classify_svm;
         cv_args.partitions = cosmo_nfold_partitioner(ds);
-        sl_dset = cosmo_searchlight(ds,cv,'args',cv_args,'radius',3);
+        sl_dset = cosmo_searchlight(ds,nbrhood,cv,cv_args);
 
 
 Using classifiers and measures in such an abstract way is a powerful approach to implement new analyses. Any function you write can be used as a dataset measure as long as it uses the dataset measure input scheme, and can directly be used with (for example) a searchlight. When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_neighborhood`_ (see above), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
@@ -293,7 +294,7 @@ CoSMoMVPA_ overloads the *searchlight* concept through a more versatile *neighbo
     - for a traditional volume-based fMRI searchlight, the features in the source and target domain are the same, and consist of the voxels.
     - for a surface-based fMRI searchlight, the features in the source domain are the voxels in the volume, whereas the features in the target domain are the nodes on the surface.
     - for an MEG-based searchlight with magnetometers in the time-locked domain, the source and target domain are the set of all combinations of magnetometers and time points.
-    - for an MEG-based searchlight with planar gradiometers (``planar``) but with output as combined (``cmb``) sensors, sensors in the source domain are the planar gradiometers and sensors in the target domain are the combined sensors.
+    - for an MEG-based searchlight with planar gradiometers (``meg_planar``) but with output as combined (``meg_combined_from_planar``) sensors, sensors in the source domain are the planar gradiometers and sensors in the target domain are the combined sensors.
 
 A neighborhood is a ``struct`` with fields:
 
@@ -313,7 +314,7 @@ Neighborhood-related functions include:
         + *cosmo_meeg_chan_neighborhood*: MEEG searchlight over sensors.
         + *cosmo_meeg_source_neighborhood*: MEEG searchlight over source space.
 
-The general :ref:`cosmo_neighborhood` functions can *cross* different neighborhoods, which provides functionality for:
+The :ref:`cosmo_cross_neighborhood` can *cross* different neighborhoods, which provides functionality for:
 
     - fMRI time-space searchlight, if multiple time points are associated with each trial condition; achieved by crossing a spherical or surficial neighborhood with an interval neighborhood (for the time dimension).
     - MEEG time-space searchlight; achieved by crossing a an interval neighborhood (for the time dimension) with a channel or source MEEG neighorhood.

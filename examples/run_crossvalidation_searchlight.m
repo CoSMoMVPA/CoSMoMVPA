@@ -43,12 +43,12 @@ measure=@cosmo_crossvalidation_measure;
 % Instead, we take a short-cut here and use an
 % odd-even partitioning scheme that has only one fold (test on odd chunks,
 % test on even)
-args=struct();
-args.partitions=cosmo_oddeven_partitioner(ds,'half');
+measure_args=struct();
+measure_args.partitions=cosmo_oddeven_partitioner(ds,'half');
 
 % Use cosmo_classify_lda as classifier argument for the measure
 % >@@>
-args.classifier=@cosmo_classify_lda;
+measure_args.classifier=@cosmo_classify_lda;
 % <@@<
 
 %% Run searchlight
@@ -58,7 +58,7 @@ args.classifier=@cosmo_classify_lda;
 % named 'ds_cfy'
 
 % >@@>
-ds_cfy=cosmo_searchlight(ds,measure,'args',args,'nbrhood',nbrhood);
+ds_cfy=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 % <@@<
 
 %% Visualize and store the results in a NIFTI file

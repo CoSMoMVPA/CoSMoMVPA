@@ -1,4 +1,4 @@
-function results_map = cosmo_searchlight(ds, measure, varargin)
+function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 %  Generic searchlight function returns a map of results computed at each
 %  searchlight location
 %
@@ -68,8 +68,7 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %     measure=@cosmo_crossvalidation_measure;
 %     %
 %     % run searchlight
-%     result=cosmo_searchlight(ds,measure,'args',args,'nbrhood',nbrhood,...
-%                                                 'progress',0);
+%     result=cosmo_searchlight(ds,nbrhood,measure,'progress',0,args);
 %     %
 %     % show results:
 %     % - .samples contains classification accuracy
@@ -118,33 +117,17 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 %
 % ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NNO
 
-    cosmo_check_dataset(ds);
+    sl_defaults=struct();
+    sl_defaults.center_ids=[];
+    sl_defaults.progress=1/50;
 
-    defaults=struct();
-    defaults.radius=[];
-    defaults.center_ids=[];
-    defaults.args=struct();
-    defaults.nbrhood=[];
-    defaults.progress=1/50;
-    defaults.parent_type=[]; % for MEEG datasets
+    sl_opt=cosmo_structjoin(sl_defaults,varargin);
+    check_input(ds,nbrhood,measure,sl_opt);
 
-    params = cosmo_structjoin(defaults,varargin);
-    radius = params.radius;
-    args = params.args;
-    center_ids=params.center_ids;
-    nbrhood=params.nbrhood;
+    measure_opt=rmfield(sl_opt,fieldnames(sl_defaults));
+    measure_opt.progress=false;
 
-    % use voxel selection function
-    if ~xor(isempty(radius), isempty(nbrhood))
-        error('need either radius or nbrhood, exclusively');
-    elseif isempty(nbrhood)
-        if cosmo_check_dataset(ds,'fmri',false)
-            nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius, params);
-        else
-            error(['Cannot determine dataset type, and no neighborhood '...
-                     'specified in nbrhood']);
-        end
-    end
+    center_ids=sl_opt.center_ids;
 
     % get the neighborhood information. This is a cell where
     % neighbors{k} contains the feature indices in input dataset 'ds'
@@ -161,9 +144,9 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
     res_cell=cell(ncenters,1);
 
     % see if progress is to be reported
-    show_progress=~isempty(params.progress) && params.progress;
+    show_progress=~isempty(sl_opt.progress) && sl_opt.progress;
     if show_progress
-        progress_step=params.progress;
+        progress_step=sl_opt.progress;
         if progress_step<1
             progress_step=ceil(ncenters*progress_step);
         end
@@ -202,15 +185,15 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
         % (try/catch can be used to provide an error message indicating
         %  which feature id caused an error)
         try
-            res=measure(sphere_ds, args);
+            res=measure(sphere_ds, measure_opt);
 
             % for efficiency, only check first output
             if ~checked_first_output
                 checked_first_output=true;
 
                 % optimization to switch off checking the partitions,
-                % because they don't change
-                args.check_partitions=false;
+                % because they don't change for different searchlights
+                measure_opt.check_partitions=false;
 
                 cosmo_check_dataset(res);
                 if size(res.samples,2)~=1
@@ -267,3 +250,30 @@ function results_map = cosmo_searchlight(ds, measure, varargin)
 
     % sanity check of the output
     cosmo_check_dataset(results_map);
+
+
+function check_input(ds, nbrhood, measure, opt)
+    if isa(nbrhood,'function_handle') || ...
+                isfield(opt,'args') || ...
+                ~isa(measure,'function_handle')
+        raise_parameter_exception();
+    end
+
+
+    cosmo_check_dataset(ds);
+    cosmo_check_neighborhood(nbrhood);
+
+function raise_parameter_exception()
+    error(['Illegal syntax, use:\n\n',...
+            '  %s(ds,nbrhood,measure,...)\n\n',...
+            'where \n',...
+            '- ds is a dataset struct\n',...
+            '- nbrhood is a neighborhood struct\n',...
+            '- measure is a function handle of a dataset measure\n',...
+            '- any arguments to measure can be given at the ''...''\n',...
+            '  position, or as a struct\n',...
+            '(Note: as of January 2015 the syntax for this function\n'...
+            'has changed. The neighboorhood argument is now a fixed\n'...
+            'parameter, and measure arguments are passed directly\n'...
+            'rather than through an ''args'' arguments'], ...
+            mfilename())

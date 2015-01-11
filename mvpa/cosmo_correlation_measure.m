@@ -116,9 +116,11 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %
 %     % minimal searchlight example
 %     ds=cosmo_synthetic_dataset('type','fmri');
-%     radius=1; % in voxel units (radius=3 is more typical)
-%     res=cosmo_searchlight(ds,@cosmo_correlation_measure,...
-%                               'radius',radius,'progress',false);
+%     % use searchlight with radius 1 voxel (radius=3 is more typical)
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
+%     % run searchlight
+%     res=cosmo_searchlight(ds,nbrhood,@cosmo_correlation_measure,...
+%                               'progress',false);
 %     cosmo_disp(res.samples)
 %     > [ 1.26    -0.215      1.05      0.99     0.515       1.8 ]
 %     cosmo_disp(res.sa)

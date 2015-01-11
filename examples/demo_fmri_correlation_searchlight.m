@@ -68,8 +68,12 @@ cosmo_disp(ds_odd_even);
 % non-matching conditions (a la Haxby 2001).
 measure=@cosmo_correlation_measure;
 
+% define spherical neighborhood with radius of 3 voxels
+radius=3; % voxels
+nbrhood=cosmo_spherical_neighborhood(ds_odd_even,'radius',3);
+
 % Run the searchlight with a 3 voxel radius
-corr_results=cosmo_searchlight(ds_odd_even,measure,'radius',3);
+corr_results=cosmo_searchlight(ds_odd_even,nbrhood,measure);
 
 % print output
 fprintf('Dataset output:\n');

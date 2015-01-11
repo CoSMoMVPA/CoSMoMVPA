@@ -75,9 +75,6 @@ nvoxels_per_searchlight=100;
 
 % The neighborhood defined here is used three times (one for each target
 % similarity matrix), so it is not recomputed for every searchlight call.
-% It is however also possible to not precompute the
-% neighborhood and call
-% cosmo_searchlight(...,'radius',-nvoxels_per_searchlight)
 fprintf('Defining neighborhood for each feature\n');
 nbrhood=cosmo_spherical_neighborhood(ds,'count',nvoxels_per_searchlight);
 
@@ -126,8 +123,7 @@ fprintf('Searchlight measure arguments:\n');
 cosmo_disp(measure_args);
 
 % run searchlight
-ds_rsm_binary=cosmo_searchlight(ds,measure,'args',measure_args,...
-                                        'nbrhood',nbrhood);
+ds_rsm_binary=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 % show results
 cosmo_plot_slices(ds_rsm_binary);
@@ -180,8 +176,7 @@ else
 end
 
 % run searchlight
-ds_rsm_linear=cosmo_searchlight(ds,measure,'args',measure_args,...
-                                        'nbrhood',nbrhood);
+ds_rsm_linear=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 % show results
 cosmo_plot_slices(ds_rsm_linear);
@@ -213,8 +208,7 @@ measure_args=struct();
 measure_args.target_dsm=target_dsm;
 
 % run searchlight
-ds_rsm_behav=cosmo_searchlight(ds,measure,'args',measure_args,...
-                                        'nbrhood',nbrhood);
+ds_rsm_behav=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 % show results
 cosmo_plot_slices(ds_rsm_behav);

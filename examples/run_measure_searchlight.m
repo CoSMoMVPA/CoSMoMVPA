@@ -43,8 +43,7 @@ hist(count,100);
 % hint: use cosmo_searchlight with the measure, args and nbrhood
 
 % >@@>
-results = cosmo_searchlight(ds,measure,'args',measure_args,...
-                'nbrhood',nbrhood);
+results = cosmo_searchlight(ds,nbrhood,measure,measure_args);
 % <@@<
 
 % the following command would store the results to disk:
