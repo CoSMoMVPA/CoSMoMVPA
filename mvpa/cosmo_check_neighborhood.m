@@ -18,7 +18,7 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset();
-%     nbrhood=cosmo_spherical_neighborhood(ds,1,'progress',false);
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     cosmo_check_neighborhood(nbrhood)
 %     > true
 %     %
