@@ -31,7 +31,7 @@ nbrhood.a.some_attribute='useless';
 % Add a field '.neighbors' to the nbrhood, which is initialized to a cell
 % with two elements (one for each ROI).
 % In the for-loop below, the cell is filled with feature indices
-nbrhood.neighbors=cell(1,nrois);
+nbrhood.neighbors=cell(nrois,1);
 
 % Add the feature indices of each ROI to the neighborhood
 for k=1:nrois
