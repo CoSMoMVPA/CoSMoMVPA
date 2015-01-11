@@ -97,11 +97,6 @@ function msg=check_basis(nbrhood)
         return
     end
 
-    if ~cosmo_isfield(nbrhood,'a.fdim.labels')
-        msg='neighborhood lacks field .a.fdim.labels';
-        return;
-    end
-
 
 function tf=is_positive_int_row_vector(x)
     tf=isempty(x) || ...
