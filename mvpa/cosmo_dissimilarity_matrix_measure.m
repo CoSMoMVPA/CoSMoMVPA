@@ -100,12 +100,12 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     % (in this toy example there are only 6 voxels, and the radisu
 %     %  of the searchlight is 1 voxel. Real-life examples use larger
 %     %  datasets and a larger radius)
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     opt=struct();
-%     opt.radius=1;                % more typical is radius=3
 %     opt.progress=false;          % do not show progress
-%     opt.args.metric='euclidean'; % (instead of default 'correlation')
+%     opt.metric='euclidean'; % (instead of default 'correlation')
 %     measure=@cosmo_dissimilarity_matrix_measure;
-%     sl_ds=cosmo_searchlight(ds, measure, opt);
+%     sl_ds=cosmo_searchlight(ds, nbrhood, measure, opt);
 %     cosmo_disp(sl_ds);
 %     > .a
 %     >   .fdim

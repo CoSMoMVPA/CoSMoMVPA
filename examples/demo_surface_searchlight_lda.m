@@ -215,8 +215,7 @@ for one_surf=[true,false]
 
 
         % Run the searchlight
-        lda_results = cosmo_searchlight(ds,measure,'args',measure_args,...
-                                            'nbrhood',nbrhood);
+        lda_results = cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 
         % print searchlight output

@@ -26,15 +26,18 @@ function res=cosmo_distatis(ds, varargin)
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('nsubjects',5,'nchunks',1,'ntargets',4);
+%     %
+%     % define neighborhood (here a searchlight with radius of 1 voxel)
+%     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
+%     %
+%     % define measure
+%     measure=@cosmo_dissimilarity_matrix_measure;
 %     % each subject is a chunk
 %     ds.sa.chunks=ds.sa.subject;
 %     % compute DSM for each subject
-%     opt=struct();
-%     opt.progress=false;
-%     opt.radius=1;
 %     sp=cosmo_split(ds,'chunks');
 %     for k=1:numel(sp)
-%         sp{k}=cosmo_searchlight(sp{k},@cosmo_dissimilarity_matrix_measure,opt);
+%         sp{k}=cosmo_searchlight(sp{k},nbrhood,measure,'progress',false);
 %         sp{k}.sa.chunks=ones(6,1)*k;
 %     end
 %     % merge results

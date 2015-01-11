@@ -31,7 +31,7 @@ nbrhood.a.some_attribute='useless';
 % Add a field '.neighbors' to the nbrhood, which is initialized to a cell
 % with two elements (one for each ROI).
 % In the for-loop below, the cell is filled with feature indices
-nbrhood.neighbors=cell(1,nrois);
+nbrhood.neighbors=cell(nrois,1);
 
 % Add the feature indices of each ROI to the neighborhood
 for k=1:nrois
@@ -89,9 +89,9 @@ cosmo_disp(nbrhood);
 % Define a measure and arguments for n-fold
 % cross-validation with LDA classifier
 measure=@cosmo_crossvalidation_measure;
-args=struct();
-args.partitions=cosmo_nfold_partitioner(ds);
-args.classifier=@cosmo_classify_lda;
+measure_args=struct();
+measure_args.partitions=cosmo_nfold_partitioner(ds);
+measure_args.classifier=@cosmo_classify_lda;
 
 % it is assumed that nbrhood was defined in the previous section. Here
 % see how many rois there are.
@@ -127,7 +127,7 @@ for k=1:nrois
     % apply the measure and store the result in the k-th element of
     % 'measure_outputs'
     % >@@>
-    each_measure_output{k}=measure(ds_roi,args);
+    each_measure_output{k}=measure(ds_roi,measure_args);
     % @<<@
 end
 
@@ -157,34 +157,26 @@ cosmo_disp(full_output)
 % the cosmo_searchlight routine uses a neighborhood and a measure
 % and applies them in a similar way as in Part 1
 
-% For the searchlight, define a struct 'opt' with two fields:
-%  args:    contains the contents of the variable 'args'
-%  nbrhood: contains the contents of the variable 'nbrhood'
-% >@@>
-opt=struct();
-opt.args=args;
-opt.nbrhood=nbrhood;
-% <@@<
-
 % Use cosmo_searchlight with arguments:
 %  - the input dataset ('ds')
+%  - the neighborhood struct ('nbrhood')
 %  - the function handle of the measure ('measure')
-%  - the additional options ('opt')
+%  - the arguments to the measure ('measure_args')
 % Assign the result to the variable 'full_output_alt' and display it
 % contents using cosmo_disp
 
 % >@@>
 % apply searchlight
-full_output_alt=cosmo_searchlight(ds,measure,opt);
+full_output_alt=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 fprintf('Output of cross-validation using cosmo_searchlight:\n');
 cosmo_disp(full_output_alt);
 
 % alternative syntax: cosmo_searchlight can also be called with
-% key-value pairs (just like cosmomvpa_fmri_dataset)
-full_output_alt2=cosmo_searchlight(ds,measure,...
-                                        'args',args,...
-                                        'nbrhood',nbrhood);
+% measure-arguments as key-value pairs (just like cosmomvpa_fmri_dataset)
+full_output_alt2=cosmo_searchlight(ds,nbrhood,measure,...
+                                   'partitions',measure_args.partitions,...
+                                   'classifier',measure_args.classifier);
 
 fprintf(['Output of cross-validation using cosmo_searchlight '...
             '(alternative syntax):\n']);
@@ -196,10 +188,6 @@ cosmo_disp(full_output_alt2);
 
 % This is a variation of part 2, showing how split-half correlation
 % differences can be computed using a searchlight
-
-% As in Part 2, set the options for the searchlight in a struct 'opt'
-% Because the cosmo_correlation_measure returns correlation differences by
-% default, no 'args' field is required
 %
 % Note: this dataset has 10 chunks. The correlation measure will,
 % by default, *not* do a 'simple' odd-even partitioning, but instead will
@@ -208,10 +196,6 @@ cosmo_disp(full_output_alt2);
 % computed for each split and then averaged.
 % (to override this, you can specify a 'partitions' argument with, for
 % example, the output of cosmo_oddeven_partitioner(ds,'half') ).
-% >@@>
-opt=struct();
-opt.nbrhood=nbrhood;
-% <@@<
 
 % Set the variable 'measure' to a function handle referring to
 % cosmo_correlation_measure
@@ -219,8 +203,10 @@ opt.nbrhood=nbrhood;
 measure=@cosmo_correlation_measure;
 % <@@<
 
-% Run the searchlight and store the output in a variable 'corr_output'
-corr_output=cosmo_searchlight(ds,measure,opt);
+% Run the searchlight using cosmo_searchlight, which takes the dataset,
+% neighborhood and measure arguments. (No additional measure arguments are
+% required for the correlation measure)
+corr_output=cosmo_searchlight(ds,nbrhood,measure);
 
 % Show the result
 cosmo_disp(corr_output);
@@ -233,23 +219,15 @@ cosmo_disp(corr_output);
 % set arguments for the measure, ensuring that the predictions (instead
 % of classification accuracies) are returned
 measure=@cosmo_crossvalidation_measure;
-args=struct();
-args.partitions=cosmo_nfold_partitioner(ds);
-args.classifier=@cosmo_classify_lda;
-args.output='predictions';
+measure_args=struct();
+measure_args.partitions=cosmo_nfold_partitioner(ds);
+measure_args.classifier=@cosmo_classify_lda;
+measure_args.output='predictions';
 
-% For the searchlight, define a struct 'opt' with two fields:
-%  args:    contains the contents of the variable 'args'
-%  nbrhood: contains the contents of the variable 'nbrhood'
+% apply searchlight using the dataset, neighborhood, measure, and measure
+% arguments; store the result in 'ds_confusion'
 % >@@>
-opt=struct();
-opt.args=args;
-opt.nbrhood=nbrhood;
-% <@@<
-
-% apply searchlight, store result in 'ds_confusion'
-% >@@>
-ds_confusion=cosmo_searchlight(ds,measure,opt);
+ds_confusion=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 % <@@<
 
 % show contents of ds_confusion

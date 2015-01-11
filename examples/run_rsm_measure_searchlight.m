@@ -32,8 +32,15 @@ measure_args = struct();
 measure_args.target_dsm = behav;
 % <@@<
 
+% use spherical neighborhood of 3 voxels
+radius=3; % 3 voxels
+% define a neighborhood using cosmo_spherical_neighborhood
+% >@@>
+nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius);
+% <@@<
+
 % Run the searchlight
-results = cosmo_searchlight(ds,measure,'args',measure_args,'radius',3);
+results = cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
 % Save the results to disc using the following command:
 % >> cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);

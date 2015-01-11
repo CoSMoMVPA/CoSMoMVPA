@@ -27,7 +27,7 @@ ds=cosmo_remove_useless_data(ds);
 %% Define spherical neighborhood for each feature (voxel)
 
 radius=3; % saerchlight radius in voxels
-nbrhood=cosmo_spherical_neighborhood(ds,radius);
+nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius);
 
 % Compute the number of elements in each element of nbrhood.neighbors,
 % and assign the result to a variable 'roi_sizes'
@@ -46,7 +46,7 @@ hist(roi_sizes,100)
 % and the spherical neighborhood just defined, run a searchlight
 % and assign the result to a variable named 'ds_corr'
 % >@@>
-ds_corr=cosmo_searchlight(ds,@cosmo_correlation_measure,'nbrhood',nbrhood);
+ds_corr=cosmo_searchlight(ds,nbrhood,@cosmo_correlation_measure);
 % <@@<
 
 %% Visualize and store the results in a NIFTI file

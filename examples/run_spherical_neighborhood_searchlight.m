@@ -33,7 +33,7 @@ nfeatures=size(ds.samples,2);
 center_ids=1:nfeatures;
 
 %% use voxel selection function
-nbrhood=cosmo_spherical_neighborhood(ds, radius);
+nbrhood=cosmo_spherical_neighborhood(ds, 'radius',radius);
 center2neighbors=nbrhood.neighbors;
 ncenters=numel(center2neighbors); % should be equal to 'nfeatures'
 

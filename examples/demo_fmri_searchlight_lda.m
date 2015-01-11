@@ -71,12 +71,14 @@ cosmo_disp(measure);
 fprintf('Searchlight measure arguments:\n');
 cosmo_disp(measure_args);
 
-% Run the searchlight with approximately 100 voxels in each searchlight.
-% (A positive value for 'radius' sets the radius in voxel units)
-% (The radius of the searchlight sphere is a bit larger at
-% the edges of the brain.)
-lda_results = cosmo_searchlight(ds_per_run,measure,'args',measure_args,...
-                                    'radius',-100);
+% Define a neighborhood with approximately 100 voxels in each searchlight.
+nvoxels_per_searchlight=100;
+nbrhood=cosmo_spherical_neighborhood(ds_per_run,...
+                        'count',nvoxels_per_searchlight);
+
+
+% Run the searchlight
+lda_results = cosmo_searchlight(ds_per_run,nbrhood,measure,measure_args);
 
 % print output dataset
 fprintf('Dataset output:\n');

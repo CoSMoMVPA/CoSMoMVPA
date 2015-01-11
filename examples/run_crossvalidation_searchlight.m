@@ -19,7 +19,7 @@ ds=cosmo_remove_useless_data(ds);
 
 % Use a searchlight with a more-or-less constant number of voxels,
 % both near the edges of the brain and in the center of the brain.
-nvoxels_min=100;
+nvoxels_per_searchlight=100;
 
 % Define a spherical neighborhood using cosmo_spherical_neighborhood,
 % and assign the result to a variable named 'nrhood'
@@ -28,7 +28,7 @@ nvoxels_min=100;
 %       the maximum distance (in voxels) from each center
 % Note: this is not perfect, just an approximation
 % @>>@
-nbrhood=cosmo_spherical_neighborhood(ds,-nvoxels_min);
+nbrhood=cosmo_spherical_neighborhood(ds,'count',nvoxels_per_searchlight);
 % @<<@
 
 %% Define the measure as
@@ -43,12 +43,12 @@ measure=@cosmo_crossvalidation_measure;
 % Instead, we take a short-cut here and use an
 % odd-even partitioning scheme that has only one fold (test on odd chunks,
 % test on even)
-args=struct();
-args.partitions=cosmo_oddeven_partitioner(ds,'half');
+measure_args=struct();
+measure_args.partitions=cosmo_oddeven_partitioner(ds,'half');
 
 % Use cosmo_classify_lda as classifier argument for the measure
 % >@@>
-args.classifier=@cosmo_classify_lda;
+measure_args.classifier=@cosmo_classify_lda;
 % <@@<
 
 %% Run searchlight
@@ -58,7 +58,7 @@ args.classifier=@cosmo_classify_lda;
 % named 'ds_cfy'
 
 % >@@>
-ds_cfy=cosmo_searchlight(ds,measure,'args',args,'nbrhood',nbrhood);
+ds_cfy=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 % <@@<
 
 %% Visualize and store the results in a NIFTI file
@@ -69,7 +69,7 @@ cosmo_plot_slices(ds_cfy);
 
 % Set output filename
 output_fn=fullfile(output_data_path,...
-            sprintf('lda_odd-even_accuracy_d%.0fvx.nii',nvoxels_min));
+            sprintf('lda_odd-even_accuracy_d%.0fvx.nii',nvoxels_per_searchlight));
 
 % Write output to a NIFTI file using cosmo_map2fmri
 % @>>@

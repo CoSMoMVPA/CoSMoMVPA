@@ -70,7 +70,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                        'geodesic' (default), 'dijkstra' or 'euclidian'.
 %    'line_def',line_def definition of lines from inner to outer surface
 %                        See surfing_nodeidxs2coords
-%    'progress_step', p  Show progress every p centers (default: 100)
+%    'progress', p       Show progress every p centers (default: 100)
 %    'vol_def', v        Volume definition with fields .mat (4x4 affine
 %                        voxel-to-world matrix) and .dim (1x3 number of
 %                        voxels in each dimension). If omittied, voldef is
@@ -173,7 +173,7 @@ check_input(surfs, varargin{:});
 defaults=struct();
 defaults.metric='geodesic';
 defaults.line_def=[10 0 1];
-defaults.progress_step=100;
+defaults.progress=100;
 defaults.vol_def=[];
 defaults.subsample_min_ratio=.2;
 defaults.center_ids=[];
@@ -242,7 +242,8 @@ if ds_is_surface
         error('Only full datasets (no missing nodes) are supported for now');
     end
 
-    [n2ns,radii]=surfing_nodeselection(v1',f',circle_def,opt.metric);
+    [n2ns,radii]=surfing_nodeselection(v1',f',circle_def,...
+                                        opt.metric,opt.progress);
     ncenters=numel(n2ns);
 
     nbrhood=struct();
@@ -271,7 +272,7 @@ elseif ds_is_volume
 
     [n2v,vmin,vmax,d]=surfing_voxelselection(v1',v2',f',circle_def,vol_def,...
                                              out2in,opt.line_def,...
-                                             opt.metric,opt.progress_step);
+                                             opt.metric,opt.progress);
 
     ncenters=numel(center_ids);
     assert(ncenters==numel(n2v));
