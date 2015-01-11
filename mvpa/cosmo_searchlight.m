@@ -128,9 +128,12 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     sl_defaults.center_ids=[];
     sl_defaults.progress=1/50;
 
+    % get options for the searchlight function
     sl_opt=cosmo_structjoin(sl_defaults,varargin);
     check_input(ds,nbrhood,measure,sl_opt);
 
+    % get options for the measure. These are all additional arguments,
+    % except that progress is set to false and center_ids is removed.
     measure_opt=rmfield(sl_opt,fieldnames(sl_defaults));
     measure_opt.progress=false;
 
