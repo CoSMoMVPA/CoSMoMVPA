@@ -12,7 +12,7 @@ function test_simple_neighborhood
     assertEqual(nh1.fa.nvoxels,ones(1,6));
     assertEqual(nh1.fa.radius,zeros(1,6));
     assertEqual(nh1.fa.center_ids,1:6);
-    assertEqual(nh1.neighbors,mat2cell((1:6)',ones(6,1),1));
+    assertEqual(nh1.neighbors,num2cell((1:6)'));
 
 
 
