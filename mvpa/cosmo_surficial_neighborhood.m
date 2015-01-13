@@ -281,7 +281,7 @@ elseif ds_is_volume
 
     [n2v,vmin,vmax,d]=surfing_voxelselection(v1',v2',f',circle_def,vol_def,...
                                              out2in,opt.line_def,...
-                                             opt.metric,opt.progress);
+                                             opt.metric,0+opt.progress);
 
     ncenters=numel(center_ids);
     assert(ncenters==numel(n2v));
@@ -520,7 +520,7 @@ function circle_def=get_direct_circle_def(radius)
     if isnan(radius) || radius
         circle_def=NaN;
     else
-        circle_def=0;
+        circle_def=[5 1];
     end
 
 
