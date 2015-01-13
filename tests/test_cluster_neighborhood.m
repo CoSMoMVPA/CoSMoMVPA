@@ -108,9 +108,41 @@ function test_meeg_cluster_neighborhood
             assertEqual(nbrs,cl_nbrhood.neighbors{feature_id});
 
         end
-
-
     end
+
+function test_cluster_neighborhood_surface
+ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
+
+    vertices=[0 0 0 1 1 1;
+                1 2 3 1 2 3;
+                0 0 0 0 0 0]';
+    faces= [ 3 2 3 2
+                2 1 5 4
+                5 4 6 5 ]';
+
+    opt=struct();
+    opt.progress=false;
+    opt.vertices=vertices;
+    opt.faces=faces;
+
+    nh1=cosmo_cluster_neighborhood(ds,opt);
+    assertEqual(nh1.neighbors,{ [ 2 4 ]
+                                [ 1 3 4 5 ]
+                                [ 2 5 6 ]
+                                [ 1 2 5 ]
+                                [ 2 3 4 6 ]
+                                [ 3 5 ] });
+    assertEqual(ds.a,nh1.a);
+    ds.fa.sizes=[1 3 2 2 3 1]/6;
+    ds.fa.radius=sqrt([1 2 2 2 2 1]);
+    assertEqual(ds.fa,nh1.fa);
+
+    opt.direct=false;
+    nh2=cosmo_cluster_neighborhood(ds,opt);
+    assertEqual(nh2.neighbors,num2cell((1:6)'));
+    assertEqual(ds.a,nh2.a);
+    ds.fa.radius(:)=0;
+    assertEqual(ds.fa,nh2.fa);
 
 
 
