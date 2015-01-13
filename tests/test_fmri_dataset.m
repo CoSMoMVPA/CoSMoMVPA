@@ -25,7 +25,7 @@ function test_bv_vmr_fmri_dataset()
     bv_vmr=cosmo_map2fmri(uint_ds,'-bv_vmr');
     bless(bv_vmr);
     assert_bv_equal(bv_vmr, get_expected_bv_vmr());
-    ds_bv_vmr=cosmo_fmri_dataset(bv_vmr);
+    ds_bv_vmr=cosmo_fmri_dataset(bv_vmr,'mask',false);
     ds_bv_vmr_lpi=cosmo_fmri_reorient(ds_bv_vmr,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_vmr_lpi,'rotation');
     bv_vmr.ClearObject();
