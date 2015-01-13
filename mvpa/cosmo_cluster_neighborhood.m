@@ -124,10 +124,13 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
     % slice nbrhood to match feature attributes
     nbrhood.neighbors=full_nbrhood.neighbors(ds2nbrhood);
     nbrhood.fa=cosmo_slice(full_nbrhood.fa,ds2nbrhood,2,'struct');
-
-    assert(isequal(nbrhood.fa,ds.fa));
-
     nbrhood.a=ds.a;
+
+    labels=ds.a.fdim.labels;
+    for k=1:numel(labels)
+        label=labels{k};
+        assert(isequal(ds.fa.(label),nbrhood.fa.(label)));
+    end
 
 function ds2nbrhood=get_dataset2neighborhood_mapping(ds, nbrhood)
     % ensure matching .fa for ds and nbrhood
