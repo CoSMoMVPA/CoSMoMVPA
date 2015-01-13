@@ -295,9 +295,12 @@ function [nbrhood, pos]=surface_neighborhood(ds,dim_pos,arg,opt)
     end
 
     surf_def={opt.vertices,opt.faces};
-
+    cosmo_check_external('surfing');
     nbrhood=cosmo_surficial_neighborhood(ds,surf_def,...
                                     'direct',do_connect,opt);
+    node_area=surfing_surfacearea(opt.vertices,opt.faces);
+    nbrhood.fa.sizes=node_area';
+
     pos=dim_pos;
 
 function [nbrhood, pos]=interval_neighborhood(ds,dim_pos,arg,opt)
