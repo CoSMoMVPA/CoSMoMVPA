@@ -242,6 +242,15 @@ if ds_is_surface
         error('Only full datasets (no missing nodes) are supported for now');
     end
 
+    nvertices=size(vi,1);
+    missing_vertex=setdiff(1:nvertices,ds.fa.node_indices);
+    if ~isempty(missing_vertex)
+        error(['vertex %d in dataset is not in surface, because the '...
+                'surface has only %d vertices'],...
+                missing_vertex(1),nvertices);
+    end
+
+
     [n2ns,radii]=surfing_nodeselection(v1',f',circle_def,...
                                         opt.metric,opt.progress);
     ncenters=numel(n2ns);
