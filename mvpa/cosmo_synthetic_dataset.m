@@ -611,7 +611,14 @@ function [ds, nfeatures]=get_fdim_fa(opt)
 
     % get dimension values
     dim_sizes=get_dim_size(size_label);
-    dim_sizes=dim_sizes(1:numel(labels));
+    nlabel=numel(labels);
+    if nlabel==1
+        % surface case
+        dim_sizes=prod(dim_sizes);
+    else
+        % everything else
+        dim_sizes=dim_sizes(1:nlabel);
+    end
 
     for k=1:numel(dim_sizes)
         if isnan(dim_sizes(k))

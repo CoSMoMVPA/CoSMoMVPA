@@ -15,18 +15,21 @@ function s=cosmo_map2surface(ds, fn)
 %     niml=cosmo_map2surface(ds,'-niml_dset');
 %     cosmo_disp(niml);
 %     > .node_indices
-%     >   [ 0         1         2 ]
+%     >   [ 0         1         2         3         4         5 ]
 %     > .data
-%     >   [   3.27      1.83     0.472     0.862      3.05     -1.31
-%     >     -0.434      3.07      3.58       5.5     -1.35      5.77
-%     >      0.725   -0.0631     0.715    -0.205    -0.124      1.49 ]
+%     >   [   2.21      1.83    -0.585     0.862      1.99     -1.31
+%     >     -0.434      2.02      3.58      4.44     -1.35      4.71
+%     >      0.725   -0.0631     0.715    -0.205    -0.124      1.49
+%     >       3.08      1.42      2.35     -1.21      2.39      1.63
+%     >      0.489      2.71     0.727      1.37     0.294     0.887
+%     >      0.888     -1.15     -1.07    -0.809     -2.94      1.44 ]
 %
 %     ds=cosmo_synthetic_dataset('type','surface');
 %     % convert to bv smp xff struct
 %     % (to store a file to disc, use a filename as the second argument)
 %     bv_smp=cosmo_map2surface(ds,'-bv_smp')
 %     >           FileVersion: 5
-%     >          NrOfVertices: 3
+%     >          NrOfVertices: 6
 %     >              NrOfMaps: 6
 %     >     NameOfOriginalSRF: 'untitled.srf'
 %     >                   Map: [1x6 struct]
