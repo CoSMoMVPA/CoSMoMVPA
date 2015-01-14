@@ -13,6 +13,7 @@ function test_fmri_cluster_neighborhood
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
+    ds.fa.sizes=ones(1,size(ds.samples,2));
     assertEqual(nh1.a,ds.a);
     assertEqual(nh1.fa,ds.fa);
 
@@ -46,6 +47,8 @@ function test_meeg_cluster_neighborhood
     n=numel(ds.a.fdim.values{1});
     ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
     nf=size(ds.samples,2);
+    ds.fa.sizes=ones(1,size(ds.samples,2));
+
 
     chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,'delaunay',true,...
                                                  'chantype','all',...

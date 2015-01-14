@@ -33,7 +33,10 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     nbrhood       Neighborhood struct
 %       .neighbors  .neighbors{k}==idxs means that feature k in ds has
 %                   neighbors with feature indices idxs
-%       .fa         identical to ds.fa
+%       .fa         identical to ds.fa, except that a field .sizes
+%                   is added indicating the size of each feature
+%                   - for surfaces, this is the area of each node
+%                   - in all other cases, it is set to a vector of ones.
 %       .a          identical to ds.a
 %
 %  Examples:
@@ -126,10 +129,22 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
     nbrhood.fa=cosmo_slice(full_nbrhood.fa,ds2nbrhood,2,'struct');
     nbrhood.a=ds.a;
 
+    nbrhood=set_feature_sizes(nbrhood);
+    check_matching_fa(ds,nbrhood);
+
+function check_matching_fa(ds,nbrhood)
+    % ensure that all dimension values in fa match between ds and nbrhood
     labels=ds.a.fdim.labels;
     for k=1:numel(labels)
         label=labels{k};
         assert(isequal(ds.fa.(label),nbrhood.fa.(label)));
+    end
+
+function nbrhood=set_feature_sizes(nbrhood)
+    % set feature sizes if not set
+    if ~isfield(nbrhood.fa,'sizes')
+        nfeatures=numel(nbrhood.neighbors);
+        nbrhood.fa.sizes=ones(1,nfeatures);
     end
 
 function ds2nbrhood=get_dataset2neighborhood_mapping(ds, nbrhood)
@@ -298,8 +313,13 @@ function [nbrhood, pos]=surface_neighborhood(ds,dim_pos,arg,opt)
     cosmo_check_external('surfing');
     nbrhood=cosmo_surficial_neighborhood(ds,surf_def,...
                                     'direct',do_connect,opt);
-    node_area=surfing_surfacearea(opt.vertices,opt.faces);
-    nbrhood.fa.sizes=node_area';
+
+
+    node_area_surf=surfing_surfacearea(opt.vertices,opt.faces);
+    feature_ids=ds.fa.node_indices(ds.a.fdim.values{dim_pos});
+    node_area_ds=node_area_surf(feature_ids);
+
+    nbrhood.fa.sizes=node_area_ds';
 
     pos=dim_pos;
 
