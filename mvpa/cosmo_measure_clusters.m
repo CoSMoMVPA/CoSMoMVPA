@@ -36,8 +36,8 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %                  The output for a feature k depends on cluster_stat:
 %                  - 'tfce':
 %                       cval(k)=sum[h=dh:dh:max(sample)] e_k(h)^E *h^H * dh
-%                     i.e. a weighted sum of the extent and height of
-%                     the cluster at different thresholds
+%                    i.e. a weighted sum of the extent and height of
+%                    the cluster at different thresholds
 %                  - 'max':
 %                       cval(k)=max0[i=cl_k(thr)] samples(i))
 %                    i.e. the maximum value in the cluster that contains k
@@ -90,6 +90,8 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %     but does support 'tfce' and does not support 'wcm'
 %   - unlike FieldTrip's clusterstat, a value is returned for each feature
 %     (rather than each cluster).
+%   - TFCE is advised in the general case, because it finds a compromise
+%     between magnitude of values and extent of clusters
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols, Threshold-free

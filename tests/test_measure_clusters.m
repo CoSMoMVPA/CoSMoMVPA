@@ -13,6 +13,8 @@ function test_measure_clusters_statfun
     aoe({'tfce','dh',.1},[ 0 2.7518 0.6668 0.6668 0 3.4931 3.4931])
     aoe({'tfce','dh',.05},[ 0 2.7935 0.5348 0.5348 0 3.6310 3.6310])
     aoe({'tfce','dh',3},zeros(1,7));
+    aoe({'tfce','dh',.05,'E',1},[0 3.1850 0.9263 0.9263 0 5.1350 5.1350])
+    aoe({'tfce','dh',.05,'H',1},[0 2.2977 0.8227 0.8227 0 2.7577 2.7577])
     aoe({'max','threshold',1},[ 0 2 2 2 0 2 2])
     aoe({'max','threshold',2},[ 0 2 0 0 0 2 2])
     aoe({'max','threshold',3},zeros(1,7));
