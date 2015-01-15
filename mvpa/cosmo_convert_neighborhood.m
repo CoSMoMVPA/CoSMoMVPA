@@ -74,12 +74,6 @@ function conv_nbrhood=cosmo_convert_neighborhood(nbrhood, output_type)
         error('Expected matrix, cell, or struct input');
     end
 
-    valid_output_types={'','matrix','struct','cell'};
-    if ~cosmo_match({output_type},valid_output_types)
-        error('illegal output type, valid is one of: ''%s''.',...
-                cosmo_strjoin(valid_output_types,''', '''));
-    end
-
     conv_nbrhood=converter(nbrhood, output_type);
 
 function y=convert_cell(x,output_type)
@@ -92,7 +86,7 @@ function y=convert_cell(x,output_type)
         case {'cell'}
             y=x;
         otherwise
-            assert(false)
+            throw_illegal_output_type_error();
     end
 
 
@@ -106,7 +100,7 @@ function y=convert_matrix(x,output_type)
         case 'matrix'
             y=x;
         otherwise
-            assert(false)
+            throw_illegal_output_type_error();
     end
 
 function y=convert_struct(x,output_type)
@@ -119,7 +113,7 @@ function y=convert_struct(x,output_type)
         case 'struct'
             y=x;
         otherwise
-            assert(false)
+            throw_illegal_output_type_error();
     end
 
 function check_matrix(neighbors)
@@ -176,4 +170,9 @@ function neighbor_matrix=convert_struct2matrix(nbrhood)
     neighbor_matrix=convert_cell2matrix(convert_struct2cell(nbrhood));
 
 
+
+function throw_illegal_output_type_error()
+    valid_output_types={'','matrix','struct','cell'};
+    error('illegal output type, valid is one of: ''%s''.',...
+                cosmo_strjoin(valid_output_types,''', '''));
 
