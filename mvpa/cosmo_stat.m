@@ -497,13 +497,13 @@ function delta=pairwise_differences(samples,targets,chunks)
 
     idxs=zeros(n2,2);
     for k=1:n
-        assert(idxs(targets(k),chunks(k))==0);
-        idxs(targets(k),chunks(k))=k;
+        assert(idxs(chunks(k),targets(k))==0);
+        idxs(chunks(k),targets(k))=k;
     end
     assert(isequal(size(idxs),[n2,2]));
     assert(all(idxs(:)>0));
 
-    delta=samples(idxs(:,1))-samples(idxs(:,2));
+    delta=samples(idxs(:,1),:)-samples(idxs(:,2),:);
 
 function [output_stat_name,tail]=get_stat_definition(stat_name,...
                                                     output_stat_name)
