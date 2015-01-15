@@ -103,7 +103,16 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %
 % NNO Oct 2013, updated Jan 2015
 
-    opt=cosmo_structjoin(varargin);
+    persistent cached_varargin;
+    persistent cached_opt;
+
+    if isequal(varargin, cached_varargin)
+        opt=cached_opt;
+    else
+        opt=cosmo_structjoin(varargin);
+        cached_opt=opt;
+        cached_varargin=varargin;
+    end
 
     % used for TFCE
     defaults=struct();
@@ -222,7 +231,19 @@ function feature_sizes=get_feature_sizes(sample,opt)
 function func=get_tfce_cluster_func(sizes,threshold_height,opt,defaults)
     % helper to get the cluster function for TFCE, using either supplied or
     % default values for the E and H paramters
-    opt_all=cosmo_structjoin(defaults,opt);
+    persistent cached_opt;
+    persistent cached_defaults;
+    persistent cached_opt_all;
+
+    if isequal(opt,cached_opt) && isequal(defaults, cached_defaults)
+        opt_all=cached_opt_all;
+    else
+        opt_all=cosmo_structjoin(defaults,opt);
+        cached_opt_all=opt_all;
+
+        cached_opt=opt;
+        cached_defaults=defaults;
+    end
 
     tfce_E=opt_all.E;
     tfce_H=opt_all.H;
@@ -274,7 +295,7 @@ function check_input_sizes(sample,nbrhood_mx)
         error('sample input must be a row vector');
     end
 
-    if ~isnumeric(sample) || islogical(sample)
+    if ~isnumeric(sample) && ~islogical(sample)
         error('sample input must be numeric or logical');
     end
 
