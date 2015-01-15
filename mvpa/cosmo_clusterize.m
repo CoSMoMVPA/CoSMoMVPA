@@ -1,4 +1,4 @@
-function clusters=cosmo_clusterize(ds,nbrhood)
+function clusters=cosmo_clusterize(sample,nbrhood_mat)
 % fast depth-first clustering based on equal values of neighbors
 %
 % clusters=cosmo_clusterize(ds,nbrhood,sizes)
@@ -60,11 +60,10 @@ function clusters=cosmo_clusterize(ds,nbrhood)
 %
 % NNO Sep 2010, updated Jan 2011, Jan 2014
 
-    data=get_data(ds);
-    nfeatures=size(data,2);
+    check_input_sizes(sample,nbrhood_mat);
 
-    nbrhood_matrix=cosmo_convert_neighborhood(nbrhood,'matrix');
-    [maxnbrs,nfeatures_matrix]=size(nbrhood_matrix);
+    nfeatures=size(sample,2);
+    [maxnbrs,nfeatures_matrix]=size(nbrhood_mat);
 
     if nfeatures~=nfeatures_matrix
         error('nbrhood has %d features, data has %d', ...
@@ -91,7 +90,7 @@ function clusters=cosmo_clusterize(ds,nbrhood)
             continue;
         end
 
-        data_val=data(data_pos); % value of candidate cluster
+        data_val=sample(data_pos); % value of candidate cluster
 
         if data_val~=0 && ~isnan(data_val)
             % found an element for a new cluster
@@ -111,11 +110,11 @@ function clusters=cosmo_clusterize(ds,nbrhood)
                 cl_idxs(qpos)=cl_idx; % assign cluster index
 
                 for j=1:maxnbrs
-                    nbr=nbrhood_matrix(j,qpos);
+                    nbr=nbrhood_mat(j,qpos);
                     % neighbour should have positive index, not queued yet,
                     % and have the same value as the first element of the
                     % current cluster
-                    if nbr>0 && ~in_queue(nbr) && data(nbr)==data_val
+                    if nbr>0 && ~in_queue(nbr) && sample(nbr)==data_val
                         % add to queue of nodes to be visited
                         queue_end=queue_end+1;
                         queue(queue_end)=nbr; %
@@ -149,15 +148,28 @@ function clusters=cosmo_clusterize(ds,nbrhood)
         clusters{k}=queue(cl_start(k):(cl_start(k+1)-1));
     end
 
-function data=get_data(ds)
-    if isstruct(ds) && isfield(ds,'samples');
-        data=ds.samples;
-    elseif isnumeric(ds) || islogical(ds);
-        data=ds;
-    else
-        error('illegal input: numeric array or struct with .samples');
+
+
+function check_input_sizes(sample,nbrhood_mat)
+    if ~isrow(sample)
+        error('sample input must be a row vector');
     end
 
-    if ~isrow(data)
-        error('input samples must be a row vector');
+    if ~isnumeric(sample) && ~islogical(sample)
+        error('sample input must be numeric or logical');
+    end
+
+    if ~ismatrix(nbrhood_mat)
+        error('neighborhood matrix must be a matrix');
+    end
+
+    if ~isnumeric(nbrhood_mat)
+        error('neighborhood matrix must be numeric');
+    end
+
+    % ensure they have matching size
+    if numel(sample)~=size(nbrhood_mat,2)
+        error(['size mismatch between data (%d elements) '...
+                'and neighborhood (%d elements)'],...
+                    numel(sample),size(nbrhood_mat,2));
     end
