@@ -199,12 +199,6 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
     visited=false(n,1);
     nbrhoods=cell(n,1);
 
-    label2func=struct();
-    label2func.fmri=@fmri_neighborhood;
-    label2func.chan=@chan_neighborhood;
-    label2func.surface=@surface_neighborhood;
-    label2func.default=@interval_neighborhood;
-
 
     while true
         i=find(~visited,1);
@@ -215,11 +209,12 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
         end
 
         dim_label=dim_labels{i};
-
+        other_dim_labels={};
         switch dim_label
             case 'i'
                 dim_type='fmri';
                 neighborhood_func=@fmri_neighborhood;
+                other_dim_labels={'j','k'};
             case 'node_indices'
                 dim_type='surface';
                 neighborhood_func=@surface_neighborhood;
@@ -231,19 +226,32 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
                 neighborhood_func=@interval_neighborhood;
         end
 
-        if isfield(opt,dim_type)
-            radius=opt.(dim_type);
-            if ~isscalar(radius) || radius<0
+        % see if option is specified for this dimension label
+        has_dim_opt=isfield(opt,dim_type);
+        if has_dim_opt
+            dim_opt=opt.(dim_type);
+        else
+            dim_opt=[];
+        end
+
+        if isstruct(dim_opt)
+            % neighborhood struct, use directly
+            cosmo_check_neighborhood(dim_opt);
+            nbrhood=dim_opt;
+        else
+            % compute neighborhood
+            radius=dim_opt;
+            if ~(isempty(radius) || (isscalar(radius) && radius>=0))
                 error('radius for %s must be non-negative scalar',...
                         dim_type)
             end
-        else
-            radius=[];
+            nbrhood=neighborhood_func(ds,i,radius,opt);
         end
 
-        [nbrhood, pos]=neighborhood_func(ds,i,radius,opt);
         nbrhoods{i}=nbrhood;
-        visited(pos)=true;
+
+        visited_dim_labels=[{dim_label} other_dim_labels];
+        visited(cosmo_match(dim_labels,visited_dim_labels))=true;
     end
 
     msk=~cellfun(@isempty,nbrhoods);
@@ -251,12 +259,12 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
 
 
 
-function [nbrhood, pos]=fmri_neighborhood(ds,dim_pos,connectivity,opt)
+function nbrhood=fmri_neighborhood(ds,dim_pos,connectivity,opt)
     if isempty(connectivity)
         connectivity=3; % NN=3 connectivity
     end
 
-    if ~any(connectivity==1:3)
+    if ~isnumeric(connectivity) || ~any(connectivity==1:3)
         error('argument for ''fmri'' must be 1, 2 or 3');
     end
 
@@ -286,18 +294,17 @@ function [nbrhood, pos]=fmri_neighborhood(ds,dim_pos,connectivity,opt)
         nbrhood.fa=rmfield(nbrhood.fa,key);
     end
 
-    pos=dim_pos+(0:2);
 
-function [nbrhood, pos]=chan_neighborhood(ds,dim_pos,arg,unused)
+function nbrhood=chan_neighborhood(ds,dim_pos,arg,unused)
     do_connect=get_default_connect(arg);
 
     assert(isequal(ds.a.fdim.labels{dim_pos},'chan'));
     nbrhood=cosmo_meeg_chan_neighborhood(ds,'chantype','all',...
                                             'label','dataset',...
                                             'delaunay',do_connect);
-    pos=dim_pos;
 
-function [nbrhood, pos]=surface_neighborhood(ds,dim_pos,arg,opt)
+
+function nbrhood=surface_neighborhood(ds,dim_pos,arg,opt)
     do_connect=get_default_connect(arg,'surface');
 
     assert(isequal(ds.a.fdim.labels{dim_pos},'node_indices'));
@@ -321,14 +328,12 @@ function [nbrhood, pos]=surface_neighborhood(ds,dim_pos,arg,opt)
 
     nbrhood.fa.sizes=node_area_ds';
 
-    pos=dim_pos;
 
-function [nbrhood, pos]=interval_neighborhood(ds,dim_pos,arg,opt)
+function nbrhood=interval_neighborhood(ds,dim_pos,arg,unused)
     dim_label=ds.a.fdim.labels{dim_pos};
     do_connect=get_default_connect(arg,dim_label);
 
     nbrhood=cosmo_interval_neighborhood(ds,dim_label,do_connect);
-    pos=dim_pos;
 
 
 function do_connect=get_default_connect(arg, label)
