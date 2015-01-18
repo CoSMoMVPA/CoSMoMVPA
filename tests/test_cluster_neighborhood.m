@@ -12,6 +12,9 @@ function test_fmri_cluster_neighborhood
 
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
+    nh_sph=cosmo_spherical_neighborhood(ds,'progress',false,...
+                                                    'radius',2.5);
+    nh3=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',nh_sph);
 
     ds.fa.sizes=ones(1,size(ds.samples,2));
     assertEqual(nh1.a,ds.a);
@@ -34,6 +37,8 @@ function test_fmri_cluster_neighborhood
         msk2=delta<sqrt(1)+.001;
         assertEqual(sort(nh2.neighbors{feature_id}),find(msk2));
 
+        msk3=delta<2.5;
+        assertEqual(sort(nh3.neighbors{feature_id}),find(msk3));
     end
 
 
@@ -114,7 +119,7 @@ function test_meeg_cluster_neighborhood
     end
 
 function test_cluster_neighborhood_surface
-ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
+    ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
 
     vertices=[0 0 0 1 1 1;
                 1 2 3 1 2 3;
@@ -146,6 +151,32 @@ ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
     assertEqual(ds.a,nh2.a);
     ds.fa.radius(:)=0;
     assertEqual(ds.fa,nh2.fa);
+
+
+function test_cluster_neighborhood_exceptions
+    ds=cosmo_synthetic_dataset();
+    aet=@(varargin)assertExceptionThrown(...
+                        @()cosmo_cluster_neighborhood(varargin{:},...
+                                            'progress',false),'');
+
+    aet(ds,'foo');
+    aet(ds,'fmri',-1);
+    aet(ds,'fmri',true);
+    aet(ds,'fmri',[1 1]);
+
+    ds.a.fdim.labels{2}='foo';
+    ds.fa.foo=ds.fa.j;
+    aet(ds);
+
+    ds2=cosmo_synthetic_dataset('type','meeg');
+    ds2.a.fdim.labels{1}='freq';
+    ds2.fa.freq=ones(1,6);
+
+    aet(ds2,'freq');
+    aet(ds2,'freq',2);
+    aet(ds2,'freq',NaN);
+    aet(ds2,'freq',[true true]);
+
 
 
 
