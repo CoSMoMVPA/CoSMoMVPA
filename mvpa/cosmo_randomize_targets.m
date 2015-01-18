@@ -91,7 +91,15 @@ function randomized_targets=cosmo_randomize_targets(ds,varargin)
     randomized_targets=targets(permutation);
 
 function rps=randperms_with_size(sizes,opt)
+    % helper function
+    % Input: sizes is 1xN vector
+    % Output: rps is 1xN cell; rps{k} is a random permutation of 1:sizes(k)
+    %
+
     cum_size=sum(sizes);
+
+    % single call to cosmo_rand, because this call is computationally
+    % expensive
     if isfield(opt,'seed')
         r=cosmo_rand(cum_size,'seed',opt.seed);
     else
