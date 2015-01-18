@@ -4,21 +4,20 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 % cval=cosmo_measure_clusters(sample,nbrhood_mat,method,['dh',dh|'threshold',t],...)
 %
 % Inputs:
-%   sample         1xP data array for k features
-%   nbrhood_mat    MxP neighborhood matrix, if each feature has at most M
-%                  neighbors. nbrhood_mx(:,k) should contain the feature
-%                  ids of the neighbors of feature k (values of zero
-%                  indicate no neighbors)
-%   cluster_stat   'tfce', 'max', 'maxsize', or 'maxsum',
-%   'dh',dh        when method is 'tfce', the integral step size
-%   'threshold',t  if method is anything but 'tfce', the threshold level
-%   'E', E         (optional) when method is 'tfce': the extent exponent,
-%                  default E=0.5
-%   'H', E         (optional) when method is 'tfce': the height exponent,
-%                  default H=2
-%   'sizes', s     (optional) 1xP element size of each feature. default
-%                  a vector of ones, but for surface based datasets this
-%                  could be set to the area occupied by each node.
+%   sample              1xP data array for k features
+%   nbrhood_mat         MxP neighborhood matrix, if each feature has at
+%                       most M neighbors. nbrhood_mx(:,k) should contain
+%                       the feature ids of the neighbors of feature k
+%                       (values of zero indicate no neighbors)
+%   cluster_stat        'tfce', 'max', 'maxsize', or 'maxsum',
+%   'dh',dh             when method is 'tfce', the integral step size
+%   'threshold',t       if method is anything but 'tfce', the threshold
+%                       level
+%   'E', E              (optional) when method is 'tfce': the extent
+%                       exponent, default E=0.5
+%   'H', E              (optional) when method is 'tfce': the height
+%                       exponent, default H=2
+%   'feature_sizes', s  (optional) 1xP element size of each feature.
 %
 % Output:
 %   cval           1xP data array with cluster values.
@@ -92,6 +91,7 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %     (rather than each cluster).
 %   - TFCE is advised in the general case, because it finds a compromise
 %     between magnitude of values and extent of clusters
+%   - this function
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols, Threshold-free
@@ -101,10 +101,13 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %   - Maris, E., Oostenveld, R. Nonparametric statistical testing of EEG-
 %     and MEG-data. Journal of Neuroscience Methods (2007).
 %
+% See also: cosmo_convert_neighborhood, cosmo
+%
 % NNO Oct 2013, updated Jan 2015
 
     persistent cached_varargin;
     persistent cached_opt;
+
 
     if isequal(varargin, cached_varargin)
         opt=cached_opt;
@@ -216,9 +219,9 @@ function [delta_thr, cluster_func, nthr]=get_clustering_params(method,...
 function feature_sizes=get_feature_sizes(sample,opt)
     nfeatures=size(sample,2);
 
-    if isfield(opt,'sizes')
+    if isfield(opt,'feature_sizes')
         % if given as option, use those
-        feature_sizes=opt.sizes;
+        feature_sizes=opt.feature_sizes;
         % ensure it is a row vector
         if ~isrow(feature_sizes) || size(feature_sizes,2) ~= nfeatures
             error('feature sizes must be of size 1x%d', nfeatures);
@@ -300,7 +303,9 @@ function check_input_sizes(sample,nbrhood_mx)
     end
 
     if ~ismatrix(nbrhood_mx)
-        error('neighborhood matrix must be a matrix');
+        error(['neighborhood matrix must be a matrix '...
+                '(use cosmo_convert_neighborhood to convert a '...
+                'neighborhood struct to matrix representation']);
     end
 
     if ~isnumeric(nbrhood_mx)

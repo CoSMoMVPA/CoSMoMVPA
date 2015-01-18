@@ -15,6 +15,8 @@ function test_measure_clusters_statfun
     aoe({'tfce','dh',3},zeros(1,7));
     aoe({'tfce','dh',.05,'E',1},[0 3.1850 0.9263 0.9263 0 5.1350 5.1350])
     aoe({'tfce','dh',.05,'H',1},[0 2.2977 0.8227 0.8227 0 2.7577 2.7577])
+    aoe({'tfce','dh',.05,'H',1,'feature_sizes',2*ones(1,7)},...
+                                [ 0 3.2495 1.1635 1.1635 0 3.9000 3.9000])
     aoe({'max','threshold',1},[ 0 2 2 2 0 2 2])
     aoe({'max','threshold',2},[ 0 2 0 0 0 2 2])
     aoe({'max','threshold',3},zeros(1,7));
@@ -53,6 +55,8 @@ function test_measure_clusters_exceptions()
 
     aetw({'max','dh',1})
     aetw({'max','dh',1,'threshold',3})
+    aetw({'max','dh',1,'feature_sizes',[]})
+    aetw({'max','dh',1,'feature_sizes',3})
 
 
 
