@@ -54,6 +54,11 @@ end
 
 n=numel(strings);
 
+if n==0
+    joined='';
+    return;
+end
+
 if ischar(delim)
     delim=repmat({delim},1,n-1);
 else
@@ -81,6 +86,7 @@ end
 
 % join them
 joined=[joined_cells{:}];
+
 
 function b=is_cell_of_strings(strings)
     % simple helper
