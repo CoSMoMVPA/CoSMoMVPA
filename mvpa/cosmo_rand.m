@@ -39,6 +39,8 @@ function result=cosmo_rand(varargin)
 %   - when using the 'seed' option, this function gives identical output
 %     under both matlab and octave. To achieve this, the PRNG is set to a
 %     different state for the two platforms
+%   - this function uses the Mersenne twister algorithm by default, even
+%     when 'seed' is used (unlike Matlab and Octave).
 %
 % NNO Jan 2015
 
