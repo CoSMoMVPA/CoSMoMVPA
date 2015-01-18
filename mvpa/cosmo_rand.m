@@ -49,9 +49,9 @@ function result=cosmo_rand(varargin)
             rng(seed);
         else
             % octave
-            rng_state=randn('state');
-            cleaner=onCleanup(@()randn('state',rng_state));
-            randn('seed',seed);
+            rng_state=rand('state');
+            cleaner=onCleanup(@()rand('state',rng_state));
+            rand('seed',seed);
         end
     end
 
@@ -78,7 +78,7 @@ function [sizes,seed]=process_input(varargin)
                 error('missing value after key ''%s''', arg);
             end
             value=varargin{k};
-            ensure_positive_scalar(k,value)
+            ensure_positive_scalar(k,value);
 
             switch arg
                 case 'seed'
