@@ -106,7 +106,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 %     >   .k
 %     >     [ 1         1         1         1         1         1 ]
 %     > .samples
-%     >   [ 0.7       0.8       0.9       0.6       0.7       0.6 ]
+%     >   [ 1         1         1       0.9         1       0.7 ]
 %     > .sa
 %     >   .labels
 %     >     { 'accuracy' }

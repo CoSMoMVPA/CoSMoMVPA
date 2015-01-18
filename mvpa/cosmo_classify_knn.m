@@ -27,19 +27,19 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
 %     pred=cosmo_classify_knn(tr.samples,tr.sa.targets,te.samples,opt);
 %     % show targets and predicted labels (40% accuracy)
 %     disp([te.sa.targets pred])
-%     >      1     4
-%     >      2     2
-%     >      3     5
-%     >      4     1
+%     >      1     1
+%     >      2     3
+%     >      3     3
+%     >      4     4
 %     >      5     5
 %     %
 %     opt.norm=1; % city-block distance
 %     pred=cosmo_classify_knn(tr.samples,tr.sa.targets,te.samples,opt);
 %     % show targets and predicted labels (40% accuracy)
 %     disp([te.sa.targets pred])
-%     >      1     4
-%     >      2     2
-%     >      3     5
+%     >      1     1
+%     >      2     3
+%     >      3     3
 %     >      4     4
 %     >      5     5
 %

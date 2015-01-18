@@ -36,26 +36,73 @@ function result=cosmo_rand(varargin)
 %   - this function behaves identically to the builtin 'rand' function,
 %     except that it supports a 'seed' option, which allows for
 %     deterministic pseudo-number generation
+%   - when using the 'seed' option, this function gives identical output
+%     under both matlab and octave. To achieve this, the PRNG is set to a
+%     different state for the two platforms
 %
 % NNO Jan 2015
 
     [sizes,seed]=process_input(varargin{:});
 
     if seed~=0
-        if cosmo_wtf('is_matlab')
-            % matlab
-            rng_state=rng();
-            cleaner=onCleanup(@()rng(rng_state));
-            rng(seed);
+        is_matlab=cosmo_wtf('is_matlab');
+
+        if is_matlab
+            % preserve old PRNG state
+            orig_rng_state=rng();
+            cleaner=onCleanup(@()rng(orig_rng_state));
+
+            % set random number generation state
+            rng_state=get_mersenne_state_from_seed(seed, is_matlab);
+            rng(rng_state);
         else
-            % octave
-            rng_state=rand('state');
-            cleaner=onCleanup(@()rand('state',rng_state));
-            rand('seed',seed);
+            % preserve old PRNG state
+            orig_rng_state=rand('state');
+            cleaner=onCleanup(@()rand('state',orig_rng_state));
+
+            % set random number generation state
+            rng_state=get_mersenne_state_from_seed(seed, is_matlab);
+            rand('state',rng_state);
         end
     end
 
     result=rand(sizes);
+
+
+function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
+    % set the PRNG of the mersenne twister based on seed
+    %
+    % based on pseudo-code from wikipedia:
+    % http://en.wikipedia.org/wiki/Mersenne_twister
+    max_uint32=2^32-1;
+    state=uint64(zeros(625,1));
+    state(1)=bitand(uint64(seed),max_uint32);
+
+    mersenne_mult=uint64(1812433253);
+
+    for j=1:623
+        v=mersenne_mult*bitxor(state(j),bitshift(state(j),-30))+uint64(j);
+        state(j+1)=bitand(v,max_uint32);
+    end
+
+    state(end)=1;
+
+    if is_matlab
+        % reverse counter relative to Octave
+        % (this is undocumented in both Matlab and Octave)
+        state(end)=uint64(625)-state(end);
+
+        % matlab uses a struct to set the state
+        rng_state=struct();
+        rng_state.State=uint32(state);
+        rng_state.Type='twister';
+        rng_state.Seed=uint32(0);
+    else
+        % octave uses a vector to set the state
+        rng_state=state;
+    end
+
+
 
 
 function [sizes,seed]=process_input(varargin)

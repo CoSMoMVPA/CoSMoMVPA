@@ -11,13 +11,13 @@ function test_clusterize_basics
     x=sample;
     sample=x>2;
     cl1=cosmo_clusterize(sample,nh);
-    assertEqual(cl1,{[9;12],10,19});
+    assertEqual(cl1,{21,25});
     nb=cosmo_convert_neighborhood(nh,'cell');
 
     sample=round(x/2);
     cl2=cosmo_clusterize(sample,nh);
-    assertEqual(cl2,{[ 1 2 5 10 13 19 20 23 25 26 29 15 18 21 24 27]',...
-                    [3 6]',[9 12]',22});
+    assertEqual(cl2,{[1 11 9 14 17 21 22 23 26 30 25]',...
+                    [3 6]',28});
 
     % test exceptions
     aet=@(x)assertExceptionThrown(@()cosmo_clusterize(x{:}),'');

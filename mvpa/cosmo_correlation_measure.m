@@ -48,7 +48,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds);
 %     cosmo_disp(c)
 %     > .samples
-%     >   [ 0.252 ]
+%     >   [ 1.23 ]
 %     > .sa
 %     >   .labels
 %     >     'corr'
@@ -57,7 +57,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds,'corr_type','Spearman');
 %     cosmo_disp(c)
 %     > .samples
-%     >   [ 0.229 ]
+%     >   [ 1.28 ]
 %     > .sa
 %     >   .labels
 %     >     'corr'
@@ -66,10 +66,10 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c_raw=cosmo_correlation_measure(ds,'output','correlation');
 %     cosmo_disp(c_raw)
 %     > .samples
-%     >   [ 0.386
-%     >     0.239
-%     >     0.238
-%     >     0.596 ]
+%     >   [  0.447
+%     >     -0.538
+%     >     -0.525
+%     >      0.959 ]
 %     > .sa
 %     >   .half1
 %     >     [ 1
@@ -93,8 +93,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     % P=1)
 %     matrices=cosmo_unflatten(c_raw,1);
 %     cosmo_disp(matrices)
-%     > [ 0.386     0.238
-%     >   0.239     0.596 ]
+%     > [  0.447    -0.525
+%     >   -0.538     0.959 ]
 %
 %     % compute for each partition separately. .ds.chunks in the output
 %     % reflects the test chunk in each partition
@@ -103,10 +103,10 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds,'output','by_partition',...
 %                         'partitions',partitions);
 %     cosmo_disp(c.samples);
-%     > [ 0.567
-%     >    1.19
-%     >    1.05
-%     >   0.731 ]
+%     > [  1.72
+%     >   0.728
+%     >    1.25
+%     >    2.02 ]
 %     cosmo_disp(c.sa);
 %     > .partition
 %     >   [ 1
@@ -122,7 +122,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     res=cosmo_searchlight(ds,nbrhood,@cosmo_correlation_measure,...
 %                               'progress',false);
 %     cosmo_disp(res.samples)
-%     > [ 1.26    -0.215      1.05      0.99     0.515       1.8 ]
+%     > [ 1.87      1.25      1.51      1.68      1.71     0.879 ]
 %     cosmo_disp(res.sa)
 %     > .labels
 %     >   'corr'

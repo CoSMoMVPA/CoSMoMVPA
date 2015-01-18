@@ -17,9 +17,9 @@ function selected_indices=cosmo_anova_feature_selector(dataset, how_many)
 %     disp(size(ds.samples))
 %     > [ 6 6 ]
 %     cosmo_anova_feature_selector(ds,.45) % find best ~45% of features
-%     > [ 4 5 2 ]
+%     > [ 2 4 5 ]
 %     cosmo_anova_feature_selector(ds,4) % find best 4 features
-%     > [ 4 5 2 1 ]
+%     > [ 2 4 5 3 ]
 %
 %
 % NNO Aug 2013

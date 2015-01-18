@@ -39,17 +39,17 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                                                       partitions);
 %     % show targets, predicted labels, and accuracy
 %     disp([ds.sa.targets pred chunks])
-%     >      3     3     1
-%     >      4     5     1
+%     >      3     5     1
+%     >      4     4     1
 %     >      5     5     1
-%     >      3     5     2
+%     >      3     3     2
 %     >      4     5     2
 %     >      5     5     2
-%     >      3     3     3
-%     >      4     4     3
-%     >      5     4     3
-%     >      3     3     4
-%     >      4     5     4
+%     >      3     5     3
+%     >      4     5     3
+%     >      5     5     3
+%     >      3     5     4
+%     >      4     4     4
 %     >      5     5     4
 %     disp(accuracy)
 %     >     0.5833
@@ -64,7 +64,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     % (chunks are set to NaN because there is no unique chunk for
 %     %  each prediction)
 %     disp([ds.sa.targets pred chunks])
-%     >      3     3   NaN
+%     >      3     5   NaN
 %     >      4     4   NaN
 %     >      5     5   NaN
 %     >      3     3   NaN
@@ -77,7 +77,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     >      4     4   NaN
 %     >      5     3   NaN
 %     disp(accuracy)
-%     >     0.9167
+%     >     0.8333
 %     %
 %     % as the example above, but use z-scoring on each training set
 %     % and apply the estimated mean and std to the test set.
@@ -92,17 +92,17 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     >      3     5     1
 %     >      4     4     1
 %     >      5     5     1
-%     >      3     4     2
+%     >      3     3     2
 %     >      4     4     2
 %     >      5     5     2
 %     >      3     5     3
 %     >      4     4     3
 %     >      5     5     3
-%     >      3     5     4
+%     >      3     3     4
 %     >      4     4     4
 %     >      5     3     4
 %     disp(accuracy)
-%     >     0.5833
+%     >     0.7500
 %
 % Notes:
 %   - to apply this to a dataset struct as a measure (for searchlights),

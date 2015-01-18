@@ -56,10 +56,10 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
 %     res=cosmo_correlation_measure(ds,'output','raw');
 %     cosmo_disp(res)
 %     > .samples
-%     >   [ 0.386
-%     >     0.239
-%     >     0.238
-%     >     0.596 ]
+%     >   [  0.447
+%     >     -0.538
+%     >     -0.525
+%     >      0.959 ]
 %     > .sa
 %     >   .half1
 %     >     [ 1
@@ -84,8 +84,8 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
 %     %
 %     % yields a 2x2x1 matrix (matlab omits the last, singleton dimension)
 %     cosmo_disp(unfl)
-%     > [ 0.386     0.238
-%     >   0.239     0.596 ]
+%     > [  0.447    -0.525
+%     >   -0.538     0.959 ]
 %     %
 %     cosmo_disp(labels)
 %     > { 'half1'  'half2' }

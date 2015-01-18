@@ -28,47 +28,47 @@ function [ds_useful,msk]=cosmo_remove_useless_data(ds, dim, type)
 %     ds.samples(:,4)=7;      % constant along feature dimension (dim=2)
 %     %
 %     cosmo_disp(ds.samples);
-%     > [   NaN     0.319      3.58         7    -0.124     0.671
-%     >    1.83     0.367       Inf         7      3.16     -1.21
-%     >       7         7         7         7         7         7
-%     >   0.862      2.02      3.03         7      3.09      1.63 ]
+%     > [    NaN     -1.05    -0.262         7    -0.209     0.844
+%     >    0.584     0.915       Inf         7      2.39      1.86
+%     >        7         7         7         7         7         7
+%     >   -0.518      1.84     0.482         7      1.39     0.502 ]
 %     %
 %     % remove all features that are useless
 %     ds_useful=cosmo_remove_useless_data(ds);
 %     cosmo_disp(ds_useful.samples);
-%     > [ 0.319    -0.124     0.671
-%     >   0.367      3.16     -1.21
+%     > [ -1.05    -0.209     0.844
+%     >   0.915      2.39      1.86
 %     >       7         7         7
-%     >    2.02      3.09      1.63 ]
+%     >    1.84      1.39     0.502 ]
 %     %
 %     % remove all features that are constant, and get the logical mask
 %     % of the kept features
 %     [ds_variable,msk]=cosmo_remove_useless_data(ds,1,'variable');
 %     cosmo_disp(ds_variable.samples);
-%     > [ 0.319      3.58    -0.124     0.671
-%     >   0.367       Inf      3.16     -1.21
+%     > [ -1.05    -0.262    -0.209     0.844
+%     >   0.915       Inf      2.39      1.86
 %     >       7         7         7         7
-%     >    2.02      3.03      3.09      1.63 ]
+%     >    1.84     0.482      1.39     0.502 ]
 %     cosmo_disp(msk)
 %     > [ false true true false true true ]
 %     %
 %     % remove all features that are not finite
 %     ds_finite=cosmo_remove_useless_data(ds,1,'finite');
 %     cosmo_disp(ds_finite.samples);
-%     > [ 0.319         7    -0.124     0.671
-%     >   0.367         7      3.16     -1.21
+%     > [ -1.05         7    -0.209     0.844
+%     >   0.915         7      2.39      1.86
 %     >       7         7         7         7
-%     >    2.02         7      3.09      1.63 ]
+%     >    1.84         7      1.39     0.502 ]
 %     %
 %     % remove all samples that are useless
 %     ds_finite_features=cosmo_remove_useless_data(ds,2);
 %     cosmo_disp(ds_finite_features.samples);
-%     > [ 0.862      2.02      3.03         7      3.09      1.63 ]
+%     > [ -0.518      1.84     0.482         7      1.39     0.502 ]
 %     %
 %     % illustrate that this function also works on an array directly
 %     samples_finite_features=cosmo_remove_useless_data(ds.samples,2);
 %     cosmo_disp(samples_finite_features);
-%     > [ 0.862      2.02      3.03         7      3.09      1.63 ]
+%     > [ -0.518      1.84     0.482         7      1.39     0.502 ]
 %
 % Notes:
 %  - by default, this function removes useless features

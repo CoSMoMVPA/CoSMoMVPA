@@ -37,9 +37,9 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
 %     pred=cosmo_classify_svm(tr.samples,tr.sa.targets,te.samples,struct);
 %     disp(pred)
-%     >      1
-%     >      1
 %     >      5
+%     >      1
+%     >      3
 %     >      4
 %     >      5
 %

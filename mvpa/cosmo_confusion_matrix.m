@@ -27,9 +27,9 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %     pred_ds=cosmo_crossvalidation_measure(ds,args);
 %     confusion=cosmo_confusion_matrix(pred_ds.sa.targets,pred_ds.samples);
 %     cosmo_disp(confusion)
-%     > [ 3         1         0
-%     >   1         2         1
-%     >   2         2         0 ]
+%     > [ 3         0         1
+%     >   0         3         1
+%     >   1         0         3 ]
 %     confusion_alt=cosmo_confusion_matrix(pred_ds);
 %     isequal(confusion,confusion_alt)
 %     > true
@@ -44,24 +44,24 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %     sl_confusion=cosmo_confusion_matrix(sl_ds);
 %     cosmo_disp(sl_confusion)
 %     > <double>@3x3x6
-%     >    (:,:,1) =  [ 2         1         1
-%     >                 0         3         1
-%     >                 3         1         0 ]
-%     >    (:,:,2) =  [ 3         1         0
-%     >                 0         2         2
-%     >                 1         1         2 ]
-%     >    (:,:,3) =  [ 4         0         0
-%     >                 0         3         1
-%     >                 1         0         3 ]
-%     >    (:,:,4) =  [ 3         1         0
-%     >                 2         1         1
-%     >                 0         4         0 ]
-%     >    (:,:,5) =  [ 3         0         1
-%     >                 0         4         0
-%     >                 1         2         1 ]
-%     >    (:,:,6) =  [ 2         1         1
-%     >                 2         1         1
-%     >                 1         0         3 ]
+%     >    (:,:,1) = [ 4         0         0
+%     >                0         4         0
+%     >                0         1         3 ]
+%     >    (:,:,2) = [ 4         0         0
+%     >                0         4         0
+%     >                0         1         3 ]
+%     >    (:,:,3) = [ 2         1         1
+%     >                0         4         0
+%     >                1         0         3 ]
+%     >    (:,:,4) = [ 4         0         0
+%     >                0         3         1
+%     >                0         1         3 ]
+%     >    (:,:,5) = [ 3         0         1
+%     >                0         4         0
+%     >                1         1         2 ]
+%     >    (:,:,6) = [ 3         0         1
+%     >                0         4         0
+%     >                1         1         2 ]
 %
 %     % using samples that are not predictions gives an error
 %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);

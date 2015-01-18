@@ -118,9 +118,9 @@ function bv_msk=get_expected_bv_msk()
     bv_msk.ZEnd = 130;
 
     data=zeros(2,1,3,'uint8');
-    data(:,:,1) = [ 40 113 ];
-    data(:,:,2) = [ 255 0 ];
-    data(:,:,3) = [ 153 195 ];
+    data(:,:,1) = [ 155 118 ];
+    data(:,:,2) = [ 153 0 ];
+    data(:,:,3) = [ 225 255 ];
     bv_msk.Mask=data;
 
 function bv_vmp=get_expected_bv_vmp()
@@ -142,7 +142,7 @@ function bv_vmp=get_expected_bv_vmp()
     bv_vmp.ZStart = 124;
     bv_vmp.ZEnd = 130;
 
-    map1.VMPData=reshape([-1.3499 0.3188 3.5784 -2.2588 1.2407 2.2120],...
+    map1.VMPData=reshape([-0.2040   -1.0504   -0.2617   -3.6849    1.3494    2.0317],...
                                                         [2 1 3]);
     map2.VMPData=reshape([3.0349 -1.3077 4.4438 2.5365 0.3426 1.8339],...
                                                         [2 1 3]);
@@ -181,9 +181,9 @@ function bv_vmr=get_expected_bv_vmr()
     bv_vmr.VoxResVerified = false;
 
     data=zeros(2,1,3,'uint8');
-    data(:,:,1) = [ 40 113 ];
-    data(:,:,2) = [ 255 0 ];
-    data(:,:,3) = [ 153 195 ];
+    data(:,:,1) = [ 155 118 ];
+    data(:,:,2) = [ 153 0 ];
+    data(:,:,3) = [ 225 255 ];
     bv_vmr.VMRData=data;
 
 function afni=get_expected_afni()
@@ -208,16 +208,16 @@ function afni=get_expected_afni()
 
     % data
     data=zeros(3,2,1,2);
-    data(:,:,1,1)=[2.2120 1.2407;-2.2588 3.5784; 0.3188 -1.3499];
-    data(:,:,1,2)=[1.8339 0.3426; 2.5365 4.4438;-1.3077  3.0349];
+    data(:,:,1,1)=[ 2.0317    1.3494;-3.6849   -0.2617;-1.0504   -0.2040];
+    data(:,:,1,2)=[ 0.5838   -0.3973; 1.7235    2.3387;-1.3265    0.4823];
 
     % add to image
     afni.img=data;
 
 function ds=get_expected_dataset()
     ds=struct();
-    ds.samples=[2.2120   -2.2588    0.3188    1.2407    3.5784   -1.3499;
-                1.8339    2.5365   -1.3077    0.3426    4.4438    3.0349];
+    ds.samples=[ 2.0317   -3.6849   -1.0504    1.3494   -0.2617   -0.2040;
+                 0.5838    1.7235   -1.3265   -0.3973    2.3387    0.4823];
     ds.fa.i=[1 2 3 1 2 3];
     ds.fa.j=[1 1 1 2 2 2];
     ds.fa.k=[1 1 1 1 1 1];
@@ -273,8 +273,8 @@ function nii=get_expected_nii()
     hdr.hist.originator = [ 2 1 1 1 ];
 
     data=zeros(3,2,1,2);
-    data(:,:,1,1)=[2.2120 1.2407;-2.2588 3.5784; 0.3188 -1.3499];
-    data(:,:,1,2)=[1.8339 0.3426; 2.5365 4.4438;-1.3077  3.0349];
+    data(:,:,1,1)=[ 2.0317  1.3494; -3.6849 -0.2617; -1.0504   -0.2040];
+    data(:,:,1,2)=[ 0.5838 -0.3973;  1.7235  2.3387; -1.3265    0.4823];
 
     nii=struct();
     nii.hdr=hdr;

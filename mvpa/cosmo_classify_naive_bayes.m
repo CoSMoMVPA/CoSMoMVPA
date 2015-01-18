@@ -20,10 +20,10 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 %     pred=cosmo_classify_naive_bayes(tr.samples,tr.sa.targets,te.samples,struct);
 %     disp([te.sa.targets pred])
 %     >      1     1
-%     >      2     1
+%     >      2     2
 %     >      3     5
 %     >      4     4
-%     >      5     5
+%     >      5     4
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
