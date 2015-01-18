@@ -37,8 +37,11 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
 %     %
 %     ds.samples=[2 0 -1 3 0 -1];
 %     %
+%     % convert neighborhood definition to matrix form
+%     nh_mat=cosmo_convert_neighborhood(nh,'matrix');
+%     %
 %     % clusterize the data
-%     cl=cosmo_clusterize(ds,nh);
+%     cl=cosmo_clusterize(ds.samples,nh_mat);
 %     %
 %     % show cluster indices
 %     cosmo_disp(cl)
