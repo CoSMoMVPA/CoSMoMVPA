@@ -16,16 +16,6 @@ function test_pdist_()
 
     has_pdist=cosmo_check_external('@stats',false);
     if has_pdist
-        other_func_err='stats:pdist:DistanceFunctionNotFound';
-    elseif cosmo_wtf('is_octave') && ~isempty(which('pdist'))
-        other_func_err='Octave:index-out-of-bounds';
-    else
-        other_func_err='';
-    end
-    assertExceptionThrown(@() cosmo_pdist(data,'foo'),other_func_err);
-
-    has_pdist=cosmo_check_external('@stats',false);
-    if has_pdist
         avae(pdist(data),d_eucl);
         avae(pdist(data,'euclidean'),d_eucl);
         avae(pdist(data,'correlation'),d_corr);
