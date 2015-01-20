@@ -170,7 +170,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
             % make temporal dimension the first one
             data=shiftdim(data,3);
         otherwise
-            error('need 3 or 4 dimensions, found %d', ndims);
+            error('need 3 or 4 dimensions, found %d', ndim);
     end
 
     % number of values in 1 temporal dimension + 3 spatial

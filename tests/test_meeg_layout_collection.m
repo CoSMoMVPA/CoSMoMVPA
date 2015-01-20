@@ -3,6 +3,14 @@ function test_suite=test_meeg_layout_collection
 
 
 function test_fieldtrip_correspondence
+
+    if ~(cosmo_check_external('fieldtrip') && cosmo_wtf('is_matlab'))
+        cosmo_notify_skip_test(['Comparison with fieldtrip output '...
+                       'is disabled because fieldtrip is not available']);
+        return
+    end
+
+
     lc=cosmo_meeg_layout_collection();
     rp_lay=randperm(numel(lc));
 

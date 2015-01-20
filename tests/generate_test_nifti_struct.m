@@ -2,23 +2,17 @@ function ni=generate_test_nifti_struct()
 % Generates a struct that behaves like a NIFTI struct
 %
 % NNO Aug 2013
-
-    voldim=[7 11 13];
-    voxdim=[3 3 3];
-    nsamples=20;
-
-    imgshape=[voldim nsamples];
-
     ni=struct();
 
-    ni.img=single(generate_random_deterministic(imgshape));
+    ds=cosmo_synthetic_dataset('size','normal');
+    ni.img=shiftdim(cosmo_unflatten(ds),1);
 
     hdr=struct();
 
     dime=struct();
     dime.datatype=16; %single
-    dime.dim=[4 imgshape 1 1 1];
-    dime.pixdim=[1 voldim 0 0 0 0];
+    dime.dim=[4 3 2 5 6 1 1 1];
+    dime.pixdim=[0 2 2 2 0 0 0 0];
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
         'slice_start','slice_duration','slice_end',...
         'scl_slope','scl_inter','slice_code','cal_max',...
@@ -39,24 +33,24 @@ function ni=generate_test_nifti_struct()
     hdr.hk=hk;
 
     hist=struct();
-    hist=set_all(hist,{'qform_code','sform_code'});
-    hist.originator=[1 1 1 1 0];
+    hist.sform_code=1;
+    hist.originator=[2 1 3 3];
     hist=set_all(hist,{'descrip','aux_file'},'');
-    hist=set_all(hist,{'qform_code','sform_code','quatern_b',...
+    hist=set_all(hist,{'qform_code','quatern_b',...
                         'quatern_d',...
                         'qoffset_x','qoffset_y','qoffset_z'});
     hist=set_all(hist,{'intent_name'},'');
 
-    hist.srow_x=[1 0 0 10];
-    hist.srow_y=[0 2 0 20];
-    hist.srow_z=[0 0 3 30];
+    hist.srow_x=[2 0 0 -1];
+    hist.srow_y=[0 2 0 -1];
+    hist.srow_z=[0 0 2 -1];
 
-    hist.quatern_c=1;
+    hist.quatern_c=0;
     hdr.hist=hist;
 
     ni.hdr=hdr;
 
-    function s=set_all(s, fns, v)
+function s=set_all(s, fns, v)
     % sets all fields in fns in struct s to v
     % if v is omitted it is set to 0.
     if nargin<3, v=0; end

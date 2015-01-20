@@ -21,6 +21,9 @@ function test_nii_fmri_dataset()
     assert_dataset_equal(ds,ds_nii);
 
 function test_bv_vmr_fmri_dataset()
+    if ~can_test_bv()
+        return
+    end
     uint_ds=get_uint8_dataset();
     bv_vmr=cosmo_map2fmri(uint_ds,'-bv_vmr');
     bless(bv_vmr);
@@ -31,6 +34,10 @@ function test_bv_vmr_fmri_dataset()
     bv_vmr.ClearObject();
 
 function test_bv_vmp_fmri_dataset()
+    if ~can_test_bv()
+        return
+    end
+
     ds=get_base_dataset();
     bv_vmp=cosmo_map2fmri(ds,'-bv_vmp');
     assert_bv_equal(bv_vmp, get_expected_bv_vmp());
@@ -41,6 +48,10 @@ function test_bv_vmp_fmri_dataset()
     bv_vmp.ClearObject();
 
 function test_bv_msk_fmri_dataset()
+    if ~can_test_bv()
+        return
+    end
+
     uint_ds=get_uint8_dataset();
     bv_msk=cosmo_map2fmri(uint_ds,'-bv_msk');
     bless(bv_msk);
@@ -50,6 +61,15 @@ function test_bv_msk_fmri_dataset()
     ds_bv_msk_lpi=cosmo_fmri_reorient(ds_bv_msk,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_msk_lpi,'translation');
     bv_msk.ClearObject();
+
+function tf=can_test_bv()
+    tf=cosmo_wtf('is_matlab') && cosmo_check_external('xff');
+    if ~tf
+        cosmo_notify_skip_test(['BrainVoyager fmri i/o cannot be '...
+                    'tested because ''xff'' is not '...
+                    'available']);
+    end
+
 
 function ds=get_base_dataset()
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);

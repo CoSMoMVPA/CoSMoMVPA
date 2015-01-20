@@ -2,11 +2,12 @@ function test_suite = test_cosmo_dataset_operations
     initTestSuite;
 
 function test_test_dataset
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset();
+
     [nsamples,nfeatures]=size(ds.samples);
 
-    assertEqual(nsamples,20);
-    assertEqual(nfeatures,1001);
+    assertEqual(nsamples,6);
+    assertEqual(nfeatures,6);
 
     fns=fieldnames(ds.sa);
     for k=1:numel(fns)
@@ -23,7 +24,7 @@ function test_test_dataset
     end
 
 function test_slicing
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset();
 
     % test features
     es=cosmo_slice(ds,[2 4],2);
@@ -31,12 +32,18 @@ function test_slicing
     assertEqual(es.sa,ds.sa);
     assertEqual(es.a,ds.a);
 
-    fs=cosmo_slice(ds,(1:1001)==2|(1:1001)==4,2);
+    fs=cosmo_slice(ds,1:6==2 | 1:6==4,2);
     assertEqual(es.samples,fs.samples);
-    assertEqual([es.fa.i; es.fa.j; es.fa.k], [2 4; 1 1;1 1]);
+    assertEqual([es.fa.i; es.fa.j; es.fa.k], [2 1; 1 2;1 1]);
+
+    if cosmo_wtf('is_matlab')
+        id_bad_index='MATLAB:badsubscript';
+    else
+        id_bad_index='Octave:invalid-index';
+    end
 
     f=@() cosmo_slice(ds,-1,2);
-    assertExceptionThrown(f,'MATLAB:badsubscript')
+    assertExceptionThrown(f,id_bad_index)
 
     f=@() cosmo_slice(ds,[2 4], 3);
     assertExceptionThrown(f,'')
@@ -46,16 +53,16 @@ function test_slicing
     assertEqual(es.samples,ds.samples([2 4],:))
     assertEqual(es.fa,ds.fa);
     assertEqual(es.a,ds.a);
-    assertEqual(es.sa.labels,{'bb','bb';'d','d'});
+    assertEqual(es.sa.targets,[2;2])
 
-    fs=cosmo_slice(ds,(1:20)==2|(1:20)==4);
+    fs=cosmo_slice(ds,(1:6)==2|(1:6)==4);
     assertEqual(es.samples,fs.samples);
 
     f=@() cosmo_slice(ds,-1);
-    assertExceptionThrown(f,'MATLAB:badsubscript')
+    assertExceptionThrown(f,id_bad_index)
 
 function test_stacking
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset();
 
     es=cosmo_stack({ds,ds});
     assertEqual(es.samples,[ds.samples;ds.samples])

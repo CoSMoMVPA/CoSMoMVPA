@@ -3,6 +3,11 @@ function test_suite = test_disp
 
 
 function test_disp_()
+    if cosmo_wtf('is_octave')
+        cosmo_notify_skip_test('Octave does not support ''evalc''');
+        return;
+    end
+
     aeq=@(s,y) assertEqual([s repmat(sprintf('\n'),size(s,1),1)],...
                                         evalc('cosmo_disp(y)'));
 

@@ -1,8 +1,8 @@
-function test_suite = test_cosmo_dataset_operations
+function test_suite = test_partitions
     initTestSuite;
 
 function test_nfold_partitioner()
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset('nchunks',5,'ntargets',4);
 
     p=cosmo_nfold_partitioner(ds);
     assertEqual(p, cosmo_nfold_partitioner(ds.sa.chunks));
@@ -25,7 +25,7 @@ function test_nfold_partitioner()
     end
 
 function test_nchoosek_partitioner()
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset('nchunks',5,'ntargets',4);
 
     p=cosmo_nfold_partitioner(ds);
     q=cosmo_nchoosek_partitioner(ds,1);

@@ -2,12 +2,12 @@ function test_suite = test_average_samples
     initTestSuite;
 
 function test_average_samples_
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset();
 
     a=cosmo_average_samples(ds,'ratio',.5);
 
     assertElementsAlmostEqual(sort(a.samples), sort(ds.samples));
-    assertElementsAlmostEqual(sort(a.samples(:,10)), sort(ds.samples(:,10)));
+    assertElementsAlmostEqual(sort(a.samples(:,3)), sort(ds.samples(:,3)));
 
     % check wrong inputs
     assertExceptionThrown(@()cosmo_average_samples(ds,'ratio',.1),'');
@@ -20,7 +20,7 @@ function test_average_samples_
 
     cosmo_check_dataset(a);
 
-    ds=cosmo_slice(ds,17,2);
+    ds=cosmo_slice(ds,3,2);
     ns=size(ds.samples,1);
     ds.samples=ds.sa.targets*1000+(1:ns)';
 

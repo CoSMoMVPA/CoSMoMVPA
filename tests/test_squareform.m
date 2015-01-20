@@ -10,14 +10,14 @@ function test_squareform_()
 
 
     assertElementsAlmostEqual(sf(vec),mx);
-    assertElementsAlmostEqual(sf(vec),mx,'tomatrix');
+    assertElementsAlmostEqual(sf(vec,'tomatrix'),mx);
     assertElementsAlmostEqual(sf(mx),vec);
-    assertElementsAlmostEqual(sf(mx),vec,'tovector');
+    assertElementsAlmostEqual(sf(mx,'tovector'),vec);
 
     assertExceptionThrown(@() sf(vec,'foo'),'');
     assertExceptionThrown(@() sf(mx,'foo'),'');
     assertExceptionThrown(@() sf(vec,struct()),...
-                                    'MATLAB:badSwitchExpression');
+                                    '');
     assertExceptionThrown(@() sf(struct()),'');
     assertExceptionThrown(@() sf(struct(),'tovector'),'');
     assertExceptionThrown(@() sf(struct(),'tomatrix'),'');

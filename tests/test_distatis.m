@@ -1,4 +1,4 @@
-function test_suite = test_statis
+function test_suite = test_distatis
     initTestSuite;
 
 

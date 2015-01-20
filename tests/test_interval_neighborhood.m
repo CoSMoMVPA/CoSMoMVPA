@@ -35,13 +35,20 @@ function test_interval_neighborhood_basis()
         end
     end
 
+    % test exceptionsclc
     aet=@(x,i)assertExceptionThrown(@()...
                         cosmo_interval_neighborhood(x{:}),i);
-    aet({ds},'MATLAB:minrhs');
-    aet({ds,'time'},'MATLAB:minrhs');
-    aet({ds,'x',2},'MATLAB:mustBeFieldName');
+
+
+    if cosmo_wtf('is_matlab')
+        id_missing_arg='MATLAB:minrhs';
+        id_missing_fieldname='MATLAB:mustBeFieldName';
+    else
+        id_missing_arg='Octave:undefined-function';
+        id_missing_fieldname='';
+    end
+    aet({ds},id_missing_arg);
+    aet({ds,'time'},id_missing_arg);
+    aet({ds,'x',2},id_missing_fieldname);
     aet({ds,'time',-1},'');
     aet({ds,'time',[2 3]},'');
-
-
-

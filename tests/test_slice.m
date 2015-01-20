@@ -3,6 +3,13 @@ function test_suite = test_slice
 
 
 function test_slice_arrays
+    if cosmo_wtf('is_matlab')
+        err_id_invalid_index='MATLAB:badsubscript';
+        err_id_out_of_bounds='MATLAB:badsubscript';
+    else
+        err_id_invalid_index='Octave:invalid-index';
+        err_id_out_of_bounds='Octave:index-out-of-bounds';
+    end
 
     % helper functions
     b=@(x)logical(x); % conversion to boolean
@@ -10,12 +17,11 @@ function test_slice_arrays
     % assert-equal
     aeq=@(args,v) assertEqual(cosmo_slice(args{:}),v);
 
-    % assert-raises
-    aet=@(args) assertExceptionThrown(@()cosmo_slice(args{:}),'');
-
-    % assert-raises with bad subscript
-    aet_bs=@(args) assertExceptionThrown(@()cosmo_slice(args{:}),...
-                                            'MATLAB:badsubscript');
+    % assert-raises with id
+    aet_with=@(args,id) assertExceptionThrown(@()cosmo_slice(args{:}),...
+                                            id);
+    % assert-raises with empty exception
+    aet=@(args) aet_with(args,'');
 
     % support boolean arrays
     xs={[0,1,2;3,4,5],{'a','b','c';'d','ee',''},b([0 1 1; 0 1 0])};
@@ -55,12 +61,12 @@ function test_slice_arrays
         aet({x,b([0 1 0 0]),2})
 
         % indices out of bounds
-        aet_bs({x,0})
-        aet_bs({x,3})
-        aet_bs({x,0,1})
-        aet_bs({x,3,1})
-        aet_bs({x,0,2})
-        aet_bs({x,4,2})
+        aet_with({x,0},err_id_invalid_index)
+        aet_with({x,3},err_id_out_of_bounds)
+        aet_with({x,0,1},err_id_invalid_index)
+        aet_with({x,3,1},err_id_out_of_bounds)
+        aet_with({x,0,2},err_id_invalid_index)
+        aet_with({x,4,2},err_id_out_of_bounds)
 
         % no support for 3D arrays
         x=repmat(x,[1 1 2]);
@@ -77,7 +83,13 @@ function test_slice_datasets()
     % (assumes that slicing of arrays works properly)
 
 
-    ds=generate_test_dataset();
+    if cosmo_wtf('is_matlab')
+        err_id_out_of_bounds='MATLAB:badsubscript';
+    else
+        err_id_out_of_bounds='Octave:index-out-of-bounds';
+    end
+
+    ds=cosmo_synthetic_dataset('size','normal');
 
     % index- and mask-based slicing
     rand_=@(n)rand(n,1);
@@ -104,7 +116,7 @@ function test_slice_datasets()
         % slice ds
         if oob
             if isnumeric(slice_arg)
-                exc='MATLAB:badsubscript';
+                exc=err_id_out_of_bounds;
             else
                 exc='';
             end

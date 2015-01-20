@@ -139,7 +139,11 @@ function msk=match_vectors(needle, haystack)
                 'cell with strings'],class(needle),class(haystack));
     end
 
-    msk=reshape(sum(matches,1)>0,size(haystack));
+    if isempty(matches)
+        msk=false(size(haystack));
+    else
+        msk=reshape(sum(matches,1)>0,size(haystack));
+    end
 
 function n=check_vec_or_empty(x)
     % this function returns the number of elements of the input

@@ -216,13 +216,15 @@ function stacked_layout=stack_channels(layouts)
     for k=1:nkeys
         key=keys{k};
         values_cell=cell(nlayout,1);
+        keep=false(nlayout,1);
         for j=1:nlayout
             layout=layouts{j};
             if ~isempty(layout)
                 values_cell{j}=layout.(key);
+                keep(j)=true;
             end
         end
-        stacked_layout.(key)=cat(1,values_cell{:});
+        stacked_layout.(key)=cat(1,values_cell{keep});
     end
 
 function layout=layout_ft_add_misc_labels(layout)

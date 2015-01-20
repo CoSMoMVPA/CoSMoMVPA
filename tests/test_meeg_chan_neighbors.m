@@ -14,10 +14,15 @@ function test_meeg_neighbors()
     % test a subset
     ntest=round(n*.5);
 
-
-    % test a subset for fieldtrip
-    % (fieldtrip is very slow, so testing all would take too long)
-    ntest_fieldtrip=1;
+    if ~(cosmo_check_external('fieldtrip') && cosmo_wtf('is_matlab'))
+        cosmo_notify_skip_test(['Comparison with fieldtrip output '...
+                       'is disabled because fieldtrip is not available']);
+        ntest_fieldtrip=0;
+    else
+        % test a subset for fieldtrip
+        % (fieldtrip is very slow, so testing all would take too long)
+        ntest_fieldtrip=1;
+    end
 
     % visit in random order
     rp=randperm(n);

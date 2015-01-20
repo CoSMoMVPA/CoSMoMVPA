@@ -8,6 +8,23 @@ function test_fmri_io_base
     exts={'.nii.gz', '.nii', '.hdr', '.img', '+orig.HEAD',...
               '+tlrc.BRIK','.vmp',...
               '.vmr', '.msk', };
+    keep_exts=true(numel(exts),1);
+
+    if ~usejava('jvm')
+        cosmo_notify_skip_test(['.nii.gz (gzipped) fmri i/o cannot be '...
+                    'tested because the java virtual machine is not '...
+                    'available']);
+        keep_exts=keep_exts && ~cosmo_match(exts,'.nii.gz');
+    end
+
+    if cosmo_wtf('is_octave') || ~cosmo_check_external('xff')
+        cosmo_notify_skip_test(['BrainVoyager fmri i/o cannot be '...
+                    'tested because ''xff'' is not '...
+                    'available']);
+        keep_exts=keep_exts && ~cosmo_match(exts,{'.vmp','.vmr','msk'});
+    end
+
+    exts=exts(keep_exts);
 
     n=numel(exts);
     for k=1:n

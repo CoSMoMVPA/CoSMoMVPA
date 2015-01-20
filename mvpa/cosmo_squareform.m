@@ -25,17 +25,18 @@ function s=cosmo_squareform(x, direction)
 %
 % NNO Jul 2014
 
+if ~ismatrix(x)
+    error('first input must be matrix or vector');
+end
 
 if nargin<2
-    if numel(size(x))~=2
-        error('Input must be matrix or vector');
-    end
-
     if isvector(x)
         direction='tomatrix';
     else
         direction='tovector';
     end
+elseif ~ischar(direction)
+    error('second argument must be a string');
 end
 
 if isempty(x)
@@ -97,8 +98,8 @@ switch direction
         s=s(:)';
 
     otherwise
-        error(['illegal direction argument ''%s'', must be one of ', ...
-                    '''tomatrix'',''tovector'''],direction);
+        error(['illegal direction argument, must be one of ', ...
+                    '''tomatrix'',''tovector''']);
 
 end
 
