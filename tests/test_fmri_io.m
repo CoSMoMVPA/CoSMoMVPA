@@ -17,7 +17,7 @@ function test_fmri_io_base
         keep_exts=keep_exts && ~cosmo_match(exts,'.nii.gz');
     end
 
-    if cosmo_wtf('is_octave') || ~cosmo_check_external('neuroelf')
+    if cosmo_wtf('is_octave') || ~cosmo_check_external('neuroelf',false)
         cosmo_notify_test_skipped(['BrainVoyager fmri i/o cannot be '...
                     'tested because ''neuroelf'' is not '...
                     'available']);
