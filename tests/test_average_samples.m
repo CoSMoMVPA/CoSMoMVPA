@@ -28,7 +28,7 @@ function test_average_samples_
 
     % no mixing of different targets
     delta=a.samples/1000-a.sa.targets;
-    assertTrue(all(.001<delta & delta<.05));
+    assertTrue(all(.001<=delta & delta<.05));
     assertElementsAlmostEqual(delta*3000,round(delta*3000));
 
 

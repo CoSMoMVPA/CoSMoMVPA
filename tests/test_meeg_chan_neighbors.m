@@ -15,7 +15,7 @@ function test_meeg_neighbors()
     ntest=round(n*.5);
 
     if ~(cosmo_check_external('fieldtrip') && cosmo_wtf('is_matlab'))
-        cosmo_notify_skip_test(['Comparison with fieldtrip output '...
+        cosmo_notify_test_skipped(['Comparison with fieldtrip output '...
                        'is disabled because fieldtrip is not available']);
         ntest_fieldtrip=0;
     else

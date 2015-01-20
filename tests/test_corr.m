@@ -14,7 +14,7 @@ function test_corr_
     aeaa(cosmo_corr(y,x),corr(y,x));
 
     if cosmo_wtf('is_octave')
-        cosmo_notify_skip_test(['Non-Pearson correlation cannot '...
+        cosmo_notify_test_skipped(['Non-Pearson correlation cannot '...
                         'be tested because Octave''s ''corr'' function '...
                         'does not suport it']);
 
@@ -31,7 +31,7 @@ function test_corr_
 
         id_minrhs='MATLAB:minrhs';
         id_unknown_type='stats:corr:UnknownType';
-        id_innerdim=''MATLAB:innerdim'';
+        id_innerdim='MATLAB:innerdim';
     end
 
 

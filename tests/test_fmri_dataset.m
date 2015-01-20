@@ -63,10 +63,10 @@ function test_bv_msk_fmri_dataset()
     bv_msk.ClearObject();
 
 function tf=can_test_bv()
-    tf=cosmo_wtf('is_matlab') && cosmo_check_external('xff');
+    tf=cosmo_wtf('is_matlab') && cosmo_check_external('neuroelf');
     if ~tf
-        cosmo_notify_skip_test(['BrainVoyager fmri i/o cannot be '...
-                    'tested because ''xff'' is not '...
+        cosmo_notify_test_skipped(['BrainVoyager fmri i/o cannot be '...
+                    'tested because ''neuroelf'' is not '...
                     'available']);
     end
 

@@ -4,7 +4,7 @@ function test_suite = test_disp
 
 function test_disp_()
     if cosmo_wtf('is_octave')
-        cosmo_notify_skip_test('Octave does not support ''evalc''');
+        cosmo_notify_test_skipped('Octave does not support ''evalc''');
         return;
     end
 
