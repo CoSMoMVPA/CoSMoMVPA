@@ -3,8 +3,6 @@ function test_suite = test_fmri_orientations
 
 
 function test_orientations()
-    has_afni=run_afni_command('afni -version > /dev/null', false);
-
     % make dataset
     ds=cosmo_synthetic_dataset('size','big');
     ds=cosmo_slice(ds,1);
@@ -37,22 +35,6 @@ function test_orientations()
         orient_idx=get_feature_index(ds,ijk);
         xyz=ds.a.vol.mat*ijk;
 
-        if has_afni
-            ds_rs=afni_resample(ds,fmt,orient); % in AFNI
-            assertEqual(cosmo_fmri_orientation(ds_rs),orient);
-
-            % verify equality with resampled dataset
-            ijk_rs=ds_rs.a.vol.mat\xyz;
-            idx_rs=get_feature_index(ds_rs,ijk_rs);
-            assertElementsAlmostEqual(ds.samples(:,orient_idx),...
-                                      ds_rs.samples(:,idx_rs),...
-                                      'absolute',1e-5);
-
-
-        elseif k==1
-            warning('Skipping i/o test with AFNI binaries');
-        end
-
         % verify equality with re-orirented dataset
         ds_ro=cosmo_fmri_reorient(ds,orient);  % using CoSMoMVPA
         assertEqual(cosmo_fmri_orientation(ds_ro),orient);
@@ -68,6 +50,31 @@ function test_orientations()
         ds2=cosmo_fmri_reorient(ds_ro,orig_orient);
         assertEqual(ds,ds2);
     end
+
+function test_fmri_orientations_with_afni_binary()
+    afni_command='which afni && afni -version > /dev/null';
+    has_afni=run_afni_command(afni_command, false);
+    if ~has_afni
+        cosmo_notify_test_skipped('afni binaries not available');
+        return
+    end
+
+    ds=cosmo_synthetic_dataset('size','big');
+    fmt='.nii';
+    orients=get_orients();
+    i=ceil(rand()*numel(orients));
+    orient=orients{i};
+
+    ds_rs=afni_resample(ds,fmt,orient); % in AFNI
+    assertEqual(cosmo_fmri_orientation(ds_rs),orient);
+
+    % verify equality with resampled dataset
+    ijk_rs=ds_rs.a.vol.mat\xyz;
+    idx_rs=get_feature_index(ds_rs,ijk_rs);
+    assertElementsAlmostEqual(ds.samples(:,orient_idx),...
+                              ds_rs.samples(:,idx_rs),...
+                              'absolute',1e-5);
+
 
 function idxs=get_feature_index(ds, ijk)
     n=size(ijk,2);
