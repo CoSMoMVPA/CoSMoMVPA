@@ -34,7 +34,7 @@ function test_corr_with_type
 function test_corr_exceptions
     if cosmo_wtf('is_octave')
         id_minrhs='Octave:undefined-function';
-        id_unknown_type='Octave:invalid-fun-call';
+        id_unknown_type='Octave:mixed-string-concat';
         id_innerdim='Octave:nonconformant-args';
     else
 
