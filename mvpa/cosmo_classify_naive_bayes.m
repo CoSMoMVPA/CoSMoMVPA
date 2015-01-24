@@ -99,6 +99,11 @@ function model=train(samples_train, targets_train)
     for k=1:nclasses
         msk=targets_train==classes(k);
         n=sum(msk); % number of samples
+        if n<2
+            error(['Cannot train: class %d has only %d samples, %d '...
+                    'are required'],n,classes(k));
+        end
+
         d=samples_train(msk,:); % samples in this class
         mu=mean(d); %mean
         mus(k,:)=mu;
