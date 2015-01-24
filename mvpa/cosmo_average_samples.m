@@ -78,6 +78,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
     % deal with input parameters
     defaults.nrep=1;
+    defaults.seed=[];
 
     params=cosmo_structjoin(defaults, varargin);
     if ~isfield(params,'ratio'), error('Need argument ''ratio'''); end
@@ -114,9 +115,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
         % generate 'nset' random permutations of 1:n and concatenate these.
         % this ensures that the numbers of times specific samples are
         % selected differ by 1 at most.
-        rp_cells=cellfun(@randperm,repmat({n},1,nrep),...
-                                    'UniformOutput',false);
-        rp=[rp_cells{:}];
+
+        rp=repeated_randperm(n,nrep,params.seed);
 
         % select random indices
         for j=1:nrep
@@ -129,3 +129,26 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
     % join results
     ds_avg=cosmo_stack(res);
+
+
+function rp=repeated_randperm(nelem,nrep,seed)
+    n=nelem*nrep;
+    if isempty(seed)
+        rp_elems=cosmo_rand(1,n);
+    else
+        rp_elems=cosmo_rand(1,n,'seed',seed);
+    end
+
+    rp=zeros(1,n);
+    for k=1:nrep
+        idxs=(k-1)*nelem+(1:nelem);
+        rp_elem=rp_elems(idxs);
+        [foo,i]=sort(rp_elem);
+        rp(idxs)=i;
+    end
+
+
+
+
+
+
