@@ -63,12 +63,15 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
     [ntest, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
 
-    if knn>nfeatures
-        error('Cannot find nearest %d neighbors: only %d features',...
-                    knn, nfeatures);
+    if nfeatures~=nfeatures_ || ntrain_~=ntrain
+        error('illegal input size');
     end
 
-    if nfeatures~=nfeatures_ || ntrain_~=ntrain, error('illegal input size'); end
+    if knn>ntrain
+        error(['Cannot find nearest %d neighbors: only %d samples '...
+                    'in training set'],...
+                    knn, ntrain);
+    end
 
     % allocate space for output
     all_predicted=zeros(ntest, knn);
