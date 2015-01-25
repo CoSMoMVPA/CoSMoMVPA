@@ -177,7 +177,7 @@ function run_doctest(preamb, expr, wants, filename, line)
     if failed
         % raise exception with informative error message
         prefix=sprintf('%s\n',CosmoDocTestCase.linkto(filename, line));
-        assertTrue(false,[prefix msg]);
+        error([prefix msg]);
     end
 end
 
