@@ -146,8 +146,10 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                   : each chunk present twice => paired-sample t-test
 %    * statname=='F': all chunks are unique => one-way ANOVA
 %                   : each chunk present N times => repeated measures ANOVA
+%    See cosmo_montecarlo_cluster_stat for examples on how .sa.targets and
+%    .sa.chunks should be set for different statistics.
 %
-% See also: anova1, ttest, ttest2
+% See also: anova1, ttest, ttest2, cosmo_montecarlo_cluster_stat
 %
 % NNO Jan 2014
 
