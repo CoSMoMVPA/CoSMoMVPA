@@ -32,13 +32,13 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',10);
-%     test_chunk=1;
+%     test_chunk=2;
 %     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
 %     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
 %     pred=cosmo_classify_svm(tr.samples,tr.sa.targets,te.samples,struct);
 %     disp(pred)
-%     >      5
-%     >      1
+%     >      3
+%     >      2
 %     >      3
 %     >      4
 %     >      5
