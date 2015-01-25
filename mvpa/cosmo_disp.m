@@ -208,7 +208,7 @@ function tf=has_size(x)
     try
         size(x);
         tf=true;
-    catch me
+    catch
         tf=false;
     end
 
