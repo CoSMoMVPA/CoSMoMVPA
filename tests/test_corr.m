@@ -34,12 +34,10 @@ function test_corr_with_type
 function test_corr_exceptions
     if cosmo_wtf('is_octave')
         id_minrhs='Octave:undefined-function';
-        id_unknown_type='Octave:mixed-string-concat';
         id_innerdim='Octave:nonconformant-args';
     else
 
         id_minrhs='MATLAB:minrhs';
-        id_unknown_type='stats:corr:UnknownType';
         id_innerdim='MATLAB:innerdim';
     end
 
@@ -49,7 +47,5 @@ function test_corr_exceptions
     y=randn(10,5);
 
     aet({},id_minrhs);
-    aet({x,'foo'},id_unknown_type);
-    aet({y,'foo'},id_unknown_type);
     aet({y',x},id_innerdim);
 
