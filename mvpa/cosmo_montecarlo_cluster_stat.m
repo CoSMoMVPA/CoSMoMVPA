@@ -235,7 +235,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
                                         iter==niter);
 
         if show_progress
-            p_min=1-max(less_than_orig_count,[],2)/max(iter,1);
+            iter_pos=max(iter,1);
+            p_min=(iter_pos-max(less_than_orig_count,[],2))/2;
             p_range=sqrt(1/4/max(iter,1));
             msg=sprintf('p = %.3f / %.3f [+/-%.3f] (left/right)',...
                                     p_min,p_range);
