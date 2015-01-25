@@ -76,6 +76,14 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
     %
     % based on pseudo-code from wikipedia:
     % http://en.wikipedia.org/wiki/Mersenne_twister
+    persistent cached_seed
+    persistent cached_rng_state
+
+    if isequal(cached_seed,seed)
+        rng_state=cached_rng_state;
+        return;
+    end
+
     max_uint32=2^32-1;
     state=uint64(zeros(625,1));
     state(1)=bitand(uint64(seed),max_uint32);
@@ -104,6 +112,7 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
         rng_state=state;
     end
 
+    cached_rng_state=rng_state;
 
 
 
