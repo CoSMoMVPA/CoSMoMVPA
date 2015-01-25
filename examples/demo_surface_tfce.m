@@ -67,6 +67,9 @@ measure=@(x,opt) cosmo_structjoin('samples',mean(x.samples,2),'sa',x.sa);
 
 surf_ds=cosmo_searchlight(vol_ds,nbrhood,measure);
 
+fprintf('Univariate surface data:\n');
+cosmo_disp(surf_ds);
+
 %% Average data in each chunk
 % for this example only consider the samples in the first condition
 % (targets==1), and average the samples in each chunk
@@ -80,6 +83,7 @@ fn_surf_ds=fullfile(output_path, 'digit_target1.niml.dset');
 
 % save to disc
 cosmo_map2surface(surf_ds, fn_surf_ds);
+fprintf('Input data saved to %s\n', fn_surf_ds);
 
 %% Run Threshold-Free Cluster Enhancement (TFCE)
 
@@ -95,9 +99,11 @@ cosmo_map2surface(surf_ds, fn_surf_ds);
 % define neighborhood for each feature
 % (cosmo_cluster_neighborhood can be used also for meeg or volumetric
 % fmri datasets)
-radius=NaN; % only consider direct neighbors: if two nodes share edge
 cluster_nbrhood=cosmo_cluster_neighborhood(surf_ds,...
                                         'vertices',vertices,'faces',faces);
+
+fprintf('Cluster neighborhood:\n');
+cosmo_disp(cluster_nbrhood);
 
 opt=struct();
 
@@ -120,12 +126,19 @@ opt.h0_mean=0;
 % them as the null argument.
 opt.null=[];
 
+fprintf('Running multiple-comparison correction with these options:\n');
+cosmo_disp(opt);
+
 % Run TFCE-based cluster correction for multiple comparisons.
 % The output has z-scores for each node indicating the probablity to find
 % the same, or higher, TFCE value under the null hypothesis
 tfce_ds=cosmo_montecarlo_cluster_stat(surf_ds,cluster_nbrhood,opt);
 
 %% Show results
+
+fprintf('TFCE z-score dataset\n');
+cosmo_disp(tfce_ds);
+
 nvertices=size(vertices,1);
 disp_opt=struct();
 disp_opt.DataRange=[-2 2];
