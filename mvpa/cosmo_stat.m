@@ -279,7 +279,7 @@ function [stat,df,stat_label]=ttest2_wrapper(samples,targets,chunks,...
 
     if ~strcmp(type,'between')
         error(['%s stat: each chunk must contain the same '...
-                'two targets'], stat_name)
+                'two targets'], stat_name);
     end
 
     m1=targets==1;
@@ -437,7 +437,7 @@ function [t,df]=quick_ttest2(x,y)
     t=(mux-muy) .* sqrt(scaling./ss);
 
 function y=cdf_wrapper(name, x, df1, df2)
-    ensure_has_stats_toolbox()
+    ensure_has_stats_toolbox();
     switch name
         case 'Ttest'
             assert(nargin==3);
@@ -451,7 +451,7 @@ function y=cdf_wrapper(name, x, df1, df2)
 
 
 function y=norminv_wrapper(x)
-    ensure_has_stats_toolbox()
+    ensure_has_stats_toolbox();
     y=norminv(x);
 
 function ensure_has_stats_toolbox()
