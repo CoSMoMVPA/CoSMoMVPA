@@ -333,7 +333,7 @@ function nbrhood=interval_neighborhood(ds,dim_pos,arg,unused)
     dim_label=ds.a.fdim.labels{dim_pos};
     do_connect=get_default_connect(arg,dim_label);
 
-    nbrhood=cosmo_interval_neighborhood(ds,dim_label,do_connect);
+    nbrhood=cosmo_interval_neighborhood(ds,dim_label,'radius',do_connect);
 
 
 function do_connect=get_default_connect(arg, label)

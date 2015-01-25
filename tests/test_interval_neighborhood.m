@@ -21,7 +21,7 @@ function test_interval_neighborhood_basis()
 
             radius=radii(j);
 
-            nh=cosmo_interval_neighborhood(ds,'time',radius);
+            nh=cosmo_interval_neighborhood(ds,'time','radius',radius);
             assert(numel(nh.neighbors)==narg);
             assertEqual(nh.fa.time,1:narg);
             assertEqual(nh.a.fdim.values,...
@@ -40,15 +40,10 @@ function test_interval_neighborhood_basis()
                         cosmo_interval_neighborhood(x{:}),i);
 
 
-    if cosmo_wtf('is_matlab')
-        id_missing_arg='MATLAB:minrhs';
-        id_missing_fieldname='MATLAB:mustBeFieldName';
-    else
-        id_missing_arg='Octave:undefined-function';
-        id_missing_fieldname='';
-    end
-    aet({ds},id_missing_arg);
-    aet({ds,'time'},id_missing_arg);
-    aet({ds,'x',2},id_missing_fieldname);
+    aet({ds},'');
+    aet({ds,'time'},'');
+    aet({ds,'x',2},'');
     aet({ds,'time',-1},'');
     aet({ds,'time',[2 3]},'');
+    aet({ds,'time','radius'},'');
+    aet({ds,'time','radius',-1},'');

@@ -119,7 +119,8 @@ for k=1:nchantypes
     % define neighborhood over time; for each time point the time
     % point itself is included, as well as the two time points before and
     % the two time points after it
-    nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',time_radius);
+    nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',...
+                                            'radius',time_radius);
 
     % run the searchlight using the measure, measure arguments, and
     % neighborhood defined above.

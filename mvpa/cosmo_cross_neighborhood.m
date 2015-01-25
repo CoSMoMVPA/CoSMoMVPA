@@ -22,8 +22,8 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
 %     % 5 bins wide and time 3 bins wide. Each neighborhood contains all
 %     % the channels, repeated up to 5*3=15 times (fewer at the border)
 %     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
-%     freq_nbrhood=cosmo_interval_neighborhood(ds,'freq',3);
-%     time_nbrhood=cosmo_interval_neighborhood(ds,'time',5);
+%     freq_nbrhood=cosmo_interval_neighborhood(ds,'freq','radius',3);
+%     time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',5);
 %     nbrhood=cosmo_cross_neighborhood(ds, {freq_nbrhood, time_nbrhood},...
 %                                                    'progress',false);
 %     cosmo_disp(nbrhood.a.fdim)

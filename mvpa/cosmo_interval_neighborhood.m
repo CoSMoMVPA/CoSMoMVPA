@@ -1,12 +1,12 @@
-function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
+function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
 % compute neighborhoods stretching intervals
 %
-% nbrhood=cosmo_interval_neighborhood(ds, label, radius)
+% nbrhood=cosmo_interval_neighborhood(ds, label, 'radius', radius)
 %
 % Inputs:
 %   ds            dataset struct
 %   label         dimension label in ds.a.fdim.labels
-%   radius        neighborhood size
+%   'radius', r   neighborhood radius
 %
 % Returns:
 %   nbrhood       struct with fields:
@@ -22,7 +22,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %     %
 %     % neighborhoods with bins 5 (=2*1+1) frequency bands wide
 %     % (every neighborhood contains all channels and time points)
-%     nbrhood=cosmo_interval_neighborhood(ds,'freq',2);
+%     nbrhood=cosmo_interval_neighborhood(ds,'freq','radius',2);
 %     cosmo_disp(nbrhood.a.fdim)
 %     > .labels
 %     >   { 'freq' }
@@ -50,7 +50,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 %     %
 %     % Neighborhoods just the frequency bin itself
 %     % (every neighborhood contains all channels)
-%     nbrhood=cosmo_interval_neighborhood(ds,'time',2);
+%     nbrhood=cosmo_interval_neighborhood(ds,'time','radius',2);
 %     cosmo_disp(nbrhood.a.fdim)
 %     > .labels
 %     >   { 'time' }
@@ -82,10 +82,8 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
 % See also: cosmo_neighborhood, cosmo_searchlight
 %
 % NNO Feb 2014
-    if ~isscalar(radius) || radius<0
-        error('radius must be positive scalar');
-    end
 
+    radius=get_radius(varargin{:});
 
     cosmo_check_dataset(ds);
 
@@ -151,3 +149,26 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, radius)
     nbrhood.neighbors=neighbors;
 
     cosmo_check_neighborhood(nbrhood);
+
+
+function radius=get_radius(varargin)
+    if nargin>=1 && isnumeric(varargin{1})
+        error(['Usage: %s(...,''radius'',r)\n',...
+                '(Note that as of Jan 2015 the syntax for this '...
+                'function has changed)'],...
+                mfilename())
+    end
+
+    opt=cosmo_structjoin(varargin);
+
+    if ~isfield(opt,'radius')
+        error('Missing option ''radius''');
+    end
+
+    radius=opt.radius;
+
+    if ~isscalar(radius) || radius<0
+        error('radius must be positive scalar');
+    end
+
+

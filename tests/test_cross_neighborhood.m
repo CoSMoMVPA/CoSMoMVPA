@@ -24,8 +24,8 @@ function test_cross_neighborhood_basis()
     nfeatures=size(ds.samples,2);
 
     % define neighborhoods
-    freq_nbrhood=cosmo_interval_neighborhood(ds,'freq',2);
-    time_nbrhood=cosmo_interval_neighborhood(ds,'time',1);
+    freq_nbrhood=cosmo_interval_neighborhood(ds,'freq','radius',2);
+    time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
     chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,'count',5,...
                                 'chantype','all','label','dataset');
     all_nbrhoods={chan_nbrhood, freq_nbrhood, time_nbrhood};
