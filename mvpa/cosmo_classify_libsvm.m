@@ -11,8 +11,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 %     .autoscale       If true (default), z-scoring is done on the training
 %                      set; the test set is z-scored using the mean and std
 %                      estimates from the training set.
-%     ?                any option supported by either libsvm or matlab's
-%                      svmtrain.
+%     ?                any option supported by either libsvm's svmtrain.
 %
 % Output
 %   predicted          Qx1 predicted data classes for samples_test
@@ -66,9 +65,9 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     try
         model=svmtrain(targets_train, samples_train, opt_str);
         predicted=svmpredict(NaN(ntest,1), samples_test, model, '-q');
-    catch me
+    catch
         cosmo_check_external('libsvm');
-        rethrow(me);
+        rethrow(lasterror());
     end
 
 
