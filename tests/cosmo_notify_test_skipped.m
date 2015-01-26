@@ -1,4 +1,6 @@
 function cosmo_notify_test_skipped(reason)
+    % notify that a unit test was skipped
+    %
     db=dbstack('-completenames');
 
     db_up=db(2);
