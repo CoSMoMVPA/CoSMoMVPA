@@ -323,22 +323,36 @@ class CoSMoModules(object):
                  'match',
                  'dim_match',
                  'dim_find',
+                 'dim_slice',
                  'isfield',
                  'cartprod',
+                 'index_unique',
+                 'rand',
+                 'tail',
+                 'overlap'
                  ],
 
 
         neighborhood=['spherical_neighborhood',
                       'interval_neighborhood',
                       'surficial_neighborhood',
+                      'meeg_chan_neighborhood',
+                      'cross_neighborhood',
                       'sphere_offsets',
                       'searchlight',
-                      'neighborhood',
-                      ],
+                    ],
+
+        clustering=['cluster_neighborhood',
+                      'convert_neighborhood',
+                      'montecarlo_cluster_stat',
+                      'check_neighborhood',
+                      'measure_clusters',
+                      'clusterize'],
 
         develop=['run_tests',
                  'publish_run_scripts',
-                 'wtf'
+                 'wtf',
+                 'notify_test_skipped',
                  ],
 
         visualization=['disp',
@@ -379,19 +393,39 @@ class CoSMoModules(object):
                      'oddeven_partitioner',
                      'chunkize',
                      'check_partitions'
-                     ]
+                     ],
+
+        meeg=       ['meeg_chan_neighbors',
+                    'meeg_senstype_collection',
+                    'meeg_chantype',
+                    'meeg_find_layout',
+                    'meeg_layout_collection',
+                    'meeg_chan_neighborhood',
+                    'meeg_senstype2layout_mapping',
+                    ],
+
+        fmri=       ['fmri_reorient',
+                    'fmri_orientation',
+                    'fmri_convert_xform',
+                    'fmri_deoblique'
+                    ],
         )
+
+
 
     _name2full= [('datasets','Dataset input/output'),
                 ('operations','Dataset operations'),
                 ('processing','Dataset processing'),
+                ('meeg','MEEG related functions'),
+                ('fmri','fMRI related functions'),
                 ('visualization','Data visualuzation'),
                 ('correlations','Correlations'),
                 ('classification','Classification and cross-validation'),
                 ('rsa','Representational similarity analysis'),
                 ('partitions','Partitioning (for cross-validation)'),
                 ('neighborhood','Neighborhoods and searchlight'),
-                ('stats','Statistics'),
+                ('clustering','Feature-based clustering'),
+                ('stats','Univariate statistics'),
                 ('utils','Utility functions'),
                 ('helpers','Misceleanous helper functions'),
                 ('develop','Developer functions')]
