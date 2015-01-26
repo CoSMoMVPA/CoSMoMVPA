@@ -84,7 +84,11 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
     cell_indices=quick_mat2cell_vec(i,cell_sizes);
     %assertEqual(cell_indices,cell_indices2);
 
-    singleton_idx=i(unq_pos);
+    if isempty(i)
+        singleton_idx=idxs;
+    else
+        singleton_idx=i(unq_pos);
+    end
 
     if return_unique_values
         unique_values=get_unique_values(values,singleton_idx,...
