@@ -15,18 +15,55 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     .metric      Distance metric used in pdist to compute pair-wise
 %                  distances between samples in ds. It accepts any
 %                  metric supported by pdist (default: 'correlation')
-%     .type:       Type of correlation between target_dsm and ds,
+%     .type        Type of correlation between target_dsm and ds,
 %                  one of 'Pearson' (default), 'Spearman', or 'Kendall'
 %
 %
-%   Returns
-%    ds_sa           Struct with fields:
+% Output:
+%    ds_sa           Dataset struct with fields:
 %      .samples      Scalar correlation value
 %      .sa           Struct with field:
 %        .labels     {'rho'}
 %
+% Examples:
+%     % generate synthetic dataset with 6 classes (conditions),
+%     % one sample per class
+%     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
+%     %
+%     % create target dissimilarity matrix to test whether
+%     % - class 1 and 2 are similar (and different from classes 3-6)
+%     % - class 3 and 4 are similar (and different from classes 1,2,5,6)
+%     % - class 5 and 6 are similar (and different from classes 1-4)
+%     target_dsm=1-kron(eye(3),ones(2));
+%     %
+%     % show the target dissimilarity matrix
+%     cosmo_disp(target_dsm);
+%     > [ 0         0         1         1         1         1
+%     >   0         0         1         1         1         1
+%     >   1         1         0         0         1         1
+%     >   1         1         0         0         1         1
+%     >   1         1         1         1         0         0
+%     >   1         1         1         1         0         0 ]
+%     %
+%     % compute similarity between pairw-wise similarity of the
+%     % patterns in the dataset and the target dissimilarity matrix
+%     dcm_ds=cosmo_target_dsm_corr_measure(ds,'target_dsm',target_dsm);
+%     %
+%     % Pearson correlation is about 0.56
+%     cosmo_disp(dcm_ds)
+%     > .samples
+%     >   [ 0.562 ]
+%     > .sa
+%     >   .labels
+%     >     { 'rho' }
+%     >   .metric
+%     >     { 'correlation' }
+%     >   .type
+%     >     { 'Pearson' }
 %
-% ACC August 2013
+% Notes
+%
+% ACC August 2013, NNO Jan 2015
 
     % process input arguments
     params=cosmo_structjoin('type','Pearson',... % set default
@@ -85,5 +122,5 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     ds_sa=struct();
     ds_sa.samples=rho;
     ds_sa.sa.labels={'rho'};
-    ds_sa.sa.metric=params.metric;
-    ds_sa.sa.type=params.type;
+    ds_sa.sa.metric={params.metric};
+    ds_sa.sa.type={params.type};
