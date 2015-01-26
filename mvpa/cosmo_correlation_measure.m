@@ -24,7 +24,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %    .corr_type   Type of correlation: 'Pearson','Spearman','Kendall'.
 %                 The default is 'Pearson'.
 %    .post_corr   Operation performed after correlation. (default: @atanh)
-%    .output      'corr' (default): correlations weighted by template
+%    .output      'mean' (default): correlations weighted by template
 %                 'raw' or 'correlation': correlations between all classes
 %                 'one_minus_correlation': 1 minus correlations
 %                 'by_partition': provide weighted correlations for each
@@ -51,7 +51,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     >   [ 1.23 ]
 %     > .sa
 %     >   .labels
-%     >     'corr'
+%     >   { 'corr' }
 %     %
 %     % use Spearman correlations
 %     c=cosmo_correlation_measure(ds,'corr_type','Spearman');
@@ -60,7 +60,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     >   [ 1.28 ]
 %     > .sa
 %     >   .labels
-%     >     'corr'
+%     >   { 'corr' }
 %     %
 %     % get raw output
 %     c_raw=cosmo_correlation_measure(ds,'output','correlation');
@@ -96,11 +96,11 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     > [  0.447    -0.525
 %     >   -0.538     0.959 ]
 %
-%     % compute for each partition separately. .ds.chunks in the output
+%     % compute for each fold separately. .ds.chunks in the output
 %     % reflects the test chunk in each partition
 %     ds=cosmo_synthetic_dataset('type','fmri','nchunks',4);
 %     partitions=cosmo_nfold_partitioner(ds);
-%     c=cosmo_correlation_measure(ds,'output','by_partition',...
+%     c=cosmo_correlation_measure(ds,'output','mean_by_fold',...
 %                         'partitions',partitions);
 %     cosmo_disp(c.samples);
 %     > [  1.72
@@ -125,7 +125,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     > [ 1.87      1.25      1.51      1.68      1.71     0.879 ]
 %     cosmo_disp(res.sa)
 %     > .labels
-%     >   'corr'
+%     >   { 'corr' }
 %
 % Notes:
 %   - by default the post_corr_func is set to @atanh. This is equivalent to
@@ -135,7 +135,7 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     are averaged *prior* to computing the correlations
 %   - if multiple partitions are present, then the correlations are
 %     computed separately for each partition, and then averaged (unless
-%     output==
+%     the ''output'' argument is set differently)
 %
 % NNO May 2014
 
@@ -244,27 +244,21 @@ ds_sa=struct();
 switch params.output
     case 'mean'
         ds_sa.samples=mean(cat(2,pdata{:}),2);
-        ds_sa.sa.labels='corr';
+        ds_sa.sa.labels={'corr'};
     case {'raw','correlation','one_minus_correlation'}
         ds_sa.samples=mean(cat(2,pdata{:}),2);
 
         nclasses=numel(classes);
-        ds_sa.sa.half1=reshape(repmat((1:nclasses)',nclasses,1),[],1);
-        ds_sa.sa.half2=reshape(repmat((1:nclasses),nclasses,1),[],1);
+        ds_sa.sa.half1=reshape(repmat((1:nclasses),nclasses,1),[],1);
+        ds_sa.sa.half2=reshape(repmat((1:nclasses)',nclasses,1),[],1);
 
         ds_sa.a.sdim=struct();
         ds_sa.a.sdim.labels={'half1','half2'};
         ds_sa.a.sdim.values={classes, classes};
 
-    case 'by_partition'
+    case 'mean_by_fold'
         ds_sa.sa.partition=(1:npartitions)';
         ds_sa.samples=[pdata{:}]';
-
-        % store chunks, but only samples in which
-        % a chunk was used just once for testing
-        test_chunks_msk=test_chunks_count==1;
-        test_chunks_last(~test_chunks_msk)=NaN;
-        ds.sa.chunks=test_chunks_last;
 
     otherwise
         assert(false,'this should be caught by get_data');
@@ -278,7 +272,7 @@ function c=apply_post_corr_func(post_corr_func,c)
 
 function agg_c=aggregate_correlations(c,template,template_msk,output)
     switch output
-        case {'mean','by_partition'}
+        case {'mean','mean_by_fold'}
             pcw=c(template_msk).*template(template_msk);
             agg_c=sum(pcw(:));
         case {'raw','correlation'}
