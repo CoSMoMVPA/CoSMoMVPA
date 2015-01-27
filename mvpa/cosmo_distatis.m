@@ -439,7 +439,7 @@ function [dsms,nclasses,dim_labels,dim_values]=get_dsms(data_cell)
             % kosher
             if is_ds
                 cosmo_stack({cosmo_slice(data,1),...
-                                cosmo_slice(data_first,1)});
+                                cosmo_slice(data_first,1)},1,'unique');
             end
         end
     end

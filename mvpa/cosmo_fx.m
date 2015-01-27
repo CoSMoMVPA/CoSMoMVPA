@@ -99,6 +99,6 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
     end
 
     % join the results
-    f_ds=cosmo_stack(res,dim,false);
+    f_ds=cosmo_stack(res,dim);
 
 

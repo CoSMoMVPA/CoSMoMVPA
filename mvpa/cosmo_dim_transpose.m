@@ -16,7 +16,7 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim)
         sp{k}=copy_attr(sp{k}, dim_labels, target_dim);
     end
 
-    ds=cosmo_stack(sp, target_dim, false);
+    ds=cosmo_stack(sp, target_dim, 1);
 
     src_name=dim2attr_name(source_dim);
     for k=1:numel(dim_labels)
