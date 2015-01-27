@@ -1,13 +1,22 @@
-function ds_stacked=cosmo_stack(datasets,dim,check_)
+function ds_stacked=cosmo_stack(ds_cell,varargin)
 % stacks multiple datasets to yield a single dataset
 %
-% ds_stacked=cosmo_stack(datasets[,dim])
+% ds_stacked=cosmo_stack(datasets[,dim,merge])
 %
 % Inputs
 %   datasets     Nx1 cell with input datasets
 %   dim          dimension over which data is stacked. This should be
-%                either 1 (stack samples) or 2 (stack features).
+%                either 1 (stack .samples and .sa) or 2 (stack features
+%                and .fa).
 %                The default is 1.
+%   merge        Merge strategy for the dimension other than which is
+%                stacked (i.e. .fa if dim==1 and .sa if dim==2), as well as
+%                the dataset attributes (.a). Must be one of:
+%                - 'drop'            drop all elements
+%                - 'drop_nonunique'  elements differing are dropped
+%                - 'unique'          raise an exception if elements differ
+%                - I                 use data from datasets{I}
+%                The default is drop_nonunique
 %
 % Ouput:
 %   ds_stacked   Stacked dataset. If dim==1 [or dim==2] and the K-th
@@ -92,127 +101,256 @@ function ds_stacked=cosmo_stack(datasets,dim,check_)
 % NNO Sep 2013
 
 
-    if nargin<2,
-        dim=1;
-    end
+    [dim, merge]=process_parameters(ds_cell, varargin{:});
 
-    if nargin<3
-        check_=true;
-    end
 
-    if ~iscell(datasets)
-        error('expected cell input');
-    end
+    n=numel(ds_cell);
 
-    n=numel(datasets);
     if n==0
         error('empty cell input')
     end
 
-    ds_stacked=datasets{1}; % take first dataset as starting point for output
-
-    if all(dim~=[1 2])
-        error('dim should be 1 or 2');
+    sample_values=get_struct_values(ds_cell, 'samples');
+    if isempty(sample_values)
+        error('missing field .samples');
     end
+    sample_sizes=get_dimension_sizes(dim, sample_values);
+    ds_stacked.samples=stack_values(dim, sample_values, '.samples');
 
     % set the field names for the dimension to be stacked, and the other
     % one
-    attrs_fns={'sa','fa'};
-    stack_fn=attrs_fns{dim};
+    attrs_keys={'sa','fa'};
+    stack_key=attrs_keys{dim};
+
+    to_stack_attr=get_struct_values(ds_cell, stack_key);
+    if ~isempty(to_stack_attr)
+
+        ds_stacked.(stack_key)=stack_structs(dim,to_stack_attr,...
+                                                sample_sizes,...
+                                                ['.' stack_key]);
+    end
 
     other_dim=3-dim; % the other dimension
-    merge_fn=attrs_fns{other_dim};
+    merge_key=attrs_keys{other_dim};
 
-    % stack attributes over dim
-    if isfield(ds_stacked, stack_fn)
-        fns=fieldnames(ds_stacked.(stack_fn));
-        nfn=numel(fns);
-
-        for k=1:nfn
-            % check k-th fieldname
-            fn=fns{k};
-            vs=cell(n,1);
-            for j=1:n
-                ds=datasets{j};
-
-                % check presence of fieldname
-                if ~isfield(ds.(stack_fn),fn)
-                    error('field name missing for %d-th input: .%s.%s', ...
-                                        j, stack_fn, fn);
-                end
-
-                v=ds.(stack_fn).(fn);
-
-                v_size=size(v, other_dim);
-                if j==1
-                    v_size_expected=v_size;
-                elseif v_size_expected~=v_size;
-                    error('input %d has %d values in dimension %d, ',...
-                            'for %s.%s, first input has %d values',...
-                            j, v_size, other_dim, ...
-                            stack_fn, fn, v_size_expected);
-                end
-
-                vs{j}=v;
-            end
-
-            ds_stacked.(stack_fn).(fn)=cat_values(dim,vs);
-        end
-    end
-
-    if check_
-        % for the other dim, just make sure that the attributes are identical
-        if isfield(ds_stacked, merge_fn)
-            fns=fieldnames(ds_stacked.(merge_fn));
-            nfn=numel(fns);
-
-            for k=1:nfn
-                % check k-th fieldname
-                fn=fns{k};
-                for j=1:n
-                    ds=datasets{j};
-                    % require that the fieldname is present
-                    if ~isfield(ds.(merge_fn),fn)
-                        error('field name not found for %d-th input: .%s.%s', ...
-                                            j, merge_fn, fn);
-                    end
-                    % if different throw an error
-                    if ~isequal(ds.(merge_fn).(fn), ds_stacked.(merge_fn).(fn))
-                        error('value mismatch: .%s.%s', merge_fn, fn);
-                    end
-                end
-            end
-        end
+    to_merge_attr=get_struct_values(ds_cell, merge_key);
+    if ~isempty(to_merge_attr)
+        ds_stacked.(merge_key)=merge_structs(to_merge_attr,merge,...
+                                    ['.' merge_key]);
     end
 
 
 
+    to_merge_a=get_struct_values(ds_cell, 'a');
+    if ~isempty(to_merge_a)
+        ds_stacked.a=merge_structs(to_merge_a,merge,...
+                                    ['.a']);
+    end
 
-    % we're good for the attributes - let's stack the sample data
-    vs=cell(1,n);
-    other_dim_sizes=zeros(1,n);
+
+
+function [dim, merge]=process_parameters(ds_cell, varargin)
+    narg=numel(varargin);
+    if narg<1 || isempty(varargin{1})
+        dim=1;
+    else
+        dim=varargin{1};
+    end
+
+    if narg<2 || isempty(varargin{2})
+        merge='drop_nonunique';
+    else
+        merge=varargin{2};
+    end
+
+    if ~iscell(ds_cell)
+        error('expected cell input');
+    end
+
+    if ~isscalar(dim) || all(dim~=[1 2])
+        error('dim should be 1 or 2');
+    end
+
+
+
+function values=get_struct_values(struct_cell, key)
+    n=numel(struct_cell);
+    values=cell(n,1);
+    has_values=false;
     for k=1:n
-        samples=datasets{k}.samples;
-        vs{k}=samples;
-        other_dim_sizes=size(samples,other_dim);
+        s=struct_cell{k};
+        if isfield(s,key)
+            has_values=true;
+            values{k}=s.(key);
+        end
     end
 
-    if ~all(other_dim_sizes==other_dim_sizes(1))
-        i=find(other_dim_sizes~=other_dim_sizes(1));
-        error(['size mismatch between elements #%d (%d) and %%d (%d) ' ...
-                    'in dimension %d'], ...
-                    1, dim_sizes(1), i, dim_sizes(i), otherdim);
-    end
-
-    ds_stacked.samples=cat(dim,vs{:});
-
-    if check_
-        cosmo_check_dataset(ds_stacked);
+    if ~has_values
+        values=[];
     end
 
 
-function c=cat_values(dim, vs)
+function keys=get_struct_keys(struct_cell)
+    n=numel(struct_cell);
+    keys=cell(n,1);
+    for k=1:n
+        keys{k}=fieldnames(struct_cell{k});
+    end
+
+
+function s=merge_structs(vs, merge, where)
+    if strcmp(merge,'drop')
+        s=struct();
+        return;
+    elseif isnumeric(merge)
+        if ~isscalar(merge) || merge<1 || ...
+                merge>numel(vs) || round(merge)~=merge
+            error(['''merge'' parameter, when an integer, must be in'...
+                        'the range 1:%d'],numel(vs));
+        end
+        s=vs{merge};
+        return;
+    elseif ~cosmo_match({merge},{'drop_nonunique','unique'})
+        error('illegal value for ''merge'' parameter');
+    end
+
+
+    all_keys_cell=get_struct_keys(vs);
+
+    keys=unique(cat(1,all_keys_cell{:}));
+    nkeys=numel(keys);
+
+    s=struct();
+
+    for k=1:nkeys
+        key=keys{k};
+        values=get_struct_values(vs, key);
+
+        [has_unique_elem, unique_elem]=get_single_unique_element(values);
+
+        if ~has_unique_elem
+            switch merge
+                case 'drop_nonunique'
+                    % do not store values
+                    continue;
+
+                case 'unique'
+                    error('non-unique elements in %s.%s',...
+                            where, key);
+
+                otherwise
+                    error('illegal value for merge: %s', merge);
+            end
+        end
+
+        s.(key)=unique_elem;
+    end
+
+function [has_unique_elem, unique_elem]=get_single_unique_element(vs)
+    n=numel(vs);
+
+    has_elem=false;
+    unique_elem=[];
+
+    for k=1:n
+        v=vs{k};
+        if isempty(v)
+            continue;
+        end
+
+        if has_elem
+            if ~isequal(v, unique_elem)
+                has_unique_elem=false;
+                return;
+            end
+        else
+            has_elem=true;
+            unique_elem=v;
+        end
+    end
+
+    has_unique_elem=true;
+
+
+
+function s=stack_structs(dim, structs, expected_sizes, where)
+    n=numel(structs);
+
+    for k=1:n
+        s=structs{k};
+
+        if ~isstruct(s)
+            error('%d-th input is not a struct', k);
+        end
+
+        keys=sort(fieldnames(s));
+
+        if k==1
+            nkeys=numel(keys);
+
+            stack_args=cell(n, nkeys);
+
+            % keep track of the keys in the first input,
+            % and how many values it has along the other dimension
+            first_keys=keys;
+
+        elseif ~isequal(keys, first_keys)
+            error('key mismatch between 1st and %d-th input in %s', ...
+                                k, where);
+        end
+
+        for j=1:nkeys
+            key=keys{j};
+            v=s.(key);
+
+            if size(v,dim)~=expected_sizes(k)
+                error(['size mismatch for %d-th input in %s.%s along '...
+                            'dimension %d'],...
+                            k, where, key, dim);
+            end
+
+            stack_args{k,j}=v;
+        end
+    end
+
+    % allocate space for output
+    s=struct();
+
+    for j=1:nkeys
+        key=keys{j};
+        s.(key)=stack_values(dim, stack_args(:,j), where);
+    end
+
+function sizes=get_dimension_sizes(dim, vs)
+    n=numel(vs);
+    sizes=zeros(n,1);
+    for k=1:n
+        sizes(k)=size(vs{k},dim);
+    end
+
+function ensure_same_size_along_dim(dim, vs, where)
+    % throw an error if element sizes along vs is not the same
+
+    sizes=get_dimension_sizes(dim, vs);
+    if numel(sizes)>1
+        m=sizes(1)~=sizes(2:end);
+        if any(m)
+            i=find(m,1)+1;
+            error(['size mismatch along dimension %d between 1st '...
+                        'and %-dth input for %s'], dim, i, where);
+        end
+    end
+
+
+function c=stack_values(dim, vs, where)
+    % stacks the contents of vs along dimension dim, or throw an error
+    % if sizes are not compatible
+    other_dim=3-dim;
+    ensure_same_size_along_dim(other_dim, vs, where);
+
     if iscell(vs) && ~isempty(vs) && ischar(vs{1})
+        % cell with strings needs special care, because normal cat
+        % produces a character array, not a cell with strings
         transpose=dim==2;
 
         vcat=cat(1,vs{:});
@@ -224,3 +362,5 @@ function c=cat_values(dim, vs)
     else
         c=cat(dim, vs{:});
     end
+
+

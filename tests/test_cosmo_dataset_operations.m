@@ -61,21 +61,5 @@ function test_slicing
     f=@() cosmo_slice(ds,-1);
     assertExceptionThrown(f,id_bad_index)
 
-function test_stacking
-    ds=cosmo_synthetic_dataset();
 
-    es=cosmo_stack({ds,ds});
-    assertEqual(es.samples,[ds.samples;ds.samples])
-    assertEqual(es.sa.targets,repmat(ds.sa.targets,2,1));
-    assertEqual(es.fa,ds.fa);
-
-    fs=cosmo_stack({ds,ds},1);
-    assertEqual(es,fs)
-    fs.fa.i(1)=0;
-    assertExceptionThrown(@()cosmo_stack({es,fs}),'');
-
-    es=cosmo_stack({ds,ds},2);
-    assertEqual(es.samples,[ds.samples ds.samples])
-    es.sa.targets(1)=0;
-    assertExceptionThrown(@()cosmo_stack({es,ds}),'');
 
