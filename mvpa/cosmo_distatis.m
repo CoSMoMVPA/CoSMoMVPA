@@ -54,10 +54,6 @@ function res=cosmo_distatis(ds, varargin)
 %     >     0.268     0.952     0.965     0.462     0.943      1.04
 %     >         0         0         0         0         0         0 ]@16x6
 %     > .fa
-%     >   .nvoxels
-%     >     [ 3         4         3         3         4         3 ]
-%     >   .radius
-%     >     [ 1         1         1         1         1         1 ]
 %     >   .center_ids
 %     >     [ 1         2         3         4         5         6 ]
 %     >   .i
@@ -65,6 +61,10 @@ function res=cosmo_distatis(ds, varargin)
 %     >   .j
 %     >     [ 1         1         1         2         2         2 ]
 %     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .nvoxels
+%     >     [ 3         4         3         3         4         3 ]
+%     >   .radius
 %     >     [ 1         1         1         1         1         1 ]
 %     >   .quality
 %     >     [ 0.685     0.742     0.617     0.648     0.757     0.591 ]
