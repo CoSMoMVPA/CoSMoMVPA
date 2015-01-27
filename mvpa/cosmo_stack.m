@@ -45,13 +45,6 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %     >   -1.05      2.04    -0.209    -0.486    -0.955      2.74
 %     >   -1.33     0.482      2.39     0.502      1.17     -0.48 ]
 %     cosmo_disp(merged.sa)
-%     > .targets
-%     >   [ 1
-%     >     2
-%     >     3
-%     >     1
-%     >     2
-%     >     3 ]
 %     > .chunks
 %     >   [ 1
 %     >     1
@@ -59,6 +52,13 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %     >     2
 %     >     2
 %     >     2 ]
+%     > .targets
+%     >   [ 1
+%     >     2
+%     >     3
+%     >     1
+%     >     2
+%     >     3 ]
 %     %
 %     % data can also be merged over features, by using dim=2
 %     % here generated data simulates two (tiny) regions of interest
@@ -107,7 +107,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
     n=numel(ds_cell);
 
     if n==0
-        error('empty cell input')
+        error('empty cell input');
     end
 
     sample_values=get_struct_values(ds_cell, 'samples');

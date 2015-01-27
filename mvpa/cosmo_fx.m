@@ -23,12 +23,12 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %     > [ 0.593    -0.452    -0.985         2     -0.39     0.312
 %     >   -0.42       2.3     0.585     0.503      2.46    -0.199 ]
 %     cosmo_disp(f_ds.sa)
-%     > .targets
-%     >   [ 1
-%     >     2 ]
 %     > .chunks
 %     >   [ 1
 %     >     1 ]
+%     > .targets
+%     >   [ 1
+%     >     2 ]
 %
 %     % Compute the average sample value for each unique combination
 %     % of targets and chunks:

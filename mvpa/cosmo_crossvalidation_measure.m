@@ -152,7 +152,7 @@ partitions=params.partitions;
 
 params=rmfield(params,'classifier');
 params=rmfield(params,'partitions');
-[pred, accuracy,chunks]=cosmo_crossvalidate(ds,classifier,...
+[pred,accuracy,chunks]=cosmo_crossvalidate(ds,classifier,...
                                         partitions,params);
 % <@@<
 ds_sa=struct();
@@ -161,10 +161,26 @@ switch params.output
     case 'accuracy'
         ds_sa.samples=accuracy;
         ds_sa.sa.labels={'accuracy'};
+
     case {'predictions','raw'}
         ds_sa.sa.targets=ds.sa.targets;
         ds_sa.sa.chunks=chunks;
         ds_sa.samples=pred(:);
+
+    case 'accuracy_by_chunk'
+        keep=find(~isnan(chunks));
+        [idxs,chunks_cell]=cosmo_index_unique({chunks(keep)});
+        nchunks=numel(idxs);
+
+        ds_sa.sa.chunks=chunks_cell{1};
+
+        ds_sa.samples=zeros(nchunks,1);
+        for k=1:nchunks
+            idx=keep(idxs{k});
+            ds_sa.samples(k)=mean(ds.sa.targets(idx)==pred(idx));
+        end
+
+
     otherwise
         error('Illegal output parameter %s', params.output);
 end

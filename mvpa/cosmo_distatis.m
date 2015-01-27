@@ -76,6 +76,14 @@ function res=cosmo_distatis(ds, varargin)
 %     >       { 'i'  'j'  'k' }
 %     >     .values
 %     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     >   .sdim
+%     >     .labels
+%     >       { 'targets1'  'targets2' }
+%     >     .values
+%     >       { [ 1    [ 1
+%     >           2      2
+%     >           3      3
+%     >           4 ]    4 ] }
 %     >   .vol
 %     >     .mat
 %     >       [ 2         0         0        -3
@@ -86,14 +94,6 @@ function res=cosmo_distatis(ds, varargin)
 %     >       [ 3         2         1 ]
 %     >     .xform
 %     >       'scanner_anat'
-%     >   .sdim
-%     >     .labels
-%     >       { 'targets1'  'targets2' }
-%     >     .values
-%     >       { [ 1    [ 1
-%     >           2      2
-%     >           3      3
-%     >           4 ]    4 ] }
 %     > .sa
 %     >   .targets1
 %     >     [ 1
@@ -279,7 +279,7 @@ function [ew,v]=eigen_weights(x, feature_id, opt)
                 'litmus test, you would be able to  '...
                 'implement DISTATIS), consider to use the option:  '...
                 '''abs_correlation'',true'],msg);
-            error(msg)
+            error(msg);
         end
     end
 
