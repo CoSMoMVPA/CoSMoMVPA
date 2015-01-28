@@ -71,7 +71,6 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
     defaults=struct();
     defaults.count=Inf;
     defaults.fitness=@(x)max(x,[],2);
-    defaults.keep_if=@(x)true;
     opt=cosmo_structjoin(defaults,varargin{:});
 
     % check sanity of input
