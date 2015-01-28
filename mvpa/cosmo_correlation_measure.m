@@ -27,8 +27,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %    .output      'mean' (default): correlations weighted by template
 %                 'raw' or 'correlation': correlations between all classes
 %                 'one_minus_correlation': 1 minus correlations
-%                 'by_partition': provide weighted correlations for each
-%                                 partition
+%                 'mean_by_fold': provide weighted correlations for each
+%                                 fold in the partitions.
 %
 %
 % Output:
