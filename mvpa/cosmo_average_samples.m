@@ -8,9 +8,10 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     .samples      NS x NF
 %     .sa           with fields .targets and .chunks
 %   'ratio', ratio  ratio (between 0 and 1) of samples to select for
-%                   each average. If >=1 then it indicates how many samples
-%                   to select for each average.
-%   'nrep', nrep    number of repeated sampling operations for each
+%                   each average. Not compatible with 'ratio'
+%   'count', c      number of samples to select for each average.
+%                   Not compatible with 'ratio'.
+%   'repeats', r    number of repeated sampling operations for each
 %                   combination of targets and chunks (default: 1).
 %
 % Returns
@@ -53,7 +54,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     % randomly and average these; repeat the random selection process 4
 %     % times. Each sample in 'ds' is used twice (=.5*4) as an element
 %     % to compute an average. The output has 24 samples
-%     ds_avg2=cosmo_average_samples(ds,'ratio',.5,'nrep',4);
+%     ds_avg2=cosmo_average_samples(ds,'ratio',.5,'repeats',4);
 %     cosmo_disp([ds_avg2.sa.targets ds_avg2.sa.chunks]);
 %     > [ 1         1
 %     >   1         2
@@ -80,49 +81,28 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     defaults.nrep=1;
     defaults.seed=[];
 
-    params=cosmo_structjoin(defaults, varargin);
-    if ~isfield(params,'ratio'), error('Need argument ''ratio'''); end
-
-    ratio=params.ratio;
-    nrep=params.nrep;
+    opt=cosmo_structjoin(defaults, varargin);
     averager=@(x)mean(x,1); % to average samples
 
     % split by unique target-chunk combinations
     ds_splits=cosmo_split(ds,{'targets','chunks'});
+    nsplits=numel(ds_splits);
+    split_counts=cellfun(@(x)size(x.samples,1),ds_splits);
+
+    split_sample_ids=get_split_sample_ids(split_counts,opt);
+    nrepeat=size(split_sample_ids,2);
+    assert(size(split_sample_ids,1)==nsplits);
 
     % allocate space for output
-    nsplits=numel(ds_splits);
-    res=cell(nsplits,nrep);
+
+    res=cell(nsplits,nrepeat);
 
     for k=1:nsplits
         ds_split=ds_splits{k};
-        n=size(ds_split.samples,1);
 
-        if ratio<1
-            % specified ratio
-            nselect=round(n*ratio);
-        else
-            nselect=ratio;
-        end
-
-        % check validity of ratio
-        if nselect==0
-            error('split %d - select zero samples?', k);
-        elseif nselect>n
-            error('split %d - only %d < %d samples', k, n, nselect);
-        end
-
-        % generate 'nset' random permutations of 1:n and concatenate these.
-        % this ensures that the numbers of times specific samples are
-        % selected differ by 1 at most.
-
-        rp=repeated_randperm(n,nrep,params.seed);
-
-        % select random indices
-        for j=1:nrep
-            rp_idxs=(j-1)*nselect+(1:nselect);
-            idxs=rp(rp_idxs);
-            ds_split_sel=cosmo_slice(ds_split,idxs);
+        for j=1:nrepeat
+            sample_ids=split_sample_ids{k,j};
+            ds_split_sel=cosmo_slice(ds_split,sample_ids);
             res{k,j}=cosmo_fx(ds_split_sel,averager,[]);
         end
     end
@@ -131,24 +111,57 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     ds_avg=cosmo_stack(res);
 
 
-function rp=repeated_randperm(nelem,nrep,seed)
-    n=nelem*nrep;
-    if isempty(seed)
-        rp_elems=cosmo_rand(1,n);
+function [nselect,nrepeat]=get_selection_params(split_counts,opt)
+    if isfield(opt,'count') && ~isempty(opt.count)
+        if isfield(opt,'ratio') && ~isempty(opt.ratio)
+            error(['''count'' and ''ratio'' options are mutually '...
+                        'exclusive']);
+        end
+        nselect=opt.count*ones(size(split_counts));
+    elseif isfield(opt,'ratio') && ~isempty(opt.ratio)
+        nselect=round(opt.ratio*split_counts);
     else
-        rp_elems=cosmo_rand(1,n,'seed',seed);
+        nselect=split_counts;
     end
 
-    rp=zeros(1,n);
-    for k=1:nrep
-        idxs=(k-1)*nelem+(1:nelem);
-        rp_elem=rp_elems(idxs);
-        [foo,i]=sort(rp_elem);
-        rp(idxs)=i;
+    wrong_nselect_mask=any(nselect<=0 | nselect>split_counts);
+    if any(wrong_nselect_mask)
+        wrong_pos=find(wrong_nselect_mask,1);
+        error('cannot select %d samples, as only %d are present',...
+                nselect(wrong_pos), split_counts(wrong_pos));
+    end
+
+    if isfield(opt,'repeats') && ~isempty(opt.repeats)
+        nrepeat=opt.repeats;
+    else
+        nrepeat=1;
     end
 
 
+function sample_ids=get_split_sample_ids(split_counts,opt)
+    [nselect,nrepeat]=get_selection_params(split_counts,opt);
 
+    nsplits=numel(split_counts);
+    nsamples=sum(split_counts);
 
+    if isfield(opt,'seed') && ~isempty(opt.seed)
+        rp=cosmo_rand(nsamples, nrepeat, 'seed', opt.seed);
+    else
+        rp=cosmo_rand(nsamples, nrepeat);
+    end
 
+    sample_ids=cell(nsplits, nrepeat);
+
+    row_first=1;
+
+    for k=1:nsplits
+        row_last=row_first+split_counts(k)-1;
+
+        for r=1:nrepeat
+            [unused,i]=sort(rp(row_first:row_last,r));
+            sample_ids{k,r}=i(1:nselect(k));
+        end
+
+        row_first=row_last+1;
+    end
 

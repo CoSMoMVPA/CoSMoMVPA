@@ -77,7 +77,7 @@ cosmo_disp(surf_ds);
 % for group analysis: set chunks to (1:nsubj)', assuming each sample is
 % data from a single participant
 surf_ds=cosmo_slice(surf_ds,surf_ds.sa.targets==1);
-surf_ds=cosmo_average_samples(surf_ds,'ratio',1);
+surf_ds=cosmo_average_samples(surf_ds);
 
 fn_surf_ds=fullfile(output_path, 'digit_target1.niml.dset');
 
