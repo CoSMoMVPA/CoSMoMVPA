@@ -8,7 +8,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     .samples      NS x NF
 %     .sa           with fields .targets and .chunks
 %   'ratio', ratio  ratio (between 0 and 1) of samples to select for
-%                   each average. Not compatible with 'ratio'
+%                   each average. Not compatible with 'ratio' (default: 1).
 %   'count', c      number of samples to select for each average.
 %                   Not compatible with 'ratio'.
 %   'repeats', r    number of repeated sampling operations for each
@@ -39,10 +39,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     >   2         2
 %     >   1         3
 %     >   2         3 ]@18x2
-%     %
-%     % for each unique target-chunk combination, select 60% of the samples
-%     % randomly and average these. The output has 6 samples.
-%     ds_avg=cosmo_average_samples(ds,'ratio',.6);
+%     % average each unique combiniation of chunks and targets
+%     ds_avg=cosmo_average_samples(ds);
 %     cosmo_disp([ds_avg.sa.targets ds_avg.sa.chunks]);
 %     > [ 1         1
 %     >   1         2
@@ -50,6 +48,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     >   2         1
 %     >   2         2
 %     >   2         3 ]
+%     %
 %     % for each unique target-chunk combination, select 50% of the samples
 %     % randomly and average these; repeat the random selection process 4
 %     % times. Each sample in 'ds' is used twice (=.5*4) as an element
