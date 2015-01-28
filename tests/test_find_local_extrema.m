@@ -1,4 +1,4 @@
-function test_suite=test_find_local_maxima
+function test_suite=test_find_local_extrema
     initTestSuite
 
 function test_find_local_maxima_basics
