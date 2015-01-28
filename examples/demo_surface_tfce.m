@@ -139,6 +139,14 @@ tfce_ds=cosmo_montecarlo_cluster_stat(surf_ds,cluster_nbrhood,opt);
 fprintf('TFCE z-score dataset\n');
 cosmo_disp(tfce_ds);
 
+nfeatures=size(tfce_ds.samples,2);
+percentiles=(1:nfeatures)/nfeatures*100;
+plot(percentiles,sort(tfce_ds.samples))
+title('sorted TFCE z-scores');
+xlabel('feature percentile');
+ylabel('z-score');
+
+
 nvertices=size(vertices,1);
 disp_opt=struct();
 disp_opt.DataRange=[-2 2];
