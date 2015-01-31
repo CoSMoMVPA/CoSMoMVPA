@@ -1,11 +1,11 @@
 %% MEEG time-lock searchlight
 %
-% This example shows MVPA analyses performed on MEEG data. 
+% This example shows MVPA analyses performed on MEEG data.
 %
 % The input dataset involved a paradigm with electrical median nerve
 % stimulation for durations of 2s at 20Hz.
 %
-% Using a time-channel neighborhood, a searchlight map is computed 
+% Using a time-channel neighborhood, a searchlight map is computed
 % indicating in time and space (channel) the pre-stimulation period can be
 % distinguished from the peri/post stimulation period.
 %
@@ -126,7 +126,7 @@ measure_args.partitions=cosmo_nchoosek_partitioner(ds_tl,'half');
 %% run searchlight
 sl_tl_ds=cosmo_searchlight(ds_tl,nbrhood,measure,measure_args,...
                                       'center_ids',center_ids);
-%% visualize results
+%% visualize timeseries results
 
 % deduce layout from output
 layout=cosmo_meeg_find_layout(sl_tl_ds);
@@ -135,23 +135,22 @@ fprintf('The output uses layout %s\n', layout.name);
 % map to FT struct for visualization
 sl_tl_ft=cosmo_map2meeg(sl_tl_ds);
 
-
-close(gcf)
+figure();
 cfg = [];
 cfg.interactive = 'yes';
 cfg.zlim=[-1 1];
 cfg.layout       = layout;
 
-
 % show figure with plots for each sensor
 ft_multiplotER(cfg, sl_tl_ft);
 
+%% visualize topology results
 % show figure with topology for 0 to 600ms after stimulus onset in bins of
 % 100 ms
-figure
+figure();
 cfg.xlim=-0.1:0.1:0.5;
 ft_topoplotER(cfg, sl_tl_ft);
 
-% Show citation information
+%% Show citation information
 cosmo_check_external('-cite');
 
