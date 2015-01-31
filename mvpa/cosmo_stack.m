@@ -295,8 +295,9 @@ function s=stack_structs(dim, structs, expected_sizes, where)
             first_keys=keys;
 
         elseif ~isequal(keys, first_keys)
-            error('key mismatch between 1st and %d-th input in %s', ...
-                                k, where);
+            delta=setxor(keys, first-keys);
+            error(['key mismatch between 1st and %d-th input in %s ' ...
+                        'for key ''%s'''], k, where, delta{1});
         end
 
         for j=1:nkeys
@@ -304,9 +305,10 @@ function s=stack_structs(dim, structs, expected_sizes, where)
             v=s.(key);
 
             if size(v,dim)~=expected_sizes(k)
-                error(['size mismatch for %d-th input in %s.%s along '...
-                            'dimension %d'],...
-                            k, where, key, dim);
+                error(['size mismatch in %d-th input: size(%s.%s,%d)=%d'...
+                        ', but size(.samples,%d)=%d'],...
+                            k, where, key, dim, size(v,dim), ...
+                            dim, expected_sizes(k));
             end
 
             stack_args{k,j}=v;
