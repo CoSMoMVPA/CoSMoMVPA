@@ -165,6 +165,7 @@ switch params.output
     case {'predictions','raw'}
         ds_sa.sa=ds.sa;
         ds_sa.samples=pred(:);
+        ds_sa.sa.chunks=chunks;
 
     case 'accuracy_by_chunk'
         keep=find(~isnan(chunks));
