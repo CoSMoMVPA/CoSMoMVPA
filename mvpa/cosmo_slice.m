@@ -77,8 +77,12 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %     >   .note
 %     >     'an example'
 %     %
-%     % select third and second samples (in that order)
-%     sliced_ds=cosmo_slice(ds, [3 2], 1);
+%     % (snippet) select samples (row) in a dataset
+%     % ds is a dataset struct
+%     sample_ids=[3 2];
+%     % select third and second sample (in that order)
+%     sliced_ds=cosmo_slice(ds,sample_ids,1);
+%     %
 %     cosmo_disp(sliced_ds);
 %     > .samples
 %     >   [ 3         7        11
