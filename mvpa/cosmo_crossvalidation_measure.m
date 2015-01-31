@@ -163,8 +163,7 @@ switch params.output
         ds_sa.sa.labels={'accuracy'};
 
     case {'predictions','raw'}
-        ds_sa.sa.targets=ds.sa.targets;
-        ds_sa.sa.chunks=chunks;
+        ds_sa.sa=ds.sa;
         ds_sa.samples=pred(:);
 
     case 'accuracy_by_chunk'
