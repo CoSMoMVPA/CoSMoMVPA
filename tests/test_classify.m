@@ -11,8 +11,8 @@ function test_classify_lda
 function test_classify_naive_bayes
     cfy=@cosmo_classify_naive_bayes;
     handle=get_predictor(cfy);
-    assert_predictions_equal(handle,[8 8 3 8 8 8 8 9 8 8 9 8 8 ...
-                                    8 8 8 8 8 8 8 8 8 8 8 8 8 8]');
+    assert_predictions_equal(handle,[1 7 3 9 2 2 8 9 7 4 7 2 4 ...
+                                    8 2 7 7 7 1 2 7 1 7 2 7 1 9 ]');
     assert_throws_illegal_input_exceptions(cfy)
 
 function test_classify_nn

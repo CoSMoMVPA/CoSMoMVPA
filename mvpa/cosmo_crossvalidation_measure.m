@@ -45,7 +45,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(acc_ds);
 %     > .samples
-%     >   [ 0.583 ]
+%     >   [ 0.917 ]
 %     > .sa
 %     >   .labels
 %     >     { 'accuracy' }

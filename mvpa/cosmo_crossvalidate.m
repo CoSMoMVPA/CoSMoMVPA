@@ -39,20 +39,20 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                                                       partitions);
 %     % show targets, predicted labels, and accuracy
 %     disp([ds.sa.targets pred chunks])
-%     >      3     5     1
+%     >      3     3     1
 %     >      4     4     1
 %     >      5     5     1
 %     >      3     3     2
 %     >      4     5     2
 %     >      5     5     2
-%     >      3     5     3
-%     >      4     5     3
+%     >      3     3     3
+%     >      4     4     3
 %     >      5     5     3
-%     >      3     5     4
+%     >      3     3     4
 %     >      4     4     4
 %     >      5     5     4
 %     disp(accuracy)
-%     >     0.5833
+%     >     0.9167
 %     %
 %     % use take-2-chunks out for testing crossvalidation, LDA classifier
 %     partitions=cosmo_nchoosek_partitioner(ds,2);

@@ -17,13 +17,15 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 %     test_chunk=1;
 %     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
 %     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
-%     pred=cosmo_classify_naive_bayes(tr.samples,tr.sa.targets,te.samples,struct);
+%     unused=struct();
+%     pred=cosmo_classify_naive_bayes(tr.samples,tr.sa.targets,...
+%                                        te.samples,unused);
 %     disp([te.sa.targets pred])
 %     >      1     1
 %     >      2     2
-%     >      3     5
+%     >      3     3
 %     >      4     4
-%     >      5     4
+%     >      5     5
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
@@ -47,10 +49,9 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 
 function predicted=test(model, samples_test)
     mus=model.mus;
-    stds=model.stds;
-    class_probs=model.class_probs;
+    vars=model.vars;
+    log_class_probs=model.log_class_probs;
     classes=model.classes;
-    nclasses=numel(classes);
 
     [ntest,nfeatures]=size(samples_test);
     if nfeatures~=size(mus,2)
@@ -61,24 +62,24 @@ function predicted=test(model, samples_test)
 
     for k=1:ntest
         sample=samples_test(k,:);
-        ps=fast_normcdf(sample, mus, stds);
+        log_ps=log_normal_pdf(sample, mus, vars);
 
         % make octave more compatible with matlab: convert nan to 1
-        ps(isnan(ps))=1;
+        log_ps(isnan(log_ps))=1;
 
         % being 'naive' we assume independence - so take the product of the
-        % p values. (for better precision we take the log of the probablities
-        % and sum them)
-        test_prob=sum(log(ps),2)+class_probs;
+        % p values. (for better precision we take the log of the
+        % probablities and sum them)
+        log_test_prob=sum(log_ps,2)+log_class_probs;
 
         % find the one with the highest probability
-        [unused, mx_idx]=max(test_prob);
+        [unused, mx_idx]=max(log_test_prob);
 
         predicted(k)=classes(mx_idx);
     end
 
-function ps=fast_normcdf(xs, mus, stds)
-    ps=.5*erfc(-bsxfun(@minus,xs,mus)./(stds*sqrt(2)));
+function ps=log_normal_pdf(xs, mus, vars)
+    ps=-.5*(log(2*pi*vars) + bsxfun(@minus,xs,mus).^2./vars);
 
 
 function model=train(samples_train, targets_train)
@@ -87,31 +88,36 @@ function model=train(samples_train, targets_train)
         error('size mismatch');
     end
 
-    classes=unique(targets_train);
+    [class_idxs,classes_cell]=cosmo_index_unique({targets_train});
+    classes=classes_cell{1};
     nclasses=numel(classes);
 
     % allocate space for statistics of each class
     mus=zeros(nclasses,nfeatures);
-    stds=zeros(nclasses,nfeatures);
-    class_probs=zeros(nclasses,1);
+    vars=zeros(nclasses,nfeatures);
+    log_class_probs=zeros(nclasses,1);
 
     % compute means and standard deviations of each class
     for k=1:nclasses
-        msk=targets_train==classes(k);
-        n=sum(msk); % number of samples
-        if n<2
+        idx=class_idxs{k};
+        nsamples_in_class=numel(idx); % number of samples
+        if nsamples_in_class<2
             error(['Cannot train: class %d has only %d samples, %d '...
-                    'are required'],n,classes(k));
+                    'are required'],nsamples_in_class,classes(k));
         end
 
-        d=samples_train(msk,:); % samples in this class
+        d=samples_train(idx,:); % samples in this class
         mu=mean(d); %mean
         mus(k,:)=mu;
-        stds(k,:)=sqrt(1/(n-1) * sum(bsxfun(@minus,mu,d).^2,1)); % standard deviation - faster implementation than 'std'
-        class_probs(k)=log(n/ntrain); % log of class probability
+
+        % variance - faster than 'var'
+        vars(k,:)=sum(bsxfun(@minus,mu,d).^2,1)/nsamples_in_class;
+
+        % log of class probability
+        log_class_probs(k)=log(nsamples_in_class/ntrain);
     end
 
     model.mus=mus;
-    model.stds=stds;
-    model.class_probs=class_probs;
+    model.vars=vars;
+    model.log_class_probs=log_class_probs;
     model.classes=classes;
