@@ -84,20 +84,10 @@ function cosmo_publish_run_scripts(varargin)
         if do_update
             fprintf('\n   building ... ');
             cd(srcpth);
-            is_built=false;
             clock_start=clock();
-            try
-                publish(srcnm, struct('outputDir',trgdir,'catchError',false));
-                is_built=true;
-            catch me
-                if exist(trgfn,'file')
-                    delete(trgfn);
-                end
 
-                warning('Unable to build %s%s: %s',srcnm,srcext,...
-                                                me.message);
-                fprintf('%s\n', me.getReport);
-            end
+            is_built=publish_wrapper(srcfn,trgfn);
+
             clock_end=clock();
             time_took=etime(clock_end,clock_start);
             total_time_took=total_time_took+time_took;
@@ -138,6 +128,61 @@ function cosmo_publish_run_scripts(varargin)
     fprintf(fid,['</UL>Back to <A HREF="../../index.html">index</A>.'...
                     '</BODY></HTML>\n']);
     fprintf('Index written to %s\n', outputfn);
+
+
+function is_built=publish_wrapper(srcfn,trgfn)
+    [srcdir,srcnm,srcext]=fileparts(srcfn);
+    trgdir=fileparts(trgfn);
+
+    is_built=false;
+
+    if cosmo_wtf('is_matlab')
+        try
+            publish(srcnm, struct('outputDir',trgdir,'catchError',false));
+            is_built=true;
+        catch me
+            if exist(trgfn,'file')
+                delete(trgfn);
+            end
+
+            warning('Unable to build %s%s: %s',srcnm,srcext,...
+                                            me.message);
+            fprintf('%s\n', me.getReport);
+        end
+    else
+        orig_pwd=pwd();
+        orig_path=path();
+
+        cleaner1=onCleanup(@()cd(orig_pwd));
+        cleaner2=onCleanup(@()path(orig_path));
+
+        try
+            addpath(srcdir);
+            cd(trgdir);
+            publish(srcnm,'format','html','imageFormat','png')
+            close all;
+            is_built=true;
+
+        catch
+            if exist(trgfn,'file')
+                delete(trgfn);
+            end
+
+            me=lasterror();
+
+            msg=sprintf('Unable to build %s%s: %s\n',srcnm,srcext,...
+                                            me.message);
+
+            s=me.stack;
+            for j=1:numel(s)
+                msg=sprintf('%s\n  %s:%s', msg, s(j).file, s(j).line);
+            end
+
+            warning('%s',msg);
+        end
+    end
+
+
 
 
 
