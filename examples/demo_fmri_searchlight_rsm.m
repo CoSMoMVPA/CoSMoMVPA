@@ -65,7 +65,7 @@ cosmo_check_dataset(ds);
 
 % print dataset
 fprintf('Dataset input:\n');
-cosmo_disp(ds_per_run);
+cosmo_disp(ds);
 
 %% Define feature neighorhoods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
