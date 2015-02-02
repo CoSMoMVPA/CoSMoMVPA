@@ -106,7 +106,6 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 
     % check input
     cosmo_check_dataset(ds);
-    cosmo_check_neighborhood(nbrhood);
 
     % set defaults
     defaults=struct();
