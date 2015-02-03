@@ -26,7 +26,5 @@ function test_check_neighborhood_exceptions
     aet(nh);
     nh.neighbors={[.5 1];struct()};
     aet(nh);
-    error()
-
 
 
