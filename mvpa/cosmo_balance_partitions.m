@@ -1,4 +1,4 @@
-function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
+function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 % balances a partition so that each target occurs equally often in each
 % training chunk
 %
@@ -9,8 +9,8 @@ function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 %     .train_indices  } Each is a 1xN cell (for N chunks) containing the
 %     .test_indices   } sample indices for each partition
 %   targets           Px1 vector, or dataset struct with field .sa.targets.
-%   'nsets',nsets     Number of balanced sets (default: 1). The output will
-%                     have nsets as many partitions as the input set.
+%   'nrep',nsets      Number of repeats (default: 1). The output will
+%                     have nrep as many partitions as the input set.
 %   'nmin',nmin       Ensure that each target occurs at least
 %                     nmin times in each training set (and some may
 %                     be repeated more often than than).
@@ -50,7 +50,7 @@ function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 %     cosmo_disp(q);
 %     > .train_indices
 %     >   { [ 2    [ 1
-%     >       3      4
+%     >       3      5
 %     >       7 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 2
@@ -59,14 +59,14 @@ function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 %     >       6 ]    8
 %     >              9 ] }
 %     %
-%     % make balancing where each target in each training set is used at
+%     % make balancing where each sample in each training fold is used at
 %     % least once
 %     q=cosmo_balance_partitions(p,ds,'nmin',1);
 %     cosmo_disp(q);
 %     > .train_indices
-%     >   { [ 2    [ 8    [ 9    [ 1    [ 5
-%     >       3      2      2      4      1
-%     >       7 ]    3 ]    3 ]    6 ]    6 ] }
+%     >   { [ 2    [ 2    [ 2    [ 1    [ 1
+%     >       3      3      3      5      4
+%     >       7 ]    9 ]    8 ]    6 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 1    [ 1    [ 2    [ 2
 %     >       4      4      4      3      3
@@ -75,12 +75,12 @@ function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 %     >                            9 ]    9 ] }
 %     %
 %     % triple the number of partitions and sample from training indices
-%     q=cosmo_balance_partitions(p,ds,'nrep',3);
+%     q=cosmo_balance_partitions(p,ds,'nrepeats',3);
 %     cosmo_disp(q);
 %     > .train_indices
-%     >   { [ 2    [ 8    [ 9    [ 1    [ 5    [ 4
-%     >       3      2      2      4      1      1
-%     >       7 ]    3 ]    3 ]    6 ]    6 ]    6 ] }
+%     >   { [ 2    [ 2    [ 2    [ 1    [ 1    [ 1
+%     >       3      3      3      5      4      5
+%     >       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
 %     >       4      4      4      3      3      3
@@ -101,78 +101,112 @@ function bpartitions=cosmo_balance_partitions(partitions, targets, varargin)
 %
 % NNO Dec 2013
 
-defaults=struct();
-defaults.nrep=1;
-params=cosmo_structjoin(defaults,varargin);
+    defaults=struct();
+    defaults.nrep=1;
+    defaults.seed=1;
+    params=cosmo_structjoin(defaults,varargin);
 
-use_nmin=isfield(params,'nmin');
-if use_nmin
-    if isfield(params,'nsets') && ~isequal(params.nsets,defaults.nsets)
-        error('Options ''nmin'' and ''nsets'' are mutually exclusive');
-    end
-    nmin=params.nmin;
-else
-    nrep=params.nrep;
-end
+    cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true);
 
-if isstruct(targets) && isfield(targets,'sa') && ...
-                isfield(targets.sa,'targets')
-    targets=targets.sa.targets;
-end
+    classes=unique(ds.sa.targets);
 
-[classes,unused,sample2class]=unique(targets);
-nclasses=numel(classes);
+    nfolds_in=numel(partitions.train_indices);
 
-train_indices=partitions.train_indices;
-test_indices=partitions.test_indices;
+    train_indices_out=cell(1,nfolds_in);
+    test_indices_out=cell(1,nfolds_in);
 
-% allocat space for output
-npar=numel(partitions.train_indices);
-bpar_train=cell(1,npar);
-bpar_test=cell(1,npar);
+    for j=1:nfolds_in
+        tr_idx=partitions.train_indices{j};
+        te_idx=partitions.test_indices(j);
+        targets=ds.sa.targets(tr_idx);
+        [fold_classes,fold_class_pos]=get_classes(targets);
 
-for k=1:npar
-    par_train=train_indices{k};
-    par_test=test_indices{k};
-    ts=sample2class(par_train);
-    nts=numel(ts);
+        if ~isequal(fold_classes,classes)
+            missing=setdiff(classes,fold_classes);
+            error('missing class %d in fold %d', missing(1), j);
+        end
 
-    h=histc(ts,1:nclasses);
-    hmin=min(h);
-    if hmin==0
-        [unused,i]=min(h);
-        error('target %d missing in .train_indices{%d}',...
-                    classes(i), k);
+        % see how many output folds for the current input fold
+        nfolds_out=get_nfolds_out(fold_class_pos,params);
+
+        % sample from the indices
+        folds_out=sample_class_pos(fold_class_pos,nfolds_out,params);
+
+        % assing training indices
+        tr_folds_out=cell(1,nfolds_out);
+        for k=1:nfolds_out
+            tr_folds_out{k}=tr_idx(folds_out{k});
+        end
+        train_indices_out{j}=tr_folds_out;
+
+        % copy test indices
+        test_indices_out{j}=repmat(te_idx,1,nfolds_out);
     end
 
-    if use_nmin
-        nrep=nmin*ceil(max(h)/min(h));
+    bal_partitions=struct();
+    bal_partitions.train_indices=cat(2,train_indices_out{:});
+    bal_partitions.test_indices=cat(2,test_indices_out{:});
+
+
+
+function [classes,class_pos]=get_classes(targets)
+    [class_pos,targets_cell]=cosmo_index_unique({targets});
+    classes=targets_cell{1};
+
+
+function nfolds=get_nfolds_out(class_pos,params)
+    % return how many folds are needed based on the sample indices for each
+    % class
+    if isfield(params,'nmin')
+        if isfield(params,'nrepeats')
+            error(['options ''nmin'' and nrepeat'' are '...
+                        'mutually exclusive']);
+        else
+            targets_hist=cellfun(@numel,class_pos);
+            nsamples_ratio=max(targets_hist)/min(targets_hist);
+            nfolds=ceil(nsamples_ratio)*params.nmin;
+        end
+    elseif isfield(params,'nrepeats')
+        nfolds=params.nrepeats;
+    else
+        nfolds=1;
     end
 
-    keep_msk=false(nts*nrep,1);
 
-    ts_rep=repmat(ts,nrep,1);
-    par_train_rep=repmat(par_train,nrep,1);
-    for c=1:nclasses
-        c_idxs=find(ts_rep==c);
-        c_pos=0;
+function folds=sample_class_pos(class_pos,nfolds,params)
+    % return nfolds folds, each with a sample from class_pos
+    nclasses=numel(class_pos);
+    class_count=cellfun(@numel,class_pos);
+    nsamples_per_class=min(class_count);
+    boundaries=[0;cumsum(class_count)];
+    nsamples=boundaries(end);
 
-        for j=1:nrep
-            c_idx=c_pos+(1:hmin);
-            keep_msk(c_idxs(c_idx),j)=true;
-            c_pos=c_pos+hmin;
+    % single call to generate pseudo-random uniform data
+    uniform_random_all=cosmo_rand(nsamples,1,'seed',params.seed);
+    idxs=cell(nfolds,nclasses);
+
+    % process each fold seperately
+    for k=1:nclasses
+        uniform_random_pos=(boundaries(k)+1):boundaries(k+1);
+        [foo,i]=sort(uniform_random_all(uniform_random_pos));
+        nrepeats=ceil(nsamples_per_class*nfolds/numel(i));
+
+        % build sequence by repeating the random indices as many times as
+        % necessary
+        seq=repmat(i,1,nrepeats);
+
+        for j=1:nfolds
+            if k==1
+                idxs{j}=cell(1,nclasses);
+            end
+
+            seq_idx=nsamples_per_class*(j-1)+(1:nsamples_per_class);
+            idxs{j,k}=class_pos{k}(seq(seq_idx));
         end
     end
 
-    bpar_train_k=cell(nrep,1);
-    for j=1:nrep
-        bpar_train_k{j}=par_train_rep(keep_msk(:,j));
+    folds=cell(1,nfolds);
+    for j=1:nfolds
+        folds{j}=cat(1,idxs{j,:});
     end
 
-    bpar_train{k}=bpar_train_k';
-    bpar_test{k}=repmat({par_test},nrep,1)';
-end
-
-bpartitions=struct();
-bpartitions.train_indices=[bpar_train{:}];
-bpartitions.test_indices=[bpar_test{:}];
