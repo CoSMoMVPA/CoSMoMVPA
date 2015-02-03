@@ -9,11 +9,13 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     .train_indices  } Each is a 1xN cell (for N chunks) containing the
 %     .test_indices   } sample indices for each partition
 %   targets           Px1 vector, or dataset struct with field .sa.targets.
-%   'nrep',nsets      Number of repeats (default: 1). The output will
-%                     have nrep as many partitions as the input set.
-%   'nmin',nmin       Ensure that each target occurs at least
-%                     nmin times in each training set (and some may
-%                     be repeated more often than than).
+%   'nrepeats',nr     Number of repeats (default: 1). The output will
+%                     have nrep as many partitions as the input set. This
+%                     option, if provided, is not compatible with 'nmin'.
+%   'nmin',nm         Ensure that each sample occurs at least
+%                     nmin times in each training set (some samples may
+%                     be repeated more often than than). This option, if
+%                     provided, is not compatible with 'nrepeats'.
 %
 % Ouput:
 %   bpartitions    similar struct as input partitions, except that
