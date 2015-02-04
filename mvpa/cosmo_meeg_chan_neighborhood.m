@@ -60,6 +60,13 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       { { 'MEG0113'
 %     >              :
 %     >           'MEG2643' }@204x1 }
+%     >   .meeg
+%     >     .samples_type
+%     >       'timelock'
+%     >     .samples_field
+%     >       'trial'
+%     >     .samples_label
+%     >       'rpt'
 %
 %     % get neighbors with radius of .1 for
 %     % planar neuromag306 channels, but with the center labels
@@ -85,6 +92,13 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       { { 'MEG0112+0113'
 %     >                 :
 %     >           'MEG2642+2643' }@102x1 }
+%     >   .meeg
+%     >     .samples_type
+%     >       'timelock'
+%     >     .samples_field
+%     >       'trial'
+%     >     .samples_label
+%     >       'rpt'
 %     >
 %
 %     % As above, but combine the two types of channels
@@ -113,6 +127,13 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       { { 'MEG0111'
 %     >                 :
 %     >           'MEG2642+2643' }@204x1 }
+%     >   .meeg
+%     >     .samples_type
+%     >       'timelock'
+%     >     .samples_field
+%     >       'trial'
+%     >     .samples_label
+%     >       'rpt'
 %
 %
 % See also: cosmo_meeg_chan_neighbors
@@ -120,7 +141,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 % NNO Dec 2014
 
 
-    [unused,unused,attr_name,dim_name,ds_label]=cosmo_dim_find(ds,...
+    [dim,unused,attr_name,dim_name,ds_label]=cosmo_dim_find(ds,...
                                                         'chan',true);
     nbrs=get_neighbors(ds,varargin{:});
 
@@ -130,8 +151,21 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
     nbrhood=struct();
     nbrhood.neighbors=chan_idxs;
     nbrhood.(attr_name).chan=1:numel(nbrs);
+    nbrhood.a=ds.a;
+    nbrhood.a.(dim_name)=struct();
     nbrhood.a.(dim_name).labels={'chan'};
     nbrhood.a.(dim_name).values={nbrs_label(:)};
+
+    if dim==2
+        other_dim_name='sdim';
+    else
+        other_dim_name='fdim';
+    end
+
+    if isfield(nbrhood.a,other_dim_name)
+        nbrhood.a=rmfield(nbrhood.a,other_dim_name);
+    end
+
 
 function [nbrs_label,chan_idxs]=get_neighbor_indices(nbrs,ds_label,ds_chan)
     nbrs_label={nbrs.label};
