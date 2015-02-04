@@ -495,6 +495,12 @@ function pre_infix_post=surround_with(show_size, pre, infix, post, matrix_sz)
 
 
 function s=matrix2str(x,opt)
+    if isempty(x)
+        show_size=opt.show_size;
+        s=surround_with(show_size,'[','  ',']',size(x));
+        return
+    end
+
     % display a matrix
     edgeitems=opt.edgeitems;
     threshold=opt.threshold;
