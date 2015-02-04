@@ -1,0 +1,293 @@
+function result=cosmo_dim_generalization_measure(ds,varargin)
+% measure generalization across pairwise combinations over time (or any other dimension)
+%
+% result=cosmo_dim_generalization_measure(ds,varargin)
+%
+% Inputs:
+%   ds                  dataset struct with d being a sample dimension, and
+%                       with ds.sa.chunks==1 for samples to use for
+%                       training and ds.sa.chunks==2 for those to use for
+%                       testing. Other values for chunks are not allowed.
+%   'measure',m         function handle to apply to combinations of samples
+%                       in the input dataset ds, such as
+%                       - @cosmo_correlation_measure
+%                       - @cosmo_crossvalidation_measure
+%                       - @cosmo_target_dsm_corr_measure
+%   'dimension',d       dimension along which to generalize. Typically this
+%                       will be 'time' for MEEG data
+%   'radius',r          radius used for the d dimension. For example, when
+%                       set to r=4 with d='time', then 4*2+1 time points
+%                       are used to asses generalization, (except on the
+%                       edges)
+%   K,V                 any other key-value pairs necessary for the measure
+%                       m, for example 'classifier' if
+%                       m=@cosmo_crossvalidation_measure
+%
+% Output:
+%    result             dataset with ['train_' d] and ['test_' d] as sample
+%                       dimensions, i.e. these are in ds.a.sdim.labels
+%                       result.samples is Nx1, where N=K*J is the number of
+%                       combinations of (1) the K points in ds with
+%                       chunks==1 and different values in dimension d, and
+%                       (2) the J points in ds with chunks==2 and different
+%                       values in dimension d.
+%
+% Examples:
+%
+%     sz='big';
+%     train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+%                                                            'nchunks',2);
+%     test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+%                                                            'nchunks',3);
+%     % set chunks
+%     train_ds.sa.chunks(:)=1;
+%     test_ds.sa.chunks(:)=2;
+%     %
+%     % construct the dataset
+%     ds=cosmo_stack({train_ds, test_ds});
+%     %
+%     % make time a sample dimension
+%     dim_label='time';
+%     ds_time=cosmo_dim_transpose(ds,dim_label,1);
+%     %
+%     % set measure and its arguments
+%     measure_args=struct();
+%     %
+%     % use correlation measure
+%     measure_args.measure=@cosmo_correlation_measure;
+%     % dimension of interest is 'time'
+%     measure_args.dimension=dim_label;
+%     %
+%     % run time-by-time generalization analysis
+%     dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args);
+%     %
+%     % the output has train_time and test_time as sample dimensions
+%     cosmo_disp(dgm_ds.a)
+%     > .sdim
+%     >   .labels
+%     >     { 'train_time'  'test_time' }
+%     >   .values
+%     >     { [  -0.2        [  -0.2
+%     >         -0.15          -0.15
+%     >          -0.1           -0.1
+%     >           :              :
+%     >             0              0
+%     >          0.05           0.05
+%     >           0.1 ]@7x1      0.1 ]@7x1 }
+%     %
+%     % Searchlight example
+%     %
+%     % only to make this example run fast, most channels are elimanated
+%     % (there is no other reason to do this step)
+%     ds_time=cosmo_dim_slice(ds_time,ds_time.fa.chan<=20,2);
+%     %
+%     % define neighborhood for channels
+%     nbrhood=cosmo_meeg_chan_neighborhood(ds_time,...
+%                                 'chantype','meg_combined_from_planar',...
+%                                 'count',5,'label','dataset');
+%     %
+%     % run searchlight with generalization measure
+%     measure=@cosmo_dim_generalization_measure;
+%     dgm_sl_ds=cosmo_searchlight(ds_time,nbrhood,measure,measure_args,...
+%                                                 'progress',false);
+%     %
+%     % the output has train_time and test_time as sample dimensions,
+%     % and chan as feature dimension
+%     cosmo_disp(dgm_sl_ds.a)
+%     > .fdim
+%     >   .labels
+%     >     { 'chan' }
+%     >   .values
+%     >     { { 'MEG0112+0113'
+%     >         'MEG0212+0213'
+%     >         'MEG0312+0313'
+%     >               :
+%     >         'MEG0512+0513'
+%     >         'MEG0612+0613'
+%     >         'MEG0712+0713' }@7x1 }
+%     > .meeg
+%     >   .samples_type
+%     >     'timelock'
+%     >   .samples_field
+%     >     'trial'
+%     >   .samples_label
+%     >     'rpt'
+%     > .sdim
+%     >   .labels
+%     >     { 'train_time'  'test_time' }
+%     >   .values
+%     >     { [  -0.2        [  -0.2
+%     >         -0.15          -0.15
+%     >          -0.1           -0.1
+%     >           :              :
+%     >             0              0
+%     >          0.05           0.05
+%     >           0.1 ]@7x1      0.1 ]@7x1 }
+%
+% Notes:
+%   - this function can be used together with searchlight
+%   - to make a dimension d a sample dimension from a feature dimension
+%     (usually necessary before running this function), or the other way
+%     around (usually necessary after running this function), use
+%     cosmo_dim_transpose
+%   - a 'partition' argument should not be provided, because this function
+%     generates them itself. The partitions are generated so that there
+%     is a single fold; samples with chunks==1 are always used for training
+%     and those with chunks==2 are used for testing. In the case of using
+%     m=@cosmo_correlation_measure, this amounts to split-half
+%     correlations.
+%
+% See also: @cosmo_correlation_measure, @cosmo_crossvalidation_measure
+%           @cosmo_target_dsm_corr_measure, cosmo_searchlight,
+%           @cosmo_dim_transpose
+%
+% NNO Feb 2015
+
+    defaults=struct();
+    defaults.radius=0;
+    opt=cosmo_structjoin(defaults,varargin);
+
+    cosmo_check_dataset(ds);
+    check_input(ds,opt);
+
+    % get training and test set
+    halves=split_dataset_in_train_and_test(ds);
+
+    % split the data in two halves
+    [train_values,train_splits]=split_half_by_dimension(halves{1},opt);
+    [test_values,test_splits]=split_half_by_dimension(halves{2},opt);
+
+    halves=[]; % let GC do its work
+
+    % set partitions in case a crossvalidation or correlation measure is
+    % used
+    ntrain_elem=cellfun(@(x)size(x.samples,1),train_splits);
+    ntest_elem=cellfun(@(x)size(x.samples,1),test_splits);
+    opt.partitions=struct();
+    opt.partitions.train_indices=cell(1);
+    opt.partitions.test_indices=cell(1);
+
+    % remove the dimension and measure arguments from the input
+    dimension=opt.dimension;
+    measure=opt.measure;
+
+    opt=rmfield(opt,'dimension');
+    opt=rmfield(opt,'measure');
+
+    train_label=['train_' dimension];
+    test_label=['test_' dimension];
+
+    % allocate space for output
+    ntrain=numel(train_values);
+    ntest=numel(test_values);
+
+    result_cell=cell(ntrain*ntest,1);
+
+    % last non-empty row in result_cell
+    pos=0;
+
+    for k=1:ntrain
+        % update partitions train set
+        opt.partitions.train_indices{1}=1:ntrain_elem(k);
+        for j=1:ntest
+            % update partitions test set
+            opt.partitions.test_indices{1}=ntrain_elem(k)+...
+                                                (1:ntest_elem(j));
+            % merge training and test dataset
+            ds_merged=cosmo_stack({train_splits{k},test_splits{j}},...
+                                                        1,1,false);
+
+            % apply measure
+            ds_result=measure(ds_merged,opt);
+
+            % set dimension attributes
+            nsamples=size(ds_result.samples,1);
+            ds_result.sa.(train_label)=repmat(k,nsamples,1);
+            ds_result.sa.(test_label)=repmat(j,nsamples,1);
+
+            % store result
+            pos=pos+1;
+            result_cell{pos}=ds_result;
+        end
+    end
+
+    % merge results into a dataset
+    result=cosmo_stack(result_cell,1,'drop_nonunique');
+    if isfield(result,'sa') && isfield(result.sa,dimension)
+        result.sa=rmfield(result.sa,dimension);
+    end
+
+    % set dimension attributes in the sample dimension
+    result=add_sample_attr(result, {train_label,test_label},...
+                                    {train_values,test_values});
+
+
+
+function check_input(ds,opt)
+    % ensure input is kosher
+    cosmo_isfield(opt,{'dimension','measure'},true);
+
+    dimension=opt.dimension;
+    dim_pos=cosmo_dim_find(ds,dimension,true);
+    if dim_pos~=1
+        error(['''%s'' must be a sample dimension (not a feature) '...
+                    'dimension. To make ''%s'' a sample dimension in '...
+                    'a dataset struct ds, use\n\n'...
+                    '  cosmo_dim_transpose(ds,''%s'',1);'],...
+                    dimension,dimension,dimension);
+    end
+
+    measure=opt.measure;
+    if ~isa(measure,'function_handle')
+        error('the ''measure'' argument must be a function handle');
+    end
+
+    if isfield(opt,'partitions')
+        error(['the partitions argument is not allowed for this '...
+                    'function, because it generates partitions itself']);
+    end
+
+function halves=split_dataset_in_train_and_test(ds)
+    % return cell with {train_ds,test_ds}
+    halves=cosmo_split(ds,'chunks',1);
+    if numel(halves)~=2 || ...
+            halves{1}.sa.chunks(1)~=1 || ...
+            halves{2}.sa.chunks(1)~=2
+        error(['chunks must be 1 (for the training set) or 2'...
+                '(for the testing set)' ]);
+    end
+
+function [values,splits]=split_half_by_dimension(ds,opt)
+    % split dataset by ds.a.(opt.dimension)
+    dimension=opt.dimension;
+    ds_pruned=cosmo_dim_prune(ds,{dimension},1);
+    nbrhood=cosmo_interval_neighborhood(ds_pruned,dimension,opt);
+
+    % remove dimension information
+    ds_pruned.a=rmfield(ds_pruned.a,'sdim');
+    ds_pruned.sa=rmfield(ds_pruned.sa,dimension);
+
+    assert(isequal(nbrhood.a.sdim.labels,{dimension}));
+    values=nbrhood.a.sdim.values{1}(:);
+
+    n=numel(nbrhood.neighbors);
+    splits=cell(n,1);
+
+    for k=1:n
+        splits{k}=cosmo_slice(ds_pruned,nbrhood.neighbors{k},1,false);
+    end
+
+
+function ds=add_sample_attr(ds, dim_labels, dim_values)
+    if ~isfield(ds,'a') || ~isfield(ds.a,'sdim')
+        ds.a.sdim=struct();
+        ds.a.sdim.labels=cell(1,0);
+        ds.a.sdim.values=cell(1,0);
+    end
+
+
+    ds.a.sdim.values=[ds.a.sdim.values dim_values];
+    ds.a.sdim.labels=[ds.a.sdim.labels dim_labels];
+
+
+

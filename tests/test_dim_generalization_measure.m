@@ -1,0 +1,175 @@
+function test_suite=test_dim_generalization_measure()
+    initTestSuite;
+
+function test_dim_generalization_measure_basics
+    aet=@(varargin)assertExceptionThrown(@()...
+                cosmo_dim_generalization_measure(varargin{:}),'');
+
+    % error on empty input
+    aet(struct());
+    ds=struct();
+    ds.samples=0;
+    aet(ds);
+
+    ds=cosmo_synthetic_dataset('type','meeg');
+
+    % three time points, two channels
+    ds.fa.chan=[1 2 1 2 1 2];
+    ds.fa.time=[1 1 2 2 3 3];
+    ds.a.fdim.values{2}=[-1 0 1];
+    cosmo_check_dataset(ds);
+    opt=struct();
+    opt.measure=@delta_measure;
+    aet(ds,opt);
+    aet(ds,'dimension','time');
+    opt.dimension='time';
+    aet(ds,opt);
+
+    ds=cosmo_dim_transpose(ds,'time',1);
+
+    % measure must be a function handle
+    aet(ds,'dimension','time','measure','foo');
+
+    % chunks are required
+    chunks=ds.sa.chunks;
+    ds.sa=rmfield(ds.sa,'chunks');
+    aet(ds,opt);
+    ds.sa.chunks=chunks;
+
+    % chunks must be 1 and 2, not 1, 2 and 3
+    aet(ds,opt)
+
+    ds.sa.chunks=ds.sa.targets;
+    ds.sa.targets=chunks;
+
+    % partitions not allowed
+    aet(ds,opt,'partitions',cosmo_nfold_partitioner(ds));
+
+    ds.samples=bsxfun(@plus,(ds.fa.chan-1)*12,6*(ds.sa.time-1)+3*(ds.sa.chunks-1)+ds.sa.targets);
+
+    ds.a.sdim.values{1}(end+1)=2;
+    tr_ds=cosmo_slice(ds,ds.sa.chunks==1);
+    te_ds=cosmo_slice(ds,repmat(find(ds.sa.chunks==2),2,1));
+    te_ds.sa.time=te_ds.sa.time+1;
+    ds=cosmo_stack({tr_ds,te_ds});
+
+    for radius=0:1
+        unq_tr_time=unique(tr_ds.sa.time)';
+        unq_te_time=unique(te_ds.sa.time)';
+
+        ntime=numel(unq_tr_time)*numel(unq_te_time);
+        expected_result_cell=cell(ntime,1);
+
+        pos=0;
+        for k=1:numel(unq_tr_time)
+            tr_time=unq_tr_time(k);
+            tr=cosmo_slice(tr_ds,abs(tr_ds.sa.time-tr_time)<=radius);
+            for j=1:numel(unq_te_time)
+                te_time=unq_te_time(j);
+                te=cosmo_slice(te_ds,abs(te_ds.sa.time-te_time)<=radius);
+
+                tr_te=cosmo_stack({tr,te});
+                pos=pos+1;
+
+                res=delta_measure(tr_te);
+                e=ones(size(res.samples));
+                res.sa.train_time=e*k;
+                res.sa.test_time=e*j;
+                expected_result_cell{pos}=res;
+            end
+        end
+
+        expected_result=cosmo_stack(expected_result_cell,1);
+        expected_result.a.sdim.labels{end}='train_time';
+        expected_result.a.sdim.labels{end+1}='test_time';
+
+        tr_dim=ds.a.sdim.values{1}(unq_tr_time);
+        te_dim=ds.a.sdim.values{1}(unq_te_time);
+
+        expected_result.a.sdim.values{end}=tr_dim(:);
+        expected_result.a.sdim.values{end+1}=te_dim(:);
+
+        result=cosmo_dim_generalization_measure(ds,opt,'radius',radius);
+        assertEqual(result, expected_result);
+    end
+
+    % result should be unaffected by permutation of the samples
+    nsamples=size(ds.samples,1);
+    rp=randperm(nsamples);
+    ds_perm=cosmo_slice(ds,rp);
+    assertFalse(isequal(ds_perm,ds));
+
+    opt.radius=1;
+    result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
+    assertEqual(result_perm,result);
+
+    % try with correlation measure
+    ds=cosmo_stack({ds,ds},2);
+    ds.samples=randn(size(ds.samples));
+    ds_perm=cosmo_slice(ds,rp);
+
+    opt.radius=0;
+    opt.measure=@cosmo_correlation_measure;
+    opt.output='correlation';
+    result=cosmo_dim_generalization_measure(ds,opt);
+    result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
+
+    assertElementsAlmostEqual(result.samples,result_perm.samples);
+    assertEqual(result.sa,result_perm.sa);
+    assertEqual(result.a,result_perm.a);
+
+    ds1=cosmo_slice(ds,ds.sa.chunks==1 & ds.sa.time==1);
+    ds2=cosmo_slice(ds,ds.sa.chunks==2 & ds.sa.time==3);
+    c=opt.measure(cosmo_stack({ds1,ds2}),opt);
+
+    result1=cosmo_slice(result,result.sa.train_time==1 & ...
+                                        result.sa.test_time==2);
+    assertElementsAlmostEqual(c.samples,result1.samples);
+    assertEqual(result1.sa.half1,c.sa.half1);
+    assertEqual(result1.sa.half2,c.sa.half2);
+
+    % try with crossvalidation measure
+    % swap chunks to get two samples in each class in the training set
+    ds.sa.chunks=3-ds.sa.chunks;
+    ds1=cosmo_slice(ds,ds.sa.chunks==2 & ds.sa.time==1);
+    ds2=cosmo_slice(ds,ds.sa.chunks==1 & ds.sa.time==3);
+    opt.measure=@cosmo_crossvalidation_measure;
+    opt.output='predictions';
+
+    if cosmo_wtf('is_matlab')
+        err_id='MATLAB:nonExistentField';
+    else
+        err_id='Octave:invalid-indexing';
+    end
+    assertExceptionThrown(@()...
+            cosmo_dim_generalization_measure(ds,opt),err_id);
+
+    opt.classifier=@cosmo_classify_lda;
+    result=cosmo_dim_generalization_measure(ds,opt);
+
+    ds_tiny=cosmo_stack({ds1,ds2});
+    opt.partitions=cosmo_nchoosek_partitioner(ds_tiny,1,'chunks',2);
+    r=opt.measure(ds_tiny,opt);
+    result1=cosmo_slice(result,result.sa.train_time==2 & ...
+                                        result.sa.test_time==1);
+    %assertEqual(r.samples,result1.samples);
+    mp=cosmo_align(r.sa.chunks,result1.sa.chunks);
+    assertEqual(r.samples(mp),result1.samples);
+
+
+function z=delta_func(x,y)
+    z_mat=bsxfun(@minus,mean(x,1),mean(y,1)');
+    z=z_mat(:);
+
+function x=delta_measure(ds,unused)
+    msk=ds.sa.chunks==1;
+
+    x=cosmo_slice(ds,msk);
+    y=cosmo_slice(ds,~msk);
+
+    x.samples=delta_func(x.samples,y.samples);
+    x.sa=struct();
+    x.sa.mu=abs(x.samples);
+    x.a=rmfield(x.a,'fdim');
+    x=rmfield(x,'fa');
+
