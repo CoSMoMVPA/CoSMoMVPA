@@ -47,3 +47,16 @@ function test_interval_neighborhood_basis()
     aet({ds,'time',[2 3]},'');
     aet({ds,'time','radius'},'');
     aet({ds,'time','radius',-1},'');
+
+function test_interval_neighborhood_sa()
+    ds=cosmo_synthetic_dataset('type','meeg');
+    ds_tr=cosmo_dim_transpose(ds,'time');
+    ds_tr=cosmo_slice(ds_tr,randperm(12));
+    for radius=0:1
+        nbrhood=cosmo_interval_neighborhood(ds_tr,'time','radius',radius);
+        unq_time=unique(ds_tr.sa.time);
+        for k=1:numel(unq_time)
+            msk=abs(ds_tr.sa.time-unq_time(k))<=radius;
+            assertEqual(nbrhood.neighbors{k},find(msk)');
+        end
+    end

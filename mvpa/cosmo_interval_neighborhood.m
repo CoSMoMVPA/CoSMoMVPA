@@ -98,7 +98,7 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
     fa_values=ds.(attr_name).(label);
 
     % get unique feature attributes
-    [fa_idxs,fa_unq]=cosmo_index_unique(fa_values');
+    [fa_idxs,fa_unq]=cosmo_index_unique(fa_values(:));
     nunq=numel(fa_unq);
 
     % cosmo_index_unique should return a sorted array of values
@@ -112,7 +112,6 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
     % this works because fa_unq is sorted, so a window can be taken that
     % moves from left to right
     first_pos=1;
-    last_pos=1;
 
     for center_id=1:nvalues
         % find left edge
@@ -145,7 +144,19 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
     nbrhood.a.(dim_name)=a_dim;
 
     nbrhood.(attr_name)=struct();
-    nbrhood.(attr_name).(label)=1:nvalues;
+
+    values=1:nvalues;
+    if dim==1
+        values=values';
+        other_dim_name='fdim';
+    else
+        other_dim_name='sdim';
+    end
+    nbrhood.(attr_name).(label)=values;
+    if isfield(nbrhood.a,other_dim_name);
+        nbrhood.a=rmfield(nbrhood.a,other_dim_name);
+    end
+
     nbrhood.neighbors=neighbors;
 
     cosmo_check_neighborhood(nbrhood);
