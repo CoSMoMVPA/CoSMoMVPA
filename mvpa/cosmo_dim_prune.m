@@ -108,7 +108,8 @@ function ds=prune_single_dim(ds, labels, dim)
     dim_name=[infix 'dim'];
 
     if cosmo_isfield(ds, ['a.' dim_name '.labels'])
-        if isempty(labels)
+        use_dim_labels=isempty(labels);
+        if use_dim_labels
             labels=ds.a.(dim_name).labels;
         end
 
@@ -130,7 +131,12 @@ function ds=prune_single_dim(ds, labels, dim)
             label=labels{k};
 
             [dim_, index]=cosmo_dim_find(ds,label,true);
-            assert(dim_==dim);
+            if use_dim_labels
+                assert(dim_==dim);
+            elseif dim~=dim_
+                continue;
+            end
+
 
             values=ds.a.(dim_name).values{index};
             attr=ds.(attr_name).(label);
