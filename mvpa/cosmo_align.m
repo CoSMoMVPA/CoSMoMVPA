@@ -33,7 +33,7 @@ function [map_x2y, map_y2x]=cosmo_align(x,y)
     [xi,xv]=cosmo_index_unique(x_cell);
     [yi,yv]=cosmo_index_unique(y_cell);
 
-    if ~isequal(xv,yv)
+    if ~isequaln(xv,yv)
         error(['the two inputs do not have the same unique '...
                     'combination of elements']);
     end

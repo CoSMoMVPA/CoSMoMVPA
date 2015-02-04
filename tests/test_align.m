@@ -39,3 +39,8 @@ function test_align_basics
     aet([2 3 4 3],[4 2 3]);
     aet([2 3 4],{[2,3,4],[2,3,4]});
 
+    aet([2 3 NaN NaN],[2 3 NaN Inf]);
+    aet([2 NaN 3],[4 2 NaN]);
+    [mp,pm]=cosmo_align([2 NaN 4],[4 2 NaN]);
+    assertEqual(mp,[3 1 2]);
+    assertEqual(pm,[2 3 1]);
