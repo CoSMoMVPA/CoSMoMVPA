@@ -73,7 +73,12 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
     % treat like dataset
     nfeatures=numel(nbrhood.neighbors);
     nbrhood=rmfield(nbrhood,'neighbors');
-    nbrhood.samples=zeros(0,nfeatures);
+
+    if isfield(nbrhood,'fa')
+        nbrhood.samples=zeros(0,nfeatures);
+    else
+        nbrhood.samples=zeros(nfeatures,0);
+    end
 
     is_ok=cosmo_check_dataset(nbrhood,raise);
 
@@ -85,16 +90,17 @@ function msg=check_basis(nbrhood)
         return
     end
 
-    keys={'neighbors','fa','a'};
-    delta=setxor(fieldnames(nbrhood),keys);
+    keys={'neighbors','a','fa','sa'};
+    delta=setdiff(fieldnames(nbrhood),keys);
     if ~isempty(delta)
         first=delta{1};
-        if isfield(nbrhood,first)
-            msg=sprintf('field ''%s'' not allowed in neighborhood',first);
-        else
-            msg=sprintf('field ''%s'' missing in neighborhood',first);
-        end
+        msg=sprintf('field ''%s'' not allowed in neighborhood',first);
         return
+    end
+
+    n=cosmo_match({'sa','fa'},fieldnames(nbrhood));
+    if n~=1
+        error('exactly one of .sa or .fa must be present');
     end
 
 
