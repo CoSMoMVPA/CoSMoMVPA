@@ -17,6 +17,11 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %                - 'unique'          raise an exception if elements differ
 %                - I                 use data from datasets{I}
 %                The default is drop_nonunique
+%   check        Check for proper size of the input datasets. The default
+%                is true; setting this to false makes this function run
+%                faster but will give less informative error messages (if
+%                any). Use this option only if you are sure that the inputs
+%                have proper dimensions.
 %
 % Ouput:
 %   ds_stacked   Stacked dataset. If dim==1 [or dim==2] and the K-th
@@ -101,7 +106,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 % NNO Sep 2013
 
 
-    [dim, merge]=process_parameters(ds_cell, varargin{:});
+    [dim, merge, check]=process_parameters(ds_cell, varargin{:});
 
 
     n=numel(ds_cell);
@@ -114,8 +119,12 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
     if isempty(sample_values)
         error('missing field .samples');
     end
-    sample_sizes=get_dimension_sizes(dim, sample_values);
-    ds_stacked.samples=stack_values(dim, sample_values, '.samples');
+    if check
+        sample_sizes=get_dimension_sizes(dim, sample_values);
+    else
+        sample_sizes=[];
+    end
+    ds_stacked.samples=stack_values(dim, sample_values, '.samples', check);
 
     % set the field names for the dimension to be stacked, and the other
     % one
@@ -149,7 +158,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
 
 
-function [dim, merge]=process_parameters(ds_cell, varargin)
+function [dim, merge, check]=process_parameters(ds_cell, varargin)
     narg=numel(varargin);
     if narg<1 || isempty(varargin{1})
         dim=1;
@@ -161,6 +170,12 @@ function [dim, merge]=process_parameters(ds_cell, varargin)
         merge='drop_nonunique';
     else
         merge=varargin{2};
+    end
+
+    if narg<3 || isempty(varargin)
+        check=true;
+    else
+        check=varargin{3};
     end
 
     if ~iscell(ds_cell)
@@ -274,6 +289,7 @@ function [has_unique_elem, unique_elem]=get_single_unique_element(vs)
 
 
 function s=stack_structs(dim, structs, expected_sizes, where)
+    check=~isempty(expected_sizes);
     n=numel(structs);
 
     for k=1:n
@@ -304,7 +320,7 @@ function s=stack_structs(dim, structs, expected_sizes, where)
             key=keys{j};
             v=s.(key);
 
-            if size(v,dim)~=expected_sizes(k)
+            if check && size(v,dim)~=expected_sizes(k)
                 error(['size mismatch in %d-th input: size(%s.%s,%d)=%d'...
                         ', but size(.samples,%d)=%d'],...
                             k, where, key, dim, size(v,dim), ...
@@ -320,7 +336,7 @@ function s=stack_structs(dim, structs, expected_sizes, where)
 
     for j=1:nkeys
         key=keys{j};
-        s.(key)=stack_values(dim, stack_args(:,j), where);
+        s.(key)=stack_values(dim, stack_args(:,j), where, check);
     end
 
 function sizes=get_dimension_sizes(dim, vs)
@@ -344,11 +360,13 @@ function ensure_same_size_along_dim(dim, vs, where)
     end
 
 
-function c=stack_values(dim, vs, where)
+function c=stack_values(dim, vs, where, check)
     % stacks the contents of vs along dimension dim, or throw an error
     % if sizes are not compatible
-    other_dim=3-dim;
-    ensure_same_size_along_dim(other_dim, vs, where);
+    if check
+        other_dim=3-dim;
+        ensure_same_size_along_dim(other_dim, vs, where);
+    end
 
     if iscell(vs) && ~isempty(vs) && ischar(vs{1})
         % cell with strings needs special care, because normal cat
