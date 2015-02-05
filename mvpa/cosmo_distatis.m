@@ -127,64 +127,125 @@ function res=cosmo_distatis(ds, varargin)
 %
 % NNO Sep 2014
 
-cosmo_check_external('distatis');
+    cosmo_check_external('distatis');
 
-defaults.return='distance';
-defaults.split_by='chunks';
-defaults.shape='square';
-defaults.mask_output=[];
-defaults.progress=100;
-defaults.feature_ids=[];
-defaults.autoscale=true;
-defaults.abs_correlation=false;
-defaults.weights='eig';
+    defaults.return='distance';
+    defaults.split_by='chunks';
+    defaults.shape='square';
+    defaults.mask_output=[];
+    defaults.progress=100;
+    defaults.feature_ids=[];
+    defaults.autoscale=true;
+    defaults.abs_correlation=false;
+    defaults.weights='eig';
 
-opt=cosmo_structjoin(defaults,varargin);
+    opt=cosmo_structjoin(defaults,varargin);
 
-if isstruct(ds)
-    subject_cell=cosmo_split(ds,opt.split_by);
-else
-    subject_cell=ds;
-end
+    subject_cell=get_subject_data(ds,opt);
+    nsubj=numel(subject_cell);
 
-[dsms,nclasses,dim_labels,dim_values]=get_dsms(subject_cell);
 
-nsubj=numel(subject_cell);
-if nsubj==0
-    error('Empty input');
-end
+    [dsms,nclasses,dim_labels,dim_values]=get_dsms(subject_cell);
 
-feature_ids=opt.feature_ids;
-if isempty(feature_ids);
-    nfeatures=size(dsms{1},3);
-    feature_ids=1:nfeatures;
-else
+    feature_ids=get_feature_ids(size(dsms{1},3),opt);
     nfeatures=numel(feature_ids);
-end
 
-quality=zeros(1,nfeatures);
-nobservations=zeros(1,nfeatures);
-correlation_warning_shown=false;
+    quality=zeros(1,nfeatures);
+    nobservations=zeros(1,nfeatures);
 
-prev_msg='';
-clock_start=clock();
-show_progress=nfeatures>1 && opt.progress;
+    prev_msg='';
+    clock_start=clock();
+    show_progress=nfeatures>1 && opt.progress;
 
-for k=1:nfeatures
-    feature_id=feature_ids(k);
-    x=zeros(nclasses*nclasses,nsubj);
-    subj_msk=false(1,nsubj);
-    for j=1:nsubj
-        dsm=dsms{j}(:,:,feature_id);
-        x(:,j)=distance2crossproduct(dsm, opt.autoscale);
+    for k=1:nfeatures
+        feature_id=feature_ids(k);
+        x=zeros(nclasses*nclasses,nsubj);
+        for j=1:nsubj
+            dsm=dsms{j}(:,:,feature_id);
+            x(:,j)=distance2crossproduct(dsm, opt.autoscale);
+        end
+
+        [x,subj_msk]=cosmo_remove_useless_data(x);
+        nkeep=sum(subj_msk);
+
+        % equivalent, but slower:
+        % [e,v]=eigs(c,1);
+
+        [ew,v]=get_weights(x, feature_id, nkeep, opt);
+
+        % compute compromise
+        compromise=x*ew;
+
+        result=convert_compromise(compromise, opt);
+
+        if feature_id==1
+            % allocate space
+            samples=zeros(numel(result),nfeatures);
+        end
+
+        samples(:,k)=result;
+
+        quality(:,k)=v/nkeep;
+        nobservations(:,k)=nkeep;
+
+
+        if show_progress && (k<10 || ...
+                                mod(k, opt.progress)==0 || ...
+                                k==nfeatures)
+            status=sprintf('quality=%.3f%% (avg)',mean(quality(1:k)));
+            prev_msg=cosmo_show_progress(clock_start,k/nfeatures,...
+                                                        status,prev_msg);
+        end
     end
 
-    [x,subj_msk]=cosmo_remove_useless_data(x);
-    nkeep=sum(subj_msk);
+    % set output in either triangular or square shape
+    [res,i,j]=get_samples_in_shape(samples,nclasses,opt.shape);
+    res=copy_fields(ds,res,{'fa','a'});
 
-    % equivalent, but slower:
-    % [e,v]=eigs(c,1);
+    % add attributes
+    res.fa.quality=quality;
+    res.fa.nchunks=nobservations;
+    res.a.sdim=struct();
+    res.a.sdim.labels=dim_labels;
+    res.a.sdim.values=dim_values;
 
+    res.sa.(dim_labels{1})=i;
+    res.sa.(dim_labels{2})=j;
+
+    cosmo_check_dataset(res);
+
+function [res,i,j]=get_samples_in_shape(samples,nclasses,shape)
+    res=struct();
+    switch shape
+        case 'triangle'
+            [msk,i,j]=distance_matrix_mask(nclasses);
+            res.samples=samples(msk(:),:);
+        case 'square'
+            res.samples=samples;
+            [i,j]=find(ones(nclasses));
+        otherwise
+            error('unsupported direction %s', shape);
+    end
+
+
+
+function dst=copy_fields(src,dst,keys)
+    for k=1:numel(keys)
+        key=keys{k};
+        if isfield(src,key)
+            dst.(key)=src.(key);
+        end
+    end
+
+
+function feature_ids=get_feature_ids(nfeatures, opt)
+    feature_ids=opt.feature_ids;
+    if isempty(feature_ids);
+        feature_ids=1:nfeatures;
+    end
+
+
+function [ew,v]=get_weights(x, feature_id, nkeep, opt)
     switch opt.weights
         case 'eig'
             [ew,v]=eigen_weights(x, feature_id, opt);
@@ -199,61 +260,18 @@ for k=1:nfeatures
     end
 
 
-    % compute compromise
-    compromise=x*ew;
 
-    result=convert_compromise(compromise, opt);
-
-    if feature_id==1
-        % allocate space
-        samples=zeros(numel(result),nfeatures);
+function subject_cell=get_subject_data(ds,opt)
+    if isstruct(ds)
+        subject_cell=cosmo_split(ds,opt.split_by);
+    else
+        subject_cell=ds;
     end
 
-    samples(:,k)=result;
-
-    quality(:,k)=v/nkeep;
-    nobservations(:,k)=nkeep;
-
-
-    if show_progress && (k<10 || ...
-                            mod(k, opt.progress)==0 || ...
-                            k==nfeatures)
-        status=sprintf('quality=%.3f%% (avg)',mean(quality(1:k)));
-        prev_msg=cosmo_show_progress(clock_start,k/nfeatures,...
-                                                    status,prev_msg);
+    if numel(subject_cell)==0
+        error('empty input');
     end
-end
 
-
-res=struct();
-
-switch opt.shape
-    case 'triangle'
-        [msk,i,j]=distance_matrix_mask(nclasses);
-        res.samples=samples(msk(:),:);
-    case 'square'
-        res.samples=samples;
-        [i,j]=find(ones(nclasses));
-    otherwise
-        error('unsupported direction %s', opt.shape);
-end
-
-if cosmo_isfield(ds,'fa')
-    res.fa=ds.fa;
-end
-res.fa.quality=quality;
-res.fa.nchunks=nobservations;
-if cosmo_isfield(ds,'a')
-    res.a=ds.a;
-end
-res.a.sdim=struct();
-res.a.sdim.labels=dim_labels;
-res.a.sdim.values=dim_values;
-
-res.sa.(dim_labels{1})=i;
-res.sa.(dim_labels{2})=j;
-
-cosmo_check_dataset(res);
 
 function [ew,v]=eigen_weights(x, feature_id, opt)
     persistent correlation_warning_shown
