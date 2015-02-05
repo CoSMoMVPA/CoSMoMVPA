@@ -1,4 +1,4 @@
-function s=cosmo_squareform(x, direction)
+function s=cosmo_squareform(x, varargin)
 % converts pair-wise distances between matrix and vector form
 %
 % s=cosmo_squareform(x[, direction])
@@ -25,85 +25,105 @@ function s=cosmo_squareform(x, direction)
 %
 % NNO Jul 2014
 
-if ~ismatrix(x)
-    error('first input must be matrix or vector');
-end
+    check_input(x)
+    direction=get_direction(x,varargin{:});
 
-if nargin<2
-    if isvector(x)
-        direction='tomatrix';
-    else
-        direction='tovector';
+    if isempty(x)
+        s=x;
+        return
     end
-elseif ~ischar(direction)
-    error('second argument must be a string');
-end
 
-if isempty(x)
-    s=x;
-    return
-end
+    switch direction
+        case 'tomatrix'
+            s=to_matrix(x);
 
-switch direction
-    case 'tomatrix'
-        if ~isvector(x)
-            error('direction ''%s'' requires a vector as input',direction);
-        end
-        n=numel(x);
+        case 'tovector'
+            s=to_vector(x);
 
-        % side*(side+1)/2=n, solve for side>0
-        side=(1+sqrt(1+8*n))/2;
-        if ~isequal(side, round(side))
-            error(['size %d of input vector is not correct for '...
-                    'the number of elements below diagonal of a '...
-                    'square matrix'], n);
-        end
-        msk=bsxfun(@gt,(1:side)',1:side);
+        otherwise
+            error(['illegal direction argument, must be one of ', ...
+                        '''tomatrix'',''tovector''']);
+    end
 
-        if islogical(x)
-            s=false(side);
-            s(msk)=x;
-            s=s|s';
-        elseif isnumeric(x)
-            s=zeros(side);
-            s(msk)=x;
-            s=s+s';
+
+function check_input(x)
+    if ~ismatrix(x)
+        error('first input must be matrix or vector');
+    end
+
+    if ~(islogical(x) || isnumeric(x))
+        error(['Unsupported data type ''%s''; only numeric '...
+                'and logical arrays are supported']', class(x));
+    end
+
+
+function s=to_vector(x)
+    [side,side_]=size(x);
+    if side~=side_
+        error('direction ''%s'' requires a square matrix as input', ...
+                                                    direction);
+    end
+
+
+
+    dg=diag(x);
+    if any(dg)
+        error('square matrix must be all zero on diagonal');
+    end
+
+    if ~isequal(x,x');
+        error('square matrix must be symmetric');
+    end
+
+    msk=bsxfun(@gt,(1:side)',1:side);
+
+    s=x(msk);
+    s=s(:)';
+
+
+function s=to_matrix(x)
+    if ~isvector(x)
+        error('direction ''to_vector'' requires a vector as input');
+    end
+    n=numel(x);
+
+    % side*(side+1)/2=n, solve for side>0
+    side=(1+sqrt(1+8*n))/2;
+    if ~isequal(side, round(side))
+        error(['size %d of input vector is not correct for '...
+                'the number of elements below diagonal of a '...
+                'square matrix'], n);
+    end
+    msk=bsxfun(@gt,(1:side)',1:side);
+
+    if islogical(x)
+        s=false(side);
+        s(msk)=x;
+        s=s|s';
+    elseif isnumeric(x)
+        s=zeros(side);
+        s(msk)=x;
+        s=s+s';
+    else
+        error('Unsupported data type ''%s''', class(x));
+    end
+
+function direction=get_direction(x,varargin)
+    if numel(varargin)<1
+        if isvector(x)
+            direction='tomatrix';
+            return
+        elseif ismatrix(x)
+            direction='tovector';
+            return;
         else
-            error('Unsupported data type ''%s''', class(x));
+            error('first argument must be a matrix or vector')
         end
-
-    case 'tovector'
-        [side,side_]=size(x);
-        if side~=side_
-            error('direction ''%s'' requires a square matrix as input', ...
-                                                        direction);
-        end
-
-        if ~(islogical(x) || isnumeric(x))
-            error('Unsupported data type ''%s''', class(x));
-        end
-
-        dg=diag(x);
-        if any(dg)
-            error('square matrix must be all zero on diagonal');
-        end
-
-        if ~isequal(x,x');
-            error('square matrix must be symmetric');
-        end
-
-        msk=bsxfun(@gt,(1:side)',1:side);
-
-        s=x(msk);
-        s=s(:)';
-
-    otherwise
-        error(['illegal direction argument, must be one of ', ...
-                    '''tomatrix'',''tovector''']);
-
-end
-
-
+    elseif ischar(varargin{1})
+        direction=varargin{1};
+    else
+        error('second argument must be a string');
+    end
 
 
 
