@@ -49,6 +49,34 @@ function test_dim_transpose_exceptions()
     x.sa.i=x.fa.i';
     aet(x,'i',1);
 
+function test_dim_transpose_nonmatching_attr()
+    x=struct();
+    x.samples=[1;2;3];
+    x.a.sdim.labels={'i'};
+    x.a.sdim.values={[10 11]};
+    x.sa.i=[2;2;2];
+    x.sa.j=1+[1;2;3];
+    x.fa=struct();
+
+    y=struct();
+    y.samples=[4;5;6];
+    y.a.sdim.labels={'i'};
+    y.a.sdim.values={[10 11]};
+    y.sa.i=[1;1;1];
+    y.sa.j=1+[2;3;1];
+    y.fa=struct();
+
+    xy=cosmo_stack({x,y});
+
+    xy_tr=cosmo_dim_transpose(xy,'i',2);
+    for k=1:6
+        [i,j]=find(xy_tr.samples==k);
+        assertEqual(xy.sa.i(xy.samples==k), xy_tr.fa.i(j));
+        assertFalse(isfield(xy_tr.fa,'j'));
+        assertFalse(isfield(xy_tr.sa,'j'));
+    end
+
+
 
 function assert_same_samples_with_permutation(x,y)
     nsamples=size(x.samples,1);

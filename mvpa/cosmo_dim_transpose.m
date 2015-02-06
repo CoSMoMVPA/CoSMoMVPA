@@ -109,12 +109,14 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
         sp{k}=copy_attr(sp{k}, dim_labels, target_dim);
     end
 
-    ds=cosmo_stack(sp, target_dim, 1);
+    ds=cosmo_stack(sp, target_dim, 'drop_nonunique');
 
     src_name=dim2attr_name(source_dim);
     for k=1:numel(dim_labels)
         dim_label=dim_labels{k};
-        ds.(src_name)=rmfield(ds.(src_name), dim_label);
+        if isfield(ds.(src_name), dim_label)
+            ds.(src_name)=rmfield(ds.(src_name), dim_label);
+        end
     end
 
     ds=move_dim(ds, dim_labels, target_dim, target_pos);
