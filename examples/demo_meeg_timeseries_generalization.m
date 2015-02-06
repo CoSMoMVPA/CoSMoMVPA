@@ -230,7 +230,6 @@ layout=cosmo_meeg_find_layout(cdt_tf_ds);
 % convert to fieldtrip format
 ft=cosmo_map2meeg(cdt_tf_ds);
 
-
 % show train_time x test_time x chan figure
 %
 % * train_time is on the vertical ('freq') axis
