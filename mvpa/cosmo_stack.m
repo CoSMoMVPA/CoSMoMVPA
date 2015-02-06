@@ -311,7 +311,7 @@ function s=stack_structs(dim, structs, expected_sizes, where)
             first_keys=keys;
 
         elseif ~isequal(keys, first_keys)
-            delta=setxor(keys, first-keys);
+            delta=setxor(keys, first_keys);
             error(['key mismatch between 1st and %d-th input in %s ' ...
                         'for key ''%s'''], k, where, delta{1});
         end
