@@ -29,6 +29,24 @@ function test_align_basics
     assertEqual(mp,[3 1 2]);
     assertEqual(pm,[2 3 1]);
 
+    % test structs
+    p=struct();
+    p.x={'b','c','c'};
+    p.y=[3 2 3];
+    q=struct();
+    q.y=[3 3 2];
+    q.x={'c','b','c'};
+    [mp,pm]=cosmo_align(p,q);
+    assertEqual(mp,[3 1 2]);
+    assertEqual(pm,[2 3 1]);
+
+    % test NaN
+    [mp,pm]=cosmo_align([2 NaN 4],[4 2 NaN]);
+    assertEqual(mp,[3 1 2]);
+    assertEqual(pm,[2 3 1]);
+
+
+
     % test exceptions
     ds_small=cosmo_slice(ds1,1:nsamples-1);
     aet=@(varargin)assertExceptionThrown(@()...
@@ -41,6 +59,8 @@ function test_align_basics
 
     aet([2 3 NaN NaN],[2 3 NaN Inf]);
     aet([2 NaN 3],[4 2 NaN]);
-    [mp,pm]=cosmo_align([2 NaN 4],[4 2 NaN]);
-    assertEqual(mp,[3 1 2]);
-    assertEqual(pm,[2 3 1]);
+
+    aet(struct,struct('a',1));
+    aet(struct('a',1),1);
+
+

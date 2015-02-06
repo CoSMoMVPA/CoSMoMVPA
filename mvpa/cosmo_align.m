@@ -18,8 +18,10 @@ function [map_x2y, map_y2x]=cosmo_align(x,y)
 %
 % NNO Feb 2015
 
-    x_cell=as_cell(x,1);
-    y_cell=as_cell(y,2);
+    [x_cell,x_label]=as_cell(x,1);
+    [y_cell,y_label]=as_cell(y,2);
+
+    ensure_matching_labels(x_label, y_label);
 
     nx=numel(x_cell);
     ny=numel(y_cell);
@@ -59,31 +61,63 @@ function [map_x2y, map_y2x]=cosmo_align(x,y)
     map_y2x(xv)=yv;
 
 
-    function v_cell=as_cell(v,pos)
-        if iscell(v) && ~iscellstr(v)
-            n=numel(v);
+function [v_cell,labels]=as_cell(v,pos)
+    if iscell(v) && ~iscellstr(v)
+        n=numel(v);
 
-            for j=1:n
-                ensure_vector(v{j},pos,j);
-            end
-            v_cell=v;
-        else
-            ensure_vector(v,pos,1);
-            v_cell={v(:)};
+        for j=1:n
+            ensure_vector(v{j},pos,j);
         end
+        v_cell=v;
+        labels=[];
+    elseif isstruct(v)
+        labels=sort(fieldnames(v));
+        n=numel(labels);
 
-
-    function ensure_vector(v,pos,i)
-        if ~isvector(v)
-            msg='only input with vectors is supported';
-        elseif ~(isnumeric(v) || iscellstr(v))
-            msg=['only inputs with numeric vectors or cellstrings '...
-                    'are supported'];
-        else
-            % all fine
-            return
+        v_cell=cell(n,1);
+        for k=1:n
+            label=labels{k};
+            v_value=v.(label);
+            ensure_vector(v_value,pos,label);
+            v_cell{k}=v_value;
         end
+    else
+        ensure_vector(v,pos,1);
+        v_cell={v(:)};
+        labels=[];
+    end
 
 
-        % throw error
-        error('input %d, element %d: %s',pos,i,msg);
+function ensure_vector(v,pos,i)
+    if ~isvector(v)
+        msg='only input with vectors is supported';
+    elseif ~(isnumeric(v) || iscellstr(v))
+        msg=['only inputs with numeric vectors or cellstrings '...
+                'are supported'];
+    else
+        % all fine
+        return
+    end
+
+    if ischar(i)
+        elem_str=['field ' i];
+    else
+        elem_str=sprintf('element %d', i);
+    end
+
+    % throw error
+    error('input %d, %s: %s',pos,elem_str,msg);
+
+function ensure_matching_labels(x_label, y_label)
+    if ~isequal(x_label, y_label)
+        if iscellstr(x_label) && iscellstr(y_label)
+            error(['field name mismatch between two inputs: '...
+                    '[%s] ~= [%s]'],...
+                    cosmo_strjoin(x_label),cosmo_strjoin(y_label));
+        else
+            error(['either both inputs must be cells or vectors, ',...
+                    'or both must be structs']);
+        end
+    end
+
+
