@@ -51,3 +51,14 @@ function test_correlation_measure_basis()
         assertElementsAlmostEqual(c5.samples, c4.samples(j));
     end
 
+    % test permutations
+    ds4=cosmo_synthetic_dataset('nchunks',2,'ntargets',10);
+    rp=randperm(20);
+
+    ds4_perm=cosmo_slice(ds4,rp);
+    assertEqual(cosmo_correlation_measure(ds4),...
+                    cosmo_correlation_measure(ds4_perm));
+    opt=struct();
+    opt.output='correlation';
+    assertEqual(cosmo_correlation_measure(ds4,opt),...
+                    cosmo_correlation_measure(ds4_perm,opt));
