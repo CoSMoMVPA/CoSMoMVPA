@@ -60,3 +60,20 @@ function test_interval_neighborhood_sa()
             assertEqual(nbrhood.neighbors{k},find(msk)');
         end
     end
+
+
+function test_interval_neighborhood_fa()
+    ds=cosmo_synthetic_dataset('type','meeg','size','big');
+    nf=size(ds.samples,2);
+    rp=randperm(nf);
+    dsp=cosmo_slice(ds,rp,2);
+
+    for radius=0:10
+        nhp=cosmo_interval_neighborhood(dsp,'time','radius',radius);
+        assertEqual(nhp.a.fdim.values{1},ds.a.fdim.values{2});
+
+        for k=1:numel(nhp.neighbors)
+            idx=find(abs(nhp.fa.time(k)-dsp.fa.time)<=radius);
+            assertEqual(nhp.neighbors{k},idx);
+        end
+    end
