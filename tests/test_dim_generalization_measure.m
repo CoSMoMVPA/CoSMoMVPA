@@ -12,11 +12,13 @@ function test_dim_generalization_measure_basics
     aet(ds);
 
     ds=cosmo_synthetic_dataset('type','meeg');
+    ds=cosmo_stack({ds,cosmo_slice(ds,1:2,2)},2);
 
-    % three time points, two channels
-    ds.fa.chan=[1 2 1 2 1 2];
-    ds.fa.time=[1 1 2 2 3 3];
-    ds.a.fdim.values{2}=[-1 0 1];
+     % four time points, two channels
+    ds.fa.chan=[1 2 1 2 1 2 1 2];
+    ds.fa.time=[1 1 2 2 3 3 4 4];
+    ds.a.fdim.values{1}{end}='foochan';
+    ds.a.fdim.values{2}=[-1 0 1 2];
     cosmo_check_dataset(ds);
     opt=struct();
     opt.measure=@delta_measure;
@@ -24,6 +26,7 @@ function test_dim_generalization_measure_basics
     aet(ds,'dimension','time');
     opt.dimension='time';
     aet(ds,opt);
+
 
     ds=cosmo_dim_transpose(ds,'time',1);
 
@@ -61,17 +64,23 @@ function test_dim_generalization_measure_basics
         expected_result_cell=cell(ntime,1);
 
         pos=0;
-        for k=1:numel(unq_tr_time)
+        for k=(1+radius):(numel(unq_tr_time)-radius)
             tr_time=unq_tr_time(k);
             tr=cosmo_slice(tr_ds,abs(tr_ds.sa.time-tr_time)<=radius);
-            for j=1:numel(unq_te_time)
+            tr_tr=cosmo_dim_transpose(tr,'time',2);
+            for j=(1+radius):(numel(unq_te_time)-radius)
                 te_time=unq_te_time(j);
                 te=cosmo_slice(te_ds,abs(te_ds.sa.time-te_time)<=radius);
 
-                tr_te=cosmo_stack({tr,te});
+                te_tr=cosmo_dim_transpose(te,'time',2);
+
+
+                both=cosmo_stack({tr_tr,te_tr});
+                both.a.fdim.values=both.a.fdim.values(1);
+                both.a.fdim.labels=both.a.fdim.labels(1);
                 pos=pos+1;
 
-                res=delta_measure(tr_te);
+                res=delta_measure(both);
                 e=ones(size(res.samples));
                 res.sa.train_time=e*k;
                 res.sa.test_time=e*j;
@@ -79,15 +88,17 @@ function test_dim_generalization_measure_basics
             end
         end
 
-        expected_result=cosmo_stack(expected_result_cell,1);
-        expected_result.a.sdim.labels{end}='train_time';
-        expected_result.a.sdim.labels{end+1}='test_time';
+        expected_result=cosmo_stack(expected_result_cell(1:pos),1);
+        expected_result.a.sdim.labels{1}='train_time';
+        expected_result.a.sdim.labels{2}='test_time';
 
         tr_dim=ds.a.sdim.values{1}(unq_tr_time);
         te_dim=ds.a.sdim.values{1}(unq_te_time);
 
-        expected_result.a.sdim.values{end}=tr_dim(:);
-        expected_result.a.sdim.values{end+1}=te_dim(:);
+        expected_result.a.sdim.values{1}=tr_dim(:);
+        expected_result.a.sdim.values{2}=te_dim(:);
+
+        expected_result=cosmo_dim_prune(expected_result);
 
         result=cosmo_dim_generalization_measure(ds,opt,'radius',radius);
         assertEqual(result, expected_result);
@@ -112,11 +123,7 @@ function test_dim_generalization_measure_basics
     opt.measure=@cosmo_correlation_measure;
     opt.output='correlation';
     result=cosmo_dim_generalization_measure(ds,opt);
-    result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
 
-    assertElementsAlmostEqual(result.samples,result_perm.samples);
-    assertEqual(result.sa,result_perm.sa);
-    assertEqual(result.a,result_perm.a);
 
     ds1=cosmo_slice(ds,ds.sa.chunks==1 & ds.sa.time==1);
     ds2=cosmo_slice(ds,ds.sa.chunks==2 & ds.sa.time==3);
@@ -150,10 +157,15 @@ function test_dim_generalization_measure_basics
     ds_tiny=cosmo_stack({ds1,ds2});
     opt.partitions=cosmo_nchoosek_partitioner(ds_tiny,1,'chunks',2);
     r=opt.measure(ds_tiny,opt);
+    ones_=ones(size(r.samples,1),1);
+    r.sa.test_time=ones_*1;
+    r.sa.train_time=ones_*2;
+    r.sa=rmfield(r.sa,'time');
+
     result1=cosmo_slice(result,result.sa.train_time==2 & ...
                                         result.sa.test_time==1);
-    %assertEqual(r.samples,result1.samples);
-    mp=cosmo_align(r.sa.chunks,result1.sa.chunks);
+
+    mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 
 

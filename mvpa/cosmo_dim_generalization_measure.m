@@ -18,7 +18,9 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %   'radius',r          radius used for the d dimension. For example, when
 %                       set to r=4 with d='time', then 4*2+1 time points
 %                       are used to asses generalization, (except on the
-%                       edges)
+%                       edges). Note that when using a radius>0, it is
+%                       assumed that splits of the dataset by dimension d
+%                       have corresponding elements in the same order.
 %   K,V                 any other key-value pairs necessary for the measure
 %                       m, for example 'classifier' if
 %                       m=@cosmo_crossvalidation_measure
@@ -261,20 +263,26 @@ function [values,splits]=split_half_by_dimension(ds,opt)
     % split dataset by ds.a.(opt.dimension)
     dimension=opt.dimension;
     ds_pruned=cosmo_dim_prune(ds,{dimension},1);
-    nbrhood=cosmo_interval_neighborhood(ds_pruned,dimension,opt);
+    ds_tr=cosmo_dim_transpose(ds_pruned,dimension,2);
+
+    nbrhood=cosmo_interval_neighborhood(ds_tr,dimension,opt);
+    assert(isequal(nbrhood.a.fdim.labels,{dimension}));
+
+    counts=cellfun(@numel,nbrhood.neighbors);
+
+    keep_nbrs=find(counts==max(counts));
 
     % remove dimension information
-    ds_pruned.a=rmfield(ds_pruned.a,'sdim');
-    ds_pruned.sa=rmfield(ds_pruned.sa,dimension);
+    ds_tr=remove_fa_field(ds_tr,dimension);
 
-    assert(isequal(nbrhood.a.sdim.labels,{dimension}));
-    values=nbrhood.a.sdim.values{1}(:);
+    values=nbrhood.a.fdim.values{1}(keep_nbrs);
 
-    n=numel(nbrhood.neighbors);
+    n=numel(keep_nbrs);
     splits=cell(n,1);
 
     for k=1:n
-        splits{k}=cosmo_slice(ds_pruned,nbrhood.neighbors{k},1,false);
+        idx=nbrhood.neighbors{keep_nbrs(k)};
+        splits{k}=cosmo_slice(ds_tr,idx,2,false);
     end
 
 
@@ -290,4 +298,18 @@ function ds=add_sample_attr(ds, dim_labels, dim_values)
     ds.a.sdim.labels=[ds.a.sdim.labels dim_labels];
 
 
+function ds=remove_fa_field(ds,label)
+    if isfield(ds.fa,label);
+        ds.fa=rmfield(ds.fa,label);
+    end
+
+    [dim, index, attr_name, dim_name]=cosmo_dim_find(ds,...
+                                                label,false);
+    if ~isempty(dim)
+        sfdim=ds.a.(dim_name);
+        m=~cosmo_match(sfdim.labels,label);
+        sfdim.values=sfdim.values(m);
+        sfdim.labels=sfdim.labels(m);
+        ds.a.(dim_name)=sfdim;
+    end
 
