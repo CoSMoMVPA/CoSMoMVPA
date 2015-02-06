@@ -1,5 +1,5 @@
-function test_correlation_measure
-
+function test_suite=test_correlation_measure
+    initTestSuite;
 
 function test_correlation_measure_basis()
     ds3=cosmo_synthetic_dataset('nchunks',3,'ntargets',4);
