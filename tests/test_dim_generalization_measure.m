@@ -111,8 +111,9 @@ function test_dim_generalization_measure_basics
     assertFalse(isequal(ds_perm,ds));
 
     opt.radius=1;
-    result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
-    assertEqual(result_perm,result);
+    assertExceptionThrown(@()cosmo_dim_generalization_measure(ds_perm,opt),'')
+    %result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
+    %assertEqual(result_perm,result);
 
     % try with correlation measure
     ds=cosmo_stack({ds,ds},2);
@@ -164,7 +165,7 @@ function test_dim_generalization_measure_basics
 
     result1=cosmo_slice(result,result.sa.train_time==2 & ...
                                         result.sa.test_time==1);
-
+    result1.sa=rmfield(result1.sa,'transpose_ids');
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 

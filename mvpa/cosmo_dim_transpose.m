@@ -109,7 +109,7 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
         sp{k}=copy_attr(sp{k}, dim_labels, target_dim);
     end
 
-    ds=cosmo_stack(sp, target_dim, 'drop_nonunique');
+    ds=cosmo_stack(sp, target_dim, 'unique');
 
     src_name=dim2attr_name(source_dim);
     for k=1:numel(dim_labels)
@@ -153,7 +153,8 @@ function attr_name=dim2label(dim)
 
 function ds=copy_attr(ds, dim_labels, target_dim)
     % copy between .fa and .sa
-    src_name=dim2attr_name(3-target_dim);
+    source_dim=3-target_dim;
+    src_name=dim2attr_name(source_dim);
     trg_name=dim2attr_name(target_dim);
 
     trg_size=[1 1];
@@ -168,9 +169,15 @@ function ds=copy_attr(ds, dim_labels, target_dim)
         unq=v(1);
         assert(all(unq==v(:)));
 
-        %ds.(src_name)=rmfield(ds.(src_name),dim_label);
+        ds.(src_name)=rmfield(ds.(src_name),dim_label);
         ds.(trg_name).(dim_label)=repmat(unq,trg_size);
     end
+
+
+    attr_label='transpose_ids';
+    src_size=[1 1];
+    src_size(source_dim)=size(ds.samples,source_dim);
+    ds.(src_name).(attr_label)=reshape(1:max(src_size),src_size);
 
 function ds=move_dim(ds, dim_labels, dim, trg_pos)
     % move between .a.fdim and .a.sdim
