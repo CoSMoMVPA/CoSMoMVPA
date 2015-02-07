@@ -23,6 +23,9 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %                   in ds_tr.a.sdim[fdim] (if target_dim is 1 [or 2]), and
 %                   where the fieldnames of ds_tr.sa[fa] is a superset of
 %                   dim_labels.
+%                   A field .fa.transpose_ids [.sa.transpose_ids] is added
+%                   indicating the original feature [sample] id (column
+%                   [row]) that the samples belonged too.
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset('type','timefreq');

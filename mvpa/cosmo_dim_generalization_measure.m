@@ -20,7 +20,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %                       are used to asses generalization, (except on the
 %                       edges). Note that when using a radius>0, it is
 %                       assumed that splits of the dataset by dimension d
-%                       have corresponding elements in the same order.
+%                       have corresponding elements in the same order
+%                       (such as provided by cosmo_dim_transpose).
 %   K,V                 any other key-value pairs necessary for the measure
 %                       m, for example 'classifier' if
 %                       m=@cosmo_crossvalidation_measure
@@ -126,16 +127,18 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     >          0.05           0.05
 %     >           0.1 ]@7x1      0.1 ]@7x1 }
 %
+%
 % Notes:
 %   - this function can be used together with searchlight
 %   - to make a dimension d a sample dimension from a feature dimension
 %     (usually necessary before running this function), or the other way
 %     around (usually necessary after running this function), use
-%     cosmo_dim_transpose
+%     cosmo_dim_transpose.
 %   - a 'partition' argument should not be provided, because this function
 %     generates them itself. The partitions are generated so that there
 %     is a single fold; samples with chunks==1 are always used for training
-%     and those with chunks==2 are used for testing. In the case of using
+%     and those with chunks==2 are used for testing (e.g. when using
+%     m=@cosmo_crossvalidation_measure). In the case of using
 %     m=@cosmo_correlation_measure, this amounts to split-half
 %     correlations.
 %
