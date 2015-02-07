@@ -20,9 +20,6 @@ function test_align_basics
     assertEqual(mp,[3 1 2]);
     assertEqual(pm,[2 3 1]);
 
-    [mp,pm]=cosmo_align({'b','c','d','d'},{'d','b','c','d'});
-    assertTrue(isequal(mp,[3 1 2 4])||isequal(mp,[4 1 2 3]));
-
 
     [mp,pm]=cosmo_align({{'b','c','c'},[3 2 3]},...
                             {{'c','b','c'},[3 3 2]});
@@ -62,5 +59,8 @@ function test_align_basics
 
     aet(struct,struct('a',1));
     aet(struct('a',1),1);
+
+    aet({'b','c','d','d'},{'d','b','c','d'});
+
 
 
