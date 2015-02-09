@@ -131,7 +131,7 @@ function check_nbrhoods(nbrhoods,ds)
             i=find(~ok_msk,1);
             error(['%d-th neighborhood .neighbors{%d} is not '...
                     'in range 1..%d or not all integer'],...
-                    k, i);
+                    k, i, nfeatures);
         end
     end
 
