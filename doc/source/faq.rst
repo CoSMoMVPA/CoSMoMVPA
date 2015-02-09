@@ -6,25 +6,27 @@ Frequently Asked/Anticipated Questions
 **What, yet another MVPA toolbox? How is this toolbox different from others?**
     Indeed, another MVPA toolbox, featuring:
 
-    + *Simple*, *light-weight*, and *modular* Matlab_ functions .
+    + *Simple*, *light-weight*, and *modular* Matlab_ / Octave_ functions .
     + Provides implementations of *all common MVPA analyses* for (correlations, representational similarity, classifiers, crossvalidation, searchlight analysis).
-    + Aims to support volumetric fMRI, surface-based fMRI, and MEEG data alike.
+    + Supports volumetric fMRI, surface-based fMRI, and MEEG data alike.
+    + Provides :ref:`searchlight <cosmo_searchlight>` functionality for :ref:`volumetric <demo_fmri_searchlight_lda>`, :ref:`surface-based <demo_surface_searchlight_lda>, MEEG `time-locked <demo_meeg_timelock_searchlight>`, and :ref:`time-frequency <demo_meeg_timefreq_searchlight>` data.
+    + Supports measuring :ref:`generalization over time <demo_meeg_timeseries_generalization>` (or any other dimension), either in an ROI or through a searchlight.
     + Support a variety of formats:
 
-        * fMRI volumetric (:ref:`cosmo_fmri_dataset` and :ref:`cosmo_map2fmri`): AFNI, BrainVoyager, ANALYZE, NIFTI. It can also load ``SPM.mat`` files from SPM_.
-        * fMRI surface-based (:ref:`cosmo_surface_dataset` and :ref:`cosmo_map2surface`): Brainvoyager, AFNI (NIML), GIFTI
+        * fMRI volumetric (:ref:`cosmo_fmri_dataset` and :ref:`cosmo_map2fmri`): AFNI_, BrainVoyager_, ANALYZE, NIFTI_. It can also load ``SPM.mat`` files from SPM_.
+        * fMRI surface-based (:ref:`cosmo_surface_dataset` and :ref:`cosmo_map2surface`): Brainvoyager, AFNI (NIML).
         * MEEG (:ref:`cosmo_meeg_dataset` and :ref:`cosmo_map2meeg`): Fieldtrip, EEGLab.
 
-    + Various runnable *example scripts* and *exerices*, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer persective).
+    + Provides proper cluster-based :ref:`multiple comparison correction functionality <cosmo_montecarlo_cluster_stat>` (:ref:`example <demo_surface_tfce>`), using either Threshold-Free Cluster Enhancement or traditional cluster-size based Monte Carlo simulations.
+    + Runs on both Matlab_ and GNU Octave_.
+    + Various runnable :ref:`example scripts <contents_demo.rst>` and :ref:`exerices <cimec2014>`, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer persective).
 
     For comparison, here is a list of other MVPA toolboxes:
 
     + PyMVPA_ is implemented in Python (it provided inspiration for the dataset structure and semantics). Our toolbox implements the most commonly used MVP analyses (but not all of them) in Matlab. Those who are familiar with Matlab but not with Python may find CoSMoMVPA easier to use.
     + PRoNTo_ is another Matlab MVPA toolbox, that is much wider in scope and provies a Graphical User Interface. In contrast, our toolbox is more aimed on the analysis itself rather than providing a GUI, meaning it has much fewer lines of code and is simpler in design. This may make it easier to understand its functions, and to modify.
-    + Searchmight_ is aimed at searchlight analyses (and does these very fast). CoSMoMVPA does support such analyses (albeit slower), but also supports other types of analyses not covered by Searchmight.
+    + Searchmight_ is aimed at searchlight analyses (and does these very fast). CoSMoMVPA does support such analyses (:ref:`example <demo_fmri_searchlight_naive_bayes>`, but also supports other types of analyses not covered by Searchmight.
     + `Princeton MVPA`_ toolbox is a sophisticated toolbox but (we think) harder to use, and is currently not under active development.
-
-    To our knowledge, the other MVPA toolboxes support fewer data formats; we are neither aware of another toolbox that supports BrainVoyager datasets, nor of one that supports both NIFTI or ANALYZE, and AFNI, natively.
 
 
 **What does CoSMoMVPA *not* provide?**
@@ -38,10 +40,15 @@ Frequently Asked/Anticipated Questions
     Also, it does not make coffee for you.
 
 **Does it integrate with PyMVPA?**
-    The ``mvpa2/datasets/cosmo.py`` module in PyMVPA_ provides input and output support between CoSMoMVPA and PyMVPA datasets and neighborhoods. This means that, for example, searchlights defined in CoSMoMVPA can be run in PyMVPA (possibly benefitting from its multi-threaded implementation), and the results converted back to CoSMoMVPA format.
+    Yes. Dataset structures are pretty much identical in CoSMoMVPA_ (PyMVPA_ provided inspiration for the data structures). The ``mvpa2/datasets/cosmo.py`` module in PyMVPA_ provides input and output support between CoSMoMVPA and PyMVPA datasets and neighborhoods. This means that, for example, searchlights defined in CoSMoMVPA can be run in PyMVPA (possibly benefitting from its multi-threaded implementation), and the results converted back to CoSMoMVPA format.
 
 **Does it run on Octave?**
-    Allmost all functionality runs in Octave_, but there may be parts that function not so well. Unit tests do not work in Octave because some object-oriented features are not supported.
+    Allmost all functionality runs in Octave_, including unit tests through MOxUnit_, but there may be parts that function not so well:
+
+        - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``.
+        - Support of visualization of MEEG results in FieldTrip_ is limited, because FieldTrip_ provided limited Octave_ compatibility.
+        - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
+
 
 **How fast does it run?**
     CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). Analyses on regions of interest are typically completed in seconds.
@@ -57,7 +64,7 @@ Frequently Asked/Anticipated Questions
     * MEEG options:
 
         - Assign chunks based on the run number
-        - If the data in different trials in the same run can be assumed to be independent, use :ref:`cosmo_chunkize`.
+        - If the data in different trials in the same run can be assumed to be independent, use unique chunk values for each trial. If that gives you a lot of chunks (which makes crossvalidation slow), use :ref:`cosmo_chunkize`.
 
 **Who are the developers of CoSMoMVPA?**
     Currently the developers are Nikolaas N. Oosterhof and Andrew C. Connolly. In the code you may find their initials (``NNO``, ``ACC``) in commented header sections.
@@ -75,12 +82,11 @@ Frequently Asked/Anticipated Questions
 **What future features can be expected?**
     Time permitting, there are some features that may be added in the future:
 
-    + Spatial clustering.
-    + Threshold-Free Cluster Enhancement.
-    + Multiple-comparison correction for group analysis.
+    + MEEG source analysis support.
+    + Snippets of useful code no the website.
 
 **How can I contact the developers?**
-    Please send an email to a@c or b@c, where a=andrew.c.connolly, b=nikolaas.n.oosterhof, c=dartmouth.edu.
+    Please send an email to a@c or b@d, where a=andrew.c.connolly, b=nikolaas.oosterhof, c=dartmouth.edu, d=unitn.it.
 
 **Is there a mailinglist?**
     There is the `CoSMoMVPA Google group`_.

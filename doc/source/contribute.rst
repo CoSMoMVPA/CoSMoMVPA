@@ -34,7 +34,7 @@ To use ``CoSMoMVPA`` functionality, it is recommended to set the path using :ref
 - also add ``externals/`` and its subdirectories to the Matlab_ path.
 - do *not* add ``examples/`` or ``tests`` to the Matlab_ path.
     + To run examples, ``cd`` to ``examples/`` and run scripts from there.
-    + To run unit tests, ``cd`` to ``tests/`` and run ``run_tests`` from there (this requires the xUnit_ framework).
+    + To run unit tests, run ``cosmo_run_tests`` (this requires the xUnit_ or MOxUnit_ testing frameworks).
 
 Organization of files and directories
 +++++++++++++++++++++++++++++++++++++
@@ -632,7 +632,7 @@ CoSMoMPVA-specific guidelines
 
 Unit tests
 ^^^^^^^^^^
-Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects. They are located in ``tests/`` and use the xUnit_ framework. For existing or new features, more tests are very much welcomed.
+Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects. They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. For existing or new features, more tests are very much welcomed.
 
 .. include:: links.txt
 

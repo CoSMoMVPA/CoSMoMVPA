@@ -11,7 +11,7 @@ Download instructions
 Get the code and example data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Matlab code is required for analyses in CoSMoMVPA_; the example data is required to run the exercises and the :ref:`demos <contents_demo.rst>`.
+The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <cimec2014>` and the :ref:`demos <contents_demo.rst>`.
 
 * Get the CoSMoMVPA_ source code:
 
@@ -44,6 +44,41 @@ The Matlab code is required for analyses in CoSMoMVPA_; the example data is requ
         cosmo_wtf
 
     which should provide a report of available system information.
+
+.. _`get_octave_packages`:
+
+* (Matlab_ users can skip this step) For users of Octave_, some additional packages from `Octave-Force` are required. First run the following from the Octave prompt:
+
+    .. code-block:: matlab
+
+        pkg install -forge io
+        pkg install -forge nan
+        pkg install -forge statistics
+        pkg install -forge miscellaneous
+        pkg install -forge general
+
+    To activate these packages, run the following commands:
+
+    .. code-block:: matlab
+
+        pkg load io
+        pkg load nan
+        pkg load statistics
+        pkg load miscellaneous
+        pkg load general
+
+    To load these packages automatically when Octave is started, it is recommended to add the following *at the end* of the ``.octaverc`` file (which is typically located in the user's home directory). Note that the first command switches off the ``more`` program for viewing output, so that all output is show directly in the command window:
+
+    .. code-block:: matlab
+
+        more off
+        pkg load io
+        pkg unload nan
+        pkg load nan
+        pkg load statistics
+        pkg load miscellaneous
+        pkg load general
+
 
 .. _`get_tutorial_data`:
 
@@ -109,6 +144,7 @@ Certain functionality require certain external toolboxes:
 - Matlab_'s Support Vector Machine (SVM) classifier (accessed through :ref:`cosmo_classify_svm`), and some other functions that use statistical computations, require the `Matlab statistics`_ toolbox.
 - LIBSVM_'s Support Vector Machine (SVM) classifier (accessed through  :ref:`cosmo_classify_libsvm`) requires the LIBSVM_ toolbox.
 - MEEG data requires FieldTrip_ for almost all MEEG-related functions.
+- On Octave_, the ``io``, ``nan``, ``statistics``, ``miscellaneous`` and ``general`` are required; they are available from `Octave-Forge`_. See :ref:`here <get_octave_packages>` for details.
 
 For operations that require external toolboxes, CoSMoMVPA_ will check their presence. If a required external toolbox is not available, an error message is given with download instructions.
 
@@ -120,6 +156,6 @@ Contributions are welcomed! Please see :ref:`contribute`.
 
 We use a build system for generating documentation. This build system only supports `Unix-like`_ systems, and dependencies include Sphinx_, Python_, and `sphinxcontrib-matlabdomain`_. For details see :ref:`building the documentation`.
 
-Unit and doc tests tests require the xUnit_ toolbox.
+Unit tests require either the xUnit_ or MOxUnit_ toolbox and run on both Matlab_ and Octave_. Doc tests are currently only supported for xUnit_, which only runs on Matlab_ (not on Octave_). MOxUnit_ does not support doc tests because Octave_ does not support the ``evalc`` command.
 
 .. include:: links.txt

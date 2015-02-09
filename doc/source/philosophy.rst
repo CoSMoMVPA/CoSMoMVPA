@@ -30,7 +30,7 @@ Store data in matrix form along with additional attributes of the data
     + subsets of rows and columns (and the corresponding attributes) can be :ref:`split <cosmo_split>` or :ref:`selected <cosmo_slice>` (optionally after :ref:`matching <cosmo_split>`), and :ref:`combined <cosmo_stack>`), which makes many operations simple:
         - :ref:`cross-validation <cosmo_crossvalidation_measure>` using various partition scheme (:ref:`odd-even <cosmo_oddeven_partitioner>`, :ref:`nfold <cosmo_nfold_partitioner>`, or :ref:`more complicated <cosmo_nchoosek_partitioner>`) requires selecting a set of rows for training and a disjoint subset for testing.
         - ROI selection requires :ref:`selecting <cosmo_slice>` a set of columns.
-        - a :ref:`searchlight <cosmo_searchlight>` is repeated ROI selection, where the selection can be defined in a :ref:`neighborhood <cosmo_neighborhood>` (in a :ref:`sphere <cosmo_spherical_neighborhood>`, :ref:`interval <cosmo_interval_neighborhood>`, or on the :ref:`surface <cosmo_surficial_neighborhood>`).
+        - a :ref:`searchlight <cosmo_searchlight>` is repeated ROI selection, where the selection can be defined in a neighborhood (in a :ref:`sphere <cosmo_spherical_neighborhood>`, time or frequency :ref:`interval <cosmo_interval_neighborhood>`, set of :ref:`channels <cosmo_meeg_chan_neighborhood>`, on the cortical :ref:`surface <cosmo_surficial_neighborhood>`, or a :ref:`combination <cosmo_cross_neighborhood>` of these to form time-channel or time-channel-frequency searchlights).
 
 .. figure:: _static/cosmo_dataset.png
 

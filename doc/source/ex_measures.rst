@@ -68,7 +68,7 @@ allows using different measures (i.e. functions) by just changing one line of co
 
         measure=@my_funky_new_measuer_no_one_knows;
 
-which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measures>` but also for searchlight analyses described :ref:`later <ex_searchlight_measure>`.
+which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measure>` but also for searchlight analyses described :ref:`later <ex_searchlight_measure>`.
 
 For more information about function handles, run in Matlab: ``help function_handle``
 
