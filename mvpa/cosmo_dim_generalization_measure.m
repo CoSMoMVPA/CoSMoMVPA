@@ -151,6 +151,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 
     defaults=struct();
     defaults.radius=0;
+    defaults.progress=1;
+    defaults.check_partitions=false;
     opt=cosmo_structjoin(defaults,varargin);
 
     cosmo_check_dataset(ds);
@@ -182,6 +184,13 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 
     train_label=['train_' dimension];
     test_label=['test_' dimension];
+
+    % see if progress has to be shown
+    show_progress=~isempty(opt.progress) && opt.progress;
+    if show_progress
+        prev_progress_msg='';
+        clock_start=clock();
+    end
 
     % allocate space for output
     ntrain=numel(train_values);
@@ -215,6 +224,13 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
             pos=pos+1;
             result_cell{pos}=ds_result;
         end
+
+        if show_progress
+            msg=sprintf('%d / %d', k*ntest, ntrain*ntest);
+            prev_progress_msg=cosmo_show_progress(clock_start, ...
+                            k/ntrain, msg, prev_progress_msg);
+        end
+
     end
 
     % merge results into a dataset
