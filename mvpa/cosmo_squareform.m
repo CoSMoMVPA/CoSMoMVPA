@@ -60,8 +60,7 @@ function check_input(x)
 function s=to_vector(x)
     [side,side_]=size(x);
     if side~=side_
-        error('direction ''%s'' requires a square matrix as input', ...
-                                                    direction);
+        error('direction ''to_vector'' requires a square matrix as input');
     end
 
 
