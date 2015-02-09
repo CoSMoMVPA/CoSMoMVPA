@@ -368,19 +368,5 @@ function c=stack_values(dim, vs, where, check)
         ensure_same_size_along_dim(other_dim, vs, where);
     end
 
-    if iscell(vs) && ~isempty(vs) && ischar(vs{1})
-        % cell with strings needs special care, because normal cat
-        % produces a character array, not a cell with strings
-        transpose=dim==2;
-
-        vcat=cat(1,vs{:});
-        c=cellstr(vcat);
-
-        if transpose
-            c=c';
-        end
-    else
-        c=cat(dim, vs{:});
-    end
-
+    c=cat(dim, vs{:});
 
