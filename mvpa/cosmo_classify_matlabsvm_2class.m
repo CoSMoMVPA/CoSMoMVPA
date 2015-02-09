@@ -69,10 +69,11 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
         s = svmtrain(samples_train, targets_train, opt_cell{:});
         predicted=svmclassify(s, samples_test);
         % <@@<
-    catch me
+    catch
+        caught_exception=lasterror();
         cosmo_check_external('matlabsvm');
 
-        if strcmp(me.identifier,'stats:svmtrain:NoConvergence');
+        if strcmp(caught_exception.identifier,'stats:svmtrain:NoConvergence');
             error(['SVM training did not converge. Your options are:\n'...
                    ' 1) increase ''boxconstraint''\n'...
                    ' 2) increase ''tolkkt''\n'...
@@ -82,7 +83,7 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
                    'either option, you are advised to try option (4) '...
                    'using cosmo_classify_lda'],'');
         else
-            rethrow(me);
+            rethrow(caught_exception);
         end
     end
 

@@ -62,7 +62,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     measure_args.dimension=dim_label;
 %     %
 %     % run time-by-time generalization analysis
-%     dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args);
+%     dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args,...
+%                                               'progress',false);
 %     %
 %     % the output has train_time and test_time as sample dimensions
 %     cosmo_disp(dgm_ds.a)

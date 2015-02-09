@@ -572,11 +572,17 @@ function senstypes=old_fieldtrip_add_combined_planar(senstypes, key)
         planar_combined_key=[key '_planar_combined'];
         senstypes.(planar_combined_key)=senstypes.(key);
         senstypes.(planar_combined_key).label=planar_channel_set(:,3);
-    catch ft_me
-        base_me=MException('CoSMoMVPA:planarchannelset',...
+    catch
+        caught_error=lasterror();
+        if cosmo_wtf('is_matlab')
+            ft_me=MException(caught_error.identifier,caught_error.message);
+            base_me=MException('CoSMoMVPA:planarchannelset',...
                     'unable to get planar channel set with old Fieldtrip');
-        both_me=addCause(base_me, ft_me);
-        throw(both_me);
+            both_me=addCause(base_me, ft_me);
+            throw(both_me);
+        else
+            rethrow(caught_error);
+        end
     end
 
 

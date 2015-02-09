@@ -133,8 +133,9 @@ function s=cosmo_config()
             ww{k+1}=sprintf('  %s: %s',fn,c.(fn));
         end
         s=cosmo_strjoin(ww,'\n');
-    catch e;
-        s=e.getReport();
+    catch
+        caught_error=lasterror();
+        s=caught_error.message;
     end
 
 
