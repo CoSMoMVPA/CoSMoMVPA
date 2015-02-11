@@ -204,8 +204,6 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     for k=1:ntrain
         % update partitions train set
         opt.partitions.train_indices{1}=1:ntrain_elem(k);
-        opt.partitions.test_indices{1}=[];
-        opt.partitions=cosmo_balance_partitions(opt.partitions,ds,opt);
         for j=1:ntest
             % update partitions test set
             opt.partitions.test_indices{1}=ntrain_elem(k)+...
@@ -213,7 +211,10 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
             % merge training and test dataset
             ds_merged=cosmo_stack({train_splits{k},test_splits{j}},...
                                                         1,1,false);
-
+            if k==1
+                opt.partitions=cosmo_balance_partitions(opt.partitions,...
+                                                            ds_merged,opt);
+            end
             % apply measure
             ds_result=measure(ds_merged,opt);
 
