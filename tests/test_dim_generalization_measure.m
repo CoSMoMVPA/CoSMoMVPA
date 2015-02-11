@@ -21,6 +21,7 @@ function test_dim_generalization_measure_basics
     ds.a.fdim.values{2}=[-1 0 1 2];
     cosmo_check_dataset(ds);
     opt=struct();
+    opt.progress=false;
     opt.measure=@delta_measure;
     aet(ds,opt);
     aet(ds,'dimension','time');
@@ -169,6 +170,36 @@ function test_dim_generalization_measure_basics
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 
+    % try with unbalanced partitions
+    opt.classifier=@my_stupid_classifier;
+    ds.sa.orig_targets=ds.sa.targets;
+    ds.sa.targets(ds.sa.targets==2)=3;
+
+    ds1=cosmo_slice(ds,ds.sa.chunks==2 & ds.sa.time==1);
+    ds2=cosmo_slice(ds,ds.sa.chunks==1 & ds.sa.time==3);
+    ds_tiny=cosmo_stack({ds1,ds2});
+
+    opt.partitions=cosmo_nchoosek_partitioner(ds_tiny,1,'chunks',2);
+    opt.partitions=cosmo_balance_partitions(opt.partitions,ds_tiny);
+    r=opt.measure(ds_tiny,opt);
+    r.sa.test_time=ones_*1;
+    r.sa.train_time=ones_*2;
+    r.sa=rmfield(r.sa,'time');
+
+    opt=rmfield(opt,'partitions');
+    result=cosmo_dim_generalization_measure(ds,opt);
+    result1=cosmo_slice(result,result.sa.train_time==2 & ...
+                                        result.sa.test_time==1);
+    result1.sa=rmfield(result1.sa,'transpose_ids');
+
+    mp=cosmo_align(r.sa,result1.sa);
+    assertEqual(r.samples(mp),result1.samples);
+
+
+function pred=my_stupid_classifier(x,y,z,unused)
+    [foo,i]=sort(x(:));
+    unq=unique(y);
+    pred=unq(mod(i(1:size(z,1)),numel(unq))+1)
 
 function z=delta_func(x,y)
     z_mat=bsxfun(@minus,mean(x,1),mean(y,1)');
