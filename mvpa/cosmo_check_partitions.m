@@ -159,10 +159,11 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     is_ok=true;
 
 function check_range(idxs,nsamples,partition,label)
-    msg='';
     if isempty(idxs)
-        msg='empty';
-    elseif ~isequal(idxs,round(idxs))
+        return;
+    end
+    msg='';
+    if ~isequal(idxs,round(idxs))
         msg='not integers';
     elseif min(idxs)<1 || max(idxs)>nsamples
         msg=sprintf('outside range 1..%d',nsamples);
