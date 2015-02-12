@@ -3,13 +3,23 @@
 --------------------------------------
 Frequently Asked/Anticipated Questions
 --------------------------------------
+**What is the history of CoSMoMVPA?**
+
+    CoSMoMVPA was started when Gunnar Blohm and Sara Fabri invited the developers (ACC and NNO) to speak at the *2013 Summer School in Computational Sensory-Motor Neuroscience* ( `CoSMo 2013 workshop`_ ) about multivariate pattern analysis methods.
+
+    In a few days they wrote the basic functionality including the dataset structure (inspired by PyMVPA_), basic input/output support for the NIFTI format, correlation analysis, several classifiers, cross-validation, and representational similarity analysis. They also decided to use restructured text to build a website, and wrote a custom build script to generate documentation for the website, including multiple versions of Matlab files to generate both exercises files (with some code to be filled in) and solution files (with all the code).
+
+    Their plan was to let participants write a basic MVPA toolbox in two days (see the :ref:`exercises <cosmo2013>`). This was, with hindsight, a tad ambitious.
+
+    The initial components in CoSMoMVPA_ still stand, but quite a few things have changed in the meantime. CoSMoMVPA has added support for various file formats, including surface-based data and MEEG data. It also supports a wider range of analyses. Finally, there is a new set of :ref:`exercises <cimec2014>`, less aimed at writing your own toolbox, but more at understanding and implementing basic MVPA techniques using CoSMoMVPA_.
+
 **What, yet another MVPA toolbox? How is this toolbox different from others?**
     Indeed, another MVPA toolbox, featuring:
 
     + *Simple*, *light-weight*, and *modular* Matlab_ / Octave_ functions .
     + Provides implementations of *all common MVPA analyses* for (correlations, representational similarity, classifiers, crossvalidation, searchlight analysis).
     + Supports volumetric fMRI, surface-based fMRI, and MEEG data alike.
-    + Provides :ref:`searchlight <cosmo_searchlight>` functionality for :ref:`volumetric <demo_fmri_searchlight_lda>`, :ref:`surface-based <demo_surface_searchlight_lda>, MEEG `time-locked <demo_meeg_timelock_searchlight>`, and :ref:`time-frequency <demo_meeg_timefreq_searchlight>` data.
+    + Provides :ref:`searchlight <cosmo_searchlight>` functionality for :ref:`volumetric <demo_fmri_searchlight_lda>`, :ref:`surface-based <demo_surface_searchlight_lda>`, MEEG `time-locked <demo_meeg_timelock_searchlight>`, and :ref:`time-frequency <demo_meeg_timefreq_searchlight>` data.
     + Supports measuring :ref:`generalization over time <demo_meeg_timeseries_generalization>` (or any other dimension), either in an ROI or through a searchlight.
     + Support a variety of formats:
 

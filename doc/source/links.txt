@@ -4,6 +4,8 @@
 .. _AFNI: http://afni.nimh.nih.gov
 .. _AFNI Matlab: http://afni.nimh.nih.gov/afni/matlab/
 .. _BrainVoyager: http://www.brainvoyager.com
+.. _`CoSMo 2013 workshop`: http://www.compneurosci.com/CoSMo2013/
+.. _`CoSMo 2014 workshop`: http://www.compneurosci.com/CoSMo2014/
 .. _CoSMoMVPA: http://cosmomvpa.org
 .. _`CoSMoMVPA Google group`: https://groups.google.com/forum/#!forum/cosmomvpa
 .. _`CoSMoMVPA issues`: https://github.com/CoSMoMVPA/CoSMoMVPA/issues

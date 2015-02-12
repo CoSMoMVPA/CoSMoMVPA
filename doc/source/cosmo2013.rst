@@ -5,7 +5,7 @@
 CoSMo 2013 Multivariate Pattern Analysis Workshop
 =================================================
 
-These exercises were presented at the CoSMo 2013 workshop in Kingston, Ontario, Canada.
+These exercises were presented at the `CoSMo 2013 workshop`_ in Kingston, Ontario, Canada.
 For the latest set of exercises, see :ref:`cimec2014`.
 
 .. _cosmo2013:
