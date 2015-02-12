@@ -199,7 +199,7 @@ function test_dim_generalization_measure_basics
 function pred=my_stupid_classifier(x,y,z,unused)
     [foo,i]=sort(x(:));
     unq=unique(y);
-    pred=unq(mod(i(1:size(z,1)),numel(unq))+1)
+    pred=unq(mod(i(1:size(z,1)),numel(unq))+1);
 
 function z=delta_func(x,y)
     z_mat=bsxfun(@minus,mean(x,1),mean(y,1)');

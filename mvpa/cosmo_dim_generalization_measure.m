@@ -211,10 +211,10 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
             % merge training and test dataset
             ds_merged=cosmo_stack({train_splits{k},test_splits{j}},...
                                                         1,1,false);
-            if k==1
-                opt.partitions=cosmo_balance_partitions(opt.partitions,...
-                                                            ds_merged,opt);
-            end
+
+            opt.partitions=cosmo_balance_partitions(opt.partitions,...
+                                            ds_merged,opt);
+
             % apply measure
             ds_result=measure(ds_merged,opt);
 
