@@ -24,6 +24,27 @@ function test_chunkize_basis
     assertExceptionThrown(@()cosmo_chunkize(ds,2),'');
 
 
+function test_chunkize_imbalance()
+    ds=struct();
+    ds.samples=(1:5)';
+    assertExceptionThrown(@()cosmo_chunkize(ds,2),'');
+    ds.sa.chunks=2+[1 1 2 2 2]';
+    assertExceptionThrown(@()cosmo_chunkize(ds,2),'');
+    ds.sa.targets=10+[1 1 2 2 2]';
+    assertExceptionThrown(@()cosmo_chunkize(ds,2),'');
+    ds.sa.targets(:)=10+[1 2 1 2 2];
+    assertExceptionThrown(@()cosmo_chunkize(ds,3),'');
+    res=cosmo_chunkize(ds,2);
+
+    assertEqual(res,[1 1 2 2 2]');
+    ds2=cosmo_stack({ds,ds});
+    res2=cosmo_chunkize(ds2,2);
+    assertEqual(res2,[1 1 2 2 2 1 1 2 2 2]');
+
+
+
+
+
 
 
 
