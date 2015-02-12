@@ -78,20 +78,33 @@ function chunks=cosmo_chunkize(ds,nchunks)
 
     nsamples=size(ds.samples,1);
 
-    [idxs,unq_cell]=cosmo_index_unique({ds.sa.chunks});
-    unq_chunks=unq_cell{1};
+    [idxs_ct,unq_ct]=cosmo_index_unique(...
+                                        [ds.sa.chunks ds.sa.targets]);
 
-    nunq=numel(unq_chunks);
+    [idxs_c,unq_c]=cosmo_index_unique(unq_ct(:,1));
+    [unused,unq_t]=cosmo_index_unique(unq_ct(:,2));
 
-    if nchunks>nunq
+    nunq_c=numel(unq_c);
+    nunq_t=numel(unq_t);
+    nunq_ct=size(unq_ct,1);
+
+    if nunq_c*nunq_t>nunq_ct
+        error(['Balance mismatch: there are %d unique chunks and '...
+                '%d unique targets, but the number of unique '...
+                'combinations is less than that, only %d'],...
+                nunq_c,nunq_t,nunq_ct);
+    end
+
+    if nchunks>nunq_c
         error('Cannot make %d chunks, only %d are present',...
-                    nchunks,nunq);
+                    nchunks,nunq_c);
     end
 
     chunks=zeros(nsamples,1);
 
-    for k=1:nunq
-        chunks(idxs{k})=mod(k-1,nchunks)+1;
+    for k=1:nunq_c
+        rows=cat(1,idxs_ct{idxs_c{k}});
+        chunks(rows)=mod(k-1,nchunks)+1;
     end
 
 
@@ -112,3 +125,14 @@ function check_input(ds)
                'where N is the number of samples'...
                '(i.e. N=size(ds.samples,1) for a dataset struct ds']);
     end
+
+    if ~cosmo_isfield(ds,'sa.targets')
+        error(['dataset has not fields .sa.targets; this is required '...
+                'to balance it. Normally, .sa.targets should indicate '...
+                'the condition of interest, so that samples with '...
+                'different target values are in different conditions. '...
+                'If all samples are in the same condition, then '...
+                '.sa.targets can be a column vector with ones']);
+    end
+
+
