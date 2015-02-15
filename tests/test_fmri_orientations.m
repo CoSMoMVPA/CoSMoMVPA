@@ -52,8 +52,7 @@ function test_orientations()
     end
 
 function test_fmri_orientations_with_afni_binary()
-    afni_command='which afni && afni -version > /dev/null';
-    has_afni=run_afni_command(afni_command, false);
+    has_afni=cosmo_check_external('afni_bin',false);
     if ~has_afni
         cosmo_notify_test_skipped('afni binaries not available');
         return

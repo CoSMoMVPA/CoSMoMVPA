@@ -285,6 +285,7 @@ function externals=get_externals()
 
     externals.afni_bin.is_present=@() isunix() && ...
                           ~unix(['which afni > /dev/null && '...
+                                 'which 3dresample > /dev/null '...
                                     'afni --version >/dev/null']);
     externals.afni_bin.is_recent=yes;
     externals.afni_bin.label='AFNI binaries';
@@ -319,7 +320,7 @@ function externals=get_externals()
                     'fileexchange/8797-tools-for-nifti-and-analyze-image'];
     externals.nifti.authors={'J. Shen'};
 
-    externals.fieldtrip.is_present=@() has('ft_read_data');
+    externals.fieldtrip.is_present=@() has('ft_defaults');
     % in the future, may require from 2014 onwards
     %externals.fieldtrip.is_recent=getfield(dir(which('ft_databrowser')),...
     %                                        'datenum')>datenum(2014,1,1);
