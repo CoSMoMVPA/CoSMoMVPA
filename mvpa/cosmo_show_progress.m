@@ -56,11 +56,17 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
         error('illegal progress %d: should be between 0 and 1', progress);
     end
 
+    if progress==0
+        ratio_to_do=Inf;
+    else
+        ratio_to_do=(1-progress)/progress;
+    end
+
     took=etime(clock, clock_start);
-    eta=(1-progress)/progress*took; % 'estimated time of arrival'
+    eta=ratio_to_do*took; % 'estimated time of arrival'
 
     % set number of backspace characters
-    delete_str=repmat('\b',1,delete_count);
+    delete_str=repmat(sprintf('\b'),1,delete_count);
 
     % define the bar
     bar_width=20;
@@ -73,11 +79,15 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
     % progress line nor printing it to standard out applies interpolation.
     progress_line=[sprintf('+%s [%s] -%s  ', secs2str(took), bar_str, ...
                                         secs2str(-eta)),...
-                   msg,...           % avoid pattern replacement of '%'
-                   sprintf('\n')];
+                   msg];
 
-    % the '%%' occurences in msg will be replaced back to '%' by fprintf
-    fprintf([delete_str strrep(progress_line,'%','%%')]);
+    if progress==1
+        postfix=sprintf('\n');
+    else
+        postfix='';
+    end
+
+    fprintf('%s%s%s',delete_str,progress_line,postfix);
 
 function [m,d]=moddiv(x,y)
     % helper function that does mod and div together so that m+d*y==x
