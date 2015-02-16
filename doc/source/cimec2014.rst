@@ -45,3 +45,6 @@ Indices and tables
 * :ref:`search`
 
 .. _matlab_pb_toc: _static/publish/index.html
+
+.. include:: links.txt
+

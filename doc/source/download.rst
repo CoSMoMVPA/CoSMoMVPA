@@ -54,8 +54,8 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
         pkg install -forge io
         pkg install -forge nan
         pkg install -forge statistics
-        pkg install -forge miscellaneous
         pkg install -forge general
+        pkg install -forge miscellaneous
 
     To activate these packages, run the following commands:
 
@@ -64,8 +64,9 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
         pkg load io
         pkg load nan
         pkg load statistics
-        pkg load miscellaneous
         pkg load general
+        pkg load miscellaneous
+
 
     To load these packages automatically when Octave is started, it is recommended to add the following *at the end* of the ``.octaverc`` file (which is typically located in the user's home directory). Note that the first command switches off the ``more`` program for viewing output, so that all output is show directly in the command window:
 

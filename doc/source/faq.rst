@@ -19,7 +19,7 @@ Frequently Asked/Anticipated Questions
     + *Simple*, *light-weight*, and *modular* Matlab_ / Octave_ functions .
     + Provides implementations of *all common MVPA analyses* for (correlations, representational similarity, classifiers, crossvalidation, searchlight analysis).
     + Supports volumetric fMRI, surface-based fMRI, and MEEG data alike.
-    + Provides :ref:`searchlight <cosmo_searchlight>` functionality for :ref:`volumetric <demo_fmri_searchlight_lda>`, :ref:`surface-based <demo_surface_searchlight_lda>`, MEEG `time-locked <demo_meeg_timelock_searchlight>`, and :ref:`time-frequency <demo_meeg_timefreq_searchlight>` data.
+    + Provides :ref:`searchlight <cosmo_searchlight>` functionality for :ref:`volumetric <demo_fmri_searchlight_lda>`, :ref:`surface-based <demo_surface_searchlight_lda>`, MEEG :ref:`time-locked <demo_meeg_timelock_searchlight>`, and :ref:`time-frequency <demo_meeg_timefreq_searchlight>` data.
     + Supports measuring :ref:`generalization over time <demo_meeg_timeseries_generalization>` (or any other dimension), either in an ROI or through a searchlight.
     + Support a variety of formats:
 

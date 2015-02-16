@@ -21,8 +21,8 @@ Prerequisites
 
 Using CoSMoMVPA_ effectively requires:
 
-- a working installation of Matlab_.
-- the CoSMoMVPA Matlab source code
+- a working installation of Matlab_ or `Octave`_.
+- the CoSMoMVPA source code, available from GitHub_; see :ref:`here <download>` for instructions to get you environment ready.
 - optionally the tutorial data, available :ref:`here <download>` (to run the :ref:`exercises <ex_toc>`).
 - optionally some external toolboxes for AFNI, BrainVoyager, and/or FieldTrip file support; see :ref:`here <download>`.
 - an :ref:`advanced beginner level <matlab_experience>` of experience in Matlab programming.
