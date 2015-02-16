@@ -11,16 +11,19 @@ function [hdr, filetype, fileprefix, machine] = load_nii_hdr(fileprefix)
    machine = 'ieee-le';
    new_ext = 0;
 
-   if findstr('.nii',fileprefix) & strcmp(fileprefix(end-3:end), '.nii')
+   if ~isempty(findstr('.nii',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.nii')
       new_ext = 1;
       fileprefix(end-3:end)='';
    end
 
-   if findstr('.hdr',fileprefix) & strcmp(fileprefix(end-3:end), '.hdr')
+   if ~isempty(findstr('.hdr',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.hdr')
       fileprefix(end-3:end)='';
    end
 
-   if findstr('.img',fileprefix) & strcmp(fileprefix(end-3:end), '.img')
+   if ~isempty(findstr('.img',fileprefix)) && ...
+                        strcmp(fileprefix(end-3:end), '.img')
       fileprefix(end-3:end)='';
    end
 
@@ -111,7 +114,7 @@ function [ dsr ] = read_header(fid)
 
     %  For Analyze data format
     %
-    if ~strcmp(dsr.hist.magic, 'n+1') & ~strcmp(dsr.hist.magic, 'ni1')
+    if ~strcmp(dsr.hist.magic, 'n+1') && ~strcmp(dsr.hist.magic, 'ni1')
         dsr.hist.qform_code = 0;
         dsr.hist.sform_code = 0;
     end

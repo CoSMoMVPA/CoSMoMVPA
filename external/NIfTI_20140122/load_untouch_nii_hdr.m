@@ -2,7 +2,7 @@
 
 %  - Jimmy Shen (jimmy@rotman-baycrest.on.ca)
 
-function hdr = load_nii_hdr(fileprefix, machine, filetype)
+function hdr = load_untouch_nii_hdr(fileprefix, machine, filetype)
 
    if filetype == 2
       fn = sprintf('%s.nii',fileprefix);
@@ -51,7 +51,7 @@ function [ dsr ] = read_header(fid)
 
     %  For Analyze data format
     %
-    if ~strcmp(dsr.hist.magic, 'n+1') & ~strcmp(dsr.hist.magic, 'ni1')
+    if ~strcmp(dsr.hist.magic, 'n+1') && ~strcmp(dsr.hist.magic, 'ni1')
         dsr.hist.qform_code = 0;
         dsr.hist.sform_code = 0;
     end

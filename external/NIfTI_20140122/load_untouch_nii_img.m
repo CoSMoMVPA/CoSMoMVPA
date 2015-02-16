@@ -4,37 +4,37 @@
 
 function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_idx,dim5_idx,dim6_idx,dim7_idx,old_RGB,slice_idx)
 
-   if ~exist('hdr','var') | ~exist('filetype','var') | ~exist('fileprefix','var') | ~exist('machine','var')
+   if ~exist('hdr','var') || ~exist('filetype','var') || ~exist('fileprefix','var') || ~exist('machine','var')
       error('Usage: [img,hdr] = load_nii_img(hdr,filetype,fileprefix,machine,[img_idx],[dim5_idx],[dim6_idx],[dim7_idx],[old_RGB],[slice_idx]);');
    end
 
-   if ~exist('img_idx','var') | isempty(img_idx) | hdr.dime.dim(5)<1
+   if ~exist('img_idx','var') || isempty(img_idx) || hdr.dime.dim(5)<1
       img_idx = [];
    end
 
-   if ~exist('dim5_idx','var') | isempty(dim5_idx) | hdr.dime.dim(6)<1
+   if ~exist('dim5_idx','var') || isempty(dim5_idx) || hdr.dime.dim(6)<1
       dim5_idx = [];
    end
 
-   if ~exist('dim6_idx','var') | isempty(dim6_idx) | hdr.dime.dim(7)<1
+   if ~exist('dim6_idx','var') || isempty(dim6_idx) || hdr.dime.dim(7)<1
       dim6_idx = [];
    end
 
-   if ~exist('dim7_idx','var') | isempty(dim7_idx) | hdr.dime.dim(8)<1
+   if ~exist('dim7_idx','var') || isempty(dim7_idx) || hdr.dime.dim(8)<1
       dim7_idx = [];
    end
 
-   if ~exist('old_RGB','var') | isempty(old_RGB)
+   if ~exist('old_RGB','var') || isempty(old_RGB)
       old_RGB = 0;
    end
 
-   if ~exist('slice_idx','var') | isempty(slice_idx) | hdr.dime.dim(4)<1
+   if ~exist('slice_idx','var') || isempty(slice_idx) || hdr.dime.dim(4)<1
       slice_idx = [];
    end
 
    %  check img_idx
    %
-   if ~isempty(img_idx) & ~isnumeric(img_idx)
+   if ~isempty(img_idx) && ~isnumeric(img_idx)
       error('"img_idx" should be a numerical array.');
    end
 
@@ -42,7 +42,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
       error('Duplicate image index in "img_idx"');
    end
 
-   if ~isempty(img_idx) & (min(img_idx) < 1 | max(img_idx) > hdr.dime.dim(5))
+   if ~isempty(img_idx) && (min(img_idx) < 1 || max(img_idx) > hdr.dime.dim(5))
       max_range = hdr.dime.dim(5);
 
       if max_range == 1
@@ -55,7 +55,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
 
    %  check dim5_idx
    %
-   if ~isempty(dim5_idx) & ~isnumeric(dim5_idx)
+   if ~isempty(dim5_idx) && ~isnumeric(dim5_idx)
       error('"dim5_idx" should be a numerical array.');
    end
 
@@ -63,7 +63,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
       error('Duplicate index in "dim5_idx"');
    end
 
-   if ~isempty(dim5_idx) & (min(dim5_idx) < 1 | max(dim5_idx) > hdr.dime.dim(6))
+   if ~isempty(dim5_idx) && (min(dim5_idx) < 1 || max(dim5_idx) > hdr.dime.dim(6))
       max_range = hdr.dime.dim(6);
 
       if max_range == 1
@@ -76,7 +76,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
 
    %  check dim6_idx
    %
-   if ~isempty(dim6_idx) & ~isnumeric(dim6_idx)
+   if ~isempty(dim6_idx) && ~isnumeric(dim6_idx)
       error('"dim6_idx" should be a numerical array.');
    end
 
@@ -84,7 +84,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
       error('Duplicate index in "dim6_idx"');
    end
 
-   if ~isempty(dim6_idx) & (min(dim6_idx) < 1 | max(dim6_idx) > hdr.dime.dim(7))
+   if ~isempty(dim6_idx) && (min(dim6_idx) < 1 || max(dim6_idx) > hdr.dime.dim(7))
       max_range = hdr.dime.dim(7);
 
       if max_range == 1
@@ -97,7 +97,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
 
    %  check dim7_idx
    %
-   if ~isempty(dim7_idx) & ~isnumeric(dim7_idx)
+   if ~isempty(dim7_idx) && ~isnumeric(dim7_idx)
       error('"dim7_idx" should be a numerical array.');
    end
 
@@ -105,7 +105,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
       error('Duplicate index in "dim7_idx"');
    end
 
-   if ~isempty(dim7_idx) & (min(dim7_idx) < 1 | max(dim7_idx) > hdr.dime.dim(8))
+   if ~isempty(dim7_idx) && (min(dim7_idx) < 1 || max(dim7_idx) > hdr.dime.dim(8))
       max_range = hdr.dime.dim(8);
 
       if max_range == 1
@@ -118,7 +118,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
 
    %  check slice_idx
    %
-   if ~isempty(slice_idx) & ~isnumeric(slice_idx)
+   if ~isempty(slice_idx) && ~isnumeric(slice_idx)
       error('"slice_idx" should be a numerical array.');
    end
 
@@ -126,7 +126,7 @@ function [img,hdr] = load_untouch_nii_img(hdr,filetype,fileprefix,machine,img_id
       error('Duplicate index in "slice_idx"');
    end
 
-   if ~isempty(slice_idx) & (min(slice_idx) < 1 | max(slice_idx) > hdr.dime.dim(4))
+   if ~isempty(slice_idx) && (min(slice_idx) < 1 || max(slice_idx) > hdr.dime.dim(4))
       max_range = hdr.dime.dim(4);
 
       if max_range == 1
@@ -237,8 +237,8 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
    %  For binary image, we have to read all because pos can not be
    %  seeked in bit and can not be calculated the way below.
    %
-   if hdr.dime.datatype == 1 | isequal(hdr.dime.dim(4:8),ones(1,5)) | ...
-	(isempty(img_idx) & isempty(dim5_idx) & isempty(dim6_idx) & isempty(dim7_idx) & isempty(slice_idx))
+   if hdr.dime.datatype == 1 || isequal(hdr.dime.dim(4:8),ones(1,5)) || ...
+	(isempty(img_idx) && isempty(dim5_idx) && isempty(dim6_idx) && isempty(dim7_idx) && isempty(slice_idx))
 
       %  For each frame, precision of value will be read
       %  in img_siz times, where img_siz is only the
@@ -250,13 +250,13 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
       %  For complex float32 or complex float64, voxel values
       %  include [real, imag]
       %
-      if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
+      if hdr.dime.datatype == 32 || hdr.dime.datatype == 1792
          img_siz = img_siz * 2;
       end
 
       %MPH: For RGB24, voxel values include 3 separate color planes
       %
-      if hdr.dime.datatype == 128 | hdr.dime.datatype == 511
+      if hdr.dime.datatype == 128 || hdr.dime.datatype == 511
 	 img_siz = img_siz * 3;
       end
 
@@ -330,13 +330,13 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
          %  For complex float32 or complex float64, voxel values
          %  include [real, imag]
          %
-         if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
+         if hdr.dime.datatype == 32 || hdr.dime.datatype == 1792
             img_siz = img_siz * 2;
          end
 
          %MPH: For RGB24, voxel values include 3 separate color planes
          %
-         if hdr.dime.datatype == 128 | hdr.dime.datatype == 511
+         if hdr.dime.datatype == 128 || hdr.dime.datatype == 511
             img_siz = img_siz * 3;
          end
 
@@ -371,13 +371,13 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
                      %  For complex float32 or complex float64, voxel values
                      %  include [real, imag]
                      %
-                     if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
+                     if hdr.dime.datatype == 32 || hdr.dime.datatype == 1792
                         img_siz = img_siz * 2;
                      end
 
                      %MPH: For RGB24, voxel values include 3 separate color planes
                      %
-                     if hdr.dime.datatype == 128 | hdr.dime.datatype == 511
+                     if hdr.dime.datatype == 128 || hdr.dime.datatype == 511
                         img_siz = img_siz * 3;
                      end
                   end; % if (roman)
@@ -411,7 +411,7 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
    %  For complex float32 or complex float64, voxel values
    %  include [real, imag]
    %
-   if hdr.dime.datatype == 32 | hdr.dime.datatype == 1792
+   if hdr.dime.datatype == 32 || hdr.dime.datatype == 1792
       img = reshape(img, [2, length(img)/2]);
       img = complex(img(1,:)', img(2,:)');
    end
@@ -425,15 +425,15 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
 
    %  old_RGB treat RGB slice by slice, now it is treated voxel by voxel
    %
-   if old_RGB & hdr.dime.datatype == 128 & hdr.dime.bitpix == 24
+   if old_RGB && hdr.dime.datatype == 128 && hdr.dime.bitpix == 24
       % remove squeeze
       img = (reshape(img, [hdr.dime.dim(2:3) 3 length(slice_idx) length(img_idx) length(dim5_idx) length(dim6_idx) length(dim7_idx)]));
       img = permute(img, [1 2 4 3 5 6 7 8]);
-   elseif hdr.dime.datatype == 128 & hdr.dime.bitpix == 24
+   elseif hdr.dime.datatype == 128 && hdr.dime.bitpix == 24
       % remove squeeze
       img = (reshape(img, [3 hdr.dime.dim(2:3) length(slice_idx) length(img_idx) length(dim5_idx) length(dim6_idx) length(dim7_idx)]));
       img = permute(img, [2 3 4 1 5 6 7 8]);
-   elseif hdr.dime.datatype == 511 & hdr.dime.bitpix == 96
+   elseif hdr.dime.datatype == 511 && hdr.dime.bitpix == 96
       img = double(img(:));
       img = single((img - min(img))/(max(img) - min(img)));
       % remove squeeze
