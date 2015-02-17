@@ -167,139 +167,109 @@ function ds=read_ft(filename)
     ft=importdata(filename);
     ds=convert_ft(ft);
 
-function tp=ft_senstype_wrapper(ft)
-    % wrapper to deal with neuromag306
-    tp=ft_senstype(ft);
-    if strcmp(tp,'unknown')
-        label=ft.label;
-        m=~cellfun(@isempty,regexp(label,'MEG.\d\d\d'));
-
-        if mean(m)>.4
-            tp='neuromag';
-        end
-    end
-
 
 function ds=convert_ft(ft)
-    % ft is a fieldtrip struct
-    datatype=ft_datatype(ft);
-    senstype=ft_senstype_wrapper(ft);
+    [data, data_field]=get_data_ft(ft);
 
-    % smallish hack: timelock data with 'avg' data is only 2D, but
-    % must be transformed to 3D with singleton dimension before
-    % flattening it to a 2D (row-vector) array.
-    set_samples_field=[];
-    switch datatype
-        case 'freq'
-            % see in which field the data is stored
-            sample_fields={'fourierspctrm','powspctrm'};
-            expected_dim_labels={'chan','freq','time'};
+    [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft);
 
-        case 'timelock'
-            % order is important - first 'trial' (means single trial data),
-            % if absent check for 'avg'.
-            sample_fields={'trial','avg'};
-            expected_dim_labels={'chan','time'};
-            set_samples_field='trial';
-
-        otherwise
-            error('unsupported fieldtrip datatype: %s', datatype);
+    if ~has_sample_field
+        data=reshape(data,[1 size(data)]);
     end
 
-    samples_arr=[];
-    for k=1:numel(sample_fields)
-        samples_field=sample_fields{k};
-        if isfield(ft, samples_field)
-            samples_arr=ft.(samples_field);
-            ft=rmfield(ft,samples_field);
+    ds=cosmo_flatten(data, dim_labels, dim_values);
+    ds.a.meeg.samples_field=data_field;
 
-            % apply hack - override the samples field
-            if ~isempty(set_samples_field)
-                samples_field=set_samples_field;
+    nsamples=size(ds.samples,1);
+    ds.sa=copy_fields(ft,nsamples,{'rpt','trialinfo','cumtapcnt'});
+
+
+function [data, data_field]=get_data_ft(ft)
+    % helper function to get the data from a fieldtrip struct
+    data_fields={'trial','avg','fourierspctrm','powspctrm'};
+    ndata_fields=numel(data_fields);
+
+    data=false;
+    for k=1:ndata_fields
+        data_field=data_fields{k};
+        if isfield(ft, data_field)
+            data=ft.(data_field);
+            return
+        end
+    end
+
+    if isequal(data,false)
+        error('Could not find data in fieldtrip struct');
+    end
+
+
+function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft)
+    % helper function to get dimensions from fieldtrip .dimord
+    if ~isfield(ft,'dimord')
+        error('missing field .dimord in fieldtrip struct');
+    end
+
+    dimord_labels=cosmo_strsplit(ft.dimord,'_');
+    ndimord_labels=numel(dimord_labels);
+
+    % first column: .dimord label
+    % second colum: fieldname in ft struct
+    ft_data_labels={'chan','label';...
+                    'freq','freq';...
+                    'time','time'};
+
+    sample_fields={'rpt'};
+
+    % allocate space for output
+    dim_labels=cell(1,ndimord_labels);
+    dim_values=cell(1,ndimord_labels);
+
+    has_sample_field=false;
+
+    pos=0;
+    for k=1:ndimord_labels
+        label=dimord_labels{k};
+
+        if cosmo_match({label},sample_fields)
+            if k>1
+                error(['Found sample field %s in .dimord at position '...
+                        '%d, expected %d'], label, k, 1);
             end
-            break
+            has_sample_field=true;
+            continue;
+        end
+
+        idx=find(cosmo_match(ft_data_labels(:,1),label));
+        if numel(idx)~=1
+            error('unsupported element in .dimord: %s', label);
+        end
+
+        pos=pos+1;
+
+        % store label
+        dim_labels{pos}=ft_data_labels{idx,1};
+
+        % store values
+        value=ft.(ft_data_labels{idx,2});
+        dim_values{pos}=value(:);
+    end
+
+    dim_labels=dim_labels(1:pos);
+    dim_values=dim_values(1:pos);
+
+
+function r=copy_fields(ft,nsamples,keys)
+    % helper function to copy fields in keys if they have nsamples values
+    r=struct();
+    for k=1:numel(keys)
+        key=keys{k};
+        if isfield(ft,key)
+            value=ft.(key);
+            if numel(value)==nsamples
+                r.(key)=value(:);
+            end
         end
     end
-
-    if isempty(samples_arr), error('Could not find sample data'); end
-
-    % get the dimension labels
-    dim_labels=cosmo_strsplit(ft.dimord,'_');
-
-    % See if the first dimension is a dimension label (chan, freq, time).
-    insert_sample_dim=cosmo_match(dim_labels(1),expected_dim_labels);
-
-    %expected_ndim=numel(expected_dim_labels)+1;
-    %insert_sample_dim=ndim==expected_ndim-1;
-
-    sa=struct(); % space for sample attributes
-    if insert_sample_dim
-        nsamples=1;
-        % one dimension short - add one at first position
-        samples_arr=reshape(samples_arr,[nsamples size(samples_arr)]);
-        % let's call it a repeat
-        samples_label='rpt';
-    else
-        % proper number of dimensions
-        nsamples=size(samples_arr,1);
-        sa.(dim_labels{1})=(1:nsamples)'; % set sample attribute
-        samples_label=dim_labels{1};
-    end
-
-    % get the dim labels - they should match expected_dim_labels
-    % if add_dim then start at first label, otherwise at second.
-    dim_labels=dim_labels((1+~insert_sample_dim):end);
-    nfeature_dim_expected=numel(dim_labels);
-
-    % check the labels
-    if ~isempty(setdiff(dim_labels,expected_dim_labels))
-        delta=setdiff(dim_labels,expected_dim_labels);
-        error('unexpected field %s in .dimord %s', delta{1}, ft.dimord);
-    end
-
-    nfeature_dim=numel(size(samples_arr))-1; % number of feature dimensions
-    if nfeature_dim~=nfeature_dim_expected
-        error('Found %d dimensions, expected %d from .dimord (%s)',...
-                    nfeature_dim, nfeature_dim_expected, ft.dimord);
-    end
-
-    % store values for each feature dimensions, e.g. labels of the
-    % channels, onets for time, and frequency for freq
-    dim_values=cell(1,nfeature_dim);
-    for k=1:nfeature_dim
-        dim_label=dim_labels{k};
-        if strcmp(dim_label,'chan')
-            % FT uses label to refer to channel names
-            dim_label='label';
-        end
-        dim_value=ft.(dim_label);
-        dim_values{k}=dim_value(:);
-    end
-
-    % make a dataset
-    ds=cosmo_flatten(samples_arr, dim_labels, dim_values);
-
-    % store as attribtues
-    ds.a.meeg.samples_field=samples_field;
-    ds.a.meeg.samples_type=datatype;
-    ds.a.meeg.samples_label=samples_label;
-
-    if ~strcmp(senstype,'unknown')
-        ds.a.meeg.senstype=senstype;
-    end
-
-    ds.sa=sa;
-    if isfield(ft,'trialinfo')
-        ds.sa.trialinfo=ft.trialinfo;
-    end
-
-    if isfield(ft,'cumtapcnt') && size(ft.cumtapcnt,1)==nsamples
-        ds.sa.cumtapcnt=ft.cumtapcnt;
-    end
-
-
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
