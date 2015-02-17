@@ -126,8 +126,10 @@ function ft=build_ft(ds)
             arr=reshape(arr,arr_size(2:end));
         end
         samples_label=cell(0);
-    else
+    elseif cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
+    else
+        samples_label={'rpt'};
     end
 
     % store the data
@@ -155,6 +157,9 @@ function ft=build_ft(ds)
             case 'time'
                 % fieldtrip will puke with column vector
                 dim_value=dim_value(:)';
+            case 'freq'
+                % fieldtrip will puke with column vector
+                dim_value=dim_value(:)';
         end
         ft.(dim_label)=dim_value;
     end
@@ -165,10 +170,6 @@ function ft=build_ft(ds)
 
     if isfield(ds.sa,'cumtapcnt')
         ft.cumtapcnt=ds.sa.cumtapcnt;
-    end
-
-    if isfield(ds.a.meeg,'senstype')
-        ft.type=ds.a.meeg.senstype;
     end
 
     % if fieldtrip is present
