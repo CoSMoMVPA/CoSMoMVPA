@@ -106,13 +106,19 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
     if transpose
         % switch samples and features
         ndim=numel(dim_labels);
-        arr=shiftdim(arr,ndim);
+        nfeatures=size(arr,ndim+1);
+        if nfeatures==1
+            arr=reshape(arr,[1 size(arr)]);
+        else
+            arr=shiftdim(arr,ndim);
+        end
     end
 
     [samples,attr]=flatten_features(arr, dim_labels, dim_values);
 
     if transpose
         samples=samples';
+        attr=transpose_attr(attr);
     end
 
     ds=struct();
@@ -121,6 +127,13 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
     ds.a.(dim_name).labels=dim_labels;
     ds.a.(dim_name).values=dim_values;
 
+function attr=transpose_attr(attr)
+    keys=fieldnames(attr);
+    for k=1:numel(keys)
+        key=keys{k};
+        value=attr.(key);
+        attr.(key)=value';
+    end
 
 function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
     % helper function to flatten features
