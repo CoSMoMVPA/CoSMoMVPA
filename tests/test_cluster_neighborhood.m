@@ -119,6 +119,11 @@ function test_meeg_cluster_neighborhood
     end
 
 function test_cluster_neighborhood_surface
+    if ~cosmo_check_external('surfing',false)
+        cosmo_notify_test_skipped(['surfing'...'
+                                    'toolbox is not available']);
+        return
+    end
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
 
     vertices=[0 0 0 1 1 1;
