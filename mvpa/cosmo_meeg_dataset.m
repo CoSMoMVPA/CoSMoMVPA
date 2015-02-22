@@ -186,56 +186,66 @@ function ds=convert_ft(ft)
 
 function [data, data_field]=get_data_ft(ft)
     % helper function to get the data from a fieldtrip struct
-    data_fields={'trial','avg','fourierspctrm','powspctrm'};
+    data_fields={'trial','avg','fourierspctrm','powspctrm','pow'};
     ndata_fields=numel(data_fields);
 
-    data=false;
+    data=ft;
+    data_field_cell=cell(ndata_fields,1);
+    pos=0;
     for k=1:ndata_fields
         data_field=data_fields{k};
-        if isfield(ft, data_field)
-            data=ft.(data_field);
-            return
+        if isfield(data, data_field)
+            % deal with source data with multiple trials
+            nsamples=numel(data);
+            if isstruct(data) && nsamples>1
+                sz=size(data(1).(data_field));
+                data=reshape(cat(1,data.(data_field)),[nsamples sz]);
+            else
+                data=data.(data_field);
+            end
+
+            pos=pos+1;
+            data_field_cell{pos}=data_field;
         end
     end
 
-    if isequal(data,false)
+    if isempty(data_field_cell)
         error('Could not find data in fieldtrip struct');
     end
+
+    data_field=cosmo_strjoin(data_field_cell(1:pos),'.');
 
 
 function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft)
     % helper function to get dimensions from fieldtrip .dimord
-    if ~isfield(ft,'dimord')
-        error('missing field .dimord in fieldtrip struct');
-    end
-
-    dimord_labels=cosmo_strsplit(ft.dimord,'_');
-    ndimord_labels=numel(dimord_labels);
 
     % first column: .dimord label
     % second colum: fieldname in ft struct
     ft_data_labels={'chan','label';...
                     'freq','freq';...
                     'time','time'};
+    if isfield(ft,'dimord')
+        dimord_labels=cosmo_strsplit(ft.dimord,'_');
+    else
+        % source data, ignore the data labels
+        dimord_labels=intersect(fieldnames(ft),ft_data_labels);
+    end
 
-    sample_fields={'rpt'};
+
+    ndimord_labels=numel(dimord_labels);
+    sample_fields={'rpt','trial'};
+
+    has_sample_field=any(cosmo_match(sample_fields,dimord_labels));
 
     % allocate space for output
     dim_labels=cell(1,ndimord_labels);
     dim_values=cell(1,ndimord_labels);
-
-    has_sample_field=false;
 
     pos=0;
     for k=1:ndimord_labels
         label=dimord_labels{k};
 
         if cosmo_match({label},sample_fields)
-            if k>1
-                error(['Found sample field %s in .dimord at position '...
-                        '%d, expected %d'], label, k, 1);
-            end
-            has_sample_field=true;
             continue;
         end
 
@@ -254,6 +264,12 @@ function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft)
         dim_values{pos}=value(:);
     end
 
+    if isfield(ft,'pos')
+        pos=pos+1;
+        dim_labels{pos}='pos';
+        dim_values{pos}=1:size(ft.pos,1);
+    end
+
     dim_labels=dim_labels(1:pos);
     dim_values=dim_values(1:pos);
 
@@ -265,8 +281,11 @@ function r=copy_fields(ft,nsamples,keys)
         key=keys{k};
         if isfield(ft,key)
             value=ft.(key);
-            if numel(value)==nsamples
-                r.(key)=value(:);
+            if size(value,1)==nsamples
+                if isrow(value)
+                    value=value(:);
+                end
+                r.(key)=value;
             end
         end
     end
