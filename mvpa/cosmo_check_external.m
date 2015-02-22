@@ -265,13 +265,24 @@ function s=url2str(url)
         s=url;
     end
 
+
+function w=noerror_which(varargin)
+    % Octave raises an expection when which is called and a mex-file of
+    % incompatible architecture is found
+    w='';
+    try
+        w=which(varargin{:});
+    catch
+        % do nothing
+    end
+
 function externals=get_externals()
     % helper function that defines the externals.
     externals=struct();
     yes=@() true;
-    has=@(x) ~isempty(which(x));
+    has=@(x) ~isempty(noerror_which(x));
     has_toolbox=@(x)check_matlab_toolbox(x,false);
-    path_of=@(x) fileparts(which(x));
+    path_of=@(x) fileparts(noerror_which(x));
     is_in_path=@(x)has(x) && cosmo_match({path_of(x)},...
                     cosmo_strsplit(path(),pathsep()));
 
@@ -439,7 +450,7 @@ function externals=get_externals()
 
 
 function version=get_libsvm_version()
-    svm_root=fileparts(fileparts(which('svmpredict')));
+    svm_root=fileparts(fileparts(noerror_which('svmpredict')));
     svm_h_fn=fullfile(svm_root,'svm.h');
 
     fid=fopen(svm_h_fn);
