@@ -181,7 +181,7 @@ opt=cosmo_structjoin(defaults,varargin{:});
 
 ds_type=get_ds_type(ds);
 
-if strcmp(opt.metric,'geodesic')
+if strcmp(opt.metric,'geodesic') && ~isfield(opt,'direct')
     cosmo_check_external('fast_marching');
 end
 

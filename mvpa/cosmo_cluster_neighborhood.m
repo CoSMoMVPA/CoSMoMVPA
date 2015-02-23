@@ -319,7 +319,8 @@ function nbrhood=surface_neighborhood(ds,dim_pos,arg,opt)
     surf_def={opt.vertices,opt.faces};
     cosmo_check_external('surfing');
     nbrhood=cosmo_surficial_neighborhood(ds,surf_def,...
-                                    'direct',do_connect,opt);
+                                    'direct',do_connect,...
+                                    'metric','dijkstra',opt);
 
 
     node_area_surf=surfing_surfacearea(opt.vertices,opt.faces);

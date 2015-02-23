@@ -281,12 +281,12 @@ function r=copy_fields(ft,nsamples,keys)
         key=keys{k};
         if isfield(ft,key)
             value=ft.(key);
-            if size(value,1)==nsamples
-                if isrow(value)
-                    value=value(:);
-                end
-                r.(key)=value;
+            nrows=size(value,1);
+            if nrows~=nsamples
+                error('field %s has %d rows, expected %d', ...
+                                key, nrows, nsamples)
             end
+            r.(key)=value;
         end
     end
 
