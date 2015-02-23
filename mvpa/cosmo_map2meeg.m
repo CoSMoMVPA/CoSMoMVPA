@@ -111,12 +111,38 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
 
     samples_field=ds.a.meeg.samples_field;
 
-function ft=build_ft(ds)
 
-    % get fieldtrip-specific fields from header
-    ft=struct();
+function tf=is_ds_source_struct(ds)
+    tf=isfield(ds,'fa') && isfield(ds.fa,'pos') && ...
+                isfield(ds.fa,'inside');
 
-    % unflatten the array
+function [ds, source_attr]=source_move_pos_fa_to_dim(ds)
+    assert(is_ds_source_struct(ds));
+    idxs_cell=cosmo_index_unique(ds.fa.pos');
+
+    idxs_count=cellfun(@numel,idxs_cell);
+    i=find(idxs_count~=1,1);
+    if ~isempty(i)
+        error('positions are not unique, this is not supported (yet)');
+    end
+
+    idxs=cell2mat(idxs_cell);
+    nvalues=numel(idxs);
+
+    ds.a.fdim.values{end+1}=1:nvalues;
+    ds.a.fdim.labels{end+1}='pos';
+
+    source_attr.pos=ds.fa.pos';
+    source_attr.inside=ds.fa.inside';
+
+    ds.fa.pos=1:nvalues;
+
+    if isfield(ds,'a') && isfield(ds.a,'meeg') && isfield(ds.a.meeg,'dim')
+        source_attr.dim=ds.a.meeg.dim;
+    end
+
+
+function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     [arr, dim_labels]=cosmo_unflatten(ds,[],NaN);
 
     is_single_sample=size(ds.samples,1)==1;
@@ -135,7 +161,62 @@ function ft=build_ft(ds)
     % store the data
     samples_field=ft_detect_samples_field(ds, is_single_sample);
 
-    ft.(samples_field)=arr;
+    samples_field_keys=cosmo_strsplit(samples_field,'.');
+    switch numel(samples_field_keys)
+        case 1
+            ft=struct();
+            ft.(samples_field)=arr;
+        case 2
+            % source data
+            ft=get_ft_source_samples_from_array(arr, ...
+                                        samples_field_keys{1},...
+                                        samples_field_keys{2});
+        otherwise
+            assert('this should not happen');
+    end
+
+function ft=get_ft_source_samples_from_array(arr, key, sub_key)
+
+    switch key
+        case 'avg'
+            % average over all trials
+            ft.method='average';
+            arr_struct=struct(sub_key,arr);
+
+
+        case 'trial'
+            % single trial data
+            ft.method='rawtrial';
+
+            nsamples=size(arr,1);
+            arr_mat=reshape(arr,nsamples,[]);
+            struct_cell=cell(1,nsamples);
+            for j=1:nsamples
+                struct_cell{j}=arr_mat(j,:);
+            end
+
+            arr_struct=struct(sub_key,struct_cell);
+
+        otherwise
+            error('not supported: %s.%s', key, sub_key);
+    end
+
+    ft.(key)=arr_struct;
+
+
+function ft=build_ft(ds)
+    % get fieldtrip-specific fields from header
+
+
+    % unflatten the array
+    if is_ds_source_struct(ds)
+        [ds,source_attr]=source_move_pos_fa_to_dim(ds);
+    else
+        source_attr=struct();
+    end
+
+    [ft, samples_label, dim_labels]=get_ft_samples(ds);
+
 
     % set dimord
     underscore2dash=@(x)strrep(x,'_','-');
@@ -143,8 +224,9 @@ function ft=build_ft(ds)
     dimord_labels=[samples_label; ...
                     cellfun(underscore2dash,dim_labels(:),...
                                             'UniformOutput',false)];
-
-    ft.dimord=cosmo_strjoin(dimord_labels,'_');
+    if ~is_ds_source_struct(ds)
+        ft.dimord=cosmo_strjoin(dimord_labels,'_');
+    end
 
     % store each feature attribute dimension value
     ndim=numel(dim_labels);
@@ -154,10 +236,7 @@ function ft=build_ft(ds)
         switch dim_label
             case 'chan'
                 dim_label='label';
-            case 'time'
-                % fieldtrip will puke with column vector
-                dim_value=dim_value(:)';
-            case 'freq'
+            case {'time','freq'}
                 % fieldtrip will puke with column vector
                 dim_value=dim_value(:)';
         end
@@ -171,6 +250,9 @@ function ft=build_ft(ds)
     if isfield(ds.sa,'cumtapcnt')
         ft.cumtapcnt=ds.sa.cumtapcnt;
     end
+
+    % deal with case of a source MEEEG dataset
+    ft=cosmo_structjoin(ft, source_attr);
 
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...

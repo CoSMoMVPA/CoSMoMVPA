@@ -183,6 +183,29 @@ function ds=convert_ft(ft)
     nsamples=size(ds.samples,1);
     ds.sa=copy_fields(ft,nsamples,{'rpt','trialinfo','cumtapcnt'});
 
+    if is_ft_source_struct(ft)
+        ds=source_move_pos_dim_to_fa(ds,ft);
+    end
+
+function ds=source_move_pos_dim_to_fa(ds,ft)
+    % do this after the flattening process
+    assert(is_ft_source_struct(ft))
+
+    [dim, index, attr_name, dim_name]=cosmo_dim_find(ds,'pos',false);
+    if ~isempty(dim)
+        pos_msk=cosmo_match(ds.a.(dim_name).labels,{'pos'});
+        assert(sum(pos_msk)==1);
+        idxs=ds.fa.pos(ds.a.(dim_name).values{pos_msk});
+
+        ds.fa.pos=ft.pos(idxs,:)';
+        ds.fa.inside=ft.inside(idxs,:)';
+
+        keep_msk=~pos_msk;
+        ds.a.(dim_name).values=ds.a.(dim_name).values(keep_msk);
+        ds.a.(dim_name).labels=ds.a.(dim_name).labels(keep_msk);
+    end
+    ds.a.meeg.dim=ft.dim;
+
 
 function [data, data_field]=get_data_ft(ft)
     % helper function to get the data from a fieldtrip struct
@@ -215,6 +238,9 @@ function [data, data_field]=get_data_ft(ft)
 
     data_field=cosmo_strjoin(data_field_cell(1:pos),'.');
 
+function tf=is_ft_source_struct(ft)
+    tf=isfield(ft,'pos') && isfield(ft,'inside');
+
 
 function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft)
     % helper function to get dimensions from fieldtrip .dimord
@@ -224,18 +250,20 @@ function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft)
     ft_data_labels={'chan','label';...
                     'freq','freq';...
                     'time','time'};
-    if isfield(ft,'dimord')
-        dimord_labels=cosmo_strsplit(ft.dimord,'_');
-    else
+    if is_ft_source_struct(ft)
         % source data, ignore the data labels
         dimord_labels=intersect(fieldnames(ft),ft_data_labels);
+    elseif isfield(ft,'dimord')
+        dimord_labels=cosmo_strsplit(ft.dimord,'_');
+    else
+        error('illegal input: expected source, timelock or timefreq');
     end
 
 
     ndimord_labels=numel(dimord_labels);
     sample_fields={'rpt','trial'};
 
-    has_sample_field=any(cosmo_match(sample_fields,dimord_labels));
+    has_sample_field=any(cosmo_match(sample_fields,fieldnames(ft)));
 
     % allocate space for output
     dim_labels=cell(1,ndimord_labels);
@@ -282,11 +310,9 @@ function r=copy_fields(ft,nsamples,keys)
         if isfield(ft,key)
             value=ft.(key);
             nrows=size(value,1);
-            if nrows~=nsamples
-                error('field %s has %d rows, expected %d', ...
-                                key, nrows, nsamples)
+            if nrows==nsamples
+                r.(key)=value;
             end
-            r.(key)=value;
         end
     end
 
