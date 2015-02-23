@@ -3,6 +3,9 @@ function test_suite=test_meeg_io()
 
 
 function test_meeg_dataset()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+
     dimords=get_dimords();
     n=numel(dimords);
     for k=1:n
@@ -37,10 +40,12 @@ function test_meeg_dataset()
         end
 
         assertEqual(ft,ft2);
+
+        % wrong size trialinfo should raise an error
+        ft.trialinfo=[1;2];
+        aet(ft);
     end
 
-    aet=@(varargin)assertExceptionThrown(@()...
-                    cosmo_meeg_dataset(varargin{:}),'');
     aet(struct());
     aet(struct('avg',1));
     aet(struct('avg',1,'dimord','rpt_foo'));
@@ -105,6 +110,6 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     keep_sizes=sizes(1:k);
     ft.(data_label)=norminv(cosmo_rand(keep_sizes,'seed',seed));
     ft.cfg=struct();
-    ft.trialinfo=(1:ntrials)';
+    ft.trialinfo=[(1:ntrials);(ntrials:-1:1)]';
 
 
