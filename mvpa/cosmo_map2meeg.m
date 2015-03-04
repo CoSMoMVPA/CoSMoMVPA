@@ -96,17 +96,26 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
     ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
     nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
 
-    if nchan>=1 && ntime>=1
-        if nfreq>=1
-            samples_field='powspctrm';
+    if is_ds_source_struct(ds)
+        if is_single_sample
+            samples_field='avg.pow';
         else
-            if is_single_sample
-                samples_field='avg';
-            else
-                samples_field='trial';
-            end
+            samples_field='trial.pow';
         end
         return
+    else
+        if nchan>=1 && ntime>=1
+            if nfreq>=1
+                samples_field='powspctrm';
+            else
+                if is_single_sample
+                    samples_field='avg';
+                else
+                    samples_field='trial';
+                end
+            end
+            return
+        end
     end
 
     samples_field=ds.a.meeg.samples_field;
@@ -114,36 +123,14 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
 
 function tf=is_ds_source_struct(ds)
     tf=isfield(ds,'fa') && isfield(ds.fa,'pos') && ...
-                isfield(ds.fa,'inside');
+                cosmo_isfield(ds,'a.fdim.labels') && ...
+                cosmo_match({'pos'},ds.a.fdim.labels);
 
-function [ds, source_attr]=source_move_pos_fa_to_dim(ds)
-    assert(is_ds_source_struct(ds));
-    idxs_cell=cosmo_index_unique(ds.fa.pos');
-
-    idxs_count=cellfun(@numel,idxs_cell);
-    i=find(idxs_count~=1,1);
-    if ~isempty(i)
-        error('positions are not unique, this is not supported (yet)');
-    end
-
-    idxs=cell2mat(idxs_cell);
-    nvalues=numel(idxs);
-
-    ds.a.fdim.values{end+1}=1:nvalues;
-    ds.a.fdim.labels{end+1}='pos';
-
-    source_attr.pos=ds.fa.pos';
-    source_attr.inside=ds.fa.inside';
-
-    ds.fa.pos=1:nvalues;
-
-    if isfield(ds,'a') && isfield(ds.a,'meeg') && isfield(ds.a.meeg,'dim')
-        source_attr.dim=ds.a.meeg.dim;
-    end
 
 
 function [ft, samples_label, dim_labels]=get_ft_samples(ds)
-    [arr, dim_labels]=cosmo_unflatten(ds,[],NaN);
+    [arr, dim_labels]=cosmo_unflatten(ds,[],'set_missing_to',NaN,...
+                                            'matrix_labels',{'pos'});
 
     is_single_sample=size(ds.samples,1)==1;
     if is_single_sample
@@ -162,17 +149,29 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     samples_field=ft_detect_samples_field(ds, is_single_sample);
 
     samples_field_keys=cosmo_strsplit(samples_field,'.');
-    switch numel(samples_field_keys)
-        case 1
+    nsubfields=numel(samples_field_keys)-1;
+
+    if xor(nsubfields>0,is_ds_source_struct(ds))
+        error(['Found sample field %s, which is incompatible '...
+                    'with the dataset being in source space or not. '...
+                    'This is not supported'],samples_field);
+    end
+
+    switch nsubfields
+        case 0
+            % non-source data
             ft=struct();
             ft.(samples_field)=arr;
-        case 2
+
+        case 1
             % source data
             ft=get_ft_source_samples_from_array(arr, ...
                                         samples_field_keys{1},...
                                         samples_field_keys{2});
+
         otherwise
-            assert('this should not happen');
+            error(['Found sample field %s with more than one '...
+                        'subfield %s'],samples_field);
     end
 
 function ft=get_ft_source_samples_from_array(arr, key, sub_key)
@@ -198,23 +197,41 @@ function ft=get_ft_source_samples_from_array(arr, key, sub_key)
             arr_struct=struct(sub_key,struct_cell);
 
         otherwise
-            error('not supported: %s.%s', key, sub_key);
+            error('not supported source data with data in %s.%s', ...
+                                    key, sub_key);
     end
 
     ft.(key)=arr_struct;
 
+function ft=ds_copy_fields(ft,ds,keys)
+    nsamples=size(ds.samples,1);
+    for k=1:numel(keys)
+        key=keys{k};
+        if isfield(ds.sa,key)
+            value=ds.sa.(key);
+            if size(value,1)==nsamples
+                ft.(key)=value;
+            end
+        end
+    end
+
+function ft=ds_set_source_fields(ft,ds)
+    assert(is_ds_source_struct(ds));
+    %[dim,pos_index]=cosmo_dim_find(ds,'pos',true);
+    %if dim~=2
+    %    error('pos attribute must be a feature attribute');
+    %end
+
+    %pos_fdim=ds.a.fdim.values{pos_index};
+    %ft.pos=pos_fdim';
+    if isfield(ds.fa,'inside')
+        ft.inside=false(size(ds.fa.inside))';
+        ft.inside(ds.fa.pos)=ds.fa.inside;
+    end
+
 
 function ft=build_ft(ds)
     % get fieldtrip-specific fields from header
-
-
-    % unflatten the array
-    if is_ds_source_struct(ds)
-        [ds,source_attr]=source_move_pos_fa_to_dim(ds);
-    else
-        source_attr=struct();
-    end
-
     [ft, samples_label, dim_labels]=get_ft_samples(ds);
 
 
@@ -239,23 +256,22 @@ function ft=build_ft(ds)
             case {'time','freq'}
                 % fieldtrip will puke with column vector
                 dim_value=dim_value(:)';
+            case 'pos'
+                dim_value=dim_value';
         end
         ft.(dim_label)=dim_value;
     end
 
-    if isfield(ds.sa,'trialinfo')
-        ft.trialinfo=ds.sa.trialinfo;
+    ft=ds_copy_fields(ft,ds,{'rpt','trialinfo','cumtapcnt'});
+    if is_ds_source_struct(ds)
+        ft=ds_set_source_fields(ft,ds);
     end
-
-    if isfield(ds.sa,'cumtapcnt')
-        ft.cumtapcnt=ds.sa.cumtapcnt;
-    end
-
-    % deal with case of a source MEEEG dataset
-    ft=cosmo_structjoin(ft, source_attr);
 
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
                 isequal(ft_datatype(ft),'unknown')
         cosmo_warning('fieldtrip does not approve of this dataset');
     end
+
+
+

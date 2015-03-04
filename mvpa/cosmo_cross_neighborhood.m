@@ -28,15 +28,11 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
 %                                                    'progress',false);
 %     cosmo_disp(nbrhood.a.fdim)
 %     > .values
-%     >   { [  2        [  -0.2
-%     >        4          -0.15
-%     >        6           -0.1
-%     >        :          -0.05
-%     >       10              0 ]
-%     >       12
-%     >       14 ]@7x1            }
+%     >   { [ 2         4         6  ...  10        12        14 ]@1x7
+%     >     [ -0.2     -0.15      -0.1     -0.05         0 ]           }
 %     > .labels
-%     >   { 'freq'  'time' }
+%     >   { 'freq'
+%     >     'time' }
 %     cosmo_disp(nbrhood.fa)
 %     > .freq
 %     >   [ 1         2         3  ...  5         6         7 ]@1x35
@@ -79,8 +75,8 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
     end
 
     % merge labels and values
-    dim_labels=[dims.labels{:}];
-    dim_values=[dims.values{:}];
+    dim_labels=cat(1,dims.labels{:});
+    dim_values=cat(1,dims.values{:});
 
     ds_labels=ds.a.fdim.labels;
 

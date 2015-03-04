@@ -6,10 +6,10 @@ function test_cross_neighborhood_basis()
     ds_full=cosmo_synthetic_dataset('type','timefreq','size','big');
 
     % make it sparse
-    n=size(ds_full.samples,2);
-    nkeep=round(n/4);
+    nfeatures=size(ds_full.samples,2);
+    nkeep=round(nfeatures/4);
     while true
-        rp=randperm(n);
+        rp=randperm(nfeatures);
         ds=cosmo_dim_slice(ds_full,rp(1:nkeep),2);
         n=numel(ds.a.fdim.values{1});
         ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
@@ -30,7 +30,7 @@ function test_cross_neighborhood_basis()
                                 'chantype','all','label','dataset');
     all_nbrhoods={chan_nbrhood, freq_nbrhood, time_nbrhood};
     ndim=numel(all_nbrhoods);
-    dim_labels={'chan','freq','time'};
+    dim_labels={'chan';'freq';'time'};
 
     ntest=5;  % number of positions to test
 
@@ -39,11 +39,11 @@ function test_cross_neighborhood_basis()
         use_freq=mod(i,2)==1;
         use_time=mod(ceil(i/2),2)==1;
 
-        use_dim_msk=[use_chan,use_freq,use_time];
+        use_dim_msk=[use_chan;use_freq;use_time];
         nbrhood=cosmo_cross_neighborhood(ds,all_nbrhoods(use_dim_msk),...
                                                 'progress',false);
         assertEqual(nbrhood.a.fdim.labels,dim_labels(use_dim_msk));
-        assertEqual(fieldnames(nbrhood.fa),dim_labels(use_dim_msk)');
+        assertEqual(fieldnames(nbrhood.fa),dim_labels(use_dim_msk));
 
         n=numel(nbrhood.neighbors);
         rp=randperm(n);

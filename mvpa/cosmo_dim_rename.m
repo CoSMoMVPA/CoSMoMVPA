@@ -17,11 +17,13 @@ function ds=cosmo_dim_rename(ds, old_name, new_name, raise)
 %     ds=cosmo_synthetic_dataset('type','timefreq');
 %     cosmo_disp(ds.a.fdim)
 %     > .labels
-%     >   { 'chan'  'freq'  'time' }
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0111'    [ 2    [ -0.2 ]
-%     >       'MEG0112'      4 ]
-%     >       'MEG0113' }                  }
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %     cosmo_disp(ds.fa)
 %     > .chan
 %     >   [ 1         2         3         1         2         3 ]
@@ -35,11 +37,13 @@ function ds=cosmo_dim_rename(ds, old_name, new_name, raise)
 %     ds=cosmo_dim_rename(ds,'freq','frequency');
 %     cosmo_disp(ds.a.fdim)
 %     > .labels
-%     >   { 'chan'  'frequency'  'time' }
+%     >   { 'chan'
+%     >     'frequency'
+%     >     'time'      }
 %     > .values
-%     >   { { 'MEG0111'    [ 2    [ -0.2 ]
-%     >       'MEG0112'      4 ]
-%     >       'MEG0113' }                  }
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %     cosmo_disp(ds.fa)
 %     > .chan
 %     >   [ 1         2         3         1         2         3 ]

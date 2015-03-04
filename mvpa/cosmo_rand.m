@@ -46,17 +46,32 @@ function result=cosmo_rand(varargin)
 
     [sizes,seed]=process_input(varargin{:});
 
-    if seed~=0
+    if seed==0
+        randomizer=@rand;
+    else
         is_matlab=cosmo_wtf('is_matlab');
 
         if is_matlab
-            % preserve old PRNG state
-            orig_rng_state=rng();
-            cleaner=onCleanup(@()rng(orig_rng_state));
+            if false
 
-            % set random number generation state
-            rng_state=get_mersenne_state_from_seed(seed, is_matlab);
-            rng(rng_state);
+                % preserve old PRNG state
+                orig_rng_state=rng();
+                cleaner=onCleanup(@()rng(orig_rng_state));
+
+                % set random number generation state
+                rng_state=get_mersenne_state_from_seed(seed, is_matlab);
+                rng(rng_state);
+                randomizer=@rand;
+
+            else
+                rng_state=get_mersenne_state_from_seed(seed, is_matlab);
+
+                stream=RandStream('mt19937ar','Seed',rng_state.Seed);
+                stream.State=rng_state.State;
+
+                randomizer=@stream.rand;
+
+            end
         else
             % preserve old PRNG state
             orig_rng_state=rand('state');
@@ -65,10 +80,11 @@ function result=cosmo_rand(varargin)
             % set random number generation state
             rng_state=get_mersenne_state_from_seed(seed, is_matlab);
             rand('state',rng_state);
+            randomizer=@rand;
         end
     end
 
-    result=rand(sizes);
+    result=randomizer(sizes);
 
 
 function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
@@ -113,6 +129,7 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
     end
 
     cached_rng_state=rng_state;
+    cached_seed=seed;
 
 
 

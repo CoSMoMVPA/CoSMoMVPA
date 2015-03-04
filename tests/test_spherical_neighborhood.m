@@ -92,8 +92,49 @@ function test_sparse_dataset
     end
 
 
+function test_with_freq_dimension_dataset
+    ds=cosmo_synthetic_dataset('size','big');
+    nfeatures=size(ds.samples,2);
 
+    freqs=[2 4 6];
+    nfreqs=numel(freqs);
+    ds_cell=cell(nfreqs,1);
+    for k=1:nfreqs
+        ds_freq=ds;
+        ds_freq.a.fdim.labels=[{'freq'};ds_freq.a.fdim.labels];
+        ds_freq.a.fdim.values=[{freqs};ds_freq.a.fdim.values];
+        ds_freq.fa.freq=ones(1,nfeatures)*k;
+        ds_cell{k}=ds_freq;
+    end
 
+    ds=cosmo_stack(ds_cell,2);
+    rp=randperm(nfeatures*nfreqs);
+    ds=cosmo_slice(ds,rp(1:nfeatures),2);
 
+    radius=5+rand()*3;
+    nh=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
 
+    assertEqual(nh.fa.i,ds.fa.i);
+    assertEqual(nh.fa.j,ds.fa.j);
+    assertEqual(nh.fa.k,ds.fa.k);
+    assertEqual(nh.a.fdim.labels,ds.a.fdim.labels(2:4));
+    assertEqual(nh.a.fdim.values,ds.a.fdim.values(2:4));
+
+    ijk=[ds.fa.i; ds.fa.j; ds.fa.k];
+
+    rp=randperm(nfeatures);
+    rp=rp(1:10);
+    for r=rp
+        nbrs=nh.neighbors{r};
+
+        ijk_center=ijk(:,r);
+        delta=sum(bsxfun(@minus,ijk_center,ijk).^2,1).^.5;
+        assertEqual(find(delta<=radius), sort(nbrs));
+    end
+
+    ds2=ds;
+    ds2.a.fdim.values=cellfun(@transpose,ds2.a.fdim.values,...
+                            'UniformOutput',false);
+    nh2=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
+    assertEqual(nh,nh2);
 

@@ -1,7 +1,7 @@
-function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
+function ds=cosmo_flatten(arr, dim_labels, dim_values, dim, varargin)
 % flattens an arbitrary array to a dataset structure
 %
-% ds=cosmo_flatten(arr, dim_labels, dim_values)
+% ds=cosmo_flatten(arr, dim_labels, dim_values, dim[, ...])
 %
 % Inputs:
 %   arr                S_1 x ... x S_K x Q input array if (dim==1), or
@@ -12,11 +12,16 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
 %                      the labels in each of the K dimensions.
 %   dim                dimension along which to flatten, either 1 (samples)
 %                      or 2 (features; default)
+%   'matrix_labels',m  Allow labels in the cell string m to be matrices
+%                      rather than vectors. Currently the only use case is
+%                      the 'pos' attribute for MEEG source space data.
+%
 % Output:
 %   ds                 dataset structure, with fields:
 %      .samples        PxQ data for P samples and Q features.
-%      .a.dim.labels   1xK cell with the values in dim_labels
-%      .a.dim.values   1xK cell with the values in dim_values.
+%      .a.dim.labels   Kx1 cell with the values in dim_labels
+%      .a.dim.values   Kx1 cell with the values in dim_values. The i-th
+%                      element has S_i elements along dimension dim
 %      .fa.(label)     for each label in a.dim.labels it contains the
 %      .samples        PxQ data for P samples and Q features, where
 %                      Q=prod(S_*) if dim==1 and P=prod(S_*) if dim==2
@@ -53,7 +58,7 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
 %
 %     % flatten samples in 1x1x2x3 array, 5 features
 %     data=reshape(1:30, [1,1,2,3,5]);
-%     ds=cosmo_flatten(data,{'i','j','k','m'},{1,'a',1:2,1:3},1);
+%     ds=cosmo_flatten(data,{'i','j','k','m'},{1,'a',(1:2)',(1:3)'},1);
 %     cosmo_disp(ds);
 %     > .samples
 %     >   [ 1         7        13        19        25
@@ -64,20 +69,41 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
 %     >     6        12        18        24        30 ]
 %     > .sa
 %     >   .i
-%     >     [ 1 1 1 1 1 1 ]
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       1
+%     >       1
+%     >       1 ]
 %     >   .j
-%     >     [ 1 1 1 1 1 1 ]
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       1
+%     >       1
+%     >       1 ]
 %     >   .k
-%     >     [ 1 2 1 2 1 2 ]
+%     >     [ 1
+%     >       2
+%     >       1
+%     >       2
+%     >       1
+%     >       2 ]
 %     >   .m
-%     >     [ 1 1 2 2 3 3 ]
+%     >     [ 1
+%     >       1
+%     >       2
+%     >       2
+%     >       3
+%     >       3 ]
 %     > .a
 %     >   .sdim
 %     >     .labels
 %     >       { 'i'  'j'  'k'  'm' }
 %     >     .values
-%     >       { [ 1 ]  'a'  [ 1 2 ]  [ 1 2 3 ] }
-%     >
+%     >       { [ 1 ]  'a'  [ 1    [ 1
+%     >                       2 ]    2
+%     >                              3 ] }
 %
 %
 % Notes:
@@ -87,23 +113,25 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
 % See also: cosmo_unflatten, cosmo_fmri_dataset, cosmo_meeg_dataset
 %
 % NNO Sep 2013
+    defaults.matrix_labels=cell(0);
+    opt=cosmo_structjoin(defaults,varargin{:});
 
     if nargin<4, dim=2; end
 
     switch dim
         case 1
-            transpose=true;
+            do_transpose=true;
             attr_name='sa';
             dim_name='sdim';
         case 2
-            transpose=false;
+            do_transpose=false;
             attr_name='fa';
             dim_name='fdim';
         otherwise
             error('illegal dim: must be 1 or 2');
     end
 
-    if transpose
+    if do_transpose
         % switch samples and features
         ndim=numel(dim_labels);
         nfeatures=size(arr,ndim+1);
@@ -112,13 +140,16 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim)
         else
             arr=shiftdim(arr,ndim);
         end
+        dim_values=cellfun(@transpose,dim_values,'UniformOutput',false);
     end
 
-    [samples,attr]=flatten_features(arr, dim_labels, dim_values);
+    [samples,dim_values,attr]=flatten_features(arr, dim_labels, ...
+                                            dim_values, opt);
 
-    if transpose
+    if do_transpose
         samples=samples';
         attr=transpose_attr(attr);
+        dim_values=cellfun(@transpose,dim_values,'UniformOutput',false);
     end
 
     ds=struct();
@@ -135,7 +166,8 @@ function attr=transpose_attr(attr)
         attr.(key)=value';
     end
 
-function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
+function [samples,dim_values,attr]=flatten_features(arr, dim_labels, ...
+                                                        dim_values, opt)
     % helper function to flatten features
 
     ndim=numel(dim_labels);
@@ -152,19 +184,14 @@ function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
 
     % number of values in remaining dimensions
     % (supports the case that arr is of size [...,1]
-    dim_sizes=cellfun(@numel,dim_values);
+    [dim_sizes,dim_values]=get_dim_sizes(arr,dim_labels,dim_values,opt);
 
     for dim=1:ndim
-        if dim_sizes(dim) ~= size(arr,dim+1)
-            error('Array has %d values on dimension %d, expected %d',...
-                    size(arr,dim+1), dim+1, dim_sizes(dim));
-        end
-
         % set values for dim-th dimension
-        dim_name=dim_labels{dim};
+        dim_label=dim_labels{dim};
+        dim_value=dim_values{dim};
 
-        values=dim_values{dim};
-        nvalues=numel(values);
+        nvalues=size(dim_value,2);
 
         % set the indices
         indices=1:nvalues;
@@ -186,10 +213,10 @@ function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
         rep_size=dim_sizes;
         rep_size(dim)=1;
 
-        rep_values=repmat(lin_values, rep_size);
+        rep_values=repmat(lin_values, rep_size(:)');
 
         % store indices as a row vector.
-        attr.(dim_name)=reshape(rep_values, 1, []);
+        attr.(dim_label)=reshape(rep_values, 1, []);
     end
 
     % get array and sample sizes
@@ -199,4 +226,34 @@ function [samples, attr]=flatten_features(arr, dim_labels, dim_values)
     samples=reshape(arr, nsamples, nfeatures);
 
 
+function [dim_sizes, dim_values]=get_dim_sizes(arr,dim_labels,dim_values,opt)
+    ndim=numel(dim_values);
+    dim_sizes=zeros(1,ndim);
+
+    for dim=1:ndim
+        dim_label=dim_labels{dim};
+        dim_value=dim_values{dim};
+
+        if cosmo_match({dim_label},opt.matrix_labels)
+            dim_size=size(dim_value,2);
+        else
+            if ~isvector(dim_value)
+                error(['Label ''%s'' (dimension %d) must be a vector, '...
+                        'because it was not specified as a matrix '...
+                        'dimension in the ''matrix_fields'' option'],...
+                        dim_label, dim);
+            end
+            dim_size=numel(dim_value);
+            dim_values{dim}=dim_value(:)'; % make it a row vector
+        end
+
+
+        if dim_size ~= size(arr,dim+1)
+            error(['Label ''%s'' (dimension %d) has %d values, ',...
+                        'expected %d based on the array input'],...
+                    dim_label, dim, dim_size, size(arr,dim+1));
+        end
+
+        dim_sizes(dim)=dim_size;
+    end
 

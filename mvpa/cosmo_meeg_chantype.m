@@ -18,14 +18,8 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %     ds=cosmo_synthetic_dataset('type','meeg','sens','neuromag306_all',...
 %                     'size','big','nchunks',1,'ntargets',1);
 %     [chantypes,senstypes]=cosmo_meeg_chantype(ds);
-%     cosmo_disp(chantypes);
-%     > { 'meg_axial'
-%     >   'meg_planar'
-%     >   'meg_planar'
-%     >        :
-%     >   'meg_axial'
-%     >   'meg_planar'
-%     >   'meg_planar' }@306x1
+%     cosmo_disp(chantypes,'edgeitems',2);
+%     > { 'meg_axial'  'meg_planar' ... 'meg_planar'  'meg_planar' }@1x306
 %     disp(senstypes)
 %     >      meg_axial: 'neuromag306alt_mag'
 %     >     meg_planar: 'neuromag306alt_planar'
@@ -38,17 +32,13 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %     % slice and prune dataset along feature dimension
 %     ds_planar=cosmo_dim_slice(ds,planar_msk,2);
 %     % the output dataset has only the 204 planar channels left
-%     cosmo_disp(ds_planar.a.fdim);
+%     cosmo_disp(ds_planar.a.fdim,'edgeitems',2);
 %     > .labels
-%     >   { 'chan'  'time' }
+%     >   { 'chan'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0112'          [  -0.2
-%     >       'MEG0113'            -0.15
-%     >       'MEG0212'             -0.1
-%     >          :                   :
-%     >       'MEG2543'                0
-%     >       'MEG2642'             0.05
-%     >       'MEG2643' }@204x1      0.1 ]@7x1 }
+%     >   { { 'MEG0112'  'MEG0113' ... 'MEG2642'  'MEG2643'   }@1x204
+%     >     [ -0.2     -0.15  ...  0.05       0.1 ]@1x7               }
 %     %
 %     cosmo_disp(ds_planar.fa.chan);
 %     > [ 1         2         3  ...  202       203       204 ]@1x1428
@@ -117,8 +107,8 @@ function [chantypes,senstype_mapping]=get_meeg_chantype(labels,opt)
     sens_chantypes=unq_types_cell{1};
     nsenstypes=numel(idxs);
 
-    visited_msk=false(nlabels,1);
-    chantypes=cell(nlabels,1);
+    visited_msk=false(size(labels));
+    chantypes=cell(size(labels));
     senstype_mapping=struct();
 
     for k=1:nsenstypes;

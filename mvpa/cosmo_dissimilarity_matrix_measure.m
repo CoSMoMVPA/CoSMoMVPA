@@ -77,7 +77,8 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     >           15 ]    15 ] }
 %     %
 %     % map results to matrix. values of 0 mean perfect correlation
-%     [samples, labels, values]=cosmo_unflatten(dsm_ds,1,NaN);
+%     [samples, labels, values]=cosmo_unflatten(dsm_ds,1,...
+%                                           'set_missing_to',NaN);
 %     cosmo_disp(samples)
 %     > [   NaN       NaN       NaN       NaN       NaN
 %     >       0       NaN       NaN       NaN       NaN

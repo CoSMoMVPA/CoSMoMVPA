@@ -177,7 +177,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     [unused,ni,nj,nk]=size(data);
 
     % make a dataset
-    ds=cosmo_flatten(data,{'i','j','k'},{1:ni,1:nj,1:nk});
+    ds=cosmo_flatten(data,{'i';'j';'k'},{1:ni;1:nj;1:nk});
     ds.sa=sa;
     ds.a.vol=vol;
 

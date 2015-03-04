@@ -93,7 +93,7 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
     mat=zeros(4);
     mat(4,4)=1;
     dim_size=zeros(1,3);
-    dim_values=cell(1,3);
+    dim_values=cell(3,1);
 
     for dim=1:3
         dim_label=fmri_dim_labels{perm(dim)};

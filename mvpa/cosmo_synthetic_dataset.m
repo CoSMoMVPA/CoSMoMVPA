@@ -149,27 +149,23 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     ds=cosmo_synthetic_dataset('type','meeg',...
 %                                   'sens','ctf151','size','huge');
 %     % show labels and values for feature dimensions
-%     cosmo_disp(ds.a.fdim)
+%     cosmo_disp(ds.a.fdim,'edgeitems',2)
 %     > .labels
-%     >   { 'chan'  'time' }
+%     >   { 'chan'
+%     >     'time' }
 %     > .values
-%     >   { { 'MLC11'          [  -0.2
-%     >       'MLC12'            -0.15
-%     >       'MLC13'             -0.1
-%     >         :                  :
-%     >       'MZO02'              0.5
-%     >       'MZP01'             0.55
-%     >       'MZP02' }@151x1      0.6 ]@17x1 }
+%     >   { { 'MLC11'  'MLC12' ... 'MZP01'  'MZP02'   }@1x151
+%     >     [ -0.2     -0.15  ...  0.55       0.6 ]@1x17      }
 %
 %     % example of MEEG dataset with 4d148 layout (3 channels only)
 %     ds=cosmo_synthetic_dataset('type','meeg','sens','4d148_planar');
 %     cosmo_disp(ds.a.fdim)
 %     > .labels
-%     >   { 'chan'  'time' }
+%     >   { 'chan'
+%     >     'time' }
 %     > .values
-%     >   { { 'A148_dH'    [  -0.2
-%     >       'A147_dH'      -0.15 ]
-%     >       'A146_dH' }            }
+%     >   { { 'A148_dH'  'A147_dH'  'A146_dH' }
+%     >     [ -0.2     -0.15 ]                  }
 %
 % NNO Aug 2014
 
@@ -239,7 +235,7 @@ function samples=generate_samples(ds, class_distance)
     nclasses=numel(unique(targets));
 
     fa_names=fieldnames(ds.fa);
-    nfeatures=numel(ds.fa.(fa_names{1}));
+    nfeatures=size(ds.fa.(fa_names{1}),2);
 
     seed=1;
     r=cosmo_rand(nsamples,nfeatures,'seed',seed);
@@ -265,26 +261,26 @@ function a=dim_labels_values(opt)
             % the matrix correctly
             a.vol.mat(1:3,4)=-3;
 
-            labels={'i','j','k'};
-            values={1:20,1:20,1:20};
+            labels={'i';'j';'k'};
+            values={1:20;1:20;1:20};
 
         case {'meeg','timelock','timefreq'}
             % simulate full neuromag 306 system
             chan=get_meeg_channels(sens_type);
 
-            time=(-.2:.05:1.3)';
+            time=(-.2:.05:1.3);
 
             switch data_type
                 case 'timefreq'
-                    freq=(2:2:40)';
-                    values={chan,freq,time};
-                    labels={'chan','freq','time'};
+                    freq=(2:2:40);
+                    values={chan;freq;time};
+                    labels={'chan';'freq';'time'};
                     a.meeg.samples_type='freq';
                     a.meeg.samples_field='powspctrm';
 
                 otherwise % meeg and timelock
-                    values={chan,time};
-                    labels={'chan','time'};
+                    values={chan;time};
+                    labels={'chan';'time'};
                     a.meeg.samples_type='timelock';
                     a.meeg.samples_field='trial';
             end
@@ -294,6 +290,11 @@ function a=dim_labels_values(opt)
         case 'surface'
             labels={'node_indices'};
             values={1:4000};
+
+        case 'source'
+            labels={'pos'};
+            values={cosmo_cartprod({-7:7,-6:6,-11:11})'};
+            a.meeg.samples_field='trial.pow';
 
         otherwise
             error('Unsupported type ''%s''', data_type);
@@ -330,6 +331,7 @@ function labels=get_meeg_channels(sens_type)
     func=sens2func.(key);
     chan_type=[cosmo_strjoin(sp(2:end),'_') '']; % ensure string
     labels=func(chan_type);
+    labels=labels(:)';
 
 
 function labels=get_eeg1020_chan(chan_type)
@@ -609,17 +611,29 @@ function [ds, nfeatures]=get_fdim_fa(opt)
 
     for k=1:numel(dim_sizes)
         if isnan(dim_sizes(k))
-            dim_sizes(k)=numel(values{k});
+            dim_sizes(k)=size(values{k},2);
         end
-        values{k}=values{k}(1:dim_sizes(k));
+
+        if isvector(values{k})
+            values{k}=values{k}(1:dim_sizes(k));
+        else
+            values{k}=values{k}(:,1:dim_sizes(k));
+        end
     end
 
     % get ds with proper size
-    ds=cosmo_flatten(zeros([1 dim_sizes]),labels,values);
+    ds=cosmo_flatten(zeros([1 dim_sizes]),labels,values,2,...
+                                            'matrix_labels',{'pos'});
     ds.a=cosmo_structjoin(ds.a,a);
-    if strcmp(data_type,'fmri')
-        ds.a.vol.dim=dim_sizes;
-        ds.a.vol.xform='scanner_anat';
+    switch data_type
+        case 'fmri'
+            ds.a.vol.dim=dim_sizes;
+            ds.a.vol.xform='scanner_anat';
+        case 'source'
+            pos=ds.a.fdim.values{1}(:,ds.fa.pos);
+            rng=max(pos)-min(pos);
+            ds.fa.inside=all(bsxfun(@lt,abs(bsxfun(@minus,...
+                                    mean(pos,2),pos)),rng/3));
     end
 
     nfeatures=prod(dim_sizes);

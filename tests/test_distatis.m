@@ -50,7 +50,7 @@ function test_statis_
 
         ds.sa.targets1=i;
         ds.sa.targets2=j;
-        faces={'f1','f2','f3','f4','f5','f6'};
+        faces={'f1','f2','f3','f4','f5','f6'}';
         ds.a.sdim.values={faces,faces};
         ds.a.sdim.labels={'targets1','targets2'};
 

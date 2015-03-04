@@ -20,17 +20,15 @@ function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 %     size(ds.samples)
 %     > [ 6 10710]
 %     % show dimension values
-%     cosmo_disp(ds.a.fdim)
+%     cosmo_disp(ds.a.fdim,'edgeitems',2)
 %     > .labels
-%     >   { 'chan'  'freq'  'time' }
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0111'          [  2        [  -0.2
-%     >       'MEG0112'             4          -0.15
-%     >       'MEG0113'             6           -0.1
-%     >          :                  :          -0.05
-%     >       'MEG2641'            10              0 ]
-%     >       'MEG2642'            12
-%     >       'MEG2643' }@306x1    14 ]@7x1            }
+%     >   { { 'MEG0111'  'MEG0112'  ...  'MEG2642'  'MEG2643'   }@1x306
+%     >     [ 2         4  ...  12        14 ]@1x7
+%     >     [ -0.2     -0.15      -0.1     -0.05         0 ]             }
 %     % show feature dimension indices for time
 %     cosmo_disp(ds.fa.time)
 %     > [ 1 1 1  ...  5 5 5 ]@1x10710
@@ -41,17 +39,15 @@ function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 %     size(ds_sel.samples)
 %     > [ 6 6426 ]
 %     % show values in time dimension
-%     cosmo_disp(ds_sel.a.fdim)
+%     cosmo_disp(ds_sel.a.fdim,'edgeitems',2)
 %     > .labels
-%     >   { 'chan'  'freq'  'time' }
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0111'          [  2        [ -0.15
-%     >       'MEG0112'             4           -0.1
-%     >       'MEG0113'             6          -0.05 ]
-%     >          :                  :
-%     >       'MEG2641'            10
-%     >       'MEG2642'            12
-%     >       'MEG2643' }@306x1    14 ]@7x1            }
+%     >   { { 'MEG0111'  'MEG0112'  ...  'MEG2642'  'MEG2643'   }@1x306
+%     >     [ 2         4    ...  12        14 ]@1x7
+%     >     [ -0.15      -0.1     -0.05 ]                                }
 %     %
 %     % show feature dimension indices for time
 %     cosmo_disp(ds_sel.fa.time)

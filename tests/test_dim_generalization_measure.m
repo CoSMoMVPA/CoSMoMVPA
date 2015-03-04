@@ -90,12 +90,14 @@ function test_dim_generalization_measure_basics
         end
 
         expected_result=cosmo_stack(expected_result_cell(1:pos),1);
+        expected_result.a.sdim.labels=cell(1,2);
         expected_result.a.sdim.labels{1}='train_time';
         expected_result.a.sdim.labels{2}='test_time';
 
         tr_dim=ds.a.sdim.values{1}(unq_tr_time);
         te_dim=ds.a.sdim.values{1}(unq_te_time);
 
+        expected_result.a.sdim.values=cell(1,2);
         expected_result.a.sdim.values{1}=tr_dim(:);
         expected_result.a.sdim.values{2}=te_dim(:);
 

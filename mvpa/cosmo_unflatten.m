@@ -1,7 +1,7 @@
-function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
+function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 % unflattens a dataset from 2 to (1+K) dimensions.
 %
-% [arr, dim_labels]=cosmo_unflatten(ds, [dim, ][, set_missing_to])
+% [arr, dim_labels]=cosmo_unflatten(ds, [dim, ][,...])
 %
 % Inputs:
 %   ds                 dataset structure, with fields:
@@ -18,7 +18,10 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
 %                      that every combination across labels is unique.
 %   dim                dimension to be unflattened, either 1 (for samples)
 %                      or 2 (for features; default)
-%   set_missing_to     value to set missing values to (default: 0)
+%   'set_missing_to',s value to set missing values to (default: 0)
+%   'matrix_labels',m  Allow labels in the cell string m to be matrices
+%                      rather than vectors. Currently the only use case is
+%                      the 'pos' attribute for MEEG source space data.
 %
 % Returns:
 %   arr                S_1 x ... x S_K x Q array if (dim==1), or
@@ -104,18 +107,23 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
 %
 % NNO Sep 2013
     if nargin<2 || isempty(dim), dim=2; end
-    if nargin<3 || isempty(set_missing_to), set_missing_to=0; end
+
+    defaults=struct();
+    defaults.set_missing_to=0;
+    defaults.matrix_labels=cell(0);
+    opt=cosmo_structjoin(defaults,varargin);
 
     switch dim
         case 1
             cosmo_isfield(ds,{'a.sdim','samples','sa'},true);
-            transpose=true;
+            do_transpose=true;
             a_dim=ds.a.sdim;
             attr=ds.sa;
 
+
         case 2
             cosmo_isfield(ds,{'a.fdim','samples','fa'},true);
-            transpose=false;
+            do_transpose=false;
             a_dim=ds.a.fdim;
             attr=ds.fa;
 
@@ -124,20 +132,23 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, set_missing_to)
     end
 
     samples=ds.samples;
-    if transpose
+    if do_transpose
         samples=samples';
+        a_dim.values=cellfun(@transpose,a_dim.values,...
+                                        'UniformOutput',false);
     end
 
     [arr, dim_labels,dim_values]=unflatten_features(samples, ...
-                                        a_dim, attr, set_missing_to);
+                                        a_dim, attr, opt);
 
-    if transpose
+    if do_transpose
         arr=shiftdim(arr,1);
+        dim_values=cellfun(@transpose,dim_values,'UniformOutput',false);
     end
 
 
 function [arr, dim_labels, dim_values]=unflatten_features(samples, ...
-                                        a_dim, attr, set_missing_to)
+                                        a_dim, attr, opt)
     nsamples=size(samples,1);
     dim_labels=a_dim.labels;
     dim_values=a_dim.values;
@@ -145,16 +156,19 @@ function [arr, dim_labels, dim_values]=unflatten_features(samples, ...
     % number of feature dimensions
     ndim=numel(dim_labels);
 
-    % number of elements in each dimension
-    dim_sizes=zeros(1,ndim);
+    % get sub indices for each feature dimension
+    sub_indices=cellfun(@(x)attr.(x), dim_labels, 'UniformOutput', false);
 
-    % space for indices in each dimension
-    sub_indices=cell(1,ndim);
+    % get dimension values
+    [dim_sizes, dim_values]=get_dim_sizes(dim_values, dim_labels, opt);
 
-    % go over dimensions
-    for k=1:ndim
-        dim_sizes(k)=numel(dim_values{k});
-        sub_indices{k}=attr.(dim_labels{k});
+    max_indices=cellfun(@max,sub_indices);
+    too_small_dim=find(max_indices(:)>dim_sizes(:),1);
+    if ~isempty(too_small_dim)
+        error(['dimension with label %s has %d dimension labels,'...
+                'but attribute indexes up to %d'],...
+                dim_labels{too_small_dim}, dim_sizes(too_small_dim),...
+                max_indices(too_small_dim));
     end
 
     % allocate space for output - one cell per sample
@@ -185,7 +199,7 @@ function [arr, dim_labels, dim_values]=unflatten_features(samples, ...
     % process each sample
     for k=1:nsamples
         % make empty
-        arr_dim(:)=set_missing_to;
+        arr_dim(:)=opt.set_missing_to;
 
         % assign to proper location
         arr_dim(lin_indices)=samples(k, :);
@@ -196,3 +210,36 @@ function [arr, dim_labels, dim_values]=unflatten_features(samples, ...
 
     % combine all samples
     arr=cat(1, arr_cell{:});
+
+
+function [dim_sizes, dim_values]=get_dim_sizes(dim_values, dim_labels, opt)
+    ndim=numel(dim_labels);
+    if numel(dim_values)~=ndim
+        error(['size mismatch between number of dimension values (%d)'...
+                    'and dimension labels (%d)'],...
+                    numel(dim_values), ndim);
+    end
+    % number of elements in each dimension
+    dim_sizes=zeros(1,ndim);
+
+    % go over dimensions
+    for dim=1:ndim
+        dim_label=dim_labels{dim};
+        dim_value=dim_values{dim};
+        if cosmo_match({dim_label},opt.matrix_labels)
+            dim_size=size(dim_value,2);
+        else
+            if ~isvector(dim_value)
+                error(['Label ''%s'' (dimension %d) must be a vector, '...
+                        'because it was not specified as a matrix '...
+                        'dimension in the ''matrix_fields'' option'],...
+                        dim_label, dim);
+            end
+            dim_size=numel(dim_value);
+            dim_values{dim}=dim_value(:)'; % make it a row vector
+        end
+
+        dim_sizes(dim)=dim_size;
+    end
+
+

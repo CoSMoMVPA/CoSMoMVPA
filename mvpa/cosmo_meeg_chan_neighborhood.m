@@ -57,9 +57,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >     .labels
 %     >       { 'chan' }
 %     >     .values
-%     >       { { 'MEG0113'
-%     >              :
-%     >           'MEG2643' }@204x1 }
+%     >       { { 'MEG0113' ... 'MEG2643'   }@1x204 }
 %     >   .meeg
 %     >     .samples_type
 %     >       'timelock'
@@ -89,9 +87,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >     .labels
 %     >       { 'chan' }
 %     >     .values
-%     >       { { 'MEG0112+0113'
-%     >                 :
-%     >           'MEG2642+2643' }@102x1 }
+%     >       { { 'MEG0112+0113' ... 'MEG2642+2643'   }@1x102 }
 %     >   .meeg
 %     >     .samples_type
 %     >       'timelock'
@@ -99,7 +95,6 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       'trial'
 %     >     .samples_label
 %     >       'rpt'
-%     >
 %
 %     % As above, but combine the two types of channels
 %     % Here the axial channels only have axial neighbors, and the planar
@@ -124,9 +119,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >     .labels
 %     >       { 'chan' }
 %     >     .values
-%     >       { { 'MEG0111'
-%     >                 :
-%     >           'MEG2642+2643' }@204x1 }
+%     >       { { 'MEG0111' ... 'MEG2642+2643'   }@1x204 }
 %     >   .meeg
 %     >     .samples_type
 %     >       'timelock'
@@ -154,7 +147,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
     nbrhood.a=ds.a;
     nbrhood.a.(dim_name)=struct();
     nbrhood.a.(dim_name).labels={'chan'};
-    nbrhood.a.(dim_name).values={nbrs_label(:)};
+    nbrhood.a.(dim_name).values={nbrs_label(:)'};
 
     if dim==2
         other_dim_name='sdim';

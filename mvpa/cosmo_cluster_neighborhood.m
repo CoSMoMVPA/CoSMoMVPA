@@ -153,7 +153,7 @@ function ds2nbrhood=get_dataset2neighborhood_mapping(ds, nbrhood)
     assert(isequal(nbrhood.a.fdim.labels(:),ds.a.fdim.labels(:)));
 
     dim_labels=ds.a.fdim.labels;
-    dim_sizes=cellfun(@numel,ds.a.fdim.values);
+    dim_sizes=cellfun(@numel,ds.a.fdim.values(:))';
     ndim=numel(dim_labels);
 
     % store fa indices
@@ -274,7 +274,7 @@ function nbrhood=fmri_neighborhood(ds,dim_pos,connectivity,opt)
     assert(isequal(ds.a.fdim.labels{dim_pos},'i'));
 
     if numel(dim_labels)>(dim_pos+2) || ...
-            ~isequal(dim_labels,{'i','j','k'})
+            ~isequal(dim_labels(:)',{'i','j','k'})
         error(['expected dataset with .a.fdim.labels([%d,%d,%d])='...
                 '{''i'',''j'',''k''}. \n'...
                 '- If this is an fMRI dataset, it seems messed up\n'...

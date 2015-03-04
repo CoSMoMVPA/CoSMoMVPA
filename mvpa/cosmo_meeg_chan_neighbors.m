@@ -41,13 +41,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %                                        'sens','eeg1010','size','big');
 %     % show all channel labels
 %     cosmo_disp(ds.a.fdim.values{1});
-%     > { 'TP10'
-%     >   'TP7'
-%     >   'TP8'
-%     >     :
-%     >   'A2'
-%     >   'M1'
-%     >   'M2'   }@94x1
+%     > { 'TP10'  'TP7'  'TP8' ... 'A2'  'M1'  'M2'   }@1x94
 %     %
 %     % simulate the case where some channels are missing; here, every 7-th
 %     % channels is removed
@@ -55,13 +49,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %
 %     % show remaining channel labels
 %     cosmo_disp(ds.a.fdim.values{1});
-%     > { 'TP10'
-%     >   'TP8'
-%     >   'TP9'
-%     >     :
-%     >   'A1'
-%     >   'A2'
-%     >   'M2'   }@80x1
+%     > { 'TP10'  'TP8'  'TP9' ... 'A1'  'A2'  'M2'   }@1x80
 %     %
 %     % get neighbors for the channel layout associated with this
 %     % dataset. This layout ('EEG1010.lay') has 88 channel positions,
@@ -288,7 +276,7 @@ function neighbors=reorder_neighbors(ds,neighbors)
     ii(i)=1:n;
 
     neighbors=neighbors(ii);
-    assert(isequal({neighbors.label}',ds_label))
+    assert(isequal({neighbors.label}',ds_label(:)))
 
 
 

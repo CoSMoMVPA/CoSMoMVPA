@@ -14,6 +14,7 @@ function test_interval_neighborhood_basis()
 
         ds=cosmo_dim_slice(ds_full,cosmo_match(ds_full.fa.time,slicearg),2);
         nf=size(ds.samples,2);
+        ds=cosmo_slice(ds,randperm(nf),2);
 
         for j=1:numel(radii)
             ds=cosmo_slice(ds,randperm(nf),2);
@@ -31,6 +32,18 @@ function test_interval_neighborhood_basis()
                 msk=m-radius<=fa_time & ...
                         fa_time <= m+radius;
                 assertEqual(find(msk),nh.neighbors{m});
+            end
+
+            % should properly deal with permutations
+            ds2=cosmo_slice(ds,randperm(nf),2);
+            ds2.a.fdim.values=cellfun(@transpose,ds2.a.fdim.values,...
+                                        'UniformOutput',false);
+            nh2=cosmo_interval_neighborhood(ds2,'time','radius',radius);
+            assertEqual(nh.fa,nh2.fa);
+            assertEqual(nh.a,nh2.a);
+            mp=cosmo_align(ds.fa,ds2.fa);
+            for m=1:numel(nh.neighbors)
+                assertEqual(sort(mp(nh2.neighbors{m})),nh.neighbors{m});
             end
         end
     end

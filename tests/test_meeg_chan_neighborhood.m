@@ -18,7 +18,7 @@ function test_neighbors()
     nbrs=cosmo_meeg_chan_neighbors(ds,'chantype','meg_planar','radius',0);
     nh=cosmo_meeg_chan_neighborhood(ds,nbrs);
 
-    assertEqual(nh.a.fdim.values,{{nbrs.label}'});
+    assertEqual(nh.a.fdim.values,{{nbrs.label}});
     assertEqual(nh.a.fdim.labels,{'chan'});
 
     n=numel(nh.neighbors);
@@ -40,9 +40,14 @@ function test_neighbors()
     n=numel(nh.neighbors);
     for k=1:test_step:n
         idx=nh.neighbors{k};
+
         chan_label=ds.a.fdim.values{1}(ds.fa.chan(idx));
-        assertEqual(intersect(ds_label,nbrs(k).neighblabel),...
-                        unique(chan_label));
+
+        % ensure both arguments for intersect are column vectors,
+        % because Octave behaves differently than Matlab
+        assertEqual(intersect(ds_label(:),nbrs(k).neighblabel(:)),...
+                        unique(chan_label'));
+
     end
 
 

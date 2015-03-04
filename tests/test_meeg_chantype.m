@@ -29,7 +29,7 @@ function test_meeg_chantype_
             else
                 chan_rep=repmat(chan_labels(:),...
                                 ceil(nchan/numel(chan_labels)),1);
-                assertEqual(tp,chan_rep(1:nf))
+                assertEqual(tp(:),chan_rep(1:nf))
             end
 
             for m=1:numel(chan_mapping)

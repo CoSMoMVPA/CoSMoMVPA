@@ -209,8 +209,8 @@ function res=cosmo_distatis(ds, varargin)
     res.a.sdim.labels=dim_labels;
     res.a.sdim.values=dim_values;
 
-    res.sa.(dim_labels{1})=i;
-    res.sa.(dim_labels{2})=j;
+    res.sa.(dim_labels{1})=i(:);
+    res.sa.(dim_labels{2})=j(:);
 
     cosmo_check_dataset(res);
 
@@ -497,8 +497,8 @@ function [dsm, dim_labels, dim_values, is_ds]=get_dsm(data)
         assert(isequal(sq1,dsm1+dsm1'));
 
 
-        dim_labels={'targets1','targets2'};
-        dim_values={1:n,1:n};
+        dim_labels={'targets1';'targets2'};
+        dim_values={1:n;1:n};
     else
         error('illegal input: expect dataset struct, or cell with arrays');
     end

@@ -4,7 +4,7 @@ function test_suite=test_meeg_source()
 
 function test_meeg_dataset()
     tps={'freq','time','rpt_trial'};
-    for j=3:numel(tps)
+    for j=1:numel(tps)
         [ft,fdim,data_label]=generate_ft_source(tps{j});
         ds=cosmo_meeg_dataset(ft);
 
@@ -23,10 +23,20 @@ function test_meeg_dataset()
 
         for k=1:numel(labels)
             label=labels{k};
-            assertEqual(ds.fa.(label),ones(1,nfeatures));
+            switch label
+                case 'pos'
+                    fa_values=1:nfeatures;
+                otherwise
+                    fa_values=ones(1,nfeatures);
+            end
+
+            assertEqual(ds.fa.(label),fa_values);
         end
 
-        assertEqual(ds.fa.pos,ft.pos');
+        [unused,i]=cosmo_dim_find(ds,'pos');
+        ds_pos=ds.a.fdim.values{i}(:,ds.fa.pos);
+
+        assertEqual(ds_pos,ft.pos');
 
         nfeatures=size(ds.samples,2);
         ds=cosmo_slice(ds,randperm(nfeatures),2);
@@ -69,24 +79,24 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
             %ft.cumtapcnt=(1:nsamples)';
             ft.method='average';
             ft.avg.pow=generate_data([1 nfeatures]);
-            fdim.labels={'freq'};
-            fdim.values={freq(:)};
+            fdim.labels={'freq';'pos'};
+            fdim.values={freq(:);ft.pos'};
             data_label={'avg','pow'};
 
         case 'time'
             ft.time=time;
             ft.method='average';
             ft.avg.pow=generate_data([1 nfeatures]);
-            fdim.labels={'time'};
-            fdim.values={time(:)};
+            fdim.labels={'time';'pos'};
+            fdim.values={time(:);ft.pos'};
             data_label={'avg','pow'};
 
         case 'rpt_trial';
             ft.time=time;
             ft.method='rawtrial';
             ft.trial=generate_data([1 nfeatures],nsamples);
-            fdim.labels={'time'};
-            fdim.values={time(:)};
+            fdim.labels={'time';'pos'};
+            fdim.values={time(:);ft.pos'};
             data_label={'trial','pow'};
 
     end

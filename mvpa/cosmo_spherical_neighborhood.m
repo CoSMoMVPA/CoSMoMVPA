@@ -71,7 +71,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     opt=cosmo_structjoin(defaults,varargin);
 
     [use_fixed_radius,radius,voxel_count]=get_selection_params(opt);
-    cosmo_check_dataset(ds,'fmri');
+    cosmo_check_dataset(ds);
 
     nfeatures=size(ds.samples,2);
     if nfeatures<voxel_count
@@ -79,36 +79,13 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
                     voxel_count, nfeatures);
     end
 
-    center_ids=1:nfeatures;
-
-
-    orig_dim=cellfun(@numel,ds.a.fdim.values);
-    orig_nvoxels=prod(orig_dim);
-
-    % mapping from all linear voxel indices to feature indices
-    map2full=zeros(orig_nvoxels,1);
-    lin_ids=fast_sub2ind(orig_dim, ds.fa.i, ds.fa.j, ds.fa.k);
-    [idxs,unq_lin_ids_cell]=cosmo_index_unique({lin_ids});
-    unq_lin_ids=unq_lin_ids_cell{1};
-
-    %unq_map2full=zeros(orig_nvoxels,1);
-    %unq_map2full(unq_lin_ids)=1:numel(unq_ids);
-
-    % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
-    % corresponds to features i1,...iN
-    lin2feature_ids=cell(orig_nvoxels,1);
-    for k=1:numel(unq_lin_ids)
-        lin_id=unq_lin_ids(k);
-        lin2feature_ids{lin_id}=idxs{k};
-
-    end
-
+    [orig_dim, lin2feature_ids, fdim, ijk_indices]=get_linear_mapping(ds);
 
     % compute voxel offsets relative to origin
-
     [sphere_offsets, o_distances]=get_sphere_offsets(radius);
 
     % allocate space for output
+    center_ids=1:nfeatures;
     ncenters=numel(center_ids);
     neighbors=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
@@ -123,9 +100,6 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
         clock_start=clock();
         prev_progress_msg='';
     end
-
-    % get the indices for output
-    ijk_indices=[ds.fa.i; ds.fa.j; ds.fa.k];
 
     % go over all features
     for k=1:ncenters
@@ -220,6 +194,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     % set the dataset and feature attributes
     nbrhood=struct();
     nbrhood.a=ds.a;
+    nbrhood.a.fdim=fdim;
     nbrhood.fa.nvoxels=nvoxels;
     nbrhood.fa.radius=final_radius;
     nbrhood.fa.center_ids=center_ids(:)';
@@ -268,6 +243,56 @@ function pos=with_approx(ids, distances, voxel_count)
     else
         pos=last;
     end
+
+
+
+function [orig_dim, lin2feature_ids, fdim, ijk]=get_linear_mapping(ds)
+    [two, index]=cosmo_dim_find(ds,'i');
+    if two~=2
+        error('dimension ''i'' must be a feature dimension');
+    end
+    [fdim,ijk]=get_spherical_fdim_from_ijk(ds, index);
+
+    orig_dim=cellfun(@numel,ds.a.fdim.values(index+(0:2)));
+    orig_dim=orig_dim(:)'; % ensure row vector
+    orig_nvoxels=prod(orig_dim);
+
+    % mapping from all linear voxel indices to feature indices
+    lin_ids=fast_sub2ind(orig_dim, ijk(1,:), ijk(2,:), ijk(3,:));
+    [idxs,unq_lin_ids_cell]=cosmo_index_unique({lin_ids});
+    unq_lin_ids=unq_lin_ids_cell{1};
+
+    % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
+    % corresponds to features i1,...iN
+    lin2feature_ids=cell(orig_nvoxels,1);
+    for k=1:numel(unq_lin_ids)
+        lin_id=unq_lin_ids(k);
+        lin2feature_ids{lin_id}=idxs{k}(:)';
+
+    end
+
+
+function [fdim,ijk]=get_spherical_fdim_from_ijk(ds, index)
+    cosmo_isfield(ds,'a.fdim.labels',true);
+
+    labels=ds.a.fdim.labels(:);
+    values=ds.a.fdim.values(:);
+
+    expected_labels={'i';'j';'k'};
+    if numel(labels)<index+2 || ...
+            ~isequal(labels(index+(0:2)),expected_labels)
+        error('expected labels %s in .a.fdim.labels(%d:%d)',...
+                    cosmo_strjoin(expected_labels,', '),index,index+2);
+    end
+
+    fdim=struct();
+    fdim.labels=labels(index+(0:2));
+    fdim.values=cellfun(@(x)x(:)',values(index+(0:2)),...
+                        'UniformOutput',false);
+    ijk=[fdim.values{1}(ds.fa.i); ...
+            fdim.values{2}(ds.fa.j); ...
+            fdim.values{3}(ds.fa.k)];
+
 
 
 

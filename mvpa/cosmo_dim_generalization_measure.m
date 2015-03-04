@@ -97,18 +97,12 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     %
 %     % the output has train_time and test_time as sample dimensions,
 %     % and chan as feature dimension
-%     cosmo_disp(dgm_sl_ds.a)
+%     cosmo_disp(dgm_sl_ds.a,'edgeitems',1)
 %     > .fdim
 %     >   .labels
 %     >     { 'chan' }
 %     >   .values
-%     >     { { 'MEG0112+0113'
-%     >         'MEG0212+0213'
-%     >         'MEG0312+0313'
-%     >               :
-%     >         'MEG0512+0513'
-%     >         'MEG0612+0613'
-%     >         'MEG0712+0713' }@7x1 }
+%     >     { { 'MEG0112+0113' ... 'MEG0712+0713'   }@1x7 }
 %     > .meeg
 %     >   .samples_type
 %     >     'timelock'
@@ -120,13 +114,9 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     >   .labels
 %     >     { 'train_time'  'test_time' }
 %     >   .values
-%     >     { [  -0.2        [  -0.2
-%     >         -0.15          -0.15
-%     >          -0.1           -0.1
-%     >           :              :
-%     >             0              0
-%     >          0.05           0.05
-%     >           0.1 ]@7x1      0.1 ]@7x1 }
+%     >     { [ -0.2        [ -0.2
+%     >           :             :
+%     >          0.1 ]@7x1     0.1 ]@7x1 }
 %
 %
 % Notes:
@@ -243,8 +233,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     end
 
     % set dimension attributes in the sample dimension
-    result=add_sample_attr(result, {train_label,test_label},...
-                                    {train_values,test_values});
+    result=add_sample_attr(result, {train_label;test_label},...
+                                    {train_values;test_values});
 
 
 
@@ -299,6 +289,11 @@ function [values,splits]=split_half_by_dimension(ds,opt)
     ds_tr=remove_fa_field(ds_tr,dimension);
 
     values=nbrhood.a.fdim.values{1}(keep_nbrs);
+    if ~isvector(values)
+        error('dimension %s must be a row vector', dimension);
+    elseif ~iscolumn(values)
+        values=values';
+    end
 
     n=numel(keep_nbrs);
     splits=cell(n,1);
@@ -317,8 +312,8 @@ function ds=add_sample_attr(ds, dim_labels, dim_values)
     end
 
 
-    ds.a.sdim.values=[ds.a.sdim.values dim_values];
-    ds.a.sdim.labels=[ds.a.sdim.labels dim_labels];
+    ds.a.sdim.values=[ds.a.sdim.values(:); dim_values]';
+    ds.a.sdim.labels=[ds.a.sdim.labels(:); dim_labels]';
 
 
 function ds=remove_fa_field(ds,label)

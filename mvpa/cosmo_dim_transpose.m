@@ -33,21 +33,23 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %     % (<empty> [samples]) x (chan x freq x time [features])
 %     cosmo_disp(ds.a.fdim)
 %     > .labels
-%     >   { 'chan'  'freq'  'time' }
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0111'    [ 2    [ -0.2 ]
-%     >       'MEG0112'      4 ]
-%     >       'MEG0113' }                  }
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %     % transpose 'time' from features to samples
 %     ds_tr_time=cosmo_dim_transpose(ds,'time');
 %     % dataset attribute dimensions are (time) x (chan x freq)
 %     cosmo_disp({ds_tr_time.a.sdim,ds_tr_time.a.fdim})
 %     > { .labels         .labels
-%     >     { 'time' }      { 'chan'  'freq' }
-%     >   .values         .values
-%     >     { [ -0.2 ] }    { { 'MEG0111'    [ 2
-%     >                         'MEG0112'      4 ]
-%     >                         'MEG0113' }        } }
+%     >     { 'time' }      { 'chan'
+%     >   .values             'freq' }
+%     >     { [ -0.2 ] }  .values
+%     >                     { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >                       [ 2         4 ]                     } }
 %     % using the defaults, chan is moved from features to samples, and
 %     % added at the end of .a.sdim.labels
 %     ds_tr_time_chan=cosmo_dim_transpose(ds_tr_time,'chan');
@@ -56,9 +58,9 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %     > { .labels                        .labels
 %     >     { 'time'  'chan' }             { 'freq' }
 %     >   .values                        .values
-%     >     { [ -0.2 ]  { 'MEG0111'        { [ 2
-%     >                   'MEG0112'            4 ] }
-%     >                   'MEG0113' } }               }
+%     >     { [ -0.2 ]  { 'MEG0111'        { [ 2         4 ] }
+%     >                   'MEG0112'
+%     >                   'MEG0113' } }                        }
 %     % when setting the position explicitly, chan is moved from features to
 %     % samples, and inserted to the first position in .a.sdim.labels
 %     ds_tr_chan_time=cosmo_dim_transpose(ds_tr_time,'chan',1,1);
@@ -67,19 +69,21 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %     > { .labels                        .labels
 %     >     { 'chan'  'time' }             { 'freq' }
 %     >   .values                        .values
-%     >     { { 'MEG0111'    [ -0.2 ]      { [ 2
-%     >         'MEG0112'                      4 ] }
-%     >         'MEG0113' }           }               }
+%     >     { { 'MEG0111'    [ -0.2 ]      { [ 2         4 ] }
+%     >         'MEG0112'
+%     >         'MEG0113' }           }                        }
 %     %
 %     % this moves the time dimension back to the feature dimension.
 %     ds_orig=cosmo_dim_transpose(ds_tr_time,'time');
 %     cosmo_disp(ds_orig.a.fdim)
 %     > .labels
-%     >   { 'chan'  'freq'  'time' }
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
 %     > .values
-%     >   { { 'MEG0111'    [ 2    [ -0.2 ]
-%     >       'MEG0112'      4 ]
-%     >       'MEG0113' }                  }
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %
 %
 % Notes:
@@ -132,7 +136,7 @@ function target_dim=find_target_dim(ds, dim_labels)
         if j==1
             source_dim=source_dim_j;
         elseif source_dim_j~=source_dim
-            error('labels %d and %d do not share the same dimension',...
+            error('labels %s and %s do not share the same dimension',...
                         dim_labels{1}, dim_labels{j});
         end
     end
@@ -231,14 +235,16 @@ function ds=move_dim(ds, dim_labels, dim, trg_pos)
 
     % move labels and values to target that are in dim_labels
 
-    ds.a.(trg_label).labels=insert_element(ds.a.(trg_label).labels(:),...
-                                                trg_pos,dim_labels(:));
-    ds.a.(trg_label).values=insert_element(ds.a.(trg_label).values(:),...
-                                                trg_pos,move_values(:));
+    ds.a.(trg_label).labels=insert_element(ds.a.(trg_label).labels,...
+                                                trg_pos,dim,dim_labels);
+    ds.a.(trg_label).values=insert_element(ds.a.(trg_label).values,...
+                                                trg_pos,dim,move_values);
+
+    ds.a.(trg_label).values=cellfun(@transpose,ds.a.(trg_label).values,...
+                                    'UniformOutput',false);
 
 
-
-function ys=insert_element(xs,i,y)
+function ys=insert_element(xs,i,dim,y)
     % insets y in xs at position i
     n=numel(xs);
     if i<0
@@ -249,7 +255,12 @@ function ys=insert_element(xs,i,y)
         error('position index must be in range 1..%d, or -%d..-1',n+1,n+1);
     end
 
-    ys=[xs(1:(i-1));y(:);xs(i:end)]';
+    xs_vec=xs(:);
+    ys=cat(1,xs_vec((1:(i-1))'),y(:),xs_vec((i:end)'));
+
+    if dim==1
+        ys=ys';
+    end
 
 
 

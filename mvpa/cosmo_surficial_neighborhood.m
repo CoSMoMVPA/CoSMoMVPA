@@ -216,7 +216,7 @@ out2in=surfing_maplow2hires(vo', vi');
 circle_def=get_circle_def(opt);
 
 % set center ids
-center_ids=opt.center_ids;
+center_ids=opt.center_ids(:)'; % ensure row vector
 if isempty(opt.center_ids)
     center_ids=1:size(vo,1);
 else

@@ -2,83 +2,106 @@ function test_suite=test_flatten()
     initTestSuite;
 
 function test_flatten_and_unflatten()
+    combis=cosmo_cartprod({1:2,0:2,1:2});
+    for k=1:size(combis,1)
+        args=num2cell(combis(k,:));
+        run_helper_test_flatten(args{:});
+    end
 
-
+function run_helper_test_flatten(nsamples, nfdim, dim)
     aet_fl=@(varargin) assertExceptionThrown(@()...
                                 cosmo_flatten(varargin{:}),'');
     aet_unfl=@(varargin) assertExceptionThrown(@()...
                                 cosmo_unflatten(varargin{:}),'');
 
-    %% single sample, flatten along features
-    % test flatten
-    data=reshape(1:30, [1 2 3 5]);
-    ds=cosmo_flatten(data,{'i','j','k'},{1:2,1:3,{'a','b','c','d','e'}});
-    assertEqual(ds.samples,1:30);
-    assertEqual(ds.fa.i,repmat([1 2],1,15));
-    assertEqual(ds.fa.j,repmat([1 1 2 2 3 3],1,5));
-    assertEqual(ds.fa.k,kron(1:5,ones(1,6)));
-    aet_fl(ds,{'i','j','k'},{1:2,1:3,{'a','b','c','d'}});
+    ndata=nsamples*30;
+    orig_labels={'i','j','k'};
+    orig_values={[1:2;3 4],[1:3;3:-1:1],{'a','b','c','d','e'}};
+
+    use_vector_values=nfdim<=1;
+    transpose_vectors=nfdim==0;
+
+    if use_vector_values
+        % select first row only
+        orig_values=cellfun(@(x)x(1,:),orig_values,...
+                                        'UniformOutput',false);
+    end
+
+    transpose_count=transpose_vectors+0;
+
+    switch dim
+        case 1
+            data_shape=[2 3 5 nsamples];
+
+            transpose_count=transpose_count+1;
+            a_dim='sa';
+            attr_dim='sdim';
+
+        case 2
+            data_shape=[nsamples 2 3 5];
+
+            a_dim='fa';
+            attr_dim='fdim';
+
+    end
+
+    if use_vector_values && transpose_vectors
+        opt=struct();
+        wrong_opt=struct();
+        wrong_opt.matrix_labels={'i','j'};
+    elseif use_vector_values
+        opt=struct();
+        wrong_opt='this will raise an error because it is not a struct';
+    else
+        opt=struct();
+        opt.matrix_labels={'i','j'};
+        wrong_opt=struct();
+    end
+
+    if mod(dim,2)==1
+        tr=@transpose;
+    else
+        tr=@(x)x;
+    end
+
+    if mod(transpose_count,2)==1
+        tr_values=@transpose;
+    else
+        tr_values=@(x)x;
+    end
+
+    orig_values_tr=cellfun(tr_values,orig_values,'UniformOutput',false);
+
+    data=reshape(1:ndata,data_shape);
+
+    ds=cosmo_flatten(data,orig_labels,orig_values_tr,dim,opt);
+    aet_fl(data,orig_labels,orig_values_tr,dim,wrong_opt);
+
+    assertEqual(ds.samples(:),(1:ndata)');
+    assertEqual(ds.(a_dim).i,tr(repmat([1 2],1,15)));
+    assertEqual(ds.(a_dim).j,tr(repmat([1 1 2 2 3 3],1,5)));
+    assertEqual(ds.(a_dim).k,tr(kron(1:5,ones(1,6))));
+    aet_fl(data,orig_labels,cellfun(@(x)x(1:2),orig_values,...
+                                'UniformOutput',false));
+
+    expected_values=cellfun(tr,orig_values,'UniformOutput',false);
+    expected_labels=cellfun(tr,orig_labels,'UniformOutput',false);
+
+    assertEqual(ds.a.(attr_dim).values,expected_values);
+    assertEqual(ds.a.(attr_dim).labels,expected_labels);
 
     % test unflatten
-    [data2,labels,values]=cosmo_unflatten(ds,2);
+    if transpose_vectors
+        ds.a.(attr_dim).values=cellfun(@transpose,...
+                                    ds.a.(attr_dim).values,...
+                                    'UniformOutput',false);
+    end
+
+    [data2,labels,values]=cosmo_unflatten(ds,dim,opt);
+    aet_unfl(ds,dim,wrong_opt);
+
     assertEqual(data,data2);
-    assertEqual(labels,{'i','j','k'});
-    assertEqual(values,{1:2,1:3,{'a','b','c','d','e'}});
-    aet_unfl(ds,1);
-
-    %% single feature, flatten along samples
-    % test flatten
-    data=reshape(1:30, [2 3 5 1]);
-    ds=cosmo_flatten(data,{'i','j','k'},{1:2,1:3,{'a','b','c','d','e'}},1);
-    assertEqual(ds.samples,(1:30)');
-    assertEqual(ds.sa.i,repmat([1 2],1,15)');
-    assertEqual(ds.sa.j,repmat([1 1 2 2 3 3],1,5)');
-    assertEqual(ds.sa.k,kron(1:5,ones(1,6))');
-    aet_fl(ds,{'i','j','k'},{1:2,1:3,{'a','b','c','d'}},1);
-
-
-    % test unflatten
-    [data2,labels,values]=cosmo_unflatten(ds,1);
-    assertEqual(data,data2);
-    assertEqual(labels,{'i','j','k'});
-    assertEqual(values,{1:2,1:3,{'a','b','c','d','e'}});
-    aet_unfl(ds,2);
-
-
-    %% two samples, flatten along features
-    % test flatten
-    data=reshape(1:60, [2 2 3 5]);
-    ds=cosmo_flatten(data,{'i','j','k'},{1:2,1:3,{'a','b','c','d','e'}});
-    assertEqual(ds.samples,[1:2:60;2:2:60]);
-    assertEqual(ds.fa.i,repmat([1 2],1,15));
-    assertEqual(ds.fa.j,repmat([1 1 2 2 3 3],1,5));
-    assertEqual(ds.fa.k,kron(1:5,ones(1,6)));
-    aet_fl(ds,{'i','j','k'},{1:2,1:3,{'a','b','c','d'}});
-
-
-    % test unflatten
-    [data2,labels,values]=cosmo_unflatten(ds,2);
-    assertEqual(data,data2);
-    assertEqual(labels,{'i','j','k'});
-    assertEqual(values,{1:2,1:3,{'a','b','c','d','e'}});
-    aet_unfl(ds,1);
-
-
-    %% two features, flatten along samples
-    % test flatten
-    data=reshape(1:60, [2 3 5 2]);
-    ds=cosmo_flatten(data,{'i','j','k'},{1:2,1:3,{'a','b','c','d','e'}},1);
-    assertEqual(ds.samples,[1:30;31:60]');
-    assertEqual(ds.sa.i,repmat([1 2],1,15)');
-    assertEqual(ds.sa.j,repmat([1 1 2 2 3 3],1,5)');
-    assertEqual(ds.sa.k,kron(1:5,ones(1,6))');
-    aet_fl(ds,{'i','j','k'},{1:2,1:3,{'a','b','c','d'}},1);
-
-    % test unflatten
-    [data2,labels,values]=cosmo_unflatten(ds,1);
-    assertEqual(data,data2);
-    assertEqual(labels,{'i','j','k'});
-    assertEqual(values,{1:2,1:3,{'a','b','c','d','e'}});
-    aet_unfl(ds,2);
-
+    assertEqual(labels,expected_labels);
+    assertEqual(values,expected_values);
+    aet_unfl(ds,3-dim);
 
