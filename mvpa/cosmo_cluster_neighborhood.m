@@ -286,13 +286,10 @@ function nbrhood=fmri_neighborhood(ds,dim_pos,connectivity,opt)
     nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius,opt);
 
     % only keep i, j and k feature attributes
-    keep_fa={'i','j','k'};
-    keys=fieldnames(nbrhood.fa);
-    i=find(~cosmo_match(keys,keep_fa));
-    for j=1:numel(i)
-        key=keys{j};
-        nbrhood.fa=rmfield(nbrhood.fa,key);
-    end
+    keep_fa_keys={'i','j','k'};
+    remove_fa_keys=setdiff(fieldnames(nbrhood.fa),keep_fa_keys);
+    nbrhood.fa=rmfield(nbrhood.fa,remove_fa_keys);
+
 
 
 function nbrhood=chan_neighborhood(ds,dim_pos,arg,unused)
