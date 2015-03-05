@@ -293,7 +293,9 @@ function a=dim_labels_values(opt)
 
         case 'source'
             labels={'pos'};
-            values={cosmo_cartprod({-7:7,-6:6,-11:11})'};
+            xyz=cosmo_cartprod({-7:7,-6:6,-11:11})';
+            [unused,i]=sort(sum(abs(xyz),1));
+            values={xyz(:,i)};
             a.meeg.samples_field='trial.pow';
 
         otherwise
