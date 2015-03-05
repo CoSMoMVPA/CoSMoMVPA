@@ -79,7 +79,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
                     voxel_count, nfeatures);
     end
 
-    [orig_dim, lin2feature_ids, fdim, ijk_indices]=get_linear_mapping(ds);
+    [fdim, fa, pos, orig_dim, lin2feature_ids]=get_linear_mapping(ds);
 
     % compute voxel offsets relative to origin
     [sphere_offsets, o_distances]=get_sphere_offsets(radius);
@@ -104,7 +104,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     % go over all features
     for k=1:ncenters
         center_id=center_ids(k);
-        center_ijk=ijk_indices(:,center_id);
+        center_pos=pos(:,center_id);
 
         % - in case of a variable radius, keep growing sphere_offsets until
         %   there are enough voxels selected. This new radius is kept
@@ -113,17 +113,17 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
         %   iteration.
         while true
             % add offsets to center
-            all_around_ijk=bsxfun(@plus, center_ijk', sphere_offsets);
+            all_around_pos=bsxfun(@plus, center_pos', sphere_offsets);
 
             % see which ones are outside the volume
-            outside_msk=all_around_ijk<=0 | ...
-                            bsxfun(@minus,orig_dim,all_around_ijk)<0;
+            outside_msk=all_around_pos<=0 | ...
+                            bsxfun(@minus,orig_dim,all_around_pos)<0;
 
             % collapse over 3 dimensions
-            feature_outside_msk=sum(outside_msk,2)>0;
+            feature_outside_msk=any(outside_msk,2);
 
             % get rid of those outside the volume
-            around_ijk=all_around_ijk(~feature_outside_msk,:);
+            around_pos=all_around_pos(~feature_outside_msk,:);
 
             % if using variable radius, keep track of those
             if ~use_fixed_radius
@@ -131,9 +131,9 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
             end
 
             % convert to linear indices
-            around_lin=fast_sub2ind(orig_dim,around_ijk(:,1), ...
-                                        around_ijk(:,2), ...
-                                        around_ijk(:,3));
+            around_lin=fast_sub2ind(orig_dim,around_pos(:,1), ...
+                                        around_pos(:,2), ...
+                                        around_pos(:,3));
 
             % convert linear to feature ids
             around_feature_ids=[lin2feature_ids{around_lin}];
@@ -195,13 +195,10 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     nbrhood=struct();
     nbrhood.a=ds.a;
     nbrhood.a.fdim=fdim;
+    nbrhood.fa=cosmo_slice(fa,center_ids,2,'struct');
     nbrhood.fa.nvoxels=nvoxels;
     nbrhood.fa.radius=final_radius;
     nbrhood.fa.center_ids=center_ids(:)';
-    nbrhood.fa.i=ds.fa.i(center_ids);
-    nbrhood.fa.j=ds.fa.j(center_ids);
-    nbrhood.fa.k=ds.fa.k(center_ids);
-
     nbrhood.neighbors=neighbors;
 
     cosmo_check_neighborhood(nbrhood);
@@ -246,12 +243,12 @@ function pos=with_approx(ids, distances, voxel_count)
 
 
 
-function [orig_dim, lin2feature_ids, fdim, ijk]=get_linear_mapping(ds)
+function [fdim, fa, ijk, orig_dim, lin2feature_ids]=get_linear_mapping(ds)
     [two, index]=cosmo_dim_find(ds,'i');
     if two~=2
         error('dimension ''i'' must be a feature dimension');
     end
-    [fdim,ijk]=get_spherical_fdim_from_ijk(ds, index);
+    [fdim,fa,ijk]=get_spherical_fdim_from_ijk(ds, index);
 
     orig_dim=cellfun(@numel,ds.a.fdim.values(index+(0:2)));
     orig_dim=orig_dim(:)'; % ensure row vector
@@ -272,26 +269,37 @@ function [orig_dim, lin2feature_ids, fdim, ijk]=get_linear_mapping(ds)
     end
 
 
-function [fdim,ijk]=get_spherical_fdim_from_ijk(ds, index)
+function [fdim,fa,ijk]=get_spherical_fdim_from_ijk(ds, index)
     cosmo_isfield(ds,'a.fdim.labels',true);
 
-    labels=ds.a.fdim.labels(:);
-    values=ds.a.fdim.values(:);
+    dim_labels=ds.a.fdim.labels(:);
+    dim_values=ds.a.fdim.values(:);
 
-    expected_labels={'i';'j';'k'};
-    if numel(labels)<index+2 || ...
-            ~isequal(labels(index+(0:2)),expected_labels)
+    ijk_labels={'i';'j';'k'};
+    nlabels=numel(ijk_labels);
+    idx_labels=index+(0:(nlabels-1));
+    if numel(dim_labels)<index+(nlabels-1) || ...
+            ~isequal(dim_labels(idx_labels),ijk_labels)
         error('expected labels %s in .a.fdim.labels(%d:%d)',...
-                    cosmo_strjoin(expected_labels,', '),index,index+2);
+                    cosmo_strjoin(ijk_labels,', '),index,index+nlabels-1);
     end
 
     fdim=struct();
-    fdim.labels=labels(index+(0:2));
-    fdim.values=cellfun(@(x)x(:)',values(index+(0:2)),...
+    fdim.labels=dim_labels(idx_labels);
+    fdim.values=cellfun(@(x)x(:)',dim_values(idx_labels),...
                         'UniformOutput',false);
-    ijk=[fdim.values{1}(ds.fa.i); ...
-            fdim.values{2}(ds.fa.j); ...
-            fdim.values{3}(ds.fa.k)];
+
+    ijk_cell=cell(1,nlabels);
+    fa=struct();
+    for j=1:nlabels
+        label=ijk_labels{j};
+        fa_value=ds.fa.(label);
+        fa.(label)=fa_value;
+        ijk_cell{j}=fdim.values{j}(fa_value);
+    end
+    ijk=cat(1,ijk_cell{:});
+
+
 
 
 
