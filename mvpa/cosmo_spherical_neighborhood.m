@@ -4,21 +4,31 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 % nbrhood=cosmo_spherical_neighborhood(ds, opt)
 %
 % Inputs
-%   ds             a dataset struct (from fmri_dataset)
-%   'radius', r    } either use a radius of r voxels, or select
-%   'count', c     } approximately c voxels per searchlight
-%                  These two options are mutually exclusive
-%   'progress', p  show progress every p features (default: 1000)
+%   ds                  a dataset struct, either:
+%                       - in fmri form (from cosmo_fmri_dataset), when
+%                         ds.fa has the fields .i, .j and .k
+%                       - in meeg source form (from cosmo_meeg_dataset),
+%                         when ds.fa has the field .pos
+%   'radius', r         } either use a radius of r, or select
+%   'count', c          } approximately c voxels per searchlight
+%                       Notes:
+%                       - These two options are mutually exclusive
+%                       - When using this option for an fmri dataset, the
+%                         radius r is expressed in voxel units; for an meeg
+%                         source dataset, the radius r is in whatever units
+%                         the source dataset uses for the positions
+%   'progress', p       show progress every p features (default: 1000)
 %
 % Outputs
-%   nbrhood           dataset-like struct without .sa or .samples, with:
-%     .a              dataset attributes, from dataset.a
-%     .fa             feature attributes with fields:
-%       .nvoxels      1xP number of voxels in each searchlight
-%       .radius       1xP radius in voxel units
-%       .center_ids   1xP feature center id
-%     .neighbors      Px1 cell so that center2neighbors{k}==nbrs contains
-%                     the feature ids of the neighbors of feature k
+%   nbrhood             dataset-like struct without .sa or .samples, with:
+%     .a                dataset attributes, from dataset.a
+%     .fa               feature attributes with the same fields as fs.fa,
+%                       and in addition the fields:
+%       .nvoxels        1xP number of voxels in each searchlight
+%       .radius         1xP radius in voxel units
+%       .center_ids     1xP feature center id
+%     .neighbors         Px1 cell so that center2neighbors{k}==nbrs contains
+%                       the feature ids of the neighbors of feature k
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('type','fmri');
@@ -62,6 +72,10 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %     >     [ 4         1         5 ]
 %     >     [ 5         4         2         6 ]
 %     >     [ 6         5         3 ]           }
+%
+%
+% See also: cosmo_fmri_dataset, cosmo_meeg_dataset
+%
 % NNO Aug 2013
 
     check_input(varargin{:});
