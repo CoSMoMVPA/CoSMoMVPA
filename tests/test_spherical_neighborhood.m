@@ -138,3 +138,39 @@ function test_with_freq_dimension_dataset
     nh2=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
     assertEqual(nh,nh2);
 
+function test_meeg_source_dataset
+    ds=cosmo_synthetic_dataset('type','source','size','normal');
+    nf=size(ds.samples,2);
+
+    rps=[randperm(nf) randperm(nf)];
+    rp=rps(round(nf/2)+(1:nf));
+
+    ds=cosmo_slice(ds,rp,2);
+
+    radius=1.2+.5*rand();
+    nh=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
+
+    assertEqual(nh.fa.pos,ds.fa.pos);
+    assertEqual(nh.a,ds.a);
+
+    count=ceil(4/3*pi*radius^3);
+    nh2=cosmo_spherical_neighborhood(ds,'count',count,'progress',false);
+    assertEqual(nh2.fa.pos,ds.fa.pos);
+    assertEqual(nh2.a,ds.a);
+
+    rp=rp(1:10);
+
+    pos=nh.a.fdim.values{1}(:,ds.fa.pos);
+
+    for r=rp
+        d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+        idxs=find(d<=radius);
+        assertEqual(sort(nh.neighbors{r}),sort(idxs));
+    end
+
+    [p,q]=cosmo_overlap(nh.neighbors,nh2.neighbors);
+
+    assertTrue(mean(diag(p))>.25);
+    assertTrue(mean(diag(q))>.9);
+
+
