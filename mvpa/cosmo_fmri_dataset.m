@@ -141,45 +141,18 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 
     params = cosmo_structjoin(defaults, varargin);
 
+    if string_endswith(filename,'.mat')
+        filename=fast_import_data(filename);
+    end
+
     % special case: if it's already a dataset, just return it
-    if isstruct(filename) && isfield(filename,'samples')
+    if cosmo_check_dataset(filename,'fmri',false);
         ds=filename;
-        cosmo_check_dataset(ds,'fmri');
         return
     end
 
     % get the supported image formats use the helper defined below
-    img_formats=get_img_formats(params);
-
-    % read the image
-    [data,vol,sa]=read_img(filename, img_formats);
-
-    if ~isa(data,'double')
-        data=double(data); % ensure data stored in double precision
-    end
-
-    % see how many dimensions there are, and their size
-    data_size = size(data);
-    ndim = numel(data_size);
-
-    switch ndim
-        case 3
-            % simple reshape operation
-            data=reshape(data,[1 data_size]);
-        case 4
-            % make temporal dimension the first one
-            data=shiftdim(data,3);
-        otherwise
-            error('need 3 or 4 dimensions, found %d', ndim);
-    end
-
-    % number of values in 1 temporal dimension + 3 spatial
-    [unused,ni,nj,nk]=size(data);
-
-    % make a dataset
-    ds=cosmo_flatten(data,{'i';'j';'k'},{1:ni;1:nj;1:nk});
-    ds.sa=sa;
-    ds.a.vol=vol;
+    ds=convert_to_dataset(filename, params);
 
     % set chunks and targets
     ds=set_sa_vec(ds,params,'targets');
@@ -238,7 +211,7 @@ function img_formats=get_img_formats(params)
     img_formats.bv_vtc.reader=@read_bv_vtc;
     img_formats.bv_vtc.externals={'neuroelf'};
 
-    img_formats.spm.exts={'.mat','mat:con','mat:beta','mat:spm'};
+    img_formats.spm.exts={'mat:con','mat:beta','mat:spm'};
     img_formats.spm.matcher=@isa_spm;
     img_formats.spm.reader=@(fn)read_spm(fn,params);
     img_formats.spm.externals=img_formats.nii.externals;
@@ -249,6 +222,71 @@ function img_formats=get_img_formats(params)
     img_formats.afni.matcher=@isa_afni;
     img_formats.afni.reader=@read_afni;
     img_formats.afni.externals={'afni'};
+
+    img_formats.ft_source.exts=cell(0);
+    img_formats.ft_source.matcher=@isa_ft_source;
+    img_formats.ft_source.reader=@read_ft_source;
+    img_formats.ft_source.externals=cell(0);
+    img_formats.ft_source.convert_volume=false;
+
+function result=fast_import_data(fn)
+    x=load(fn);
+    keys=fieldnames(x);
+    if numel(keys)~=1
+        error('Cannot load .mat file %s with multiple variables: %s',...
+                fn, cosmo_strjoin(keys,', '));
+    end
+    result=x.(keys{1});
+
+
+function ds=convert_to_dataset(fn, params)
+    img_formats_collection=get_img_formats(params);
+    label=find_img_format(fn, img_formats_collection);
+
+    % make sure the required externals exist
+    img_format=img_formats_collection.(label);
+    externals=img_format.externals;
+    cosmo_check_external(externals);
+
+    reader=img_format.reader;
+
+    if isfield(img_format,'convert_volume') && ...
+                ~img_format.convert_volume
+        ds=reader(fn);
+        return;
+    end
+
+    % read the data
+    [data,vol,sa]=reader(fn);
+
+    if ~isa(data,'double')
+        data=double(data); % ensure data stored in double precision
+    end
+
+    % see how many dimensions there are, and their size
+    data_size = size(data);
+    ndim = numel(data_size);
+
+    switch ndim
+        case 3
+            % simple reshape operation
+            data=reshape(data,[1 data_size]);
+        case 4
+            % make temporal dimension the first one
+            data=shiftdim(data,3);
+        otherwise
+            error('need 3 or 4 dimensions, found %d', ndim);
+    end
+
+    % number of values in 1 temporal dimension + 3 spatial
+    [unused,ni,nj,nk]=size(data);
+
+    % make a dataset
+    ds=cosmo_flatten(data,{'i';'j';'k'},{1:ni;1:nj;1:nk});
+    ds.sa=sa;
+    ds.a.vol=vol;
+
+
 
 function ds=set_sa_vec(ds,p,fieldname)
     % helper: sets a sample attribute as a vector
@@ -272,6 +310,10 @@ function ds=set_sa_vec(ds,p,fieldname)
     end
     ds.sa.(fieldname)=v(:);
 
+function tf=string_endswith(s, tail)
+    tf=ischar(s) && ~isempty(s) && isempty(cosmo_strsplit(s, tail, -1));
+
+
 function img_format=find_img_format(filename, img_formats)
     % helper: find image format of filename fn
 
@@ -285,7 +327,7 @@ function img_format=find_img_format(filename, img_formats)
             m=numel(exts);
             for j=1:m
                 ext=exts{j};
-                if isempty(cosmo_strsplit(filename,ext,-1))
+                if string_endswith(filename,ext)
                     img_format=fn;
                     return
                 end
@@ -456,20 +498,6 @@ function auto_mask=compute_auto_mask(data, mask_type)
 
     auto_mask=~to_remove(:)';
 
-function [data,vol,sa]=read_img(fn, img_formats)
-    % helper: returns data (3D or 4D), header, and a string indicating the
-    % image format. It matches the filename extension with what is stored
-    % in img_formats
-
-    img_format=find_img_format(fn, img_formats);
-
-    % make sure the required externals exist
-    externals=img_formats.(img_format).externals;
-    cosmo_check_external(externals);
-
-    % read the data
-    reader=img_formats.(img_format).reader;
-    [data,vol,sa]=reader(fn);
 
 function hdr=get_and_check_data(hdr, loader_func, check_func)
     % is hdr is a char, load it using loader; otherwise return the input.
@@ -1078,3 +1106,26 @@ function [data,vol,sa]=read_spm(fn,params)
     end
 
     assert(sample_counter==nsamples);
+
+% FIeldTrip source struct
+function  b=isa_ft_source(hdr)
+    b=isstruct(hdr) && ((isfield(hdr,'inside') && isfield(hdr,'pos')) ||...
+                        (cosmo_check_dataset(hdr,false) && ...
+                         cosmo_isfield(hdr,'fa.pos')));
+
+function [data,vol,sa]=read_ft_source(ft)
+    assert(isstruct(ft));
+
+    if isfield(ft,'inside') && isfield(ft,'pos')
+        ds=cosmo_meeg_dataset(ft);
+    else
+        ds=ft;
+    end
+
+    cosmo_check_dataset(ds,'meeg')
+
+
+
+
+
+
