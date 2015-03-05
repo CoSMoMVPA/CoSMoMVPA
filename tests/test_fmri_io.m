@@ -8,34 +8,73 @@ function test_fmri_io_base
     exts={'.nii.gz', '.nii', '.hdr', '.img', '+orig.HEAD',...
               '+tlrc.BRIK','.vmp',...
               '.vmr', '.msk', };
-    keep_exts=true(numel(exts),1);
 
-    if ~usejava('jvm')
-        cosmo_notify_test_skipped(['.nii.gz (gzipped) fmri i/o cannot be '...
-                    'tested because the java virtual machine is not '...
-                    'available']);
-        keep_exts=keep_exts && ~cosmo_match(exts,'.nii.gz');
-    end
+    skips=struct();
 
-    if cosmo_wtf('is_octave') || ~cosmo_check_external('neuroelf',false)
-        cosmo_notify_test_skipped(['BrainVoyager fmri i/o cannot be '...
-                    'tested because ''neuroelf'' is not '...
-                    'available']);
-        keep_exts=keep_exts && ~cosmo_match(exts,{'.vmp','.vmr','msk'});
-    end
+    skips.nii_gz.description='.nii.gz (gzipped) NIFTI';
+    skips.nii_gz.matcher=@()~usejava('jvm');
+    skips.nii_gz.exts={'.nii.gz'};
+    skips.nii_gz.component='java VM';
 
-    exts=exts(keep_exts);
+    skips.afni.description='AFNI';
+    skips.afni.matcher=@()~cosmo_check_external('afni',false);
+    skips.afni.exts={'+orig.HEAD','+tlrc.BRIK'};
+    skips.afni.component='external ''afni''';
+
+    skips.bv.description='BrainVoyager';
+    skips.bv.matcher=@()cosmo_wtf('is_octave') || ...
+                    ~cosmo_check_external('neuroelf',false);
+    skips.bv.component='external ''neuroelf''';
+    skips.bv.exts={'.vmp','.vmr','.msk'};
+
+    skip_keys=fieldnames(skips);
+    nskip_keys=numel(skip_keys);
+    skipped_fieldname=[];
 
     n=numel(exts);
     for k=1:n
         ext=exts{k};
+
+        skip_test=false;
+        for j=1:nskip_keys
+            s=skips.(skip_keys{j});
+            if cosmo_match({ext},s.exts) && s.matcher()
+                skipped_fieldname=skip_keys{j};
+                skip_test=true;
+                break;
+            end
+        end
+
+        if skip_test
+            continue;
+        end
+
         y=save_and_load(x_base,ext);
-        assert_samples_equal(x.samples,y.samples,ext);
-        assert_a_equal(x,y,ext);
-        assert_fa_equal(x,y,ext);
+        assert_dataset_equal(x,y,ext);
     end
 
-function assert_samples_equal(xs,ys,ext)
+
+    if ~isempty(skipped_fieldname)
+        s=skips.(skipped_fieldname);
+        reason=sprintf(['fmri i/o for %s files skipped because %s'...
+                        'is not available'],...
+                        s.description,s.component);
+
+        cosmo_notify_test_skipped(reason);
+    end
+
+
+
+function assert_dataset_equal(x,y,ext)
+    funcs={@assert_samples_equal, @assert_a_equal, @assert_fa_equal};
+    for j=1:numel(funcs)
+        func=funcs{j};
+        func(x,y,ext);
+    end
+
+function assert_samples_equal(x,y,ext)
+    xs=x.samples;
+    ys=y.samples;
     switch ext
         case '.msk'
             assert(cosmo_corr(xs',ys')>.999);
