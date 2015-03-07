@@ -1113,7 +1113,7 @@ function  b=isa_ft_source(hdr)
                         (cosmo_check_dataset(hdr,false) && ...
                          cosmo_isfield(hdr,'fa.pos')));
 
-function [data,vol,sa]=read_ft_source(ft)
+function ds=read_ft_source(ft)
     assert(isstruct(ft));
 
     if isfield(ft,'inside') && isfield(ft,'pos')
