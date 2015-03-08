@@ -28,10 +28,11 @@ function test_dim_find_basics()
                 name=dim_labels(msk);
             end
 
-            [d,i,an,dn,vs]=cosmo_dim_find(ds,name);
+            [d,i,an,dn,vs]=cosmo_dim_find(ds,name,false);
 
             if ~any(msk)
                 assertEqual({d,i,an,dn,vs},{[],[],[],[],[]});
+
             else
 
                 assertEqual(d,dim);
@@ -48,6 +49,27 @@ function test_dim_find_basics()
                 end
             end
         end
-
-
     end
+
+
+function test_dim_find_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                cosmo_dim_find(varargin{:}),'');
+
+
+    ds=cosmo_synthetic_dataset();
+
+    ds=cosmo_dim_transpose(ds,'i',1);
+    aet(ds,{'i','j'});
+    assertEqual(cosmo_dim_find(ds,{'i','j'},false),[]);
+    aet(ds,{'foo'});
+    assertEqual(cosmo_dim_find(ds,{'foo'},false),[]);
+    aet(ds,'foo');
+    assertEqual(cosmo_dim_find(ds,'foo',false),[]);
+    ds=cosmo_dim_transpose(ds,'i',2);
+    cosmo_dim_find(ds,'i');
+    ds.a.fdim.labels{1}='k';
+    aet(ds,'k',true);
+
+
+

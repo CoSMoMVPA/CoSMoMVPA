@@ -49,7 +49,7 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
 % NNO Aug 2014
 
 
-    if nargin<3, raise=false; end
+    if nargin<3, raise=true; end
 
     is_singleton=ischar(dim_label);
     if is_singleton
@@ -70,9 +70,11 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
             dim=d;
             attr_name=an;
             dim_name=dn;
-        elseif isempty(d) || dim~=d || ~isequal(attr_name,an) || ...
+        end
+
+        if isempty(d) || dim~=d || ~isequal(attr_name,an) || ...
                                     ~isequal(dim_name,dn)
-            dim=d;
+            dim=[];
             break;
         end
 
