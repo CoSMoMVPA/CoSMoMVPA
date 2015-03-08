@@ -3,7 +3,7 @@ function test_suite = test_vol_coordinates
 
 
 function test_vol_coordinates_()
-    ds=generate_test_dataset();
+    ds=cosmo_synthetic_dataset();
 
     [ns,nf]=size(ds.samples);
 
