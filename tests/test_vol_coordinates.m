@@ -46,7 +46,7 @@ function test_vol_coordinates_()
 function test_vol_coordinates_afni()
 % test coordinates using AFNI's 3dmerge
     if ~cosmo_check_external('afni_bin',false)
-        warning('AFNI test skipped');
+        cosmo_notify_test_skipped('AFNI binaries not available');
         return
     end
     % make an fMRI dataset
