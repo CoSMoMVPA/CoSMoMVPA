@@ -49,44 +49,98 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
 % NNO Aug 2014
 
 
-if nargin<3, raise=false; end
+    if nargin<3, raise=true; end
 
-infixes='sf';
-for dim=1:numel(infixes)
-    infix=infixes(dim);
+    is_singleton=ischar(dim_label);
+    if is_singleton
+        dim_label={dim_label};
+    elseif ~iscellstr(dim_label)
+        error('Second input must be string or cell with strings');
+    end
 
-    attr_name=[infix 'a'];
-    dim_name=[infix 'dim'];
+    nlabel=numel(dim_label);
 
-    if cosmo_isfield(ds, ['a.' dim_name '.labels'])
-        labels=ds.a.(dim_name).labels;
-        m=cosmo_match(labels, dim_label);
-        if any(m)
-            index=find(m);
-            if numel(index)>1 && raise
-                error('Duplicate label %s in .a.%s.labels', ...
-                                dim_label, dim_name);
-            elseif ~cosmo_isfield(ds, {['a.' dim_name '.values'],...
-                                        [attr_name '.' dim_label]}, raise)
-                % not all fields present
+    dim=[];
+    index=zeros(size(dim_label));
+    values=cell(size(dim_label));
+    for k=1:nlabel
+        [d,i,an,dn,vs]=find_singleton(ds,dim_label{k},raise);
 
-            else
-                values=ds.a.(dim_name).values{index};
-                return
+        if k==1
+            dim=d;
+            attr_name=an;
+            dim_name=dn;
+        end
+
+        if isempty(d) || dim~=d || ~isequal(attr_name,an) || ...
+                                    ~isequal(dim_name,dn)
+            dim=[];
+            break;
+        end
+
+        index(k)=i;
+        values{k}=vs;
+    end
+
+    if isempty(dim)
+        index=[];
+        attr_name=[];
+        dim_name=[];
+        values=[];
+
+        if raise
+            error('Unable to find all labels in the same dimension: %s',...
+                        cosmo_strjoin(dim_label,', '));
+        end
+    elseif is_singleton
+        values=values{1};
+    end
+
+
+
+function [dim, index, attr_name, dim_name, values]=find_singleton(ds,dim_label,raise)
+    found=false;
+
+    infixes='sf';
+    for dim=1:numel(infixes)
+        infix=infixes(dim);
+
+        attr_name=[infix 'a'];
+        dim_name=[infix 'dim'];
+
+        if cosmo_isfield(ds, ['a.' dim_name '.labels'])
+            labels=ds.a.(dim_name).labels;
+            m=cosmo_match(labels, dim_label);
+            if any(m)
+                index=find(m);
+                if numel(index)>1 && raise
+                    error('Duplicate label %s in .a.%s.labels', ...
+                                    dim_label, dim_name);
+                elseif ~cosmo_isfield(ds, {['a.' dim_name '.values'],...
+                                            [attr_name '.' dim_label]}, raise)
+                    % not all fields present
+
+                else
+                    values=ds.a.(dim_name).values{index};
+                    return
+                end
             end
         end
     end
-end
 
-dim=[];
-index=[];
-attr_name=[];
-dim_name=[];
-values=[];
+    if found
+        return;
+    end
 
-if raise
-    error('Not found: dimension label %s', dim_label);
-end
+    dim=[];
+    index=[];
+    attr_name=[];
+    dim_name=[];
+    values=[];
+
+    if raise
+        error('Not found: dimension label %s', dim_label);
+    end
 
 
 
