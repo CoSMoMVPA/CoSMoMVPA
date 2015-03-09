@@ -6,9 +6,9 @@ function test_fmri_cluster_neighborhood
 
     ds=cosmo_synthetic_dataset('type','fmri','size','normal');
     nf=size(ds.samples,2);
-    imsk=find(rand(1,nf)>.4);
+    imsk=find(rand(1,nf)>.8);
     rp=randperm(numel(imsk));
-    ds=cosmo_dim_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
+    ds=cosmo_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
 
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
@@ -23,7 +23,7 @@ function test_fmri_cluster_neighborhood
     nf=size(ds.samples,2);
     rp=randperm(nf);
 
-    nfeatures_test=3;
+    nfeatures_test=nf;
 
     ijk=[ds.fa.i; ds.fa.j; ds.fa.k];
     feature_ids=rp(1:nfeatures_test);
