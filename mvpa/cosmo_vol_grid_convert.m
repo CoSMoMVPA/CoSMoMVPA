@@ -78,9 +78,6 @@ function ds_conv=cosmo_vol_grid_convert(ds,varargin)
 %
 % NNO Mar 2015
 
-
-
-
     check_input(ds);
     direction=get_direction(ds,varargin{:});
 
