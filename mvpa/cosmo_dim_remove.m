@@ -5,15 +5,17 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 %
 % Inputs:
 %   ds                  dataset struct
-%   dim_labels          string or cellstring with label(s) to remove
+%   dim_labels          cellstring with label(s) to remove. A single
+%                       string s is interpreted as s{1}
 %
 % Output:
 %   ds_result           dataset struct with dim_labels removed from
 %                       .a.{fdim,sdim} and .{fa,sa}.
 %   attr                struct based on .{fa,sa} but only with the fields in
 %                       dim_labels
-%   values              cell based on .a.{fdim,sdim}.values, but only
-%                       with the fields in dim_labels.
+%   values              Nx1 cell based on .a.{fdim,sdim}.values, but only
+%                       with the fields in dim_labels. If dim_labels is a
+%                       string, then the output is values{1}.
 %
 % Example:
 %     % generate tiny fmri dataset
@@ -52,16 +54,13 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 %
 % NNO Mar 2015
 
-
-
-
     has_char_label=ischar(dim_labels);
     if has_char_label
         dim_labels={dim_labels};
     end
     nlabels=numel(dim_labels);
 
-    [unused,remove_idxs,attr_name,dim_name]=cosmo_dim_find(ds,dim_labels);
+    [dim,remove_idxs,attr_name,dim_name]=cosmo_dim_find(ds,dim_labels);
 
     % update .fa / .sa
     xa=ds.(attr_name);
@@ -83,15 +82,25 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
     xdim.labels=xdim.labels(keep_msk);
     xdim.values=xdim.values(keep_msk);
 
+    % remove from the input
     if any(keep_msk)
+        % there are dimensions left
         ds.a.(dim_name)=xdim;
     else
+        % no dimensions left, remove sdim or fdim
         ds.a=rmfield(ds.a,dim_name);
     end
 
+    % set values to return
     values=xdim_values(remove_idxs);
+    assert(isvector(values));
+
+    if xor(dim==1,isrow(values))
+        values=values';
+    end
 
     if has_char_label
+        % return singleton element
         assert(numel(values)==1);
         values=values{1};
     end

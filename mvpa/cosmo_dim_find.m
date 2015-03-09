@@ -61,8 +61,8 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
     nlabel=numel(dim_label);
 
     dim=[];
-    index=zeros(size(dim_label));
-    values=cell(size(dim_label));
+    index=zeros(nlabel,1);
+    values=cell(nlabel,1);
     for k=1:nlabel
         [d,i,an,dn,vs]=find_singleton(ds,dim_label{k},raise);
 
@@ -92,15 +92,20 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
             error('Unable to find all labels in the same dimension: %s',...
                         cosmo_strjoin(dim_label,', '));
         end
-    elseif is_singleton
-        values=values{1};
+    else
+        if dim==1
+            index=index';
+            values=values';
+        end
+        if is_singleton
+            values=values{1};
+        end
     end
 
 
 
-function [dim, index, attr_name, dim_name, values]=find_singleton(ds,dim_label,raise)
-    found=false;
-
+function [dim, index, attr_name, dim_name, values]=find_singleton(ds,...
+                                                        dim_label,raise)
     infixes='sf';
     for dim=1:numel(infixes)
         infix=infixes(dim);
@@ -126,10 +131,6 @@ function [dim, index, attr_name, dim_name, values]=find_singleton(ds,dim_label,r
                 end
             end
         end
-    end
-
-    if found
-        return;
     end
 
     dim=[];

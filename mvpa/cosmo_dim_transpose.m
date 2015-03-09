@@ -177,10 +177,10 @@ function ds=copy_attr(ds, dim_labels, target_dim)
         unq=v(1);
         assert(all(unq==v(:)));
 
-        ds.(src_name)=rmfield(ds.(src_name),dim_label);
         ds.(trg_name).(dim_label)=repmat(unq,trg_size);
     end
 
+    ds.(src_name)=rmfield(ds.(src_name),dim_labels);
 
     attr_label='transpose_ids';
     src_size=[1 1];
