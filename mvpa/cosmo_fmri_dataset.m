@@ -129,8 +129,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %
 % See also: cosmo_map2fmri
 %
-% part of the NIFTI code is ported from Pascal to Matlab based on MRICron,
-% copyright 2006 Chris Rorden, BSD license
+% part of the NIFTI code is based on code by Robert W Cox, 2003,
+% dedicated to the public domain.
 %
 % ACC, NNO Aug, Sep 2013, 2014
 
@@ -572,12 +572,13 @@ function [mx, xform]=get_nifti_transform(hdr, varargin)
     %  - this function is experimental
     %  - at the moment it relies on the quaternion values in the NIFTI header,
     %    and ignores srow* fields. (support for srow is future work)
-    %  - initial testing suggests agreement with MRIcron
-    %  - part of the code is ported from Pascal to Matlab based on MRICron,
-    %    copyright 2006 Chris Rorden, BSD license
+    %  - initial testing suggests agreement with MRIcron (thanks to Chris
+    %    Rorden for providing this software)
+    %  - functionality in the subfunctions are based on nftii1_io.h in
+    %    AFNI, written Robert W Cox (2003), public domain dedication;
+    %    http://afni.nimh.nih.gov/afni/doc/source/nifti1__io_8c-source.html
     %  - to convert voxel coordinates (i,j,k) to (x,y,z), compute
     %    lpi_mx*[x y z 1]'. For the reverse, compute inv(lpi_mx)*[i j k 1]'
-    %
     %
     % NNO Dec 2014
 
@@ -679,38 +680,6 @@ function mx=nifti_matrix_from_pixdim(hdr)
 
 
 function mx=nifti_matrix_from_qform(hdr)
-    % Code in the nifti_matrix_from_qform is based on MRIcron
-    %
-    % MRIcron medical viewer 
-    % Copyright (c) 2006 Chris Rorden
-    % All rights reserved.
-    % 
-    % Redistribution and use in source and binary forms, with or without 
-    % modification, are permitted provided that the following conditions 
-    % are met:
-    % 
-    % Redistributions of source code must retain the above copyright 
-    % notice, this list of conditions and the following disclaimer.
-    % 
-    % Redistributions in binary form must reproduce the above copyright 
-    % notice, this list of conditions and the following disclaimer in the 
-    % documentation and/or other materials provided with the distribution.
-    % Neither the names of the copyright owners nor the names of this 
-    % project (MRIcron) may be used to endorse or promote products derived 
-    % from this software without specific prior written permission.
-    % 
-    % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-    % "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-    % LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-    % A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-    % OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-    % SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
-    % LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-    % DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-    % THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-    % (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-    % OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
-    
     % convert quaternion to affine matrix
     qfac=hdr.dime.pixdim(1);
     dx=hdr.dime.pixdim(2);
