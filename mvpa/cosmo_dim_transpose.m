@@ -110,24 +110,31 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 
     attr_name=dim2attr_name(target_dim);
 
+    % split dataset by dim_labels
     source_dim=3-target_dim;
     sp=cosmo_split(ds, dim_labels, source_dim);
 
+    % move attribute for each split
     n=numel(sp);
     for k=1:n
         sp{k}=copy_attr(sp{k}, dim_labels, target_dim);
     end
 
+    % join splits
     ds=cosmo_stack(sp, target_dim, 'unique');
+
+    % remove dimension from source_dim
     [ds,unused,values]=cosmo_dim_remove(ds,dim_labels);
 
     cell_transpose=@(c)cellfun(@(x)x',c,'UniformOutput',false)';
     values_tr=cell_transpose(values);
     attr_tr=ds.(attr_name);
 
-    ds=cosmo_dim_insert(ds,target_dim,target_pos,dim_labels,values_tr,attr_tr);
+    % insert dimension in target_dim
+    ds=cosmo_dim_insert(ds,target_dim,target_pos,...
+                            dim_labels,values_tr,attr_tr);
 
-    %ds=move_dim(ds, dim_labels, target_dim, target_pos);
+    % ensure all kosher
     cosmo_check_dataset(ds);
 
 function target_dim=find_target_dim(ds, dim_labels)
@@ -144,9 +151,6 @@ function target_dim=find_target_dim(ds, dim_labels)
 
     target_dim=3-source_dim;
 
-
-
-
 function prefix=dim2prefix(dim)
     prefixes='sf';
     prefix=prefixes(dim);
@@ -154,10 +158,6 @@ function prefix=dim2prefix(dim)
 function attr_name=dim2attr_name(dim)
     % returns 'sa' or 'fa'
     attr_name=[dim2prefix(dim) 'a'];
-
-function attr_name=dim2label(dim)
-    % return 'sdim' or 'fdim'
-    attr_name=[dim2prefix(dim) 'dim'];
 
 function ds=copy_attr(ds, dim_labels, target_dim)
     % copy between .fa and .sa
@@ -182,113 +182,10 @@ function ds=copy_attr(ds, dim_labels, target_dim)
 
     ds.(src_name)=rmfield(ds.(src_name),dim_labels);
 
+    % add transpose_ids, so that the input can be reconstructed
+    % even after permutations of rows or columns
     attr_label='transpose_ids';
     src_size=[1 1];
     src_size(source_dim)=size(ds.samples,source_dim);
     ds.(src_name).(attr_label)=reshape(1:max(src_size),src_size);
-
-function ds=move_dim(ds, dim_labels, dim, trg_pos)
-    expected_dim=cosmo_dim_find(ds, dim_labels);
-    if ~isequal(expected_dim,dim)
-        error('not all found in dimension %d: %s',...
-                    dim,cosmo_strjoin(dim_labels,', '));
-    end
-
-    cell_transpose=@(c)cellfun(@(x)x',c,'UniformOutput',false)';
-
-    [ds,attr,values]=cosmo_dim_remove(ds,dim_labels);
-    attr_cell=cellfun(@(x)attr.(x),values,'UniformOutput',false);
-
-    attr_tr=cell_transpose(attr_cell);
-    values_tr=cell_transpose(values);
-
-    ds=cosmo_dim_insert(ds,dim,-1,dim_labels,values_tr,attr_tr);
-    return
-
-
-
-    % move between .a.fdim and .a.sdim
-    src_label=dim2label(3-dim);
-    trg_label=dim2label(dim);
-
-    src_attr=ds.a.(src_label);
-    src_labels=src_attr.labels;
-
-    dim_msk=cosmo_match(dim_labels, src_labels);
-    if ~all(dim_msk)
-        i=find(dim_msk,1);
-        error('missing label %s in .a.%s.labels',dim_labels{i},src_label);
-    end
-
-    if ~cosmo_isfield(ds.a,trg_label)
-        ds.a.(trg_label)=struct();
-        ds.a.(trg_label).labels=cell(1,0);
-        ds.a.(trg_label).values=cell(1,0);
-    end
-
-    trg_attr=ds.a.(trg_label);
-    trg_labels=trg_attr.labels;
-
-    % dim_labels cannot be present in target
-    conflicting_msk=cosmo_match(dim_labels, trg_labels);
-    if any(conflicting_msk)
-        i=find(conflicting_msk,1);
-        error('label %s already in .a.%s.labels',dim_labels{i},trg_label);
-    end
-
-    nlabels=numel(dim_labels);
-    src_move_idx=zeros(nlabels,1);
-    for k=1:nlabels
-        src_move_idx(k)=find(cosmo_match(src_labels,dim_labels(k)));
-    end
-
-    src_keep_idx=setdiff(1:numel(src_labels),src_move_idx);
-    move_values=src_attr.values(src_move_idx);
-
-    if isempty(src_keep_idx)
-        ds.a=rmfield(ds.a,src_label);
-    else
-        % keep labels and values in source that are not in dim_labels
-        ds.a.(src_label).labels=ds.a.(src_label).labels(src_keep_idx);
-        ds.a.(src_label).values=ds.a.(src_label).values(src_keep_idx);
-    end
-
-    % move labels and values to target that are in dim_labels
-
-    ds.a.(trg_label).labels=insert_element(ds.a.(trg_label).labels,...
-                                                trg_pos,dim,dim_labels);
-    ds.a.(trg_label).values=insert_element(ds.a.(trg_label).values,...
-                                                trg_pos,dim,move_values);
-
-    ds.a.(trg_label).values=cellfun(@transpose,ds.a.(trg_label).values,...
-                                    'UniformOutput',false);
-
-
-function ys=insert_element(xs,i,dim,y)
-    % insets y in xs at position i
-    n=numel(xs);
-    if i<0
-        i=n-i;
-    end
-
-    if i<0 || i>(n+1)
-        error('position index must be in range 1..%d, or -%d..-1',n+1,n+1);
-    end
-
-    xs_vec=xs(:);
-    ys=cat(1,xs_vec((1:(i-1))'),y(:),xs_vec((i:end)'));
-
-    if dim==1
-        ys=ys';
-    end
-
-
-
-
-
-
-
-
-
-
 
