@@ -109,7 +109,7 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
     end
 
     attr_name=dim2attr_name(target_dim);
-    
+
     source_dim=3-target_dim;
     sp=cosmo_split(ds, dim_labels, source_dim);
 
@@ -117,16 +117,16 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
     for k=1:n
         sp{k}=copy_attr(sp{k}, dim_labels, target_dim);
     end
-    
+
     ds=cosmo_stack(sp, target_dim, 'unique');
     [ds,unused,values]=cosmo_dim_remove(ds,dim_labels);
-    
+
     cell_transpose=@(c)cellfun(@(x)x',c,'UniformOutput',false)';
     values_tr=cell_transpose(values);
     attr_tr=ds.(attr_name);
-    
+
     ds=cosmo_dim_insert(ds,target_dim,target_pos,dim_labels,values_tr,attr_tr);
-    
+
     %ds=move_dim(ds, dim_labels, target_dim, target_pos);
     cosmo_check_dataset(ds);
 
@@ -193,19 +193,19 @@ function ds=move_dim(ds, dim_labels, dim, trg_pos)
         error('not all found in dimension %d: %s',...
                     dim,cosmo_strjoin(dim_labels,', '));
     end
-    
+
     cell_transpose=@(c)cellfun(@(x)x',c,'UniformOutput',false)';
-    
+
     [ds,attr,values]=cosmo_dim_remove(ds,dim_labels);
     attr_cell=cellfun(@(x)attr.(x),values,'UniformOutput',false);
-    
+
     attr_tr=cell_transpose(attr_cell);
     values_tr=cell_transpose(values);
-    
+
     ds=cosmo_dim_insert(ds,dim,-1,dim_labels,values_tr,attr_tr);
     return
-    
-    
+
+
 
     % move between .a.fdim and .a.sdim
     src_label=dim2label(3-dim);
