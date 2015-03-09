@@ -116,8 +116,8 @@ function [dim, index, attr_name, dim_name, values]=find_singleton(ds,dim_label,r
                 if numel(index)>1 && raise
                     error('Duplicate label %s in .a.%s.labels', ...
                                     dim_label, dim_name);
-                elseif ~cosmo_isfield(ds, {['a.' dim_name '.values'],...
-                                            [attr_name '.' dim_label]}, raise)
+                elseif ~cosmo_isfield(ds, ['a.' dim_name '.values'],...
+                                                        raise)
                     % not all fields present
 
                 else

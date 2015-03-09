@@ -69,10 +69,11 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
     attr=struct();
     for k=1:nlabels
         label=dim_labels{k};
-        attr.(label)=xa.(label);
+        if isfield(xa,label)
+            attr.(label)=xa.(label);
+            ds.(attr_name)=rmfield(ds.(attr_name),label);
+        end
     end
-
-    ds.(attr_name)=rmfield(xa,dim_labels);
 
     % update .a.fdim / .a.sdim
     xdim=ds.a.(dim_name);

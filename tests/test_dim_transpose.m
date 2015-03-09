@@ -12,7 +12,7 @@ function test_dim_transpose_basics()
 
     z=cosmo_dim_transpose(x,{'k','i','j'},1);
     assertEqual(z,cosmo_dim_transpose(x,{'k','i','j'}));
-    assertEqual(z,cosmo_dim_transpose(x,{'k','i','j'},1,-1));
+    assertEqual(z,cosmo_dim_transpose(x,{'k','i','j'},1,0));
 
     rps=ceil(rand(1,10)*nsamples);
     for rp=rps
