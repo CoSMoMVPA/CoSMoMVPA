@@ -5,15 +5,17 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 %
 % Inputs:
 %   ds                  dataset struct
-%   dim_labels          string or cellstring with label(s) to remove
+%   dim_labels          cellstring with label(s) to remove. A single
+%                       string s is interpreted as s{1}
 %
 % Output:
 %   ds_result           dataset struct with dim_labels removed from
 %                       .a.{fdim,sdim} and .{fa,sa}.
 %   attr                struct based on .{fa,sa} but only with the fields in
 %                       dim_labels
-%   values              cell based on .a.{fdim,sdim}.values, but only
-%                       with the fields in dim_labels.
+%   values              Nx1 cell based on .a.{fdim,sdim}.values, but only
+%                       with the fields in dim_labels. If dim_labels is a
+%                       string, then the output is values{1}.
 %
 % Example:
 %     % generate tiny fmri dataset
