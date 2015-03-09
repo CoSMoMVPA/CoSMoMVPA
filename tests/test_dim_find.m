@@ -4,6 +4,13 @@ function test_suite = test_dim_find()
 function test_dim_find_basics()
     prefixes='sf';
     for dim=1:2
+        if dim==1
+            transposer=@transpose;
+        else
+            transposer=@(x)x;
+        end
+
+
         prefix=prefixes(dim);
         attr_name=[prefix 'a'];
         dim_name=[prefix 'dim'];
@@ -34,9 +41,8 @@ function test_dim_find_basics()
                 assertEqual({d,i,an,dn,vs},{[],[],[],[],[]});
 
             else
-
                 assertEqual(d,dim);
-                assertEqual(i,find(msk));
+                assertEqual(i,transposer(find(msk)'));
                 assertEqual(an,attr_name);
                 assertEqual(dn,dim_name);
 
@@ -45,7 +51,7 @@ function test_dim_find_basics()
                 if use_string_name
                     assertEqual(vs,values{msk});
                 else
-                    assertEqual(vs,values(msk));
+                    assertEqual(vs,values(transposer(msk)));
                 end
             end
         end
