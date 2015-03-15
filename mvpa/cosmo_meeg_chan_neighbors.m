@@ -561,6 +561,6 @@ function chan_labels=get_dataset_channel_label(ds)
     if iscellstr(ds)
         chan_labels=ds;
     else
-        [dim, index, attr_name, dim_name]=cosmo_dim_find(ds,'chan',true);
+        [unused, index, unused, dim_name]=cosmo_dim_find(ds,'chan',true);
         chan_labels=ds.a.(dim_name).values{index};
     end
