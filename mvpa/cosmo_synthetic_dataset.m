@@ -293,7 +293,7 @@ function a=dim_labels_values(opt)
 
         case 'source'
             labels={'pos'};
-            xyz=cosmo_cartprod({-7:7,-6:6,-11:11})';
+            xyz=cosmo_cartprod({-70:10:70,-60:10:60,-110:10:110})';
             [unused,i]=sort(sum(abs(xyz),1));
             values={xyz(:,i)};
             a.meeg.samples_field='trial.pow';
@@ -635,7 +635,7 @@ function [ds, nfeatures]=get_fdim_fa(opt)
             pos=ds.a.fdim.values{1}(:,ds.fa.pos);
             rng=max(pos)-min(pos);
             ds.fa.inside=all(bsxfun(@lt,abs(bsxfun(@minus,...
-                                    mean(pos,2),pos)),rng/3));
+                                    mean(pos,2),pos)),rng));
     end
 
     nfeatures=prod(dim_sizes);
