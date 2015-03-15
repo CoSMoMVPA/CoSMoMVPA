@@ -77,7 +77,7 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
     unq_pos=find(msk);
 
     nidxs=size(idxs,1);
-    cell_sizes=[diff([unq_pos;(nidxs+1)])];
+    cell_sizes=diff([unq_pos;(nidxs+1)]);
 
     % convert to cell representation
     %cell_indices=mat2cell(i,cell_sizes,1);
