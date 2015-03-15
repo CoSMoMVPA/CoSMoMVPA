@@ -152,8 +152,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
     to_merge_a=get_struct_values(ds_cell, 'a');
     if ~isempty(to_merge_a)
-        ds_stacked.a=merge_structs(to_merge_a,merge,...
-                                    ['.a']);
+        ds_stacked.a=merge_structs(to_merge_a,merge,'.a');
     end
 
 
