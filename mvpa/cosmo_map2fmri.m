@@ -416,9 +416,6 @@ function hdr=new_bv_vmr(ds)
         error('Unsupported: more than 1 sample');
     end
 
-    mn=min(ds.samples);
-    mx=max(ds.samples);
-
     % scale to 0..255
     vol_data=unflatten(ds);
     hdr.VMRData=scale_uint8(vol_data(:,:,:,1));
