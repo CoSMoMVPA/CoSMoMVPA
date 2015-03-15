@@ -67,8 +67,6 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 %
 % NNO Jan 2014
 
-    is_ok=false;
-
     % process input arguments
     defaults=struct();
     defaults.unbalanced_partitions_ok=false;
