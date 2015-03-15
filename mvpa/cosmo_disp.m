@@ -195,7 +195,7 @@ function s=disp_helper(x, opt)
         s=nd_any2str(x,opt);
     end
 
-function s=any2summary_str(x,opt)
+function s=any2summary_str(x,unused)
     if has_size(x)
         sz=size(x);
     else
