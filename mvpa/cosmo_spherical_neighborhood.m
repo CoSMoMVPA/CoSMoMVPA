@@ -8,7 +8,9 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %                       - in fmri form (from cosmo_fmri_dataset), when
 %                         ds.fa has the fields .i, .j and .k
 %                       - in meeg source form (from cosmo_meeg_dataset),
-%                         when ds.fa has the field .pos
+%                         when ds.fa has the field .pos. In this case, the
+%                         features must have positions that can be
+%                         converted to a grid.
 %   'radius', r         } either use a radius of r, or select
 %   'count', c          } approximately c voxels per searchlight
 %                       Notes:
@@ -27,8 +29,12 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %       .nvoxels        1xP number of voxels in each searchlight
 %       .radius         1xP radius in voxel units
 %       .center_ids     1xP feature center id
-%     .neighbors         Px1 cell so that center2neighbors{k}==nbrs contains
+%     .neighbors        Px1 cell so that center2neighbors{k}==nbrs contains
 %                       the feature ids of the neighbors of feature k
+%                       If the dataset has a field ds.fa.inside, then
+%                       features that are not inside are not included as
+%                       neighbors in the output
+%
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('type','fmri');
@@ -74,7 +80,18 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %     >     [ 6         5         3 ]           }
 %
 %
-% See also: cosmo_fmri_dataset, cosmo_meeg_dataset
+% Notes:
+%   - this function can return neighborhoods with either a fixed number of
+%     features, or a fixed radius. When used with a searchlight, the
+%     former has the advantage that the number of features is less
+%     variable (especially near edges of the brain, in an fmri dataset),
+%     which can make it easier to compare result in different regions as
+%     the number of features can affect
+%     pattern discriminablity. The latter has the advantage that the
+%     smoothness of the output maps under the null hypothesis can be more
+%     uniformly smooth.
+%
+% See also: cosmo_fmri_dataset, cosmo_meeg_dataset, cosmo_searchlight
 %
 % NNO Aug 2013
 
@@ -87,29 +104,33 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     [use_fixed_radius,radius,voxel_count]=get_selection_params(opt);
     cosmo_check_dataset(ds);
 
-    nfeatures=size(ds.samples,2);
+    % ensure not too many features are requested
+    feature_mask=get_features_mask(ds);
+    nfeatures=sum(feature_mask);
     if nfeatures<voxel_count
         error('Cannot select %d features: only %d are present',...
                     voxel_count, nfeatures);
     end
 
-    use_grid=ds_has_pos_in_grid(ds);
-
-    if use_grid
-        [fdim, fa_ordered, pos, grid_dim, lin2feature_ids]=get_linear_mapping(ds);
-    else
-        [fdim, fa_ordered, pos]=get_pos_attributes(ds);
-    end
+    % get attributes for output dataset, and the positions and dimension of
+    % the grid
+    [fdim,fa,pos,grid_dim]=get_spherical_attributes(ds,feature_mask);
 
     % compute voxel offsets relative to origin
-    [sphere_offsets, o_distances]=get_sphere_offsets(radius);
+    [sphere_offsets, distances]=get_sphere_offsets(radius);
+
+    % get mapping from linear ids to feature ids
+    lin2feature_ids=get_lin2feature_ids(grid_dim,pos,feature_mask);
+
+    % number of features associated with each linear id
+    feature_id_count=cellfun(@numel,lin2feature_ids);
 
     % allocate space for output
-    center_ids=1:nfeatures;
-    ncenters=numel(center_ids);
+    ncenters=numel(feature_mask);
     neighbors=cell(ncenters,1);
     nvoxels=zeros(1,ncenters);
     final_radius=zeros(1,ncenters);
+    visited=false(1,ncenters);
 
     show_progress=opt.progress>0;
 
@@ -121,18 +142,26 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
         prev_progress_msg='';
     end
 
-    % go over all features
-    for k=1:ncenters
-        center_id=center_ids(k);
-        center_pos=pos(:,center_id);
+    % a position may occur at multiple features; only consider unique
+    % positions
+    [center_idxs,unq_pos]=cosmo_index_unique(pos(:,feature_mask)');
+    masked2all=find(feature_mask);
+    nunq_centers=numel(center_idxs);
 
-        % - in case of a variable radius, keep growing sphere_offsets until
-        %   there are enough voxels selected. This new radius is kept
-        %   for every subsequent iteration.
-        % - in case of a fixed radius this loop is left after the first
-        %   iteration.
-        while true
-            if use_grid
+    % go over all features
+    for k=1:nunq_centers
+        variable_radius=NaN;
+        if voxel_count==0
+            feature_ids=zeros(1,0);
+        else
+            center_pos=unq_pos(k,:)';
+
+            % - in case of a variable radius, keep growing sphere_offsets
+            %   until there are enough voxels selected. This new radius is
+            %   kept for every subsequent iteration.
+            % - in case of a fixed radius this loop is left after the first
+            %   iteration.
+            while true
                 % add offsets to center
                 all_around_pos=bsxfun(@plus, center_pos', sphere_offsets);
 
@@ -146,10 +175,6 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
                 % get rid of those outside the volume
                 around_pos=all_around_pos(~feature_outside_msk,:);
 
-                % if using variable radius, keep track of those
-                if ~use_fixed_radius
-                    center_distances=o_distances(~feature_outside_msk);
-                end
 
                 % convert to linear indices
                 around_lin=fast_sub2ind(grid_dim,around_pos(:,1), ...
@@ -157,108 +182,178 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
                                             around_pos(:,3));
 
                 % convert linear to feature ids
-                around_feature_ids=[lin2feature_ids{around_lin}];
-            else
-                [around_feature_ids,center_distances]=eucl_neighbors(...
-                                                            center_pos,...
-                                                            pos,radius);
+
+
+                feature_ids=[lin2feature_ids{around_lin}];
+
+                if use_fixed_radius
+                    break; % we're done selecting voxels
+                elseif numel(feature_ids)<voxel_count
+                    % the current radius is too small.
+                    % increase the radius by half a voxel and recompute new
+                    % offsets, then try again in the next iteration.
+                    radius=radius+.5;
+                    [sphere_offsets,distances]=get_sphere_offsets(radius);
+                    continue
+                end
+
+
+                % if using variable radius, compute distance of each linear
+                % index
+                center_distances=distances(~feature_outside_msk);
+
+                % get distance for each feature
+                feature_distances=get_distances(center_distances,...
+                                            feature_id_count(around_lin));
+
+                % coming here, the radius is variable and enough features
+                % were selected. Now decide which voxels to keep,
+                % and also compute the metric radius, then leave the while
+                % loop.
+
+                nselect=boundary_at_approx(feature_ids,...
+                                            feature_distances,voxel_count);
+                feature_ids=feature_ids(1:nselect);
+
+                variable_radius=feature_distances(nselect);
+                break; % we're done
             end
-
-            % also exclude those that were not mapped (outside the mask)
-            feature_mask=around_feature_ids>0;
-            around_feature_ids=around_feature_ids(feature_mask);
-
-
-            if use_fixed_radius
-                break; % we're done selecting voxels
-            elseif numel(around_feature_ids)<voxel_count
-                % the current radius is too small.
-                % increase the radius by half a voxel and recompute new
-                % offsets, then try again in the next iteration.
-                radius=radius+.5;
-                [sphere_offsets, o_distances]=get_sphere_offsets(radius);
-                continue
-            end
-
-            % apply the feature_id mask to distances
-            center_distances=center_distances(feature_mask);
-
-            % coming here, the radius is variable and enough features
-            % were selected. Now decide which voxels to keep,
-            % and also compute the metric radius, then leave the while
-            % loop.
-
-            nselect=with_approx(around_feature_ids,...
-                                                center_distances,voxel_count);
-            around_feature_ids=around_feature_ids(1:nselect);
-
-            if nselect>0
-                variable_radius=center_distances(nselect);
-            else
-                variable_radius=NaN;
-            end
-            break; % we're done
         end
 
 
         % store results
-        neighbors{k}=around_feature_ids(:)';
-        nvoxels(k)=numel(around_feature_ids);
-        if use_fixed_radius
-            final_radius(k)=radius;
-        else
-            final_radius(k)=variable_radius;
+        ids=masked2all(center_idxs{k});
+
+        for j=1:numel(ids)
+            % for each unique feature id, store the results
+            id=ids(j);
+            neighbors{id}=feature_ids(:)';
+            nvoxels(id)=numel(feature_ids);
+            if use_fixed_radius
+                final_radius(id)=radius;
+            else
+                final_radius(id)=variable_radius;
+            end
+
+            visited(id)=true;
         end
 
-        if show_progress && (k==1 || k==ncenters || mod(k,opt.progress)==0)
-            mean_size=mean(nvoxels(1:k));
+        if show_progress && (k==1 || k==nunq_centers || ...
+                                        mod(k,opt.progress)==0)
+            mean_size=mean(nvoxels(visited));
             msg=sprintf('mean size %.1f', mean_size);
             prev_progress_msg=cosmo_show_progress(clock_start, ...
-                                       k/ncenters, msg, prev_progress_msg);
+                                   k/nunq_centers, msg, prev_progress_msg);
         end
     end
+
+    not_visited_ids=find(~visited);
+    assert(all(cellfun(@numel,neighbors(not_visited_ids))==0));
+    neighbors(not_visited_ids)=repmat({zeros(1,0)},...
+                                        1,numel(not_visited_ids));
+
 
     % set the dataset and feature attributes
     nbrhood=struct();
     nbrhood.a=ds.a;
     nbrhood.a.fdim=fdim;
 
-    fa_ordered=cosmo_slice(fa_ordered,center_ids,2,'struct');
+    center_ids=zeros(size(feature_mask));
+    center_ids(feature_mask)=1:sum(feature_mask);
+
+    %fa_full=cosmo_slice(fa_full,center_ids,2,'struct');
     nbrhood.fa=cosmo_structjoin('nvoxels',nvoxels,...
                                 'radius',final_radius,...
                                 'center_ids',center_ids(:)',...
-                                fa_ordered);
+                                fa);
 
     nbrhood.neighbors=neighbors;
 
     cosmo_check_neighborhood(nbrhood);
 
 
-function [feature_ids,distances]=eucl_neighbors(center_pos,pos,radius)
-    eucl_distances=sum(bsxfun(@minus,center_pos,pos).^2,1).^.5;
 
-    within_distance_mask=eucl_distances<=radius;
-    unsorted_feature_ids=find(within_distance_mask);
-    unsorted_distances=eucl_distances(unsorted_feature_ids);
+function feature_distances=get_distances(center_distances,feature_id_count)
+    % get distances based on selected features
+    n=numel(center_distances);
+    assert(n==numel(feature_id_count));
 
-    [distances,i]=sort(unsorted_distances);
-    feature_ids=unsorted_feature_ids(i);
+    m=max(feature_id_count);
+    if m<=1
+        % optimization
+        feature_distances=center_distances(feature_id_count==1);
+        return
+    end
+
+    ds=NaN(m,n);
+
+    for k=1:m
+        msk=feature_id_count>=k;
+        ds(k,msk)=center_distances(msk);
+    end
+
+    feature_distances=ds(~isnan(ds));
 
 
+function lin2feature_ids=get_lin2feature_ids(grid_dim, ...
+                                            all_pos,center_mask)
+    % returns a function that maps linear ids to feature ids
+    % the function takes as input linear ids and the distance for each
+    % linear id, and returns the feature ids and their corresponding
+    % distances
+
+    orig_nvoxels=prod(grid_dim);
+
+    ijk=all_pos(:,center_mask);
+
+    lin_ids=fast_sub2ind(grid_dim, ijk(1,:), ijk(2,:), ijk(3,:));
+    [idxs,unq_lin_ids]=cosmo_index_unique(lin_ids');
+
+    mask2full=find(center_mask);
+    % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
+    % corresponds to features i1,...iN
+    lin2feature_ids=cell(orig_nvoxels,1);
+    for k=1:numel(unq_lin_ids)
+        lin_id=unq_lin_ids(k);
+        idx=idxs{k}(:)';
+        lin2feature_ids{lin_id}=mask2full(idx);
+    end
 
 
-function tf=ds_has_pos_in_grid(ds)
-    tf=cosmo_isfield(ds,'a.fdim.labels') && ...
-                all(cosmo_match({'i','j','k'},ds.a.fdim.labels));
+function feature_mask=get_features_mask(ds)
+    % use .fa.inside if it is present, otherwise an array with only true
+    % values
+    nfeatures=size(ds.samples,2);
+
+    if cosmo_isfield(ds,'fa.inside')
+        inside=ds.fa.inside;
+
+        if ~isrow(inside)
+            error('field .fa.inside must be a row vector');
+        end
+
+        if islogical(inside)
+            feature_mask=inside;
+        else
+            feature_mask=false(1,nfeatures);
+            feature_mask(inside)=true;
+        end
+    else
+        feature_mask=true(1,nfeatures);
+    end
+
 
 function lin=fast_sub2ind(sz, i, j, k)
     lin=sz(1)*(sz(2)*(k-1)+(j-1))+i;
 
-function pos=with_approx(ids, distances, voxel_count)
+function pos=boundary_at_approx(ids, distances, voxel_count)
+    % pseudo-random selection of approximatly voxel_count elements
     if voxel_count<=0
         pos=0;
         return
     end
+
+    assert(issorted(distances));
 
     max_distance=distances(voxel_count);
     first=find(distances<max_distance,1,'last')+1;
@@ -288,87 +383,86 @@ function pos=with_approx(ids, distances, voxel_count)
         pos=last;
     end
 
-function [fdim, fa, pos]=get_pos_attributes(ds)
-    [two,index]=cosmo_dim_find(ds,'pos',true);
+    assert(first==1 || distances(first-1)<distances(first));
+    assert(last==numel(distances) || distances(last+1)>distances(first));
+
+
+function [fdim,fa,ijk,orig_dim]=get_spherical_attributes(ds, center_mask)
+    % returns fdim, fa, and ijk positions for dataset
+    labels=get_dim_label(ds);
+
+    fdim=get_spherical_fdim(ds,labels);
+    fa=get_spherical_fa(ds.fa,labels);
+
+    if cosmo_isfield(ds,'fa.inside')
+        fa.inside=center_mask;
+    end
+
+    small_ds=cosmo_slice(ds,[],1);
+    small_ds_vol=cosmo_vol_grid_convert(small_ds, 'tovol');
+
+    ijk=[small_ds_vol.fa.i;small_ds_vol.fa.j;small_ds_vol.fa.k];
+
+    ijk_labels={'i','j','k'};
+    [unused,index]=has_fdim_label(small_ds_vol,ijk_labels);
+
+    orig_dim=cellfun(@numel,small_ds_vol.a.fdim.values(index));
+    orig_dim=orig_dim(:)';
+
+
+function [tf,index]=has_fdim_label(ds, label)
+    [two,index]=cosmo_dim_find(ds,label,false);
+    tf=~isempty(two) && two==2;
+
+
+function [labels,index]=get_dim_label(ds)
+    % get either pos or i, j, and k labels
+    possible_labels={{'pos'},{'i';'j';'k'}};
+    for j=1:numel(possible_labels)
+        labels=possible_labels{j};
+        [has_label,index]=has_fdim_label(ds, labels);
+        if has_label
+            return
+        end
+    end
+
+    error(['Unable to find dimension labels, either ''pos'' '...
+                    'or ''i'', ''j'', and ''k''']);
+
+
+function fdim=get_spherical_fdim(ds, target_labels)
+    first_target_label=target_labels{1};
+    [two, index]=cosmo_dim_find(ds,first_target_label,true);
+
     if two~=2
-        error('dimension ''pos'' must be a feature dimension');
+        error('dimension ''%s'' must be a feature dimension');
     end
-
-    fdim=struct();
-    fdim.labels=ds.a.fdim.labels(index);
-    fdim.values=ds.a.fdim.values(index);
-
-    if size(fdim.values{1},1)~=3
-        error('dimension ''pos'' must be 3xN');
-    end
-
-    fa=struct();
-    fa.pos=ds.fa.pos;
-
-    pos=fdim.values{1}(:,fa.pos);
-
-
-function [fdim, fa, ijk, orig_dim, lin2feature_ids]=get_linear_mapping(ds)
-    [two, index]=cosmo_dim_find(ds,'i',true);
-    if two~=2
-        error('dimension ''i'' must be a feature dimension');
-    end
-    [fdim,fa,ijk]=get_spherical_fdim_from_ijk(ds, index);
-
-    orig_dim=cellfun(@numel,ds.a.fdim.values(index+(0:2)));
-    orig_dim=orig_dim(:)'; % ensure row vector
-    orig_nvoxels=prod(orig_dim);
-
-    % mapping from all linear voxel indices to feature indices
-    lin_ids=fast_sub2ind(orig_dim, ijk(1,:), ijk(2,:), ijk(3,:));
-    [idxs,unq_lin_ids_cell]=cosmo_index_unique({lin_ids});
-    unq_lin_ids=unq_lin_ids_cell{1};
-
-    % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
-    % corresponds to features i1,...iN
-    lin2feature_ids=cell(orig_nvoxels,1);
-    for k=1:numel(unq_lin_ids)
-        lin_id=unq_lin_ids(k);
-        lin2feature_ids{lin_id}=idxs{k}(:)';
-
-    end
-
-
-function [fdim,fa,ijk]=get_spherical_fdim_from_ijk(ds, index)
     cosmo_isfield(ds,'a.fdim.labels',true);
 
     dim_labels=ds.a.fdim.labels(:);
     dim_values=ds.a.fdim.values(:);
 
-    ijk_labels={'i';'j';'k'};
-    nlabels=numel(ijk_labels);
-    idx_labels=index+(0:(nlabels-1));
+    nlabels=numel(target_labels);
+    idx_labels=(index+(0:(nlabels-1)))';
     if numel(dim_labels)<index+(nlabels-1) || ...
-            ~isequal(dim_labels(idx_labels),ijk_labels)
+            ~isequal(dim_labels(idx_labels),target_labels)
         error('expected labels %s in .a.fdim.labels(%d:%d)',...
-                    cosmo_strjoin(ijk_labels,', '),index,index+nlabels-1);
+                  cosmo_strjoin(target_labels,', '),idx_labels([1 end]));
     end
 
     fdim=struct();
     fdim.labels=dim_labels(idx_labels);
-    fdim.values=cellfun(@(x)x(:)',dim_values(idx_labels),...
-                        'UniformOutput',false);
+    fdim.values=dim_values(idx_labels);
 
-    ijk_cell=cell(1,nlabels);
+
+function fa=get_spherical_fa(ds_fa, target_labels)
+    nlabels=numel(target_labels);
     fa=struct();
     for j=1:nlabels
-        label=ijk_labels{j};
-        fa_value=ds.fa.(label);
+        label=target_labels{j};
+        fa_value=ds_fa.(label);
         fa.(label)=fa_value;
-        ijk_cell{j}=fdim.values{j}(fa_value);
     end
-    ijk=cat(1,ijk_cell{:});
-
-
-
-
-
-
 
 
 function [sphere_offsets, o_distances]=get_sphere_offsets(radius)
@@ -412,7 +506,6 @@ function [use_fixed_radius,radius,voxel_count]=get_selection_params(opt)
     end
 
     raise_parameter_error();
-
 
 
 function raise_parameter_error()

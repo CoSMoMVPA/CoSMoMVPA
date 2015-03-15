@@ -22,8 +22,8 @@ function test_searchlight_
 
     nh2=cosmo_spherical_neighborhood(ds,'count',17,'progress',0);
     m=cosmo_searchlight(ds,nh2,measure,'progress',0);
-    assertEqual(m.samples,[17 17 17 17 17 17 18 15 15 18 15 18 ...
-                            16 16 18 16 19 19 18 19 17 17 17 17]);
+    assertEqual(m.samples,[17 17 17 17 17 17 17 17 17 17 18 16 ...
+                                17 17 16 15 17 17 17 17 17 17 17 17]);
 
 
     measure=@cosmo_correlation_measure;

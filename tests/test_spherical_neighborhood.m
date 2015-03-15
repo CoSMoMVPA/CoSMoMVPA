@@ -137,23 +137,27 @@ function test_with_freq_dimension_dataset
                             'UniformOutput',false);
     nh2=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
     assertEqual(nh,nh2);
+    assertFalse(isfield(nh.fa,'inside'));
 
 function test_meeg_source_dataset
     ds=cosmo_synthetic_dataset('type','source','size','normal');
     nf=size(ds.samples,2);
 
-    rps=[randperm(nf) randperm(nf)];
-    rp=rps(round(nf/2)+(1:nf));
+    [unused,idxs]=sort(cosmo_rand(1,nf*4,'seed',1));
+    rps=mod(idxs-1,nf)+1;
+    rp=rps(round(nf/2)+(1:(3*nf)));
 
     ds=cosmo_slice(ds,rp,2);
 
-    radius=1.2+.5*rand();
+    radius=1.2+.2*rand();
+
+    voxel_size=10;
     nh=cosmo_spherical_neighborhood(ds,'radius',radius,'progress',false);
 
     assertEqual(nh.fa.pos,ds.fa.pos);
     assertEqual(nh.a,ds.a);
 
-    count=ceil(4/3*pi*radius^3);
+    count=ceil(4/3*pi*(radius)^3 * .5);
     nh2=cosmo_spherical_neighborhood(ds,'count',count,'progress',false);
     assertEqual(nh2.fa.pos,ds.fa.pos);
     assertEqual(nh2.a,ds.a);
@@ -161,16 +165,55 @@ function test_meeg_source_dataset
     rp=rp(1:10);
 
     pos=nh.a.fdim.values{1}(:,ds.fa.pos);
+    inside=ds.fa.inside;
 
     for r=rp
-        d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
-        idxs=find(d<=radius);
+        if inside(r)
+            d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+            idxs=find(d<=(radius*voxel_size) & inside);
+        else
+            idxs=zeros(1,0);
+        end
+
         assertEqual(sort(nh.neighbors{r}),sort(idxs));
     end
+    assertEqual(inside,nh.fa.inside);
 
     [p,q]=cosmo_overlap(nh.neighbors,nh2.neighbors);
 
-    assertTrue(mean(diag(p))>.25);
-    assertTrue(mean(diag(q))>.9);
+    dp=diag(p);
+    dq=diag(q);
+
+    assertEqual(isnan(dp),~inside');
+    assertEqual(isnan(dq),~inside');
+
+    assertTrue(mean(dp(inside))>.1);
+    assertTrue(mean(dq(inside))>.4);
+
+function test_fmri_fixed_number_of_features()
+    ds=cosmo_synthetic_dataset('size','normal');
+    nf=size(ds.samples,2);
+    [unused,idxs]=sort(cosmo_rand(1,nf*3,'seed',1));
+    rps=mod(idxs-1,nf)+1;
+    rp=rps(round(nf/2)+(1:(2*nf)));
+    ds=cosmo_slice(ds,rp,2);
+
+
+    count=20;
+    nh=cosmo_spherical_neighborhood(ds,'count',count,'progress',false);
+    rp=randperm(nf);
+    rp=rp(1:10);
+
+    pos=[ds.fa.i;ds.fa.j;ds.fa.k];
+    for r=rp
+        d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+        idxs=nh.neighbors{r};
+        di=d(idxs);
+        do=d(setdiff(1:nf,idxs));
+        assert(max(di)<=min(do));
+        assertElementsAlmostEqual(max(di),nh.fa.radius(r),'absolute',1e-4);
+    end
+
+
 
 
