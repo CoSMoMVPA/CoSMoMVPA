@@ -1,5 +1,5 @@
 function test_suite = test_randomize_targets()
-    initTestSuite();
+    initTestSuite;
 
 function test_randomize_targets_basics()
     ds=cosmo_synthetic_dataset('ntargets',4,'nchunks',10);
