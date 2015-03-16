@@ -135,10 +135,22 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     correlation differences (if maps were obtained using a searchlight
 %     with cosmo_correlation_measure), or against a mean of 1/C (if maps
 %     were obtained using a searchlight with classification analysis
-%     with C classes).
+%     with C classes, with each class occuring equally often in the
+%     training set).
+%   - The permutations used with the 'h0_mean' option involve randomly
+%     flipping the sign of samples (over all features) after subtracting
+%     'h0_mean' (This preserves spatial smoothness in individual samples).
+%     This approach is fast but somewhat conservative, and it becomes
+%     more conservative with larger effect sizes. For the most accurate
+%     (but also slowest to compute) results, use the 'null' data option
+%     instead.
 %   - The number of iterations determines the precision of the estimates
 %     z-scores. For publication-quality papers, 10,000 iterations is
 %     recommended.
+%   - The neighborhood used for clustering can, for almost all use cases,
+%     be computed using cosmo_cluster_neighborhood
+%
+% Se also: cosmo_cluster_neighborhood
 %
 % NNO Jan 2015
 
@@ -560,7 +572,8 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
             opt.threshold=-norminv(p_unc); % right tail
     end
 
-    % convert neighborhood struct to matrix representation
+    % convert neighborhood struct to matrix representation, because that
+    % speeds up clustering significantly
     nbrhood_mat=cosmo_convert_neighborhood(nbrhood,'matrix');
 
     clustering_func=@(perm_ds) cosmo_measure_clusters(perm_ds,...
