@@ -164,8 +164,8 @@ function ds_conv=convert_grid2vol(ds)
 
             if numel(ratios)~=(1+max_ratio) || ...
                             max(abs(ratios-(0:max_ratio)))>tolerance
-                error(['''pos'' in .a.fdim.values{%d}(%d,:) do not follow '...
-                        'grid-like structure'],index,dim);
+                error(['''pos'' in .a.fdim.values{%d}(%d,:) do not '...
+                        'follow grid-like structure'],index,dim);
             end
         end
         % store data
