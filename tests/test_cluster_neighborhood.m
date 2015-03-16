@@ -201,12 +201,12 @@ function test_cluster_neighborhood_source
             else
                 d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
 
-                di=d(idxs);
+                d_inside=d(idxs);
                 outside_mask=~ds.fa.inside;
                 outside_mask(d <= radius)=false;
-                do=d(outside_mask);
-                assert(all(di<=radius));
-                assert(all(do>radius));
+                d_outside=d(outside_mask);
+                assert(all(d_inside<=radius));
+                assert(all(d_outside>radius));
             end
         end
     end
