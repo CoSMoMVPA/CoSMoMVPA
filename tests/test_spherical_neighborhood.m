@@ -208,10 +208,11 @@ function test_fmri_fixed_number_of_features()
     for r=rp
         d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
         idxs=nh.neighbors{r};
-        di=d(idxs);
-        do=d(setdiff(1:nf,idxs));
-        assert(max(di)<=min(do));
-        assertElementsAlmostEqual(max(di),nh.fa.radius(r),'absolute',1e-4);
+        d_inside=d(idxs);
+        d_outside=d(setdiff(1:nf,idxs));
+        assert(max(d_inside)<=min(d_outside));
+        assertElementsAlmostEqual(max(d_inside),nh.fa.radius(r),...
+                                                'absolute',1e-4);
     end
 
 
