@@ -157,6 +157,60 @@ function test_cluster_neighborhood_surface
     ds.fa.radius(:)=0;
     assertEqual(ds.fa,nh2.fa);
 
+function test_cluster_neighborhood_source
+    ds=cosmo_synthetic_dataset('size','normal','type','source');
+    nf=size(ds.samples,2);
+    [unused,idxs]=sort(cosmo_rand(1,nf*3));
+    rps=mod(idxs-1,nf)+1;
+    rp=rps(round(nf/2)+(1:(2*nf)));
+    ds=cosmo_slice(ds,rp,2);
+
+
+    [unused,rp]=sort(cosmo_rand(1,nf));
+    rp=rp(1:10);
+
+    grid_spacing=10;
+    pos=ds.a.fdim.values{1}(:,ds.fa.pos)/grid_spacing;
+
+    for connectivity=0:3
+        if connectivity==0
+            radius=sqrt(3)+.001;
+            args={};
+        else
+            args={'source',connectivity};
+            radius=sqrt(connectivity)+.001;
+        end
+
+        nh=cosmo_cluster_neighborhood(ds,'progress',false,args);
+        nh2=cosmo_spherical_neighborhood(ds,'progress',false,...
+                                                'radius',radius);
+
+        assertEqual(nh.fa.pos,nh2.fa.pos)
+        assertEqual(nh.a.fdim,nh2.a.fdim)
+        assertEqual(nh.fa.inside,nh2.fa.inside)
+
+        assertEqual(nh.fa.pos,ds.fa.pos);
+        assertEqual(nh.fa.inside,ds.fa.inside);
+        assertEqual(nh.a.fdim,ds.a.fdim);
+
+        for r=rp
+            idxs=nh.neighbors{r};
+            assertEqual(idxs,sort(nh2.neighbors{r}));
+            if ~nh.fa.inside(r)
+                assertEqual(idxs,zeros(1,0));
+            else
+                d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+
+                di=d(idxs);
+                outside_mask=~ds.fa.inside;
+                outside_mask(d <= radius)=false;
+                do=d(outside_mask);
+                assert(all(di<=radius));
+                assert(all(do>radius));
+            end
+        end
+    end
+
 
 function test_cluster_neighborhood_exceptions
     ds=cosmo_synthetic_dataset();
