@@ -55,6 +55,19 @@ function test_meeg_dataset()
 
     end
 
+function test_meeg_fmri_dataset()
+    ds=cosmo_synthetic_dataset('type','source');
+    ds_fmri=cosmo_fmri_dataset(ds);
+    ft=cosmo_map2meeg(ds);
+    ds_ft_fmri=cosmo_fmri_dataset(ft);
+
+    ds_vol=cosmo_vol_grid_convert(ds,'tovol');
+    assertEqual(ds_vol,ds_fmri);
+
+    assertTrue(isempty(fieldnames(ds_ft_fmri.sa)))
+    ds_vol=rmfield(ds_vol,'sa');
+    ds_ft_fmri=rmfield(ds_ft_fmri,'sa');
+    assertEqual(ds_vol,ds_ft_fmri);
 
 
 

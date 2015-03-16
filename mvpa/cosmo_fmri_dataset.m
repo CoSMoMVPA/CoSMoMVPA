@@ -1117,14 +1117,17 @@ function ds=read_ft_source(ft)
     assert(isstruct(ft));
 
     if isfield(ft,'inside') && isfield(ft,'pos')
-        ds=cosmo_meeg_dataset(ft);
+        % fieldtrip struct
+        ds_meeg=cosmo_meeg_dataset(ft);
     else
-        ds=ft;
+        % must be dataset struct with field .fa.pos
+        cosmo_isfield(ft,'fa.pos',true);
+        ds_meeg=ft;
     end
 
-    cosmo_check_dataset(ds,'meeg')
+    cosmo_check_dataset(ds_meeg,'meeg');
 
-
+    ds=cosmo_vol_grid_convert(ds_meeg,'tovol');
 
 
 
