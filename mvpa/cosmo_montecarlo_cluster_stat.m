@@ -550,12 +550,17 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
         end
     end
 
+    has_p_uncorrected=isfield(opt, 'p_uncorrected');
+
     switch cluster_stat
         case 'tfce'
-            % all good
+            if has_p_uncorrected
+                error(['option ''p_uncorrected'' not allowed '...
+                            'for method %s'],cluster_stat);
+            end
 
         otherwise
-            if ~isfield(opt, 'p_uncorrected')
+            if ~has_p_uncorrected
                 error('missing field ''p_uncorrected'' for method %s',...
                         cluster_stat);
             end
