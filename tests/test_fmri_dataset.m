@@ -26,12 +26,15 @@ function test_bv_vmr_fmri_dataset()
     end
     uint_ds=get_uint8_dataset();
     bv_vmr=cosmo_map2fmri(uint_ds,'-bv_vmr');
+
+    cleaner=onCleanup(@()bv_vmr.ClearObject());
     bless(bv_vmr);
+
     assert_bv_equal(bv_vmr, get_expected_bv_vmr());
     ds_bv_vmr=cosmo_fmri_dataset(bv_vmr,'mask',false);
     ds_bv_vmr_lpi=cosmo_fmri_reorient(ds_bv_vmr,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_vmr_lpi,'rotation');
-    bv_vmr.ClearObject();
+
 
 function test_bv_vmp_fmri_dataset()
     if ~can_test_bv()
@@ -40,12 +43,15 @@ function test_bv_vmp_fmri_dataset()
 
     ds=get_base_dataset();
     bv_vmp=cosmo_map2fmri(ds,'-bv_vmp');
-    assert_bv_equal(bv_vmp, get_expected_bv_vmp());
+
+    cleaner=onCleanup(@()bv_vmp.ClearObject());
     bless(bv_vmp);
+
+    assert_bv_equal(bv_vmp, get_expected_bv_vmp());
     ds_bv_vmp=cosmo_fmri_dataset(bv_vmp);
     ds_bv_vmp_lpi=cosmo_fmri_reorient(ds_bv_vmp,'LPI');
     assert_dataset_equal(ds,ds_bv_vmp_lpi,'translation');
-    bv_vmp.ClearObject();
+
 
 function test_bv_msk_fmri_dataset()
     if ~can_test_bv()
@@ -54,13 +60,16 @@ function test_bv_msk_fmri_dataset()
 
     uint_ds=get_uint8_dataset();
     bv_msk=cosmo_map2fmri(uint_ds,'-bv_msk');
+
+    cleaner=onCleanup(@()bv_msk.ClearObject());
     bless(bv_msk);
+
     assert_bv_equal(bv_msk, get_expected_bv_msk());
 
     ds_bv_msk=cosmo_fmri_dataset(bv_msk);
     ds_bv_msk_lpi=cosmo_fmri_reorient(ds_bv_msk,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_msk_lpi,'translation');
-    bv_msk.ClearObject();
+
 
 function tf=can_test_bv()
     tf=cosmo_wtf('is_matlab') && cosmo_check_external('neuroelf',false);
