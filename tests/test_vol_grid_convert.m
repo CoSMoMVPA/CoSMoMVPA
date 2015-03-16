@@ -6,12 +6,26 @@ function test_vol_grid_convert_basics
     aet=@(varargin)assertExceptionThrown(@()...
                             cosmo_vol_grid_convert(varargin{:}),'');
 
-    ds=cosmo_synthetic_dataset('size','normal');
-    ds.a.vol=rmfield(ds.a.vol,'xform');
-    nfeatures=size(ds.samples,2);
+    ds_orig=cosmo_synthetic_dataset('size','normal');
+    ds_orig.a.vol=rmfield(ds_orig.a.vol,'xform');
+    nfeatures=size(ds_orig.samples,2);
     nfeatures2=round(nfeatures/2);
-    rp=randperm(nfeatures);
-    ds=cosmo_slice(ds,repmat(rp(1:nfeatures2),1,2),2);
+    while true
+        rp=randperm(nfeatures);
+        ds=cosmo_slice(ds_orig,repmat(rp(1:nfeatures2),1,2),2);
+        ijk=[ds.fa.i; ds.fa.j; ds.fa.k];
+
+        no_missing_features=true;
+        for dim=1:3
+            no_missing_features=no_missing_features && ...
+                                        isequal(unique(ijk(dim,:)),...
+                                                    1:ds.a.vol.dim(dim));
+        end
+        if no_missing_features
+            break;
+        end
+    end
+
 
     ds2=cosmo_vol_grid_convert(ds);
     assert(all(~cosmo_isfield(ds2.fa,{'i','j','k'})));
@@ -53,9 +67,6 @@ function test_vol_grid_convert_basics
     aet(ds6,'togrid');
     aet(ds6);
     aet(ds6,'tovol','togrid');
-
-
-
 
 
 
