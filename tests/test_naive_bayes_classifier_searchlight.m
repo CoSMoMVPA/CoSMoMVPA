@@ -1,5 +1,5 @@
 function test_suite=test_naive_bayes_classifier_searchlight
-    initTestSuite();
+    initTestSuite;
 
 function test_naive_bayes_classifier_searchlight_basics
     ds=cosmo_synthetic_dataset('ntargets',25,'nchunks',4,'size','small');
