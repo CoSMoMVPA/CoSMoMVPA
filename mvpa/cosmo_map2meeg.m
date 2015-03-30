@@ -188,10 +188,11 @@ function ft=get_ft_source_samples_from_array(arr, key, sub_key)
             ft.method='rawtrial';
 
             nsamples=size(arr,1);
+            arr_size=size(arr);
             arr_mat=reshape(arr,nsamples,[]);
             struct_cell=cell(1,nsamples);
             for j=1:nsamples
-                struct_cell{j}=arr_mat(j,:);
+                struct_cell{j}=reshape(arr_mat(j,:),[arr_size(2:end) 1]);
             end
 
             arr_struct=struct(sub_key,struct_cell);
@@ -217,17 +218,26 @@ function ft=ds_copy_fields(ft,ds,keys)
 
 function ft=ds_set_source_fields(ft,ds)
     assert(is_ds_source_struct(ds));
-    %[dim,pos_index]=cosmo_dim_find(ds,'pos',true);
-    %if dim~=2
+    [dim,pos_index]=cosmo_dim_find(ds,'pos',true);
+    if dim~=2
     %    error('pos attribute must be a feature attribute');
-    %end
-
-    %pos_fdim=ds.a.fdim.values{pos_index};
-    %ft.pos=pos_fdim';
-    if isfield(ds.fa,'inside')
-        ft.inside=false(size(ds.fa.inside))';
-        ft.inside(ds.fa.pos)=ds.fa.inside;
     end
+
+    % set the inside field
+    inside_ds=cosmo_slice(ds,1,1);
+    inside_ds.samples=ds.fa.inside;
+
+    inside_arr=cosmo_unflatten(inside_ds,2,'matrix_labels',{'pos'});
+
+    inside_arr_pos_first=shiftdim(inside_arr,pos_index);
+    n=size(inside_arr_pos_first,1);
+    inside_matrix_pos_first=reshape(inside_arr_pos_first,n,[]);
+    ft.inside=any(inside_matrix_pos_first,2);
+
+    ds_vol=cosmo_vol_grid_convert(ds,'tovol');
+    ft.dim=ds_vol.a.vol.dim(:)';
+
+
 
 
 function ft=build_ft(ds)

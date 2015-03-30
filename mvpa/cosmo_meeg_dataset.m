@@ -169,29 +169,132 @@ function ds=read_ft(filename)
 
 
 function ds=convert_ft(ft)
-    [data, sample_field]=get_data_ft(ft);
+    %[data, sample_field]=get_data_ft(ft);
+    %[dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft,...
+                                                    %sample_field);
+    [data, samples_field, dim_labels, dim_values]=get_ft_data(ft);
+    %if ~has_sample_field
+    %    data=reshape(data,[1 size(data)]);
+    %end
 
-    [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft,...
-                                                    sample_field);
-
-    if ~has_sample_field
-        data=reshape(data,[1 size(data)]);
-    end
-
-    if numel(dim_labels)==1
-        data=reshape(data,size(data,1),[]);
-    end
+    %if numel(dim_labels)==1
+    %    data=reshape(data,size(data,1),[]);
+    %end
 
     ds=cosmo_flatten(data, dim_labels, dim_values,2,...
-                                'matrix_labels',{'pos'});
-    ds.a.meeg.samples_field=sample_field;
+                                'matrix_labels',get_ft_matrix_labels());
+    ds.a.meeg.samples_field=samples_field;
 
     if is_ft_source_struct(ft)
-        ds.fa.inside=ft.inside';
+        ds=set_source_fa_inside(ds,dim_labels,dim_values,ft.inside);
     end
 
     nsamples=size(ds.samples,1);
-    ds.sa=copy_fields(ft,nsamples,{'rpt','trialinfo','cumtapcnt'});
+    ft_fields={'rpt','trialinfo','cumtapcnt'};
+    ds.sa=copy_fields_for_matching_sample_size(ft,nsamples,ft_fields);
+
+function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft)
+    [data, samples_field]=get_data_ft(ft);
+    [dim_labels,ft_dim_labels]=get_ft_dim_labels(ft);
+
+    nlabels=numel(dim_labels);
+    dim_values=cell(nlabels,1);
+    matrix_labels=get_ft_matrix_labels();
+    for k=1:nlabels
+        label=ft_dim_labels{k};
+        value=ft.(label);
+        if cosmo_match({label},matrix_labels)
+            dim_values{k}=value';
+        else
+            dim_values{k}=value(:)';
+        end
+    end
+
+
+function labels=get_ft_matrix_labels()
+    labels={'pos'}    ;
+
+function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft)
+    cosmo_ft_dim_labels={ 'pos','pos'
+                          'chan','label';...
+                          'freq','freq';...
+                          'time','time';
+                                  };
+    if isfield(ft,'dimord')
+        dimord_labels=cosmo_strsplit(ft.dimord,'_');
+
+        sample_field=get_sample_dimord_field(ft);
+        sample_msk=cosmo_match(dimord_labels, sample_field);
+
+        dimord_labels_without_sample=dimord_labels(~sample_msk);
+
+        labels_msk=cosmo_match(cosmo_ft_dim_labels(:,1),...
+                                dimord_labels_without_sample);
+    else
+        % source data
+        keys=fieldnames(ft);
+        labels_msk=cosmo_match(cosmo_ft_dim_labels(:,2),keys);
+
+    end
+
+    ft_dim_labels=cosmo_ft_dim_labels(labels_msk,2);
+    cosmo_dim_labels=cosmo_ft_dim_labels(labels_msk,1);
+
+function sample_field=get_sample_dimord_field(ft)
+    sample_field='';
+
+    sample_dimord_fields={'rpt'};
+    if isfield(ft,'dimord')
+        ft_dimord_fields=cosmo_strsplit(ft.dimord,'_');
+        msk=cosmo_match(ft_dimord_fields,sample_dimord_fields);
+        if any(msk)
+            assert(sum(msk)==1)
+            sample_field=sample_dimord_fields{msk};
+        end
+    end
+
+
+function sa=copy_fields_for_matching_sample_size(ft,nsamples,keys)
+    n=numel(keys);
+
+    sa=struct();
+    for k=1:n
+        key=keys{k};
+        if isfield(ft,key)
+            value=ft.(key);
+            if size(value,1)==nsamples
+                sa.(key)=value;
+            end
+        end
+    end
+
+
+
+
+
+
+
+function ds=set_source_fa_inside(ds,dim_labels,dim_values,inside_mask)
+    ndim=numel(dim_labels);
+    dim_sizes=cellfun(@numel,dim_values);
+
+    pos_idx=find(cosmo_match(dim_labels,'pos'),1);
+    assert(~isempty(pos_idx),['this function should only be called '...
+                                'with source datasets']);
+
+    inside_vec_size=[1 ones(1,ndim)];
+    inside_vec_size(1+pos_idx)=numel(inside_mask);
+    inside_array_vec=reshape(inside_mask, inside_vec_size);
+
+    other_dim_size=[1 dim_sizes(:)'];
+    other_dim_size(1+pos_idx)=1;
+
+    inside_array=repmat(inside_array_vec,other_dim_size);
+    inside_ds=cosmo_flatten(inside_array, dim_labels, dim_values,2,...
+                                         'matrix_labels',{'pos'});
+    ds.fa.inside=inside_ds.samples;
+
+
 
 
 function [data, sample_field]=get_data_ft(ft)
@@ -199,115 +302,53 @@ function [data, sample_field]=get_data_ft(ft)
     sample_fields={'trial','avg','fourierspctrm','powspctrm','pow'};
     nsample_fields=numel(sample_fields);
 
-    data=ft;
+    ft_data=ft;
     data_field_cell=cell(nsample_fields,1);
     pos=0;
     for k=1:nsample_fields
         sample_field=sample_fields{k};
-        if isfield(data, sample_field)
-            % deal with source data with multiple trials
-            nsamples=numel(data);
-            if isstruct(data) && nsamples>1
-                sz=size(data(1).(sample_field));
-                data=reshape(cat(1,data.(sample_field)),[nsamples sz]);
+        if isfield(ft_data(1), sample_field)
+            if isstruct(ft_data(1).(sample_field))
+                % field with subfield
+                ft_data=ft_data.(sample_field);
             else
-                data=data.(sample_field);
-            end
+                % deal with source data with multiple trials
+                if is_ft_source_struct(ft)
+                    nsamples=numel(ft_data);
+                    feature_size=size(ft_data(1).(sample_field));
 
+                    data_cell=cell(nsamples,1);
+                    for j=1:nsamples
+                        data_arr=ft_data(j).(sample_field);
+                        data_cell{j}=reshape(data_arr,[1 feature_size]);
+                    end
+
+                    data=cat(1,data_cell{:});
+                else
+                    assert(numel(ft_data)==1)
+
+                    data=ft.(sample_field);
+                    if isempty(get_sample_dimord_field(ft))
+                        % no 'rpt_...'
+                        data=reshape(data,[1 size(data)]);
+                    end
+                end
+            end
             pos=pos+1;
             data_field_cell{pos}=sample_field;
         end
     end
 
-    if isempty(data_field_cell)
+    if pos==0
         error('Could not find data in fieldtrip struct');
     end
 
     sample_field=cosmo_strjoin(data_field_cell(1:pos),'.');
 
+
 function tf=is_ft_source_struct(ft)
     tf=isfield(ft,'pos') && isfield(ft,'inside');
 
-
-function [dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft, ...
-                                                            sample_field)
-    % helper function to get dimensions from fieldtrip .dimord
-
-    % first column: .dimord label
-    % second colum: fieldname in ft struct
-    ft_pos_labels={'chan','label';...
-                    'freq','freq';...
-                    'time','time';
-                    'pos','pos'};
-    if is_ft_source_struct(ft)
-        % source data, ignore the data labels; keep same order as
-        % ft_pos_labels
-        keep_labels_msk=cosmo_match(ft_pos_labels(:,2),fieldnames(ft));
-        dimord_labels=ft_pos_labels(keep_labels_msk,2);
-    elseif isfield(ft,'dimord')
-        dimord_labels=cosmo_strsplit(ft.dimord,'_');
-    else
-        error('illegal input: expected source, timelock or timefreq');
-    end
-
-    ignore_sample_field=cosmo_strsplit(sample_field,'.',1);
-    sample_fields={'rpt','trial'};
-
-    has_sample_field=cosmo_match({ignore_sample_field},sample_fields)||...
-                        any(cosmo_match(dimord_labels,sample_fields));
-
-    % allocate space for output
-    ndimord_labels=numel(dimord_labels);
-    dim_labels=cell(ndimord_labels,1);
-    dim_values=cell(ndimord_labels,1);
-
-    pos=0;
-    for k=1:ndimord_labels
-        label=dimord_labels{k};
-
-        if cosmo_match({label},sample_fields)
-            continue;
-        end
-
-        idx=find(cosmo_match(ft_pos_labels(:,1),label));
-        if numel(idx)~=1
-            error('unsupported element in .dimord: %s', label);
-        end
-
-        pos=pos+1;
-
-        % store label
-        dim_labels{pos}=ft_pos_labels{idx,1};
-
-        % store values
-        value=ft.(ft_pos_labels{idx,2});
-        if strcmp(label,'pos')
-            if size(value,2)~=3
-                error('.pos must be Nx3');
-            end
-            dim_values{pos}=value';
-        else
-            dim_values{pos}=value(:)';
-        end
-    end
-
-    dim_labels=dim_labels(1:pos);
-    dim_values=dim_values(1:pos);
-
-
-function r=copy_fields(ft,nsamples,keys)
-    % helper function to copy fields in keys if they have nsamples values
-    r=struct();
-    for k=1:numel(keys)
-        key=keys{k};
-        if isfield(ft,key)
-            value=ft.(key);
-            nrows=size(value,1);
-            if nrows==nsamples
-                r.(key)=value;
-            end
-        end
-    end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
