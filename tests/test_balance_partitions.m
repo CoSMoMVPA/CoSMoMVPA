@@ -90,9 +90,13 @@ function test_balance_partitions_exceptions
                 cosmo_balance_partitions(varargin{:}),'');
 
     aet(struct,struct)
-    aet(ds,p);
+    aet(ds,p); % wrong order
 
     aet(p,ds,'nmin',1,'nrepeats',1);
+
+    % create missing class
+    ds.sa.targets(1)=4;
+    aet(p,ds);
 
     % missing target
     p.train_indices{1}=p.train_indices{1}([1 3]);
