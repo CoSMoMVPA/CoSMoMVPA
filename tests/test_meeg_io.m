@@ -39,6 +39,10 @@ function test_meeg_dataset()
             ft=rmfield(ft,'cfg');
         end
 
+        if isfield(ft,'avg') && isfield(ft,'trial')
+            ft=rmfield(ft,'avg');
+        end
+
         assertEqual(ft,ft2);
 
         % wrong size trialinfo should not store trialinfo
@@ -137,5 +141,9 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     ft.(data_label)=norminv(cosmo_rand(keep_sizes,'seed',seed));
     ft.cfg=struct();
     ft.trialinfo=[(1:ntrials);(ntrials:-1:1)]';
+
+    if strcmp(data_label,'trial')
+        ft.avg=mean(ft.(data_label),1);
+    end
 
 

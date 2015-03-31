@@ -243,7 +243,7 @@ function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft)
 function sample_field=get_sample_dimord_field(ft)
     sample_field='';
 
-    sample_dimord_fields={'rpt'};
+    sample_dimord_fields={'rpt','trial'};
     if isfield(ft,'dimord')
         ft_dimord_fields=cosmo_strsplit(ft.dimord,'_');
         msk=cosmo_match(ft_dimord_fields,sample_dimord_fields);
@@ -299,17 +299,19 @@ function ds=set_source_fa_inside(ds,dim_labels,dim_values,inside_mask)
 
 function [data, sample_field]=get_data_ft(ft)
     % helper function to get the data from a fieldtrip struct
-    sample_fields={'trial','avg','fourierspctrm','powspctrm','pow'};
-    nsample_fields=numel(sample_fields);
+    sample_fields_in_order={'trial','avg',...
+                            'fourierspctrm','powspctrm','pow'};
+    nsample_fields=numel(sample_fields_in_order);
 
     ft_data=ft;
     data_field_cell=cell(nsample_fields,1);
     pos=0;
     for k=1:nsample_fields
-        sample_field=sample_fields{k};
+        sample_field=sample_fields_in_order{k};
         if isfield(ft_data(1), sample_field)
             if isstruct(ft_data(1).(sample_field))
-                % field with subfield
+                % field with subfield (in source data),
+                % such as .avg.pow
                 ft_data=ft_data.(sample_field);
             else
                 % deal with source data with multiple trials
@@ -327,7 +329,9 @@ function [data, sample_field]=get_data_ft(ft)
                 else
                     assert(numel(ft_data)==1)
 
-                    data=ft.(sample_field);
+                    ft_data=ft_data.(sample_field);
+                    data=ft_data;
+
                     if isempty(get_sample_dimord_field(ft))
                         % no 'rpt_...'
                         data=reshape(data,[1 size(data)]);
