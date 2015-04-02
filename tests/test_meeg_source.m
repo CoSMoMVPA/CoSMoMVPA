@@ -14,14 +14,16 @@ function test_meeg_dataset()
         key=data_label{1};
         sub_key=data_label{2};
 
-        ft_first_sample=ft.(key).(sub_key);
+        ft_first_sample_all=ft.(key).(sub_key);
+        ft_first_sample=ft_first_sample_all(ft.inside,:);
         assertEqual(ds.samples(1,:),ft_first_sample(:)');
 
 
         [ft_arr, ft_labels, ft_values]=cosmo_unflatten(ds,2,...
                                             'matrix_labels','pos');
 
-        assertEqual(ft_arr(:),ds.samples(:));
+
+        assertEqual(ft_arr(ft_arr~=0),ds.samples(:));
         assertEqual(ft_labels, fdim.labels);
         assertEqual(ft_values, fdim.values);
 
@@ -53,7 +55,11 @@ function test_meeg_dataset()
         ds_sel=cosmo_slice(cosmo_slice(ds,~ds_msk,2),ft_idx{1});
         ft_sel=ft_arr(ft_idx{:});
 
-        assertEqual(ds_sel.samples,ft_sel);
+        if isempty(ft_sel)
+            assertEqual(ds.samples,0);
+        else
+            assertEqual(ds_sel.samples,ft_sel);
+        end
 
 
 
@@ -87,7 +93,6 @@ function test_meeg_fmri_dataset()
 function [ft,fdim,data_label]=generate_ft_source(tp)
     ft=struct();
     dim_pos_range={-3:3,-4:4,-5:5};
-    %dim_pos_range={-1:0,0,0};
     nsamples=2;
     freq=[3 5 7 9];
     time=[-1 0 1 2];
@@ -96,8 +101,6 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
     ft.pos=cosmo_cartprod(dim_pos_range);
     ft.inside=sum(ft.pos.^2,2)<40;
 
-    npos=numel(ft.inside);
-
     fdim=struct();
 
     switch tp
@@ -105,7 +108,7 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
             ft.freq=freq;
             %ft.cumtapcnt=(1:nsamples)';
             ft.method='average';
-            ft.avg.pow=generate_data([npos numel(freq)]);
+            ft.avg.pow=generate_data(ft.inside,numel(freq));
             fdim.labels={'pos';'freq'};
             fdim.values={ft.pos';freq(:)'};
             data_label={'avg','pow'};
@@ -113,7 +116,7 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
         case 'time'
             ft.time=time;
             ft.method='average';
-            ft.avg.pow=generate_data([npos numel(time)]);
+            ft.avg.pow=generate_data(ft.inside,numel(time));
             fdim.labels={'pos';'time'};
             fdim.values={ft.pos';time(:)'};
             data_label={'avg','pow'};
@@ -121,7 +124,7 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
         case 'rpt_trial';
             ft.time=time;
             ft.method='rawtrial';
-            ft.trial=generate_data([npos numel(time)],nsamples);
+            ft.trial=generate_data(ft.inside,numel(time),nsamples);
             fdim.labels={'pos';'time'};
             fdim.values={ft.pos';time(:)'};
             data_label={'trial','pow'};
@@ -130,14 +133,19 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
     end
 
 
-function d=generate_data(sz,struct_length)
-    as_struct=nargin>=2;
+function d=generate_data(inside,dim_size,struct_length)
+    as_struct=nargin>=3;
 
     if ~as_struct
         struct_length=1;
     end
 
-    d=cosmo_rand([sz struct_length],'seed',1);
+    dim_other=[dim_size struct_length];
+    nsensors=numel(inside);
+    nother=prod(dim_other);
+    d_mat=NaN(nsensors, nother);
+    d_mat(inside,:)=cosmo_rand([sum(inside) nother],'seed',1);
+    d=reshape(d_mat,[nsensors dim_other]);
 
     if as_struct
         c=cell(struct_length,1);

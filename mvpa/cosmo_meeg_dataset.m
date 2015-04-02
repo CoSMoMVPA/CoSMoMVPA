@@ -169,24 +169,14 @@ function ds=read_ft(filename)
 
 
 function ds=convert_ft(ft)
-    %[data, sample_field]=get_data_ft(ft);
-    %[dim_labels, dim_values, has_sample_field]=get_fdim_ft(ft,...
-                                                    %sample_field);
     [data, samples_field, dim_labels, dim_values]=get_ft_data(ft);
-    %if ~has_sample_field
-    %    data=reshape(data,[1 size(data)]);
-    %end
-
-    %if numel(dim_labels)==1
-    %    data=reshape(data,size(data,1),[]);
-    %end
 
     ds=cosmo_flatten(data, dim_labels, dim_values,2,...
                                 'matrix_labels',get_ft_matrix_labels());
     ds.a.meeg.samples_field=samples_field;
 
     if is_ft_source_struct(ft)
-        ds=set_source_fa_inside(ds,dim_labels,dim_values,ft.inside);
+        ds=apply_ft_source_inside(ds,dim_labels,dim_values,ft.inside);
     end
 
     nsamples=size(ds.samples,1);
@@ -274,13 +264,26 @@ function sa=copy_fields_for_matching_sample_size(ft,nsamples,keys)
 
 
 
-function ds=set_source_fa_inside(ds,dim_labels,dim_values,inside_mask)
+function ds=apply_ft_source_inside(ds,dim_labels,dim_values,ft_inside)
     ndim=numel(dim_labels);
     dim_sizes=cellfun(@numel,dim_values);
 
     pos_idx=find(cosmo_match(dim_labels,'pos'),1);
     assert(~isempty(pos_idx),['this function should only be called '...
                                 'with source datasets']);
+
+    if isnumeric(ft_inside)
+        pos=ds.a.fdim.values{pos_idx};
+        [three,npos]=size(pos);
+        assert(three==3);
+        inside_mask=false(npos,1);
+        inside_mask(ft_inside)=true;
+    elseif islogical(ft_inside)
+        inside_mask=ft_inside;
+    else
+        error('.inside must either be numeric or logical');
+    end
+
 
     inside_vec_size=[1 ones(1,ndim)];
     inside_vec_size(1+pos_idx)=numel(inside_mask);
@@ -292,7 +295,7 @@ function ds=set_source_fa_inside(ds,dim_labels,dim_values,inside_mask)
     inside_array=repmat(inside_array_vec,other_dim_size);
     inside_ds=cosmo_flatten(inside_array, dim_labels, dim_values,2,...
                                          'matrix_labels',{'pos'});
-    ds.fa.inside=inside_ds.samples;
+    ds=cosmo_slice(ds,inside_ds.samples,2);
 
 
 

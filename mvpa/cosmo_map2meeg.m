@@ -225,7 +225,7 @@ function ft=ds_set_source_fields(ft,ds)
 
     % set the inside field
     inside_ds=cosmo_slice(ds,1,1);
-    inside_ds.samples=ds.fa.inside;
+    inside_ds.samples(:)=1;
 
     inside_arr=cosmo_unflatten(inside_ds,2,'matrix_labels',{'pos'});
 

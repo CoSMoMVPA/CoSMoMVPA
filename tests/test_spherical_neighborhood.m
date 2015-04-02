@@ -165,30 +165,21 @@ function test_meeg_source_dataset
     rp=rp(1:10);
 
     pos=nh.a.fdim.values{1}(:,ds.fa.pos);
-    inside=ds.fa.inside;
 
     for r=rp
-        if inside(r)
-            d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
-            idxs=find(d<=(radius*voxel_size) & inside);
-        else
-            idxs=zeros(1,0);
-        end
+        d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+        idxs=find(d<=(radius*voxel_size));
 
         assertEqual(sort(nh.neighbors{r}),sort(idxs));
     end
-    assertEqual(inside,nh.fa.inside);
 
     [p,q]=cosmo_overlap(nh.neighbors,nh2.neighbors);
 
     dp=diag(p);
     dq=diag(q);
 
-    assertEqual(isnan(dp),~inside');
-    assertEqual(isnan(dq),~inside');
-
-    assertTrue(mean(dp(inside))>.1);
-    assertTrue(mean(dq(inside))>.4);
+    assertTrue(mean(dp)>.1);
+    assertTrue(mean(dq)>.4);
 
 function test_fmri_fixed_number_of_features()
     ds=cosmo_synthetic_dataset('size','normal');

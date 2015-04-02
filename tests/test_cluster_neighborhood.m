@@ -187,27 +187,22 @@ function test_cluster_neighborhood_source
 
         assertEqual(nh.fa.pos,nh2.fa.pos)
         assertEqual(nh.a.fdim,nh2.a.fdim)
-        assertEqual(nh.fa.inside,nh2.fa.inside)
 
         assertEqual(nh.fa.pos,ds.fa.pos);
-        assertEqual(nh.fa.inside,ds.fa.inside);
         assertEqual(nh.a.fdim,ds.a.fdim);
 
         for r=rp
             idxs=nh.neighbors{r};
             assertEqual(idxs,sort(nh2.neighbors{r}));
-            if ~nh.fa.inside(r)
-                assertEqual(idxs,zeros(1,0));
-            else
-                d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
 
-                d_inside=d(idxs);
-                outside_mask=~ds.fa.inside;
-                outside_mask(d <= radius)=false;
-                d_outside=d(outside_mask);
-                assert(all(d_inside<=radius));
-                assert(all(d_outside>radius));
-            end
+            d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+
+            d_inside=d(idxs);
+            outside_mask=true(size(d));
+            outside_mask(d <= radius)=false;
+            d_outside=d(outside_mask);
+            assert(all(d_inside<=radius));
+            assert(all(d_outside>radius));
         end
     end
 

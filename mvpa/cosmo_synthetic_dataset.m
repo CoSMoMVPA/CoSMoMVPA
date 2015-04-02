@@ -631,11 +631,6 @@ function [ds, nfeatures]=get_fdim_fa(opt)
         case 'fmri'
             ds.a.vol.dim=dim_sizes;
             ds.a.vol.xform='scanner_anat';
-        case 'source'
-            pos=ds.a.fdim.values{1}(:,ds.fa.pos);
-            rng=max(pos)-min(pos);
-            ds.fa.inside=all(bsxfun(@lt,abs(bsxfun(@minus,...
-                                    mean(pos,2),pos)),rng));
     end
 
     nfeatures=prod(dim_sizes);
