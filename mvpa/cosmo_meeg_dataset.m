@@ -90,7 +90,7 @@ function ds=cosmo_meeg_dataset(filename, varargin)
     reader=supported_image_formats.(img_format).reader;
 
     % read the dataset
-    ds=reader(filename);
+    ds=reader(filename, params);
 
     % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
@@ -162,14 +162,14 @@ function img_formats=get_supported_image_formats()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fieldtrip helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function ds=read_ft(filename)
+function ds=read_ft(filename, opt)
     % reads it from a .mat data file
     ft=importdata(filename);
-    ds=convert_ft(ft);
+    ds=convert_ft(ft, opt);
 
 
-function ds=convert_ft(ft)
-    [data, samples_field, dim_labels, dim_values]=get_ft_data(ft);
+function ds=convert_ft(ft, opt)
+    [data, samples_field, dim_labels, dim_values]=get_ft_data(ft, opt);
 
     ds=cosmo_flatten(data, dim_labels, dim_values,2,...
                                 'matrix_labels',get_ft_matrix_labels());
@@ -183,8 +183,8 @@ function ds=convert_ft(ft)
     ft_fields={'rpt','trialinfo','cumtapcnt'};
     ds.sa=copy_fields_for_matching_sample_size(ft,nsamples,ft_fields);
 
-function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft)
-    [data, samples_field]=get_data_ft(ft);
+function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft,opt)
+    [data, samples_field]=get_data_ft(ft,opt);
     [dim_labels,ft_dim_labels]=get_ft_dim_labels(ft);
 
     nlabels=numel(dim_labels);
@@ -300,7 +300,7 @@ function ds=apply_ft_source_inside(ds,dim_labels,dim_values,ft_inside)
 
 
 
-function [data, sample_field]=get_data_ft(ft)
+function [data, sample_field]=get_data_ft(ft,opt)
     % helper function to get the data from a fieldtrip struct
     sample_fields_in_order={'trial','avg',...
                             'fourierspctrm','powspctrm','pow'};
@@ -362,7 +362,7 @@ function tf=is_ft_source_struct(ft)
 % eeglab helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ds=read_eeglab_txt(fn)
+function ds=read_eeglab_txt(fn, unused)
     % reads eeglab time series data. returns data in fieldtrip-like format
     fid=fopen(fn);
 
