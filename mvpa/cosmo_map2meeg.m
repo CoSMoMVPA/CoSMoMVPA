@@ -145,10 +145,6 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
 
     is_single_sample=size(ds.samples,1)==1;
     if is_single_sample
-        arr_size=size(arr);
-        if numel(arr_size)>2
-            arr=reshape(arr,arr_size(2:end));
-        end
         samples_label=cell(0);
     elseif cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
@@ -171,8 +167,8 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     switch nsubfields
         case 0
             % non-source data
-            ft=struct();
-            ft.(samples_field)=arr;
+            ft=get_ft_sensor_samples_from_array(ds, arr, ...
+                                        samples_field_keys{1});
 
         case 1
             % source data
@@ -185,78 +181,76 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                         'subfield %s'],samples_field);
     end
 
+function ft=get_ft_sensor_samples_from_array(ds, arr, key)
+    if size(ds.samples,1)==1
+        arr_size=size(arr);
+        arr_ft=reshape(arr,[arr_size(2:end) 1]);
+    else
+        arr_ft=arr;
+    end
+
+    ft=struct();
+    ft.(key)=arr_ft;
+
+
 function ft=get_ft_source_samples_from_array(ds, arr, key, sub_key)
     ft=init_ft_source_fields(ds);
 
-    switch key
-        case 'avg'
-            % average over all trials
-            ft.method='average';
-
-            switch sub_key
-                case 'pow'
-                    arr_struct=struct(sub_key,arr);
-
-                case 'mom'
-                    nsensors=size(arr,1);
-                    arr_size=[size(arr) 1];
-                    arr_mat=reshape(arr,nsensors,[]);
-                    remainder_size=[arr_size(2:end) 1];
-
-                    arr_cell=cell(nsensors,1);
-                    for k=1:nsensors
-                        if ft.inside(k)
-                            arr_cell{k}=reshape(arr_mat(k,:),remainder_size);
-                        end
-                    end
-                    arr_struct=struct();
-                    arr_struct.mom=arr_cell;
-            end
+    arr_size=size(arr);
+    nsamples=arr_size(1);
+    remainder_size=arr_size(2:end);
 
 
+    switch sub_key
+        case 'pow'
+            converter=@convert_ft_source_vector2array;
 
-        case 'trial'
-            % single trial data
-            ft.method='rawtrial';
-
-            % space for data in matrix form
-            arr_size=size(arr);
-            nsamples=arr_size(1);
-            arr_mat=reshape(arr,nsamples,[]);
-
-            struct_cell=cell(1,nsamples);
-            switch sub_key
-                case 'pow'
-                    remainder_size=[arr_size(2:end) 1];
-
-                    for j=1:nsamples
-                        struct_cell{j}=reshape(arr_mat(j,:),remainder_size);
-                    end
-
-                case 'mom'
-                    nsensors=size(arr,2);
-                    remainder_size=arr_size(3:end);
-
-                    for j=1:nsamples
-                        arr_sens_mat=reshape(arr_mat(j,:),[nsensors remainder_size]);
-                        arr_cell=cell(nsensors,1);
-                        for k=1:nsensors
-                            if ft.inside(k)
-                                arr_cell{k}=reshape(arr_sens_mat(k,:),remainder_size);
-                            end
-                        end
-                        struct_cell{j}=arr_cell;
-                    end
-            end
-
-            arr_struct=struct(sub_key,struct_cell);
+        case 'mom'
+            converter=@convert_ft_source_vector2cell;
 
         otherwise
-            error('not supported source data with data in %s.%s', ...
-                                    key, sub_key);
+            error('unsupported key %s', sub_key);
     end
 
+    arr_sample_mat=reshape(arr,nsamples,[]);
+    struct_cell=cell(1,nsamples);
+
+    for j=1:nsamples
+        struct_cell{j}=converter(arr_sample_mat(j,:),remainder_size, ...
+                                                ft.inside);
+    end
+
+    arr_struct=struct(sub_key,struct_cell);
     ft.(key)=arr_struct;
+
+    key2method=struct();
+    key2method.avg='average';
+    key2method.trial='rawtrial';
+
+    ft.method=key2method.(key);
+
+function arr=convert_ft_source_vector2array(arr_vec, remainder_size, ...
+                                                is_inside)
+    arr=reshape(arr_vec,[remainder_size 1]);
+    arr(~is_inside)=NaN;
+
+
+function arr_cell=convert_ft_source_vector2cell(arr_vec,remainder_size,...
+                                                is_inside)
+    nsensors=remainder_size(1);
+    remainder_remainder_size=[remainder_size(2:end) 1 1];
+
+    arr_sens_mat=reshape(arr_vec,nsensors,[]);
+    arr_cell=cell(nsensors,1);
+    for k=1:nsensors
+        if is_inside(k)
+            arr_cell{k}=reshape(arr_sens_mat(k,:),...
+                                        remainder_remainder_size);
+        end
+    end
+
+
+
 
 function ft=ds_copy_fields(ft,ds,keys)
     nsamples=size(ds.samples,1);
