@@ -292,28 +292,6 @@ function ft=init_ft_source_fields(ds)
 
 
 
-function ft=ft_set_source_mom_fields(ft)
-    assert(isfield(ft,'mom'));
-    % for MEEG source with a .mom field, set the outside entries to an
-    % empty cell
-    samples_label_split=cosmo_split(samples_label,'.');
-    main_key=samples_label_split{1};
-    sub_key=samples_label_split{2};
-
-    data=ft.(main_key);
-    nsamples=numel(data);
-
-    % set outside fields to empty
-    for k=1:nsamples
-        d=data(k).(sub_key);
-        d(~ft.inside)={[]};
-        data(k).(sub_key)=d;
-    end
-
-    ft.(main_key)=data;
-    ft=rmfield(ft,'mom');
-
-
 function ft=build_ft(ds)
     % get fieldtrip-specific fields from header
     [ft, samples_label, dim_labels]=get_ft_samples(ds);
