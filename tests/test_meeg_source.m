@@ -3,7 +3,8 @@ function test_suite=test_meeg_source()
     initTestSuite;
 
 function test_meeg_dataset()
-    tps={'freq','time','rpt_trial'};
+    tps={'freq_pow','time_mom','rpt_trial_mom',...
+                        'rpt_trial_pow'};
     for j=1:numel(tps)
         [ft,fdim,data_label]=generate_ft_source(tps{j});
         ds=cosmo_meeg_dataset(ft);
@@ -16,8 +17,19 @@ function test_meeg_dataset()
 
         ft_first_sample_all=ft.(key).(sub_key);
         ft_first_sample=ft_first_sample_all(ft.inside,:);
-        assertEqual(ds.samples(1,:),ft_first_sample(:)');
 
+        switch sub_key
+            case 'mom'
+                % choose a random sensor
+                inside_idxs=find(ft.inside);
+                pos=ceil(rand()*numel(inside_idxs));
+                inside_idx=inside_idxs(pos);
+                assertEqual(ds.samples(1,ds.fa.pos==inside_idx),...
+                                        ft_first_sample{pos}(:)')
+
+            otherwise
+                assertEqual(ds.samples(1,:),ft_first_sample(:)');
+        end
 
         [ft_arr, ft_labels, ft_values]=cosmo_unflatten(ds,2,...
                                             'matrix_labels','pos');
@@ -32,7 +44,6 @@ function test_meeg_dataset()
         dim_sizes=cellfun(@(x)size(x,2),fdim.values);
         ndim=numel(dim_sizes);
         rp=ceil(rand(1,ndim).*dim_sizes(:)');
-
         [nsamples,nfeatures]=size(ds.samples);
         ds_msk=false(1,nfeatures);
         ft_idx=cell(1,1+ndim);
@@ -41,13 +52,17 @@ function test_meeg_dataset()
             dim_label=fdim.labels{k};
             ds_msk = ds_msk | rp(k)~=ds.fa.(dim_label);
 
-            ft_values=ft.(dim_label);
             switch dim_label
+                case 'mom'
+                    ft_idx{k+1}=rp(k);
+
                 case 'pos'
+                    ft_values=ft.(dim_label);
                     ft_idx{k+1}=find(all(bsxfun(@eq,...
                                     ft_values(rp(k),:),ft_values),2));
 
                 otherwise
+                    ft_values=ft.(dim_label);
                     ft_idx{k+1}=find(ft_values(rp(k))==ft_values);
             end
         end
@@ -55,8 +70,8 @@ function test_meeg_dataset()
         ds_sel=cosmo_slice(cosmo_slice(ds,~ds_msk,2),ft_idx{1});
         ft_sel=ft_arr(ft_idx{:});
 
-        if isempty(ft_sel)
-            assertEqual(ds.samples,0);
+        if ft_sel==0
+            assertTrue(isempty(ds_sel.samples));
         else
             assertEqual(ds_sel.samples,ft_sel);
         end
@@ -96,62 +111,108 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
     nsamples=2;
     freq=[3 5 7 9];
     time=[-1 0 1 2];
+    mom_labels={'x','y','z'};
 
     ft.dim=cellfun(@numel,dim_pos_range);
     ft.pos=cosmo_cartprod(dim_pos_range);
-    ft.inside=sum(ft.pos.^2,2)<40;
+    ft.inside=sum(ft.pos.^2,2)<30;
 
     fdim=struct();
 
     switch tp
-        case 'freq'
+        case 'freq_pow'
             ft.freq=freq;
-            %ft.cumtapcnt=(1:nsamples)';
             ft.method='average';
-            ft.avg.pow=generate_data(ft.inside,numel(freq));
+            ft.avg=generate_data(ft.inside,numel(freq),1,'pow');
             fdim.labels={'pos';'freq'};
             fdim.values={ft.pos';freq(:)'};
             data_label={'avg','pow'};
 
-        case 'time'
+        case 'time_mom'
             ft.time=time;
             ft.method='average';
-            ft.avg.pow=generate_data(ft.inside,numel(time));
-            fdim.labels={'pos';'time'};
-            fdim.values={ft.pos';time(:)'};
-            data_label={'avg','pow'};
+            ft.avg=generate_data(ft.inside,numel(time),1,'mom');
+            fdim.labels={'pos';'mom';'time'};
+            fdim.values={ft.pos';mom_labels;time(:)'};
+            data_label={'avg','mom'};
 
-        case 'rpt_trial';
+
+        case 'rpt_trial_pow';
             ft.time=time;
             ft.method='rawtrial';
-            ft.trial=generate_data(ft.inside,numel(time),nsamples);
+            ft.trial=generate_data(ft.inside,numel(time),nsamples,'pow');
             fdim.labels={'pos';'time'};
             fdim.values={ft.pos';time(:)'};
             data_label={'trial','pow'};
 
+        case 'rpt_trial_mom';
+            ft.time=time;
+            ft.method='rawtrial';
+            ft.trial=generate_data(ft.inside,numel(time),nsamples,'mom');
+            fdim.labels={'pos';'mom';'time'};
+            fdim.values={ft.pos';mom_labels;time(:)'};
+            data_label={'trial','mom'};
+
+        otherwise
+            error('unsupported type %s', tp);
 
     end
 
 
-function d=generate_data(inside,dim_size,struct_length)
-    as_struct=nargin>=3;
+function d=generate_data(inside,nfeatures,nsamples,fld)
+    is_single_trial=nargin<3;
 
-    if ~as_struct
-        struct_length=1;
+    if is_single_trial
+        nsamples=1;
     end
 
-    dim_other=[dim_size struct_length];
-    nsensors=numel(inside);
-    nother=prod(dim_other);
-    d_mat=NaN(nsensors, nother);
-    d_mat(inside,:)=cosmo_rand([sum(inside) nother],'seed',1);
-    d=reshape(d_mat,[nsensors dim_other]);
+    switch fld
+        case 'mom'
+            d=generate_mom(inside,nfeatures,nsamples);
+        case 'pow'
+            d=generate_pow(inside,nfeatures,nsamples);
+        otherwise
+            error('not supported: %s', fld);
+    end
 
-    if as_struct
-        c=cell(struct_length,1);
-        for k=1:struct_length
-            c{k}.pow=d(:,:,k);
+
+function all_trials=generate_pow(inside,nfeatures,nsamples)
+    nf=numel(inside);
+    ni=sum(inside);
+
+    all_data=NaN(nf,nfeatures);
+    trial_data=cosmo_rand(ni,nfeatures);
+
+    all_trials_cell=cell(nsamples,1);
+    for j=1:nsamples
+        data=all_data;
+        data(inside,:)=trial_data+j;
+        all_trials_cell{j}.pow=data;
+    end
+
+    all_trials=cat(1,all_trials_cell{:})';
+
+
+function all_trials=generate_mom(inside,nfeatures,nsamples)
+    nf=numel(inside);
+    i=find(inside);
+    ni=numel(i);
+
+    data=cosmo_rand(3,nfeatures,ni);
+
+    all_trials_cell=cell(1,nsamples);
+    for j=1:nsamples
+        one_trial=cell(nf,1);
+        for k=1:ni
+            one_trial{i(k)}=data(:,:,k)+j;
         end
-        d=cat(2,c{:});
-
+        all_trials_cell{j}=one_trial;
     end
+
+    all_trials=struct('mom',all_trials_cell);
+
+
+
+
+
+

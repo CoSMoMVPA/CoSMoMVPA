@@ -13,6 +13,9 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
 %                     the output as ds.sa.chunks
+%   'data_field', f   For MEEG source dataset with multiple data fields
+%                     (such as 'pow' and 'mom'), this sets which data field
+%                     is used.
 %
 % Returns:
 %   ds                dataset struct with the following fields
@@ -185,7 +188,7 @@ function ds=convert_ft(ft, opt)
 
 function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft,opt)
     [data, samples_field]=get_data_ft(ft,opt);
-    [dim_labels,ft_dim_labels]=get_ft_dim_labels(ft);
+    [dim_labels,ft_dim_labels]=get_ft_dim_labels(ft, samples_field);
 
     nlabels=numel(dim_labels);
     dim_values=cell(nlabels,1);
@@ -200,17 +203,40 @@ function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft,opt)
         end
     end
 
+    % insert .mom field for source struct
+    samples_field_split=cosmo_strsplit(samples_field,'.');
+    has_mom=numel(samples_field_split)==2 && ...
+                    strcmp(samples_field_split{2},'mom');
+    if has_mom
+        dim_labels=[dim_labels(1);{'mom'};dim_labels(2:end)];
+        dim_values=[dim_values(1);{{'x','y','z'}};dim_values(2:end)];
+    end
+
 
 function labels=get_ft_matrix_labels()
-    labels={'pos'}    ;
+    labels={'pos'};
 
-function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft)
+function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft, ...
+                                                        samples_field)
     cosmo_ft_dim_labels={ 'pos','pos'
                           'chan','label';...
                           'freq','freq';...
                           'time','time';
                                   };
-    if isfield(ft,'dimord')
+
+    is_source=is_ft_source_struct(ft);
+
+    if is_source==isfield(ft,'dimord')
+        error('Weird fieldtrip data: .pos and .dimord are not compatible');
+    end
+
+    if is_source
+        % source data
+        keys=fieldnames(ft);
+        labels_msk=cosmo_match(cosmo_ft_dim_labels(:,2),keys);
+    else
+
+
         dimord_labels=cosmo_strsplit(ft.dimord,'_');
 
         sample_field=get_sample_dimord_field(ft);
@@ -220,15 +246,14 @@ function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft)
 
         labels_msk=cosmo_match(cosmo_ft_dim_labels(:,1),...
                                 dimord_labels_without_sample);
-    else
-        % source data
-        keys=fieldnames(ft);
-        labels_msk=cosmo_match(cosmo_ft_dim_labels(:,2),keys);
-
     end
 
     ft_dim_labels=cosmo_ft_dim_labels(labels_msk,2);
     cosmo_dim_labels=cosmo_ft_dim_labels(labels_msk,1);
+
+
+
+
 
 function sample_field=get_sample_dimord_field(ft)
     sample_field='';
@@ -301,56 +326,123 @@ function ds=apply_ft_source_inside(ds,dim_labels,dim_values,ft_inside)
 
 
 function [data, sample_field]=get_data_ft(ft,opt)
-    % helper function to get the data from a fieldtrip struct
-    sample_fields_in_order={'trial','avg',...
-                            'fourierspctrm','powspctrm','pow'};
-    nsample_fields=numel(sample_fields_in_order);
+    if is_ft_source_struct(ft)
+        [data, sample_field]=get_source_data_ft(ft, opt);
+    else
+        [data, sample_field]=get_sensor_data_ft(ft);
+    end
 
-    ft_data=ft;
-    data_field_cell=cell(nsample_fields,1);
-    pos=0;
-    for k=1:nsample_fields
-        sample_field=sample_fields_in_order{k};
-        if isfield(ft_data(1), sample_field)
-            if isstruct(ft_data(1).(sample_field))
-                % field with subfield (in source data),
-                % such as .avg.pow
-                ft_data=ft_data.(sample_field);
-            else
-                % deal with source data with multiple trials
-                if is_ft_source_struct(ft)
-                    nsamples=numel(ft_data);
-                    feature_size=size(ft_data(1).(sample_field));
+function [data, sample_field]=get_source_data_ft(ft, opt)
+    main_fields={'trial','avg'};
+    sub_fields={'pow','mom'};
 
-                    data_cell=cell(nsamples,1);
-                    for j=1:nsamples
-                        data_arr=ft_data(j).(sample_field);
-                        data_cell{j}=reshape(data_arr,[1 feature_size]);
-                    end
+    msk_main=cosmo_match(main_fields,fieldnames(ft));
+    switch sum(msk_main)
+        case 0
+            error('No data found in source struct');
 
-                    data=cat(1,data_cell{:});
-                else
-                    assert(numel(ft_data)==1)
+        case 1
+            % ok
 
-                    ft_data=ft_data.(sample_field);
-                    data=ft_data;
+        otherwise
+            error('Multiple data fields found in source struct');
+    end
 
-                    if isempty(get_sample_dimord_field(ft))
-                        % no 'rpt_...'
-                        data=reshape(data,[1 size(data)]);
-                    end
-                end
-            end
-            pos=pos+1;
-            data_field_cell{pos}=sample_field;
+    main_field=main_fields{msk_main};
+    main_data=ft.(main_field);
+
+    sub_field_option='data_field';
+    if isfield(opt,sub_field_option)
+        sub_field=opt.(sub_field_option);
+    else
+        msk_sub=cosmo_match(sub_fields,fieldnames(main_data));
+
+        switch sum(msk_sub)
+            case 0
+                error('No data found in .%s source struct', main_field);
+
+            case 1
+                sub_field=sub_fields{msk_sub};
+
+            otherwise
+                error(['Multiple data fields found in .%s source '...
+                        'struct: ''%s''. To select one of these, use '...
+                        'the ''%s'' option'],...
+                        main_field,...
+                        cosmo_strjoin(sub_fields(msk_sub),''', '''),...
+                        sub_field_option);
         end
     end
 
-    if pos==0
-        error('Could not find data in fieldtrip struct');
+    data=extract_source_data_array_ft(main_data, sub_field);
+    sample_field=sprintf('%s.%s',main_field,sub_field);
+
+function data=extract_source_data_array_ft(main_data, sub_field)
+    nsamples=numel(main_data);
+    first_data=main_data(1).(sub_field);
+    data_cell=cell(nsamples,1);
+
+
+    switch sub_field
+        case 'mom'
+            npos=numel(first_data);
+            data_inside_pos=find(~cellfun(@isempty,first_data));
+            ninside=numel(data_inside_pos);
+
+            [nmom, nfeatures]=size(first_data{data_inside_pos(1)});
+
+            data_arr_empty=NaN(1,npos,nmom,nfeatures);
+
+            for j=1:nsamples
+                data_cell_cell=main_data(j).(sub_field);
+                data_arr=data_arr_empty;
+
+                for k=1:ninside
+                    pos=data_inside_pos(k);
+                    data_arr(1,pos,:,:)=data_cell_cell{pos};
+                end
+
+                data_cell{j}=data_arr;
+            end
+
+
+        case 'pow'
+            feature_size=size(first_data);
+
+            for j=1:nsamples
+                data_arr=main_data(j).(sub_field);
+                data_cell{j}=reshape(data_arr,[1 feature_size]);
+            end
+
+        otherwise
+            error('not supported sub_field: %s', sub_field);
     end
 
-    sample_field=cosmo_strjoin(data_field_cell(1:pos),'.');
+    data=cat(1,data_cell{:});
+
+
+
+
+function [data, sample_field]=get_sensor_data_ft(ft)
+    % order precedence: if .trial and .avg both exist, take .trial
+    sample_fields_in_order={'trial',...
+                            'fourierspctrm','powspctrm','avg'};
+    msk=cosmo_match(sample_fields_in_order, fieldnames(ft));
+
+    if ~any(msk)
+        error('no data field found in sensor data struct');
+    end
+
+    i=find(msk,1);
+    sample_field=sample_fields_in_order{i};
+
+    data=ft.(sample_field);
+
+    if isempty(get_sample_dimord_field(ft))
+                        % no 'rpt_...'
+        data=reshape(data,[1 size(data)]);
+    end
+
 
 
 function tf=is_ft_source_struct(ft)

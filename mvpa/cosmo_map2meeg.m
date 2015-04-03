@@ -98,10 +98,19 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
 
     if is_ds_source_struct(ds)
         if is_single_sample
-            samples_field='avg.pow';
+            main_field='avg';
         else
-            samples_field='trial.pow';
+            main_field='trial';
         end
+
+        if cosmo_match({'mom'},ds.a.fdim.labels)
+            sub_field='mom';
+        else
+            sub_field='pow';
+        end
+
+        samples_field=sprintf('%s.%s',main_field,sub_field);
+
         return
     else
         if nchan>=1 && ntime>=1
@@ -118,6 +127,8 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
         end
     end
 
+
+    % fallback option
     samples_field=ds.a.meeg.samples_field;
 
 
@@ -165,7 +176,7 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
 
         case 1
             % source data
-            ft=get_ft_source_samples_from_array(arr, ...
+            ft=get_ft_source_samples_from_array(ds, arr, ...
                                         samples_field_keys{1},...
                                         samples_field_keys{2});
 
@@ -174,25 +185,68 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                         'subfield %s'],samples_field);
     end
 
-function ft=get_ft_source_samples_from_array(arr, key, sub_key)
+function ft=get_ft_source_samples_from_array(ds, arr, key, sub_key)
+    ft=init_ft_source_fields(ds);
 
     switch key
         case 'avg'
             % average over all trials
             ft.method='average';
-            arr_struct=struct(sub_key,arr);
+
+            switch sub_key
+                case 'pow'
+                    arr_struct=struct(sub_key,arr);
+
+                case 'mom'
+                    nsensors=size(arr,1);
+                    arr_size=[size(arr) 1];
+                    arr_mat=reshape(arr,nsensors,[]);
+                    remainder_size=[arr_size(2:end) 1];
+
+                    arr_cell=cell(nsensors,1);
+                    for k=1:nsensors
+                        if ft.inside(k)
+                            arr_cell{k}=reshape(arr_mat(k,:),remainder_size);
+                        end
+                    end
+                    arr_struct=struct();
+                    arr_struct.mom=arr_cell;
+            end
+
 
 
         case 'trial'
             % single trial data
             ft.method='rawtrial';
 
-            nsamples=size(arr,1);
+            % space for data in matrix form
             arr_size=size(arr);
+            nsamples=arr_size(1);
             arr_mat=reshape(arr,nsamples,[]);
+
             struct_cell=cell(1,nsamples);
-            for j=1:nsamples
-                struct_cell{j}=reshape(arr_mat(j,:),[arr_size(2:end) 1]);
+            switch sub_key
+                case 'pow'
+                    remainder_size=[arr_size(2:end) 1];
+
+                    for j=1:nsamples
+                        struct_cell{j}=reshape(arr_mat(j,:),remainder_size);
+                    end
+
+                case 'mom'
+                    nsensors=size(arr,2);
+                    remainder_size=arr_size(3:end);
+
+                    for j=1:nsamples
+                        arr_sens_mat=reshape(arr_mat(j,:),[nsensors remainder_size]);
+                        arr_cell=cell(nsensors,1);
+                        for k=1:nsensors
+                            if ft.inside(k)
+                                arr_cell{k}=reshape(arr_sens_mat(k,:),remainder_size);
+                            end
+                        end
+                        struct_cell{j}=arr_cell;
+                    end
             end
 
             arr_struct=struct(sub_key,struct_cell);
@@ -216,12 +270,11 @@ function ft=ds_copy_fields(ft,ds,keys)
         end
     end
 
-function ft=ds_set_source_fields(ft,ds)
+function ft=init_ft_source_fields(ds)
+    ft=struct();
+    % for MEEG source data, set the .inside field
     assert(is_ds_source_struct(ds));
     [dim,pos_index]=cosmo_dim_find(ds,'pos',true);
-    if dim~=2
-    %    error('pos attribute must be a feature attribute');
-    end
 
     % set the inside field
     inside_ds=cosmo_slice(ds,1,1);
@@ -238,6 +291,27 @@ function ft=ds_set_source_fields(ft,ds)
     ft.dim=ds_vol.a.vol.dim(:)';
 
 
+
+function ft=ft_set_source_mom_fields(ft)
+    assert(isfield(ft,'mom'));
+    % for MEEG source with a .mom field, set the outside entries to an
+    % empty cell
+    samples_label_split=cosmo_split(samples_label,'.');
+    main_key=samples_label_split{1};
+    sub_key=samples_label_split{2};
+
+    data=ft.(main_key);
+    nsamples=numel(data);
+
+    % set outside fields to empty
+    for k=1:nsamples
+        d=data(k).(sub_key);
+        d(~ft.inside)={[]};
+        data(k).(sub_key)=d;
+    end
+
+    ft.(main_key)=data;
+    ft=rmfield(ft,'mom');
 
 
 function ft=build_ft(ds)
@@ -261,6 +335,9 @@ function ft=build_ft(ds)
         dim_label=dim_labels{dim};
         dim_value=ds.a.fdim.values{dim};
         switch dim_label
+            case 'mom'
+                % ignore
+                continue
             case 'chan'
                 dim_label='label';
             case {'time','freq'}
@@ -273,9 +350,9 @@ function ft=build_ft(ds)
     end
 
     ft=ds_copy_fields(ft,ds,{'rpt','trialinfo','cumtapcnt'});
-    if is_ds_source_struct(ds)
-        ft=ds_set_source_fields(ft,ds);
-    end
+    %if is_ds_source_struct(ds)
+    %    ft=fs_set_source_fields(ft,ds);
+    %end
 
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
