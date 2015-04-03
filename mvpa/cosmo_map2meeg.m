@@ -340,19 +340,16 @@ function ft=build_ft(ds)
                 continue
             case 'chan'
                 dim_label='label';
-            case {'time','freq'}
-                % fieldtrip will puke with column vector
-                dim_value=dim_value(:)';
             case 'pos'
                 dim_value=dim_value';
+            otherwise
+                % time or freq; fieldtrip will puke with column vector
+                dim_value=dim_value(:)';
         end
         ft.(dim_label)=dim_value;
     end
 
     ft=ds_copy_fields(ft,ds,{'rpt','trialinfo','cumtapcnt'});
-    %if is_ds_source_struct(ds)
-    %    ft=fs_set_source_fields(ft,ds);
-    %end
 
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
