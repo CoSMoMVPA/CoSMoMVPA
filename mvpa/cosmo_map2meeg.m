@@ -252,7 +252,7 @@ function arr_cell=convert_ft_source_vector2cell(arr_vec,remainder_size,...
 
 
 
-function ft=ds_copy_fields(ft,ds,keys)
+function ft=ds_copy_fields_with_matching_sample_size(ft,ds,keys)
     nsamples=size(ds.samples,1);
     for k=1:numel(keys)
         key=keys{k};
@@ -321,7 +321,8 @@ function ft=build_ft(ds)
         ft.(dim_label)=dim_value;
     end
 
-    ft=ds_copy_fields(ft,ds,{'rpt','trialinfo','cumtapcnt'});
+    ft=ds_copy_fields_with_matching_sample_size(ft,ds,...
+                                    {'rpt','trialinfo','cumtapcnt'});
 
     % if fieldtrip is present
     if cosmo_check_external('fieldtrip',false) && ...
