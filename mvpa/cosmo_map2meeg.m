@@ -282,8 +282,13 @@ function ft=init_ft_source_fields(ds)
     inside_matrix_pos_first=reshape(inside_arr_pos_first,n,[]);
     ft.inside=any(inside_matrix_pos_first,2);
 
-    ds_vol=cosmo_vol_grid_convert(ds,'tovol');
-    ft.dim=ds_vol.a.vol.dim(:)';
+    if cosmo_isfield(ds,'a.meeg.dim')
+        ft.dim=ds.a.meeg.dim;
+    else
+        % use regular grid to determine
+        ds_vol=cosmo_vol_grid_convert(ds,'tovol');
+        ft.dim=ds_vol.a.vol.dim(:)';
+    end
 
 
 

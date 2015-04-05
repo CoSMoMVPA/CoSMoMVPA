@@ -137,6 +137,15 @@ function test_meeg_fmri_dataset()
     ds_ft_fmri=rmfield(ds_ft_fmri,'sa');
     assertEqual(ds_vol,ds_ft_fmri);
 
+function test_irregular_source_grid()
+    ft=generate_ft_source('freq_pow');
+    ft.pos=ft.pos+randn(size(ft.pos));
+
+    ds=cosmo_meeg_dataset(ft);
+    ft2=cosmo_map2meeg(ds);
+
+    assertEqual(ft,ft2);
+
 
 function [ft,fdim,data_label]=generate_ft_source(tp)
     ft=struct();

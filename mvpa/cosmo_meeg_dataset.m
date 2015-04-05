@@ -181,6 +181,7 @@ function ds=convert_ft(ft, opt)
     if is_ft_source_struct(ft)
         ds=apply_ft_source_inside(ds,fdim.labels,fdim.values,...
                                         ft.inside);
+        ds.a.meeg.dim=ft.dim;
     end
 
     nsamples=size(ds.samples,1);

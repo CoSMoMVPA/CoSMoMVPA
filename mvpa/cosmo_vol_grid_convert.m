@@ -190,6 +190,11 @@ function ds_conv=convert_grid2vol(ds)
     ds_conv.a.vol.mat=mat;
     ds_conv.a.vol.dim=dim_sizes(:)';
 
+    if cosmo_isfield(ds_conv,'a.meeg.dim')
+        ds_conv.a.meeg=rmfield(ds_conv.a.meeg,'dim');
+    end
+
+
 
 function check_input(ds)
     cosmo_check_dataset(ds);
