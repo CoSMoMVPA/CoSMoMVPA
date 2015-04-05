@@ -171,21 +171,22 @@ function ds=read_ft(filename, opt)
 
 
 function ds=convert_ft(ft, opt)
-    [data, samples_field, dim_labels, dim_values]=get_ft_data(ft, opt);
+    [data, samples_field, fdim]=get_ft_data(ft, opt);
 
-    ds=cosmo_flatten(data, dim_labels, dim_values,2,...
+    ds=cosmo_flatten(data, fdim.dim_labels, fdim.dim_values,2,...
                                 'matrix_labels',get_ft_matrix_labels());
     ds.a.meeg.samples_field=samples_field;
 
     if is_ft_source_struct(ft)
-        ds=apply_ft_source_inside(ds,dim_labels,dim_values,ft.inside);
+        ds=apply_ft_source_inside(ds,fdim.dim_labels,fdim.dim_values,...
+                                        ft.inside);
     end
 
     nsamples=size(ds.samples,1);
     ft_fields={'rpt','trialinfo','cumtapcnt'};
     ds.sa=copy_fields_for_matching_sample_size(ft,nsamples,ft_fields);
 
-function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft,opt)
+function [data,samples_field,fdim]=get_ft_data(ft,opt)
     [data, samples_field]=get_data_ft(ft,opt);
     [dim_labels,ft_dim_labels]=get_ft_dim_labels(ft, samples_field);
 
@@ -202,13 +203,24 @@ function [data,samples_field,dim_labels,dim_values]=get_ft_data(ft,opt)
         end
     end
 
+    fdim.dim_labels=dim_labels;
+    fdim.dim_values=dim_values;
+
+    fdim=add_ft_mom_field_if_present(fdim, samples_field);
+
+
+function fdim=add_ft_mom_field_if_present(fdim, samples_field)
     % insert .mom field for source struct
     samples_field_split=cosmo_strsplit(samples_field,'.');
     has_mom=numel(samples_field_split)==2 && ...
                     strcmp(samples_field_split{2},'mom');
     if has_mom
-        dim_labels=[dim_labels(1);{'mom'};dim_labels(2:end)];
-        dim_values=[dim_values(1);{{'x','y','z'}};dim_values(2:end)];
+        fdim.dim_labels=[fdim.dim_labels(1);...
+                                {'mom'};...
+                                fdim.dim_labels(2:end)];
+        fdim.dim_values=[fdim.dim_values(1);...
+                                {{'x','y','z'}};...
+                                fdim.dim_values(2:end)];
     end
 
 
