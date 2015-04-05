@@ -77,23 +77,22 @@ function ds=cosmo_meeg_dataset(filename, varargin)
     params = cosmo_structjoin(defaults, varargin);
 
     if cosmo_check_dataset(filename,'meeg',false)
-        % it is already a dataset, so return it
+        % it is already a dataset
         ds=filename;
-        return
+    else
+        % get image format and verify it is supported
+        img_format=get_img_format(filename);
+        supported_image_formats=get_supported_image_formats();
+
+        % check externals
+        cosmo_check_external(supported_image_formats.(img_format).externals);
+
+        % get the reader
+        reader=supported_image_formats.(img_format).reader;
+
+        % read the dataset
+        ds=reader(filename, params);
     end
-
-    % get image format and verify it is supported
-    img_format=get_img_format(filename);
-    supported_image_formats=get_supported_image_formats();
-
-    % check externals
-    cosmo_check_external(supported_image_formats.(img_format).externals);
-
-    % get the reader
-    reader=supported_image_formats.(img_format).reader;
-
-    % read the dataset
-    ds=reader(filename, params);
 
     % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
@@ -218,11 +217,10 @@ function labels=get_ft_matrix_labels()
 
 function [cosmo_dim_labels,ft_dim_labels]=get_ft_dim_labels(ft, ...
                                                         samples_field)
-    cosmo_ft_dim_labels={ 'pos','pos'
+    cosmo_ft_dim_labels={ 'pos','pos';...
                           'chan','label';...
                           'freq','freq';...
-                          'time','time';
-                                  };
+                          'time','time'};
 
     is_source=is_ft_source_struct(ft);
 
