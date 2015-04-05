@@ -71,6 +71,11 @@ function test_synthetic_meeg_dataset()
         assertEqual(ds.a.meeg.samples_field,ds2.a.meeg.samples_field);
     end
 
+    ds2=cosmo_meeg_dataset(ds,'targets',1);
+    assertTrue(all(ds2.sa.targets==1));
+    assertExceptionThrown(@()cosmo_meeg_dataset(ds,'targets',[1 2]),'');
+
+
 function test_meeg_eeglab_io()
     ds=cosmo_synthetic_dataset('type','meeg');
 
@@ -113,6 +118,40 @@ function test_meeg_eeglab_io()
     cosmo_map2meeg(ds2,tmp2_fn);
     ds3=cosmo_meeg_dataset(tmp2_fn);
     assertEqual(ds2,ds3);
+
+
+function test_meeg_ft_io()
+    ds=cosmo_synthetic_dataset('type','meeg');
+    tmp_fn=sprintf('_tmp_%06.0f.mat',rand()*1e5);
+    file_remover=onCleanup(@()delete(tmp_fn));
+
+    cosmo_map2meeg(ds,tmp_fn);
+    ds2=cosmo_meeg_dataset(tmp_fn);
+    assertEqual(ds.a.meeg.samples_field,ds2.a.meeg.samples_field);
+    ds.a.meeg=[];
+    ds.sa=struct();
+    ds2.a.meeg=[];
+    assertEqual(ds,ds2);
+
+    ds3=cosmo_meeg_dataset(ds2);
+    assertEqual(ds2,ds3);
+
+function test_meeg_ft_io_exceptions()
+    aeti=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+    aeto=@(varargin)assertExceptionThrown(@()...
+                    cosmo_map2meeg(varargin{:}),'');
+    ds=cosmo_synthetic_dataset('type','timefreq');
+    aeti('file_without_extension');
+    aeti('file.with_unknown_extension');
+
+    aeto(ds,'file_without_extension');
+    aeto(ds,'file.with_unknown_extension');
+
+    aeto(ds,'eeglab_timelock.txt');
+
+
+
 
 
 function dimords=get_dimords()
