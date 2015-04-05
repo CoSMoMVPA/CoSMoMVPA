@@ -35,10 +35,11 @@ function hdr=cosmo_map2meeg(ds, fn)
 
     % if filename was provided, store to file
     if nargin>1
-        ext=cosmo_strsplit(fn,'.',-1);
-        if isempty(ext)
+        fn_parts=cosmo_strsplit(fn,'.');
+        if numel(fn_parts)<2
             error('Filename needs extension');
         end
+        ext=fn_parts{end};
 
         ext2writer=struct();
         ext2writer.txt=@write_eeglab_txt;
@@ -81,7 +82,7 @@ function write_eeglab_txt(fn, hdr)
 
 function write_ft(fn,hdr)
     % use matlab save
-    save(fn, '-struct', hdr);
+    save(fn, '-struct', 'hdr');
 
 
 function tf=is_ft_timelock(ft)
