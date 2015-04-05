@@ -60,7 +60,7 @@ function test_meeg_dataset()
 function test_synthetic_meeg_dataset()
     combis=cosmo_cartprod({{'timelock','timefreq','source'},...
                             {'tiny','small','normal','big','huge'}});
-    for k=1:size(combis,1)
+    for k=1:4:size(combis,1)
         ds=cosmo_synthetic_dataset('type',combis{k,1},...
                                         'size',combis{k,2});
 
