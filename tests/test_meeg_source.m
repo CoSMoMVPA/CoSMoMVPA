@@ -5,7 +5,7 @@ function test_suite=test_meeg_source()
 function test_meeg_dataset()
     tps={'freq_pow','time_mom','rpt_trial_mom',...
                         'rpt_trial_pow','strange_ft_lcmv_pow'};
-    for j=5:numel(tps)
+    for j=1:numel(tps)
         is_ft_strange_lcmv_avg_pow=isequal(cosmo_strsplit(tps{j},'_',1),...
                                                 'strange');
 
@@ -119,9 +119,8 @@ function test_meeg_dataset()
             ft2.inside=struct();
             assertExceptionThrown(@()cosmo_meeg_dataset(ft2),'');
         end
-
-
     end
+
 
 
 function test_meeg_fmri_dataset()
