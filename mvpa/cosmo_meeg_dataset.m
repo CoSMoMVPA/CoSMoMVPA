@@ -482,27 +482,17 @@ function ds=read_eeglab_txt(fn, unused)
     timepoints=cell_data{1};
     nrows=numel(timepoints);
 
-    % check that timepoints are increasing for each trial, and repeating
-    t_start=min(timepoints);
-    t_end=max(timepoints);
-
-    pos_start=find(timepoints==t_start,1,'first');
-    pos_end=find(timepoints==t_end,1,'first');
-
-    % onsets of the first trial
-    t_trial=timepoints(pos_start:pos_end);
-
-    % number of timepoints per trial
+    [unused,t_trial]=cosmo_index_unique(timepoints);
     ntime=numel(t_trial);
+
+    if mod(nrows,ntime)~=0 || ...
+                ~all(all(bsxfun(@eq,reshape(timepoints,ntime,[]),...
+                                  t_trial)))
+        error('Data not contiguous or unexpected order of time points');
+    end
 
     % number of trials
     ntrial=nrows/ntime;
-
-    % ensure time points are set properly
-    if pos_start~=1 || round(ntrial)~=ntrial || ...
-            ~isequal(repmat(t_trial,ntrial,1), timepoints)
-        error('Data not contiguous or unexpected order of time points');
-    end
 
 
     %%%%%%%%%%%%%%%
@@ -516,8 +506,8 @@ function ds=read_eeglab_txt(fn, unused)
     %%%%%%%%%%%%%%%
     % flatten and make it a dataset
     % (convert miliseconds to seconds along the way)
-    dim_labels={'chan','time'};
-    dim_values={chan_labels, .001*t_trial'};
+    dim_labels={'chan';'time'};
+    dim_values={chan_labels;.001*t_trial'};
 
     % make a dataset
     ds=cosmo_flatten(data, dim_labels, dim_values);

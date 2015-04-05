@@ -71,6 +71,48 @@ function test_synthetic_meeg_dataset()
         assertEqual(ds.a.meeg.samples_field,ds2.a.meeg.samples_field);
     end
 
+function test_meeg_eeglab_io()
+    ds=cosmo_synthetic_dataset('type','meeg');
+
+    tmp_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
+    file_remover=onCleanup(@()delete(tmp_fn));
+    fid=fopen(tmp_fn,'w');
+    file_closer=onCleanup(@()fclose(fid));
+
+    chans=[{' '} ds.a.fdim.values{1}];
+    fprintf(fid,'%s\t',chans{:});
+    fprintf(fid,'\n');
+
+    times=ds.a.fdim.values{2};
+    ntime=numel(times);
+    nsamples=size(ds.samples,1);
+
+    for k=1:nsamples
+        for j=1:ntime
+            data=ds.samples(k,ds.fa.time==j);
+            fprintf(fid,'%.3f',times(j));
+            fprintf(fid,'\t%.4f',data);
+            fprintf(fid,'\n');
+        end
+    end
+
+    ds2=cosmo_meeg_dataset(tmp_fn);
+    assertElementsAlmostEqual(ds.samples,ds2.samples,'absolute',1e-4);
+    assertEqual(ds.a.fdim.values{1},ds2.a.fdim.values{1});
+    assertElementsAlmostEqual(ds.a.fdim.values{2},...
+                                    1000*ds2.a.fdim.values{2});
+    assertEqual(ds.a.fdim.labels,ds2.a.fdim.labels);
+    assertEqual(ds.fa,ds2.fa);
+
+    % add bogus data
+    fprintf(fid,'.3');
+    assertExceptionThrown(@()cosmo_meeg_dataset(tmp_fn),'');
+
+    tmp2_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
+    file_remover2=onCleanup(@()delete(tmp2_fn));
+    cosmo_map2meeg(ds2,tmp2_fn);
+    ds3=cosmo_meeg_dataset(tmp2_fn);
+    assertEqual(ds2,ds3);
 
 
 function dimords=get_dimords()
