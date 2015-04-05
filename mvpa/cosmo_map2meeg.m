@@ -53,42 +53,42 @@ function hdr=cosmo_map2meeg(ds, fn)
 
 
 function write_eeglab_txt(fn, hdr)
-
-    dimords=cosmo_strsplit(hdr.dimord,'_');
-    if numel(dimords)~=3 || ~isequal(dimords(2:3),{'chan','time'})
-        error('Only support timelock data with dimord=..._chan_time');
-    end
-
-    data=hdr.trial;
-
-    % make an array to contain output data in 2D eeglab form
-    [ntrial, nchan, ntime]=size(data);
-    arr=zeros(nchan+1,ntrial*ntime);
-
-    % set time dimension - and convert seconds to miliseconds
-    arr(1,:)=repmat(hdr.time(:)*1000,ntrial,1);
-
-    % set channel data
-    for k=1:nchan
-        arr(k+1,:)=reshape(squeeze(data(:,k,:)),[],1);
+    if ~is_ft_timelock(hdr)
+        error('Only time-lock data is supported for EEGlab data');
     end
 
     % prepare header
-    header=cosmo_strjoin([{''}, hdr.label(:)'],'\t');
+    header=[cosmo_strjoin([{' '}, hdr.label(:)',{''}],'\t') '\n'];
+
+    % prepare body
+    data=hdr.trial;
+    [ntrial, nchan, ntime]=size(data);
+    arr=zeros(ntrial*ntime,nchan+1);
+
+    % set time dimension - and convert seconds to miliseconds
+    arr(:,1)=repmat(hdr.time(:)*1000,ntrial,1);
+    arr(:,2:end)=reshape(shiftdim(data,2),ntime*ntrial,nchan);
 
     % prepare pattern to write data in array
-    arr_pat=cosmo_strjoin(repmat({'%.4f'},1,nchan+1),'\t');
+    arr_pat=[cosmo_strjoin(repmat({'%.4f'},1,nchan+1),'\t') '\n'];
 
     % write data
     fid=fopen(fn,'w');
-    fprintf(fid,[header '\n']);
-    fprintf(fid,[arr_pat '\n'], arr);
+    fprintf(fid,header);
+    fprintf(fid,arr_pat,arr'); % transpose because order is row then column
     fclose(fid);
 
 
 function write_ft(fn,hdr)
     % use matlab save
     save(fn, '-struct', hdr);
+
+
+function tf=is_ft_timelock(ft)
+    tf=isstruct(ft) && ...
+            isfield(ft,'dimord') && ...
+            cosmo_match({ft.dimord}, {'rpt_chan_time','chan_time'});
+
 
 
 function samples_field=ft_detect_samples_field(ds, is_single_sample)
