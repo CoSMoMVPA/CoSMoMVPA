@@ -4,8 +4,12 @@ function test_suite=test_meeg_source()
 
 function test_meeg_dataset()
     tps={'freq_pow','time_mom','rpt_trial_mom',...
-                        'rpt_trial_pow'};
-    for j=1:numel(tps)
+                        'rpt_trial_pow','strange_ft_lcmv_pow'};
+    for j=5:numel(tps)
+        is_ft_strange_lcmv_avg_pow=isequal(cosmo_strsplit(tps{j},'_',1),...
+                                                'strange');
+
+
         [ft,fdim,data_label]=generate_ft_source(tps{j});
         ds=cosmo_meeg_dataset(ft);
 
@@ -16,7 +20,12 @@ function test_meeg_dataset()
         sub_key=data_label{2};
 
         ft_first_sample_all=ft.(key).(sub_key);
-        ft_first_sample=ft_first_sample_all(ft.inside,:);
+
+        if is_ft_strange_lcmv_avg_pow
+            ft_first_sample=ft_first_sample_all(:,ft.inside);
+        else
+            ft_first_sample=ft_first_sample_all(ft.inside,:);
+        end
 
         switch sub_key
             case 'mom'
@@ -35,6 +44,9 @@ function test_meeg_dataset()
                                             'matrix_labels','pos');
 
 
+        if is_ft_strange_lcmv_avg_pow
+            ft_arr=ft_arr';
+        end
         assertEqual(ft_arr(ft_arr~=0),ds.samples(:));
         assertEqual(ft_labels, fdim.labels);
         assertEqual(ft_values, fdim.values);
@@ -68,6 +80,11 @@ function test_meeg_dataset()
         end
 
         ds_sel=cosmo_slice(cosmo_slice(ds,~ds_msk,2),ft_idx{1});
+
+        if is_ft_strange_lcmv_avg_pow
+            ft_idx=ft_idx(2:end);
+        end
+
         ft_sel=ft_arr(ft_idx{:});
 
         if ft_sel==0
@@ -83,7 +100,14 @@ function test_meeg_dataset()
         ds2=cosmo_slice(ds,randperm(nfeatures),2);
 
         ft2=cosmo_map2meeg(ds2);
+
+        if is_ft_strange_lcmv_avg_pow
+            ft2.avg.pow=ft2.avg.pow';
+            ft2.time=ft.time;
+        end
+
         assertEqual(ft,ft2);
+
 
         if j==1
             % test compatibility with old fieldtrip
@@ -113,7 +137,6 @@ function test_meeg_fmri_dataset()
     ds_vol=rmfield(ds_vol,'sa');
     ds_ft_fmri=rmfield(ds_ft_fmri,'sa');
     assertEqual(ds_vol,ds_ft_fmri);
-
 
 
 function [ft,fdim,data_label]=generate_ft_source(tp)
@@ -163,6 +186,18 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
             fdim.labels={'pos';'mom';'time'};
             fdim.values={ft.pos';mom_labels;time(:)'};
             data_label={'trial','mom'};
+
+        case 'strange_ft_lcmv_pow'
+            % FT with LCMV source puts .avg data in a 1xNSOURCE matrix,
+            % even with NTIME>1 timepoints. In this case, the output
+            % dataset structure has the time points averaged.
+            ft.time=time;
+            ft.method='average';
+            ft.avg=generate_data(ft.inside,1,1,'pow');
+            ft.avg.pow=ft.avg.pow';
+            fdim.labels={'pos';'time'};
+            fdim.values={ft.pos';mean(time)};
+            data_label={'avg','pow'};
 
         otherwise
             error('unsupported type %s', tp);

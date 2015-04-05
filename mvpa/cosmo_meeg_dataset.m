@@ -6,9 +6,10 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 % Inputs:
 %   filename          filename of MEEG data to be loaded. Currently this
 %                     can be a .mat file (for FieldTrip) with timelocked or
-%                     time-frequency data, or .txt (exported EEGLab) for
-%                     timelocked data. Alternatively it can be a FieldTrip
-%                     struct with timelocked or time-frequency data.
+%                     time-frequency data at either the sensor or source
+%                     level, or .txt (exported EEGLab) with timelocked
+%                     data. Alternatively it can be a FieldTrip struct with
+%                     timelocked or time-frequency data.
 %   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
@@ -173,12 +174,12 @@ function ds=read_ft(filename, opt)
 function ds=convert_ft(ft, opt)
     [data, samples_field, fdim]=get_ft_data(ft, opt);
 
-    ds=cosmo_flatten(data, fdim.dim_labels, fdim.dim_values,2,...
+    ds=cosmo_flatten(data, fdim.labels, fdim.values,2,...
                                 'matrix_labels',get_ft_matrix_labels());
     ds.a.meeg.samples_field=samples_field;
 
     if is_ft_source_struct(ft)
-        ds=apply_ft_source_inside(ds,fdim.dim_labels,fdim.dim_values,...
+        ds=apply_ft_source_inside(ds,fdim.labels,fdim.values,...
                                         ft.inside);
     end
 
@@ -203,10 +204,55 @@ function [data,samples_field,fdim]=get_ft_data(ft,opt)
         end
     end
 
-    fdim.dim_labels=dim_labels;
-    fdim.dim_values=dim_values;
+    fdim.labels=dim_labels;
+    fdim.values=dim_values;
 
-    fdim=add_ft_mom_field_if_present(fdim, samples_field);
+    if is_ft_source_struct(ft)
+        fdim=add_ft_mom_field_if_present(fdim, samples_field);
+        [data,fdim]=fix_ft_lcmv_if_necessary(data,fdim);
+    end
+
+
+function [data,fdim]=fix_ft_lcmv_if_necessary(data,fdim)
+    % FT LCMV does something weird for average data; the .avg.pow field
+    % is 1xNCHAN for a NCHAN x NTIME field.
+    % To address this:
+    % - reshape the data
+    % - average the time field
+    dim_labels=fdim.labels;
+    data_size=size(data);
+
+    pos_pos=find(cosmo_match(dim_labels,'pos'));
+    if ~isempty(pos_pos) && ... % has pos field
+                pos_pos<numel(dim_labels)
+
+        npos=size(fdim.values{pos_pos},2);
+        next_dim_pos=pos_pos+1;
+
+        if data_size(pos_pos+1)==1 && data_size(next_dim_pos+1)==npos
+            new_data_size=data_size;
+
+            % fix with next dimension
+            new_data_size(pos_pos+1)=npos;
+            new_data_size(next_dim_pos+1)=1;
+
+            data=reshape(data,new_data_size);
+
+            % the next dimension (typically time) is averaged if
+            % necessary
+            next_dim_value=fdim.values{next_dim_pos};
+            if numel(next_dim_value)~=1
+                fdim.values{next_dim_pos}=mean(next_dim_value);
+            end
+
+        end
+    end
+
+
+
+
+
+
 
 
 function fdim=add_ft_mom_field_if_present(fdim, samples_field)
@@ -215,12 +261,12 @@ function fdim=add_ft_mom_field_if_present(fdim, samples_field)
     has_mom=numel(samples_field_split)==2 && ...
                     strcmp(samples_field_split{2},'mom');
     if has_mom
-        fdim.dim_labels=[fdim.dim_labels(1);...
+        fdim.labels=[fdim.labels(1);...
                                 {'mom'};...
-                                fdim.dim_labels(2:end)];
-        fdim.dim_values=[fdim.dim_values(1);...
+                                fdim.labels(2:end)];
+        fdim.values=[fdim.values(1);...
                                 {{'x','y','z'}};...
-                                fdim.dim_values(2:end)];
+                                fdim.values(2:end)];
     end
 
 
