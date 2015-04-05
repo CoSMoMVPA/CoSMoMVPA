@@ -80,10 +80,21 @@ function test_meeg_dataset()
 
         %re-order features
         nfeatures=size(ds.samples,2);
-        ds=cosmo_slice(ds,randperm(nfeatures),2);
+        ds2=cosmo_slice(ds,randperm(nfeatures),2);
 
-        ft2=cosmo_map2meeg(ds);
+        ft2=cosmo_map2meeg(ds2);
         assertEqual(ft,ft2);
+
+        if j==1
+            % test compatibility with old fieldtrip
+
+            ft2.inside=find(ft2.inside);
+            ds3=cosmo_meeg_dataset(ft2);
+            assertEqual(ds,ds3);
+
+            ft2.inside=struct();
+            assertExceptionThrown(@()cosmo_meeg_dataset(ft2),'');
+        end
 
 
     end
