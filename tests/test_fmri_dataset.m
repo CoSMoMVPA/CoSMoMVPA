@@ -220,10 +220,10 @@ function bv_vmp=get_expected_bv_vmp()
     bv_vmp.ZStart = 124;
     bv_vmp.ZEnd = 130;
 
-    map1.VMPData=reshape([-0.2040   -1.0504   -0.2617   -3.6849    1.3494    2.0317],...
-                                                        [2 1 3]);
-    map2.VMPData=reshape([3.0349 -1.3077 4.4438 2.5365 0.3426 1.8339],...
-                                                        [2 1 3]);
+    map1.VMPData=reshape([-0.2040   -1.0504   -0.2617   ...
+                            -3.6849    1.3494    2.0317],[2 1 3]);
+    map2.VMPData=reshape([0.4823 -1.3265 2.3387 ...
+                            1.7235 -0.3973 0.5838],[2 1 3]);
     bv_vmp.Map=cat(1,map1,map2);
 
 function bv_vmr=get_expected_bv_vmr()
@@ -263,6 +263,8 @@ function bv_vmr=get_expected_bv_vmr()
     data(:,:,2) = [ 153 0 ];
     data(:,:,3) = [ 225 255 ];
     bv_vmr.VMRData=data;
+
+
 
 function afni=get_expected_afni()
 
