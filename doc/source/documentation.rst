@@ -18,6 +18,7 @@ Overview
    contact
    contribute
    thanks
+   copyright
 
 Detailed
 --------
