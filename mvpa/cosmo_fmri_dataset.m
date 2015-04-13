@@ -596,7 +596,7 @@ function [mx, xform]=get_nifti_transform(hdr, varargin)
         case 'sform'
             key=hdr.hist.sform_code;
         case 'qform'
-            key=hdr.qform.qform_code;
+            key=hdr.hist.qform_code;
         otherwise
             key=0;
     end

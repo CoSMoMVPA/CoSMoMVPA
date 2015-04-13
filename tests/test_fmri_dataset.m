@@ -13,12 +13,18 @@ function test_afni_fmri_dataset()
     ds_afni=cosmo_fmri_dataset(afni);
     assert_dataset_equal(ds,ds_afni);
 
-function test_nii_fmri_dataset()
+function test_nii_sform_fmri_dataset()
     ds=get_base_dataset();
     nii=cosmo_map2fmri(ds,'-nii');
-    assertAlmostEqualWithTol(nii, get_expected_nii());
+    assertAlmostEqualWithTol(nii, get_expected_nii_sform());
     ds_nii=cosmo_fmri_dataset(nii);
     assert_dataset_equal(ds,ds_nii);
+
+function test_nii_qform_fmri_dataset()
+    ds=get_base_dataset();
+    ds_nii=cosmo_fmri_dataset(get_expected_nii_qform());
+    assert_dataset_equal(ds,ds_nii);
+
 
 function test_bv_vmr_fmri_dataset()
     if ~can_test_bv()
@@ -259,7 +265,22 @@ function ds=get_expected_dataset()
     ds.a.vol.xform='scanner_anat';
 
 
-function nii=get_expected_nii()
+function nii=get_expected_nii_sform()
+    nii=get_expected_nii_helper();
+    nii.hdr.hist.sform_code = 1;
+
+    fields_to_clear={'quatern_b','quatern_c','quatern_d',...
+                        'qoffset_x','qoffset_y','qoffset_z'};
+    nii.hdr.hist=clear_fields(nii.hdr.hist,fields_to_clear);
+
+function nii=get_expected_nii_qform()
+    nii=get_expected_nii_helper();
+    nii.hdr.hist.qform_code = 1;
+
+    fields_to_clear={'srow_x','srow_y','srow_z'};
+    nii.hdr.hist=clear_fields(nii.hdr.hist,fields_to_clear);
+
+function nii=get_expected_nii_helper()
     hdr=struct();
     hdr.dime.datatype = 16;
     hdr.dime.dim = [ 4 3 2 1 2 1 1 1 ];
@@ -285,21 +306,29 @@ function nii=get_expected_nii()
     hdr.hk.session_error = 0;
     hdr.hk.regular='r';
     hdr.hk.dim_info = 0;
-    hdr.hist.sform_code = 1;
+
     hdr.hist.descrip='';
     hdr.hist.aux_file='';
     hdr.hist.intent_name='';
-    hdr.hist.qform_code = 0;
-    hdr.hist.quatern_b = 0;
-    hdr.hist.quatern_d = 0;
-    hdr.hist.qoffset_x = 0;
-    hdr.hist.qoffset_y = 0;
-    hdr.hist.qoffset_z = 0;
     hdr.hist.srow_x = [ 2 0 0 -1 ];
     hdr.hist.srow_y = [ 0 2 0 -1 ];
     hdr.hist.srow_z = [ 0 0 2 -1 ];
     hdr.hist.quatern_c = 0;
     hdr.hist.originator = [ 2 1 1 1 ];
+
+    hdr.hist.sform_code = 0;
+    hdr.hist.qform_code = 0;
+
+    % set up qform
+    m=[hdr.hist.srow_x;hdr.hist.srow_y;hdr.hist.srow_z];
+    quatern_a=.5*sqrt(1+m(1,1)+m(2,2)+m(3,3));
+    hdr.hist.quatern_b = .25*(m(3,2)-m(2,3)) / quatern_a;
+    hdr.hist.quatern_c = .25*(m(1,3)-m(3,1)) / quatern_a;
+    hdr.hist.quatern_d = .25*(m(2,1)-m(1,2)) / quatern_a;
+
+    hdr.hist.qoffset_x = m(1,4);
+    hdr.hist.qoffset_y = m(2,4);
+    hdr.hist.qoffset_z = m(3,4);
 
     data=zeros(3,2,1,2);
     data(:,:,1,1)=[ 2.0317  1.3494; -3.6849 -0.2617; -1.0504   -0.2040];
@@ -309,4 +338,12 @@ function nii=get_expected_nii()
     nii.hdr=hdr;
     nii.img=single(data);
 
+function s=clear_fields(s,keys);
+    n=numel(keys);
+    for k=1:n
+        key=keys{k};
+        v=s.(key);
+        v(:)=0;
+        s.(key)=v;
+    end
 
