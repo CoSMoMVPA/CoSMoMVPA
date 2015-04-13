@@ -76,6 +76,23 @@ function test_bv_msk_fmri_dataset()
     ds_bv_msk_lpi=cosmo_fmri_reorient(ds_bv_msk,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_msk_lpi,'translation');
 
+function test_bv_glm_subject_fmri_dataset()
+    if ~can_test_bv()
+        return
+    end
+
+    % no support for map2fmri, so just test with neuroelf struct
+    ds=get_base_dataset();
+
+    xff_bv_glm=get_expected_xff_bv_glm();
+    cleaner=onCleanup(@()xff_bv_glm.ClearObject());
+    bless(xff_bv_glm);
+
+    ds_bv_glm=cosmo_fmri_dataset(xff_bv_glm);
+    ds_bv_glm_lpi=cosmo_fmri_reorient(ds_bv_glm,'LPI');
+
+    assert_dataset_equal(ds,ds_bv_glm_lpi,'translation');
+
 
 function tf=can_test_bv()
     tf=cosmo_wtf('is_matlab') && cosmo_check_external('neuroelf',false);
@@ -135,12 +152,38 @@ function assert_bv_equal(x_xff, y_struct)
         y=y_struct.(key);
         x=x_xff.(key);
         if isstruct(x)
-            assert_bv_equal(x,y)
+            for j=1:numel(x)
+                assert_bv_equal(x(j),y(j))
+            end
         else
             assertAlmostEqualWithTol(x,y);
         end
 
     end
+
+function xff_bv_glm=get_expected_xff_bv_glm()
+    xff_bv_glm=xff('new:glm');
+    xff_bv_glm.NrOfSubjects=1;
+    xff_bv_glm.NrOfPredictors=2;
+    xff_bv_glm.Predictor=struct('Name1',{'1','2'},...
+                                'Name2',{'1','2'},...
+                                'RGB',{[255 0 0] [0 255 0]});
+    xff_bv_glm.Resolution=2;
+    xff_bv_glm.XStart = 126;
+    xff_bv_glm.XEnd = 130;
+    xff_bv_glm.YStart = 128;
+    xff_bv_glm.YEnd = 130;
+    xff_bv_glm.ZStart = 124;
+    xff_bv_glm.ZEnd = 130;
+
+    data=zeros(2,1,3,2);
+    data_size=size(data);
+    mat_size=data_size(1:3);
+    data(:,:,:,1)=reshape([ -0.2040   -1.0504   -0.2617 ...
+                            -3.6849    1.3494    2.0317], mat_size);
+    data(:,:,:,2)=reshape([0.4823 -1.3265 2.3387 ...
+                            1.7235 -0.3973 0.5838], mat_size);
+    xff_bv_glm.GLMData.BetaMaps=data;
 
 function bv_msk=get_expected_bv_msk()
     bv_msk=struct();
