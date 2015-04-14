@@ -109,6 +109,7 @@ function test_mask_fmri_dataset()
 
 
     aet(ds,'mask','foo');
+    aet(ds,'mask','-foo');
     aet(ds,'mask',ds);
     aet(ds,'mask',struct);
 
@@ -120,6 +121,8 @@ function test_mask_fmri_dataset()
 
     x4=cosmo_fmri_dataset(ds,'mask','-all');
     assertEqual(x4,cosmo_slice(ds,[1 2 3 4 5],2));
+
+
 
 
 function test_meeg_source_fmri_dataset()
