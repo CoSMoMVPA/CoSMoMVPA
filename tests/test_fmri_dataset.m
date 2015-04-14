@@ -94,6 +94,36 @@ function test_bv_glm_subject_fmri_dataset()
     assert_dataset_equal(ds,ds_bv_glm_lpi,'translation');
 
 
+function test_mask_fmri_dataset()
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_fmri_dataset(varargin{:}),'');
+    ds=cosmo_synthetic_dataset();
+    ds.samples(:,[2 6])=0;
+
+    x=cosmo_fmri_dataset(ds,'mask','-auto');
+    assertEqual(x,cosmo_slice(ds,[1 3 4 5],2));
+    x1=cosmo_fmri_dataset(ds,'mask',true);
+    assertEqual(x1,x);
+    x2=cosmo_fmri_dataset(ds,'mask',false);
+    assertEqual(x2,ds);
+
+
+    aet(ds,'mask','foo');
+    aet(ds,'mask',ds);
+    aet(ds,'mask',struct);
+
+    ds.samples(1,2)=1;
+    aet(ds,'mask','-auto');
+
+    x3=cosmo_fmri_dataset(ds,'mask','-any');
+    assertEqual(x3,x);
+
+    x4=cosmo_fmri_dataset(ds,'mask','-all');
+    assertEqual(x4,cosmo_slice(ds,[1 2 3 4 5],2));
+
+
+
+
 function tf=can_test_bv()
     tf=cosmo_wtf('is_matlab') && cosmo_check_external('neuroelf',false);
     if ~tf
