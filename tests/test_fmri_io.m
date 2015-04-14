@@ -227,6 +227,11 @@ function ds_again=save_and_load(ds,ext)
         case '.mat'
             save(fn,'ds');
         otherwise
+            % disable automask warning
+            warning_state=cosmo_warning();
+            state_resetter=onCleanup(@()cosmo_warning(warning_state));
+            cosmo_warning('off');
+
             cosmo_map2fmri(ds,fn);
     end
 
