@@ -320,7 +320,7 @@ function sample_field=get_sample_dimord_field(ft)
         ft_dimord_fields=cosmo_strsplit(ft.dimord,'_');
         msk=cosmo_match(ft_dimord_fields,sample_dimord_fields);
         if any(msk)
-            assert(sum(msk)==1)
+            assert(sum(msk)==1);
             sample_field=sample_dimord_fields{msk};
         end
     end
@@ -520,14 +520,13 @@ function ds=read_eeglab_txt(fn, unused)
     chan_labels=chan_labels(2:(end-1)); % omit first & last bogus element
 
     nchan=numel(chan_labels);
-    data_pat=cosmo_strjoin(repmat({'%n'},1,nchan+1),'\t');
+    data_pat=cosmo_strjoin(repmat({'%n'},1,nchan+1),' ');
 
     % read data from file
     cell_data=textscan(fid,data_pat);
 
     % check all data was read
     neg_one=fgetl(fid);
-    fgetl(fid);
     if neg_one~=-1
         error('Could not read all data from %s', fn);
     end
@@ -564,7 +563,7 @@ function ds=read_eeglab_txt(fn, unused)
     % flatten and make it a dataset
     % (convert miliseconds to seconds along the way)
     dim_labels={'chan';'time'};
-    dim_values={chan_labels;.001*t_trial'};
+    dim_values={chan_labels(:)';.001*t_trial(:)'};
 
     % make a dataset
     ds=cosmo_flatten(data, dim_labels, dim_values);
