@@ -194,6 +194,14 @@ function assert_a_equal(xd,yd,ext)
 function assert_fa_equal(x,y,ext)
     assertEqual(x.fa,y.fa);
 
+function assert_sa_equal(x,y,ext)
+    ignore_sa_exts={'.nii','.nii.gz','.hdr','.img','.vmr','.msk'};
+    if cosmo_match({ext},ignore_sa_exts)
+        return;
+    end
+
+    assertEqual(x.sa,y.sa);
+
 
 function s=rmfield_if_present(s, f)
     if isfield(s,f)
@@ -205,6 +213,9 @@ function x=get_base_dataset()
     x=cosmo_synthetic_dataset('size','big');
     x=cosmo_fmri_reorient(x,'ASR');
     x=cosmo_slice(x,1);
+    x.sa=struct();
+    x.sa.labels={'labels1'};
+    x.sa.stats={'Ttest(17)'};
 
 function ds_again=save_and_load(ds,ext)
     pat=['tmp%d' ext];
