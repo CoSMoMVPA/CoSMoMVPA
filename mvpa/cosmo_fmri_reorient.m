@@ -82,7 +82,8 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
     cosmo_check_dataset(ds,'fmri');
 
     ds_orient=cosmo_fmri_orientation(ds);
-    [perm, flip]=get_transform(ds_orient,upper(new_orient));
+    upper_new_orient=upper(new_orient);
+    [perm, flip]=get_transform(ds_orient,upper_new_orient);
 
     fmri_dim_labels={'i','j','k'};
 
@@ -125,7 +126,7 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
     [foo,i]=sort(ind);
     ds=cosmo_slice(ds,i,2,false);
 
-    assert(isequal(cosmo_fmri_orientation(ds),new_orient));
+    assert(isequal(cosmo_fmri_orientation(ds),upper_new_orient));
 
 
 
