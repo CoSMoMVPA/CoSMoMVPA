@@ -122,6 +122,9 @@ function test_mask_fmri_dataset()
     assertEqual(x4,cosmo_slice(ds,[1 2 3 4 5],2));
 
 
+function test_meeg_source_fmri_dataset()
+    ds=cosmo_synthetic_dataset('type','source');
+    res=cosmo_fmri_dataset(ds);
 
 
 function tf=can_test_bv()
