@@ -63,6 +63,22 @@ function test_fmri_io_base
         cosmo_notify_test_skipped(reason);
     end
 
+function test_fmri_io_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_fmri_dataset(varargin{:}),'');
+
+    fn=get_temp_filename('test.mat');
+    cleaner=onCleanup(@()delete_files({fn}));
+
+    x=struct();
+    save(fn,'x');
+    aet(fn);
+
+    x=1;
+    y=1;
+    save(fn,'x','y');
+    aet(fn);
+
 
 
 function assert_dataset_equal(x,y,ext)
