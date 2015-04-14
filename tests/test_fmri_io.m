@@ -115,6 +115,12 @@ function test_fmri_io_mask
     x=cosmo_fmri_dataset(fn,'mask',fn2);
     assert_dataset_equal(x,ds,'.nii')
 
+    m_rsa=cosmo_fmri_reorient(m,'RSA');
+    cosmo_map2fmri(m_rsa,fn2);
+    x=cosmo_fmri_dataset(fn,'mask',fn2);
+    assert_dataset_equal(x,ds,'.nii')
+
+
 
 
 
