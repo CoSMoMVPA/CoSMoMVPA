@@ -67,7 +67,8 @@ function test_fmri_io_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...
                             cosmo_fmri_dataset(varargin{:}),'');
 
-    fn=get_temp_filename('test.mat');
+    fn=get_temp_filename('test%d.mat');
+    fn2=get_temp_filename('test%d+orig.HEAD');
     cleaner=onCleanup(@()delete_files({fn}));
 
     x=struct();
@@ -78,6 +79,16 @@ function test_fmri_io_exceptions()
     y=1;
     save(fn,'x','y');
     aet(fn);
+
+    % incomplete AFNI struct
+    x=struct();
+    x.DATASET_DIMENSIONS=[];
+    x.DATASET_RANK=[];
+    aet(x);
+
+    % illegal AFNI file
+    save(fn2,'x');
+    aet(fn2);
 
 
 
