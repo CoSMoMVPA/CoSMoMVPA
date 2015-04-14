@@ -72,7 +72,7 @@ function test_bv_msk_fmri_dataset()
 
     assert_bv_equal(bv_msk, get_expected_bv_msk());
 
-    ds_bv_msk=cosmo_fmri_dataset(bv_msk);
+    ds_bv_msk=cosmo_fmri_dataset(bv_msk,'mask',false);
     ds_bv_msk_lpi=cosmo_fmri_reorient(ds_bv_msk,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_msk_lpi,'translation');
 
