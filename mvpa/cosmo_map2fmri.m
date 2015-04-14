@@ -225,10 +225,10 @@ function ni=new_nii(ds)
     a=ds.a;
     vol=a.vol;
     vol_data=unflatten(ds);
-    dim=size(vol_data);
-    if numel(dim)==3
-        dim(4)=1;
-    end
+    dim_all=[4 ones(1,7)];
+    vol_dim=size(vol_data);
+    nvol_dim=numel(vol_dim);
+    dim_all(1+(1:nvol_dim))=vol_dim;
 
     mat=vol.mat;
     mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*[1 1 1]';
@@ -237,7 +237,7 @@ function ni=new_nii(ds)
 
     dime=struct();
     dime.datatype=16; %single
-    dime.dim=[4 dim(:)' 1 1 1];
+    dime.dim=dim_all;
     dime.pixdim=[0 abs(pix_dim(:))' 0 0 0 0]; % ensure positive values
 
     fns={'intent_p1','intent_p2','intent_p3','intent_code',...
@@ -280,7 +280,9 @@ function ni=new_nii(ds)
     hist.srow_y=mat(2,:);
     hist.srow_z=mat(3,:);
     hist.quatern_c=0;
-    hist.originator=round(dim(:)'/2); % otherwise complaints with hdr/img
+
+    % required to avoid complaints with hdr/img
+    hist.originator=round(dim_all(2:5)/2);
     hdr.hist=hist;
 
     ni.img=single(vol_data);
