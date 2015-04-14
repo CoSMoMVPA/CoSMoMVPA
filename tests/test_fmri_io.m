@@ -7,7 +7,7 @@ function test_fmri_io_base
     x=x_base;
     exts={'.nii.gz', '.nii', '.hdr', '.img', '+orig.HEAD',...
               '+tlrc.BRIK','.vmp',...
-              '.vmr', '.msk', };
+              '.vmr', '.msk', '.mat'};
 
     skips=struct();
 
@@ -123,8 +123,13 @@ function ds_again=save_and_load(ds,ext)
     fn2=get_sibling(fn,ext);
     cleaner=onCleanup(@()delete_files({fn,fn2}));
 
+    switch ext
+        case '.mat'
+            save(fn,'ds');
+        otherwise
+            cosmo_map2fmri(ds,fn);
+    end
 
-    cosmo_map2fmri(ds,fn);
     ds_again=cosmo_fmri_dataset(fn);
 
 function sib_fn=get_sibling(fn,ext)
