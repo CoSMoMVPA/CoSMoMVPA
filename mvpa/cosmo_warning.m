@@ -26,14 +26,23 @@ function varargout=cosmo_warning(message, varargin)
             case 0
                 warning();
             case 1
-                s=warning();
-                s.when_show_warning=when_show_warning;
-                s.shown_warnings=shown_warnings;
-                varargout{1}=s;
+                warning_state=warning();
+                warning_state.when_show_warning=when_show_warning;
+                warning_state.shown_warnings=shown_warnings;
+                varargout{1}=warning_state;
             otherwise
                 assert(false);
         end
         return
+    end
+
+    if isstruct(message)
+        % input was warning state
+        warning_state=message;
+        warning(warning_state);
+        when_show_warning=warning_state.when_show_warning;
+        shown_warnings=warning_state.shown_warnings;
+        return;
     end
 
     if isnumeric(when_show_warning)
@@ -109,7 +118,8 @@ function varargout=cosmo_warning(message, varargin)
     end
 
     if show_warning
-        s=warning(); % store state
+        warning_state=warning(); % store state
+        state_resetter=onCleanup(@()warning(warning_state));
 
         warning('on');
         % avoid extra entry on the stack
@@ -118,5 +128,5 @@ function varargout=cosmo_warning(message, varargin)
         else
             warning('%s',full_message);
         end
-        warning(s); % reset state
+
     end
