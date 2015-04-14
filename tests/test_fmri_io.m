@@ -90,6 +90,12 @@ function test_fmri_io_exceptions()
     save(fn2,'x');
     aet(fn2);
 
+    % wrong dimension size
+    ds=cosmo_synthetic_dataset();
+    afni=cosmo_map2fmri(ds,'-afni');
+    afni.img=zeros(1,1,1,1,5);
+    aet(afni);
+
 
 
 function assert_dataset_equal(x,y,ext)
