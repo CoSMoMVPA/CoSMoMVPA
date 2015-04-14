@@ -266,19 +266,20 @@ function ds=convert_to_dataset(fn, params)
     data_size = size(data);
     ndim = numel(data_size);
 
-    switch ndim
-        case 3
-            % simple reshape operation
-            data=reshape(data,[1 data_size]);
-        case 4
-            % make temporal dimension the first one
-            data=shiftdim(data,3);
-        otherwise
-            error('need 3 or 4 dimensions, found %d', ndim);
+    if ndim<4
+        % simple reshape operation
+        data=reshape(data,[1 data_size]);
+    elseif ndim==4
+        data=shiftdim(data,3);
+    else
+        error('need 3 or 4 dimensions, found %d', ndim);
     end
 
-    % number of values in 1 temporal dimension + 3 spatial
-    [unused,ni,nj,nk]=size(data);
+    % number of values in 3 spatial dimensions
+    full_size=[size(data) 1 1];
+    ni=full_size(2);
+    nj=full_size(3);
+    nk=full_size(4);
 
     % make a dataset
     ds=cosmo_flatten(data,{'i';'j';'k'},{1:ni;1:nj;1:nk});
