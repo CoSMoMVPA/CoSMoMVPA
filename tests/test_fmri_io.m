@@ -3,7 +3,6 @@ function test_suite=test_fmri_io
 
 function test_fmri_io_base
     x_base=get_base_dataset();
-    x_base_onesample=cosmo_slice(x_base,1);
 
     x=x_base;
     exts={'.nii.gz', '.nii', '.hdr', '.img', '+orig.HEAD',...
@@ -52,9 +51,6 @@ function test_fmri_io_base
 
         y=save_and_load(x_base,ext);
         assert_dataset_equal(x,y,ext);
-
-        y_onesample=save_and_load(x_base_onesample,ext);
-        assert_dataset_equal(x_base_onesample,y_onesample,ext);
     end
 
 
@@ -101,6 +97,9 @@ function test_fmri_io_exceptions()
     aet(afni);
 
 function test_fmri_io_mask
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_fmri_dataset(varargin{:}),'');
+
     ds=cosmo_synthetic_dataset();
     ds.sa=struct();
     m=cosmo_slice(ds,1);
