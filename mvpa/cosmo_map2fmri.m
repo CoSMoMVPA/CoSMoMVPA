@@ -387,8 +387,8 @@ function hdr=new_bv_vmp(ds)
         map=empty_hdr.Map;
         ds_k=cosmo_slice(ds,k);
         map.VMPData=unflatten(ds_k);
-        if isfield(ds_k,'labels')
-            map.Name=[ds_k.labels{:}];
+        if cosmo_isfield(ds_k,'sa.labels')
+            map.Name=[ds_k.sa.labels{:}];
         end
         if ~isempty(stats)
             map=cosmo_structjoin(map, stats{k});
