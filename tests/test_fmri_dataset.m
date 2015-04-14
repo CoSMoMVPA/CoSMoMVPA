@@ -125,6 +125,16 @@ function test_mask_fmri_dataset()
 function test_meeg_source_fmri_dataset()
     ds=cosmo_synthetic_dataset('type','source');
     res=cosmo_fmri_dataset(ds);
+    assertEqual(ds.samples,res.samples);
+    assertEqual(diag(res.a.vol.mat),[10 10 10 1]');
+
+function test_set_sa_fmri_dataset()
+    ds=cosmo_synthetic_dataset();
+    res=cosmo_fmri_dataset(ds,'targets',1:6,'chunks',3);
+    assertEqual(res.sa.targets,(1:6)');
+    assertEqual(res.sa.chunks,ones(6,1)*3);
+
+    assertExceptionThrown(@()cosmo_fmri_dataset(ds,'targets',[1 2]),'');
 
 
 function tf=can_test_bv()
