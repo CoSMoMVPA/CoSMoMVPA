@@ -385,23 +385,19 @@ function mask=get_mask(ds, mask_param)
             end
 
             % ensure the mask is compatible with the dataset
-            if ~isequal(ds_mask.fa,ds.fa)
-                error('feature attribute mismatch between data and mask');
-            end
-
-            if ~isequal(ds_mask.a.fdim,ds_mask.a.fdim)
-                error('dimension mismatch between data and mask');
+            if ~isequal(ds_mask.fa,ds.fa) || ...
+                            ~isequal(ds_mask.a.fdim,ds_mask.a.fdim)
+                error(['feature attribute or size mismatch between '...
+                                'data and mask']);
             end
 
             % check voxel-to-world mapping
             max_delta=1e-4; % allow for minor tolerance
             delta=max(abs(ds_mask.a.vol.mat(:)-ds.a.vol.mat(:)));
             if delta>max_delta
-                cosmo_disp(ds_mask.a.vol.mat);
-                cosmo_disp(ds.a.vol.mat);
-
                 error(['voxel dimension mismatch between data and mask:'...
-                            '%.5f > %.5f'],delta,max_delta);
+                            'max difference is %.5f > %.5f'],...
+                            delta,max_delta);
             end
 
             % only support single volume
