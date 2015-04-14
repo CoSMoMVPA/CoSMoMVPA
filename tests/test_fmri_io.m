@@ -197,6 +197,9 @@ function temp_path=get_temp_path()
     temp_path=c.temp_path;
 
 function fn=get_temp_filename(pat)
+    if ~any(pat=='%')
+        error('pattern must contain numeric identifier');
+    end
     temp_path=get_temp_path();
     k=0;
     while true
