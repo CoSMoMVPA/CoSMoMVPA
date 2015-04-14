@@ -119,12 +119,43 @@ function test_fmri_io_mask
     x=cosmo_fmri_dataset(fn,'mask',fn2);
     assert_dataset_equal(x,ds,'.nii')
 
+    m_bad_fa=m;
+    m_bad_fa.a.fdim.values{1}=[1 2 3 4];
+    m_bad_fa.a.vol.dim(1)=4;
+    m_bad_fa.fa.i=m.fa.i+1;
+    cosmo_map2fmri(m_bad_fa,fn2);
+    aet(fn,'mask',fn2);
+
+    m_bad_mat=m;
+    m_bad_mat.a.vol.mat(1)=3;
+    cosmo_map2fmri(m_bad_mat,fn2);
+    aet(fn,'mask',fn2);
+
+    m_bad_2samples=cosmo_stack({m,m});
+    cosmo_map2fmri(m_bad_2samples,fn2);
+    aet(fn,'mask',fn2);
+
+    % disable automask warning
+    warning_state=cosmo_warning();
+    state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    ds.samples(:,1:5)=0;
+    ds.samples(1,1)=1;
+
+    res=cosmo_fmri_dataset(ds,'mask','');
+    assertEqual(res,ds);
+
+
+
 
 
 
 
 function assert_dataset_equal(x,y,ext)
-    funcs={@assert_samples_equal, @assert_a_equal, @assert_fa_equal};
+    funcs={@assert_samples_equal, @assert_a_equal, ...
+                    @assert_fa_equal,...
+                    @assert_sa_equal};
     for j=1:numel(funcs)
         func=funcs{j};
         func(x,y,ext);
