@@ -560,9 +560,11 @@ function write_afni(fn, hdr)
     if ends_with({'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz'},fn)
         hdr.SCENE_DATA(1)=0;
+        afniopt.View='+orig';
     elseif ends_with({'+tlrc','+tlrc.HEAD',...
                            '+tlrc.BRIK','+tlrc.BRIK.gz'},fn)
         hdr.SCENE_DATA(1)=2;
+        afniopt.View='+tlrc';
     else
         error('Unsupported scene data for %s', fn);
     end
