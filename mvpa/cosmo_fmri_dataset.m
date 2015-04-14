@@ -340,7 +340,13 @@ function img_format=find_img_format(filename, img_formats)
             end
         end
     end
-    error('Could not find image format for "%s"', filename);
+
+    if ischar(filename)
+        desc=sprintf('file ''%s''',filename);
+    else
+        desc=sprintf('<%s> input',class(filename));
+    end
+    error('Could not find image format for %s',desc);
 
 function mask=get_mask(ds, mask_param)
     if isempty(mask_param)
