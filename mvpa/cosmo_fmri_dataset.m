@@ -148,11 +148,10 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     % special case: if it's already a dataset, just return it
     if cosmo_check_dataset(filename,'fmri',false);
         ds=filename;
-        return
+    else
+        % get the supported image formats use the helper defined below
+        ds=convert_to_dataset(filename, params);
     end
-
-    % get the supported image formats use the helper defined below
-    ds=convert_to_dataset(filename, params);
 
     % set chunks and targets
     ds=set_sa_vec(ds,params,'targets');
