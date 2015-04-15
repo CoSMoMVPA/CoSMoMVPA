@@ -445,7 +445,7 @@ function auto_mask=compute_auto_mask(data, mask_type)
             pct_any=100*n_any/n;
             pct_all=100*n_all/n;
 
-            do_mask_suggestion=pct_any>pct_threshold && ...
+            do_mask_suggestion=pct_all>pct_threshold && ...
                                 strcmp(mask_type,'');
 
             if any_equals_all
