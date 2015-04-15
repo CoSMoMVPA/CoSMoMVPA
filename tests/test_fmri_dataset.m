@@ -40,9 +40,19 @@ function test_nii_qform_fmri_dataset()
 
 function test_nii_pixdim_fmri_dataset()
     ds=get_base_dataset();
-    ds_nii=cosmo_fmri_dataset(get_expected_nii_pixdim());
+    nii=get_expected_nii_pixdim();
+    ds_nii=cosmo_fmri_dataset(nii);
     ds_nii.a.vol.mat(:,4)=ds.a.vol.mat(:,4);
     assert_dataset_equal(ds,ds_nii);
+
+    nii.hdr.dime.scl_inter=200;
+    nii.hdr.dime.scl_slope=17;
+
+    ds_nii_scl=cosmo_fmri_dataset(nii);
+    assertElementsAlmostEqual(17*ds.samples+200,ds_nii_scl.samples,...
+                                    'absolute',1e-3);
+
+
 
 function test_nii_sform_and_qform_fmri_dataset()
     ds=get_base_dataset();
