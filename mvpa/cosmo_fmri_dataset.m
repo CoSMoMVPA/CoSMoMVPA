@@ -750,9 +750,9 @@ function mx=nifti_matrix_from_qform(hdr)
 
 function mx=nifti_matrix_from_sform(hdr)
     % set the srow values
-    mx=[hdr.hist.srow_x;
-        hdr.hist.srow_y;
-        hdr.hist.srow_z;
+    mx=[hdr.hist.srow_x;...
+        hdr.hist.srow_y;...
+        hdr.hist.srow_z;...
         [0 0 0 1]];
 
 function scaling=nifti_get_scaling_factor(hdr)
