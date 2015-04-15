@@ -30,7 +30,7 @@ function test_meeg_dataset()
             assertEqual(data_size',fdim_sizes);
         end
 
-        assertAlmostEqual(data(:),ds.samples(:));
+        assertElementsAlmostEqual(data(:),ds.samples(:));
 
         ds2=cosmo_slice(ds,randperm(nfeatures),2);
         ft2=cosmo_map2meeg(ds2);
@@ -101,7 +101,9 @@ function test_meeg_eeglab_io()
         end
     end
 
+    fclose(fid);
     ds2=cosmo_meeg_dataset(tmp_fn);
+
     assertElementsAlmostEqual(ds.samples,ds2.samples,'absolute',1e-4);
     assertEqual(ds.a.fdim.values{1},ds2.a.fdim.values{1});
     assertElementsAlmostEqual(ds.a.fdim.values{2},...
@@ -109,8 +111,12 @@ function test_meeg_eeglab_io()
     assertEqual(ds.a.fdim.labels,ds2.a.fdim.labels);
     assertEqual(ds.fa,ds2.fa);
 
-    % add bogus data
+    % add bogus datamox
+    fid=fopen(tmp_fn,'a');
     fprintf(fid,'.3');
+    fclose(fid);
+    file_closer=[];
+
     assertExceptionThrown(@()cosmo_meeg_dataset(tmp_fn),'');
 
     tmp2_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
@@ -131,10 +137,19 @@ function test_meeg_ft_io()
     ds.a.meeg=[];
     ds.sa=struct();
     ds2.a.meeg=[];
-    assertEqual(ds,ds2);
+
+    % deal with rounding errors in Octave
+    assertElementsAlmostEqual(ds.samples,ds2.samples);
+    assertElementsAlmostEqual(ds.a.fdim.values{2},ds2.a.fdim.values{2});
 
     ds3=cosmo_meeg_dataset(ds2);
     assertEqual(ds2,ds3);
+
+    ds2.samples=ds.samples;
+    ds2.a.fdim.values{2}=ds.a.fdim.values{2};
+    assertEqual(ds,ds2);
+
+
 
 function test_meeg_ft_io_exceptions()
     aeti=@(varargin)assertExceptionThrown(@()...
