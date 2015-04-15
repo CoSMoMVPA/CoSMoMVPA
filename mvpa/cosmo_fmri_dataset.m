@@ -1014,6 +1014,10 @@ function [data,vol,sa]=read_spm(fn,params)
             error('expected data with struct ''SPM''');
         end
         spm_=spm_.SPM;
+    else
+        input_type='beta';
+        spm_=fn;
+        pth='';
     end
 
     % just do a check (ignore output)
