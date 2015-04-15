@@ -25,7 +25,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                         the partitioning scheme is balanced)
 %   'cluster_stat',s    (optional) statistic for clusters, one of 'tfce'
 %                       'max', 'maxsum', 'maxsize'. Default: 'tfce'
-%                       (Threshold-Free Cluster Enhancement)
+%                       (Threshold-Free Cluster Enhancement; see
+%                       References)
 %   'dh',dh             (optional) Threshold step (only if cluster_stat is
 %                       'tfce'). The default value of dh=0.1 should be fine
 %                       in most (if not all) cases.
@@ -35,7 +36,10 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       from cosmo_randomize_targets. Each dataset in
 %                       null_data{i} must have the same size as ds.
 %                       If this option is provided, then null data is
-%                       sampled from null_data.
+%                       sampled from null_data. According to Stelzer et al
+%                       (see References), about 100 null datasets per
+%                       participant are sufficient for good estimates of
+%                       data under the null hypothesis
 %                       If this option is not provided, null data is based
 %                       on the contents of ds, which is less precise (more
 %                       conservative, in other words has less power)
@@ -149,6 +153,18 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     recommended.
 %   - The neighborhood used for clustering can, for almost all use cases,
 %     be computed using cosmo_cluster_neighborhood
+%
+% References:
+%   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
+%     cluster enhancement: Addressing problems of smoothing, threshold
+%     dependence and localisation in cluster inference, NeuroImage, Volume
+%     44, 83-98.
+%   - Maris, E., Oostenveld, R. Nonparametric statistical testing of EEG-
+%     and MEG-data. Journal of Neuroscience Methods (2007).
+%   - Johannes Stelzer, Yi Chen and Robert Turner (2013). Statistical
+%     inference and multiple testing correction in classification-based
+%     multi-voxel pattern analysis (MVPA): Random permutations and cluster
+%     size control. NeuroImage, Volume 65, 69-82.
 %
 % Se also: cosmo_cluster_neighborhood
 %

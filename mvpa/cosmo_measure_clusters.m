@@ -94,10 +94,10 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %   - this function
 %
 % References:
-%   - Stephen M. Smith, Thomas E. Nichols, Threshold-free
+%   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
 %     cluster enhancement: Addressing problems of smoothing, threshold
 %     dependence and localisation in cluster inference, NeuroImage, Volume
-%     44, Issue 1, 1 January 2009, Pages 83-98.
+%     44, 83-98.
 %   - Maris, E., Oostenveld, R. Nonparametric statistical testing of EEG-
 %     and MEG-data. Journal of Neuroscience Methods (2007).
 %
