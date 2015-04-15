@@ -323,6 +323,41 @@ The following are guidelines, intended to improve:
 
         error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
 
+- Do not repeat yourself: if the same expression is evaluated multiple times, evaluate it once and assign its result to a variable.
+
+    **bad:**
+
+    .. code-block:: matlab
+
+        if nfeatures>nsamples
+            delta=nfeatures-nsamples
+        else
+            delta=0;
+        end
+
+        aggregate_size=[nfeatures,nsamples,delta];
+
+        if nsamples<=nfeatures
+            cosmo_warning('%d samples < %d features', nsamples, nfeatures);
+        end
+
+    **good**
+
+    .. code-block:: matlab
+
+        has_more_features_than_samples=nfeatures>nsamples
+
+        if has_more_features_than_samples=nfeatures>nsamples
+            delta=nfeatures-nsamples
+        else
+            delta=0;
+        end
+
+        aggregate_size=[nfeatures,nsamples,delta];
+
+        if has_more_features_than_samples=nfeatures>nsamples
+            cosmo_warning('%d samples < %d features', nsamples, nfeatures);
+        end
 
 - Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
     **bad:**
