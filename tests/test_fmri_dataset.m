@@ -117,6 +117,26 @@ function test_bv_msk_fmri_dataset()
     ds_bv_msk_lpi=cosmo_fmri_reorient(ds_bv_msk,'LPI');
     assert_dataset_equal(uint_ds,ds_bv_msk_lpi,'translation');
 
+
+function test_bv_vtc_fmri_dataset()
+    if ~can_test_bv()
+        return
+    end
+
+    ds=get_base_dataset();
+    ds.samples=round(ds.samples);
+    ds.samples(ds.samples<0)=0;
+
+    xff_bv_vtc=get_expected_xff_bv_vtc();
+    cleaner=onCleanup(@()xff_bv_vtc.ClearObject());
+    bless(xff_bv_vtc);
+
+    ds_bv_vtc=cosmo_fmri_dataset(xff_bv_vtc);
+    ds_bv_glm_lpi=cosmo_fmri_reorient(ds_bv_vtc,'LPI');
+
+    assert_dataset_equal(ds,ds_bv_glm_lpi,'translation');
+
+
 function test_bv_glm_subject_fmri_dataset()
     if ~can_test_bv()
         return
@@ -271,6 +291,32 @@ function xff_bv_glm=get_expected_xff_bv_glm()
     data(:,:,:,2)=reshape([0.4823 -1.3265 2.3387 ...
                             1.7235 -0.3973 0.5838], mat_size);
     xff_bv_glm.GLMData.BetaMaps=data;
+
+function xff_bv_vtc=get_expected_xff_bv_vtc()
+    xff_bv_vtc=xff('new:vtc');
+    xff_bv_vtc.NrOfVolumes=2;
+
+    xff_bv_vtc.Resolution=2;
+    xff_bv_vtc.XStart = 126;
+    xff_bv_vtc.XEnd = 130;
+    xff_bv_vtc.YStart = 128;
+    xff_bv_vtc.YEnd = 130;
+    xff_bv_vtc.ZStart = 124;
+    xff_bv_vtc.ZEnd = 130;
+
+    data_orig=zeros(2,1,3,2);
+    data_size=size(data_orig);
+    mat_size=data_size(1:3);
+    data_orig(:,:,:,1)=reshape([ -0.2040   -1.0504   -0.2617 ...
+                            -3.6849    1.3494    2.0317], mat_size);
+    data_orig(:,:,:,2)=reshape([0.4823 -1.3265 2.3387 ...
+                            1.7235 -0.3973 0.5838], mat_size);
+
+    data=uint16(data_orig);
+    xff_bv_vtc.VTCData=zeros(2,2,1,3,'uint16');
+    xff_bv_vtc.VTCData(1,:,:,:)=data(:,:,:,1);
+    xff_bv_vtc.VTCData(2,:,:,:)=data(:,:,:,2);
+
 
 function bv_msk=get_expected_bv_msk()
     bv_msk=struct();
