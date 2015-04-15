@@ -22,14 +22,39 @@ function test_nii_sform_fmri_dataset()
 
 function test_nii_qform_fmri_dataset()
     ds=get_base_dataset();
-    ds_nii=cosmo_fmri_dataset(get_expected_nii_qform());
+    nii=get_expected_nii_qform();
+    ds_nii=cosmo_fmri_dataset(nii);
     assert_dataset_equal(ds,ds_nii);
+
+    % check qform with illegal pixdims
+    nii.hdr.dime.pixdim(1:4)=-1;
+    nii.hdr.hist.quatern_b=1;
+    nii.hdr.hist.quatern_c=0;
+    nii.hdr.hist.quatern_d=0;
+
+    ds_nii_alt=cosmo_fmri_dataset(nii);
+    m=ds_nii_alt.a.vol.mat;
+    assertEqual(diag(m),[1 -1 1 1]');
+    assertEqual(m(1:3,4),[-2 0 -2]');
+
 
 function test_nii_pixdim_fmri_dataset()
     ds=get_base_dataset();
     ds_nii=cosmo_fmri_dataset(get_expected_nii_pixdim());
     ds_nii.a.vol.mat(:,4)=ds.a.vol.mat(:,4);
     assert_dataset_equal(ds,ds_nii);
+
+function test_nii_sform_and_qform_fmri_dataset()
+    ds=get_base_dataset();
+    nii=get_expected_nii_sform_and_qform();
+    ds_nii=cosmo_fmri_dataset(nii);
+    assert_dataset_equal(ds,ds_nii);
+
+    nii.hdr.hist.srow_x(1)=1;
+    assertExceptionThrown(@()cosmo_fmri_dataset(nii),'');
+    ds_nii_qform=cosmo_fmri_dataset(nii,'nifti_form','qform');
+    assertEqual(ds_nii_qform,ds_nii);
+    assertExceptionThrown(@()cosmo_fmri_dataset(nii,'nifti_form','X'),'');
 
 
 function test_bv_vmr_fmri_dataset()
@@ -364,10 +389,15 @@ function ds=get_expected_dataset()
 
 function nii=get_expected_nii_pixdim()
     nii=get_expected_nii_helper();
-     fields_to_clear={'quatern_b','quatern_c','quatern_d',...
+    fields_to_clear={'quatern_b','quatern_c','quatern_d',...
                         'qoffset_x','qoffset_y','qoffset_z',...
                         'srow_x','srow_y','srow_z'};
     nii.hdr.hist=clear_fields(nii.hdr.hist,fields_to_clear);
+
+function nii=get_expected_nii_sform_and_qform()
+    nii=get_expected_nii_helper();
+    nii.hdr.hist.sform_code = 1;
+    nii.hdr.hist.qform_code = 1;
 
 function nii=get_expected_nii_sform()
     nii=get_expected_nii_helper();
