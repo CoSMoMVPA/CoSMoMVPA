@@ -273,13 +273,13 @@ function [stat,df,stat_label]=ttest2_wrapper(samples,targets,chunks,...
     nclasses=max(targets);
 
     if nclasses~=2
-        error('%s stat: expected 2 classes, found %d',...
-                    stat_name, nclasses);
+        error('ttest2 stat: expected 2 classes, found %d',...
+                    nclasses);
     end
 
     if ~strcmp(type,'between')
-        error(['%s stat: each chunk must contain the same '...
-                'two targets'], stat_name);
+        error(['ttest2 stat: each chunk must contain the same '...
+                'two targets']);
     end
 
     m1=targets==1;
@@ -295,8 +295,7 @@ function [stat,df,stat_label]=ftest_wrapper(samples,targets,chunks,...
     nclasses=max(targets);
 
     if nclasses<2
-        error('%s stat: expected >=2 classes, found %d',...
-                    stat_name, nclasses);
+        error('F stat: expected >=2 classes, found %d',nclasses);
     end
 
     switch type
