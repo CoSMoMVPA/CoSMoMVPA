@@ -25,6 +25,12 @@ function test_nii_qform_fmri_dataset()
     ds_nii=cosmo_fmri_dataset(get_expected_nii_qform());
     assert_dataset_equal(ds,ds_nii);
 
+function test_nii_pixdim_fmri_dataset()
+    ds=get_base_dataset();
+    ds_nii=cosmo_fmri_dataset(get_expected_nii_pixdim());
+    ds_nii.a.vol.mat(:,4)=ds.a.vol.mat(:,4);
+    assert_dataset_equal(ds,ds_nii);
+
 
 function test_bv_vmr_fmri_dataset()
     if ~can_test_bv()
@@ -356,6 +362,13 @@ function ds=get_expected_dataset()
     ds.a.vol.xform='scanner_anat';
 
 
+function nii=get_expected_nii_pixdim()
+    nii=get_expected_nii_helper();
+     fields_to_clear={'quatern_b','quatern_c','quatern_d',...
+                        'qoffset_x','qoffset_y','qoffset_z',...
+                        'srow_x','srow_y','srow_z'};
+    nii.hdr.hist=clear_fields(nii.hdr.hist,fields_to_clear);
+
 function nii=get_expected_nii_sform()
     nii=get_expected_nii_helper();
     nii.hdr.hist.sform_code = 1;
@@ -429,7 +442,7 @@ function nii=get_expected_nii_helper()
     nii.hdr=hdr;
     nii.img=single(data);
 
-function s=clear_fields(s,keys);
+function s=clear_fields(s,keys)
     n=numel(keys);
     for k=1:n
         key=keys{k};
