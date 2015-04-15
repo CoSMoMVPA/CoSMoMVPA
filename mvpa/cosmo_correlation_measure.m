@@ -201,6 +201,11 @@ nsamples=size(targets,1);
 [classes,unused,class_ids]=fast_unique(targets);
 nclasses=numel(classes);
 
+if nclasses<=1
+    error(['At least unique values for .sa.targets are required, '...
+                    'found %d'], nclasses);
+end
+
 if isempty(template)
     template=(eye(nclasses)-1/nclasses)/(nclasses-1);
 else

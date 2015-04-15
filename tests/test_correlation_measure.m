@@ -62,3 +62,12 @@ function test_correlation_measure_basis()
     opt.output='correlation';
     assertEqual(cosmo_correlation_measure(ds4,opt),...
                     cosmo_correlation_measure(ds4_perm,opt));
+
+
+function test_correlation_measure_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                cosmo_correlation_measure(varargin{:}),'');
+
+    ds=cosmo_synthetic_dataset();
+    ds.sa.targets(:)=1;
+    aet(ds);
