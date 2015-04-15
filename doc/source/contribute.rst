@@ -135,7 +135,7 @@ Notes on committing
     + To commit changes to a file, run ``git add -i``, then press 'p' (for 'patch'), indicate which files to patch, and press 'y' or 'n' for each meaningful 'atomic' change.- To view the history of commits, ``gitk`` is useful.
 - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
+    + ``ACK``: Acknowledge contribution from someone else. Contributors should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. For example,    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
     + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
     + ``BLD``: Changes in the build system.
     + ``BIG``: Major change. Please use together with another tag.
@@ -144,7 +144,6 @@ Notes on committing
     + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
     + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
-    + ``LNC``: Indicates that the contributor permits distribution of his changes using the applicable license(s) of CoSMoMVPA. Only needed for a person's first contribution; after the first contribution this permission is assumed. If you made several commits but the first did not contain this tag, just make a new commit containing the text '``LNC: applies to previous commits``'.
     + ``LZY``: 'Apologies for being lazy here but cannot be bothered to describe the changes in detail'. Acceptable in exceptional cases, including after *n* hours of continuous coding, when *n* is large; or when presenting a workshop on CoSMoMVPA_ the very next day (these are not mutually exclusive). If you know what your are doing this can go together with the ``-a`` option in ``git``.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature.
@@ -168,7 +167,8 @@ Notes on committing
     + ``git commit -m 'RF: build a lookup table mapping all voxels to those in the dataset``
     + ``git commit -m 'BF+TST: throw an error if partitions are not balanced; added unit test'``
     + ``git commit -m 'DOC+SML: fixed a typo'``
-    + ``git commit -am LZY`` [others can see you were lazy; *to be used in special circumstances only*]
+    + ``git commit -m BF+ACK: show error message when negative radius is provided. Thanks to #John Doe# and #Jane Doe# for bringing up this use case``.
+
 
 .. _`build_system`:
 
