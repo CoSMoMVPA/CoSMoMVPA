@@ -137,6 +137,11 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     computed separately for each partition, and then averaged (unless
 %     the ''output'' argument is set differently)
 %
+% References
+%   - Haxby, J. V. et al (2001). Distributed and overlapping
+%     representations of faces and objects in ventral temporal cortex.
+%     Science 293, 2425?2430
+%
 % NNO May 2014
 
 persistent cached_partitions;
