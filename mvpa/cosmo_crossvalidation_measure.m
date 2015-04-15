@@ -168,16 +168,21 @@ switch params.output
         ds_sa.sa.chunks=chunks;
 
     case 'accuracy_by_chunk'
-        keep=find(~isnan(chunks));
-        [idxs,chunks_cell]=cosmo_index_unique({chunks(keep)});
-        nchunks=numel(idxs);
+        [unused,orig_chunks]=cosmo_index_unique(ds.sa.chunks);
+        norig_chunks=numel(orig_chunks);
 
-        ds_sa.sa.chunks=chunks_cell{1};
+        ds_sa.samples=NaN(norig_chunks,1);
+        ds_sa.sa.chunks=NaN(norig_chunks,1);
 
-        ds_sa.samples=zeros(nchunks,1);
-        for k=1:nchunks
-            idx=keep(idxs{k});
+        [chunk_idxs,unq_chunks]=cosmo_index_unique(chunks);
+        for k=1:numel(unq_chunks)
+            chunk_value=unq_chunks(k);
+            if isnan(chunk_value)
+                continue;
+            end
+            idx=chunk_idxs{k};
             ds_sa.samples(k)=mean(ds.sa.targets(idx)==pred(idx));
+            ds_sa.sa.chunks(k)=chunk_value;
         end
 
 
