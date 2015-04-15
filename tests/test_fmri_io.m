@@ -141,6 +141,10 @@ function test_fmri_io_mask
     cosmo_warning('off');
 
     ds.samples(:,1:5)=0;
+
+    res=cosmo_fmri_dataset(ds,'mask','');
+    assertEqual(res,ds);
+
     ds.samples(1,1)=1;
 
     res=cosmo_fmri_dataset(ds,'mask','');
