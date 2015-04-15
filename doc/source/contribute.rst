@@ -204,7 +204,7 @@ The following are guidelines, intended to improve:
 
 **Note**: None of these guidelines are set in stone. Try to use common sense when considering not to follow them. Indeed, for each guideline there may be a good reason to deviate from it.
 
-- Try to keep line lengths limited to 80 characters. Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
+- Try to keep line lengths limited to 80 characters, so that files can be viewed in a standard terminal window without line breaks. (The Matlab editor shows a vertical line after the 80-th character). Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
     **bad:**
 
     .. code-block:: matlab
