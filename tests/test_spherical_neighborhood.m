@@ -179,7 +179,7 @@ function test_meeg_source_dataset
     dq=diag(q);
 
     assertTrue(mean(dp)>.1);
-    assertTrue(mean(dq)>.4);
+    assertTrue(mean(dq)>.3);
 
 function test_fmri_fixed_number_of_features()
     ds=cosmo_synthetic_dataset('size','normal');
