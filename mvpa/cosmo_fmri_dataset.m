@@ -481,13 +481,13 @@ function auto_mask=compute_auto_mask(data, mask_type)
                             ' %s(...,''mask'',-any'')\n'],...
                             n_all,pct_all,n_any,pct_any,me_name,me_name);
 
-                if do_mask_suggestion
+                if strcmp(mask_type,'auto');
+                    error('automatic mask failed:\n%s',msg);
+                else
                     % give a warning
                     cosmo_warning(msg);
                     % set mask to empty, so that a mask will not be applied
                     to_remove=[];
-                else
-                    error('automatic mask failed:\n%s',msg);
                 end
             end
         case 'any'
