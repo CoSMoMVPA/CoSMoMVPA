@@ -151,9 +151,125 @@ function test_fmri_io_mask
     assertEqual(res,ds);
 
 
+function test_fmri_io_spm()
+    cleaner=onCleanup(@()register_or_delete_all_files());
+    spm_fn=build_spm_dot_mat();
+
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
+    ds_spm=cosmo_fmri_dataset(spm_fn);
+
+    assertEqual(ds.sa.chunks,ds_spm.sa.chunks);
+    assertEqual(ds_spm.sa.beta_index,(1:2)')
+    assertEqual(ds_spm.sa.labels,{'sample_1';'sample_2'});
+    assertElementsAlmostEqual(ds.samples+1,ds_spm.samples,'relative',1e-4);
+
+    input_keys={'beta','con','spm'};
+    for k=1:numel(input_keys)
+        key=input_keys{k};
+
+        spm_fn_key=[spm_fn ':' key];
+        ds_spm=cosmo_fmri_dataset(spm_fn_key);
+        assertElementsAlmostEqual(ds.samples+k,ds_spm.samples,...
+                            'relative',1e-4);
+    end
 
 
 
+function spm_fn=build_spm_dot_mat()
+    register_or_delete_all_files();
+
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
+    nsamples=size(ds.samples,1);
+    input_types.beta.vols='Vbeta';
+    input_types.con.vols='Vcon';
+    input_types.spmT.vols='Vspm';
+
+
+    input_keys=fieldnames(input_types);
+
+
+    SPM=struct();
+    SPM.SPMid=[];
+    xCon_cell=cell(1,nsamples);
+
+    for k=1:numel(input_keys);
+        key=input_keys{k};
+        is_beta=strcmp(key,'beta');
+
+        values=input_types.(key);
+        vol_label=values.vols;
+
+        samples_offset=k;
+
+        vol_cell=cell(1,nsamples);
+        sample_labels=cell(1,nsamples);
+        for j=1:nsamples
+            prefix=sprintf('_tmp_%s_%04d',key,j);
+            fn=[prefix '.hdr'];
+            vol=ds.a.vol;
+            vol.fname=fn;
+            vol_cell{j}=vol;
+
+            ds_sample=cosmo_slice(ds,j);
+            ds_sample.samples=ds_sample.samples+samples_offset;
+            cosmo_map2fmri(ds_sample,fn);
+            sample_labels{j}=sprintf('sample_%d',j);
+
+            register_or_delete_all_files(fn);
+            register_or_delete_all_files([prefix '.img']);
+            register_or_delete_all_files([prefix '.mat']);
+
+            if ~is_beta
+                xcon=xCon_cell{j};
+                if isempty(xcon)
+                    xcon=struct();
+                    xcon.name=sample_labels{j};
+                end
+                xcon.(vol_label)=vol;
+                xCon_cell{j}=xcon;
+            end
+        end
+
+
+
+        vol_info=cat(2,vol_cell{:});
+        if is_beta
+            SPM.(vol_label)=vol_info;
+        end
+
+        if is_beta
+            SPM.xX.X=[];
+            SPM.Sess.Fc.i=1:2;
+            SPM.Sess.col=1:2;
+            SPM.xX.name=sample_labels;
+        end
+    end
+
+    SPM.xCon=cat(1,xCon_cell{:});
+
+    spm_fn='_tmp_SPM.mat';
+    register_or_delete_all_files(spm_fn);
+    save(spm_fn,'SPM');
+
+
+
+
+function register_or_delete_all_files(fn)
+    persistent files_to_delete;
+
+    has_files_to_delete=iscell(files_to_delete);
+
+    if nargin==0
+        if has_files_to_delete
+            delete_files(files_to_delete);
+        end
+        files_to_delete=[];
+    else
+        if ~has_files_to_delete
+            files_to_delete=cell(0,1);
+        end
+        files_to_delete{end+1}=fn;
+    end
 
 
 function assert_dataset_equal(x,y,ext)
