@@ -86,9 +86,9 @@ function test_fmri_io_exceptions()
     x.DATASET_RANK=[];
     aet(x);
 
-    % illegal AFNI file
-    save(fn2,'x');
-    aet(fn2);
+    % illegal .mat file
+    save(fn,'x');
+    aet(fn);
 
     % wrong dimension size
     ds=cosmo_synthetic_dataset();
