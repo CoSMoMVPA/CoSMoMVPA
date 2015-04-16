@@ -71,6 +71,7 @@ function test_dim_find_exceptions()
     aet(ds,{'foo'});
     assertEqual(cosmo_dim_find(ds,{'foo'},false),[]);
     aet(ds,'foo');
+    aet(ds,[]);
     assertEqual(cosmo_dim_find(ds,'foo',false),[]);
     ds=cosmo_dim_transpose(ds,'i',2);
     cosmo_dim_find(ds,'i');
