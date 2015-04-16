@@ -27,7 +27,7 @@ function stat_repr=cosmo_statcode(ds, output_format)
     if nargin<2, output_format=''; end
 
     % see what kind of input we got
-    if iscell(ds)
+    if iscellstr(ds)
         % string representation of stats
         stat_repr=ds(:);
     elseif isstruct(ds) && isfield(ds,'samples')
@@ -45,13 +45,13 @@ function stat_repr=cosmo_statcode(ds, output_format)
         stat_repr=hdr2strs(ds);
     end
 
+    % convert to (name, df) pairs
+    name_df=stat_strs2name_df(stat_repr);
+
     if isempty(output_format)
         % we're done
         return
     end
-
-    % convert to (name, df) pairs
-    name_df=stat_strs2name_df(stat_repr);
 
     % convert to package-specific header
     stat_repr=name_df2hdr(name_df, output_format);
@@ -240,11 +240,14 @@ function stat_strs=hdr2strs(hdr)
             aux=hdr.BRICK_STATAUX;
             naux=numel(aux);
             pos=0;
-            while pos<naux
+            while (pos+2)<naux
                 pos=pos+1;
                 brik_idx=aux(pos)+1; % base0 => base1
                 stat_code=aux(pos+1); % stat code
                 n_df=aux(pos+2); % # of df
+                if naux<pos+2+n_df
+                    break;
+                end
                 df=aux(pos+2+(1:n_df)); % get dfs
                 stat_strs{brik_idx}=stat_code2str(codes, stat_code, df);
                 pos=pos+2+n_df;
@@ -320,29 +323,29 @@ function codes=get_codes(package)
         case 'nifti'
             % http://nifti.nimh.nih.gov/nifti-1/documentation/...
             %                 nifti_stats.pdf
-            codes={'',0; % not defined
-                    'Correl',1; % first one starts at 2
-                    'Ttest',1;
-                    'Ftest',2;
-                    'Zscore',0;
-                    'Chisq',1;
-                    'Beta',2;
-                    'Binom',2;
-                    'Gamma',2;
-                    'Poisson',1;
-                    'Normal',2,;
-                    'Ftest_Nonc',3;
-                    'Chisq_Nonc',2;
-                    'Logistic',2;
-                    'Laplace',2;
-                    'Uniform',2;
-                    'Ttest_Nonc',2;
-                    'Weibull',3;
-                    'Chi',1;
-                    'Invgauss',2;
-                    'Extval',2;
-                    'Pval',0;
-                    'Logpval',0;
+            codes={'',0;... % not defined
+                    'Correl',1;... % first one starts at 2
+                    'Ttest',1;...
+                    'Ftest',2;...
+                    'Zscore',0;...
+                    'Chisq',1;...
+                    'Beta',2;...
+                    'Binom',2;...
+                    'Gamma',2;...
+                    'Poisson',1;...
+                    'Normal',2,;...
+                    'Ftest_Nonc',3;...
+                    'Chisq_Nonc',2;...
+                    'Logistic',2;...
+                    'Laplace',2;...
+                    'Uniform',2;...
+                    'Ttest_Nonc',2;...
+                    'Weibull',3;...
+                    'Chi',1;...
+                    'Invgauss',2;...
+                    'Extval',2;...
+                    'Pval',0;...
+                    'Logpval',0;...
                     'Log10pval',0};
 
 
@@ -359,22 +362,22 @@ function codes=get_codes(package)
             %              Available_Plugins/niftiplugin_manual_v12.pdf
             % why follow a standard (like NIFTI) if one can
             % come up with something incompatible too?
-            codes={'Ttest',1;
-                      'Correl',1;
-                      'Correl',1; % "cross-correlation", whatever it means
-                      'Ftest',2;
-                      'Zscore',0;
-                      '',0; % lots of undefined codes here
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      '',0;
-                      'Chisq',1;
+            codes={'Ttest',1;...
+                      'Correl',1;...
+                      'Correl',1;... % "cross-correlation", whatever it means
+                      'Ftest',2;...
+                      'Zscore',0;...
+                      '',0;... % lots of undefined codes here
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      '',0;...
+                      'Chisq',1;...
                       'Beta',2};
         otherwise
             error('Unsupported analysis package %s', package);
