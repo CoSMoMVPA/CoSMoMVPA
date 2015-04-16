@@ -466,17 +466,16 @@ function [samples,targets,chunks,type]=get_descriptors(ds)
 
     % unique targets
     [unused,unusued,targets]=unique(ds.sa.targets);
-    nt=max(targets);
 
     % unique chunks
-    [unused,unusued,chunks]=unique(ds.sa.chunks);
+    [unq_chunks,unusued,chunks]=unique(ds.sa.chunks);
     nc=max(chunks);
 
-    if isequal(sort(chunks),unique(chunks))
+    if isequal(sort(ds.sa.chunks),unq_chunks)
         type='between';
     else
         combis=(targets-1)*nc+chunks;
-        if isequal(unique(combis),sort(combis))
+        if isequal(sort(combis),(1:numel(combis))')
             type='within';
         else
             error(['Either all chunks must be unique, or each chunk '...
