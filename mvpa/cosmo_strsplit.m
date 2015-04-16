@@ -73,7 +73,7 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %
 % NNO Sep 2013
 
-if nargin<2 || isequal(delim,[])
+if nargin<2 || (~ischar(delim) && isequal(delim,[]))
     % split by white-space
     split=regexp(string,'(\S)*','match');
 else

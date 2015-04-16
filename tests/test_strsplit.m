@@ -19,6 +19,9 @@ function test_suite = test_strsplit_basics
     aeq({'a','b','','c'},sprintf('a\tb\t\tc'),'\t');
 
     aeq({'abcd'},'abcd','e');
+    aeq({''},'','');
+    aeq({''},'','x');
+    aeq({'abc'},'abc','');
 
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_strsplit(varargin{:}),'');
