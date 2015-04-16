@@ -195,7 +195,7 @@ function f=get_stat_func(stat_name)
     stat_name2func.F=@ftest_wrapper;
 
     if ~isfield(stat_name2func,stat_name)
-        error('illegal statname %s, supported are:%s',stat_name,...
+        error('illegal statname ''%s'', supported are: %s',stat_name,...
                     cosmo_strjoin(fieldnames(stat_name2func),', '));
     end
 
