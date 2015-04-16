@@ -202,7 +202,7 @@ nsamples=size(targets,1);
 nclasses=numel(classes);
 
 if nclasses<=1
-    error(['At least unique values for .sa.targets are required, '...
+    error(['At least 2 unique values for .sa.targets are required, '...
                     'found %d'], nclasses);
 end
 
