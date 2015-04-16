@@ -160,11 +160,9 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     [output_stat_name,tail]=get_stat_definition(stat_name,...
                                                 output_stat_name);
     [samples,targets,chunks,type]=get_descriptors(ds);
-    nsamples=size(samples,1);
 
     % Set label to be used for cdf (in case 'p' or 'z' has to be computed).
     % This is only different from stat_name in the case of 't2'
-    cdf_label=stat_name;
 
     % run specified helper function
     if isfield(ds.sa,'contrast')
