@@ -219,7 +219,6 @@ end
 template_msk=isfinite(template);
 
 npartitions=numel(partitions.train_indices);
-halves={partitions.train_indices, partitions.test_indices};
 
 % space for output
 pdata=cell(npartitions,1);
