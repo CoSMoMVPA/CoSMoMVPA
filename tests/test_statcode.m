@@ -14,13 +14,16 @@ function test_statcode_self()
 
     aet=@(varargin)assertExceptionThrown(@()...
                             cosmo_statcode(varargin{:}),'');
+    % store warning state
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    % test illegal input
     aet({'()'});
     aet({'foo(;)'});
     aet({'Zscore()'},'foo');
     aet('Zscore');
-
-    warning_state=cosmo_warning();
-    cleaner=onCleanup(@()cosmo_warning(warning_state));
 
     % unknown input
     s=cosmo_statcode({'foo'},'afni');
@@ -108,12 +111,13 @@ function test_statcode_afni()
     assertExceptionThrown(@()cosmo_statcode(afni_struct),'');
 
 function test_statcode_nifti()
-    [stats,stats_proper]=get_test_stats();
+    stats=get_test_stats();
 
     % NIFTI does not support multiple stats
     % silence warning
     warning_state=cosmo_warning();
     cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
 
     assertEqual(cosmo_statcode(stats,'nifti'),struct());
     stats=repmat(stats(3),6,1);
