@@ -41,13 +41,44 @@ function test_classify_matlabsvm
     end
     assert_predictions_equal(handle,[1 3 9 7 6 6 9 3 7 5 6 6 4 ...
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
-    assert_throws_illegal_input_exceptions(cfy)
+    assert_throws_illegal_input_exceptions(cfy);
+
+
+
+
+
+
+
+function test_classify_matlabsvm_2class
+    cfy=@cosmo_classify_matlabsvm_2class;
+    handle=get_predictor(cfy);
+    if no_external('matlabsvm')
+        assertExceptionThrown(handle,'');
+        return;
+    end
+    assertExceptionThrown(handle,''); % cannot deal with nine classes
+
+    handle=get_predictor(cfy,struct(),2);
+
+    assert_predictions_equal(handle,[1 2 2 2 1 2]');
+    assert_throws_illegal_input_exceptions(cfy);
+
+     % test non-convergence
+    aet=@(exc,varargin)assertExceptionThrown(@()...
+                        cosmo_classify_matlabsvm_2class(varargin{:}),exc);
+    opt=struct();
+    opt.options.MaxIter=1;
+    aet('',[0 0; 0 1; 1 0; 1 1; ],[1 2 2 1],NaN(2),opt);
+    opt.tolkkt=struct();
+    aet('stats:svmtrain:badTolKKT',...
+                [0 0; 0 1; 1 0; 1 1; ],[1 2 2 1],NaN(2),opt);
+
 
 function test_classify_libsvm
     cfy=@cosmo_classify_libsvm;
     handle=get_predictor(cfy);
     if no_external('libsvm')
-        assertExceptionThrown(handle(),'');
+        assertExceptionThrown(handle,'');
         return
     end
     assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 5 4 ...
@@ -80,14 +111,25 @@ function assert_throws_illegal_input_exceptions(cfy)
     assertExceptionThrown(@()cfy([1 2; 3 4; 5 6],[1;1;1],[1 2 3]),'')
 
     % should pass
-    cfy([1 2; 3 4],[1;1],[1 2]);
-    cfy([1 2; 3 4; 5 6],[1;1;1],[1 2]);
+    can_handle_single_class=~isequal(cfy,@cosmo_classify_matlabsvm_2class);
 
-function handle=get_predictor(cfy,opt)
+    if can_handle_single_class
+        cfy([1 2; 3 4],[1;1],[1 2]);
+        cfy([1 2; 3 4; 5 6],[1;1;1],[1 2]);
+    end
+
+    % no features, should still make prediction
+    res=cfy(zeros(4,0),[1 1 2 2]',zeros(2,0));
+    assertEqual(res,[1 1]');
+
+function handle=get_predictor(cfy,opt,nclasses)
+    if nargin<3
+        nclasses=9;
+    end
     if nargin<2
         opt=struct();
     end
-    [tr_samples,tr_targets,te_samples]=generate_data();
+    [tr_samples,tr_targets,te_samples]=generate_data(nclasses);
     handle=@()cfy(tr_samples,tr_targets,te_samples,opt);
 
 
@@ -96,8 +138,9 @@ function assert_predictions_equal(handle, targets)
     assertEqual(pred, targets);
 
 
-function [tr_samples,tr_targets,te_samples]=generate_data()
-    ds=cosmo_synthetic_dataset('ntargets',9,'nchunks',6);
+function [tr_samples,tr_targets,te_samples]=generate_data(nclasses)
+    ds=cosmo_synthetic_dataset('ntargets',nclasses,...
+                                'nchunks',6);
     te_msk=ds.sa.chunks<=3;
     tr_msk=~te_msk;
     tr_targets=ds.sa.targets(tr_msk);
