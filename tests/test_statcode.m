@@ -12,6 +12,34 @@ function test_statcode_self()
     ds.sa.stats=stats;
     assertEqual(cosmo_statcode(ds),stats);
 
+    aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_statcode(varargin{:}),'');
+    aet({'()'});
+    aet({'foo(;)'});
+    aet({'Zscore()'},'foo');
+    aet('Zscore');
+
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+
+    % unknown input
+    s=cosmo_statcode({'foo'},'afni');
+    assertEqual(s.BRICK_STATAUX,[]);
+
+    s=cosmo_statcode({'foo'},'nifti');
+    assertEqual(s.intent_code,0);
+    assertEqual(s.intent_p1,0);
+    assertEqual(s.intent_p1,0);
+    assertEqual(s.intent_p1,0);
+
+    % empty input
+    assertEqual(cosmo_statcode({}),cell(0,1));
+    assertEqual(cosmo_statcode({},'bv'),cell(0,1));
+    assertEqual(cosmo_statcode({},'nifti'),struct());
+    assertEqual(cosmo_statcode({},'afni'),...
+                        cosmo_structjoin('BRICK_STATAUX',[]));
+
+
 
 
 function test_statcode_bv()
