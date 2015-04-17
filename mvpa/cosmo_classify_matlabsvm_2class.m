@@ -14,10 +14,13 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 %   predicted          Qx1 predicted data classes for samples_test
 %
 % Notes:
-%  - this function uses matlab's builtin svmtrain function, which has
+%  - this function uses Matlab's builtin svmtrain function, which has
 %    the same name as LIBSVM's version. Use of this function is not
 %    supported when LIBSVM's svmtrain precedes in the matlab path; in
 %    that case, adjust the path or use cosmo_classify_libsvm instead.
+%  - Matlab's SVM classifier is rather slow, especially for multi-class
+%    data (more than two classes). When classification takes a long time,
+%    consider using libsvm.
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
@@ -28,11 +31,6 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 % NNO Aug 2013
 
     if nargin<4, opt=struct(); end
-
-    cosmo_warning(sprintf(['Using Matlab''s SVM classifier. This '...
-                    'classifier is **slow**\nFor better '...
-                    'performance, consider using libsvm. Run\n\n'...
-                    '  help cosmo_classify_libsvm\n\nfor details']));
 
     [ntrain, nfeatures]=size(samples_train);
     [ntest, nfeatures_]=size(samples_test);

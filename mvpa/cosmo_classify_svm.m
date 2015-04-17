@@ -25,8 +25,10 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %    https://github.com/cjlin1/libsvm
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
-%  - It is usually a good idea to scale the data when using SVM. matlab's
-%    svm does this automatically, libsvm does not.
+%  - Matlab's SVM classifier is rather slow, especially for multi-class
+%    data (more than two classes). When classification takes a long time,
+%    consider using libsvm.
+%  - In both implemenations, by default the data is scaled.
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
 %    provide an option 'normalization' to perform data scaling.
 %
@@ -68,7 +70,6 @@ if ~isnumeric(cached_classifier_func) && ...
                         (auto_select || strcmp(svm_name, ...
                                         cached_classifier_name))
     classifier_func=cached_classifier_func;
-    classifier_name=cached_classifier_name;
 else
     if auto_select
         svm_name='libsvm';
