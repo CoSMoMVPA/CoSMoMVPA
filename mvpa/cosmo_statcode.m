@@ -183,16 +183,16 @@ function hdr=name_df2hdr(name_df, output_format)
             max_ndf=max(ndf);
             df_matrix=zeros(n, max_ndf);
 
-            if max_ndf>0
-                for k=1:n
-                    dfk=df{k};
-                    df_matrix(k,1:numel(dfk))=dfk;
+
+            for k=1:n
+                dfk=df{k};
+                n_dfk=numel(dfk);
+                if n_dfk>0
+                    df_matrix(k,1:n_dfk)=dfk;
                 end
             end
+
             unq_df=unique(df_matrix,'rows');
-
-
-
 
             if numel(unq_stat_idx)>1 || numel(unique(ndf))>1 || ...
                             size(unq_df,1)>1
@@ -244,7 +244,7 @@ function stat_strs=hdr2strs(hdr)
     elseif isstruct(hdr) && isfield(hdr,'DATASET_RANK')
         % afni
         nsamples=hdr.DATASET_RANK(2);
-        stat_strs=cell(nsamples,1);
+        stat_strs=repmat({''},nsamples,1);
 
         if isfield(hdr,'BRICK_STATAUX')
             codes=get_codes('afni');
