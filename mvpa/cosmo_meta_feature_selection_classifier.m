@@ -1,7 +1,7 @@
 function predicted=cosmo_meta_feature_selection_classifier(samples_train, targets_train, samples_test, opt)
 % meta classifier that uses feature selection on the training data
 %
-% predicted=cosmo_meta_feature_selection_classifier(samples_train, targets_train, samples_test, opt)
+% predicted=cosmo_classify_meta_feature_selection(samples_train, targets_train, samples_test, opt)
 %
 % Inputs:
 %   samples_train      PxR training data for P samples and R features.
@@ -15,34 +15,18 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %      .feature_selection_ratio_to_keep   ratio of how many features to
 %                                         keep. Should be in between 0 and
 %                                         1.
-% Output
+% Output:
 %   predicted          Qx1 predicted data classes for samples_test
+%
+% Notes:
+%   - this function is deprecated. Use
+%     cosmo_classify_meta_feature_selection instead.
 %
 % NNO Aug 2013
 
-    classifier=opt.child_classifier;
-    feature_selector=opt.feature_selector;
-    ratio_to_keep=opt.feature_selection_ratio_to_keep;
+cosmo_warning(['%s is deprecated and will be removed in the future; '...
+                'use cosmo_classify_meta_feature_selection instead'],...
+                mfilename());
 
-    % make a temporary dataset from the training set
-    ds=struct();
-    ds.samples=samples_train;
-    ds.sa.targets=targets_train;
-    ds.sa.chunks=(1:size(targets_train,1))'; % assume all independent
-    feature_idxs=feature_selector(ds, ratio_to_keep);
-
-    % select data with the 'best' features
-    selected_samples_train=samples_train(:,feature_idxs);
-    selected_samples_test=samples_test(:,feature_idxs);
-
-    % use the classifier to predict it on that data
-    predicted=classifier(selected_samples_train, targets_train, ...
-                            selected_samples_test, opt);
-
-
-
-
-
-
-
-
+predicted=cosmo_classify_meta_feature_selection(samples_train, ...
+                                    targets_train, samples_test, opt);
