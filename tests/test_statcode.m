@@ -145,3 +145,4 @@ function [stats,stats_proper]=get_test_stats()
     stats_proper=stats;
     stats_proper{1}='';
     stats_proper{4}='Zscore()';
+    stats_proper{6}='';
