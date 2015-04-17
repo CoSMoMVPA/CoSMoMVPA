@@ -476,7 +476,7 @@ function nbrs_msk=pairwise_delaunay_direct_neighbors_unique(pos,msk)
     f_pos=delaunay_with_stretch(pos,stretch);
 
     % delaunay with applying the mask
-    idx=find(msk);
+    idx=find(msk(:)');
     pos_msk=pos(idx,:);
     f_msk=delaunay_with_stretch(pos_msk,stretch);
     f_msk_pos=idx(f_msk);
@@ -502,14 +502,21 @@ function nbrs_msk=pairwise_delaunay_direct_neighbors_unique(pos,msk)
 
 
 function d=delaunay_with_stretch(pos, stretches)
-    n=numel(stretches);
-    ds=cell(n,1);
-    for k=1:n
-        stretch_pos=bsxfun(@times,pos,[1 stretches(k)]);
-        ds{k}=delaunay(stretch_pos(:,1),stretch_pos(:,2));
-    end
-    d=cat(1,ds{:});
+    nrows=size(pos,1);
+    if nrows<3
+        % minimal surface, cannot do Delaunay
+        d=ones(1,3);
+        d(1:nrows)=1:nrows;
+    else
+        n=numel(stretches);
+        ds=cell(n,1);
 
+        for k=1:n
+            stretch_pos=bsxfun(@times,pos,[1 stretches(k)]);
+            ds{k}=delaunay(stretch_pos(:,1),stretch_pos(:,2));
+        end
+        d=cat(1,ds{:});
+    end
 
 
 function nbrs_msk=nearest_neighbors_from_distance(d,msk,count)
