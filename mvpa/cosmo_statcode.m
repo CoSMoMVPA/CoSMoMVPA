@@ -180,10 +180,14 @@ function hdr=name_df2hdr(name_df, output_format)
             df=name_df(:,2);
             n=numel(df);
             ndf=cellfun(@numel,df);
-            df_matrix=zeros(n, max(ndf));
-            for k=1:n
-                dfk=df{k};
-                df_matrix(k,1:numel(dfk))=dfk;
+            max_ndf=max(ndf);
+            df_matrix=zeros(n, max_ndf);
+
+            if max_ndf>0
+                for k=1:n
+                    dfk=df{k};
+                    df_matrix(k,1:numel(dfk))=dfk;
+                end
             end
             unq_df=unique(df_matrix,'rows');
 
