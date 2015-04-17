@@ -54,7 +54,7 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
     if nclasses~=2
         error(['%s requires 2 classes, found %d. Consider using '...
                 'cosmo_classify_{matlab,lib}svm instead'],...
-                    nclasses,mfilename());
+                    mfilename(),nclasses);
     end
 
     opt_cell=opt2cell(opt);
