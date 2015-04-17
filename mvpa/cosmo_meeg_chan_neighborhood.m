@@ -192,8 +192,12 @@ function nbrs=get_neighbors(ds, varargin)
 
     verify_neighbors(nbrs)
 
+function tf=is_neighborhood_struct(nbrs)
+    tf=isstruct(nbrs) && ...
+                isfield(nbrs,'label') && ...
+                isfield(nbrs,'neighblabel');
+
 function verify_neighbors(nbrs)
-    if ~isstruct(nbrs) || ...
-                ~isfield(nbrs,'label') || ~isfield(nbrs,'neighblabel')
+    if ~is_neighborhood_struct(nbrs);
         error('neighbor struct must be neighborhood struct');
     end
