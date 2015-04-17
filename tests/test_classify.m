@@ -39,14 +39,14 @@ function test_classify_matlabsvm
         assertExceptionThrown(handle,'');
         return;
     end
+
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     assert_predictions_equal(handle,[1 3 9 7 6 6 9 3 7 5 6 6 4 ...
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
     assert_throws_illegal_input_exceptions(cfy);
-
-
-
-
-
 
 
 function test_classify_matlabsvm_2class
@@ -56,6 +56,10 @@ function test_classify_matlabsvm_2class
         assertExceptionThrown(handle,'');
         return;
     end
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     assertExceptionThrown(handle,''); % cannot deal with nine classes
 
     handle=get_predictor(cfy,struct(),2);
@@ -92,9 +96,16 @@ function test_classify_svm
         assertExceptionThrown(handle,'');
         return;
     end
+
+    % matlab and libsvm show slightly different results
     if cosmo_check_external('libsvm',false)
         pred=[1 3 6 8 6 6 8 7 7 5 7 5 4 9 7 7 7 8 1 2 8 1 9 6 7 1 7]';
     else
+        % do not show warning message
+        warning_state=cosmo_warning();
+        cleaner=onCleanup(@()cosmo_warning(warning_state));
+        cosmo_warning('off');
+
         pred=[1 3 9 7 6 6 9 3 7 5 6 6 4 1 7 7 7 7 1 7 7 1 7 6 7 1 9]';
     end
 
