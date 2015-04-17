@@ -101,4 +101,14 @@ Frequently Asked/Anticipated Questions
 **Is there a mailinglist?**
     There is the `CoSMoMVPA Google group`_.
 
+===================
+Technical questions
+===================
+**What is the correspondence between voxel indices in AFNI and feature indices in CoSMoMVPA?**
+    In the AFNI GUI, you can view voxel indices by right-clicking on the coordinate field in the very right-top corner. Note that:
+
+        - ds.fa.i, ds.fa.j, and ds.fa.k are base-1 whereas AFNI uses base-0. So, to convert AFNI's ijk-indices to CoSMoMVPA's, add 1 to AFNI's coordinates.
+        - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
+
+
 .. include:: links.txt
