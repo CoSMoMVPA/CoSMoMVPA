@@ -118,6 +118,21 @@ function test_meeg_cluster_neighborhood
         end
     end
 
+
+function test_tiny_meeg_cluster_neighborhood
+    ds=cosmo_synthetic_dataset('type','meeg');
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+
+    ds.fa.sizes=ones(1,6);
+    assertEqual(ds.fa,nh.fa);
+
+    assertEqual(ds.a,nh.a);
+
+    half_neighbors={[1 4];[2 3 5 6];[2 3 5 6]};
+    assertEqual(nh.neighbors,repmat(half_neighbors,2,1));
+
+
+
 function test_cluster_neighborhood_surface
     if ~cosmo_check_external('surfing',false)
         cosmo_notify_test_skipped(['surfing'...'

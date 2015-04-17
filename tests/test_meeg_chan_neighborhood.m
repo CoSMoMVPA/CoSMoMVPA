@@ -87,4 +87,18 @@ function test_neighbors()
     assert(all(h==5));
 
 
+    % test tiny dataset
+    ds=cosmo_synthetic_dataset('type','meeg');
+    opt=struct();
+    opt.delaunay=true;
+    opt.label='dataset';
+    opt.chantype='meg_axial';
+
+    nh=cosmo_meeg_chan_neighborhood(ds,opt);
+    assertEqual(nh.neighbors,{[1 4]});
+
+    opt.chantype='meg_planar';
+    nh=cosmo_meeg_chan_neighborhood(ds,opt);
+    assertEqual(nh.neighbors,{[2 5 3 6]; [2 5 3 6]});
+
 
