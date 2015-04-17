@@ -184,7 +184,7 @@ function [nbrs_label,chan_idxs]=get_neighbor_indices(nbrs,ds_label,ds_chan)
 
 
 function nbrs=get_neighbors(ds, varargin)
-    if numel(varargin)==1
+    if numel(varargin)==1 && is_neighborhood_struct(varargin{1})
         nbrs=varargin{1};
     else
         nbrs=cosmo_meeg_chan_neighbors(ds,varargin{:});
