@@ -35,7 +35,7 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
                     '  help cosmo_classify_libsvm\n\nfor details']));
 
     [ntrain, nfeatures]=size(samples_train);
-    [unused, nfeatures_]=size(samples_test);
+    [ntest, nfeatures_]=size(samples_test);
     ntrain_=numel(targets_train);
 
     if nfeatures~=nfeatures_ || ntrain_~=ntrain
@@ -45,7 +45,7 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
     if nfeatures==0
         % matlab's svm cannot deal with empty data, so predict all
         % test samples as the class of the first sample
-        predicted=samples_train(1) * ones(1,ntrain);
+        predicted=targets_train(1) * ones(ntest,1);
         return
     end
 

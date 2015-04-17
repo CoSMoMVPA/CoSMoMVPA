@@ -41,7 +41,7 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
     if nclasses<2 || nfeatures==0
         % matlab's svm cannot deal with empty data, so predict all
         % test samples as the class of the first sample
-        predicted=targets_train(1) * (ones(1,ntest));
+        predicted=targets_train(1) * (ones(ntest,1));
         return
     end
 
