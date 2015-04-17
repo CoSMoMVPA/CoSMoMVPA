@@ -71,14 +71,19 @@ function name_df=stat_strs2name_df(stat_strs)
             name_df{k,1}='';
         else
             % try with parentheses: 'stat_name(df1,df2,df3)'
-            names=regexp(stat_str,'(?<name>\w+)\((?<df>[,\d]+)\)','names');
+            names=regexp(stat_str,'^(?<name>\w+)\((?<df>[,\d]*)\)$',...
+                                                        'names');
             if isempty(names)
                 % try without parentheses: 'stat_name'
-                names=regexp(stat_str,'(?<name>\w+)','names');
+                names=regexp(stat_str,'^(?<name>\w+)$','names');
                 df=[];
             else
                 df_split=cosmo_strsplit(names.df,',');
-                df=cellfun(@str2num,df_split);
+                if isequal(df_split,{''})
+                    df=[];
+                else
+                    df=cellfun(@str2num,df_split);
+                end
             end
 
             if isempty(names)
@@ -201,7 +206,7 @@ function hdr=name_df2hdr(name_df, output_format)
             hdr.intent_p3=df(3);
 
         otherwise
-            error('Unsupported output format %s', output_format);
+            assert(false,'should never come here');
     end
 
 
