@@ -189,6 +189,10 @@ function did_pass=cosmo_run_tests(varargin)
     % instead, cd to the tests directory and run the tests from there.
     cd(unittest_dir);
 
+    % reset set of skipped tests
+    cosmo_notify_test_skipped('on');
+
+    % start with empty test suite
     suite=TestSuite();
 
     % collect unit tests
@@ -221,8 +225,39 @@ function did_pass=cosmo_run_tests(varargin)
     % run the tests
     did_pass=suite.run(monitor);
 
+    % show skipped tests, if any
+    report_test_result(fid, opt.verbose, did_pass);
+
     % close file, if one was opened earlier
     if do_open_output_file
         fclose(fid);
     end
+
+
+
+function report_test_result(fid, verbose, did_pass)
+    if did_pass
+        prefix='OK';
+    else
+        prefix='FAILED';
+    end
+
+    skipped_descs=cosmo_notify_test_skipped();
+    nskip=numel(skipped_descs);
+
+    if nskip==0
+        postfix='';
+    else
+        if verbose
+            for k=1:nskip
+                fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
+            end
+        end
+
+        postfix=sprintf(' (skips=%d)', nskip);
+
+    end
+
+    fprintf(fid,'%s%s\n',prefix,postfix);
+
 

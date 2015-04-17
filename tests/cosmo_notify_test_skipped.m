@@ -1,19 +1,47 @@
-function cosmo_notify_test_skipped(reason)
-    % notify that a unit test was skipped
-    %
-    db=dbstack('-completenames');
+function varargout=cosmo_notify_test_skipped(reason)
+    persistent skipped_tests
 
-    db_up=db(2);
-    desc=sprintf('%s: %s', db_up.name, reason);
+    if isempty(skipped_tests)
+        skipped_tests=cell(0);
+    end
 
-    if test_was_run_by_MOxUnit(db)
-        moxunit_throw_test_skipped_exception(desc);
+    if nargin<1
+        varargout={skipped_tests};
+        return;
     else
-        warning('CoSMoMVPA:skipTest','Skipping test in %s (%s:%d)',...
-                desc, db_up.file, db_up.line);
+        varargout={};
+    end
+
+    switch reason
+        case 'on'
+            skipped_tests=cell(0);
+
+        otherwise
+            % notify that a unit test was skipped
+            %
+            db=dbstack('-completenames');
+
+            db_up=db(2);
+            desc=sprintf('%s: %s (%s:%d)', db_up.name, reason, ...
+                                    db_up.file, db_up.line);
+
+            if test_was_run_by_MOxUnit(db)
+                moxunit_throw_test_skipped_exception(desc);
+            elseif test_was_run_by_cosmo_run_tests(db)
+                % do nothing
+            else
+                warning('%s',desc)
+            end
+
+            skipped_tests{end+1}=desc;
     end
 
 function tf=test_was_run_by_MOxUnit(db)
-    files={db.file};
-    tf=any(~cellfun(@isempty,regexp(files,'@MOxUnit')));
+    tf=dbstack_contains_string(db,'@MOxUnit');
 
+function tf=test_was_run_by_cosmo_run_tests(db)
+    tf=dbstack_contains_string(db,'cosmo_run_tests.m');
+
+function tf=dbstack_contains_string(db, string)
+    files={db.file};
+    tf=any(~cellfun(@isempty,regexp(files,string)));
