@@ -62,6 +62,8 @@ function stat_repr=cosmo_statcode(ds, output_format)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function name_df=stat_strs2name_df(stat_strs)
 % converts string representations to name and degrees of freedom
+    match_regexp_failed=@(res) isempty(res) || isempty(res.name);
+
     n=numel(stat_strs);
 
     name_df=cell(n,2);
@@ -73,7 +75,7 @@ function name_df=stat_strs2name_df(stat_strs)
             % try with parentheses: 'stat_name(df1,df2,df3)'
             names=regexp(stat_str,'^(?<name>\w+)\((?<df>[,\d]*)\)$',...
                                                         'names');
-            if isempty(names)
+            if match_regexp_failed(names)
                 % try without parentheses: 'stat_name'
                 names=regexp(stat_str,'^(?<name>\w+)$','names');
                 df=[];
@@ -86,7 +88,7 @@ function name_df=stat_strs2name_df(stat_strs)
                 end
             end
 
-            if isempty(names)
+            if match_regexp_failed(names)
                 error('Unable to parse stat string %s', stat_str);
             end
 
