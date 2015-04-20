@@ -43,7 +43,11 @@ function test_fmri_cluster_neighborhood
 
 
 function test_meeg_cluster_neighborhood
-
+    if ~cosmo_check_external('fieldtrip',false)
+        cosmo_notify_test_skipped(['fieldtrip'...'
+                                    'toolbox is not available']);
+        return
+    end
     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
     nf=size(ds.samples,2);
     imsk=find(rand(1,nf)>.4);
@@ -120,6 +124,11 @@ function test_meeg_cluster_neighborhood
 
 
 function test_tiny_meeg_cluster_neighborhood
+    if ~cosmo_check_external('fieldtrip',false)
+        cosmo_notify_test_skipped(['fieldtrip'...'
+                                    'toolbox is not available']);
+        return
+    end
     ds=cosmo_synthetic_dataset('type','meeg');
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
