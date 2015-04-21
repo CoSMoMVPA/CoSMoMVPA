@@ -55,7 +55,9 @@ function varargout=cosmo_notify_test_skipped(reason)
             %
             db=dbstack('-completenames');
 
-            db_up=db(2);
+            db_idx=last_non_testing_suite_stack_index(db);
+
+            db_up=db(db_idx);
             desc=sprintf('%s: %s (%s:%d)', db_up.name, reason, ...
                                     db_up.file, db_up.line);
 
@@ -77,5 +79,25 @@ function tf=test_was_run_by_cosmo_run_tests(db)
     tf=dbstack_contains_string(db,'cosmo_run_tests.m');
 
 function tf=dbstack_contains_string(db, string)
+    tf=~isempty(first_stack_index_with_string(db, string));
+
+function idx=first_stack_index_with_string(db, string)
     files={db.file};
-    tf=any(~cellfun(@isempty,regexp(files,string)));
+    has_string=~cellfun(@isempty,regexp(files,string));
+    idx=find(has_string,1,'first');
+
+
+function idx=last_non_testing_suite_stack_index(db)
+    if test_was_run_by_MOxUnit(db)
+        suite_dir=fileparts(which('moxunit_runtests'));
+        disp('suite dir');
+        disp(suite_dir);
+        idx=first_stack_index_with_string(db, suite_dir)-1;
+
+    elseif test_was_run_by_cosmo_run_tests(db)
+        suite_dir=fileparts(which('runtests'));
+        idx=first_stack_index_with_string(db, suite_dir)-1;
+
+    else
+        idx=[];
+    end
