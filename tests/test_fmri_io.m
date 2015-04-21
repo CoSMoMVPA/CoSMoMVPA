@@ -63,7 +63,7 @@ function test_fmri_io_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...
                             cosmo_fmri_dataset(varargin{:}),'');
 
-    fn=get_temp_filename('test%d.mat');
+    fn=cosmo_make_temp_filename('test','.mat');
     cleaner=onCleanup(@()delete_files({fn}));
 
     x=struct();
@@ -99,8 +99,8 @@ function test_fmri_io_mask
     ds.sa=struct();
     m=cosmo_slice(ds,1);
 
-    fn=get_temp_filename('test%d.nii');
-    fn2=get_temp_filename('test2_%d.nii');
+    fn=cosmo_make_temp_filename('fn1','.nii');
+    fn2=cosmo_make_temp_filename('fn2','.nii');
 
     cleaner=onCleanup(@()delete_files({fn,fn2}));
 
@@ -199,20 +199,23 @@ function spm_fn=build_spm_dot_mat()
         vol_cell=cell(1,nsamples);
         sample_labels=cell(1,nsamples);
         for j=1:nsamples
-            prefix=sprintf('_tmp_%s_%04d',key,j);
-            fn=[prefix '.hdr'];
+            tmp_fns=cosmo_make_temp_filename('XX',{'.hdr','.img','.mat'});
+            tmp_hdr_fn=tmp_fns{1};
+            tmp_img_fn=tmp_fns{2};
+            tmp_mat_fn=tmp_fns{3};
+
             vol=ds.a.vol;
-            vol.fname=fn;
+            vol.fname=tmp_hdr_fn;
             vol_cell{j}=vol;
 
             ds_sample=cosmo_slice(ds,j);
             ds_sample.samples=ds_sample.samples+samples_offset;
-            cosmo_map2fmri(ds_sample,fn);
+            cosmo_map2fmri(ds_sample,tmp_hdr_fn);
             sample_labels{j}=sprintf('sample_%d',j);
 
-            register_or_delete_all_files(fn);
-            register_or_delete_all_files([prefix '.img']);
-            register_or_delete_all_files([prefix '.mat']);
+            register_or_delete_all_files(tmp_hdr_fn);
+            register_or_delete_all_files(tmp_img_fn);
+            register_or_delete_all_files(tmp_mat_fn);
 
             if ~is_beta
                 xcon=xCon_cell{j};
@@ -333,45 +336,48 @@ function x=get_base_dataset()
     x.sa.stats={'Ttest(17)'};
 
 function ds_again=save_and_load(ds,ext)
-    pat=['tmp%d' ext];
-    fn=get_temp_filename(pat);
-    fn2=get_sibling(fn,ext);
-    cleaner=onCleanup(@()delete_files({fn,fn2}));
+    sib_exts=get_sibling_exts(ext);
+
+    all_exts=[{ext} sib_exts];
+
+    temp_fns=cosmo_make_temp_filename('' ,all_exts);
+    main_temp_fn=temp_fns{1};
+    cleaner=onCleanup(@()delete_files(temp_fns));
 
     switch ext
         case '.mat'
-            save(fn,'ds');
+            save(main_temp_fn,'ds');
         otherwise
             % disable automask warning
             warning_state=cosmo_warning();
             state_resetter=onCleanup(@()cosmo_warning(warning_state));
             cosmo_warning('off');
 
-            cosmo_map2fmri(ds,fn);
+            cosmo_map2fmri(ds,main_temp_fn);
     end
 
-    ds_again=cosmo_fmri_dataset(fn);
+    ds_again=cosmo_fmri_dataset(main_temp_fn);
 
-function sib_fn=get_sibling(fn,ext)
+function sib_exts=get_sibling_exts(ext)
+    sib_exts=cell(1,0);
     switch ext
         case '.img'
-            sib_ext='hdr';
+            sib_exts={'.hdr','.mat'};
         case '.hdr'
-            sib_ext='img';
+            sib_exts={'.img','.mat'};
         case '+orig.HEAD'
-            sib_ext='+orig.BRIK';
+            sib_exts={'+orig.BRIK'};
         case '+orig.BRIK'
-            sib_ext='+orig.HEAD';
+            sib_exts={'+orig.HEAD'};
         case '+tlrc.HEAD'
-            sib_ext='+tlrc.BRIK';
+            sib_exts={'+tlrc.BRIK'};
         case '+tlrc.BRIK'
-            sib_ext='+tlrc.HEAD';
+            sib_exts={'+tlrc.HEAD'};
+        case {'.msk','.mat','.vmr','.vmp','.nii','.nii.gz'};
+            % do nothing
         otherwise
-            sib_fn=[];
-            return
+            error('unsupported extension ''%s''',ext);
     end
-
-    sib_fn=strrep(fn,ext,sib_ext);
 
 
 function delete_files(fns)
@@ -382,23 +388,3 @@ function delete_files(fns)
         end
     end
 
-function temp_path=get_temp_path()
-    c=cosmo_config();
-    if ~isfield(c,'temp_path')
-        error('temp_path is not set in cosmo_config');
-    end
-    temp_path=c.temp_path;
-
-function fn=get_temp_filename(pat)
-    if ~any(pat=='%')
-        error('pattern must contain numeric identifier');
-    end
-    temp_path=get_temp_path();
-    k=0;
-    while true
-        fn=fullfile(temp_path,sprintf(pat,k));
-        if ~exist(fn,'file')
-            return;
-        end
-        k=k+1;
-    end
