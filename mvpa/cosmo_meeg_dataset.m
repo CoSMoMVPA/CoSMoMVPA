@@ -151,12 +151,12 @@ function img_formats=get_supported_image_formats()
     % XXX any .mat file is currently assumed to be a fieldtrip struct
     img_formats.ft.file_matcher=endswith('.mat');
     img_formats.ft.reader=@read_ft;
-    img_formats.ft.externals={'fieldtrip'};
+    img_formats.ft.externals={};
 
     % fieldtrip matlab struct
     img_formats.ft_struct.file_matcher=@(x) is_ft_struct(x);
     img_formats.ft_struct.reader=@convert_ft;
-    img_formats.ft_struct.externals={'fieldtrip'};
+    img_formats.ft_struct.externals={};
 
 
 
