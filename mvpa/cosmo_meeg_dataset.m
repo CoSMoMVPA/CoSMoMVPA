@@ -154,8 +154,7 @@ function img_formats=get_supported_image_formats()
     img_formats.ft.externals={'fieldtrip'};
 
     % fieldtrip matlab struct
-    img_formats.ft_struct.file_matcher=@(x) isstruct(x) && ...
-                                ~strcmp('unknown',isempty(ft_datatype(x)));
+    img_formats.ft_struct.file_matcher=@(x) is_ft_struct(x);
     img_formats.ft_struct.reader=@convert_ft;
     img_formats.ft_struct.externals={'fieldtrip'};
 
@@ -503,8 +502,13 @@ function [data, sample_field]=get_sensor_data_ft(ft)
 
 
 function tf=is_ft_source_struct(ft)
-    tf=isfield(ft,'pos') && isfield(ft,'inside');
+    tf=isstruct(ft) && isfield(ft,'pos') && isfield(ft,'inside');
 
+function tf=is_ft_sensor_struct(ft)
+    tf=isfield(ft,'dimord') && isfield(ft,'label');
+
+function tf=is_ft_struct(ft)
+    tf=is_ft_source_struct(ft) || is_ft_sensor_struct(ft);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
