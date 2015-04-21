@@ -2,6 +2,9 @@ function test_suite=test_meeg_chantype
     initTestSuite;
 
 function test_meeg_chantype_
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
 
     props=get_senstype_properties();
     n=numel(props);

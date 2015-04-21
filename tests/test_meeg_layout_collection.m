@@ -3,11 +3,8 @@ function test_suite=test_meeg_layout_collection
 
 
 function test_fieldtrip_correspondence
-
-    if ~(cosmo_check_external('fieldtrip',false) && cosmo_wtf('is_matlab'))
-        cosmo_notify_test_skipped(['Comparison with fieldtrip output '...
-                       'is disabled because fieldtrip is not available']);
-        return
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
     end
 
 

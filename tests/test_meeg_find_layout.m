@@ -2,6 +2,10 @@ function test_suite=test_meeg_find_layout()
     initTestSuite;
 
 function test_meeg_find_layout_()
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
     coverage=1; % allow for covering subset only
 
     props=get_props();

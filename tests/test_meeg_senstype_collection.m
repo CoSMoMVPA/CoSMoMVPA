@@ -2,6 +2,9 @@ function test_suite=test_meeg_senstype_collection
     initTestSuite;
 
 function test_meeg_senstype_collection_
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
 
     % get senstype properties
     % order is:

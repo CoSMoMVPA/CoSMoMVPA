@@ -3,6 +3,10 @@ function test_suite=test_meeg_chan_neighbors()
 
 
 function test_meeg_neighbors()
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
     % switch off warnings by fieldtrip
     warning_state=warning('query','all');
     cleaner=onCleanup(@()warning(warning_state));
@@ -14,15 +18,10 @@ function test_meeg_neighbors()
     % test a subset
     ntest=round(n*.5);
 
-    if ~(cosmo_check_external('fieldtrip',false) && cosmo_wtf('is_matlab'))
-        cosmo_notify_test_skipped(['Comparison with fieldtrip output '...
-                       'is disabled because fieldtrip is not available']);
-        ntest_fieldtrip=0;
-    else
-        % test a subset for fieldtrip
-        % (fieldtrip is very slow, so testing all would take too long)
-        ntest_fieldtrip=1;
-    end
+
+    % test a subset for fieldtrip
+    % (fieldtrip is very slow, so testing all would take too long)
+    ntest_fieldtrip=1;
 
     % visit in random order
     rp=randperm(n);

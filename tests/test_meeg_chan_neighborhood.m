@@ -3,6 +3,9 @@ function test_suite=test_meeg_chan_neighborhood()
 
 function test_neighbors()
     % note: this tests assumes that meeg_chan_neighbors works properly
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
 
     % only test every test_step-th channel
     test_step=10;
