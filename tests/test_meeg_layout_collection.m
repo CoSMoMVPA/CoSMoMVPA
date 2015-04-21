@@ -69,6 +69,9 @@ function test_fieldtrip_correspondence
     end
 
 function test_meeg_layout_collection_
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
 
     % get layout properties
     % order is:
