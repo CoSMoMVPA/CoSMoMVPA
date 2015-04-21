@@ -1,0 +1,34 @@
+# vim ft=yaml
+# travis-ci.org definition for CoSMoMVPA build (based on PyMVPA, which is
+# based on nipype configuration, which in turn was based on nipy)
+#
+# We pretend to be erlang because we need GNU Octave which is not 
+# available (as of April 2015)
+
+language: erlang
+cache:
+  - apt
+env:
+ global:
+    - OCTAVE=octave
+    # - PYTHON=python3 PYSUF=3 : python3-numpy not currently available
+before_install:
+    # to prevent IPv6 being used for APT
+    - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
+    - travis_retry sudo apt-get install -y software-properties-common python-software-properties
+    - travis_retry sudo apt-add-repository -y ppa:octave/stable
+    - travis_retry sudo apt-get -y -qq update
+    # get Octave 3.8
+    - travis_retry sudo apt-get -y install octave
+    # go up one level to retrieve MOxUnit
+    - cd ..
+    - git clone git://github.com/nno/MOxUnit.git
+script:
+    - cd ..
+    - ROOTDIR=`pwd`
+    - CMD="more('off');"
+    - CMD="${CMD}cosmo_set_path();"
+    - CMD="${CMD}result=moxunit_runtests('-verbose','${ROOTDIR}/CoSMoMVPA/tests');"
+    - CMD="${CMD}exit(~result);"
+    - $OCTAVE --path ${ROOTDIR}/CoSMoMVPA/mvpa:${ROOTDIR}/CoSMoMVPA/tests:${ROOTDIR}/MOxUnit/MOxUnit --eval "${CMD}"
+
