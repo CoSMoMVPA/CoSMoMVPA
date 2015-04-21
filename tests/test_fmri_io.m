@@ -87,9 +87,9 @@ function test_fmri_io_exceptions()
 
     % wrong dimension size
     ds=cosmo_synthetic_dataset();
-    afni=cosmo_map2fmri(ds,'-afni');
-    afni.img=zeros(1,1,1,1,5);
-    aet(afni);
+    nii=cosmo_map2fmri(ds,'-nii');
+    nii.img=zeros(1,1,1,1,5);
+    aet(nii);
 
 function test_fmri_io_mask
     aet=@(varargin)assertExceptionThrown(@()...
