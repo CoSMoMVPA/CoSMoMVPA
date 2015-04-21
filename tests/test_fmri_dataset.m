@@ -202,13 +202,7 @@ function test_set_sa_fmri_dataset()
 
 
 function tf=can_test_bv()
-    tf=cosmo_wtf('is_matlab') && cosmo_check_external('neuroelf',false);
-    if ~tf
-        cosmo_notify_test_skipped(['BrainVoyager fmri i/o cannot be '...
-                    'tested because ''neuroelf'' is not '...
-                    'available']);
-    end
-
+    tf=~cosmo_skip_test_if_no_external('neuroelf');
 
 function ds=get_base_dataset()
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);

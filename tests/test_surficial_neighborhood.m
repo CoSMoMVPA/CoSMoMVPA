@@ -2,9 +2,7 @@ function test_suite = test_surficial_neighborhood
     initTestSuite;
 
 function test_surficial_neighborhood_surface
-    if ~cosmo_check_external('fast_marching',false)
-        cosmo_notify_test_skipped(['surfing '...'
-                                    'toolbox is not available']);
+    if cosmo_skip_test_if_no_external('surfing')
         return
     end
     opt=struct();
@@ -19,18 +17,10 @@ function test_surficial_neighborhood_surface
                 2 1 5 4
                 5 4 6 5 ]';
 
-    nh=cosmo_surficial_neighborhood(ds,{vertices,faces},'count',4,opt);
-    assert_equal_cell(nh.neighbors,{[ 1 2 4 5 ]
-                                    [ 2 1 3 5 ]
-                                    [ 3 2 6 5 ]
-                                    [ 4 1 5 2 ]
-                                    [ 5 2 4 6 ]
-                                    [ 6 3 5 2 ] });
-    assertEqual(nh.fa.node_indices,1:6);
-    assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
+
 
     nh2=cosmo_surficial_neighborhood(ds,{vertices,faces},'count',4,...
-    'metric','dijkstra',opt);
+                                    'metric','dijkstra',opt);
     assert_equal_cell(nh2.neighbors,{ [ 1 2 4 3 ]
                                         [ 2 1 3 5 ]
                                         [ 3 2 6 5 ]
@@ -42,14 +32,14 @@ function test_surficial_neighborhood_surface
     assertEqual(nh2.fa.node_indices,1:6);
 
     nh3=cosmo_surficial_neighborhood(ds,{vertices,faces},...
-    'direct',true,opt);
+                                    'direct',true,opt);
     assert_equal_cell(nh3.neighbors,{ [ 2 4 ]
                                         [ 3 1 4 5 ]
                                         [ 2 5 6 ]
                                         [ 1 2 5 ]
                                         [ 3 6 2 4 ]
                                         [ 3 5 ] });
-    assertEqual(nh3.fa.radius,sqrt([1 2 2 2 2 1]));
+    assertElementsAlmostEqual(nh3.fa.radius,sqrt([1 2 2 2 2 1]));
 
 function test_surficial_neighborhood_surface_geodesic
     if ~cosmo_check_external('fast_marching',false)

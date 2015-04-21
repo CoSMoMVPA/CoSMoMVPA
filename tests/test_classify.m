@@ -158,10 +158,6 @@ function [tr_samples,tr_targets,te_samples]=generate_data(nclasses)
     tr_samples=ds.samples(tr_msk,:);
     te_samples=ds.samples(te_msk,:);
 
-function is_absent=no_external(name)
-    is_absent=~cosmo_check_external(name,false);
-    if is_absent
-        reason=sprintf('External ''%s'' is not present',name);
-        cosmo_notify_test_skipped(reason)
-    end
+function is_absent=no_external(external_name)
+    is_absent=cosmo_notify_test_skipped(external_name);
 

@@ -43,9 +43,7 @@ function test_fmri_cluster_neighborhood
 
 
 function test_meeg_cluster_neighborhood
-    if ~cosmo_check_external('fieldtrip',false)
-        cosmo_notify_test_skipped(['fieldtrip'...'
-                                    'toolbox is not available']);
+    if cosmo_skip_test_if_no_external('fieldtrip')
         return
     end
     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
@@ -124,9 +122,7 @@ function test_meeg_cluster_neighborhood
 
 
 function test_tiny_meeg_cluster_neighborhood
-    if ~cosmo_check_external('fieldtrip',false)
-        cosmo_notify_test_skipped(['fieldtrip'...'
-                                    'toolbox is not available']);
+    if cosmo_skip_test_if_no_external('fieldtrip')
         return
     end
     ds=cosmo_synthetic_dataset('type','meeg');
@@ -143,9 +139,7 @@ function test_tiny_meeg_cluster_neighborhood
 
 
 function test_cluster_neighborhood_surface
-    if ~cosmo_check_external('surfing',false)
-        cosmo_notify_test_skipped(['surfing'...'
-                                    'toolbox is not available']);
+    if cosmo_skip_test_if_no_external('surfing')
         return
     end
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');

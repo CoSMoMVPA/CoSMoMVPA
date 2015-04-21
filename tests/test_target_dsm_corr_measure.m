@@ -34,11 +34,8 @@ function test_target_dsm_corr_measure_partial
 
 
 function test_target_dsm_corr_measure_partial_matlab_correspondence
-    if ~cosmo_check_external('@stats',false)
-        cosmo_notify_test_skipped(['partial correlations '...
-                                    'correspondence not tested; '...'
-                                    'stats toolbox is not available']);
-        return
+    if cosmo_skip_test_if_no_external('@stats')
+        return;
     end
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
     mat1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
@@ -54,11 +51,8 @@ function test_target_dsm_corr_measure_partial_matlab_correspondence
 
 function test_target_dsm_corr_measure_non_pearson
     % test non-Pearson correlations
-    if ~cosmo_check_external('@stats',false)
-        cosmo_notify_test_skipped(['non-Pearson correlations are '...
-                                    'not tested; '...'
-                                    'stats toolbox is not available']);
-        return
+    if cosmo_skip_test_if_no_external('@stats')
+        return;
     end
 
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);

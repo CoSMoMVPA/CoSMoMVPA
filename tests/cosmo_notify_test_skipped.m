@@ -1,4 +1,38 @@
 function varargout=cosmo_notify_test_skipped(reason)
+% notify that a test is skipped
+%
+% Usages:
+%   - cosmo_notify_test_skipped(reason)
+%
+%       Input:
+%           reason          string indicating why a test is skipped, and
+%                           store reason internally in this function.
+%
+%   - skipped_tests=cosmo_notify_test_skipped()
+%
+%       Output:
+%           skipped_tests   cell with strings containing the reason values
+%                           stored internally
+%
+%   - cosmo_notify_test_skipped()
+%
+%       Side effect: this empties the internal list of skipped tests
+%
+% Notes:
+%   - depending on the call stack, this function:
+%       * when called through MOxUnit's moxunit_run_tests, it raises an
+%         exception through  moxunit_throw_test_skipped_exception. When
+%         moxunit_run_tests is finished testing, it can summarize which
+%         tests were skipped.
+%       * when called through cosmo_run_tests, no warning is shown and no
+%         error is thrown. When cosmo_run_tests is finished testing, it can
+%         summarize which tests were skipped.
+%       * otherwise, a warning message is shown with the reason.
+%
+% See also: moxunit_throw_test_skipped_exception, cosmo_run_tests
+%
+% NNO Apr 2015
+
     persistent skipped_tests
 
     if isempty(skipped_tests)
