@@ -90,8 +90,6 @@ function idx=first_stack_index_with_string(db, string)
 function idx=last_non_testing_suite_stack_index(db)
     if test_was_run_by_MOxUnit(db)
         suite_dir=fileparts(which('moxunit_runtests'));
-        disp('suite dir');
-        disp(suite_dir);
         idx=first_stack_index_with_string(db, suite_dir)-1;
 
     elseif test_was_run_by_cosmo_run_tests(db)
