@@ -3,6 +3,8 @@ function test_suite=test_cross_neighborhood()
 
 
 function test_cross_neighborhood_basis()
+    can_use_chan_nbrhood=cosmo_check_external('fieldtrip',false);
+
     ds_full=cosmo_synthetic_dataset('type','timefreq','size','big');
 
     % make it sparse
@@ -26,8 +28,13 @@ function test_cross_neighborhood_basis()
     % define neighborhoods
     freq_nbrhood=cosmo_interval_neighborhood(ds,'freq','radius',2);
     time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
-    chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,'count',5,...
+    if can_use_chan_nbrhood
+        chan_nbrhood=cosmo_meeg_chan_neighborhood(ds,'count',5,...
                                 'chantype','all','label','dataset');
+    else
+        chan_nbrhood='dummy';
+    end
+
     all_nbrhoods={chan_nbrhood, freq_nbrhood, time_nbrhood};
     ndim=numel(all_nbrhoods);
     dim_labels={'chan';'freq';'time'};
@@ -35,7 +42,7 @@ function test_cross_neighborhood_basis()
     ntest=5;  % number of positions to test
 
     for i=7:-1:1
-        use_chan=i<=4;
+        use_chan=can_use_chan_nbrhood && i<=4;
         use_freq=mod(i,2)==1;
         use_time=mod(ceil(i/2),2)==1;
 
@@ -105,6 +112,15 @@ function test_cross_neighborhood_basis()
         end
     end
 
+    if ~can_use_chan_nbrhood
+        cosmo_notify_test_skipped('channel neighborhood not available');
+        return;
+    end
+
+
+function test_cross_neighborhood_exceptions()
+    ds=cosmo_synthetic_dataset('type','meeg','size','big');
+    time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
 
     % test exceptions
     aet=@(x)assertExceptionThrown(@()cosmo_cross_neighborhood(ds,x{:}),'');
@@ -121,7 +137,8 @@ function test_cross_neighborhood_basis()
     time_nbrhood.neighbors{1}=1.5;
     aet({time_nbrhood});
 
-    chan_nbrhood.a.fdim.labels{1}='foo';
-    chan_nbrhood.fa.foo=chan_nbrhood.fa.chan;
-    aet({chan_nbrhood});
+    time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
+    time_nbrhood.a.fdim.labels{1}='foo';
+    time_nbrhood.fa.foo=time_nbrhood.fa.time;
+    aet({time_nbrhood});
 
