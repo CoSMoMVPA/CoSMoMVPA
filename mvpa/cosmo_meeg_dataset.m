@@ -56,10 +56,26 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %  - if the input contains data from a single sample (such as an average)
 %    the .sample_field is set to .trial, and mapping back to MEEG format
 %    adds a singleton dimension to the .trial data output field.
+%  - For single-subject MVPA of single trials using data preprocessed with
+%    FieldTrip, consider setting, depending on the data type:
+%       * timelock (ft_timelockanalysis): cfg.keeptrials = 'yes'
+%       * timefreq (ft_timefreqanalysis): cfg.keeptrials = 'yes'
+%       * source   (ft_sourceanalysis)  : cfg.keeptrials = 'yes' *and*
+%                                                   cfg.rawtrials = 'yes'
 %  - Most MVPA applications require that .sa.targets (experimental
 %    condition of each sample) and .sa.chunks (partitioning of the samples
 %    in independent sets) are set, either by using this function or
 %    manually afterwards.
+%  - If the input is a FieldTrip struct with a field .trialinfo, then this
+%    field is present in .sa.trialinfo. Depending on the contents of
+%    .trialinfo, this could be used to specify conditions in each trial.
+%    For example, if the third column of .trialinfo contains an integer
+%    specifying the condition of each trial, after running this function
+%    one can do
+%
+%       ds.sa.targets=ds.sa.trialinfo(:,3)
+%
+%    to set the trial conditions.
 %
 % See also: cosmo_map2meeg
 %
