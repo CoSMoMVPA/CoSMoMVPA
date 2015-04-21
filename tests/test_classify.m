@@ -159,5 +159,5 @@ function [tr_samples,tr_targets,te_samples]=generate_data(nclasses)
     te_samples=ds.samples(te_msk,:);
 
 function is_absent=no_external(external_name)
-    is_absent=cosmo_notify_test_skipped(external_name);
+    is_absent=cosmo_skip_test_if_no_external(external_name);
 

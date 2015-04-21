@@ -42,9 +42,9 @@ function varargout=cosmo_notify_test_skipped(reason)
     if nargin<1
         varargout={skipped_tests};
         return;
-    else
-        varargout={};
     end
+
+    varargout=cell(0);
 
     switch reason
         case 'on'
