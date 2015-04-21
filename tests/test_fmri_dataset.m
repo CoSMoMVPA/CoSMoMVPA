@@ -7,6 +7,10 @@ function test_base_fmri_dataset()
     assert_dataset_equal(ds, get_expected_dataset());
 
 function test_afni_fmri_dataset()
+    if cosmo_skip_test_if_no_external('afni')
+        return;
+    end
+
     ds=get_base_dataset();
     afni=cosmo_map2fmri(ds,'-afni');
     assertAlmostEqualWithTol(afni, get_expected_afni());
