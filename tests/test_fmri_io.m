@@ -2,8 +2,8 @@ function test_suite=test_fmri_io
     initTestSuite;
 
 function test_fmri_io_nii_gz()
-    if ~usejava('jvm')
-        cosmo_notify_test_skipped('java VM not available');
+    if ~usejava('jvm') || cosmo_wtf('is_octave')
+        cosmo_notify_test_skipped('java VM not available for .nii.gz');
         return;
     end
 
