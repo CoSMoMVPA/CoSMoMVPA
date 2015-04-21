@@ -101,6 +101,7 @@ function bl=baseline_correct(samples, mu, method)
             error('illegal baseline correction method ''%s''',method);
     end
 
+
 function bl_ds=baseline_correct_interval(ds,interval,baseline_label,method)
     if numel(interval)~=2
         error('interval must have two values');
