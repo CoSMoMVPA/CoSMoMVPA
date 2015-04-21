@@ -42,9 +42,13 @@ function test_cross_neighborhood_basis()
     ntest=5;  % number of positions to test
 
     for i=7:-1:1
-        use_chan=can_use_chan_nbrhood && i<=4;
+        use_chan=i<=4;
         use_freq=mod(i,2)==1;
         use_time=mod(ceil(i/2),2)==1;
+
+        if ~can_use_chan_nbrhood && use_chan
+            continue;
+        end
 
         use_dim_msk=[use_chan;use_freq;use_time];
         nbrhood=cosmo_cross_neighborhood(ds,all_nbrhoods(use_dim_msk),...
