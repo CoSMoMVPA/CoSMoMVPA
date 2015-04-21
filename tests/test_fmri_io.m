@@ -1,74 +1,69 @@
 function test_suite=test_fmri_io
     initTestSuite;
 
-function test_fmri_io_base
+function test_fmri_io_nii_gz()
+    if ~usejava('jvm')
+        cosmo_notify_test_skipped('java VM not available');
+        return;
+    end
+
+    save_and_load_dataset_with_extension('.nii.gz');
+
+function test_fmri_io_nii()
+    save_and_load_dataset_with_extension('.nii');
+
+function test_fmri_io_hdr()
+    save_and_load_dataset_with_extension('.hdr');
+
+function test_fmri_io_img()
+    save_and_load_dataset_with_extension('.img');
+
+function test_fmri_io_afni_orig_head()
+    if cosmo_skip_test_if_no_external('afni')
+        return;
+    end
+
+    save_and_load_dataset_with_extension('+orig.HEAD');
+
+function test_fmri_io_afni_tlrc_brik()
+    if cosmo_skip_test_if_no_external('afni')
+        return;
+    end
+    save_and_load_dataset_with_extension('+tlrc.BRIK');
+
+function test_fmri_io_bv_vmp()
+    if cosmo_skip_test_if_no_external('neuroelf')
+        return;
+    end
+    save_and_load_dataset_with_extension('.vmp');
+
+function test_fmri_io_bv_vmr()
+    if cosmo_skip_test_if_no_external('neuroelf')
+        return;
+    end
+    save_and_load_dataset_with_extension('.vmr');
+
+function test_fmri_io_bv_msk()
+    if cosmo_skip_test_if_no_external('neuroelf')
+        return;
+    end
+    save_and_load_dataset_with_extension('.msk');
+
+function test_fmri_io_mat()
+    save_and_load_dataset_with_extension('.mat');
+
+
+function save_and_load_dataset_with_extension(ext)
     x_base=get_base_dataset();
+    y=save_and_load(x_base,ext);
+    assert_dataset_equal(x_base,y,ext);
 
-    x=x_base;
-    exts={'.nii.gz', '.nii', '.hdr', '.img', '+orig.HEAD',...
-              '+tlrc.BRIK','.vmp',...
-              '.vmr', '.msk', '.mat'};
-
-    skips=struct();
-
-    skips.nii_gz.description='.nii.gz (gzipped) NIFTI';
-    skips.nii_gz.matcher=@()~usejava('jvm');
-    skips.nii_gz.exts={'.nii.gz'};
-    skips.nii_gz.component='java VM';
-
-    skips.afni.description='AFNI';
-    skips.afni.matcher=@()~cosmo_check_external('afni',false);
-    skips.afni.exts={'+orig.HEAD','+tlrc.BRIK'};
-    skips.afni.component='external ''afni''';
-
-    skips.bv.description='BrainVoyager';
-    skips.bv.matcher=@()cosmo_wtf('is_octave') || ...
-                    ~cosmo_check_external('neuroelf',false);
-    skips.bv.component='external ''neuroelf''';
-    skips.bv.exts={'.vmp','.vmr','.msk'};
-
-    skip_keys=fieldnames(skips);
-    nskip_keys=numel(skip_keys);
-    skipped_fieldname=[];
-
-    n=numel(exts);
-    for k=1:n
-        ext=exts{k};
-
-        skip_test=false;
-        for j=1:nskip_keys
-            s=skips.(skip_keys{j});
-            if cosmo_match({ext},s.exts) && s.matcher()
-                skipped_fieldname=skip_keys{j};
-                skip_test=true;
-                break;
-            end
-        end
-
-        if skip_test
-            continue;
-        end
-
-        y=save_and_load(x_base,ext);
-        assert_dataset_equal(x,y,ext);
-    end
-
-
-    if ~isempty(skipped_fieldname)
-        s=skips.(skipped_fieldname);
-        reason=sprintf(['fmri i/o for %s files skipped because %s'...
-                        'is not available'],...
-                        s.description,s.component);
-
-        cosmo_notify_test_skipped(reason);
-    end
 
 function test_fmri_io_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...
                             cosmo_fmri_dataset(varargin{:}),'');
 
     fn=get_temp_filename('test%d.mat');
-    fn2=get_temp_filename('test%d+orig.HEAD');
     cleaner=onCleanup(@()delete_files({fn}));
 
     x=struct();
