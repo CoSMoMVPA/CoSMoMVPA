@@ -2,8 +2,13 @@ function test_suite = test_stat
     initTestSuite;
 
 
-function test_stat_
+function test_stat_correspondence
     is_matlab=cosmo_wtf('is_matlab');
+
+    if isempty(which('ttest'))
+        cosmo_notify_test_skipped('ttest is not available');
+        return
+    end
 
     % test conformity with matlab's stat functions
     ds=cosmo_synthetic_dataset('nchunks',5,'ntargets',4,'sigma',0);
