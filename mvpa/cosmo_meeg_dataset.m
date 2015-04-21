@@ -61,10 +61,6 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %    in independent sets) are set, either by using this function or
 %    manually afterwards.
 %
-% Dependency:
-%  - Loading Fieldtrip structures requires the FieldTrip toolbox:
-%      http://http://fieldtrip.fcdonders.nl
-%
 % See also: cosmo_map2meeg
 %
 % NNO Sep 2013
