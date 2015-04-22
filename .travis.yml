@@ -25,19 +25,10 @@ before_install:
     - git clone git://github.com/nno/MOxUnit.git
 script:
     - cd ..
-    - ROOTDIR=`pwd`
-    - echo "Rootdir: $ROOTDIR"
-    - echo "Contents of rootdir:"
-    - ls ${ROOTDIR}
-    - echo "Contents of rootdir/CoSMoMVPA"
-    - ls ${ROOTDIR}/CoSMoMVPA
-    - echo "Contents of rootdir/CoSMoMVPA/mvpa"
-    - ls ${ROOTDIR}/CoSMoMVPA
-    - echo "finding cosmo_set_path"
-    - find . -iname cosmo_run_tests.m
+    - ROOTDIR=`pwd`"/"
     - CMD="more('off');"
     - CMD="${CMD}cosmo_set_path();"
-    - CMD="${CMD}result=moxunit_runtests('-verbose','${ROOTDIR}/CoSMoMVPA/tests');"
+    - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
     - CMD="${CMD}exit(~result);"
-    - $OCTAVE --path "${ROOTDIR}/CoSMoMVPA/mvpa:${ROOTDIR}/CoSMoMVPA/tests:${ROOTDIR}/MOxUnit/MOxUnit" --eval "${CMD}"
+    - $OCTAVE --path "CoSMoMVPA/mvpa:CoSMoMVPA/tests:MOxUnit/MOxUnit" --eval "${CMD}"
 
