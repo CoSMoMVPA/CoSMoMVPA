@@ -188,7 +188,8 @@ function test_cluster_neighborhood_source
     rp=rp(1:10);
 
     grid_spacing=10;
-    pos=ds.a.fdim.values{1}(:,ds.fa.pos)/grid_spacing;
+    ds_pos=ds.a.fdim.values{1}(:,ds.fa.pos)/grid_spacing;
+
 
     for connectivity=0:3
         if connectivity==0
@@ -200,20 +201,12 @@ function test_cluster_neighborhood_source
         end
 
         nh=cosmo_cluster_neighborhood(ds,'progress',false,args);
-        nh2=cosmo_spherical_neighborhood(ds,'progress',false,...
-                                                'radius',radius);
-
-        assertEqual(nh.fa.pos,nh2.fa.pos)
-        assertEqual(nh.a.fdim,nh2.a.fdim)
-
-        assertEqual(nh.fa.pos,ds.fa.pos);
-        assertEqual(nh.a.fdim,ds.a.fdim);
+        nh_pos=nh.a.fdim.values{1}(:,nh.fa.pos)/grid_spacing;
 
         for r=rp
             idxs=nh.neighbors{r};
-            assertEqual(idxs,sort(nh2.neighbors{r}));
 
-            d=sum(bsxfun(@minus,pos(:,r),pos).^2,1).^.5;
+            d=sum(bsxfun(@minus,nh_pos(:,r),ds_pos).^2,1).^.5;
 
             d_inside=d(idxs);
             outside_mask=true(size(d));
