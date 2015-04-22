@@ -25,10 +25,12 @@ before_install:
     - git clone git://github.com/nno/MOxUnit.git
 script:
     - ls
-    - pwd
+    - ls CoSMoMVPA
+    - ls CoSMoMVPA/mvpa
+    - PTH=`pwd`
     - CMD="more('off');"
     - CMD="${CMD}cosmo_set_path();"
     - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
     - CMD="${CMD}exit(~result);"
-    - $OCTAVE --path "CoSMoMVPA/mvpa:CoSMoMVPA/tests:MOxUnit/MOxUnit" --eval "${CMD}"
+    - $OCTAVE --path "${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests:${PTH}/MOxUnit/MOxUnit" --eval "${CMD}"
 
