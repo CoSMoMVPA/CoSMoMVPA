@@ -16,7 +16,7 @@ before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
     - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
-    - travis_retry sudo apt-add-repository -y -qq ppa:octave/stable
+    - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
     # get Octave 3.8
     - travis_retry sudo apt-get -y -qq install octave
