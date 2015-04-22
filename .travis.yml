@@ -24,8 +24,8 @@ before_install:
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
 script:
-    - cd ..
-    - ROOTDIR=`pwd`"/"
+    - ls
+    - pwd
     - CMD="more('off');"
     - CMD="${CMD}cosmo_set_path();"
     - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
