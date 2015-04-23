@@ -525,6 +525,8 @@ function afni_info=new_afni(ds)
     afni_info.DELTA=delta(:)';
     afni_info.ORIGIN=origin(:)';
     afni_info.SCALE=0;
+    afni_info.NOTES_COUNT=0;
+    afni_info.WARP_TYPE=[0 0];
 
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
                 'BRICK_STATS','BRICK_FLOAT_FACS',...
@@ -556,6 +558,7 @@ function write_afni(fn, hdr)
     afniopt.Prefix=fn; %the second input argument
     afniopt.OverWrite='y';
     afniopt.NoCheck=0;
+    afniopt.AppendHistory=false;
 
     if ends_with({'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz'},fn)
@@ -568,6 +571,8 @@ function write_afni(fn, hdr)
     else
         error('Unsupported scene data for %s', fn);
     end
+
+
 
     [err, ErrMessage]=WriteBrik(data, hdr, afniopt);
     if err
