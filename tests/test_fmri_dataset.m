@@ -416,6 +416,12 @@ function afni=get_expected_afni()
     afni.BRICK_KEYWORDS = [];
     afni.BRICK_STATAUX = [];
     afni.STAT_AUX = [];
+    afni.SCALE=0;
+    afni.NOTES_COUNT=0;
+    afni.WARP_TYPE=[0 0];
+    afni.FileFormat='BRIK';
+    [unused, unused, endian_ness] = computer();
+    afni.BYTEORDER_STRING = [endian_ness 'SB_FIRST'];
 
     % data
     data=zeros(3,2,1,2);
