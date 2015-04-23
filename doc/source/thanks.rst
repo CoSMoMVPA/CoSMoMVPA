@@ -26,17 +26,26 @@ We would like to thank the following people for specific contributions:
 
 The following people have provided valuable suggestions, advice, support, or code to CoSMoMVPA:
 
++ Talia Brandman
++ Robert W. Cox
 + Sarah Belinda Aimee Degosciu
++ Yaroslav Halchenko
 + Thomas Hartmann
 + James Haxby
++ Clayton Hickey
 + Daniel Kaiser
 + James Keidel
++ Sam Nastase
 + Nicholas Peatfield
 + Liuba Papeo
 + Jia Hou Poh
 + Reshanne Reader
++ Anne Roefs
 + Jens Schwarzbach
 + Mohamed Tawfik
++ Luca Turella
++ Moritz Wurm
+
 
 Citations
 ---------
