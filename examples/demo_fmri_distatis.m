@@ -51,7 +51,7 @@ for subject_num=1:nsubjects
     data_path=fullfile(study_path,subject_id);
 
     % Define data locations and load data from even and odd runs
-    mask_fn=fullfile(data_path, [mask_label '.nii']); % whole brain
+    mask_fn=fullfile(data_path, [mask_label '.nii']); % vt mask
 
     % Use odd runs only
     data_fn=fullfile(data_path,'glm_T_stats_odd.nii');
