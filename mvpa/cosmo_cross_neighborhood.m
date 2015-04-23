@@ -54,7 +54,7 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
     cosmo_check_dataset(ds);
     check_nbrhoods(nbrhoods,ds);
 
-    default.progress=true;
+    default.progress=1000;
     opt=cosmo_structjoin(default, varargin{:});
 
     ndim=numel(nbrhoods);
