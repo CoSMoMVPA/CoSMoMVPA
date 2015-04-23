@@ -139,13 +139,15 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
     %   nthr           number of thresholds (1 for any method except for
     %                  TFCE)
 
-    [delta_thr, cluster_func, nthr]=get_clustering_params(cluster_stat,...
+    [delta_thr,cluster_func,nthr,has_inf]=get_clustering_params(...
+                                                          cluster_stat,...
                                                           sample,...
                                                           feature_sizes,...
                                                           opt,defaults);
 
     % initially all features survive the mask, except non-finite ones
-    super_threshold_msk=isfinite(sample);
+    super_threshold_msk=~isnan(sample);
+    infinity_msk=isinf(sample) & sample>0;
 
     % keep
     thr_counter=0;
@@ -165,9 +167,19 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
         % update mask of features above threshold
         super_threshold_msk=super_threshold_msk & sample>=thr;
 
-        if ~any(super_threshold_msk)
-            % no features surive, clustering is completed
-            break;
+        if has_inf
+            % if output can contain infinity, break if all values are less
+            % than the threshold or inifity
+            if ~any(super_threshold_msk & ~infinity_msk)
+                % no features surive, clustering is completed
+                break;
+            end
+        else
+            % if output cannot contain infinity, break if all values are
+            % less than the threshold
+            if ~any(super_threshold_msk)
+                break;
+            end
         end
 
         % apply clustering
@@ -186,7 +198,12 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
         thr_counter=thr_counter+1;
     end
 
-function [delta_thr, cluster_func, nthr]=get_clustering_params(method,...
+    if has_inf
+        cval(infinity_msk)=Inf;
+    end
+
+function [delta_thr,cluster_func,nthr,has_inf]=get_clustering_params(...
+                                                      method,...
                                                       sample,sizes,...
                                                       opt,defaults)
     switch method
@@ -195,21 +212,25 @@ function [delta_thr, cluster_func, nthr]=get_clustering_params(method,...
             cluster_func=get_tfce_cluster_func(sizes,delta_thr,...
                                                 opt,defaults);
             nthr=Inf;
+            has_inf=true;
 
         case 'max'
             cluster_func=@(idxs,thr) max(sample(idxs));
             delta_thr=get_fixed_threshold_height(opt);
             nthr=1;
+            has_inf=true;
 
         case 'maxsize'
             cluster_func=@(idxs,thr) sum(sizes(idxs));
             delta_thr=get_fixed_threshold_height(opt);
             nthr=1;
+            has_inf=false;
 
         case 'maxsum'
             cluster_func=@(idxs,thr) sum(sample(idxs));
             delta_thr=get_fixed_threshold_height(opt);
             nthr=1;
+            has_inf=true;
 
         otherwise
             error('illegal method ''%s''', method);

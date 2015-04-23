@@ -28,6 +28,28 @@ function test_measure_clusters_statfun
     aoe({'maxsum','threshold',3},zeros(1,7));
 
 
+function test_measure_clusters_infinity
+    samples=[-Inf Inf Inf 1 NaN 2 Inf];
+    nbrhood_mat=[ 1 1 2 3 4 5 6
+                  2 2 3 4 5 6 7
+                  0 3 4 5 6 7 0];
+
+    m=@(x) cosmo_measure_clusters(samples,nbrhood_mat,x{:});
+    aoe=@(x,v)assertElementsAlmostEqual(m(x),v,'relative',1e-4);
+
+    aoe({'tfce','dh',.1},[ 0 Inf Inf 0.6668 0 3.4931 Inf]);
+    aoe({'max','threshold',1},[ 0 Inf Inf Inf 0 Inf Inf]);
+    aoe({'max','threshold',2},[ 0 Inf Inf 0 0 Inf Inf]);
+    aoe({'max','threshold',3},[ 0 Inf Inf 0 0 0 Inf]);
+    aoe({'maxsize','threshold',1},[ 0 3 3 3 0 2 2])
+    aoe({'maxsize','threshold',2},[0 2 2 0 0 2 2])
+    aoe({'maxsize','threshold',3},[0 2 2 0 0 0 1]);
+    aoe({'maxsum','threshold',1},[ 0 Inf Inf Inf 0 Inf Inf])
+    aoe({'maxsum','threshold',2},[ 0 Inf Inf 0 0 Inf Inf])
+    aoe({'maxsum','threshold',3},[ 0 Inf Inf 0 0 0 Inf]);
+
+
+
 function test_measure_clusters_exceptions()
     aet=@(x)assertExceptionThrown(@()cosmo_measure_clusters(x{:}),'');
     aet({ones(1,3),ones(1,4),'tfce','dh',.1})
