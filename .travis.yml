@@ -21,6 +21,7 @@ before_install:
     - travis_retry sudo apt-get -y -qq update
     # get Octave 3.8
     - travis_retry sudo apt-get -y install octave
+    - travis_retry sudo apt-get -y install liboctave-dev
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
