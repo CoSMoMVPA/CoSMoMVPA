@@ -46,6 +46,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Luca Turella
 + Moritz Wurm
 
+Work on CoSMoMVPA has been supported by the ATTEND_ project.
 
 Citations
 ---------
