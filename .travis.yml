@@ -11,7 +11,7 @@ cache:
 env:
  global:
     - OCTAVE=octave
-    - EXTERNALS="afni surfing"
+    - EXTERNALS="afni surfing fieldtrip"
     # - PYTHON=python3 PYSUF=3 : python3-numpy not currently available
 before_install:
     # to prevent IPv6 being used for APT
@@ -39,11 +39,24 @@ script:
       fi
     # optionally install afni
     # Hopefull soon the official AFNI Matlab code can be used
-    # currently (Apr 2015) we use our own version
+    # currently (Apr 2015) we use our own version that
+    # is compatible with Octave
+    # (PR: https://github.com/afniHQ/AFNI/pull/8)
     # TODO: git clone git://github.com/afniHQ/AFNI.git --depth 1
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
           git clone -b _cleanup git://github.com/nno/AFNI.git;
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab";
+      fi
+    # optionally install FieldTrip
+    # Hopefull soon the official FieldTrip code can be used
+    # currently (Apr 2015) we use our own version that
+    # is compatible with Octave
+    # (PR: https://github.com/fieldtrip/fieldtrip/pull/54)
+    # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
+    - if [[ "$EXTERNALS" = *"fieldtrip"* ]]; then
+          git clone -b octave git://github.com/nno/fieldtrip.git;
+          CMD="${CMD}ft_defaults();"
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
       fi
     - CMD="${CMD}cosmo_set_path();"
     - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
