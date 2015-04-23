@@ -125,13 +125,6 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     % number of features associated with each linear id
     feature_id_count=cellfun(@numel,lin2feature_ids);
 
-    % allocate space for output
-    ncenters=numel(feature_mask);
-    neighbors=cell(ncenters,1);
-    nvoxels=zeros(1,ncenters);
-    final_radius=zeros(1,ncenters);
-    visited=false(1,ncenters);
-
     show_progress=opt.progress>0;
 
     if show_progress
@@ -145,8 +138,15 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     % a position may occur at multiple features; only consider unique
     % positions
     [center_idxs,unq_pos]=cosmo_index_unique(pos(:,feature_mask)');
-    masked2all=find(feature_mask);
     nunq_centers=numel(center_idxs);
+
+    % allocate space for output
+    ncenters=nunq_centers;
+    neighbors=cell(ncenters,1);
+    nvoxels=zeros(1,ncenters);
+    final_radius=zeros(1,ncenters);
+    visited=false(1,ncenters);
+    center_ids=zeros(1,ncenters);
 
     % go over all features
     for k=1:nunq_centers
@@ -222,21 +222,20 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 
 
         % store results
-        ids=masked2all(center_idxs{k});
+        id=center_idxs{k}(1);
 
-        for j=1:numel(ids)
-            % for each unique feature id, store the results
-            id=ids(j);
-            neighbors{id}=feature_ids(:)';
-            nvoxels(id)=numel(feature_ids);
-            if use_fixed_radius
-                final_radius(id)=radius;
-            else
-                final_radius(id)=variable_radius;
-            end
 
-            visited(id)=true;
+        neighbors{k}=feature_ids(:)';
+        nvoxels(k)=numel(feature_ids);
+        if use_fixed_radius
+            final_radius(k)=radius;
+        else
+            final_radius(k)=variable_radius;
         end
+
+        visited(k)=true;
+        assert(center_ids(k)==0);
+        center_ids(k)=id;
 
         if show_progress && (k==1 || k==nunq_centers || ...
                                         mod(k,opt.progress)==0)
@@ -258,18 +257,41 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     nbrhood.a=ds.a;
     nbrhood.a.fdim=fdim;
 
-    center_ids=zeros(size(feature_mask));
-    center_ids(feature_mask)=1:sum(feature_mask);
 
-    %fa_full=cosmo_slice(fa_full,center_ids,2,'struct');
+    fa_full=cosmo_slice(fa,center_ids,2,'struct');
     nbrhood.fa=cosmo_structjoin('nvoxels',nvoxels,...
                                 'radius',final_radius,...
                                 'center_ids',center_ids(:)',...
-                                fa);
+                                fa_full);
 
     nbrhood.neighbors=neighbors;
 
+    nbrhood=align_nbrhood_to_ds_if_possible(ds,nbrhood);
+
     cosmo_check_neighborhood(nbrhood);
+
+
+
+function nbrhood=align_nbrhood_to_ds_if_possible(ds,nbrhood)
+   labels=get_dim_label(ds);
+
+   ds_fa=get_spherical_fa_cell(ds.fa,labels);
+   nbrhood_fa=get_spherical_fa_cell(nbrhood.fa,labels);
+
+   [unq_ds,idx_ds]=cosmo_index_unique(ds_fa);
+   [unq_nbrhood,idx_nbrhood]=cosmo_index_unique(nbrhood_fa);
+
+   if all(cellfun(@numel,unq_ds)==1) && ...
+           isequal(sort(cell2mat(unq_ds)),sort(cell2mat(unq_nbrhood)))
+       mp=cosmo_align(nbrhood_fa,ds_fa);
+
+       nbrhood.neighbors=nbrhood.neighbors(mp);
+       nbrhood.fa=cosmo_slice(nbrhood.fa,mp,2,'struct');
+   end
+
+
+
+
 
 
 
@@ -454,14 +476,52 @@ function fdim=get_spherical_fdim(ds, target_labels)
     fdim.labels=dim_labels(idx_labels);
     fdim.values=dim_values(idx_labels);
 
+    fdim=ensure_row_vector_or_3d_matrix(fdim);
+
+function fdim=ensure_row_vector_or_3d_matrix(fdim)
+    labels=fdim.labels;
+    nlabels=numel(labels);
+
+    keys={'labels','values'};
+    nkeys=numel(keys);
+    for k=1:nlabels
+        label=labels{k};
+        for j=1:nkeys
+            key=keys{j};
+            value=fdim.(key){k};
+
+            if strcmp(label,'pos') && strcmp(key,'values')
+                if size(value,1)~=3
+                    error(['''pos'' attribute in .a.fdim.values '...
+                                'must be 3xM']);
+                end
+            else
+                if ~isvector(value)
+                    error(['''%s'' attribute in .a.fdim.%s must '...
+                            'be a vector'],labels,key);
+                end
+                fdim.(key){k}=value(:)';
+            end
+        end
+    end
+
+
+
+
+
+
 
 function fa=get_spherical_fa(ds_fa, target_labels)
+    fa_cell=get_spherical_fa_cell(ds_fa, target_labels);
+    fa=cell2struct(fa_cell,target_labels,2);
+
+
+function fa_cell=get_spherical_fa_cell(ds_fa, target_labels)
     nlabels=numel(target_labels);
-    fa=struct();
+    fa_cell=cell(1,nlabels);
     for j=1:nlabels
         label=target_labels{j};
-        fa_value=ds_fa.(label);
-        fa.(label)=fa_value;
+        fa_cell{j}=ds_fa.(label);
     end
 
 

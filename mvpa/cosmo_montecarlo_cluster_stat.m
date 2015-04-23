@@ -43,7 +43,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       If this option is not provided, null data is based
 %                       on the contents of ds, which is less precise (more
 %                       conservative, in other words has less power)
-%   'progress',p        Show progress every p steps
+%   'progress',p        Show progress every p steps (default: 10). Use
+%                       p=false to not show progress.
 %
 % Output:
 %   ds_z                Dataset struct with (two-tailed) z-scores for each

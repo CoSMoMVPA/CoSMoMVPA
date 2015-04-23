@@ -14,7 +14,7 @@ We would like to thank the following people for specific contributions:
 
 +  **Gunnar Blohm** and **Sara Fabri**: for inviting the developers (ACC and NNO) to speak at the *2013 Summer School in Computational Sensory-Motor Neuroscience* (`CoSMo 2013 workshop`_) workshop. This invitation formed the basis of CoSMoMVPA.
 +  **Gunnar Blohm** for providing us with, and allowing us to use, the CoSMo logo.
-+  **Michael Hanke** and **Yaroslav Halchenko**, **James Haxby**: for their work on and support of PyMVPA, which inspired the semantics and data structure of datasets in CoSMoMVPA.
++  **Michael Hanke**, **Yaroslav Halchenko**, and **James Haxby**: for their work on and support of PyMVPA, which inspired the semantics and data structure of datasets in CoSMoMVPA.
 +  **Stephania Bracci**: for providing sample datasets in BrainVoyager.
 +  **Jimmy Shen**: for providing a free/open source NIFTI library.
 +  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier.
@@ -26,17 +26,27 @@ We would like to thank the following people for specific contributions:
 
 The following people have provided valuable suggestions, advice, support, or code to CoSMoMVPA:
 
++ Talia Brandman
++ Robert W. Cox
 + Sarah Belinda Aimee Degosciu
++ Yaroslav Halchenko
 + Thomas Hartmann
 + James Haxby
++ Clayton Hickey
 + Daniel Kaiser
 + James Keidel
++ Sam Nastase
 + Nicholas Peatfield
 + Liuba Papeo
 + Jia Hou Poh
 + Reshanne Reader
++ Anne Roefs
 + Jens Schwarzbach
 + Mohamed Tawfik
++ Luca Turella
++ Moritz Wurm
+
+Work on CoSMoMVPA has been supported by the ATTEND_ project.
 
 Citations
 ---------

@@ -3,6 +3,7 @@
 
 .. _AFNI: http://afni.nimh.nih.gov
 .. _AFNI Matlab: http://afni.nimh.nih.gov/afni/matlab/
+.. _ATTEND: http://attendproject.eu
 .. _BrainVoyager: http://www.brainvoyager.com
 .. _`CoSMo 2013 workshop`: http://www.compneurosci.com/CoSMo2013/
 .. _`CoSMo 2014 workshop`: http://www.compneurosci.com/CoSMo2014/

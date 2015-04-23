@@ -4,7 +4,7 @@ CoSMoMVPA |build-status|
 .. |build-status|
    image:: https://secure.travis-ci.org/CoSMoMVPA/CoSMoMVPA.png
            ?branch=master
-   :target: http://travis-ci.org/PyMVPA/PyMVPA
+   :target: http://travis-ci.org/CoSMoMVPA/CoSMoMVPA
    :alt: CoSMoMVPA travis-ci build status
 
 

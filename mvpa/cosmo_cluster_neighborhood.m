@@ -129,7 +129,7 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 
     % set defaults
     default=struct();
-    default.progress=true;
+    default.progress=1000;
     opt=cosmo_structjoin(default,varargin{:});
 
     % check dataset

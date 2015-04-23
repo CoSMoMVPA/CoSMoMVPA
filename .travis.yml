@@ -16,19 +16,17 @@ env:
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
-    - travis_retry sudo apt-get install -y software-properties-common python-software-properties
+    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
     # get Octave 3.8
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
+    - travis_retry sudo apt-get -y -qq install octave
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
 script:
-    - ls
-    - ls CoSMoMVPA
-    - ls CoSMoMVPA/mvpa
     - PTH=`pwd`
     - CMD="more('off');"
     - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests:${PTH}/MOxUnit/MOxUnit"
