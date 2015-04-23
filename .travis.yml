@@ -11,18 +11,21 @@ cache:
 env:
  global:
     - OCTAVE=octave
-    - EXTERNALS="afni surfing fieldtrip"
+    - EXTERNALS="afni surfing fieldtrip libsvm"
     # - PYTHON=python3 PYSUF=3 : python3-numpy not currently available
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
+    # Prepare to get Octave
     - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
+
     # get Octave 3.8
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
+
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
@@ -58,6 +61,15 @@ script:
           CMD="${CMD}ft_defaults();"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
       fi
+
+    # optionally install libsvm
+    - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
+          git clone -b octave git://github.com/cjlin1/libsvm.com;
+          CMD="${CMD}cd('libsvm/matlab');make;cd('../..');"
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
+      fi
+
+    # set final commands and run test suite
     - CMD="${CMD}cosmo_set_path();"
     - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
     - CMD="${CMD}exit(~result);"
