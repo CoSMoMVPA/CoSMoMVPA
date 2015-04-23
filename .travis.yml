@@ -24,7 +24,6 @@ before_install:
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
-
 script:
     - ls
     - ls CoSMoMVPA
@@ -34,16 +33,16 @@ script:
     - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests:${PTH}/MOxUnit/MOxUnit"
     # optionally enable surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
-    -     git clone file:///media/sf_nick/git/surfing --depth 1;
-    -     CMD="${CMD}cd('surfing');surfing_compile_mex();cd('..');"
-    -     CMD="${CMD}surfing_set_path();"
-    -     OCTAVEPTH="${OCTAVEPTH}:${PTH}/surfing:${PTH}/surfing/surfing"
-    - fi
+          git clone git://github.com/nno/surfing.git --depth 1;
+          CMD="${CMD}cd('surfing');surfing_compile_mex();cd('..');"
+          CMD="${CMD}surfing_set_path();"
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/surfing:${PTH}/surfing/surfing"
+      fi
     # optionally install afni
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
-    -     git clone file:///media/sf_nick/git/AFNI --depth 1;
-    -     OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab"
-    - fi
+          git clone git://github.com/afniHQ/AFNI.git --depth 1;
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab"
+      fi
     - CMD="${CMD}cosmo_set_path();"
     - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
     - CMD="${CMD}exit(~result);"
