@@ -1,10 +1,11 @@
 function test_suite = test_surficial_neighborhood
     initTestSuite;
 
-function test_surficial_neighborhood_surface
-    if cosmo_skip_test_if_no_external('surfing')
-        return
-    end
+function test_surficial_neighborhood_surface_dijkstra_and_direct
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
+
     opt=struct();
     opt.progress=false;
 
@@ -48,6 +49,10 @@ function test_surficial_neighborhood_surface_geodesic
         return
     end
 
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
+
     opt=struct();
     opt.progress=false;
 
@@ -70,12 +75,16 @@ function test_surficial_neighborhood_surface_geodesic
     assertEqual(nh.fa.node_indices,1:6);
     assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
 
-function test_surficial_neighborhood_volume
+function test_surficial_neighborhood_volume_geodesic
     if ~cosmo_check_external('fast_marching',false)
         cosmo_notify_test_skipped(['fast marching '...'
                                     'toolbox is not available']);
         return
     end
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
+
     opt=struct();
     opt.progress=false;
 
@@ -103,6 +112,27 @@ function test_surficial_neighborhood_volume
     assertEqual(nh1.fa.node_indices,1:6);
     assertEqual(nh1,nh2);
 
+
+function test_surficial_neighborhood_volume_dijkstra
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
+
+    opt=struct();
+    opt.progress=false;
+
+    ds=cosmo_synthetic_dataset();
+    vertices=[-2 0 2 -2 0 2;
+                -1 -1 -1 1 1 1
+                -1 -1 -1 -1 -1 -1]';
+    faces= [ 3 2 3 2
+                2 1 5 4
+                5 4 6 5 ]';
+    pial=vertices;
+    pial(:,3)=pial(:,3)+1;
+    white=vertices;
+    white(:,3)=white(:,3)-1;
+
     nh3=cosmo_surficial_neighborhood(ds,{vertices,[-1 1],faces},...
     'metric','dijkstra','count',4,opt);
     nh4=cosmo_surficial_neighborhood(ds,{pial,white,faces},...
@@ -113,6 +143,7 @@ function test_surficial_neighborhood_volume
                                         [ 4 1 5 2 ]
                                         [ 5 2 4 6 ]
                                         [ 6 3 5 2 ] });
+    assertEqual(nh3.fa.node_indices,1:6);
     assert_equal_cell(nh4.neighbors,nh3.neighbors);
 
 function test_surficial_neighborhood_exceptions
