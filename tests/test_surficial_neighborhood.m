@@ -2,6 +2,9 @@ function test_suite = test_surficial_neighborhood
     initTestSuite;
 
 function test_surficial_neighborhood_surface_dijkstra_and_direct
+    if cosmo_skip_test_if_no_external('surfing')
+        return;
+    end
     warning_state=warning();
     warning_resetter=onCleanup(@()warning(warning_state));
     warning('off');
@@ -43,10 +46,9 @@ function test_surficial_neighborhood_surface_dijkstra_and_direct
     assertElementsAlmostEqual(nh3.fa.radius,sqrt([1 2 2 2 2 1]));
 
 function test_surficial_neighborhood_surface_geodesic
-    if ~cosmo_check_external('fast_marching',false)
-        cosmo_notify_test_skipped(['fast marching '...'
-                                    'toolbox is not available']);
-        return
+    if cosmo_skip_test_if_no_external('fast_marching') || ...
+            cosmo_skip_test_if_no_external('surfing')
+        return;
     end
 
     warning_state=warning();
@@ -76,10 +78,9 @@ function test_surficial_neighborhood_surface_geodesic
     assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
 
 function test_surficial_neighborhood_volume_geodesic
-    if ~cosmo_check_external('fast_marching',false)
-        cosmo_notify_test_skipped(['fast marching '...'
-                                    'toolbox is not available']);
-        return
+    if cosmo_skip_test_if_no_external('fast_marching') || ...
+            cosmo_skip_test_if_no_external('surfing')
+        return;
     end
     warning_state=warning();
     warning_resetter=onCleanup(@()warning(warning_state));
@@ -114,6 +115,9 @@ function test_surficial_neighborhood_volume_geodesic
 
 
 function test_surficial_neighborhood_volume_dijkstra
+    if cosmo_skip_test_if_no_external('surfing')
+        return;
+    end
     warning_state=warning();
     warning_resetter=onCleanup(@()warning(warning_state));
     warning('off');
@@ -147,6 +151,9 @@ function test_surficial_neighborhood_volume_dijkstra
     assert_equal_cell(nh4.neighbors,nh3.neighbors);
 
 function test_surficial_neighborhood_exceptions
+    if cosmo_skip_test_if_no_external('surfing')
+        return
+    end
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
     vertices=[0 0 0 1 1 1;
                 1 2 3 1 2 3;
