@@ -64,11 +64,10 @@ script:
       fi
 
     # optionally install libsvm
-    - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
+    - if false && [[ "$EXTERNALS" = *"libsvm"* ]]; then
           git clone git://github.com/cjlin1/libsvm.git;
           CMD="${CMD}cd('libsvm/matlab');make;cd('../..');"
-          # For now disable libsvm because it throws an error
-          # OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
       fi
 
     # set path for CoSMoMVPA
