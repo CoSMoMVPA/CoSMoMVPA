@@ -70,9 +70,17 @@ script:
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
       fi
 
-    # set final commands and run test suite
+    # set path for CoSMoMVPA
     - CMD="${CMD}cosmo_set_path();"
-    - CMD="${CMD}result=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
-    - CMD="${CMD}exit(~result);"
+
+    # randomize number generator and print the state
+    - CMD="${CMD}prng_state=round(1000*clock());"
+    - CMD="${CMD}disp('PRNG state:');disp(prng_state);"
+    - CMD="${CMD}rand('state',prng_state);"
+
+    # run tests, and quit with error if any test fails or errors
+    - CMD="${CMD}passed=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
+    - CMD="${CMD}if(~passed),cosmo_wtf();end;"
+    - CMD="${CMD}exit(~passed);"
     - $OCTAVE --path "${OCTAVEPTH}" --eval "${CMD}"
 
