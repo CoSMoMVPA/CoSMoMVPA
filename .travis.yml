@@ -64,7 +64,7 @@ script:
 
     # optionally install libsvm
     - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
-          git clone -b octave git://github.com/cjlin1/libsvm.com;
+          git clone -b octave git://github.com/cjlin1/libsvm.git;
           CMD="${CMD}cd('libsvm/matlab');make;cd('../..');"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
       fi
