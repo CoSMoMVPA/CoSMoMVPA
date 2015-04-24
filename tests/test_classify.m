@@ -131,7 +131,8 @@ function assert_throws_illegal_input_exceptions(cfy)
 
     % no features, should still make prediction
     res=cfy(zeros(4,0),[1 1 2 2]',zeros(2,0));
-    assertEqual(res,[1 1]');
+    assertEqual(size(res),[2 1]);
+    assertTrue(all(res==1 | res==2));
 
 function handle=get_predictor(cfy,opt,nclasses)
     if nargin<3

@@ -172,7 +172,14 @@ switch method
             params.mu=mu;
             params.sigma=sigma;
         end
-        samples=bsxfun(@rdivide,bsxfun(@minus,samples,mu),sigma);
+        d=bsxfun(@minus,samples,mu);
+
+        if isempty(sigma)
+            % Octave 3.8.2 on Ubuntu gives it the wrong size
+            sigma=zeros(size(d));
+        end
+
+        samples=bsxfun(@rdivide,d,sigma);
 
     case 'scale_unit'
         if apply_params
