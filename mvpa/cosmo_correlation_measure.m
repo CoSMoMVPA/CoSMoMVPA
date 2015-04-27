@@ -131,12 +131,51 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 % Notes:
 %   - by default the post_corr_func is set to @atanh. This is equivalent to
 %     a Fisher transformation from r (correlation) to z (standard z-score).
-%     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r))
+%     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r)).
+%     The rationale is to make data more normally distributed under the
+%     null hypothesis.
 %   - if multiple samples are present with the same chunk and target, they
 %     are averaged *prior* to computing the correlations
 %   - if multiple partitions are present, then the correlations are
 %     computed separately for each partition, and then averaged (unless
-%     the ''output'' argument is set differently)
+%     the ''output'' argument is set differently).
+%   - When more than two chunks are present in the input, partitions
+%     consist of all half splits. For illustration, up to 6 chunks, the
+%     partitions are:
+%       - 2 chunks   -  partition #1
+%         chunks first  half: {    1
+%         chunks second half:  {   2
+%
+%       - 3 chunks   -  partition #1  #2  #3
+%         chunks first  half: {    3   2   1
+%                              {   1   1   2
+%         chunks second half:  {   2   3   3
+%
+%       - 4 chunks   -  partition #1  #2  #3
+%                             {    3   2   2
+%         chunks first  half: {    4   4   3
+%                              {   1   1   1
+%         chunks second half:  {   2   3   4
+%
+%       - 5 chunks   -  partition #1  #2  #3  #4  #5  #6  #7  #8  #9  #10
+%                             {    4   3   3   2   2   2   1   1   1   1
+%         chunks first  half: {    5   5   4   5   4   3   5   4   3   2
+%                              {   1   1   1   1   1   1   2   2   2   3
+%         chunks second half:  {   2   2   2   3   3   4   3   3   4   4
+%                              {   3   4   5   4   5   5   4   5   5   5
+%
+%       - 6 chunks   -  partition #1  #2  #3  #4  #5  #6  #7  #8  #9  #10
+%                             {    4   3   3   3   2   2   2   2   2   2
+%         chunks first  half: {    5   5   4   4   5   4   4   3   3   3
+%                             {    6   6   6   5   6   6   5   6   5   4
+%                              {   1   1   1   1   1   1   1   1   1   1
+%         chunks second half:  {   2   2   2   2   3   3   3   4   4   5
+%                              {   3   4   5   6   4   5   6   5   6   6
+%     Thus, with an increasing number of chunks, the number of partitions
+%     (and thus the time required to run this function) increases
+%     quadratically. To use simpler partition schemes (e.g. odd-even, as
+%     provided by cosmo_oddeven_partitioner), specify the 'partitions'
+%     argument.
 %
 % References
 %   - Haxby, J. V. et al (2001). Distributed and overlapping
