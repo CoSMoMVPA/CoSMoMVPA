@@ -23,7 +23,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %                 is a row vector.
 %    .corr_type   Type of correlation: 'Pearson','Spearman','Kendall'.
 %                 The default is 'Pearson'.
-%    .post_corr   Operation performed after correlation. (default: @atanh)
+%    .post_corr_func  Operation performed after correlation. (default:
+%                     @atanh)
 %    .output      'mean' (default): correlations weighted by template
 %                 'raw' or 'correlation': correlations between all classes
 %                 'one_minus_correlation': 1 minus correlations
