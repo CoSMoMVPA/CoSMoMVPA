@@ -13,7 +13,7 @@ env:
     - OCTAVE=octave
  matrix:
     - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti"
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -32,13 +32,13 @@ before_install:
     - git clone git://github.com/nno/MOxUnit.git
 install:
     - PTH=`pwd`
-    - CMD="more('off');"
-    - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests:${PTH}/MOxUnit/MOxUnit"
+    - BUILDCMD="more('off');"
+    - OCTAVEPTH="${PTH}"
     # optionally enable surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
-          CMD="${CMD}cd('surfing');surfing_compile_mex();cd('..');";
-          CMD="${CMD}surfing_set_path();";
+          BUILDCMD="${BUILDCMD}cd('surfing');surfing_compile_mex();cd('..');";
+          BUILDCMD="${BUILDCMD}surfing_set_path();";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/surfing:${PTH}/surfing/surfing";
       fi
     # optionally install afni
@@ -59,29 +59,46 @@ install:
     # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
     - if [[ "$EXTERNALS" = *"fieldtrip"* ]]; then
           git clone -b octave git://github.com/nno/fieldtrip.git;
-          CMD="${CMD}ft_defaults();"
+          BUILDCMD="${BUILDCMD}ft_defaults();"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
       fi
 
     # optionally install libsvm
     - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
           git clone git://github.com/cjlin1/libsvm.git;
-          CMD="${CMD}cd('libsvm/matlab');make;cd('../..');"
+          BUILDCMD="${BUILDCMD}cd('libsvm/matlab');make;cd('../..');"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
       fi
+    # optionally install gifti library
+    # TODO: update URL to refer to original website:
+    #   http://www.artefact.tk/software/matlab/gifti/
+    # when updated to version 1.5
+    - if [[ "$EXTERNALS" = *"gifti"* ]]; then
+          git clone git://github.com/nno/matlab_GIfTI;
+          BUILDCMD="${BUILDCMD}cd('matlab_GIfTI/@gifti/private');";
+          BUILDCMD="${BUILDCMD}mex('zstream.c');";
+          BUILDCMD="${BUILDCMD}cd('../../..');";
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI/@gifti";
+      fi
+    - $OCTAVE --path "${OCTAVEPTH}" --eval "${TESTCMD}"
+
+
 before_script:
     # set path for CoSMoMVPA
-    - CMD="${CMD}cosmo_set_path();"
+    - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests"
+    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
+    - TESTCMD="more(off);";
+    - TESTCMD="${TESTCMD}cosmo_set_path();"
 
     # randomize number generator and print the state
-    - CMD="${CMD}prng_state=round(1000*clock());"
-    - CMD="${CMD}disp('PRNG state:');disp(prng_state);"
-    - CMD="${CMD}rand('state',prng_state);"
+    - TESTCMD="${TESTCMD}prng_state=round(1000*clock());"
+    - TESTCMD="${TESTCMD}disp('PRNG state:');disp(prng_state);"
+    - TESTCMD="${TESTCMD}rand('state',prng_state);"
 
     # run tests, and quit with error if any test fails or errors
-    - CMD="${CMD}passed=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
-    - CMD="${CMD}if(~passed),cosmo_wtf();end;"
-    - CMD="${CMD}exit(~passed);"
+    - TESTCMD="${TESTCMD}passed=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
+    - TESTCMD="${TESTCMD}if(~passed),cosmo_wtf();end;"
+    - TESTCMD="${TESTCMD}exit(~passed);"
 script:
-    - $OCTAVE --path "${OCTAVEPTH}" --eval "${CMD}"
+    - $OCTAVE --path "${OCTAVEPTH}" --eval "${TESTCMD}"
 
