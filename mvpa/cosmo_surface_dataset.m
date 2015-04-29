@@ -42,9 +42,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     >     .labels
 %     >       { 'node_indices' }
 %     >     .values
-%     >       { [   2
-%     >            21
-%     >           202 ] }
+%     >       { [ 2 21 202 ] }
 %
 %     % construct BrainVoyager surface map
 %     cosmo_check_external('neuroelf');
@@ -63,19 +61,13 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     >     { 'Ttest(249)' }
 %     > .fa
 %     >   .node_indices
-%     >     [ 1         2         3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962
+%     >     [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962
 %     > .a
 %     >   .fdim
 %     >     .labels
 %     >       { 'node_indices' }
 %     >     .values
-%     >       { [       1
-%     >                 2
-%     >                 3
-%     >              :
-%     >           4.1e+04
-%     >           4.1e+04
-%     >           4.1e+04 ]@40962x1 }
+%     >       { [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962 }
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
