@@ -89,7 +89,7 @@ before_script:
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/mvpa"
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/tests"
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
-    - TESTCMD="more(off);";
+    - TESTCMD="more('off');";
     - TESTCMD="${TESTCMD}cosmo_set_path();"
 
     # randomize number generator and print the state
