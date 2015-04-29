@@ -30,7 +30,7 @@ before_install:
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
-script:
+install:
     - PTH=`pwd`
     - CMD="more('off');"
     - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests:${PTH}/MOxUnit/MOxUnit"
@@ -69,7 +69,7 @@ script:
           CMD="${CMD}cd('libsvm/matlab');make;cd('../..');"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
       fi
-
+before_script:
     # set path for CoSMoMVPA
     - CMD="${CMD}cosmo_set_path();"
 
@@ -82,5 +82,6 @@ script:
     - CMD="${CMD}passed=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
     - CMD="${CMD}if(~passed),cosmo_wtf();end;"
     - CMD="${CMD}exit(~passed);"
+script:
     - $OCTAVE --path "${OCTAVEPTH}" --eval "${CMD}"
 
