@@ -80,12 +80,14 @@ install:
           BUILDCMD="${BUILDCMD}cd('../../..');";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI/@gifti";
       fi
-    - $OCTAVE --path "${OCTAVEPTH}" --eval "${TESTCMD}"
+    - BUILDCMD="${BUILDCMD};exit();"
+    - $OCTAVE --path "${OCTAVEPTH}" --eval "${BUILDCMD}"
 
 
 before_script:
-    # set path for CoSMoMVPA
-    - OCTAVEPTH="${PTH}/CoSMoMVPA/mvpa:${PTH}/CoSMoMVPA/tests"
+    # add path for CoSMoMVPA
+    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/mvpa"
+    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/tests"
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
     - TESTCMD="more(off);";
     - TESTCMD="${TESTCMD}cosmo_set_path();"
@@ -96,7 +98,8 @@ before_script:
     - TESTCMD="${TESTCMD}rand('state',prng_state);"
 
     # run tests, and quit with error if any test fails or errors
-    - TESTCMD="${TESTCMD}passed=moxunit_runtests('-verbose','CoSMoMVPA/tests');"
+    - TESTDIR="CoSMoMVPA/tests"
+    - TESTCMD="${TESTCMD}passed=moxunit_runtests('-verbose','${TESTDIR}');"
     - TESTCMD="${TESTCMD}if(~passed),cosmo_wtf();end;"
     - TESTCMD="${TESTCMD}exit(~passed);"
 script:
