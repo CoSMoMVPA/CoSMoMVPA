@@ -78,7 +78,7 @@ install:
           BUILDCMD="${BUILDCMD}cd('matlab_GIfTI/@gifti/private');";
           BUILDCMD="${BUILDCMD}mex('zstream.c');";
           BUILDCMD="${BUILDCMD}cd('../../..');";
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI/@gifti";
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI";
       fi
     - BUILDCMD="${BUILDCMD};exit();"
     - $OCTAVE --path "${OCTAVEPTH}" --eval "${BUILDCMD}"
