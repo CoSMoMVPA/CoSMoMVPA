@@ -54,18 +54,22 @@ function filename=cosmo_make_temp_filename(prefix,suffix)
     while true
         infix=generate_random_infix();
 
+        does_exist=false;
+
         for k=1:nsuffix
             fn=[prefix infix suffix_cell{k}];
 
             if exist(fn,'file')
+                does_exist=true;
                 break;
             end
 
             filename_cell{k}=fn;
         end
 
-        % all suffixes lead to file that does not exist; break
-        break;
+        if ~does_exist
+            break;
+        end
     end
 
     if suffix_is_cell
