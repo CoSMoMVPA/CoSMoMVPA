@@ -128,7 +128,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
     % set dataset attributes
     fdim=struct();
     fdim.labels={'node_indices'};
-    fdim.values={node_indices(:)};
+    fdim.values={node_indices(:)'};
     ds.a.fdim=fdim;
 
      % set targets and chunks
@@ -212,6 +212,36 @@ function img_formats=get_img_formats()
     img_formats.bv_smp.reader=@read_bv_smp;
     img_formats.bv_smp.builder=@build_bv_smp;
     img_formats.bv_smp.externals={'neuroelf'};
+
+    img_formats.gii.exts={'.gii'};
+    img_formats.gii.matcher=@isa_gii;
+    img_formats.gii.reader=@read_gii;
+    img_formats.gii.builder=@build_gii;
+    img_formats.gii.externals={'gifti'};
+
+
+function b=isa_gii(x)
+    b=isa(x,'gifti') && isfield(x,'cdata');
+
+function s=read_gii(fn)
+    s=gifti(fn);
+
+function [data,node_indices,sa]=build_gii(s)
+    data=s.cdata';
+
+    if ~isa(data,'double')
+        data=double(data);
+    end
+
+    if isfield(s,'indices')
+        node_indices=double(s.indices);
+    else
+        nv=size(data,2);
+        node_indices=1:nv;
+    end
+
+    sa=struct();
+
 
 function b=isa_niml_dset(x)
     b=isstruct(x) && isfield(x,'data');

@@ -1,11 +1,11 @@
-function s=cosmo_map2surface(ds, fn)
+function s=cosmo_map2surface(ds, fn, varargin)
 % maps a dataset structure to AFNI/SUMA NIML dset or BV SMP file
 %
 % Usage 1: s=cosmo_map2surface(ds, '-{FMT}) returns a struct s
 % Usage 2: cosmo_map2surface(ds, fn) saves a dataset to a file.
 %
-% In Usage 1, {FMT} can be one of 'niml_dset' or 'bv_smp'
-% In Usage 2, fn should end with '.niml.dset' or '.smp'
+% In Usage 1, {FMT} can be one of 'niml_dset', 'bv_smp', or 'gii'
+% In Usage 2, fn should end with '.niml.dset' or '.smp', or '.gii'
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset('type','surface');
@@ -53,6 +53,9 @@ function s=cosmo_map2surface(ds, fn)
 %
 % NNO May 2014
 
+    defaults=struct();
+    opt=cosmo_structjoin(defaults,varargin);
+
     cosmo_check_dataset(ds,'surface');
 
     formats=get_formats();
@@ -82,7 +85,7 @@ function s=cosmo_map2surface(ds, fn)
 
     if save_to_file
         writer=format.writer;
-        writer(fn, s);
+        writer(fn, s, opt);
     end
 
 function format=get_format(formats,fn)
@@ -114,6 +117,31 @@ function formats=get_formats()
     formats.bv_smp.builder=@build_bv_smp;
     formats.bv_smp.writer=@write_bv_smp;
     formats.bv_smp.externals={'neuroelf'};
+
+    formats.gii.exts={'.gii'};
+    formats.gii.builder=@build_gifti;
+    formats.gii.writer=@write_gifti;
+    formats.gii.externals={'gifti'};
+
+function g=build_gifti(ds)
+    s=struct();
+    node_indices=ds.a.fdim.values{1}(ds.fa.node_indices);
+    s.indices=node_indices(:);
+    s.cdata=ds.samples';
+
+    g=gifti(s);
+
+function write_gifti(fn,g,opt)
+    if isfield(opt,'encoding')
+        args={opt.encoding};
+    else
+        args={};
+    end
+
+    save(g,fn,args{:});
+
+
+
 
 function s=build_niml_dset(ds)
     if ~isequal(ds.a.fdim.labels,{'node_indices'})
