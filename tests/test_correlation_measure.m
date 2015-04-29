@@ -64,10 +64,19 @@ function test_correlation_measure_basis()
                     cosmo_correlation_measure(ds4_perm,opt));
 
 
+
 function test_correlation_measure_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                 cosmo_correlation_measure(varargin{:}),'');
 
-    ds=cosmo_synthetic_dataset();
+    ds=cosmo_synthetic_dataset('nchunks',2);
+    aet(ds,'template',eye(4));
+    aet(ds,'output','foo');
+
     ds.sa.targets(:)=1;
     aet(ds);
+    ds.sa.targets(1)=2;
+    aet(ds);
+
+
+
