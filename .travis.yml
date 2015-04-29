@@ -95,7 +95,7 @@ before_script:
 
     # randomize number generator and print the state
     - TESTCMD="${TESTCMD}prng_state=round(1000*clock());"
-    - TESTCMD="${TESTCMD}disp('PRNG state:');disp(prng_state);fprintf('\n')"
+    - TESTCMD="${TESTCMD}disp('PRNG state:');disp(prng_state);fprintf('\n');"
     - TESTCMD="${TESTCMD}rand('state',prng_state);"
 
     # show path
