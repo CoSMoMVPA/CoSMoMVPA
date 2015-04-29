@@ -3,6 +3,10 @@ function test_suite = test_surficial_io_gifti
 
 
 function test_gifti_dataset_io()
+    if cosmo_skip_test_if_no_external('gifti')
+        return;
+    end
+
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1,...
                         'type','surface');
     ds.a.fdim.values{1}=1+[1 4 7 8 5 3];
