@@ -106,7 +106,8 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
     end
 
     % list check functions
-    checkers={@check_samples,...
+    checkers={@check_fields,...
+              @check_samples,...
               @check_targets,...
               @check_chunks,...
               @check_attributes,...
@@ -199,6 +200,21 @@ function msg=check_dim_legacy(ds)
     end
 
 
+function msg=check_fields(ds)
+    msg='';
+
+    if ~isstruct(ds)
+        msg='input must be a struct';
+        return;
+    end
+
+    delta=setdiff(fieldnames(ds),{'samples','fa','sa','a'});
+    if ~isempty(delta)
+        msg=sprintf('illegal field .%s', delta{1});
+        return
+    end
+
+
 function msg=check_targets(ds)
     msg='';
 
@@ -216,10 +232,6 @@ function msg=check_chunks(ds)
 
 function msg=check_samples(ds)
     msg='';
-    if ~isstruct(ds)
-        msg='dataset not a struct';
-        return
-    end
 
     if  ~isfield(ds,'samples')
         msg='dataset has no field .samples';
@@ -306,7 +318,7 @@ function msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str)
     msg='';
     % attrs is from .sa or .fa; dim_attrs from .a.sdim or .a.fdim
     % the *_str arguments contain a string representation
-    if ~cosmo_isfield(dim_attrs,{'labels','values'})
+    if ~all(cosmo_isfield(dim_attrs,{'labels','values'}))
         msg=sprintf('Missing field .%s.{labels,values}',dim_attrs_str);
         return;
     end
