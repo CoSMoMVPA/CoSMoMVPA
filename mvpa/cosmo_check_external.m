@@ -277,6 +277,16 @@ function w=noerror_which(varargin)
     end
 
 function externals=get_externals()
+    persistent cached_externals;
+
+    if ~isstruct(cached_externals)
+        cached_externals=get_externals_helper();
+    end
+
+    externals=cached_externals;
+
+
+function externals=get_externals_helper()
     % helper function that defines the externals.
     externals=struct();
     yes=@() true;
@@ -435,7 +445,8 @@ function externals=get_externals()
                              'pattern recognition, San Diego, CA, USA '...
                              '(pp. 42?47), 2005'];
 
-    externals.fast_marching.is_present=has('perform_front_propagation_mesh');
+    externals.fast_marching.is_present=@() has(...
+                                        'perform_front_propagation_mesh');
     externals.fast_marching.is_recent=yes;
     externals.fast_marching.label=['toolbox fast marching [included '...
                                     'in surfing]'];
