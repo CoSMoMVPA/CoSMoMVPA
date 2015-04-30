@@ -128,9 +128,6 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     show_progress=opt.progress>0;
 
     if show_progress
-        if opt.progress<1
-            opt.progress=ceil(ncenters/opt.progress);
-        end
         clock_start=clock();
         prev_progress_msg='';
     end

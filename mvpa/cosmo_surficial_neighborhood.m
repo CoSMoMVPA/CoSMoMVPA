@@ -1,7 +1,7 @@
 function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin)
 % neighborhood definition for surface-based searchlight
 %
-% [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, radius, surfs, ...)
+% [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, ...)
 %
 % Inputs:
 %    ds            fMRI-like volumetric dataset
@@ -212,8 +212,7 @@ end
 % if they are identical then low2high is the identity
 out2in=surfing_maplow2hires(vo', vi');
 
-% get circle definition
-circle_def=get_circle_def(opt);
+
 
 % set center ids
 center_ids=opt.center_ids(:)'; % ensure row vector
@@ -235,34 +234,21 @@ if ds_is_surface
     % todo: use out2in to allow for subset of node indices as center
     %       (the current implementation computes neighborhoods for all
     %       nodes)
-    nfeatures=size(ds.samples,2);
-    feature_ids=(1:nfeatures)';
-    if ~isequal(feature_ids,ds.fa.node_indices') || ...
-                 ~isequal(feature_ids,ds.a.fdim.values{1}(:))
-        error('Only full datasets (no missing nodes) are supported for now');
+    if ~isequal(center_ids,1:size(vo,1))
+        error('Unsupported center_ids option');
     end
 
-    nvertices=size(vi,1);
-    missing_vertex=setdiff(1:nvertices,ds.fa.node_indices);
-    if ~isempty(missing_vertex)
-        error(['vertex %d in dataset is not in surface, because the '...
-                'surface has only %d vertices'],...
-                missing_vertex(1),nvertices);
+    if ~isequal(out2in',1:numel(out2in))
+        %error('Unsupported other output surface than input surface');
     end
 
+    nbrhood=surface_to_surface_neighborhood(ds,vi,f,opt);
 
-    [n2ns,radii]=surfing_nodeselection(v1',f',circle_def,...
-                                        opt.metric,opt.progress);
-    ncenters=numel(n2ns);
-
-    nbrhood=struct();
-    nbrhood.a.fdim.labels={'node_indices'};
-    nbrhood.a.fdim.values={1:ncenters};
-    nbrhood.fa.node_indices=(1:ncenters);
-    nbrhood.fa.radius=radii(:)';
-    nbrhood.neighbors=n2ns;
 
 elseif ds_is_volume
+    % get circle definition
+    circle_def=get_circle_def(opt);
+
     % set volume definition
     if isempty(opt.vol_def)
         vol_def=ds.a.vol;
@@ -317,6 +303,51 @@ end
 nbrhood=ensure_neighbors_row_vectors(nbrhood);
 
 cosmo_check_neighborhood(nbrhood);
+
+
+function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
+    circle_def=get_circle_def(opt);
+
+    [two,fdim_index]=cosmo_dim_find(ds,'node_indices',true);
+
+    if two~=2
+        error(['unsupported node_indices in sample dimension, expected '...
+                    'in feature dimension']);
+    end
+
+    nvertices=size(ds.fa.node_indices,2);
+    if ~isequal(ds.fa.node_indices,1:nvertices) || ...
+                ~isequal(ds.a.fdim.values{fdim_index},1:nvertices)
+        error('not supported (for now): sparse surfaces');
+    end
+
+    [fa_idxs, fa_node_ids]=cosmo_index_unique(ds.fa.node_indices);
+    nvertices=size(vertices,1);
+
+    too_large_index=find(fa_node_ids>nvertices,1);
+    if any(too_large_index)
+        error(['surface has %d vertices, but maximum .fa.node_indices '...
+                    'is %d'],nvertices,fa_node_ids(too_large_index));
+    end
+
+    [n2ns,radii]=surfing_nodeselection(vertices',faces',circle_def,...
+                                        opt.metric,opt.progress);
+    ncenters=numel(fa_node_ids);
+
+    nbrhood=struct();
+    nbrhood.a.fdim.labels={'node_indices'};
+    nbrhood.a.fdim.values=ds.a.fdim.values(fdim_index);
+
+    nbrhood.neighbors=cell(ncenters,1);
+    for k=1:ncenters
+        unq_node_id=fa_node_ids(k);
+    end
+
+
+    nbrhood.fa.node_indices=(1:ncenters);
+    nbrhood.fa.radius=radii(:)';
+    nbrhood.neighbors=n2ns;
+
 
 function nbrhood=ensure_neighbors_row_vectors(nbrhood)
     % compatibility wrapper for the surfing toolbox
