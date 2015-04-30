@@ -14,12 +14,7 @@ function test_surficial_neighborhood_surface_dijkstra
 
     ds=cosmo_synthetic_dataset('type','surface');
 
-    vertices=[0 0 0 1 1 1;
-                1 2 3 1 2 3;
-                0 0 0 0 0 0]';
-    faces= [ 3 2 3 2
-                2 1 5 4
-                5 4 6 5 ]';
+    [vertices,faces]=get_synthetic_surface();
 
     % dijkstra neighborhood fixed number of voxels
     args={{vertices,faces},'count',4,'metric','dijkstra',opt};
@@ -45,7 +40,8 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [1 2 3 4 5 6];
                                      [1 2 3 4 5 6];
                                      [2 3 4 5 6]; });
-
+    assertEqual(nh2.fa.radius,[2,2,1+sqrt(2),1+sqrt(2),2,2]);
+    assertEqual(nh2.fa.node_indices,1:6);
 
     args{1}{1}([2,6],:)=NaN;
 
@@ -56,6 +52,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [1 3 4 5];
                                      [1 3 4 5];
                                      []; });
+    assertEqual(nh3.fa.radius,[2,Inf,1+sqrt(2),1+sqrt(2),2,Inf]);
 
     args{2}='count';
     args{3}=3;
@@ -67,6 +64,8 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [4 1 5];
                                      [5 4 3];
                                      []; });
+    assertEqual(nh4.fa.radius,[2,Inf,1+sqrt(2),1,sqrt(2),Inf]);
+
 
     args{1}{1}=vertices;
     args{1}{1}([2,5])=NaN;
@@ -78,6 +77,17 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [4 1];
                                      [];
                                      [6 3]; });
+    assertEqual(nh5.fa.radius,[1,Inf,1,1,Inf,1]);
+
+
+    % throw error when too many nodes asked for
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_surficial_neighborhood(varargin{:}),'');
+    args{2}='count';
+    args{3}=3;
+
+
+    aet(ds,args{:})
 
 
 
@@ -299,6 +309,23 @@ function check_partial_neighborhood(ds,nh,args)
 
 
 
+function [vertices,faces]=get_synthetic_surface()
+    % return the following surface (face indices in [brackets])
+    %
+    %  1-----2-----3
+    %  |    /|    /|
+    %  |[2]/ |[1]/ |
+    %  |  /  |  /  |
+    %  | /[4]| /[3]|
+    %  |/    |/    |
+    %  4-----5-----6
+
+    vertices=[0 0 0 1 1 1;
+                1 2 3 1 2 3;
+                0 0 0 0 0 0]';
+    faces= [ 3 2 3 2
+                2 1 5 4
+                5 4 6 5 ]';
 
 
 function assert_equal_cell(x,y)
