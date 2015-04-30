@@ -315,6 +315,12 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
                     'in feature dimension']);
     end
 
+    nvertices=size(ds.fa.node_indices,2);
+    if ~isequal(ds.fa.node_indices,1:nvertices) || ...
+                ~isequal(ds.a.fdim.values{fdim_index},1:nvertices)
+        error('not supported (for now): sparse surfaces');
+    end
+
     [fa_idxs, fa_node_ids]=cosmo_index_unique(ds.fa.node_indices);
     nvertices=size(vertices,1);
 
