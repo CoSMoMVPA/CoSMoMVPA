@@ -149,7 +149,7 @@ function dsm_vec=get_dsm_vec(params,name,npairs_dataset)
         dsm_vec=dsm;
     else
         % convert square matrix to vector
-        dsm_vec=cosmo_squareform(params.target_dsm,'tovector')';
+        dsm_vec=cosmo_squareform(dsm,'tovector')';
     end
 
     if npairs_dataset ~= numel(dsm_vec),
