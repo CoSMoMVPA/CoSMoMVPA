@@ -157,12 +157,12 @@ function test_cluster_neighborhood_surface
     opt.faces=faces;
 
     nh1=cosmo_cluster_neighborhood(ds,opt);
-    assertEqual(nh1.neighbors,{ [ 2 4 ]
-                                [ 1 3 4 5 ]
-                                [ 2 5 6 ]
-                                [ 1 2 5 ]
-                                [ 2 3 4 6 ]
-                                [ 3 5 ] });
+    assertEqual(nh1.neighbors,{ [ 1 2 4 ]
+                                [ 1 2 3 4 5 ]
+                                [ 2 3 5 6 ]
+                                [ 1 2 4 5 ]
+                                [ 2 3 4 5 6 ]
+                                [ 3 5 6 ] });
     assertEqual(ds.a,nh1.a);
     ds.fa.sizes=[1 3 2 2 3 1]/6;
     ds.fa.radius=sqrt([1 2 2 2 2 1]);

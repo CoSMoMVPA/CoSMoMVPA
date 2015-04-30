@@ -28,6 +28,7 @@ function test_surficial_neighborhood_surface_dijkstra
 
     assertEqual(nh1.fa.radius,[2 1 sqrt(2) sqrt(2) 1 2]);
     assertEqual(nh1.fa.node_indices,1:6);
+    check_partial_neighborhood(ds,nh1,args);
 
     check_partial_neighborhood(ds,nh1,args);
 
@@ -42,6 +43,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [2 3 4 5 6]; });
     assertEqual(nh2.fa.radius,[2,2,1+sqrt(2),1+sqrt(2),2,2]);
     assertEqual(nh2.fa.node_indices,1:6);
+    check_partial_neighborhood(ds,nh2,args);
 
     args{1}{1}([2,6],:)=NaN;
 
@@ -53,6 +55,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [1 3 4 5];
                                      []; });
     assertEqual(nh3.fa.radius,[2,NaN,1+sqrt(2),1+sqrt(2),2,NaN]);
+    check_partial_neighborhood(ds,nh3,args);
 
     args{2}='count';
     args{3}=3;
@@ -65,7 +68,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [5 4 3];
                                      []; });
     assertEqual(nh4.fa.radius,[2,NaN,1+sqrt(2),1,sqrt(2),NaN]);
-
+    check_partial_neighborhood(ds,nh4,args);
 
     args{1}{1}=vertices;
     args{1}{1}([2,5],:)=NaN; % split in two surfaces
@@ -78,7 +81,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [];
                                      [6 3]; });
     assertEqual(nh5.fa.radius,[1,NaN,1,1,NaN,1]);
-
+    check_partial_neighborhood(ds,nh5,args);
 
     % throw error when too many nodes asked for
     aet=@(varargin)assertExceptionThrown(@()...
@@ -120,6 +123,7 @@ function test_surficial_neighborhood_surface_direct
                                         [ 5 3 6 2 4 ]
                                         [ 6 3 5 ] });
     assertElementsAlmostEqual(nh3.fa.radius,sqrt([1 2 2 2 2 1]));
+    check_partial_neighborhood(ds,nh3,args);
 
     args{1}{1}([2 5],:)=NaN;
     nh4=cosmo_surficial_neighborhood(ds,args{:});
