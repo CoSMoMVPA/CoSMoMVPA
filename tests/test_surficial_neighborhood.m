@@ -52,7 +52,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [1 3 4 5];
                                      [1 3 4 5];
                                      []; });
-    assertEqual(nh3.fa.radius,[2,Inf,1+sqrt(2),1+sqrt(2),2,Inf]);
+    assertEqual(nh3.fa.radius,[2,NaN,1+sqrt(2),1+sqrt(2),2,NaN]);
 
     args{2}='count';
     args{3}=3;
@@ -64,11 +64,11 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [4 1 5];
                                      [5 4 3];
                                      []; });
-    assertEqual(nh4.fa.radius,[2,Inf,1+sqrt(2),1,sqrt(2),Inf]);
+    assertEqual(nh4.fa.radius,[2,NaN,1+sqrt(2),1,sqrt(2),NaN]);
 
 
     args{1}{1}=vertices;
-    args{1}{1}([2,5])=NaN;
+    args{1}{1}([2,5],:)=NaN; % split in two surfaces
     args{3}=2;
     nh5=cosmo_surficial_neighborhood(ds,args{:});
     assert_equal_cell(nh5.neighbors,{[1 4];
@@ -77,7 +77,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [4 1];
                                      [];
                                      [6 3]; });
-    assertEqual(nh5.fa.radius,[1,Inf,1,1,Inf,1]);
+    assertEqual(nh5.fa.radius,[1,NaN,1,1,NaN,1]);
 
 
     % throw error when too many nodes asked for
@@ -85,7 +85,6 @@ function test_surficial_neighborhood_surface_dijkstra
                     cosmo_surficial_neighborhood(varargin{:}),'');
     args{2}='count';
     args{3}=3;
-
 
     aet(ds,args{:})
 
@@ -114,15 +113,24 @@ function test_surficial_neighborhood_surface_direct
     % direct neighborhood
     args={{vertices,faces},'direct',true,opt};
     nh3=cosmo_surficial_neighborhood(ds,args{:});
-    assert_equal_cell(nh3.neighbors,{ [ 2 4 ]
-                                        [ 3 1 4 5 ]
-                                        [ 2 5 6 ]
-                                        [ 1 2 5 ]
-                                        [ 3 6 2 4 ]
-                                        [ 3 5 ] });
+    assert_equal_cell(nh3.neighbors,{ [ 1 2 4 ]
+                                        [ 2 3 1 4 5 ]
+                                        [ 3 2 5 6 ]
+                                        [ 4 1 2 5 ]
+                                        [ 5 3 6 2 4 ]
+                                        [ 6 3 5 ] });
     assertElementsAlmostEqual(nh3.fa.radius,sqrt([1 2 2 2 2 1]));
 
-    check_partial_neighborhood(ds,nh3,args);
+    args{1}{1}([2 5],:)=NaN;
+    nh4=cosmo_surficial_neighborhood(ds,args{:});
+    assert_equal_cell(nh4.neighbors,{ [ 1 4 ]
+                                        []
+                                        [ 3 6 ]
+                                        [ 1 4 ]
+                                        []
+                                        [6 3] });
+
+    check_partial_neighborhood(ds,nh4,args);
 
 function test_surficial_neighborhood_surface_geodesic
     if cosmo_skip_test_if_no_external('fast_marching') || ...
