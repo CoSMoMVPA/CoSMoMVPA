@@ -39,6 +39,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Nicholas Peatfield
 + Liuba Papeo
 + Jia Hou Poh
++ Daria Proklova
 + Reshanne Reader
 + Anne Roefs
 + Jens Schwarzbach
