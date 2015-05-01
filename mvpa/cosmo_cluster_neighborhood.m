@@ -361,7 +361,7 @@ function nbrhood=surface_neighborhood(ds,dim_pos,arg,opt)
 
 
     node_area_surf=surfing_surfacearea(opt.vertices,opt.faces);
-    feature_ids=ds.fa.node_indices(ds.a.fdim.values{dim_pos});
+    feature_ids=ds.a.fdim.values{dim_pos}(nbrhood.fa.node_indices);
     node_area_ds=node_area_surf(feature_ids);
 
     nbrhood.fa.sizes=node_area_ds';

@@ -307,46 +307,83 @@ cosmo_check_neighborhood(nbrhood);
 
 function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
     circle_def=get_circle_def(opt);
+    dim_label='node_indices';
 
-    [two,fdim_index]=cosmo_dim_find(ds,'node_indices',true);
+    [two,fdim_index,attr_name,dim_name]=cosmo_dim_find(ds,...
+                                        dim_label,true);
 
-    if two~=2
-        error(['unsupported node_indices in sample dimension, expected '...
-                    'in feature dimension']);
+    fdim_nodes=ds.a.(dim_name).values{fdim_index};
+    fa_indices=ds.(attr_name).(dim_label);
+
+    if ~isequal(sort(fdim_nodes), unique(fdim_nodes))
+        error('values in .a.%s.values{%d} are not all unique',...
+                    dim_name, fdim_index);
     end
 
-    nvertices=size(ds.fa.node_indices,2);
-    if ~isequal(ds.fa.node_indices,1:nvertices) || ...
-                ~isequal(ds.a.fdim.values{fdim_index},1:nvertices)
-        error('not supported (for now): sparse surfaces');
-    end
 
-    [fa_idxs, fa_node_ids]=cosmo_index_unique(ds.fa.node_indices);
+
+    % - unq_nodes contains the node index associated with each unique
+    %   node_indices feature in the dataset
+    [fa_idxs,unq_fa_indices]=cosmo_index_unique(fa_indices');
+    unq_nodes=fdim_nodes(unq_fa_indices);
+
     nvertices=size(vertices,1);
 
-    too_large_index=find(fa_node_ids>nvertices,1);
+    too_large_index=find(unq_nodes>nvertices,1);
     if any(too_large_index)
-        error(['surface has %d vertices, but maximum .fa.node_indices '...
-                    'is %d'],nvertices,fa_node_ids(too_large_index));
+        error(['surface has %d vertices, but maximum .fa.%s '...
+                    'is %d'],...
+                    nvertices,dim_label,fa_node_ids(too_large_index));
     end
 
+    ignore_vertices_msk=true(nvertices,1);
+    ignore_vertices_msk(unq_nodes)=false;
+
+    vertices(ignore_vertices_msk,:)=NaN;
+
+    % set mapping from nodes to feature ids
+    ncenters=numel(unq_fa_indices);
+    node2feature_ids=cell(1,nvertices);
+    for k=1:ncenters
+        node=unq_nodes(k);
+        if ignore_vertices_msk(node)
+            feature_ids=cell(1,0);
+        else
+            feature_ids=fa_idxs{k};
+        end
+        node2feature_ids{node}=feature_ids;
+    end
+
+
+    % run node selection
     [n2ns,radii]=surfing_nodeselection(vertices',faces',circle_def,...
                                         opt.metric,opt.progress);
-    ncenters=numel(fa_node_ids);
 
+    % set output
     nbrhood=struct();
     nbrhood.a.fdim.labels={'node_indices'};
-    nbrhood.a.fdim.values=ds.a.fdim.values(fdim_index);
+    nbrhood.a.fdim.values={fdim_nodes};
+
 
     nbrhood.neighbors=cell(ncenters,1);
+    nbrhood.fa.radius=zeros(1,ncenters);
+    nbrhood.fa.node_indices=zeros(1,ncenters);
+
     for k=1:ncenters
-        unq_node_id=fa_node_ids(k);
+        center_node=unq_nodes(k);
+        nbrhood.fa.node_indices(k)=unq_fa_indices(k);
+        nbrhood.fa.radius(k)=radii(center_node);
+
+        if ignore_vertices_msk(center_node)
+            around_feature_ids=zeros(1,0);
+        else
+            around_nodes=n2ns{center_node};
+            around_feature_ids=cat(1,node2feature_ids{around_nodes});
+        end
+
+        nbrhood.neighbors{k}=around_feature_ids(:)';
     end
 
-
-    nbrhood.fa.node_indices=(1:ncenters);
-    nbrhood.fa.radius=radii(:)';
-    nbrhood.neighbors=n2ns;
 
 
 function nbrhood=ensure_neighbors_row_vectors(nbrhood)

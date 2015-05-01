@@ -175,6 +175,32 @@ function test_cluster_neighborhood_surface
     ds.fa.radius(:)=0;
     assertEqual(ds.fa,nh2.fa);
 
+    % take a subset of features
+    rp=randperm(6);
+    nsel=4;
+    sel=rp(1:nsel);
+
+    ds3=cosmo_slice(ds,sel,2);
+
+    %re-order node ids
+    rp2=randperm(6);
+    ds.a.fdim.values{1}=ds.a.fdim.values{1}(rp2);
+
+    opt.direct=true;
+    nh3=cosmo_cluster_neighborhood(ds3,opt);
+    assertEqual(nh3.a,ds3.a);
+    assertEqual(nh3.fa.node_indices,ds3.fa.node_indices);
+
+    node_ids=ds3.a.fdim.values{1}(ds3.fa.node_indices);
+    for k=1:nsel
+        nbs=nh3.neighbors{k}(:);
+        node_id=node_ids(k);
+
+        nb1=intersect(nh1.neighbors{node_id},sel);
+        assertEqual(sort(nb1'), sort(node_ids(nbs))');
+    end
+
+
 function test_cluster_neighborhood_source
     ds=cosmo_synthetic_dataset('size','normal','type','source');
     nf=size(ds.samples,2);

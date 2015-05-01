@@ -28,9 +28,6 @@ function test_surficial_neighborhood_surface_dijkstra
 
     assertEqual(nh1.fa.radius,[2 1 sqrt(2) sqrt(2) 1 2]);
     assertEqual(nh1.fa.node_indices,1:6);
-    check_partial_neighborhood(ds,nh1,args);
-
-    check_partial_neighborhood(ds,nh1,args);
 
     args={{vertices,faces},'radius',2.5,'metric','dijkstra',opt};
     nh2=cosmo_surficial_neighborhood(ds,args{:});
@@ -68,7 +65,6 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [5 4 3];
                                      []; });
     assertEqual(nh4.fa.radius,[2,NaN,1+sqrt(2),1,sqrt(2),NaN]);
-    check_partial_neighborhood(ds,nh4,args);
 
     args{1}{1}=vertices;
     args{1}{1}([2,5],:)=NaN; % split in two surfaces
@@ -81,7 +77,6 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [];
                                      [6 3]; });
     assertEqual(nh5.fa.radius,[1,NaN,1,1,NaN,1]);
-    check_partial_neighborhood(ds,nh5,args);
 
     % throw error when too many nodes asked for
     aet=@(varargin)assertExceptionThrown(@()...
@@ -106,12 +101,7 @@ function test_surficial_neighborhood_surface_direct
 
     ds=cosmo_synthetic_dataset('type','surface');
 
-    vertices=[0 0 0 1 1 1;
-                1 2 3 1 2 3;
-                0 0 0 0 0 0]';
-    faces= [ 3 2 3 2
-                2 1 5 4
-                5 4 6 5 ]';
+    [vertices,faces]=get_synthetic_surface();
 
     % direct neighborhood
     args={{vertices,faces},'direct',true,opt};
@@ -151,12 +141,7 @@ function test_surficial_neighborhood_surface_geodesic
 
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
 
-    vertices=[0 0 0 1 1 1;
-                1 2 3 1 2 3;
-                0 0 0 0 0 0]';
-    faces= [ 3 2 3 2
-                2 1 5 4
-                5 4 6 5 ]';
+    [vertices,faces]=get_synthetic_surface();
 
     args={{vertices,faces},'count',4,opt};
     nh=cosmo_surficial_neighborhood(ds,args{:});
@@ -168,8 +153,6 @@ function test_surficial_neighborhood_surface_geodesic
                                     [ 6 3 5 2 ] });
     assertEqual(nh.fa.node_indices,1:6);
     assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
-
-    check_partial_neighborhood(ds,nh,args);
 
 function test_surficial_neighborhood_volume_geodesic
     if cosmo_skip_test_if_no_external('fast_marching') || ...
@@ -190,14 +173,15 @@ function test_surficial_neighborhood_volume_geodesic
     faces= [ 3 2 3 2
                 2 1 5 4
                 5 4 6 5 ]';
+
     pial=vertices;
     pial(:,3)=pial(:,3)+1;
     white=vertices;
     white(:,3)=white(:,3)-1;
     nh1=cosmo_surficial_neighborhood(ds,{vertices,[-1 1],faces},...
-    'count',4,opt);
+                                    'count',4,opt);
     nh2=cosmo_surficial_neighborhood(ds,{pial,white,faces},...
-    'count',4,opt);
+                                    'count',4,opt);
     assert_equal_cell(nh1.neighbors,{[ 1 2 4 5 ]
                                         [ 1 2 3 5 ]
                                         [ 2 3 5 6 ]
@@ -226,6 +210,7 @@ function test_surficial_neighborhood_volume_dijkstra
     faces= [ 3 2 3 2
                 2 1 5 4
                 5 4 6 5 ]';
+
     pial=vertices;
     pial(:,3)=pial(:,3)+1;
     white=vertices;
@@ -253,70 +238,123 @@ function test_surficial_neighborhood_exceptions
         return
     end
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
-    vertices=[0 0 0 1 1 1;
-                1 2 3 1 2 3;
-                0 0 0 0 0 0]';
-    faces= [ 3 2 3 2
-                2 1 5 4
-                5 4 6 5 ]';
+    [vertices,faces]=get_synthetic_surface();
+
     aet=@(x)assertExceptionThrown(@()...
     cosmo_surficial_neighborhood(x{:},'progress',false),'');
     aet({ds,{vertices,faces}});
-    ds2=cosmo_stack({ds,ds},2);
-    aet({ds2,{vertices,faces},'count',1});
-    ds3=cosmo_slice(ds,1:4,2);
-    aet({ds3,{vertices,faces},'count',2});
-    ds3=cosmo_dim_prune(ds3);
-    aet({ds3,{vertices,faces},'count',2});
 
 
 function check_partial_neighborhood(ds,nh,args)
     % TODO: enable this test
-    return
+
     % see if when have a partial dataset, the neighborbood reflects
     % that too
 
     nf=size(ds.samples,2);
 
     rp=randperm(nf);
-    keep_count=round(nf/2);
+    keep_count=round(nf*.7);
     keep_sel=rp(1:keep_count);
     keep_all=[keep_sel keep_sel keep_sel];
 
-    ds_sel=cosmo_slice(ds,keep_sel,2);
+    ds_sel=cosmo_slice(ds,keep_all,2);
+
+    fdim=ds_sel.a.fdim.values{1};
+    rp_fdim=randperm(numel(fdim));
+    ds_sel.a.fdim.values{1}=fdim(rp_fdim);
 
     nh_sel=cosmo_surficial_neighborhood(ds_sel,args{:});
 
     assertEqual(numel(nh_sel.neighbors), numel(keep_sel));
-    assertEqual(cosmo_slice(nh.fa,keep_all,2,'struct'),nh_sel.fa);
-    assertEqual(nh_sel.a,nh.a);
+
+    assertEqual(nh_sel.a.fdim.labels,nh.a.fdim.labels);
+    assertEqual(nh_sel.a.fdim.values{1},nh.a.fdim.values{1}(rp_fdim));
+    assertEqual(numel(nh_sel.a.fdim.values),numel(nh.a.fdim.values));
+
+    assertEqual(ds_sel.a,nh_sel.a);
+    %assertEqual(sort(nh.a.fdim.values{1}(nh.fa.node_indices(keep_sel))),...
+    %            sort(nh_sel.a.fdim.values{1}(nh_sel.fa.node_indices)));
+
+
+
+
+    opt=cosmo_structjoin(args(2:end));
+
+
+    if isfield(opt,'radius')
+        metric=opt.metric;
+        metric_arg=opt.radius;
+    elseif isfield(opt,'count')
+        metric=opt.metric;
+        metric_arg=[10 opt.count];
+    elseif isfield(opt,'direct')
+        metric='direct';
+        if opt.direct
+            metric_arg=NaN;
+        else
+            metric_arg=0;
+        end
+    else
+        assert(false);
+    end
+
+
+
+    faces=args{1}{2};
+    n2f=surfing_invertmapping(faces);
+
+    nodes_ds_sel=ds_sel.a.fdim.values{1}(ds_sel.fa.node_indices);
+    nodes_ds=ds.a.fdim.values{1}(ds.fa.node_indices);
+
+    nodes_nh_sel=nh_sel.a.fdim.values{1}(nh_sel.fa.node_indices);
+
+    vertices=args{1}{1};
+
+
+    nvertices=size(vertices,1);
+    nodes_kept=cosmo_match(1:nvertices,nodes_ds_sel);
+    vertices(~nodes_kept,:)=NaN;
+
+    node_mask=all(isfinite(vertices),2);
+
+    nodes_removed=setdiff(nodes_ds(:)',nodes_ds_sel(:)');
+    assertEqual(setxor(nodes_removed,nodes_ds_sel),1:nf);
 
     nb_sel=nh_sel.neighbors;
-    nb=nh.neighbors;
     for k=1:numel(nh_sel.neighbors)
-        y=nb_sel{k};
-        y_node=nh_sel.a.fdim{1}(nh_sel.fa.node_indices(y));
+        sel_center_node=nodes_nh_sel(k);
+        idx=find(nodes_ds==sel_center_node);
+        assert(numel(idx)==1);
+        center_node=nodes_ds(idx);
 
+        assertEqual(sel_center_node, center_node);
 
-        x_id=keep_sel(k);
-        x=nb{x_id};
-
-        nx=numel(x);
-        y_expected_cell=cell(nx,1);
-        for j=1:nx
-            xi=find(keep_sel==x(j));
-
-            if isempty(xi)
-                y_expected_cell{j}=zeros(1,0);
-                continue;
-            end
-
-            y_expected_cell{j}=find(keep_all==xi);
+        switch metric
+            case 'direct'
+                if node_mask(sel_center_node)
+                    direct_neighbors=surfing_surface_nbrs(faces',...
+                                                            vertices');
+                    around_nodes=direct_neighbors(sel_center_node,:);
+                    msk=cosmo_match(around_nodes, ...
+                                            find(isfinite(vertices(:,1))));
+                    % add node itself
+                    around_nodes=[sel_center_node,...
+                                    around_nodes(msk & around_nodes>0)];
+                else
+                    around_nodes=[];
+                end
+            otherwise
+                around_nodes=surfing_circleROI(vertices',faces',sel_center_node,metric_arg,metric,n2f);
         end
 
-        y_expected=cat(2,y_expected_cell{:});
+        sel_around_nodes=nodes_ds_sel(nb_sel{k});
 
-        assertEqual(sort(y), sort(y_expected));
+        if isempty(sel_around_nodes)
+            assertTrue(isempty(around_nodes));
+        else
+            assertEqual(unique(sel_around_nodes),setdiff(around_nodes, nodes_removed))
+        end
     end
 
 
