@@ -154,6 +154,7 @@ function test_surficial_neighborhood_surface_geodesic
     assertEqual(nh.fa.node_indices,1:6);
     assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
 
+
 function test_surficial_neighborhood_volume_geodesic
     if cosmo_skip_test_if_no_external('fast_marching') || ...
             cosmo_skip_test_if_no_external('surfing')
@@ -345,7 +346,8 @@ function check_partial_neighborhood(ds,nh,args)
                     around_nodes=[];
                 end
             otherwise
-                around_nodes=surfing_circleROI(vertices',faces',sel_center_node,metric_arg,metric,n2f);
+                around_nodes=surfing_circleROI(vertices',faces',...
+                            sel_center_node,metric_arg,metric,n2f);
         end
 
         sel_around_nodes=nodes_ds_sel(nb_sel{k});
@@ -353,7 +355,8 @@ function check_partial_neighborhood(ds,nh,args)
         if isempty(sel_around_nodes)
             assertTrue(isempty(around_nodes));
         else
-            assertEqual(unique(sel_around_nodes),setdiff(around_nodes, nodes_removed))
+            assertEqual(unique(sel_around_nodes),...
+                        setdiff(around_nodes, nodes_removed))
         end
     end
 
