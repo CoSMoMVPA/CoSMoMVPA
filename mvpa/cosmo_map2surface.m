@@ -162,7 +162,7 @@ function s=build_niml_dset(ds)
         end
     end
 
-function write_niml_dset(fn,s)
+function write_niml_dset(fn,s,opt)
     afni_niml_writesimple(s,fn);
 
 
@@ -209,7 +209,7 @@ function s=build_bv_smp(ds)
     s.NrOfMaps=nsamples;
     s.NrOfVertices=nfeatures;
 
-function write_bv_smp(fn,s)
+function write_bv_smp(fn,s,opt)
     s.SaveAs(fn);
 
 
