@@ -380,7 +380,8 @@ function externals=get_externals_helper()
     externals.surfing.is_present=has('surfing_voxelselection');
     % require recent version with surfing_write
     externals.surfing.is_recent=has('surfing_write') && ...
-                                    has('surfing_nodeselection');
+                                    has('surfing_nodeselection') && ...
+                                    get_surfing_version() >= .5;
     externals.surfing.label='Surfing toolbox';
     externals.surfing.url='http://github.com/nno/surfing';
     externals.surfing.authors={'N. N. Oosterhof','T. Wiestler',...
@@ -486,6 +487,32 @@ function version=get_libsvm_version()
 
     error('Could not find LIBSVM version in %s', svm_h_fn);
 
+function version=get_surfing_version()
+    surfing_root=fileparts(fileparts(noerror_which(...
+                                    'surfing_voxelselection')));
+    surfing_version_fn=fullfile(surfing_root,'VERSION');
+
+    fid=fopen(surfing_version_fn);
+    if fid<0
+        if ~exist(surfing_version_fn,'file')
+            version=0;
+            return;
+        else
+            error('Unable to open %s, cannot determine surfing version',...
+                    surfing_version_fn);
+        end
+    end
+
+    c=onCleanup(@()fclose(fid));
+
+    chars=fread(fid,Inf,'char=>char')';
+    v_str=regexp(chars,'version\s+([\d\.]*)','tokens');
+
+    if iscell(v_str)
+        v_str=v_str{1};
+    end
+
+    version=str2double(v_str);
 
 
 function c=add_to_cell(c, v)
