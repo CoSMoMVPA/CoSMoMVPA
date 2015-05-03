@@ -7,12 +7,7 @@ function test_niml_dset_dataset_io()
         return;
     end
 
-    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1,...
-                        'type','surface');
-    ds.a.fdim.values{1}=1+[1 4 7 8 5 3];
-    ds.sa.stats={'Ftest(3,4)';'Zscore()'};
-    ds.sa.labels={'label1';'label2'};
-
+    ds=get_niml_dataset();
     fn=cosmo_make_temp_filename('_tmp','.niml.dset');
     cleaner=onCleanup(@()delete(fn));
 
@@ -29,6 +24,15 @@ function assert_dataset_equal(x,y)
     assertEqual(sort(fieldnames(x)),sort(fieldnames(y)));
     assertEqual(x.fa,y.fa);
     assertEqual(x.a,y.a);
+
+
+function ds=get_niml_dataset()
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1,...
+                        'type','surface');
+    ds.a.fdim.values{1}=1+[1 4 7 8 5 3];
+    ds.sa.stats={'Ftest(3,4)';'Zscore()'};
+    ds.sa.labels={'label1';'label2'};
+
 
 
 function string=get_niml_dset_string(format)
