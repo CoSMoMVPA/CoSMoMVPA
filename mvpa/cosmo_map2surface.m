@@ -226,8 +226,11 @@ function s=build_bv_smp(ds)
     s.NrOfMaps=nsamples;
     s.NrOfVertices=nfeatures;
 
+    bless(s);
+
 function write_bv_smp(fn,s,opt)
     s.SaveAs(fn);
+    s.ClearObject();
 
 
 

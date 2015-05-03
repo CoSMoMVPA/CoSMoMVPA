@@ -264,6 +264,7 @@ function b=isa_bv_smp(x)
 
 function s=read_bv_smp(fn)
     s=xff(fn);
+    s=bless(s);
 
 function [data,node_indices,sa]=build_bv_smp(s)
     nsamples=s.NrOfMaps;
