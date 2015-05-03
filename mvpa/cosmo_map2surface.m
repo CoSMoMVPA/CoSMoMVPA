@@ -123,11 +123,25 @@ function formats=get_formats()
     formats.gii.writer=@write_gifti;
     formats.gii.externals={'gifti'};
 
+
+function [data, node_indices]=get_surface_data_and_node_indices(ds)
+    [data, dim_labels, dim_values]=cosmo_unflatten(ds);
+    if ~isequal(dim_labels,{'node_indices'})
+        error('.a.fdim.labels must be {''node_indices''}');
+    end
+
+    node_indices=dim_values{1}(:)';
+
+
+
+
 function g=build_gifti(ds)
     s=struct();
-    node_indices=ds.a.fdim.values{1}(ds.fa.node_indices);
+
+    [data, node_indices]=get_surface_data_and_node_indices(ds);
+
     s.indices=node_indices(:);
-    s.cdata=ds.samples';
+    s.cdata=data';
 
     g=gifti(s);
 
@@ -149,8 +163,11 @@ function s=build_niml_dset(ds)
     end
 
     s=struct();
-    s.node_indices=(ds.a.fdim.values{1}(ds.fa.node_indices))-1;
-    s.data=ds.samples';
+
+    [data, node_indices]=get_surface_data_and_node_indices(ds);
+
+    s.node_indices=node_indices-1;
+    s.data=data';
 
     if isfield(ds,'sa')
         if isfield(ds.sa,'labels');
