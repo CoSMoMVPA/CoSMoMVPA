@@ -34,6 +34,7 @@ install:
     - PTH=`pwd`
     - BUILDCMD="more('off');"
     - OCTAVEPTH="${PTH}"
+    - CHECKEXTCMD=""
     # optionally enable surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
@@ -41,6 +42,7 @@ install:
           BUILDCMD="${BUILDCMD}surfing_compile_mex();";
           BUILDCMD="${BUILDCMD}surfing_set_path();";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/surfing:${PTH}/surfing/surfing";
+          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('surfing');";
       fi
 
     # optionally install afni
@@ -52,6 +54,7 @@ install:
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
           git clone -b _cleanup git://github.com/nno/AFNI.git;
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab";
+          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('afni');";
       fi
 
     # optionally install FieldTrip
@@ -64,6 +67,7 @@ install:
           git clone -b octave git://github.com/nno/fieldtrip.git;
           BUILDCMD="${BUILDCMD}ft_defaults();"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
+          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('fieldtrip');";
       fi
 
     # optionally install libsvm
@@ -72,6 +76,7 @@ install:
           BUILDCMD="${BUILDCMD}cd('${PTH}/libsvm/matlab');";
           BUILDCMD="${BUILDCMD}make;";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
+          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('libsvm');";
       fi
 
     # optionally install gifti library
@@ -83,6 +88,7 @@ install:
           BUILDCMD="${BUILDCMD}cd('${PTH}/matlab_GIfTI/@gifti/private');";
           BUILDCMD="${BUILDCMD}mex('zstream.c');";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI";
+          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('gifti');";
       fi
 
     # show path
@@ -102,6 +108,7 @@ before_script:
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
     - TESTCMD="more('off');";
     - TESTCMD="${TESTCMD}cosmo_set_path();"
+    - TESTCMD="${TESTCMD}${CHECKEXTCMD}"
 
     # randomize number generator and print the state
     - TESTCMD="${TESTCMD}prng_state=round(1000*clock());"
