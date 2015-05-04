@@ -117,28 +117,30 @@ function test_target_dsm_corr_measure_non_pearson
 function test_target_dsm_corr_measure_model_dsms
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
     ds_vec_row=cosmo_pdist(ds.samples,'correlation');
-    ds_vec=ds_vec_row(:);
+    ds_vec=cosmo_normalize(ds_vec_row(:),'zscore');
 
     mat1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
     mat2=mat1;
     mat2(1:10)=mat2(10:-1:1);
 
     nrows=numel(mat1);
-    design_matrix=[mat1',mat2',ones(nrows,1)];
+    design_matrix=[cosmo_normalize([mat1',mat2'],'zscore'),ones(nrows,1)];
+
     betas=design_matrix \ ds_vec;
 
     dcm1=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
 
     assertElementsAlmostEqual(dcm1.samples,betas(1:2));
-    assertElementsAlmostEqual(dcm1.samples,[0.2188;0.2492],...
+    assertElementsAlmostEqual(dcm1.samples,[0.3505;0.3994],...
                                     'absolute',1e-4);
     sa=cosmo_structjoin('labels',{'beta1';'beta2'},...
                             'metric',{'correlation';'correlation'});
     assertEqual(dcm1.sa,sa);
 
     mat2=cosmo_squareform(mat2);
-    dcm2=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
-    assertEqual(dcm1,dcm2);
+    dcm2=cosmo_target_dsm_corr_measure(ds,'model_dsms',{1+3*mat1,2*mat2});
+    assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
+    assertEqual(dcm1.sa,dcm2.sa);
 
     dcm3=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat2,mat1});
     assertElementsAlmostEqual(dcm1.samples([2 1],:), dcm3.samples);

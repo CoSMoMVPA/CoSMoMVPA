@@ -27,17 +27,18 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     .model_dsms  (optional) cell with model dissimilarity matrices or
 %                  vectors (as .target_dsm) for using a general linear
 %                  model to get regression coefficients for each element in
-%                  .model_dsms. This linear model includes a constant term
-%                  to regress out main effects. This option cannot used
-%                  together with .target_dsm or regress_dsm; the 'type'
-%                  option is ignored.
+%                  .model_dsms. Both the input data and the dissimilarity
+%                  matrices are z-scored before estimating the regression
+%                  coefficients. This option cannot used together with
+%                  .target_dsm or regress_dsm; the 'type' option is
+%                  ignored.
 %
 % Output:
 %    ds_sa         Dataset struct with fields:
 %      .samples    Scalar correlation value between the pair-wise
 %                  distances of the samples in ds and target_dsm; or
-%                  (when 'model_dsms' is supplied) a vector with beta
-%                  coefficients
+%                  (when 'model_dsms' is supplied) a vector with
+%                  normalized beta coefficients
 %      .sa         Struct with field:
 %        .labels   {'rho'}; or (when 'model_dsms' is supplied) a cell
 %                  {'beta1','beta2',...}.
@@ -144,17 +145,17 @@ function ds_sa=linear_regression_dsm(ds_pdist, params)
     npairs_dataset=numel(ds_pdist);
 
     dsm_mat=get_dsm_mat_from_cell(params.model_dsms, npairs_dataset);
-    nvec=size(dsm_mat,2);
 
-    % add constant
-    design_mat_intercept=[dsm_mat, ones(npairs_dataset,1)];
+    % normalize matrices
+    dsm_mat_zscore=cosmo_normalize(dsm_mat,'zscore');
 
-    betas_intercept=design_mat_intercept \ ds_pdist(:);
+    % normalize data
+    ds_pdist_zscore=cosmo_normalize(ds_pdist(:),'zscore');
 
-    % remove intercept
-    betas=betas_intercept(1:(end-1));
+    betas=dsm_mat_zscore \ ds_pdist_zscore;
 
     % construct labels
+    nvec=size(dsm_mat_zscore,2);
     labels=cell(nvec,1);
     for k=1:nvec
         labels{k}=sprintf('beta%d', k);
@@ -164,7 +165,6 @@ function ds_sa=linear_regression_dsm(ds_pdist, params)
     ds_sa.samples=betas;
     ds_sa.sa.labels=labels;
     ds_sa.sa.metric=repmat({params.metric},nvec,1);
-
 
 
 function [ds_resid,target_resid]=regress_out(ds_pdist,...
