@@ -99,9 +99,6 @@ function test_target_dsm_corr_measure_partial_no_correlation
     assertElementsAlmostEqual(t_regress.samples,-0.7410,'absolute',1e-4);
 
 
-
-
-
 function test_target_dsm_corr_measure_non_pearson
     % test non-Pearson correlations
     if cosmo_skip_test_if_no_external('@stats')
@@ -117,6 +114,39 @@ function test_target_dsm_corr_measure_non_pearson
     assertElementsAlmostEqual(dcm1.samples,0.2558,'absolute',1e-4);
 
 
+function test_target_dsm_corr_measure_model_dsms
+    ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
+    ds_vec_row=cosmo_pdist(ds.samples,'correlation');
+    ds_vec=ds_vec_row(:);
+
+    mat1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
+    mat2=mat1;
+    mat2(1:10)=mat2(10:-1:1);
+
+    nrows=numel(mat1);
+    design_matrix=[mat1',mat2',ones(nrows,1)];
+    betas=design_matrix \ ds_vec;
+
+    dcm1=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
+
+    assertElementsAlmostEqual(dcm1.samples,betas(1:2));
+    assertElementsAlmostEqual(dcm1.samples,[0.2188;0.2492],...
+                                    'absolute',1e-4);
+    sa=cosmo_structjoin('labels',{'beta1';'beta2'},...
+                            'metric',{'correlation';'correlation'});
+    assertEqual(dcm1.sa,sa);
+
+    mat2=cosmo_squareform(mat2);
+    dcm2=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
+    assertEqual(dcm1,dcm2);
+
+    dcm3=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat2,mat1});
+    assertElementsAlmostEqual(dcm1.samples([2 1],:), dcm3.samples);
+
+
+
+
+
 
 % test exceptions
 function test_target_dsm_corr_measure_exceptions
@@ -130,5 +160,13 @@ function test_target_dsm_corr_measure_exceptions
     aet(ds,'target_dsm',[mat1 1]);
     aet(ds,'target_dsm',eye(6));
     aet(ds,'target_dsm',zeros(7));
+
+    aet(ds,'target_dsm',mat1,'model_dsms',{mat1});
+    aet(ds,'regress_dsm',mat1,'model_dsms',{mat1});
+    aet(ds,'model_dsms',struct());
+    aet(ds,'model_dsms',{[mat1 1]});
+
+
+
 
 

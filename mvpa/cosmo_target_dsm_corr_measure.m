@@ -24,14 +24,23 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  correlation between the pairwise distances between
 %                  samples in ds and target_dsm, after controlling for the
 %                  effect in regress_dsm.
-%
+%     .model_dsms  (optional) cell with model dissimilarity matrices or
+%                  vectors (as .target_dsm) for using a general linear
+%                  model to get regression coefficients for each element in
+%                  .model_dsms. This linear model includes a constant term
+%                  to regress out main effects. This option cannot used
+%                  together with .target_dsm or regress_dsm; the 'type'
+%                  option is ignored.
 %
 % Output:
 %    ds_sa         Dataset struct with fields:
 %      .samples    Scalar correlation value between the pair-wise
-%                  distances of the samples in ds and target_dsm.
+%                  distances of the samples in ds and target_dsm; or
+%                  (when 'model_dsms' is supplied) a vector with beta
+%                  coefficients
 %      .sa         Struct with field:
-%        .labels   {'rho'}
+%        .labels   {'rho'}; or (when 'model_dsms' is supplied) a cell
+%                  {'beta1','beta2',...}.
 %
 % Examples:
 %     % generate synthetic dataset with 6 classes (conditions),
@@ -79,6 +88,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
                             varargin);
 
     check_input(ds);
+    check_params(params);
 
     % - compute the pair-wise distance between all dataset samples using
     %   cosmo_pdist
@@ -87,16 +97,28 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 
     % number of pairwise distances; should match that of target_dsm_vec
     % below
+
+    has_model_dsms=isfield(params,'model_dsms');
+
+    if has_model_dsms
+        ds_sa=linear_regression_dsm(ds_pdist, params);
+    else
+        ds_sa=correlation_dsm(ds_pdist,params);
+    end
+
+function ds_sa=correlation_dsm(ds_pdist,params)
     npairs_dataset=numel(ds_pdist);
 
     % get target dsm in vector form
-    target_dsm_vec=get_dsm_vec(params,'target_dsm',npairs_dataset);
+    target_dsm_vec=get_dsm_vec_from_struct(params,'target_dsm',...
+                                                npairs_dataset);
 
     % ensure the size of the dataset matches the matrix
 
     has_regress_dsm=isfield(params,'regress_dsm');
     if has_regress_dsm
-        regress_dsm_vec=get_dsm_vec(params,'regress_dsm',npairs_dataset);
+        regress_dsm_vec=get_dsm_vec_from_struct(params,'regress_dsm',...
+                                                        npairs_dataset);
 
         % overwrite
         [ds_pdist(:),target_dsm_vec(:)]=regress_out(ds_pdist,...
@@ -118,6 +140,33 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     ds_sa.sa.type={params.type};
 
 
+function ds_sa=linear_regression_dsm(ds_pdist, params)
+    npairs_dataset=numel(ds_pdist);
+
+    dsm_mat=get_dsm_mat_from_cell(params.model_dsms, npairs_dataset);
+    nvec=size(dsm_mat,2);
+
+    % add constant
+    design_mat_intercept=[dsm_mat, ones(npairs_dataset,1)];
+
+    betas_intercept=design_mat_intercept \ ds_pdist(:);
+
+    % remove intercept
+    betas=betas_intercept(1:(end-1));
+
+    % construct labels
+    labels=cell(nvec,1);
+    for k=1:nvec
+        labels{k}=sprintf('beta%d', k);
+    end
+
+    ds_sa=struct();
+    ds_sa.samples=betas;
+    ds_sa.sa.labels=labels;
+    ds_sa.sa.metric=repmat({params.metric},nvec,1);
+
+
+
 function [ds_resid,target_resid]=regress_out(ds_pdist,...
                                                 target_dsm_vec,...
                                                 regress_dsm_vec)
@@ -134,15 +183,31 @@ function [ds_resid,target_resid]=regress_out(ds_pdist,...
     ds_resid=both_resid(:,1);
     target_resid=both_resid(:,2);
 
+function dsm_mat=get_dsm_mat_from_cell(dsm_cell, npairs_dataset)
+    if ~iscell(dsm_cell)
+        error('dsm inputs must be provided in a cell');
+    end
 
-function dsm_vec=get_dsm_vec(params,name,npairs_dataset)
+    n=numel(dsm_cell);
+    dsm_mat=zeros(npairs_dataset,n);
+
+    for k=1:n
+        name=sprintf('.model_dsms{%d}',k);
+        dsm_mat(:,k)=get_dsm_vec(dsm_cell{k},npairs_dataset,name);
+    end
+
+function dsm_vec=get_dsm_vec_from_struct(params,name,npairs_dataset)
     % helper funciton to get dsm in vector form
     if ~isfield(params,name)
         error('Missing parameter ''%s''',name);
     end
 
     dsm=params.(name);
+    dsm_vec=get_dsm_vec(dsm, npairs_dataset, ['''' name '''']);
 
+
+function dsm_vec=get_dsm_vec(dsm,npairs_dataset,name)
+     % helper funciton to get dsm in vector form
     if isrow(dsm)
         dsm_vec=dsm';
     elseif iscolumn(dsm)
@@ -154,7 +219,7 @@ function dsm_vec=get_dsm_vec(params,name,npairs_dataset)
 
     if npairs_dataset ~= numel(dsm_vec),
         error(['Sample size mismatch between dataset (%d pairs) '...
-                    'and ''%s'' in vector form (%d pairs)'], ...
+                    'and %s in vector form (%d pairs)'], ...
                         npairs_dataset,name,numel(dsm_vec));
     end
 
@@ -180,3 +245,14 @@ function check_input(ds)
         end
         error(msg);
     end
+
+function check_params(params)
+    if isfield(params,'model_dsms')
+        if isfield(params,'regress_dsm') || isfield(params,'target_dsm')
+            error(['''model_dsms'' cannot be used with ''regress_dsm'''...
+                    'or ''target_dsm''']);
+        end
+    elseif ~isfield(params,'target_dsm')
+        error('''target_dsm'' or ''model_dsms'' option is required');
+    end
+
