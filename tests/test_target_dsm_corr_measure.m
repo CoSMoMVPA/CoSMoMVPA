@@ -144,7 +144,7 @@ function test_target_dsm_corr_measure_model_dsms
 
     dcm3=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat2,mat1});
     assertElementsAlmostEqual(dcm1.samples([2 1],:), dcm3.samples);
-
+    assertEqual(dcm1.sa,dcm3.sa);
 
 
 
