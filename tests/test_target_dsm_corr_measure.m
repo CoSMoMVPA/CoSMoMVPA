@@ -147,6 +147,23 @@ function test_target_dsm_corr_measure_model_dsms
     assertEqual(dcm1.sa,dcm3.sa);
 
 
+function test_target_dsm_corr_measure_model_dsms_matlab_correspondence
+    if cosmo_skip_test_if_no_external('@stats')
+        return;
+    end
+    ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
+    ds.samples=randn(size(ds.samples));
+    ds_vec_row=cosmo_pdist(ds.samples,'correlation');
+    ds_vec=cosmo_normalize(ds_vec_row(:),'zscore');
+
+    mat1=rand(1,15);
+    mat2=rand(1,15);
+
+    design_matrix=cosmo_normalize([mat1',mat2'],'zscore');
+
+    beta=regress(ds_vec, design_matrix);
+    ds_beta=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
+    assertElementsAlmostEqual(beta, ds_beta.samples);
 
 
 
