@@ -114,7 +114,7 @@ function test_target_dsm_corr_measure_non_pearson
     assertElementsAlmostEqual(dcm1.samples,0.2558,'absolute',1e-4);
 
 
-function test_target_dsm_corr_measure_model_dsms
+function test_target_dsm_corr_measure_glm_dsm
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
     ds_vec_row=cosmo_pdist(ds.samples,'correlation');
     ds_vec=cosmo_normalize(ds_vec_row(:),'zscore');
@@ -128,7 +128,7 @@ function test_target_dsm_corr_measure_model_dsms
 
     betas=design_matrix \ ds_vec;
 
-    dcm1=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
+    dcm1=cosmo_target_dsm_corr_measure(ds,'glm_dsm',{mat1,mat2});
 
     assertElementsAlmostEqual(dcm1.samples,betas(1:2));
     assertElementsAlmostEqual(dcm1.samples,[0.3505;0.3994],...
@@ -138,16 +138,16 @@ function test_target_dsm_corr_measure_model_dsms
     assertEqual(dcm1.sa,sa);
 
     mat2=cosmo_squareform(mat2);
-    dcm2=cosmo_target_dsm_corr_measure(ds,'model_dsms',{1+3*mat1,2*mat2});
+    dcm2=cosmo_target_dsm_corr_measure(ds,'glm_dsm',{1+3*mat1,2*mat2});
     assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
     assertEqual(dcm1.sa,dcm2.sa);
 
-    dcm3=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat2,mat1});
+    dcm3=cosmo_target_dsm_corr_measure(ds,'glm_dsm',{mat2,mat1});
     assertElementsAlmostEqual(dcm1.samples([2 1],:), dcm3.samples);
     assertEqual(dcm1.sa,dcm3.sa);
 
 
-function test_target_dsm_corr_measure_model_dsms_matlab_correspondence
+function test_target_dsm_corr_measure_glm_dsm_matlab_correspondence
     if cosmo_skip_test_if_no_external('@stats')
         return;
     end
@@ -162,7 +162,7 @@ function test_target_dsm_corr_measure_model_dsms_matlab_correspondence
     design_matrix=cosmo_normalize([mat1',mat2'],'zscore');
 
     beta=regress(ds_vec, design_matrix);
-    ds_beta=cosmo_target_dsm_corr_measure(ds,'model_dsms',{mat1,mat2});
+    ds_beta=cosmo_target_dsm_corr_measure(ds,'glm_dsm',{mat1,mat2});
     assertElementsAlmostEqual(beta, ds_beta.samples);
 
 
@@ -180,10 +180,10 @@ function test_target_dsm_corr_measure_exceptions
     aet(ds,'target_dsm',eye(6));
     aet(ds,'target_dsm',zeros(7));
 
-    aet(ds,'target_dsm',mat1,'model_dsms',{mat1});
-    aet(ds,'regress_dsm',mat1,'model_dsms',{mat1});
-    aet(ds,'model_dsms',struct());
-    aet(ds,'model_dsms',{[mat1 1]});
+    aet(ds,'target_dsm',mat1,'glm_dsm',{mat1});
+    aet(ds,'regress_dsm',mat1,'glm_dsm',{mat1});
+    aet(ds,'glm_dsm',struct());
+    aet(ds,'glm_dsm',{[mat1 1]});
 
 
 

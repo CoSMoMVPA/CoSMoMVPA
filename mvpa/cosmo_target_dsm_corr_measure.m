@@ -7,11 +7,13 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %   ds             dataset struct with field .samples PxQ for P samples and
 %                  Q features
 %   args           struct with fields:
-%     .target_dsm  Either:
+%     .target_dsm  (optional) Either:
 %                  - target dissimilarity matrix of size PxP. It should
 %                    have zeros on the diagonal and be symmetric.
 %                  - target dissimilarity vector of size Nx1, with
 %                    N=P*(P-1)/2 the number of pairs of samples in ds.
+%                  This option is required if the 'glm_dsm' option is not
+%                  provided, and is incompatible with the 'glm_dsm' option.
 %     .metric      (optional) distance metric used in pdist to compute
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
@@ -24,14 +26,16 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  correlation between the pairwise distances between
 %                  samples in ds and target_dsm, after controlling for the
 %                  effect in regress_dsm.
-%     .model_dsms  (optional) cell with model dissimilarity matrices or
+%     .glm_dsm     (optional) cell with model dissimilarity matrices or
 %                  vectors (as .target_dsm) for using a general linear
 %                  model to get regression coefficients for each element in
 %                  .model_dsms. Both the input data and the dissimilarity
 %                  matrices are z-scored before estimating the regression
-%                  coefficients. This option cannot used together with
-%                  .target_dsm or regress_dsm; the 'type' option is
-%                  ignored.
+%                  coefficients.
+%                  This option is required when 'target_dsm' is not
+%                  provided; it cannot cannot used together with
+%                  .target_dsm or regress_dsm.
+%                  When using this option, the 'type' option is ignored.
 %
 % Output:
 %    ds_sa         Dataset struct with fields:
@@ -99,7 +103,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     % number of pairwise distances; should match that of target_dsm_vec
     % below
 
-    has_model_dsms=isfield(params,'model_dsms');
+    has_model_dsms=isfield(params,'glm_dsm');
 
     if has_model_dsms
         ds_sa=linear_regression_dsm(ds_pdist, params);
@@ -144,7 +148,7 @@ function ds_sa=correlation_dsm(ds_pdist,params)
 function ds_sa=linear_regression_dsm(ds_pdist, params)
     npairs_dataset=numel(ds_pdist);
 
-    dsm_mat=get_dsm_mat_from_cell(params.model_dsms, npairs_dataset);
+    dsm_mat=get_dsm_mat_from_vector_or_cell(params.glm_dsm, npairs_dataset);
 
     % normalize matrices
     dsm_mat_zscore=cosmo_normalize(dsm_mat,'zscore');
@@ -183,8 +187,10 @@ function [ds_resid,target_resid]=regress_out(ds_pdist,...
     ds_resid=both_resid(:,1);
     target_resid=both_resid(:,2);
 
-function dsm_mat=get_dsm_mat_from_cell(dsm_cell, npairs_dataset)
-    if ~iscell(dsm_cell)
+function dsm_mat=get_dsm_mat_from_vector_or_cell(dsm_cell, npairs_dataset)
+    if isnumeric(dsm_cell)
+        dsm_cell={dsm_cell};
+    elseif ~iscell(dsm_cell)
         error('dsm inputs must be provided in a cell');
     end
 
@@ -247,12 +253,12 @@ function check_input(ds)
     end
 
 function check_params(params)
-    if isfield(params,'model_dsms')
+    if isfield(params,'glm_dsm')
         if isfield(params,'regress_dsm') || isfield(params,'target_dsm')
-            error(['''model_dsms'' cannot be used with ''regress_dsm'''...
+            error(['''glm_dsm'' cannot be used with ''regress_dsm'''...
                     'or ''target_dsm''']);
         end
     elseif ~isfield(params,'target_dsm')
-        error('''target_dsm'' or ''model_dsms'' option is required');
+        error('''target_dsm'' or ''glm_dsm'' option is required');
     end
 
