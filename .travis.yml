@@ -52,7 +52,7 @@ install:
     # (PR: https://github.com/afniHQ/AFNI/pull/8)
     # TODO: git clone git://github.com/afniHQ/AFNI.git --depth 1
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
-          git clone -b _cleanup git://github.com/nno/AFNI.git;
+          git clone -b _cleanup git://github.com/AFNIHQ/AFNI.git;
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('afni');";
       fi
