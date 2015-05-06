@@ -46,13 +46,8 @@ install:
       fi
 
     # optionally install afni
-    # Hopefull soon the official AFNI Matlab code can be used
-    # currently (Apr 2015) we use our own version that
-    # is compatible with Octave
-    # (PR: https://github.com/afniHQ/AFNI/pull/8)
-    # TODO: git clone git://github.com/afniHQ/AFNI.git --depth 1
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
-          git clone -b _cleanup git://github.com/AFNIHQ/AFNI.git;
+          git clone git://github.com/AFNIHQ/AFNI.git --depth 1
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('afni');";
       fi
