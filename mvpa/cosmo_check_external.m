@@ -323,9 +323,13 @@ function externals=get_externals_helper()
 
 
     externals.afni.is_present=@() has('BrikLoad');
-    externals.afni.is_recent=@() has('afni_niml_readsimple');
+    % Octave requires a more recent version of AFNI, whereas there is
+    % currently no need for Matlab users to upgrade
+    externals.afni.is_recent=@() has('afni_niml_readsimple') && ...
+                                        (cosmo_wtf('is_matlab') || ...
+                                        has('afni_isdigit'))
     externals.afni.label='AFNI Matlab library';
-    externals.afni.url='http://afni.nimh.nih.gov/afni/matlab/';
+    externals.afni.url='https://github.com/afnihq/AFNI';
     externals.afni.authors={'Z. Saad','G. Chen'};
 
     externals.neuroelf.is_present=@() has('xff');
