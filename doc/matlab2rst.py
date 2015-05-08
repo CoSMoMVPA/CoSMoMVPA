@@ -285,7 +285,8 @@ class CoSMoModules(object):
                      'crossvalidate',
                      'crossvalidation_measure',
                      'winner_indices',
-                     'confusion_matrix'
+                     'confusion_matrix',
+                     'classify_meta_feature_selection',
                      ],
 
         operations=['slice',
@@ -295,7 +296,10 @@ class CoSMoModules(object):
                     'split',
                     'dim_prune',
                     'dim_transpose',
-                    'dim_rename'],
+                    'dim_rename',
+                    'dim_insert',
+                    'dim_remove',
+                    ],
 
         processing=['randomize_targets',
                     'fx',
@@ -330,6 +334,7 @@ class CoSMoModules(object):
                  'rand',
                  'tail',
                  'overlap'
+                 'align',
                  ],
 
 
@@ -340,6 +345,7 @@ class CoSMoModules(object):
                       'cross_neighborhood',
                       'sphere_offsets',
                       'searchlight',
+                      'naive_bayes_searchlight',
                     ],
 
         clustering=['cluster_neighborhood',
@@ -347,12 +353,16 @@ class CoSMoModules(object):
                       'montecarlo_cluster_stat',
                       'check_neighborhood',
                       'measure_clusters',
-                      'clusterize'],
+                      'clusterize',
+                      'find_local_extrema',
+                      ],
 
         develop=['run_tests',
                  'publish_run_scripts',
                  'wtf',
                  'notify_test_skipped',
+                 'notify_skip_test_if_no_external',
+                 'make_temp_filename',
                  ],
 
         visualization=['disp',
@@ -383,7 +393,8 @@ class CoSMoModules(object):
                      'dissimilarity_matrix_measure',
                      'pdist',
                      'squareform',
-                     'distatis'
+                     'distatis',
+                     'dim_generalization_measure'
                      ],
 
         partitions= ['balance_partitions',
@@ -407,7 +418,9 @@ class CoSMoModules(object):
         fmri=       ['fmri_reorient',
                     'fmri_orientation',
                     'fmri_convert_xform',
-                    'fmri_deoblique'
+                    'fmri_deoblique',
+                    'vol_grid_convert',
+                    'vol_coordinates',
                     ],
         )
 
