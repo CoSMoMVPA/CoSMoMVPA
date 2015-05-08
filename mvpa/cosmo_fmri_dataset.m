@@ -149,7 +149,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     if cosmo_check_dataset(filename,'fmri',false);
         ds=filename;
     else
-        % get the supported image formats use the helper defined below
+        % create dataset from filename
         ds=convert_to_dataset(filename, params);
     end
 
