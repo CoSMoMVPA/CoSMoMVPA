@@ -333,7 +333,7 @@ class CoSMoModules(object):
                  'index_unique',
                  'rand',
                  'tail',
-                 'overlap'
+                 'overlap',
                  'align',
                  ],
 
@@ -345,7 +345,7 @@ class CoSMoModules(object):
                       'cross_neighborhood',
                       'sphere_offsets',
                       'searchlight',
-                      'naive_bayes_searchlight',
+                      'naive_bayes_classifier_searchlight',
                     ],
 
         clustering=['cluster_neighborhood',
@@ -361,7 +361,7 @@ class CoSMoModules(object):
                  'publish_run_scripts',
                  'wtf',
                  'notify_test_skipped',
-                 'notify_skip_test_if_no_external',
+                 'skip_test_if_no_external',
                  'make_temp_filename',
                  ],
 
