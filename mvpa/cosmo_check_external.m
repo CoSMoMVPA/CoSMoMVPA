@@ -327,7 +327,7 @@ function externals=get_externals_helper()
     % currently no need for Matlab users to upgrade
     externals.afni.is_recent=@() has('afni_niml_readsimple') && ...
                                         (cosmo_wtf('is_matlab') || ...
-                                        has('afni_isdigit'))
+                                        has('afni_isdigit'));
     externals.afni.label='AFNI Matlab library';
     externals.afni.url='https://github.com/afnihq/AFNI';
     externals.afni.authors={'Z. Saad','G. Chen'};
