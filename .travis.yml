@@ -47,8 +47,8 @@ install:
 
     # optionally install afni
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
-          git clone git://github.com/AFNIHQ/AFNI.git --depth 1;
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/AFNI/src/matlab";
+          git clone git://github.com/afni/afni.git --depth 1;
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/afni/src/matlab";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('afni');";
       fi
 
