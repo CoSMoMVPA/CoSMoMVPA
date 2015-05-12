@@ -244,6 +244,10 @@ function s=read_niml_dset(fn)
 function [data,node_indices,sa]=build_niml_dset(s)
     data=s.data';
 
+    if ~isa(data,'double')
+        data=double(data);
+    end
+
     if isfield(s,'node_indices')
         node_indices=s.node_indices+1; % base0 -> base1
     else
