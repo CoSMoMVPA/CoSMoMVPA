@@ -170,6 +170,14 @@ function [data,node_indices,sa]=read(fn)
                 if endswith(fn,exts{j})
                     cosmo_check_external(img_format.externals);
                     s=reader(fn);
+
+                    if ~matcher(s)
+                        error(['Could read file ''%s'', but the data '...
+                                'is not matching the expected contents '...
+                                'for a dataset of type %s'],...
+                                fn, name);
+                    end
+
                     [data,node_indices,sa]=builder(s);
                     return
                 end

@@ -76,6 +76,19 @@ function save_and_load(format)
 
     assert_dataset_equal(ds,ds3,format);
 
+    fid=fopen(tmp_fn,'w');
+    fprintf(fid,'foo');
+    fclose(fid);
+
+    switch format
+        case 'bv_smp'
+            exception='xff:XFFioFailed';
+        otherwise
+            exception='';
+    end
+    assertExceptionThrown(@()reader(tmp_fn),exception);
+
+
 function assert_dataset_equal(x,y,format)
     assertElementsAlmostEqual(x.samples,y.samples,'absolute',1e-4);
     assertEqual(x.fa,y.fa);
