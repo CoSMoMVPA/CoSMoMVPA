@@ -84,8 +84,8 @@ function infix=generate_random_infix(infix_length)
         infix_length=20;
     end
 
-    char_val_min='a'+0;
-    char_val_max='z'+0;
+    char_val_min=double('a');
+    char_val_max=double('z');
     char_val_range=char_val_max-char_val_min;
 
     rand_chars=char(rand(1,infix_length)*char_val_range+char_val_min);
