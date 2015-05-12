@@ -180,7 +180,10 @@ function s=build_niml_dset(ds)
     end
 
 function write_niml_dset(fn,s,opt)
-    afni_niml_writesimple(s,fn);
+    if isfield(opt, 'encoding')
+        args={opt.encoding};
+    end
+    afni_niml_writesimple(s, fn, args{:});
 
 
 function s=build_bv_smp(ds)
