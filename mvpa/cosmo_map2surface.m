@@ -182,6 +182,8 @@ function s=build_niml_dset(ds)
 function write_niml_dset(fn,s,opt)
     if isfield(opt, 'encoding')
         args={opt.encoding};
+    else
+        args={};
     end
     afni_niml_writesimple(s, fn, args{:});
 
