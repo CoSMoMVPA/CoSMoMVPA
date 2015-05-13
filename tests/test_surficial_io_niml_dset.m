@@ -16,7 +16,7 @@ function test_niml_dset_dataset_io()
     if isempty(which('afni_swapbytes'))
         formats=formats(1);
         cosmo_warning(['Temporarily disabling test for binary NIML '...
-                            'until this is incorporated in the AFNI '
+                            'until this is incorporated in the AFNI '...
                             'Matlab library']);
     end
 
