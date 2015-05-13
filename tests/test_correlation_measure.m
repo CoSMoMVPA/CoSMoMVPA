@@ -28,7 +28,8 @@ function test_correlation_measure_basis()
     assertEqual(repmat((1:4)',4,1),c2.sa.half2);
 
     i=7;
-    assertElementsAlmostEqual(cxy(c2.sa.half1(i),c2.sa.half2(i)),c2.samples(i));
+    assertElementsAlmostEqual(cxy(c2.sa.half1(i),c2.sa.half2(i)),...
+                                        c2.samples(i));
 
     assertEqual({'half1','half2'},c2.a.sdim.labels);
     assertEqual({20+(1:4)',20+(1:4)'},c2.a.sdim.values);
