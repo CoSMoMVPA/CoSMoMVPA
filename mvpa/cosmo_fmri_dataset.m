@@ -242,7 +242,7 @@ function result=fast_import_data(fn)
 
 function ds=convert_to_dataset(fn, params)
     if string_endswith(fn,'.mat')
-        fn=fast_import_data(filename);
+        fn=fast_import_data(fn);
     end
 
     img_formats_collection=get_img_formats;
