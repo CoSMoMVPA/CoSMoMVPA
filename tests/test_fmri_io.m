@@ -341,9 +341,7 @@ function assert_sa_equal(x,y,ext)
     if cosmo_match({ext},ignore_sa_exts)
         return;
     end
-    if ~isequal(x.sa,y.sa)
-        2
-    end
+
     assertEqual(x.sa,y.sa);
 
 
