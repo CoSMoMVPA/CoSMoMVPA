@@ -62,13 +62,23 @@ function save_and_load_dataset_with_extension(ext, multi_volume)
     if multi_volume
         y=save_and_load(x_base,ext);
         assert_dataset_equal(x_base,y,ext);
+
+        volumes=[4 2];
     else
         assertExceptionThrown(@()save_and_load(x_base,ext),'');
+        volumes=1;
     end
 
-    x_sel=cosmo_slice(x_base,3);
+    x_sel=cosmo_slice(x_base,volumes);
 
-    y_sel=save_and_load(x_sel,ext);
+    if multi_volume
+        x=x_base;
+    else
+        x=x_sel;
+    end
+
+    y_sel=save_and_load(x,ext,'volumes',volumes);
+
     assert_dataset_equal(x_sel,y_sel,ext);
 
 

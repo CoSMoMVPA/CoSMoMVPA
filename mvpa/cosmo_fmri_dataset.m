@@ -138,6 +138,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     defaults.mask=[];
     defaults.targets=[];
     defaults.chunks=[];
+    defaults.volumes=[];
 
     params = cosmo_structjoin(defaults, varargin);
 
@@ -145,13 +146,8 @@ function ds = cosmo_fmri_dataset(filename, varargin)
         filename=fast_import_data(filename);
     end
 
-    % special case: if it's already a dataset, just return it
-    if cosmo_check_dataset(filename,'fmri',false);
-        ds=filename;
-    else
-        % create dataset from filename
-        ds=convert_to_dataset(filename, params);
-    end
+    % create dataset from filename
+    ds=convert_to_dataset(filename, params);
 
     % set chunks and targets
     ds=set_sa_vec(ds,params,'targets');
@@ -171,7 +167,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function img_formats=get_img_formats(params)
+function img_formats=get_img_formats()
 
     % define which formats are supports
     % .exts indicates the extensions
@@ -182,7 +178,7 @@ function img_formats=get_img_formats(params)
 
     img_formats.nii.exts={'.nii','.nii.gz','.hdr','.img'};
     img_formats.nii.matcher=@isa_nii;
-    img_formats.nii.reader=@(fn)read_nii(fn,params);
+    img_formats.nii.reader=@read_nii;
     img_formats.nii.externals={'nifti'};
 
     img_formats.bv_vmp.exts={'.vmp'};
@@ -212,7 +208,7 @@ function img_formats=get_img_formats(params)
 
     img_formats.spm.exts={'mat:con','mat:beta','mat:spm'};
     img_formats.spm.matcher=@isa_spm;
-    img_formats.spm.reader=@(fn)read_spm(fn,params);
+    img_formats.spm.reader=@read_spm;
     img_formats.spm.externals=img_formats.nii.externals;
 
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
@@ -228,6 +224,15 @@ function img_formats=get_img_formats(params)
     img_formats.ft_source.externals=cell(0);
     img_formats.ft_source.convert_volume=false;
 
+    img_formats.cosmo_fmri_ds.exts=cell(0);
+    img_formats.cosmo_fmri_ds.matcher=@(x)cosmo_check_dataset(x,...
+                                                        'fmri',false);
+    img_formats.cosmo_fmri_ds.reader=@read_cosmo_fmri_ds;
+    img_formats.cosmo_fmri_ds.externals=cell(0);
+    img_formats.cosmo_fmri_ds.convert_volume=false;
+
+
+
 function result=fast_import_data(fn)
     x=load(fn);
     keys=fieldnames(x);
@@ -239,7 +244,7 @@ function result=fast_import_data(fn)
 
 
 function ds=convert_to_dataset(fn, params)
-    img_formats_collection=get_img_formats(params);
+    img_formats_collection=get_img_formats;
     label=find_img_format(fn, img_formats_collection);
 
     % make sure the required externals exist
@@ -251,12 +256,12 @@ function ds=convert_to_dataset(fn, params)
 
     if isfield(img_format,'convert_volume') && ...
                 ~img_format.convert_volume
-        ds=reader(fn);
+        ds=reader(fn, params);
         return;
     end
 
     % read the data
-    [data,vol,sa]=reader(fn);
+    [data,vol,sa]=reader(fn, params);
 
     if ~isa(data,'double')
         data=double(data); % ensure data stored in double precision
@@ -501,16 +506,78 @@ function auto_mask=compute_auto_mask(data, mask_type)
     auto_mask=~to_remove(:)';
 
 
-function hdr=get_and_check_data(hdr, loader_func, check_func)
-    % is hdr is a char, load it using loader; otherwise return the input.
-    % in any case the output is checked using check_func
+function hdr=get_and_check_data(hdr, loader_func, check_func, varargin)
+    % is hdr is a char, load it using loader with optional arguments
+    % from varargin
+    % For other input, the input is returned.
+    %
+    % in any case the output is checked using check_func.
     if ischar(hdr)
-        hdr=loader_func(hdr);
+        hdr=loader_func(hdr, varargin{:});
     end
     if ~check_func(hdr)
         error('Illegal input of type %s - failed to pass %s',...
                     class(hdr), func2str(check_func));
     end
+
+function volume_indices=get_volume_indices(nvolumes, opt)
+    % returns [] if opt does not contain a 'volumes' field,
+    % or if opt.volumes is empty, otherwise the contents of opt.volumes.
+    % An error is raised if opt.volumes has illegal values
+    if ~isfield(opt,'volumes') || isempty(opt.volumes)
+        volume_indices=[];
+        return
+    end
+
+    volume_indices=opt.volumes;
+    if ~isvector(volume_indices) ||...
+            ~isnumeric(volume_indices) || ...
+            min(volume_indices)<1 || ...
+            max(volume_indices)>nvolumes || ...
+            any(round(volume_indices)~=volume_indices) || ...
+            ~isequal(unique(volume_indices),sort(volume_indices))
+        error(['the ''volumes'' argument must contain integers in the '...
+                    'range 1:%d'], nvolumes);
+    end
+
+function sliced_data=slice_4d_array_volumes(data, opt)
+    % return the input data sliced along the 4th dimension, if opt.volumes
+    % is non-empty; otherwise the input is returned
+    data_sz=[size(data) 1 1];
+    nvolumes=data_sz(4);
+
+    volume_indices=get_volume_indices(nvolumes, opt);
+
+    if isempty(volume_indices)
+        sliced_data=data;
+        return;
+    end
+
+    if numel(size(data))<=3
+        % single volume data
+        if ~isequal(volume_indices,1)
+            error('Single volume, can only select volume 1, not %d',...
+                        volume_indices(1));
+        end
+        sliced_data=data;
+        return;
+    end
+
+    sliced_data=data(:,:,:,volume_indices);
+
+
+function sliced_ds=slice_dataset_volumes(ds,opt)
+    % return the input data sliced along first (sample) dimension,
+    % if opt.volumes is non-empty; otherwise the input is returned
+    nvolumes=size(ds.samples,1);
+    volume_indices=get_volume_indices(nvolumes,opt);
+
+    if isempty(volume_indices)
+        sliced_ds=ds;
+        return;
+    end
+
+    sliced_ds=cosmo_slice(ds,volume_indices);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -524,14 +591,21 @@ function b=isa_nii(hdr)
             isfield(hdr,'hdr') && isfield(hdr.hdr,'dime') && ...
             isfield(hdr.hdr.dime,'dim') && isnumeric(hdr.hdr.dime.dim);
 
-function nii=load_nii_helper(fn)
+function nii=load_nii_helper(fn, params)
+    % loads only selected volumes
     nii=struct();
     nii.hdr=load_untouch_header_only(fn);
-    nii.img=nifti_load_img(fn);
+
+    nii_dim=nii.hdr.dime.dim;
+    nvolumes=max(nii_dim(5), prod(nii_dim(5:end)));
+    volume_indices=get_volume_indices(nvolumes, params);
+
+    nii_tmp=load_untouch_nii(fn, volume_indices);
+    nii.img=double(nii_tmp.img);
 
 
 function [data,vol,sa]=read_nii(fn, params)
-    nii=get_and_check_data(fn, @load_nii_helper, @isa_nii);
+    nii=get_and_check_data(fn, @load_nii_helper, @isa_nii, params);
     hdr=nii.hdr;
     data=nii.img;
 
@@ -768,9 +842,6 @@ function scaling=nifti_get_scaling_factor(hdr)
         scaling=[];
     end
 
-function img=nifti_load_img(fn)
-    nii=load_untouch_nii(fn);
-    img=double(nii.img);
 
 
 
@@ -826,31 +897,40 @@ function b=isa_bv_vmp(hdr)
             isfield(hdr,'Map') && isstruct(hdr.Map) && ...
             isfield(hdr,'VMRDimX') && isfield(hdr,'NrOfMaps');
 
-function [data,vol,sa]=read_bv_vmp(fn)
+function [data,vol,sa]=read_bv_vmp(fn, params)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vmp);
 
-    nsamples=hdr.NrOfMaps;
+    nvolumes=hdr.NrOfMaps;
+    volume_indices=get_volume_indices(nvolumes,params);
+    if isempty(volume_indices)
+        volume_indices=1:nvolumes;
+    end
+
+    nsamples=numel(volume_indices);
     voldim=size(hdr.Map(1).VMPData);
 
     data=zeros([voldim nsamples]);
     labels=cell(nsamples,1);
     for k=1:nsamples
-        map=hdr.Map(k);
+        map=hdr.Map(volume_indices(k));
         data(:,:,:,k)=map.VMPData;
         labels{k}=map.Name;
     end
 
+    stats_all=cosmo_statcode(hdr);
+    stats=stats_all(volume_indices);
+
     vol=get_vol_bv(hdr);
 
     sa=struct();
-    sa.stats=cosmo_statcode(hdr);
+    sa.stats=stats;
     sa.labels=labels;
 
 % BV volume (usually anatomical)
 function b=isa_bv_vmr(hdr)
     b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr,'VMRData');
 
-function [data,vol,sa]=read_bv_vmr(fn)
+function [data,vol,sa]=read_bv_vmr(fn, params)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vmr);
 
     nsamples=1;
@@ -869,17 +949,26 @@ function b=isa_bv_glm(hdr)
     b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr,'Predictor') &&  ...
             isfield(hdr,'GLMData') && isfield(hdr,'DesignMatrix');
 
-function [data,vol,sa]=read_bv_glm(fn)
+function [data,vol,sa]=read_bv_glm(fn, params)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_glm);
 
-    nsamples=hdr.NrOfPredictors;
-    data=hdr.GLMData.BetaMaps(:,:,:,:);
+    nvolumes=hdr.NrOfPredictors;
+
+    volume_indices=get_volume_indices(params);
+    data=slice_4d_array_volumes(hdr.GLMData.BetaMaps);
+
+    if isempty(volume_indices)
+        volume_indices=1:nvolumes;
+    end
+
+    nsamples=numel(volume_indices);
 
     name1=cell(nsamples,1);
     name2=cell(nsamples,1);
     rgb=zeros(nsamples,3);
     for k=1:nsamples
-        p=hdr.Predictor(k);
+        volume_index=volume_indices(k);
+        p=hdr.Predictor(volume_index);
         name1{k}=p.Name1;
         name2{k}=p.Name2;
         rgb(k,:)=p.RGB(1,:);
@@ -898,11 +987,11 @@ function b=isa_bv_msk(hdr)
     b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr, 'Mask');
 
 
-function [data,vol,sa]=read_bv_msk(fn)
+function [data,vol,sa]=read_bv_msk(fn, params)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_msk);
 
     sa=struct();
-    data=hdr.Mask;
+    data=slice_4d_array_volumes(hdr.Mask,params);
     vol=get_vol_bv(hdr);
 
 
@@ -911,10 +1000,10 @@ function b=isa_bv_vtc(hdr)
 
     b=(isa(hdr,'xff') || isstruct(hdr)) && isfield(hdr, 'VTCData');
 
-function [data,vol,sa]=read_bv_vtc(fn)
+function [data,vol,sa]=read_bv_vtc(fn, params)
     hdr=get_and_check_data(fn, @xff_struct, @isa_bv_vtc);
     sa=struct();
-    data=shiftdim(hdr.VTCData,1);
+    data=slice_4d_array_volumes(shiftdim(hdr.VTCData,1),params);
     vol=get_vol_bv(hdr);
 
 
@@ -924,17 +1013,31 @@ function b=isa_afni(hdr)
     b=isstruct(hdr) && isfield(hdr,'DATASET_DIMENSIONS') && ...
             isfield(hdr,'DATASET_RANK');
 
-function [data,vol,sa]=read_afni(fn)
+function [data,vol,sa]=read_afni(fn, params)
     if isa_afni(fn)
         if isfield(fn,'img')
-            data=fn.img;
+            data=slice_4d_array_volumes(fn.img, params);
+            nvolumes=size(data,4);
+
+            volume_indices=get_volume_indices(nvolumes,params);
+
             hdr=fn;
             hdr=rmfield(hdr,'img');
         else
             error('AFNI struct has missing image data (field .img)');
         end
     else
-        [err,data,hdr,err_msg]=BrikLoad(fn);
+        [err, hdr]=BrikInfo(fn);
+        if err
+            error('Error reading afni file %s', fn);
+        end
+        nvolumes=hdr.DATASET_RANK(2);
+        volume_indices=get_volume_indices(nvolumes,params);
+
+        opt=struct();
+        opt.Frames=volume_indices;
+
+        [err,data,hdr,err_msg]=BrikLoad(fn,opt);
         if err
             error('Error reading afni file: %s', err_msg);
         end
@@ -945,7 +1048,7 @@ function [data,vol,sa]=read_afni(fn)
     if isfield(hdr,'BRICK_LABS') && ~isempty(hdr.BRICK_LABS);
         % if present, get labels
         labels=cosmo_strsplit(hdr.BRICK_LABS,'~');
-        nsamples=hdr.DATASET_RANK(2);
+        nsamples=size(data,4);
         if numel(labels)==nsamples+1 && isempty(labels{end})
             labels=labels(1:(end-1));
         end
@@ -955,6 +1058,10 @@ function [data,vol,sa]=read_afni(fn)
     if isfield(hdr,'BRICK_STATAUX') && ~isempty(hdr.BRICK_STATAUX);
         % if present, get stat codes
         sa.stats=cosmo_statcode(hdr);
+    end
+
+    if ~isempty(volume_indices)
+        sa=cosmo_slice(sa,volume_indices,1,'struct');
     end
 
     vol=get_vol_afni(hdr);
@@ -1113,13 +1220,22 @@ function [data,vol,sa]=read_spm(fn,params)
 
     assert(sample_counter==nsamples);
 
+    volume_indices=get_volume_indices(nsamples, params);
+    if ~isempty(volume_indices);
+        data=data(:,:,:,volume_indices);
+        sa=cosmo_slice(sa,volume_indices,1,'struct');
+    end
+
+
+
 % FIeldTrip source struct
 function  b=isa_ft_source(hdr)
     b=isstruct(hdr) && ((isfield(hdr,'inside') && isfield(hdr,'pos')) ||...
                         (cosmo_check_dataset(hdr,false) && ...
                          cosmo_isfield(hdr,'fa.pos')));
 
-function ds=read_ft_source(ft)
+
+function ds=read_ft_source(ft, params)
     assert(isstruct(ft));
 
     if isfield(ft,'inside') && isfield(ft,'pos')
@@ -1133,7 +1249,13 @@ function ds=read_ft_source(ft)
 
     cosmo_check_dataset(ds_meeg,'meeg');
 
-    ds=cosmo_vol_grid_convert(ds_meeg,'tovol');
+    ds_full=cosmo_vol_grid_convert(ds_meeg,'tovol');
+    ds=slice_dataset_volumes(ds_full,params);
+
+
+function ds=read_cosmo_fmri_ds(ds, params)
+    ds=slice_dataset_volumes(ds,params);
+
 
 
 
