@@ -55,9 +55,12 @@ function test_statcode_bv()
     for j=1:numel(bv_values)
         bv_value=bv_values{j};
 
-        s=[];
+        s=struct();
         nv=numel(bv_value);
-        if nv>=1
+
+        if nv==0
+            s.Type=0;
+        else
             s.Type=bv_value(1);
             for k=1:(nv-1)
                 label=sprintf('DF%d',k);
