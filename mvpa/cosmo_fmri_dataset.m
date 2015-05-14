@@ -142,9 +142,6 @@ function ds = cosmo_fmri_dataset(filename, varargin)
 
     params = cosmo_structjoin(defaults, varargin);
 
-    if string_endswith(filename,'.mat')
-        filename=fast_import_data(filename);
-    end
 
     % create dataset from filename
     ds=convert_to_dataset(filename, params);
@@ -244,6 +241,10 @@ function result=fast_import_data(fn)
 
 
 function ds=convert_to_dataset(fn, params)
+    if string_endswith(fn,'.mat')
+        fn=fast_import_data(filename);
+    end
+
     img_formats_collection=get_img_formats;
     label=find_img_format(fn, img_formats_collection);
 
