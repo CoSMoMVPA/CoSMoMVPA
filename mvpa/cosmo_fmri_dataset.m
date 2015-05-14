@@ -151,7 +151,7 @@ function ds = cosmo_fmri_dataset(filename, varargin)
     ds=set_sa_vec(ds,params,'chunks');
 
     % compute mask
-    mask=get_mask(ds,params.mask);
+    mask=get_boolean_vector_array_mask(ds,params.mask);
 
     if ~isempty(mask)
         % apply mask
@@ -227,7 +227,6 @@ function img_formats=get_img_formats()
     img_formats.cosmo_fmri_ds.reader=@read_cosmo_fmri_ds;
     img_formats.cosmo_fmri_ds.externals=cell(0);
     img_formats.cosmo_fmri_ds.convert_volume=false;
-
 
 
 function result=fast_import_data(fn)
@@ -355,7 +354,7 @@ function img_format=find_img_format(filename, img_formats)
     end
     error('Could not find image format for %s',desc);
 
-function mask=get_mask(ds, mask_param)
+function mask=get_boolean_vector_array_mask(ds, mask_param)
     if isempty(mask_param)
         % not given; optionally give a suggestion about using an automask
         compute_auto_mask(ds.samples,'');
@@ -379,43 +378,48 @@ function mask=get_mask(ds, mask_param)
         if mask_param(1)=='-'
             mask=compute_auto_mask(ds.samples,mask_param(2:end));
         else
-            ds_mask=convert_to_dataset(mask_param, struct());
-
-            % if necessary, bring in the same space
-            ds_orient=cosmo_fmri_orientation(ds);
-            if ~isequal(ds_orient, cosmo_fmri_orientation(ds_mask))
-                ds_mask=cosmo_fmri_reorient(ds_mask, ds_orient);
-            end
-
-            % ensure the mask is compatible with the dataset
-            if ~isequal(ds_mask.fa,ds.fa) || ...
-                            ~isequal(ds_mask.a.fdim,ds_mask.a.fdim)
-                error(['feature attribute or size mismatch between '...
-                                'data and mask']);
-            end
-
-            % check voxel-to-world mapping
-            max_delta=1e-4; % allow for minor tolerance
-            delta=max(abs(ds_mask.a.vol.mat(:)-ds.a.vol.mat(:)));
-            if delta>max_delta
-                error(['voxel dimension mismatch between data and mask:'...
-                            'max difference is %.5f > %.5f'],...
-                            delta,max_delta);
-            end
-
-            % only support single volume
-            nsamples_mask=size(ds_mask.samples,1);
-            if nsamples_mask~=1
-                error('mask must have a single volume, found %d',...
-                                                nsamples_mask);
-            end
-
-            % compute logical mask
-            mask=ds_mask.samples~=0 & isfinite(ds_mask.samples);
+            ds_mask=convert_to_mask_ds(ds, mask_param);
+            mask=ds_mask.samples;
         end
     end
 
+function ds_mask=convert_to_mask_ds(ds, mask_param)
+    assert(ischar(mask_param)); % enforced by calling function
 
+
+    ds_mask=convert_to_dataset(mask_param, struct());
+
+    % if necessary, bring in the same space
+    ds_orient=cosmo_fmri_orientation(ds);
+    if ~isequal(ds_orient, cosmo_fmri_orientation(ds_mask))
+        ds_mask=cosmo_fmri_reorient(ds_mask, ds_orient);
+    end
+
+    % ensure the mask is compatible with the dataset
+    if ~isequal(ds_mask.fa,ds.fa) || ...
+                    ~isequal(ds_mask.a.fdim,ds_mask.a.fdim)
+        error(['feature attribute or size mismatch between '...
+                        'data and mask']);
+    end
+
+    % check voxel-to-world mapping
+    max_delta=1e-4; % allow for minor tolerance
+    delta=max(abs(ds_mask.a.vol.mat(:)-ds.a.vol.mat(:)));
+    if delta>max_delta
+        error(['voxel dimension mismatch between data and mask:'...
+                    'max difference is %.5f > %.5f'],...
+                    delta,max_delta);
+    end
+
+    % only support single volume
+    nsamples_mask=size(ds_mask.samples,1);
+    if nsamples_mask~=1
+        error('mask must have a single volume, found %d',...
+                                        nsamples_mask);
+    end
+
+    % compute logical mask
+    ds_mask.samples=ds_mask.samples~=0 & isfinite(ds_mask.samples);
 
 function auto_mask=compute_auto_mask(data, mask_type)
     % mask_type can be 'any', 'all', 'auto', or ''
@@ -952,8 +956,8 @@ function [data,vol,sa]=read_bv_glm(fn, params)
 
     nvolumes=hdr.NrOfPredictors;
 
-    volume_indices=get_volume_indices(params);
-    data=slice_4d_array_volumes(hdr.GLMData.BetaMaps);
+    volume_indices=get_volume_indices(nvolumes, params);
+    data=slice_4d_array_volumes(hdr.GLMData.BetaMaps, params);
 
     if isempty(volume_indices)
         volume_indices=1:nvolumes;
