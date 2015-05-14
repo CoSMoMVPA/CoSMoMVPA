@@ -379,10 +379,7 @@ function mask=get_mask(ds, mask_param)
         if mask_param(1)=='-'
             mask=compute_auto_mask(ds.samples,mask_param(2:end));
         else
-            me=str2func(mfilename()); % make immune to renaming
-
-            % load mask (using recursion)
-            ds_mask=me(mask_param,'mask',false);
+            ds_mask=convert_to_dataset(mask_param, struct());
 
             % if necessary, bring in the same space
             ds_orient=cosmo_fmri_orientation(ds);
