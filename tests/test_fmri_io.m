@@ -41,22 +41,36 @@ function test_fmri_io_bv_vmr()
     if cosmo_skip_test_if_no_external('neuroelf')
         return;
     end
-    save_and_load_dataset_with_extension('.vmr');
+    save_and_load_dataset_with_extension('.vmr',false);
 
 function test_fmri_io_bv_msk()
     if cosmo_skip_test_if_no_external('neuroelf')
         return;
     end
-    save_and_load_dataset_with_extension('.msk');
+    save_and_load_dataset_with_extension('.msk',false);
 
 function test_fmri_io_mat()
     save_and_load_dataset_with_extension('.mat');
 
 
-function save_and_load_dataset_with_extension(ext)
+function save_and_load_dataset_with_extension(ext, multi_volume)
+    if nargin<2
+        multi_volume=true;
+    end
+
     x_base=get_base_dataset();
-    y=save_and_load(x_base,ext);
-    assert_dataset_equal(x_base,y,ext);
+    if multi_volume
+        y=save_and_load(x_base,ext);
+        assert_dataset_equal(x_base,y,ext);
+    else
+        assertExceptionThrown(@()save_and_load(x_base,ext),'');
+    end
+
+    x_sel=cosmo_slice(x_base,3);
+
+    y_sel=save_and_load(x_sel,ext);
+    assert_dataset_equal(x_sel,y_sel,ext);
+
 
 
 function test_fmri_io_exceptions()
@@ -317,7 +331,9 @@ function assert_sa_equal(x,y,ext)
     if cosmo_match({ext},ignore_sa_exts)
         return;
     end
-
+    if ~isequal(x.sa,y.sa)
+        2
+    end
     assertEqual(x.sa,y.sa);
 
 
@@ -330,12 +346,12 @@ function s=rmfield_if_present(s, f)
 function x=get_base_dataset()
     x=cosmo_synthetic_dataset('size','big');
     x=cosmo_fmri_reorient(x,'ASR');
-    x=cosmo_slice(x,1);
+    x=cosmo_slice(x,1:4);
     x.sa=struct();
-    x.sa.labels={'labels1'};
-    x.sa.stats={'Ttest(17)'};
+    x.sa.labels={'labels1';'labels2';'labels3';'labels4'};
+    x.sa.stats={'Beta(17,2)';'';'Zscore()';'Ftest(2,3)'};
 
-function ds_again=save_and_load(ds,ext)
+function ds_again=save_and_load(ds,ext,varargin)
     sib_exts=get_sibling_exts(ext);
 
     all_exts=[{ext} sib_exts];
@@ -352,11 +368,10 @@ function ds_again=save_and_load(ds,ext)
             warning_state=cosmo_warning();
             state_resetter=onCleanup(@()cosmo_warning(warning_state));
             cosmo_warning('off');
-
             cosmo_map2fmri(ds,main_temp_fn);
     end
 
-    ds_again=cosmo_fmri_dataset(main_temp_fn);
+    ds_again=cosmo_fmri_dataset(main_temp_fn,varargin{:});
 
 function sib_exts=get_sibling_exts(ext)
     sib_exts=cell(1,0);

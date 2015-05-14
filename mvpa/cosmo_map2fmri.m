@@ -391,7 +391,13 @@ function hdr=new_bv_vmp(ds)
             map.Name=[ds_k.sa.labels{:}];
         end
         if ~isempty(stats)
-            map=cosmo_structjoin(map, stats{k});
+            stats_k=stats{k};
+
+            stats_k_fieldnames=fieldnames(stats_k);
+            for j=1:numel(stats_k_fieldnames)
+                key=stats_k_fieldnames{j};
+                map.(key)=stats_k.(key);
+            end
         end
         maps{k}=map;
         empty_hdr.ClearObject();

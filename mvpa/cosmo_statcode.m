@@ -155,15 +155,15 @@ function hdr=name_df2hdr(name_df, output_format)
             for k=1:nsamples
                 map=struct();
                 stat_idx=stat_idxs(k);
+                map.Type=stat_idx;
 
-                if stat_idx==0
-                    continue;
+                if stat_idx~=0
+                    df=name_df{k,2};
+
+                    if numel(df)>=1, map.DF1=df(1); end
+                    if numel(df)>=2, map.DF2=df(2); end
                 end
 
-                map.Type=stat_idx;
-                df=name_df{k,2};
-                if numel(df)>=1, map.DF1=df(1); end
-                if numel(df)>=2, map.DF2=df(2); end
                 maps{k}=map;
             end
 
@@ -373,23 +373,22 @@ function codes=get_codes(package)
             %              Available_Plugins/niftiplugin_manual_v12.pdf
             % why follow a standard (like NIFTI) if one can
             % come up with something incompatible too?
-            codes={'Ttest',1;...
-                      'Correl',1;...
-                      'Correl',1;... % "cross-correlation", whatever it means
-                      'Ftest',2;...
-                      'Zscore',0;...
-                      '',0;... % lots of undefined codes here
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      '',0;...
-                      'Chisq',1;...
-                      'Beta',2};
+            codes={'Ttest',1;...      % 1
+                      'Correl',1;...  % 2  correlation
+                      'Correl',1;...  % 3 "cross-correlation"
+                      'Ftest',2;...   % 4
+                      'Zscore',0;...  % 5
+                      '',0;...        % 6 [lots of undefined codes here]
+                      '',0;...        % 7
+                      '',0;...        % 8
+                      '',0;...        % 9
+                      '',0;...        % 10
+                      '',0;...        % 11 "percent signal change" ignored
+                      '',0;...        % 12 "ICA" ignored
+                      '',0;...        % 13
+                      'Chisq',1;...   % 14
+                      'Beta',2;...    % 15
+                      'Pval',0};      % 16
         otherwise
             error('Unsupported analysis package %s', package);
     end
