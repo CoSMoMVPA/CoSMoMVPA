@@ -113,11 +113,6 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
     if n==0
         error('empty cell input');
-    elseif n==1
-        ds_stacked=ds_cell{1};
-        if check
-            cosmo_check_dataset(ds_stacked);
-        end
         return;
     end
 
