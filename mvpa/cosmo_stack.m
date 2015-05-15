@@ -175,6 +175,10 @@ function [dim, merge, check]=process_parameters(ds_cell, varargin)
         merge='drop_nonunique';
     else
         merge=varargin{2};
+        if ~isnumeric(merge) && ...
+                ~cosmo_match({merge},{'drop','drop_nonunique','unique'})
+            error('illegal value for ''merge'' parameter');
+        end
     end
 
     if narg<3 || isempty(varargin)
