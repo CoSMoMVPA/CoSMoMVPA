@@ -59,6 +59,9 @@ function test_stack_features
     s5=cosmo_stack({ds,ds2},2,2);
     assertEqual(s5.sa,ds2.sa);
 
+    s6=cosmo_stack({ds},1);
+    assertEqual(s6,ds);
+
 function test_stack_exceptions
     % test exceptions
     ds=cosmo_synthetic_dataset();
@@ -66,7 +69,6 @@ function test_stack_exceptions
     aet('foo');
     aet({ds},3);
     aet({ds},1,'foo');
-    aet({struct});
 
     ds1=ds;
     ds1.samples=ones(1,5);

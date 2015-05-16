@@ -113,6 +113,8 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
     if n==0
         error('empty cell input');
+    elseif n==1
+        ds_stacked=ds_cell{1};
         return;
     end
 
@@ -164,6 +166,9 @@ function [dim, merge, check]=process_parameters(ds_cell, varargin)
         dim=1;
     else
         dim=varargin{1};
+        if ~(isequal(dim,1) || isequal(dim,2))
+            error('second argument must be 1 or 2');
+        end
     end
 
     if narg<2 || isempty(varargin{2})
@@ -172,7 +177,7 @@ function [dim, merge, check]=process_parameters(ds_cell, varargin)
         merge=varargin{2};
         if ~isnumeric(merge) && ...
                 ~cosmo_match({merge},{'drop','drop_nonunique','unique'})
-            error('illegal value for ''merge'' parameter');
+            error('illegal value for third argument ''merge''');
         end
     end
 
@@ -180,15 +185,17 @@ function [dim, merge, check]=process_parameters(ds_cell, varargin)
         check=true;
     else
         check=varargin{3};
+
+        if ~(islogical(check) && isscalar(check))
+            error('fourth argument ''check'' must be a scalar boolean');
+        end
+
     end
 
     if ~iscell(ds_cell)
         error('expected cell input');
     end
 
-    if ~isscalar(dim) || all(dim~=[1 2])
-        error('dim should be 1 or 2');
-    end
 
 
 
