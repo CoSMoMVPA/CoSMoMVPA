@@ -52,6 +52,10 @@ accs=zeros(1,ncenters);
 % desired features using center2neighbors, then use cosmo_crossvalidate
 % to get classification accuracies (it's its second output argument),
 % and store the classiifcation accuracies.
+%
+% Note: it is generally easier (and faster) to use cosmo_searchlight
+%       and cosmo_crossvalidation_measure; this example here is for
+%       illustrative purposes mainly
 
 % use cosmo_show_progress to show a pretty progress bar
 prev_msg='';
@@ -76,7 +80,7 @@ for k=1:ncenters
     % show progress every 1000 steps, and at the beginning and end.
     if k==1 || mod(k,show_progress_every)==0 || k==nfeatures
         mean_so_far=mean(accs(1:k));
-        msg=sprintf('accuracy %.3f (%d features visited)', k, mean_so_far);
+        msg=sprintf('accuracy %.3f (%d features visited)', mean_so_far, k);
         prev_msg=cosmo_show_progress(clock_start,k/ncenters,msg,prev_msg);
     end
 end
@@ -84,6 +88,7 @@ end
 %% store the output
 % this uses the neighborhood from spherical voxel selection
 res_map=nbrhood;
+res_map=rmfield(res_map,'neighbors');
 res_map.samples=accs;
 
 % little sanity check
@@ -94,6 +99,7 @@ cosmo_disp(res_map);
 
 
 output_fn=fullfile(output_path, 'spherical_neighborhood_searchlight.nii');
+cosmo_map2fmri(res_map, output_fn);
 fprintf('Output written to %s\n', output_fn);
 
 %% Plot a few slices
