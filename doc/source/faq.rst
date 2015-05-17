@@ -111,4 +111,43 @@ Technical questions
         - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
 
 
+**I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?**
+
+    Assume we have data with those characteristics; there we generate synthetic data for illustration. This data has 7 time points, 3 channels, and 10 trials:
+
+        .. code-block:: matlab
+
+            time_axis=-.1:.1:.5;
+            channel_axis={'chan1','chan2','chan3'};
+
+            n_trials=10;
+            n_time=numel(time_axis);
+            n_channels=numel(channel_axis);
+
+            data=randn([n_channels,n_time,n_trials]); % Gaussian random data
+
+    Because in CoSMoMVPA, samples are in the first dimension, the order of the dimensions have to be shifted so that the ``trials`` (samples) dimension comes first:
+
+        .. code-block:: matlab
+
+            data_samples_first_dim=shiftdim(data,2);
+
+    Now the data can be flattened to a CoSMoMVPA data struct with:
+
+        .. code-block:: matlab
+
+            ds=cosmo_flatten(data_samples_first_dim,...
+                    {'chan','time'},...
+                    {channel_axis,time_axis});
+
+    Here combinations of ``chan`` and ``time`` are the features of the dataset. If one would only want to consider the ``chan`` dimension as features, and consider ``time`` as a sample dimension, do:
+
+        .. code-block:: matlab
+
+            ds_time_in_sample_dim=cosmo_dim_transpose(ds,{'time'},1);
+
+
+
+
+
 .. include:: links.txt
