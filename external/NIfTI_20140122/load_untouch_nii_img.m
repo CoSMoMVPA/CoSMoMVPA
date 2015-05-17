@@ -358,8 +358,15 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
                   %  to byte storage size, hdr.dime.bitpix/8 will be
                   %  applied.
                   %
-                  pos = sub2ind([d1 d2 d3 d4 d5 d6 d7], 1, 1, slice_idx(s), ...
-			                    img_idx(t), dim5_idx(i5),dim6_idx(i6),dim7_idx(i7)) -1;
+                  %  Note: use of builtin sub2ind is disabled, because that
+                  %        function is much slower than 'fast_sub2ind'
+                  %        included at the end of this file
+                  %pos = sub2ind([d1 d2 d3 d4 d5 d6 d7], 1, 1, slice_idx(s), ...
+			      %              img_idx(t), dim5_idx(i5),dim6_idx(i6),dim7_idx(i7)) -1;
+                  %
+                  pos = fast_sub2ind([d1 d2 d3 d4 d5 d6 d7], ...
+                                [1, 1, slice_idx(s), ...
+			                    img_idx(t), dim5_idx(i5),dim6_idx(i6),dim7_idx(i7)]) -1;
                   pos = pos * hdr.dime.bitpix/8;
 
                   % ROMAN: begin
@@ -466,3 +473,15 @@ function [img,hdr] = read_image(hdr,filetype,fileprefix,machine,img_idx,dim5_idx
 
    return						% read_image
 
+
+
+function lin=fast_sub2ind(sizes, sub_idxs)
+    % helper function that implements sub2ind functionality, but runs fast
+    % because it does not any bound checks
+    n=numel(sizes);
+    mfac=[1 cumprod(sizes(1:(n-1)))];
+
+    lin=1;
+    for k=1:n
+        lin=lin+(sub_idxs(k)-1)*mfac(k);
+    end
