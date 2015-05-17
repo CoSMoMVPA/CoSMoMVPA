@@ -147,7 +147,12 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
 
     nbrhood.neighbors=neighbors;
 
-    cosmo_check_neighborhood(nbrhood);
+    origin=struct();
+    origin.a=ds.a;
+    origin.(attr_name)=ds.(attr_name);
+    nbrhood.origin=origin;
+
+    cosmo_check_neighborhood(nbrhood,ds);
 
 
 function radius=get_radius(varargin)

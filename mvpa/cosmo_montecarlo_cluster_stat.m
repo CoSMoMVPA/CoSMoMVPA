@@ -604,5 +604,5 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
                                                        opt);
 function check_inputs(ds, nbrhood)
     cosmo_check_dataset(ds);
-    cosmo_check_neighborhood(nbrhood);
+    cosmo_check_neighborhood(nbrhood,ds);
 

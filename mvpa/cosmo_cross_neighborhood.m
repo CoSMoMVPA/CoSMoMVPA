@@ -105,6 +105,11 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
     crossed_nbrhood.a.fdim.values=dim_values;
     crossed_nbrhood.a.fdim.labels=dim_labels;
 
+    origin=struct();
+    origin.a=ds.a;
+    origin.fa=ds.fa;
+    crossed_nbrhood.origin=origin;
+
 
 function check_nbrhoods(nbrhoods,ds)
     if ~iscell(nbrhoods)
@@ -117,7 +122,7 @@ function check_nbrhoods(nbrhoods,ds)
 
     for k=1:numel(nbrhoods)
         nbrhood=nbrhoods{k};
-        cosmo_check_neighborhood(nbrhood);
+        cosmo_check_neighborhood(nbrhood,ds);
 
         is_ok=@(x) isempty(x) || ...
                     (min(x)>=1 && max(x)<=nfeatures && all(round(x)==x));

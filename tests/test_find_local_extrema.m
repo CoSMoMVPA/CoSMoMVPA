@@ -41,8 +41,6 @@ function test_find_local_maxima_exceptions
     aet(ds,nh)
 
     ds.fa.i=ds.fa.i(end:-1:1);
-    ds.a=struct();
-    aet(ds,nh)
 
     nh.a=struct();
     ds.samples=1;

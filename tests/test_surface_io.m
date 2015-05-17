@@ -86,6 +86,7 @@ function save_and_load(format)
         otherwise
             exception='';
     end
+
     assertExceptionThrown(@()reader(tmp_fn),exception);
 
 

@@ -302,7 +302,12 @@ end
 % compatibility wrapper for the surfing toolbox
 nbrhood=ensure_neighbors_row_vectors(nbrhood);
 
-cosmo_check_neighborhood(nbrhood);
+origin=struct();
+origin.a=ds.a;
+origin.fa=ds.fa;
+nbrhood.origin=origin;
+
+cosmo_check_neighborhood(nbrhood,ds);
 
 
 function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)

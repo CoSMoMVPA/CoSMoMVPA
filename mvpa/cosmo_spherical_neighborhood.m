@@ -34,6 +34,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %                       If the dataset has a field ds.fa.inside, then
 %                       features that are not inside are not included as
 %                       neighbors in the output
+%     .origin           Has fields .a and .fa from input dataset
 %
 %
 % Example:
@@ -78,6 +79,34 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %     >     [ 4         1         5 ]
 %     >     [ 5         4         2         6 ]
 %     >     [ 6         5         3 ]           }
+%     > .origin
+%     >   .a
+%     >     .fdim
+%     >       .labels
+%     >         { 'i'
+%     >           'j'
+%     >           'k' }
+%     >       .values
+%     >         { [ 1         2         3 ]
+%     >           [ 1         2 ]
+%     >           [ 1 ]                     }
+%     >     .vol
+%     >       .mat
+%     >         [ 2         0         0        -3
+%     >           0         2         0        -3
+%     >           0         0         2        -3
+%     >           0         0         0         1 ]
+%     >       .dim
+%     >         [ 3         2         1 ]
+%     >       .xform
+%     >         'scanner_anat'
+%     >   .fa
+%     >     .i
+%     >       [ 1         2         3         1         2         3 ]
+%     >     .j
+%     >       [ 1         1         1         2         2         2 ]
+%     >     .k
+%     >       [ 1         1         1         1         1         1 ]
 %
 %
 % Notes:
@@ -264,6 +293,10 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     nbrhood.neighbors=neighbors;
 
     nbrhood=align_nbrhood_to_ds_if_possible(ds,nbrhood);
+    origin=struct();
+    origin.a=ds.a;
+    origin.fa=ds.fa;
+    nbrhood.origin=origin;
 
     cosmo_check_neighborhood(nbrhood);
 

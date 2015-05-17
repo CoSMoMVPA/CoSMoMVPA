@@ -277,7 +277,7 @@ function check_input(ds, nbrhood, measure, opt)
 
 
     cosmo_check_dataset(ds);
-    cosmo_check_neighborhood(nbrhood);
+    cosmo_check_neighborhood(nbrhood,ds);
 
 function raise_parameter_exception()
     error(['Illegal syntax, use:\n\n',...

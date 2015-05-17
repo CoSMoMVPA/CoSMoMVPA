@@ -75,8 +75,6 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 
     % check sanity of input
     cosmo_check_dataset(ds);
-    cosmo_check_neighborhood(nbrhood);
-
     check_compatibility(ds,nbrhood);
 
     [nsamples,nfeatures]=size(ds.samples);
@@ -138,24 +136,5 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 
 
 function check_compatibility(ds,nbrhood)
-    if ~isequal(ds.a, nbrhood.a)
-        error('.a mismatch between dataset and neighborhood');
-    end
-
-    if numel(nbrhood.neighbors) ~= size(ds.samples,2)
-        error('feature size mismatch between dataset and neighborhood');
-    end
-
-    if isfield(ds,'fa')
-        keys=fieldnames(ds.fa);
-        for j=1:numel(keys)
-            key=keys{j};
-
-            if ~isfield(nbrhood.fa,key) || ...
-                    ~isequal(ds.fa.(key),nbrhood.fa.(key))
-                error(['.fa.%s mismatch between dataset and '...
-                        'neighborhood'],key);
-            end
-        end
-    end
+    cosmo_check_neighborhood(nbrhood,ds);
 
