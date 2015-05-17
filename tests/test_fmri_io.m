@@ -172,7 +172,7 @@ function test_fmri_io_mask
 
 function test_fmri_io_spm()
     cleaner=onCleanup(@()register_or_delete_all_files());
-    spm_fn=build_spm_dot_mat();
+    [spm_fn,SPM]=write_spm_dot_mat();
 
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
     ds_spm=cosmo_fmri_dataset(spm_fn);
@@ -183,18 +183,31 @@ function test_fmri_io_spm()
     assertElementsAlmostEqual(ds.samples+1,ds_spm.samples,'relative',1e-4);
 
     input_keys={'beta','con','spm'};
-    for k=1:numel(input_keys)
-        key=input_keys{k};
+    for k=0:numel(input_keys)
+        if k==0
+            postfix='';
+            offset=1;
+        else
+            key=input_keys{k};
+            postfix=[':' key];
+            offset=k;
+        end
 
-        spm_fn_key=[spm_fn ':' key];
+        spm_fn_key=[spm_fn postfix];
         ds_spm=cosmo_fmri_dataset(spm_fn_key);
-        assertElementsAlmostEqual(ds.samples+k,ds_spm.samples,...
+        assertElementsAlmostEqual(ds.samples+offset,ds_spm.samples,...
                             'relative',1e-4);
+
+        is_beta=k<=1;
+        if is_beta
+            ds_spm2=cosmo_fmri_dataset(SPM);
+            assertEqual(ds_spm2, ds_spm);
+        end
     end
 
 
 
-function spm_fn=build_spm_dot_mat()
+function [spm_fn,SPM]=write_spm_dot_mat()
     register_or_delete_all_files();
 
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);

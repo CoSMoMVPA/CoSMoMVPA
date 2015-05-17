@@ -187,6 +187,11 @@ function test_mask_fmri_dataset()
     x4=cosmo_fmri_dataset(ds,'mask','-all');
     assertEqual(x4,cosmo_slice(ds,[1 2 3 4 5],2));
 
+    msk_ds=cosmo_slice(cosmo_slice(x,randperm(size(x.samples,2)),2),1);
+    x5=cosmo_fmri_dataset(ds,'mask',msk_ds);
+    assertEqual(x5,x);
+
+
 
 
 
