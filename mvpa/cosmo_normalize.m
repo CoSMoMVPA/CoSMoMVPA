@@ -10,8 +10,6 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %                   - 'demean'     (mean of zero)
 %                   - 'zscore'     (demean and unit variance)
 %                   - 'scale_unit' (scale to interval [-1,1])
-%                   (a '1' or '2' can be added at the end to specify dim,
-%                    e.g. 'demean1' or 'zscore2')
 %                 -or-
 %                 previously estimated parameters using the 'params'
 %                 output result from a previous call to this function.
@@ -60,7 +58,7 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     >     -10         0        10
 %     >     -10         0        10 ]
 %     %
-%     % scale to range [-1,1] alnog first dimension
+%     % scale to range [-1,1] along first dimension
 %     dsn=cosmo_normalize(ds,'scale_unit',1);
 %     cosmo_disp(dsn);
 %     > .samples
