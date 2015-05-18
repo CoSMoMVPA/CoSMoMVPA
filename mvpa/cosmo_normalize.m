@@ -178,6 +178,10 @@ switch method
             sigma=zeros(size(d));
         end
 
+        % In Octave, std can give non-NaN even with NaN input
+        nan_mask=any(isnan(samples),dim);
+        sigma(nan_mask)=NaN;
+
         samples=bsxfun(@rdivide,d,sigma);
 
     case 'scale_unit'
