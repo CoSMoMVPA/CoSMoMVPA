@@ -21,3 +21,8 @@ function test_synthetic_dataset_basics()
     assertEqual(ds.sa.chunks,[1 1 1 2 2 2]');
 
 
+function test_synthetic_dataset_exceptions()
+    aet=@(varargin)assertExceptionThrown(...
+                        cosmo_synthetic_dataset(varargin{:}),'');
+    aet('size','foo');
+    aet('
