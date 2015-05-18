@@ -15,7 +15,12 @@ function test_normalize_basics()
                           0         0         0;...
                           2         2         2;...
                           4         4         4 ]);
-                            %
+
+    dsn2=cosmo_normalize(ds,'demean');
+    aoe(dsn.samples,dsn2.samples);
+    dsn2=cosmo_normalize(ds,'demean1');
+    aoe(dsn.samples,dsn2.samples);
+
     % demean along second dimension
     dsn=cosmo_normalize(ds,'demean',2);
     aoe(dsn.samples, [ -10         0        10;...
@@ -23,6 +28,9 @@ function test_normalize_basics()
                         -10         0        10;...
                         -10         0        10;...
                         -10         0        10 ]);
+    dsn2=cosmo_normalize(ds,'demean2');
+    aoe(dsn.samples,dsn2.samples);
+
     %
     % scale to range [-1,1] alnog first dimension
     dsn=cosmo_normalize(ds,'scale_unit',1);
@@ -31,7 +39,11 @@ function test_normalize_basics()
                            0         0         0;...
                          0.5      0.5       0.5;...
                            1         1         1 ]);
-%
+    dsn2=cosmo_normalize(ds,'scale_unit');
+    aoe(dsn.samples,dsn2.samples);
+    dsn2=cosmo_normalize(ds,'scale_unit1');
+    aoe(dsn.samples,dsn2.samples);
+
     % z-score along first dimension
     dsn=cosmo_normalize(ds,'zscore',1);
     aoe(dsn.samples, [  -1.2649     -1.2649     -1.2649;...
@@ -39,7 +51,11 @@ function test_normalize_basics()
                              0         0         0;...
                          0.6325     0.6325     0.6325;...
                           1.2649      1.2649      1.2649 ]);
-%
+    dsn2=cosmo_normalize(ds,'zscore');
+    aoe(dsn.samples,dsn2.samples);
+    dsn2=cosmo_normalize(ds,'zscore1');
+    aoe(dsn.samples,dsn2.samples);
+
     % z-score along second dimension
     dsn=cosmo_normalize(ds,'zscore',2);
     aoe(dsn.samples, [ -1         0         1;...
@@ -83,5 +99,34 @@ function test_normalize_basics()
     te=cosmo_normalize(zeros(2,0),params);
     assertEqual(tr,zeros(4,0));
     assertEqual(te,zeros(2,0));
+
+    dsn=cosmo_normalize(ds,'');
+    assertEqual(dsn,ds);
+
+    warning_state=cosmo_warning();
+    warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    ds.samples(1,1)=NaN;
+    dsn=cosmo_normalize(ds,'zscore');
+    assert(all(isnan(dsn.samples(:,1))));
+    assert(all(all(~isnan(dsn.samples(:,2:3)))));
+
+
+function test_normalize_exceptions()
+    ds=cosmo_synthetic_dataset();
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_normalize(ds,varargin{:}),'');
+
+    aet('zscore3');
+    aet('foo');
+    aet('zscore1',1);
+    aet('zscore1',2);
+
+    [unused,params]=cosmo_normalize(ds,'zscore',1);
+    aet(params,2);
+
+    aet({'foo'});
+
 
 

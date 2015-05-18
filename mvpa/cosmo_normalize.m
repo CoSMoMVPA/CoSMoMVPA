@@ -10,6 +10,8 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %                   - 'demean'     (mean of zero)
 %                   - 'zscore'     (demean and unit variance)
 %                   - 'scale_unit' (scale to interval [-1,1])
+%                 where the type may be suffixed by either '1' or '2' (e.g.
+%                 'zscore1' or 'demean2' to specify the dimension.
 %                 -or-
 %                 previously estimated parameters using the 'params'
 %                 output result from a previous call to this function.
@@ -124,23 +126,22 @@ if isempty(params) || (ischar(params) && strcmp(params,'none'))
     return;
 end
 
-if nargin<3, dim=1; end
+if nargin<3, dim=[]; end
 
 apply_params=isstruct(params);
 if apply_params;
-    method=params.method;
-    if nargin>=3 && params.dim~=dim
+    if ~isempty(dim) && params.dim~=dim
         error('Dim specified as %d, but estimates used %d',dim,params.dim);
     end
-    dim=params.dim;
 elseif ischar(params)
-    method=params;
-    params=struct();
-    params.method=method;
-    params.dim=dim;
+    params=get_method_and_dim(params,dim);
 else
     error('norm_spec must be struct or string');
 end
+
+method=params.method;
+dim=params.dim;
+
 
 is_ds=isstruct(ds) && isfield(ds,'samples');
 
@@ -209,3 +210,36 @@ if is_ds
 else
     ds=samples;
 end
+
+function params=get_method_and_dim(params,dim_arg)
+    assert(ischar(params))
+    assert(numel(params)>0);
+
+    dim=[];
+    if params(end)=='1'
+        method=params(1:(end-1));
+        dim=1;
+    elseif params(end)=='2'
+        method=params(1:(end-1));
+        dim=2;
+    else
+        method=params;
+    end
+
+    if isempty(dim_arg)
+        if isempty(dim)
+            dim=1;
+        end
+    else
+        if isempty(dim)
+            dim=dim_arg;
+        else
+            error(['Cannot have third argument when second argument '...
+                        'ends with a number']);
+        end
+    end
+
+
+    params=struct();
+    params.method=method;
+    params.dim=dim;
