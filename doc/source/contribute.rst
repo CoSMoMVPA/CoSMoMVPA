@@ -28,7 +28,9 @@ Meta - naming conventions in the documentation
 
 Setting the Matlab_ path
 ++++++++++++++++++++++++
-To use ``CoSMoMVPA`` functionality, it is recommended to set the path using :ref:`cosmo_set_path` (followed by ``savepath``). Alternatively the path can be set manually as follows:
+To use ``CoSMoMVPA`` functionality, it is recommended to set the path using :ref:`cosmo_set_path`. Optionally run ``savepath`` afterwards if you want to store the new path, so that it is set the next time Matlab or Octave is started.
+
+Alternatively the path can be set manually as follows:
 
 - add the ``mvpa/`` directory to the Matlab_ path.
 - also add ``externals/`` and its subdirectories to the Matlab_ path.
@@ -109,8 +111,8 @@ The instructions below assume a unix-like platform, and the command below should
     + on the github_ project page, `fork the repository`_, and follow the instructions there.
     + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``
     + change to the directory: ``cd CoSMoMVPA``
-    + tell git about the `offical` release: ``git remote add official https://github.com/CoSMoMVPA/CoSMoMVPA.git``
-    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull official master``
+    + tell git about the `offical` release: ``git remote add upstream https://github.com/CoSMoMVPA/CoSMoMVPA.git``
+    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull upstream master``
     + to add a new feature or provide a bugfix:
 
         - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``
@@ -135,27 +137,27 @@ Notes on committing
     + To commit changes to a file, run ``git add -i``, then press 'p' (for 'patch'), indicate which files to patch, and press 'y' or 'n' for each meaningful 'atomic' change.- To view the history of commits, ``gitk`` is useful.
 - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``ACK``: Acknowledge contribution from someone else. Contributors should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. For example,    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
+    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. If the acknowledgement includes code or documentation (not a bug report or question), use ``CTB`` as well.
+    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
     + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
     + ``BLD``: Changes in the build system.
     + ``BIG``: Major change. Please use together with another tag.
     + ``CLN``: Code cleanup. ``SML`` can be omitted.
-    + ``CTB``: Contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
+    + ``CTB``: Code contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). Use together with ``ACK``. If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
     + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
     + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
-    + ``LZY``: 'Apologies for being lazy here but cannot be bothered to describe the changes in detail'. Acceptable in exceptional cases, including after *n* hours of continuous coding, when *n* is large; or when presenting a workshop on CoSMoMVPA_ the very next day (these are not mutually exclusive). If you know what your are doing this can go together with the ``-a`` option in ``git``.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
-    + ``NF``: New feature.
+    + ``NF``: New feature or functionality.
     + ``OPT``: Optimalization. It should be used when the new code runs faster or uses less memory.
     + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
     + ``RUN``: Change in runnable example scripts (in ``examples/``).
     + ``SML``: Minor change. Can be without an explanation of what was changed.  Please use together with another tag.
 
-    + ``TST``: Change in test functions (in ``test/``).
+    + ``TST``: Change in test functions (functions in ``tests/``, or documentation tests).
     + ``WEB``: Changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
 
-    Using these tags allows others to quickly see what *kind of* changes were made, and to generate summary reports on the kind of changes.
+    Using these tags allows others to quickly see what *kind of* changes were made, and to generate summary reports on the kind of changes automatically.
 
     Please describe what changes you made. The tags don't have to name which files were changed, as git_ takes care of that.
 
@@ -183,10 +185,10 @@ The build system is used to generate documentation for the web site (or local us
         - Header contents (suffix ``_hdr``), containing only the header (i.e. the first line and every subsequent line until the first line that does not start with ``%`` (note: line continuation, explained below, is currently *not* supported).
         - Skeleton contents (suffix ``_skl``), containing a skeleton of the source code. In the skeleton version, lines between a starting line ``% >@@>`` and ending line ``% <@@<`` is replaced by a text saying ``%%%% Your code comes here %%%%``. Skeleton files are intended for exercises.
     + Both ``.txt`` files (with the raw contents preceded by an ``include`` statement) and ``.rst`` files (with a title and label) are generated; the latter contain ``include`` statements to include the former.
-    + the ``Makefile`` in ``source/``, when used through ``make html``, uses the ``mat2rst.py`` to generate reStructuredText_ Matlab files and then uses Sphinx_ to convert these files to html.
+    + the ``Makefile`` in ``source/``, when used through ``make html``, uses ``mat2rst.py`` to generate reStructuredText_ Matlab files and then uses Sphinx_ to convert these files to html.
 - The ``build.sh`` script builds the documentation and datasets.
 
-**Note:** building the documentation, as described in the previous points, is currently supported on `Unix-like`_ systems only, and require additional dependencies (see download_).
+**Note:** building the documentation, as described in the previous points, is currently supported on `Unix-like`_ systems only, and requires additional dependencies (see download_).
 
 .. _download: download.html
 
@@ -222,7 +224,7 @@ The following are guidelines, intended to improve:
     (Yes, we break this rule occasionely.)
 
 
-- Indentation is 4 spaces, and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
+- Indentation is 4 spaces (no tabs), and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
     **bad:**
 
     .. code-block:: matlab
@@ -410,7 +412,9 @@ The following are guidelines, intended to improve:
 
     .. code-block:: matlab
 
-       fprintf('Starting analysis - please be patient...\n');
+        if show_progress
+            fprintf('Starting analysis - please be patient...\n');
+        end
 
 - When writing function definitions:
     + start with a short sentence (one line) describing its purpose.
@@ -460,7 +464,7 @@ The following are guidelines, intended to improve:
 - When possible use vectorization rather than a ``for`` or ``while`` loop.
     + Many functions support vectorized functions, where the same function is applied to elements in arrays.
     + Vectorization reduces the number of lines of code.
-    + Vectorization reduces execution time.
+    + Vectorization typically reduces execution time.
 
 
     **really bad:** (see previous guideline)
@@ -553,6 +557,89 @@ The following are guidelines, intended to improve:
             data_result(k)=f(data(k,:));
         end
 
+    .. code-block:: matlab
+
+        [nsamples, nfeatures]=size(ds.samples);
+
+
+- Generally try to avoid side effects, and if that is not possible, indicate such effects clearly in the function name.
+
+    **extremily bad:**
+
+    .. code-block:: matlab
+
+        function init_my_toolbox()
+
+            restoredefaultpath();
+            addpath('my_functions')
+
+    The above is bad because:
+
+         - The function name ``init_my_toolbox`` does something one would not expect based on its name, namely it resets the Matlab path.
+         - Functions that were accessible before are not longer in the Matlab path.
+
+    It is acceptible to add something to the Matlab path, if the function name clearly indicates that it does so:
+
+
+    **acceptible:**
+
+     .. code-block:: matlab
+
+        function my_toolbox_set_path()
+
+            addpath('my_functions')
+
+    Along the same lines, in general functions should not change the current working directory, the path, or the warning state. Sometimes this cannot be avoided, but in that case these changes should be undone when leaving the function.
+
+    **bad:**
+
+    .. code-block:: matlab
+
+        function do_computation()
+
+            addpath('my_functions');
+            original_dir=pwd();
+            cd('other_functions/private');
+            warning('off');
+
+            do_stuff();
+
+            rmpath('my_functions');
+            cd(original_dir);
+            warning('on');
+
+    The above is bad, because:
+
+        - the user may have added ``my_functions`` to the path themselves; after calling this function, it is removed from the path.
+        - the user may have set the warning state themselves to ``off``; this is undone after calling this funciton
+        - the current working directory and the path are not restored when execution is interrupted because of an error or a user interrupt (``ctrl+C``).
+
+    **acceptible:**
+
+    .. code-block:: matlab
+
+         function do_computation()
+
+            original_path=path();
+            original_working_dir=pwd();
+            original_warning_state=warning();
+
+            path_resetter=onCleanup(@()cd(original_path));
+            working_dir_resetter=onCleanup(@()path(original_working_dir));
+            warning_state_resetter=onCleanup(@()warning(original_warning_state);
+
+            addpath('my_functions');
+            original_dir=pwd();
+            cd('other_functions/private');
+
+            do_stuff();
+
+            % the path, working directory, and warning state are reset when execution
+            % of the code in the function body is completed or interrupted.
+
+
+- When implementing unit tests (in the ``tests``) directory, functions should run automatically without any user interaction. If a test were to require user interaction, one of the main advantages of the test suite (fully automated testing) is lost.
+
 - Do not use global variables: these can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
 
 - Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
@@ -634,13 +721,12 @@ The following are guidelines, intended to improve:
             f_data=f_handle(data(k));
         end
 
-- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances; here the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. Current exceptions are:
+- The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Current exceptions are:
 
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``.
     + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail.
 
-- Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using :ref:`cosmo_correlation_measure`. Similarly, :ref:`cosmo_slice` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
-
+- Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected.
 
 CoSMoMPVA-specific guidelines
 +++++++++++++++++++++++++++++
@@ -667,7 +753,12 @@ CoSMoMPVA-specific guidelines
 
 Unit tests
 ^^^^^^^^^^
-Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. For existing or new features, more tests are very much welcomed.
+Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. To run them, use either
+
+    - run :ref:`cosmo_run_tests`: when using xUnit_. Only supported on the Matlab platform.
+    - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet, because Octave does not support ``eval`` (as of May 2015).
+
+For existing or new features, more tests are very much welcomed.
 
 .. include:: links.txt
 
