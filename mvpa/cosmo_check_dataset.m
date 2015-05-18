@@ -183,7 +183,7 @@ function msg=check_with_type(ds, ds_type)
     end
 
 function tf=is_int_vector(x)
-    tf=isnumeric(x) && isvector(x) && all(round(x)==x);
+    tf=isnumeric(x) && isvector(x) && all(round(x)==x | isnan(x));
 
 
 function msg=check_dim_legacy(ds)
