@@ -113,7 +113,7 @@ Technical questions
 
 **I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?**
 
-    Assume we have data with those characteristics; there we generate synthetic data for illustration. This data has 7 time points, 3 channels, and 10 trials:
+    Let's assume there is data with those characteristics; here we generate synthetic data for illustration. This data has 7 time points, 3 channels, and 10 trials:
 
         .. code-block:: matlab
 
@@ -137,16 +137,18 @@ Technical questions
         .. code-block:: matlab
 
             ds=cosmo_flatten(data_samples_first_dim,...
-                    {'chan','time'},...
-                    {channel_axis,time_axis});
+                                {'chan','time'},...
+                                {channel_axis,time_axis});
 
-    Here combinations of ``chan`` and ``time`` are the features of the dataset. If one would only want to consider the ``chan`` dimension as features, and consider ``time`` as a sample dimension, do:
+    Combinations of ``chan`` and ``time`` are the features of the dataset. For example, to see how informative the data is for different time points (across all channels), one could define a :ref:`cosmo_interval_neighborhood` for the time dimension and run a :ref:`searchlight <cosmo_searchlight>`.
+
+    If one would only want to consider the ``chan`` dimension as features, and consider ``time`` as a sample dimension, do:
 
         .. code-block:: matlab
 
             ds_time_in_sample_dim=cosmo_dim_transpose(ds,{'time'},1);
 
-
+    When the data is in this form, one can analyse how well information :ref:`generalizes over time <demo_meeg_timeseries_generalization>` .
 
 
 
