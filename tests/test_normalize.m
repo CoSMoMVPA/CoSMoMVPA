@@ -18,8 +18,6 @@ function test_normalize_basics()
 
     dsn2=cosmo_normalize(ds,'demean');
     aoe(dsn.samples,dsn2.samples);
-    dsn2=cosmo_normalize(ds,'demean1');
-    aoe(dsn.samples,dsn2.samples);
 
     % demean along second dimension
     dsn=cosmo_normalize(ds,'demean',2);
@@ -28,8 +26,6 @@ function test_normalize_basics()
                         -10         0        10;...
                         -10         0        10;...
                         -10         0        10 ]);
-    dsn2=cosmo_normalize(ds,'demean2');
-    aoe(dsn.samples,dsn2.samples);
 
     %
     % scale to range [-1,1] alnog first dimension
@@ -41,8 +37,6 @@ function test_normalize_basics()
                            1         1         1 ]);
     dsn2=cosmo_normalize(ds,'scale_unit');
     aoe(dsn.samples,dsn2.samples);
-    dsn2=cosmo_normalize(ds,'scale_unit1');
-    aoe(dsn.samples,dsn2.samples);
 
     % z-score along first dimension
     dsn=cosmo_normalize(ds,'zscore',1);
@@ -52,8 +46,6 @@ function test_normalize_basics()
                          0.6325     0.6325     0.6325;...
                           1.2649      1.2649      1.2649 ]);
     dsn2=cosmo_normalize(ds,'zscore');
-    aoe(dsn.samples,dsn2.samples);
-    dsn2=cosmo_normalize(ds,'zscore1');
     aoe(dsn.samples,dsn2.samples);
 
     % z-score along second dimension
@@ -119,6 +111,8 @@ function test_normalize_exceptions()
                     cosmo_normalize(ds,varargin{:}),'');
 
     aet('zscore3');
+    aet('zscore2');
+    aet('zscore1');
     aet('foo');
     aet('zscore1',1);
     aet('zscore1',2);

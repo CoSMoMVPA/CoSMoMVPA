@@ -10,8 +10,6 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %                   - 'demean'     (mean of zero)
 %                   - 'zscore'     (demean and unit variance)
 %                   - 'scale_unit' (scale to interval [-1,1])
-%                 where the type may be suffixed by either '1' or '2' (e.g.
-%                 'zscore1' or 'demean2' to specify the dimension.
 %                 -or-
 %                 previously estimated parameters using the 'params'
 %                 output result from a previous call to this function.
@@ -220,15 +218,7 @@ function params=get_method_and_dim(params,dim_arg)
     assert(numel(params)>0);
 
     dim=[];
-    if params(end)=='1'
-        method=params(1:(end-1));
-        dim=1;
-    elseif params(end)=='2'
-        method=params(1:(end-1));
-        dim=2;
-    else
-        method=params;
-    end
+    method=params;
 
     if isempty(dim_arg)
         if isempty(dim)
