@@ -159,6 +159,11 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
         nbrhood.a=rmfield(nbrhood.a,other_dim_name);
     end
 
+    origin=struct();
+    origin.(attr_name)=ds.(attr_name);
+    origin.a.(dim_name)=ds.a.(dim_name);
+    nbrhood.origin=origin;
+
 
 function [nbrs_label,chan_idxs]=get_neighbor_indices(nbrs,ds_label,ds_chan)
     nbrs_label={nbrs.label};
