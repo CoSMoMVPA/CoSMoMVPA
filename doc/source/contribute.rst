@@ -293,7 +293,10 @@ Indentation should be used for `if-else-end`, `while` and `function` blocks. Exp
             y=x+2;
 
 
-- Use lower-case letters for variable names, with underscores (``_``) to separate words.
+Use lower-case letters for variable names
++++++++++++++++++++++++++++++++++++++++++
+
+Use underscores (``_``) to separate words.
     **bad:**
 
     .. code-block:: matlab
@@ -314,7 +317,10 @@ Indentation should be used for `if-else-end`, `while` and `function` blocks. Exp
 
         my_var=0;
 
-- Crash early, and when doing so, provide informative error messages.
+Throw an error early
+++++++++++++++++++++
+
+Throw an error as soon as something seems out of order. When doing so, provide informative error messages.
 
     **bad:**
 
@@ -760,8 +766,8 @@ Statements with ``eval`` can obfuscates the code considerably. In almost all cas
             f_data=f_handle(data(k));
         end
 
-Try to avoid using ``try`` and ``catch``
-++++++++++++++++++++++++++++++++++++++++
+Minimize using ``try`` and ``catch``
+++++++++++++++++++++++++++++++++++++
 The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Current exceptions are:
 
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``.
