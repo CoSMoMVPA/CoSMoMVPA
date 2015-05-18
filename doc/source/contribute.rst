@@ -144,7 +144,6 @@ Notes on committing
     + ``BIG``: Major change. Please use together with another tag.
     + ``CLN``: Code cleanup. ``SML`` can be omitted.
     + ``CTB``: Code contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). Use together with ``ACK``. If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
-    + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
     + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
@@ -153,7 +152,7 @@ Notes on committing
     + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
     + ``RUN``: Change in runnable example scripts (in ``examples/``).
     + ``SML``: Minor change. Can be without an explanation of what was changed.  Please use together with another tag.
-
+    + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
     + ``TST``: Change in test functions (functions in ``tests/``, or documentation tests).
     + ``WEB``: Changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
 
