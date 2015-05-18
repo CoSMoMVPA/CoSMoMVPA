@@ -206,7 +206,10 @@ The following are guidelines, intended to improve:
 
 **Note**: None of these guidelines are set in stone. Try to use common sense when considering not to follow them. Indeed, for each guideline there may be a good reason to deviate from it.
 
-- Try to keep line lengths limited to 80 characters, so that files can be viewed in a standard terminal window without line breaks. (The Matlab editor shows a vertical line after the 80-th character). Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
+Maximum line length is 80 characters
+++++++++++++++++++++++++++++++++++++
+
+Try to keep line lengths limited to 80 characters, so that files can be viewed in a standard terminal window without line breaks. (The Matlab editor shows a vertical line after the 80-th character). Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
     **bad:**
 
     .. code-block:: matlab
@@ -224,7 +227,10 @@ The following are guidelines, intended to improve:
     (Yes, we break this rule occasionely.)
 
 
-- Indentation is 4 spaces (no tabs), and should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
+Indentation is 4 spaces (no tabs)
++++++++++++++++++++++++++++++++++
+
+Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
     **bad:**
 
     .. code-block:: matlab
@@ -325,7 +331,10 @@ The following are guidelines, intended to improve:
 
         error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
 
-- Do not repeat yourself: if the same expression is evaluated multiple times, evaluate it once and assign its result to a variable.
+Do not repeat yourself
+++++++++++++++++++++++
+
+If the same expression is evaluated multiple times, evaluate it once and assign its result to a variable.
 
     **bad:**
 
@@ -361,7 +370,9 @@ The following are guidelines, intended to improve:
             cosmo_warning('%d samples < %d features', nsamples, nfeatures);
         end
 
-- Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
+Write in normal, understandable english
+---------------------------------------
+Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
     **bad:**
 
     .. code-block:: matlab
@@ -416,7 +427,10 @@ The following are guidelines, intended to improve:
             fprintf('Starting analysis - please be patient...\n');
         end
 
-- When writing function definitions:
+Document functions
+++++++++++++++++++
+
+When writing function definitions:
     + start with a short sentence (one line) describing its purpose.
     + describe the signature of the function (input and output arguments)
     + describe the input parameters
@@ -434,6 +448,9 @@ The following are guidelines, intended to improve:
 
     .. include:: matlab/cosmo_winner_indices_hdr.txt
 
+
+Pre-allocate space for data
++++++++++++++++++++++++++++
 - Allocate space for output or intermediate results beforehand, rather than let arrays grow in a ``for`` or ``while`` loop.
     + This can greatly improve performance. Growing an array requires reallocating memory, which slows down code execution.
     + It also indicates what the size of the output is, which can help in understanding what code does.
@@ -461,7 +478,9 @@ The following are guidelines, intended to improve:
             accs(k)=acc;
         end
 
-- When possible use vectorization rather than a ``for`` or ``while`` loop.
+Use vectorization
++++++++++++++++++
+When possible use vectorization rather than a ``for`` or ``while`` loop.
     + Many functions support vectorized functions, where the same function is applied to elements in arrays.
     + Vectorization reduces the number of lines of code.
     + Vectorization typically reduces execution time.
@@ -503,7 +522,10 @@ The following are guidelines, intended to improve:
 
         abs_data=abs(data);
 
-- Use clear variable names, aimed at finding a good balance between length and readability. Short variable names are fine if their use is clear (e.g., ``i``, ``j``, ``k`` for loop variables; ``n`` for number of elements, ``f`` for a function). It is recommended to document what a statement does if this cannot be deduced easily from the variable/function names.
+
+Use clear variable names
+++++++++++++++++++++++++
+The aim is to find a good balance between length and readability. Short variable names are fine if their use is clear (e.g., ``i``, ``j``, ``k`` for loop variables; ``n`` for number of elements, ``f`` for a function). It is recommended to document what a statement does if this cannot be deduced easily from the variable/function names.
 
     *Note:* ``i`` and ``j`` are used in Matlab to indicate the imagery unit (for which it holds that ``i^2==-1``), but for functions that do not use complex numbers (currently all of them) their use as a loop variable is acceptable.
 
@@ -562,7 +584,10 @@ The following are guidelines, intended to improve:
         [nsamples, nfeatures]=size(ds.samples);
 
 
-- Generally try to avoid side effects, and if that is not possible, indicate such effects clearly in the function name.
+Avoid side effects
+++++++++++++++++++
+
+Generally try to avoid side effects, and if that is not possible, indicate such effects clearly in the function name.
 
     **extremily bad:**
 
@@ -637,10 +662,13 @@ The following are guidelines, intended to improve:
             % the path, working directory, and warning state are reset when execution
             % of the code in the function body is completed or interrupted.
 
+Tests should not require user interaction
++++++++++++++++++++++++++++++++++++++++++
+When implementing unit tests (in the ``tests``) directory, functions should run automatically without any user interaction. If a test were to require user interaction, one of the main advantages of the test suite (fully automated testing) is lost.
 
-- When implementing unit tests (in the ``tests``) directory, functions should run automatically without any user interaction. If a test were to require user interaction, one of the main advantages of the test suite (fully automated testing) is lost.
-
-- Do not use global variables: these can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
+Do not use global variables
++++++++++++++++++++++++++++
+Global variables can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
 
 - Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
 
@@ -662,6 +690,9 @@ The following are guidelines, intended to improve:
             test_indices{j}=find(sample_count);
         end
 
+
+Use ``sprintf`` or ``fprint`` when formatting strings
++++++++++++++++++++++++++++++++++++++++++++++++++++++
 - When formatting strings use ``sprintf`` or ``fprintf``, rather than ``num2str`` and string concatenation. Avoid using disp when printing strings; use ``fprintf`` instead.
 
     **bad:**
@@ -681,7 +712,9 @@ The following are guidelines, intended to improve:
     *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons with older versions, an alternative implementation is provided as ``cosmo_strjoin``.
 
 
-- Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+Avoid using ``eval``
+++++++++++++++++++++
+Statements with ``eval`` can obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
 
     **very bad:**
 
@@ -721,15 +754,19 @@ The following are guidelines, intended to improve:
             f_data=f_handle(data(k));
         end
 
-- The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Current exceptions are:
+Try to avoid using ``try`` and ``catch``
+++++++++++++++++++++++++++++++++++++++++
+The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Current exceptions are:
 
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``.
     + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail.
 
-- Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected.
+Check input arguments
++++++++++++++++++++++
+Generally it is good to check the input arguments, although there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected.
 
 CoSMoMPVA-specific guidelines
-+++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 + To indicate that a code block is an exercise, place a line containing ``% >@@>`` before the block and one containing ``% <@@<`` after the block. When using the build system (see above), this will replace the corresponding block by a message saying ``%%%% Your code comes here %%%%`` in the online documentation.
 
