@@ -26,6 +26,9 @@ function ds=cosmo_synthetic_dataset(varargin)
 %   'nmodalities', nm       number of unique modalities (default: [])
 %   'nsubjects', ns         number of unique subjects (default: [])
 %   'nreps', nr             number of sample repeats (default: [])
+%   'seed', seed            seed value for pseudo-random number generator
+%                           (default: 1). Different seed values give
+%                           different random numbers.
 %
 % Output:
 %    ds                     dataset struct according to parameters.
@@ -185,6 +188,9 @@ function ds=cosmo_synthetic_dataset(varargin)
 
     default.target1=1;
 
+    % for PRNG
+    default.seed=1;
+
     % for MEEG
     default.sens='neuromag306_all';
 
@@ -206,7 +212,7 @@ function ds=cosmo_synthetic_dataset(varargin)
     nelem=log(nfeatures*max([opt.nreps 1]));
     class_distance=opt.sigma/sqrt(nelem);
 
-    ds.samples=generate_samples(ds, class_distance);
+    ds.samples=generate_samples(ds, class_distance, opt.seed);
     ds=assign_sa(ds, opt, {'chunks','targets'});
 
     ds.sa.targets=ds.sa.targets+opt.target1-1;
@@ -228,7 +234,7 @@ function ds=assign_sa(ds, opt, names)
     end
 
 
-function samples=generate_samples(ds, class_distance)
+function samples=generate_samples(ds, class_distance, seed)
 
     targets=ds.sa.targets;
     nsamples=numel(targets);
@@ -237,7 +243,6 @@ function samples=generate_samples(ds, class_distance)
     fa_names=fieldnames(ds.fa);
     nfeatures=size(ds.fa.(fa_names{1}),2);
 
-    seed=1;
     r=cosmo_rand(nsamples,nfeatures,'seed',seed);
     samples=norminv(r);
 
