@@ -204,6 +204,12 @@ The following are guidelines, intended to improve:
 + readability, so that less time is spent in understanding how the code works or what it does.
 + performance, so that execution time or memory usage is reduced.
 
+
+.. contents::
+    :depth: 1
+    :local:
+
+
 **Note**: None of these guidelines are set in stone. Try to use common sense when considering not to follow them. Indeed, for each guideline there may be a good reason to deviate from it.
 
 Maximum line length is 80 characters
