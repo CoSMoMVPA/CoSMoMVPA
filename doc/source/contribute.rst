@@ -214,12 +214,26 @@ The following are guidelines, intended to improve:
 Maximum line length is 80 characters
 ++++++++++++++++++++++++++++++++++++
 
-Try to keep line lengths limited to 80 characters, so that files can be viewed in a standard terminal window without line breaks. (The Matlab editor shows a vertical line after the 80-th character). Use line continuation (``...`` at the very end of the line) to spread a long expression over multiple lines.
+Try to keep line lengths limited to 75 characters, so that files can be viewed in a standard terminal window, possibly with scroll bars, without line breaks. (The Matlab editor shows a vertical line after the 75-th character). Use line continuation (``...`` at the very end of the line) followed by indentation for the continued lines.
+
+- An exception to this rule is including URLs in documentation, because they allow for copy-pasting the URL directly.
+
+- If a binary operator is used together with line continuation, put the operator before the line continuation.
+
+- Lines should not end with whitespace.
+
     **bad:**
 
     .. code-block:: matlab
 
         my_output_data=my_awesome_function(first_argument, second_argument, third_argument, fourth_argument, fifth_argument, sixth_argument);
+
+        apply_mask=user_has_supplied_mask ...
+                        && ~isempty(user_mask) ...
+                        && sum(user_mask)>0
+
+        my_string='Nick was right (as he usually is) in stating that although the use of long expressions may sometimes seem unavoidable, the use of line continuations hardly ever is.';
+
 
     **good:**
 
@@ -229,6 +243,15 @@ Try to keep line lengths limited to 80 characters, so that files can be viewed i
                                            third_argument, fourth_argument,...
                                            fifth_argument, sixth_argument);
 
+        apply_mask=user_has_supplied_mask && ...
+                        ~isempty(user_mask) && ...
+                        sum(user_mask)>0
+
+        my_string=['Nick was right (as he usually is) in stating that '...
+                    'although the use of long expressions may sometimes '...
+                    'seem unavoidable, the use of line continuations'...
+                    'hardly ever is.'];
+
     (Yes, we break this rule occasionely.)
 
 
@@ -236,6 +259,9 @@ Indentation is 4 spaces (no tabs)
 +++++++++++++++++++++++++++++++++
 
 Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
+
+If this guideline and the previous one do not give you enough room to express yourself, then most likely you are overcomplicating things; consider rewriting the code and/or use subfunctions.
+
     **bad:**
 
     .. code-block:: matlab
