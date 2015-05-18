@@ -347,7 +347,7 @@ The following are guidelines, intended to improve:
 
         has_more_features_than_samples=nfeatures>nsamples
 
-        if has_more_features_than_samples=nfeatures>nsamples
+        if has_more_features_than_samples
             delta=nfeatures-nsamples
         else
             delta=0;
@@ -355,7 +355,7 @@ The following are guidelines, intended to improve:
 
         aggregate_size=[nfeatures,nsamples,delta];
 
-        if has_more_features_than_samples=nfeatures>nsamples
+        if has_more_features_than_samples
             cosmo_warning('%d samples < %d features', nsamples, nfeatures);
         end
 
@@ -553,7 +553,7 @@ The following are guidelines, intended to improve:
             data_result(k)=f(data(k,:));
         end
 
-- Do not use global variables: these can have nasty and unpredictable side effects. In other words: use functions really as *functions*, where the output should depend on the input only (with the exception of the state of the random number generator).
+- Do not use global variables: these can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
 
 - Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
 
@@ -591,7 +591,7 @@ The following are guidelines, intended to improve:
         fprintf('Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
 
 
-    *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons an alternative implementation is provided as ``cosmo_strjoin``.
+    *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons with older versions, an alternative implementation is provided as ``cosmo_strjoin``.
 
 
 - Avoid using ``eval``, unless absolutely necessary. Not only do these carry a space penalty, but it obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
@@ -634,9 +634,9 @@ The following are guidelines, intended to improve:
             f_data=f_handle(data(k));
         end
 
-- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that the code is code aimed for use in a Mars rover, that should never crash even in unexcepted circumstances; instead the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. Current exceptions are:
+- [possibly subject to change]: The use ``try`` and ``catch`` statements is generally avoided; rather throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances; here the code is aimed at analysis of neuroscience data, where getting correct results is more important than requiring someone to modify a script because the inputs were wrong and and error was raised. Current exceptions are:
 
-    + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``).
+    + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``.
     + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail.
 
 - Note on checking consistency of input arguments: there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected. For example, the current implementation does not check for *double dipping* for partitions in general, but does raise an error when using :ref:`cosmo_correlation_measure`. Similarly, :ref:`cosmo_slice` checks for the proper size of feature or sample attributes, but such a check is not done in some other functions.
@@ -667,7 +667,7 @@ CoSMoMPVA-specific guidelines
 
 Unit tests
 ^^^^^^^^^^
-Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects. They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. For existing or new features, more tests are very much welcomed.
+Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. For existing or new features, more tests are very much welcomed.
 
 .. include:: links.txt
 
