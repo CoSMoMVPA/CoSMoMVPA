@@ -408,7 +408,7 @@ If the same expression is evaluated multiple times, evaluate it once and assign 
         end
 
 Write in normal, understandable english
----------------------------------------
++++++++++++++++++++++++++++++++++++++++
 Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
     **bad:**
 
