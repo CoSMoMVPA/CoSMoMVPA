@@ -34,6 +34,7 @@
 .. _Sphinx: http://sphinx-doc.org
 .. _`sphinxcontrib-matlabdomain`: https://pypi.python.org/pypi/sphinxcontrib-matlabdomain
 .. _SPM: http://www.fil.ion.ucl.ac.uk/spm/
+.. _`Travis-ci`: https://travis-ci.org/CoSMoMVPA/CoSMoMVPA
 .. _`Unix-like`: http://en.wikipedia.org/wiki/Unix-like
 .. _xUnit: http://www.mathworks.com/matlabcentral/fileexchange/22846-matlab-xunit-test-framework
 .. _`zip archive`: https://github.com/CoSMoMVPA/CoSMoMVPA/archive/master.zip

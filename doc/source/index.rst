@@ -13,6 +13,7 @@ CoSMoMVPA
 - Supports most common fMRI (including NIFTI, ANALYZE, BrainVoyager, AFNI, GIFTI) and MEEG (FieldTrip, EEGLab)  data formats.
 - Handles fMRI volumetric, fMRI surface-based, and MEEG data in a uniform manner (e.g. in searchlight analyses).
 - Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
+- Uses an automated test suite and continuous integration testing (through `Travis-ci`_) to enhance quality control
 - Is Free/Open Source Software (MIT License).
 
 **Note: CoSMoMVPA is currently in a pre-first-release state. Code, features and documentation may change rapidly.**
@@ -22,6 +23,7 @@ CoSMoMVPA
    :hidden:
 
    philosophy
+   news
    get_started
    download
    documentation
