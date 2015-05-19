@@ -7,6 +7,7 @@
 .. _BrainVoyager: http://www.brainvoyager.com
 .. _`CoSMo 2013 workshop`: http://www.compneurosci.com/CoSMo2013/
 .. _`CoSMo 2014 workshop`: http://www.compneurosci.com/CoSMo2014/
+.. _`CoSMo 2015 workshop`: http://www.compneurosci.com/CoSMo
 .. _CoSMoMVPA: http://cosmomvpa.org
 .. _`CoSMoMVPA Google group`: https://groups.google.com/forum/#!forum/cosmomvpa
 .. _`CoSMoMVPA issues`: https://github.com/CoSMoMVPA/CoSMoMVPA/issues

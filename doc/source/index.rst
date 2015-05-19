@@ -57,6 +57,8 @@ CoSMoMVPA
 .. image:: _static/icon_thanks.png
    :target: thanks.html
 
+.. include:: news.rst
+
 .. include:: _static/git_summary.txt
 
 
@@ -69,4 +71,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. include:: links.txt
 
