@@ -136,7 +136,7 @@ To get started with git_ and github_ to allow for code contributions to CoSMoMVP
 
         cd CoSMoMVPA
 
-    + tell git about the `offical` release, which we call ``upstream``:
+    + tell git about the `offical` release, which we call ``upstream``::
 
         git remote add upstream https://github.com/CoSMoMVPA/CoSMoMVPA.git
 
@@ -161,7 +161,7 @@ Proposing a change in the code (a.k.a. submitting a Pull Request (PR)
 
         git push origin my_awesome_new_feature
 
-    + go to your own github page, i.e. ``https://github.com/karen/CoSMoMVPA`` if your git user name is ``karen``. Typically the github_ webpage already mentions that a new branch was pushed, so just click on `create pull request`. Ohterwise click `pull requests` in the right-hand bar, then click `New pull request`. Add a description to the pull request, and then submit it.
+    + go to your own github page, i.e. ``https://github.com/karen/CoSMoMVPA`` if your git user name is ``karen``. Typically the github_ webpage already mentions that a new branch was pushed, so just click on `create pull request`. Otherwise click `pull requests` in the right-hand bar, then click `New pull request`. Add a description to the pull request, and then submit it.
 
       We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
 
@@ -182,9 +182,18 @@ Notes on committing
 -------------------
 - Please review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
 - Do *not* use ``git -a``; instead manually add the (changes to) files individually. Preferably commits should be atomic, that is change just one feature.  For example if you changed a file at two places by (1) improving the documentation and (2) refactoring code used internally, then preferably you should make two commits. Using the tags below these could be ``DOC: ...`` and ``RF: ...``.
-    + To add a new file ``my_new_file.m``, run ``git add my_new_file.m``.
-    + To commit changes to a file, run ``git add -i``, then press 'p' (for 'patch'), indicate which files to patch, and press 'y' or 'n' for each meaningful 'atomic' change.- To view the history of commits, ``gitk`` is useful.
-- Use the following tags (inspired by PyMVPA_) for commits:
+  - To add a new file ``my_new_file.m``, run::
+
+        git add my_new_file.m
+
+  - To commit changes to a file, run::
+
+        git add -i
+
+    then press ``p`` (for 'patch'), indicate which files to patch, and press ``y`` or ``n`` for each meaningful 'atomic' change, and ``q`` to quit. (Usually followed by ``git commit ...``).
+
+  - To view the history of previous commits, ``gitk`` is useful.
+  - Use the following tags (inspired by PyMVPA_) for commits:
 
     + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. If the acknowledgement includes code or documentation (not a bug report or question), use ``CTB`` as well.
     + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
