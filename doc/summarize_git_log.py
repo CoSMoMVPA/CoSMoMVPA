@@ -289,6 +289,7 @@ if __name__=='__main__':
     print "Building git log summary . . .",
     with open(summary_fn,'w') as f:
         f.write(as_title('Changes since %s' % git_since, '='))
+        f.write('.. contents::\n    :local:\n    :depth: 1\n\n')
 
         f.write('\n%s\n' % summary)
 
