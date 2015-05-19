@@ -688,7 +688,7 @@ Avoid side effects
 
 Generally try to avoid side effects, and if that is not possible, indicate such effects clearly in the function name.
 
-    **extremily bad:**
+    **very bad:**
 
     .. code-block:: matlab
 
