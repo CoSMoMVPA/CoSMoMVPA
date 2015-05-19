@@ -6,9 +6,11 @@ Information for contributors
 
 We would be very happy to receive contributions!
 
-You don't have to be a Matlab_ programmer. Useful *code* contributions are very much appreciated, but improved documentation, ideas on how our web site can be made prettier, or other ideas are also valued highly.
+You don't have to be a Matlab_ / Octave_ programmer. Useful *code* contributions are very much appreciated, but improved documentation, ideas on how our web site can be made prettier, or other ideas are also valued highly.
 
-If you are not a Matlab_ programmer but would to contribute or suggest improvements on the documentation or examples, please contact_ us (this assumes you are at least as uncomfortable using git_ as using Matlab_, which is a reasonable assumption if you are not a Matlab_ programmer).
+If you are not a Matlab_ / Octave_ programmer but would like to contribute or suggest improvements on the documentation or examples, please contact_ us directly.
+
+For programmers, the preferred way to contribute is using git_ and github_. If you would like to contribute code in another way, also please contact_ us directly.
 
 .. contents::
     :depth: 2
@@ -21,9 +23,10 @@ Directory locations and naming conventions
 
 Meta - naming conventions in the documentation
 ++++++++++++++++++++++++++++++++++++++++++++++
+
+In what follows we use the following naming conventions.
 - Path names are `Unix-like`_-based; ``/`` is the path separation character, rather than ``\`` used on Windows platforms.
-- Directories have ``/`` as the last character, and are relative to the directory where ``CoSMoMVPA`` resides.
-- Sometimes ``${a_name}`` is used, this indicates that `a_name` is a meta-syntactic variable.
+- Directories have ``/`` as the last character, and are relative to the root directory where CoSMoMVPA_ resides. For example, if CoSMoMVPA is located in ``/Users/karen/git/CoSMoMVPA``, then ``mvpa/`` refers to ``/Users/karen/git/CoSMoMVPA/mvpa``.
 
 
 Setting the Matlab_ path
@@ -44,7 +47,7 @@ Organization of files and directories
 - Core ``CoSMoMVPA`` Matlab functions are in ``mvpa/``. File names should match the pattern ``cosmo_*.m``.
 - Runnable Matlab example scripts are in ``examples/``. File names should match the pattern ``run_*.m`` or ``demo_*.m``.
 - Unit tests are in ``tests/``. File names should match the pattern ``test_*.m`` for unit tests, and any other prefix for helper functionality.
-- External libraries are in ``external/${library}/``.
+- External libraries are in ``external``.
 - Documentation is in ``doc/source/``:
     + Documentation files have the ``.rst`` extension and are formatted as reStructuredText_.
     + Exercises have the prefix ``ex_``.
@@ -57,7 +60,7 @@ Organization of files and directories
 
 Setting up the documentation build system
 +++++++++++++++++++++++++++++++++++++++++
-The documentation is built using Sphinx_, Python_ and `sphinxcontrib-matlabdomain`_. Currently only Unix-like systems are supported; we have tested it on Linux and Mac OS. Python_ is a required dependency; we have tested with with version 2.7. Building requires using terminal, for example ``bash``.
+The documentation is built using Sphinx_, Python_, `sphinxcontrib-matlabdomain`_, and customly written Python_ code. Currently only Unix-like systems are supported; we have tested it on Linux and Mac OS. Python_ is a required dependency; we have tested with with version 2.7. Building requires using a shell, for example ``bash``.
 
 Installation is easiest using `easy_install`_. To install as root::
 
@@ -100,40 +103,86 @@ Contributing using git
 
 The git_ distributed version control system is used for code development. It has several advantages over just downloading the `zip archive`_:
     + a distributed workflow: multiple people can work on the code simultaneously, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easly.
-    + keeping track of individual contributions. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but then tagging: every change is annotated (see below). This allows one to see what was changed when, and undo unwanted changes back, if necessary.
+    + keeping track of individual contributions. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but with some kind of tagging: every change is annotated (see below). This allows anyone to see what was changed, when this happended, and by who.
     + code sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
     + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. This is very useful for new experimental features or bug-fixing without affecting the *prestine* master code. Once changes are considered ready for the master repository, they can be merged easily.
 
-The instructions below assume a unix-like platform, and the command below should be run on the terminal (for example in bash). To get started with git:
+The instructions below assume a unix-like platform, and the command below should be run on the terminal (for example in bash).
+
+.. _initial_git_setup:
+
+Initial git_ / github_ setup
+----------------------------
+
+To get started with git_ and github_ to allow for code contributions to CoSMoMVPA:
+
     + set up a working installation of git_ (see `installing git`_).
-    + tell git about your name and email address: ``git config --global user.name "Your full name"`` and ``git config --global user.email "your_email@the_domain.com"``
+    + tell git about your name and email address::
+
+        git config --global user.name "Your full name"``
+        git config --global user.email "your_email@the_domain.com"
+
+      By setting these options, all commits you make will have this information, so that everybody can identify who changed what.
+
     + make an account on github_, if you have not done so.
     + on the github_ project page, `fork the repository`_, and follow the instructions there.
-    + get a local copy of your forked repository: run ``git clone https://github.com/${your_name}/CoSMoMVPA.git``
-    + change to the directory: ``cd CoSMoMVPA``
-    + tell git about the `offical` release: ``git remote add upstream https://github.com/CoSMoMVPA/CoSMoMVPA.git``
-    + to update your repository with the latest official code, first make sure you are on master (``git checkout master``), then run ``git pull upstream master``
-    + to add a new feature or provide a bugfix:
+    + get a local copy of your forked repository: run::
 
-        - start a new branch: ``git checkout -b _tent/${new_feature}`` or ``git checkout -b _bf/${bugfix}``
-        - make the desired changes, then commit them. `See below for details`.
-        - push these changes to *your* github_ account: ``git push origin _tent/${new_feature}`` or ``git push origin _bf/${bugfix}``
-        -  on the github page, send a pull request against the master of ``CoSMoMVPA/CoSMoMVPA``. We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
-        - if you want go back to using code from the original master, run ``git checkout master``
+        git clone https://github.com/karen/CoSMoMVPA.git
 
-      Keep in mind that your master is supposed to contain working, runnable code. Branching in ``git`` is cheap; for experimentation, bug fixes or new features please use branches.
+      if ``karen`` is your github user name.
+
+    + change to the directory just created::
+
+        cd CoSMoMVPA
+
+    + tell git about the `offical` release, which we call ``upstream``:
+
+        git remote add upstream https://github.com/CoSMoMVPA/CoSMoMVPA.git
+
+
+Proposing a change in the code (a.k.a. submitting a Pull Request (PR)
+---------------------------------------------------------------------
+
+    + to update your repository to the latest official code, first make sure you are on the master branch, then pull the current code::
+
+        git checkout master
+        git pull upstream master
+
+      (This assumes that added the remote ``upstream`` as described in the :ref:`previous section<initial_git_setup>`.)
+
+    + to add a new feature or provide a bugfix, start a new branch::
+
+        git checkout -b my_awesome_new_feature
+
+
+    + make the desired changes, then commit them. :ref:`See below for details <committing_notes>`.
+    + push these changes to *your* github_ account::
+
+        git push origin my_awesome_new_feature
+
+    + go to your own github page, i.e. ``https://github.com/karen/CoSMoMVPA`` if your git user name is ``karen``. Typically the github_ webpage already mentions that a new branch was pushed, so just click on `create pull request`. Ohterwise click `pull requests` in the right-hand bar, then click `New pull request`. Add a description to the pull request, and then submit it.
+
+      We'll get back to you to review and discuss the code. Once the code is ready for the official master it will be merged. You should receive notifications by email when the code is discussed or merged.
+
+    + if you want go back to using code from the ``master`` branch (the `official` code), run::
+
+        git checkout master
+
+      Keep in mind that the ``master`` branch is supposed to contain working, runnable code. Proposed changes, including experimental code and bug-fixes, should preferably be submitted in separate branches.
 
 There are many great resources on using git_ on the web; a detailed explanation is beyond the scope of this documentation.
 
 .. _`installing git`: http://git-scm.com/book/en/Getting-Started-Installing-Git
 .. _`fork the repository`: https://help.github.com/articles/fork-a-repo
 
+.. _committing_notes:
 
 Notes on committing
-+++++++++++++++++++
+-------------------
 - Please review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
 - Do *not* use ``git -a``; instead manually add the (changes to) files individually. Preferably commits should be atomic, that is change just one feature.  For example if you changed a file at two places by (1) improving the documentation and (2) refactoring code used internally, then preferably you should make two commits. Using the tags below these could be ``DOC: ...`` and ``RF: ...``.
-    + To add a new file, run ``git add ${filename}``.
+    + To add a new file ``my_new_file.m``, run ``git add my_new_file.m``.
     + To commit changes to a file, run ``git add -i``, then press 'p' (for 'patch'), indicate which files to patch, and press 'y' or 'n' for each meaningful 'atomic' change.- To view the history of commits, ``gitk`` is useful.
 - Use the following tags (inspired by PyMVPA_) for commits:
 
@@ -357,16 +406,19 @@ Throw an error as soon as something seems out of order. When doing so, provide i
 
         if ntemplate~=nsamples
             % this is bad because the friggofrag analysis is invalid.
-            % Telling the user that they provided wrong input could harm their self-esteem
-            % however, so let's just make up some data that, although completely meaningless,
-            % will ensure that the script does not crash.
+            % Telling the user that they provided wrong input could harm their
+            % self-esteem however, so let's just make up some data that,
+            % although completely meaningless, will ensure that the script
+            % does not crash.
             samples=randn(ntemplate);
+        end
 
     **good:**
 
     .. code-block:: matlab
 
-        error('targets have size %d x %d, expected %d % d', targ_size, exp_size);
+        error('targets have size %d x %d, expected %d % d', ...
+                     target_size, expected_target_size);
 
 Do not repeat yourself
 ++++++++++++++++++++++
@@ -410,6 +462,7 @@ If the same expression is evaluated multiple times, evaluate it once and assign 
 Write in normal, understandable english
 +++++++++++++++++++++++++++++++++++++++
 Avoid using capital letters in the documentation, unless you want others to PERCEIVE YOUR MESSAGE AS SHOUTING, normal spelling dictates this (start of a sentence, proper names), tag code, or to refer to variable names. Avoid capital letters for variable names. If possible, give informative error messages.
+
     **bad:**
 
     .. code-block:: matlab
@@ -633,12 +686,12 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
         function init_my_toolbox()
 
             restoredefaultpath();
-            addpath('my_functions')
+            addpath('my_functions');
 
     The above is bad because:
 
          - The function name ``init_my_toolbox`` does something one would not expect based on its name, namely it resets the Matlab path.
-         - Functions that were accessible before are not longer in the Matlab path.
+         - Functions that were accessible before are not longer in the Matlab path. In particular, any other external toolboxes or code not part of the Matlab installation becomes unavailable.
 
     It is acceptible to add something to the Matlab path, if the function name clearly indicates that it does so:
 
@@ -649,7 +702,7 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
 
         function my_toolbox_set_path()
 
-            addpath('my_functions')
+            addpath('my_functions');
 
     Along the same lines, in general functions should not change the current working directory, the path, or the warning state. Sometimes this cannot be avoided, but in that case these changes should be undone when leaving the function.
 
@@ -688,16 +741,18 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
 
             path_resetter=onCleanup(@()cd(original_path));
             working_dir_resetter=onCleanup(@()path(original_working_dir));
-            warning_state_resetter=onCleanup(@()warning(original_warning_state);
+            warning_state_resetter=onCleanup(@()warning(original_warning_state));
 
             addpath('my_functions');
-            original_dir=pwd();
+            warning('off');
+
             cd('other_functions/private');
 
             do_stuff();
 
-            % the path, working directory, and warning state are reset when execution
-            % of the code in the function body is completed or interrupted.
+            % (the path, working directory, and warning state are reset when
+            %  execution of the code in the function body is completed or
+            %  interrupted.)
 
 Tests should not require user interaction
 +++++++++++++++++++++++++++++++++++++++++
@@ -706,6 +761,9 @@ When implementing unit tests (in the ``tests``) directory, functions should run 
 Do not use global variables
 +++++++++++++++++++++++++++
 Global variables can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
+
+Avoid long and complicated expressions
+++++++++++++++++++++++++++++++++++++++
 
 - Avoid long expressions with many nested parentheses; rather use multiple lines in which variables (with informative names) are assigned in succession. Although this carries a minor speed penalty in Matlab, it improves readability.
 
@@ -751,7 +809,7 @@ Use ``sprintf`` or ``fprint`` when formatting strings
 
 Avoid using ``eval``
 ++++++++++++++++++++
-Statements with ``eval`` can obfuscates the code considerably. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+Statements with ``eval`` can obfuscates the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles
 
     **very bad:**
 
@@ -767,6 +825,8 @@ Statements with ``eval`` can obfuscates the code considerably. In almost all cas
             end
         end
 
+        This is bad because it uses ``eval`` and does not pre-allocate space for data.
+
     **bad:**
 
     .. code-block:: matlab
@@ -775,9 +835,12 @@ Statements with ``eval`` can obfuscates the code considerably. In almost all cas
         results=zeros(nsamples,1);
         f_names={'f_odd','f_even'};
         for k=1:nsamples
-            f_name=f_names(mod(k+1,2)+1);
+            f_index=mod(k+1,2)+1);
+            f_name=f_names{f_index};
             eval(sprintf('results(%d)=%s(data(%d));', k, f_name, k));
         end
+
+        This is bad because it uses ``eval``.
 
     **good:**
 
@@ -787,16 +850,19 @@ Statements with ``eval`` can obfuscates the code considerably. In almost all cas
         results=zeros(nsamples,1);
         f_handles={@f_odd, @f_even};
         for k=1:nsamples
-            f_handle=f_handles{mod(k+1,2)+1};
+            f_index=mod(k+1,2)+1;
+            f_handle=f_handles{f_index};
             f_data=f_handle(data(k));
         end
 
 Minimize using ``try`` and ``catch``
 ++++++++++++++++++++++++++++++++++++
-The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Current exceptions are:
+The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Some current exceptions are:
 
-    + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``.
-    + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail.
+    + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``. We don't want that function to crash if any of the scripts it is publishing crashes.
+    + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail, as that is a likely scenarion. In that case, even though the error is caught initially, always a subsequent error is thrown.
+    + :ref:`cosmo_searchlight`, which if an error is thrown by the `measure` function handle, prefixes the error message with the feature id that caused the error, and then throws a new error.
+
 
 Check input arguments
 +++++++++++++++++++++
@@ -820,9 +886,9 @@ CoSMoMPVA-specific guidelines
             % <@@<
         end
 
-+ When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``.
++ When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
-    .. include:: matlab/cosmo_run_tests_hdr.txt
+    .. include:: matlab/cosmo_strsplit_hdr.txt
 
 
 Unit tests
