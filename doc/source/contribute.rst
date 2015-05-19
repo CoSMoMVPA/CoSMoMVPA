@@ -119,7 +119,7 @@ To get started with git_ and github_ to allow for code contributions to CoSMoMVP
     + set up a working installation of git_ (see `installing git`_).
     + tell git about your name and email address::
 
-        git config --global user.name "Your full name"``
+        git config --global user.name "Your full name"
         git config --global user.email "your_email@the_domain.com"
 
       By setting these options, all commits you make will have this information, so that everybody can identify who changed what.
