@@ -18,7 +18,8 @@ function test_simple_neighborhood
     assertEqual(nh1.fa.center_ids,mp);
     assertEqual(nh1.neighbors,num2cell(mp'));
 
-
+    assertEqual(nh1.origin.fa,ds_al.fa);
+    assertEqual(nh1.origin.a.fdim,ds_al.a.fdim);
 
 
     nh2=cosmo_spherical_neighborhood(ds,'radius',1.5,'progress',false);

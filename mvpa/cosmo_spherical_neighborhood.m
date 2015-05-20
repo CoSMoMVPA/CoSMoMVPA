@@ -298,7 +298,7 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     origin.fa=ds.fa;
     nbrhood.origin=origin;
 
-    cosmo_check_neighborhood(nbrhood);
+    cosmo_check_neighborhood(nbrhood,ds);
 
 
 

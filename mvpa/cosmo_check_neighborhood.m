@@ -178,10 +178,15 @@ function msg=check_origin_matches(nbrhood, ds)
     msg='';
 
     % legacy neighborhood, do not throw an exception
-    if ~isfield(nbrhood,'origin') || isempty(ds)
+    if ~isfield(nbrhood,'origin')
         cosmo_warning(['Legacy warning: newer versions of CoSMoMVPA '...
                         'require a field .origin in the neighborhood '...
                         'struct']);
+        return;
+    end
+
+    if isempty(ds)
+        % no dataset, so no further checks
         return;
     end
 
@@ -212,11 +217,17 @@ function msg=check_origin_matches(nbrhood, ds)
             if ~cosmo_isfield(origin,[attr_name '.' key]) || ...
                     ~isequal(ds.(attr_name).(key),...
                             origin.(attr_name).(key))
-                error(['.fa.%s mismatch between dataset and '...
-                        'neighborhood'],key);
+                error(['.%sa.%s mismatch between dataset and '...
+                        'neighborhood'],infix,key);
             end
         end
     end
+
+    if isfield(origin,'a') && ~(isfield(ds,'a') && ...
+                                isequal(origin.a, ds.a))
+        error('.a mismatch between dataset and neighborhood');
+    end
+
 
 
 function [raise, ds]=process_input(varargin)

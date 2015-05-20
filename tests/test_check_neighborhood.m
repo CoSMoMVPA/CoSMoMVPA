@@ -123,8 +123,14 @@ function test_check_neighborhood_exceptions
     is_ok(nh,ds); % should pass
     ok_wo(nh,ds);
     ok_wo(nh);
-    is_ok(nh,true); % should pass
+    is_ok(nh); % should pass
 
+    ds2=ds;
+    ds2.a.vol.dim=[2 2 2];
+    aet(nh,ds2);
+    ok_wo(nh,ds2);
+    ok_wo(nh);
+    is_ok(nh);
 
     ds=cosmo_slice(ds,3:6);
     nh=struct();
@@ -137,10 +143,17 @@ function test_check_neighborhood_exceptions
     aet(nh);
 
     nh.neighbors={1;2;4;3};
-    is_ok(nh,ds); % should pass
+    is_ok(nh,ds);
     ok_wo(nh,ds);
     ok_wo(nh);
-    is_ok(nh); % should pass
+    is_ok(nh);
+
+    % different .a.vol.dim
+    nh.origin.a.vol.dim=[4 0 0];
+    aet(nh,ds);
+    ok_wo(nh,ds);
+    ok_wo(nh);
+    is_ok(nh);
 
 function nh=remove_origin(nh)
     if isfield(nh,'origin')

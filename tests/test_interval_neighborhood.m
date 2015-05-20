@@ -28,6 +28,9 @@ function test_interval_neighborhood_basis()
             assertEqual(nh.a.fdim.values,...
                             {ds_full.a.fdim.values{2}(slicearg)});
 
+            assertEqual(nh.origin.a.fdim,ds.a.fdim);
+            assertEqual(nh.origin.fa,ds.fa);
+
             for m=1:narg
                 msk=m-radius<=fa_time & ...
                         fa_time <= m+radius;

@@ -65,6 +65,27 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       'trial'
 %     >     .samples_label
 %     >       'rpt'
+%     > .origin
+%     >   .fa
+%     >     .chan
+%     >       [ 1  ...  306 ]@1x2142
+%     >     .time
+%     >       [ 1  ...  7 ]@1x2142
+%     >   .a
+%     >     .fdim
+%     >       .labels
+%     >         { 'chan'
+%     >           'time' }
+%     >       .values
+%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     >           [ -0.2  ...  0.1 ]@1x7                }
+%     >     .meeg
+%     >       .samples_type
+%     >         'timelock'
+%     >       .samples_field
+%     >         'trial'
+%     >       .samples_label
+%     >         'rpt'
 %
 %     % get neighbors with radius of .1 for
 %     % planar neuromag306 channels, but with the center labels
@@ -95,6 +116,27 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       'trial'
 %     >     .samples_label
 %     >       'rpt'
+%     > .origin
+%     >   .fa
+%     >     .chan
+%     >       [ 1  ...  306 ]@1x2142
+%     >     .time
+%     >       [ 1  ...  7 ]@1x2142
+%     >   .a
+%     >     .fdim
+%     >       .labels
+%     >         { 'chan'
+%     >           'time' }
+%     >       .values
+%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     >           [ -0.2  ...  0.1 ]@1x7                }
+%     >     .meeg
+%     >       .samples_type
+%     >         'timelock'
+%     >       .samples_field
+%     >         'trial'
+%     >       .samples_label
+%     >         'rpt'
 %
 %     % As above, but combine the two types of channels
 %     % Here the axial channels only have axial neighbors, and the planar
@@ -127,6 +169,27 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       'trial'
 %     >     .samples_label
 %     >       'rpt'
+%     > .origin
+%     >   .fa
+%     >     .chan
+%     >       [ 1  ...  306 ]@1x2142
+%     >     .time
+%     >       [ 1  ...  7 ]@1x2142
+%     >   .a
+%     >     .fdim
+%     >       .labels
+%     >         { 'chan'
+%     >           'time' }
+%     >       .values
+%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     >           [ -0.2  ...  0.1 ]@1x7                }
+%     >     .meeg
+%     >       .samples_type
+%     >         'timelock'
+%     >       .samples_field
+%     >         'trial'
+%     >       .samples_label
+%     >         'rpt'
 %
 %
 % See also: cosmo_meeg_chan_neighbors
@@ -161,7 +224,7 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 
     origin=struct();
     origin.(attr_name)=ds.(attr_name);
-    origin.a.(dim_name)=ds.a.(dim_name);
+    origin.a=ds.a;
     nbrhood.origin=origin;
 
 
