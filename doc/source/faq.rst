@@ -104,14 +104,28 @@ Frequently Asked/Anticipated Questions
 ===================
 Technical questions
 ===================
-**What is the correspondence between voxel indices in AFNI and feature indices in CoSMoMVPA?**
+
+**How do I ...**
+
+.. contents::
+    :local:
+    :depth: 1
+
+Find the correspondence between voxel indices in AFNI and feature indices in CoSMoMVPA
+--------------------------------------------------------------------------------------
+
+
     In the AFNI GUI, you can view voxel indices by right-clicking on the coordinate field in the very right-top corner. Note that:
 
         - ds.fa.i, ds.fa.j, and ds.fa.k are base-1 whereas AFNI uses base-0. So, to convert AFNI's ijk-indices to CoSMoMVPA's, add 1 to AFNI's coordinates.
         - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
 
 
-**I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?**
+Get eCog data ina CoSMoMVPA struct
+----------------------------------
+
+
+        I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?
 
     Let's assume there is data with those characteristics; here we generate synthetic data for illustration. This data has 7 time points, 3 channels, and 10 trials:
 
@@ -150,6 +164,104 @@ Technical questions
 
     When the data is in this form, one can analyse how well information :ref:`generalizes over time <demo_meeg_timeseries_generalization>` .
 
+Run group analysis
+------------------
 
 
-.. include:: links.txt
+        'I ran an fMRI searchlight analysis using :ref:`cosmo_searchlight` with :ref:`cosmo_spherical_neighborhood` and got a result map for a single participant. Now I want to repeat this for my other participants, and then do a group analysis. It is my understanding that I should use :ref:`cosmo_montecarlo_cluster_stat`, but the documentation refers to :ref:`cosmo_cluster_neighborhood`.'
+
+    Indeed :ref:`cosmo_cluster_neighborhood` should be used with :ref:`cosmo_montecarlo_cluster_stat`, because that neighborhood function returns a neighborhood structure indicating which features (voxels) are next to each other. This is different from, say, a spherical neighborhood with a radius of 3 voxels.
+
+        (Technically :ref:`cosmo_cluster_neighborhood`, when applied on a typical fMRI dataset (that is, without other feature dimensions), returns by default a neighborhood that is equivalent to a spherical neighborhood with a radius between ``sqrt(3)`` and ``2``, meaning that under the assumption of isotropocy, voxels are neighbors if they share at least a vertex (corner).
+
+        Also, :ref:`cosmo_cluster_neighborhood` works on other types of datasets, including surface-based fMRI, timelocked MEEG, and time-frequency MEEG.)
+
+    First of all, it is important that subjects are in the same common space, such as MNI or Talairach.
+    If you run the searchlight for each subject along the following lines:
+
+        .. code-block:: matlab
+
+            result_cell=cell(nsubj,1);
+            for subj=1:nsubj
+                % searchlight code for this subject
+                % (your code here)
+                result=searchlight(...);
+
+                % here we assume a single output (sample) for each
+                % searchlight. For statistical analysis later, where
+                % we want to do a one-sample t-test, we set
+                % .sa.targets to 1 (any constant value will do) and
+                % .sa.chunks to the subject number.
+                % nsamples=size(result.samples,1);
+                %
+                % Notes:
+                % - these values can also be set after the analysis is run,
+                %   although that may be more error-prone
+                % - for other statistical tests, such as one-way ANOVA,
+                %   repeated-measures ANOVA, paired-sample t-test and
+                %   two-sample t-tests, chunks and targets have to be
+                %   set differently. See the documentation of
+                %   cosmo_montecarlo_cluster_stat for details.
+
+                result.sa.targets=1;
+                result.sa.chunks=subj;
+                result_cell{subj}=result;
+            end
+
+    then data can be joined using
+
+        .. code-block:: matlab
+
+            result=cosmo_stack(result_cell);
+
+    (If this gives an error because feature attributes do not match: this can be due to using different brain masks across participants. To use a common mask, either use :ref:`cosmo_fmri_dataset` with a common mask to load the data before running the searchlight, or apply a common mask afterwards, as in
+
+        .. code-block:: matlab
+
+            % If data from different subjects was based on different masks,
+            % they can be masked afterwards using a common mask.
+            %
+            % It is strongly recommended to use a the common mask that
+            % is an intersection mask, with non-zero values only for features
+            % (voxels) that have data for all participants. Otherwise
+            % this could lead to either loss of power, or (in the case
+            % of the 'h0_mean' parameter set to a non-zero value in
+            % cosmo_montecarlo_cluster_stat), incorrect results with
+            % artifacts
+
+
+            % for the common mask use either a filename, or a dataset with
+            % a single sample
+            common_mask='my_common_mask.nii';
+
+            for k=1:nsubj
+                % apply common mask for each subject
+                result_cell{k}=cosmo_fmri_dataset(result_cell{k},...
+                                        'mask',common_mask);
+            end
+
+    Assuming that ``result`` was constructed as above, a group analysis using Threshold-Free Cluster Enhancement and using 1000 permutations can now by done quite easily. For a one-sample t-test (one sample per participant, it is however required to specify the mean under the null hypothesis. When the :ref:`cosmo_correlation_measure` or :ref:`cosmo_target_dsm_corr_measure` is used, this is typically zero, whereas for :ref:`cosmo_crossvalidation_measure`, this is typically 1 divided by the number of classes (e.g. ``0.25`` for 4-class discrimination).
+
+        .. code-block:: matlab
+
+            % one-sample t-test against 0
+            % (for representational similarity analysis)
+            h0_mean=0;
+
+            % number of null iterations.
+            % values of at least 10,000 are recommended for publication-quality
+            niter=1000;
+
+            %
+            % Set neighborhood for clustering
+            cluster_nbrhood=cosmo_cluster_neighborhood(result);
+
+            stat_map=cosmo_montecarlo_cluster_stat(result, cluster_nbrhood,...
+                                                    'niter', niter,...
+                                                    'h0_mean', h0_mean);
+
+
+
+
+
+    .. include:: links.txt
