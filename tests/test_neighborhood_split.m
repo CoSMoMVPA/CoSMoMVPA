@@ -21,9 +21,8 @@ function test_neighborhood_split_basics()
         n_sp=numel(nh_sp);
         assertEqual(n_sp,numel(masks));
 
-        assert(n_sp<=divisions^3);
-        disp(n_sp)
-        disp(divisions)
+        assert(n_sp<=(divisions+1)^3);
+
         assert(n_sp>=(divisions-1)^3);
 
         % space for neighborhood matrix consisting of the different splits

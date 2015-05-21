@@ -163,7 +163,7 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
     % all other (div-1) elements:   step                elements
 
     step=ceil((extent+1-max_size)/opt.divisions);
-    assert(step>=1);
+    assert(all(step>=1));
 
     % for each element in nh.neighbors, assign it to a block
     % indexed by ndim integers (where ndim is the number of dimensions)
