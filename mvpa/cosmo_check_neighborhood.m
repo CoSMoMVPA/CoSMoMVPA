@@ -63,7 +63,7 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
         msg=checker(nbrhood, ds);
         if ~isempty(msg)
             if raise
-                error(msg);
+                error([func2str(checker) ': ' msg]);
             end
             return
         end
@@ -217,8 +217,9 @@ function msg=check_origin_matches(nbrhood, ds)
             if ~cosmo_isfield(origin,[attr_name '.' key]) || ...
                     ~isequal(ds.(attr_name).(key),...
                             origin.(attr_name).(key))
-                error(['.%sa.%s mismatch between dataset and '...
+                msg=sprintf(['.%sa.%s mismatch between dataset and '...
                         'neighborhood'],infix,key);
+                return
             end
         end
     end
