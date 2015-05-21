@@ -169,6 +169,14 @@ function test_fmri_io_mask
     res=cosmo_fmri_dataset(ds,'mask','');
     assertEqual(res,ds);
 
+    msk=ds;
+    msk.samples=logical([0 1 1 0 1 0]);
+    msk=rmfield(msk,'sa');
+
+    ds=cosmo_fmri_dataset(msk,'mask',msk);
+    ds_expected=cosmo_slice(msk,msk.samples,2);
+    assertEqual(ds,ds_expected);
+
 
 function test_fmri_io_spm()
     cleaner=onCleanup(@()register_or_delete_all_files());

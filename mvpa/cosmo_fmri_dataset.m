@@ -295,7 +295,9 @@ function ds_all=convert_to_dataset(fn, params)
         ds_hdr=ds_hdr_full;
 
         % get sample attributes for these volumes from the header
-        ds_hdr.sa=cosmo_slice(ds_hdr.sa, volumes,1,'struct');
+        if isfield(ds_hdr,'sa')
+            ds_hdr.sa=cosmo_slice(ds_hdr.sa, volumes,1,'struct');
+        end
 
         % update from header
         ds=cosmo_structjoin(ds_hdr, ds);
