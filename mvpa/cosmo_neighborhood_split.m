@@ -138,80 +138,95 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %
 % NNO May 2015
 
-defaults=struct();
-defaults.divisions=4;
+    defaults=struct();
+    defaults.divisions=4;
 
-opt=cosmo_structjoin(defaults,varargin);
-validate_input(nh, opt);
+    opt=cosmo_structjoin(defaults,varargin);
+    validate_input(nh, opt);
 
-% see how big each block is along each dimension
-[first,last,nfeatures]=get_dim_range(nh);
+    % see how big each block is along each dimension
+    [first,last,nfeatures]=get_dim_range(nh);
 
-max_last=max(last,[],2);
-max_step=max(last-first,[],2);
-step=ceil((max_last - max_step + 1)./ (opt.divisions-1));
+    min_first=min(first,[],2);
+    max_last=max(last,[],2);
+    max_size=max(last-first,[],2)+1;
+    extent=max_last-min_first+1;
 
-% for each element in nh.neighbors, assign it to a block
-% indexed by ndim integers (where ndim is the number of dimensions)
-dim_pos=floor(bsxfun(@rdivide,first-1,step))+1;
+    % Examples of how max_size, step and extent are related:
+    % max_size=1, step=5, extent=25, 5 div: 1-5, 6-10, 11-15, 16-20, 21-25
+    % max_size=1, step=4, extent=20, 5 div: 1-4,  5-8,  9-12, 13-16, 17-20
+    % max_size=2, step=5, extent=26, 5 div: 1-6, 6-11, 11-16, 16-21, 21-26
+    % max_size=2, step=4, extent=21, 5 div: 1-5,  5-9,  9-13, 13-17, 17-21
+    % max_size=3, step=4, extent=22, 5 div: 1-6, 5-10,  9-14, 13-18, 17-22
 
-% get the indices for each block.
-% idxs{k}=[a_k1, ..., a_kN] means that nh.neighbors{a_k1}, ...,
-% nh.neighbors{a_kN} all refer to neighboring features
-%
-[idxs,unq]=cosmo_index_unique(dim_pos');
+    % first element:                step+max_size-1     elements
+    % all other (div-1) elements:   step                elements
 
-nsplit=size(unq,1);
+    step=ceil((extent+1-max_size)/opt.divisions);
+    assert(step>=1);
 
-nh_split=cell(nsplit,1);
-masks=cell(nsplit,1);
+    % for each element in nh.neighbors, assign it to a block
+    % indexed by ndim integers (where ndim is the number of dimensions)
+    dim_pos=floor(bsxfun(@rdivide,first-1,step))+1;
 
-keep_split_mask=false(nsplit,1);
+    % get the indices for each block.
+    % idxs{k}=[a_k1, ..., a_kN] means that nh.neighbors{a_k1}, ...,
+    % nh.neighbors{a_kN} all refer to neighboring features
+    %
+    [idxs,unq]=cosmo_index_unique(dim_pos');
 
-for split_id=1:nsplit
-    msk=false(1,nfeatures);
-    idx=idxs{split_id};
-    n_nbrs=numel(idx);
-    for j=1:n_nbrs
-        nb=nh.neighbors{idx(j)};
-        msk(1,nb)=true;
+    nsplit=size(unq,1);
+
+    nh_split=cell(nsplit,1);
+    masks=cell(nsplit,1);
+
+    keep_split_mask=false(nsplit,1);
+
+    for split_id=1:nsplit
+        msk=false(1,nfeatures);
+        idx=idxs{split_id};
+        n_nbrs=numel(idx);
+        for j=1:n_nbrs
+            nb=nh.neighbors{idx(j)};
+            msk(1,nb)=true;
+        end
+
+        if ~any(msk)
+            % skip empty neighbors
+            continue;
+        end
+
+        keep_split_mask(split_id)=true;
+
+
+        m_k=struct();
+        m_k.samples=msk;
+        m_k.a=nh.origin.a;
+        m_k.fa=nh.origin.fa;
+
+        nh_k=struct();
+        nh_k.origin.a=m_k.a;
+        nh_k.origin.fa=cosmo_slice(m_k.fa,msk,2,'struct');
+        nh_k.a=nh.a;
+        nh_k.fa=cosmo_slice(nh.fa, idx, 2, 'struct');
+
+        all2some=zeros(1,nfeatures);
+        all2some(msk)=1:sum(msk);
+        neighbors=cell(n_nbrs,1);
+        for j=1:n_nbrs
+            some=all2some(nh.neighbors{idx(j)});
+            assert(all(some~=0));
+            neighbors{j}=some;
+        end
+        nh_k.neighbors=neighbors;
+
+        nh_split{split_id}=nh_k;
+        masks{split_id}=m_k;
     end
 
-    if ~any(msk)
-        % skip empty neighbors
-        continue;
-    end
-
-    keep_split_mask(split_id)=true;
-
-
-    m_k=struct();
-    m_k.samples=msk;
-    m_k.a=nh.origin.a;
-    m_k.fa=nh.origin.fa;
-
-    nh_k=struct();
-    nh_k.origin.a=m_k.a;
-    nh_k.origin.fa=cosmo_slice(m_k.fa,msk,2,'struct');
-    nh_k.a=nh.a;
-    nh_k.fa=cosmo_slice(nh.fa, idx, 2, 'struct');
-
-    all2some=zeros(1,nfeatures);
-    all2some(msk)=1:sum(msk);
-    neighbors=cell(n_nbrs,1);
-    for j=1:n_nbrs
-        some=all2some(nh.neighbors{idx(j)});
-        assert(all(some~=0));
-        neighbors{j}=some;
-    end
-    nh_k.neighbors=neighbors;
-
-    nh_split{split_id}=nh_k;
-    masks{split_id}=m_k;
-end
-
-nh_split=nh_split(keep_split_mask);
-masks=masks(keep_split_mask);
+    % only keep non-empty masks
+    nh_split=nh_split(keep_split_mask);
+    masks=masks(keep_split_mask);
 
 
 function [first,last,nfeatures]=get_dim_range(nh)
