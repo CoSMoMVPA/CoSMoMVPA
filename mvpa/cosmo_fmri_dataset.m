@@ -107,7 +107,7 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 % -  for Brainvoyager files (.vmp, .vtc, .msk, .glm), it requires the
 %    NeuroElf toolbox, available from: http://neuroelf.net
 % -  for AFNI files (+{orig,tlrc}.{HEAD,BRIK[.gz]}) it requires the AFNI
-%    Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%    Matlab toolbox, available from: https://github.com/afni/AFNI
 %
 % Examples:
 %     % load nifti file

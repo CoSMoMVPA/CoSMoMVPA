@@ -47,7 +47,7 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %   - for Brainvoyager files (.smp), it requires the NeuroElf
 %     toolbox, available from: http://neuroelf.net
 %   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
-%     Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%     Matlab toolbox, available from: https://github.com/afni/AFNI
 %
 % See also: cosmo_surface_dataset
 %
