@@ -13,13 +13,6 @@ function test_niml_dset_dataset_io()
 
     formats={'ascii','binary','binary.lsbfirst','binary.msbfirst'};
 
-    if isempty(which('afni_swapbytes'))
-        formats=formats(1);
-        cosmo_warning(['Temporarily disabling test for binary NIML '...
-                            'until this is incorporated in the AFNI '...
-                            'Matlab library']);
-    end
-
     n_formats=numel(formats);
 
     for k=1:n_formats
