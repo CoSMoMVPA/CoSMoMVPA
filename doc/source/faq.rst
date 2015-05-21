@@ -121,11 +121,11 @@ Find the correspondence between voxel indices in AFNI and feature indices in CoS
         - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
 
 
-Get eCog data ina CoSMoMVPA struct
+Get ECoG data in a CoSMoMVPA struct
 ----------------------------------
 
 
-        I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?
+        'I have eCog data in a 3D array (``channels x time x trials``). How can I get this in a CoSMoMVPA struct?'
 
     Let's assume there is data with those characteristics; here we generate synthetic data for illustration. This data has 7 time points, 3 channels, and 10 trials:
 
