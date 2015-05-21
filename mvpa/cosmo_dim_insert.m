@@ -47,6 +47,7 @@ function ds=cosmo_dim_insert(ds,dim,index,labels,values,attr,varargin)
 
 
     defaults.matrix_labels=cell(0);
+    defaults.check_dataset=true;
     opt=cosmo_structjoin(defaults,varargin{:});
 
     prefixes='sf';
@@ -73,7 +74,9 @@ function ds=cosmo_dim_insert(ds,dim,index,labels,values,attr,varargin)
         ds.(attr_name).(label)=attr_values{j};
     end
 
-    cosmo_check_dataset(ds);
+    if opt.check_dataset
+        cosmo_check_dataset(ds);
+    end
 
 function ds=ensure_has_xa_xdim(ds,dim,attr_name,dim_name)
     if ~cosmo_isfield(ds,attr_name)
