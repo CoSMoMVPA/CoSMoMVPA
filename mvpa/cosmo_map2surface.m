@@ -7,6 +7,9 @@ function s=cosmo_map2surface(ds, fn, varargin)
 % In Usage 1, {FMT} can be one of 'niml_dset', 'bv_smp', or 'gii'
 % In Usage 2, fn should end with '.niml.dset' or '.smp', or '.gii'
 %
+% Optionally the third argument can be 'format':
+% - for NIML, this can be 'binary' or 'ascii' (default: 'binary')
+%
 % Examples:
 %     ds=cosmo_synthetic_dataset('type','surface');
 %     %
