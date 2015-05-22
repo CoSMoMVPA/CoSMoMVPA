@@ -214,7 +214,11 @@ Notes on committing
     + ``TST``: Change in test functions (functions in ``tests/``, or documentation tests).
     + ``WEB``: Changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
 
-    Using these tags allows others to quickly see what *kind of* changes were made, and to generate summary reports on the kind of changes automatically.
+    Using these tags:
+
+    + allows others to quickly see what *kind of* changes were made
+    + the web page build system to generate summary reports on the kind of changes automatically.
+    + generate statistics on types of changes over type.
 
     Please describe what changes you made. The tags don't have to name which files were changed, as git_ takes care of that.
 
@@ -226,7 +230,7 @@ Notes on committing
     + ``git commit -m 'RF: build a lookup table mapping all voxels to those in the dataset``
     + ``git commit -m 'BF+TST: throw an error if partitions are not balanced; added unit test'``
     + ``git commit -m 'DOC+SML: fixed a typo'``
-    + ``git commit -m BF+ACK: show error message when negative radius is provided. Thanks to #John Doe# and #Jane Doe# for bringing up this use case``.
+    + ``git commit -m 'BF+ACK: show error message when negative radius is provided. Thanks to #John Doe# and #Jane Doe# for bringing up this use case``.
 
 
 .. _`build_system`:
@@ -400,16 +404,18 @@ Use underscores (``_``) to separate words.
 
         my_var=0;
 
-Throw an error early
-++++++++++++++++++++
+Throw an (informative) error early
+++++++++++++++++++++++++++++++++++
 
-Throw an error as soon as something seems out of order. When doing so, provide informative error messages.
+Throw an error as soon as something seems out of order. When doing so, try to provide an informative error message.
 
     **bad:**
 
     .. code-block:: matlab
 
         error('What do you mean?');
+
+    This is bad because the user has no idea why an error was thrown.
 
     .. code-block:: matlab
 
@@ -422,12 +428,31 @@ Throw an error as soon as something seems out of order. When doing so, provide i
             samples=randn(ntemplate);
         end
 
+    This is very bad because instead of reporting that data was of incorrect
+    shape, the code generates new (random) data, which the user most likely neither expects or desires.
+
     **good:**
 
     .. code-block:: matlab
 
         error('targets have size %d x %d, expected %d % d', ...
                      target_size, expected_target_size);
+
+    .. code-block:: matlab
+
+        if strcmp(caught_exception.identifier,...
+                            'stats:svmtrain:NoConvergence');
+            error(['SVM training did not converge. Your options are:\n'...
+                   ' 1) increase ''boxconstraint''\n'...
+                   ' 2) increase ''tolkkt''\n'...
+                   ' 3) set ''kktviolationlevel'' to a positive value\n'...
+                   ' 4) use a different classifier\n'...
+                   'If you do not have a strong preference for '...
+                   'either option, you are advised to try option (4) '...
+                   'using cosmo_classify_lda'],'');
+        else
+            rethrow(caught_exception);
+        end
 
 Do not repeat yourself
 ++++++++++++++++++++++
@@ -900,12 +925,19 @@ CoSMoMPVA-specific guidelines
     .. include:: matlab/cosmo_strsplit_hdr.txt
 
 
-Unit tests
+Test suite
 ^^^^^^^^^^
-Unit tests are aimed at maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. To run them, use either
+CoSMoMVPA_ uses a test suite, which can automatically test most of the code. This helps in maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (such as bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. To run them, either:
 
     - run :ref:`cosmo_run_tests`: when using xUnit_. Only supported on the Matlab platform.
     - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet, because Octave does not support ``eval`` (as of May 2015).
+
+Currently we use `travis-ci`_ for continuous integration testing. If you have a github_ account and a CoSMoMVPA_ fork, you can also use it to test new branches. To do so:
+
+    - Make an account on `travis-ci`.
+    - Link it to your github_ account.
+    - Now, after every 'push' to github, the test suite is run automatically using ``moxunit_run_testa`` on Octave.
+    - If any tests fails, or passes if it failed before, you will be notified by email.
 
 For existing or new features, more tests are very much welcomed.
 
