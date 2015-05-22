@@ -727,10 +727,10 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
          - The function name ``init_my_toolbox`` does something one would not expect based on its name, namely it resets the Matlab path.
          - Functions that were accessible before are not longer in the Matlab path. In particular, any other external toolboxes or code not part of the Matlab installation becomes unavailable.
 
-    It is acceptible to add something to the Matlab path, if the function name clearly indicates that it does so:
+    It is acceptable to add something to the Matlab path, if the function name clearly indicates that it does so:
 
 
-    **acceptible:**
+    **acceptable:**
 
      .. code-block:: matlab
 
@@ -763,7 +763,7 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
         - the user may have set the warning state themselves to ``off``; this is undone after calling this funciton
         - the current working directory and the path are not restored when execution is interrupted because of an error or a user interrupt (``ctrl+C``).
 
-    **acceptible:**
+    **acceptable:**
 
     .. code-block:: matlab
 
