@@ -42,7 +42,8 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %      .samples    Scalar correlation value between the pair-wise
 %                  distances of the samples in ds and target_dsm; or
 %                  (when 'model_dsms' is supplied) a vector with
-%                  normalized beta coefficients
+%                  normalized beta coefficients. These correlations
+%                  are untransformed (e.g. there is no Fisher transform)
 %      .sa         Struct with field:
 %        .labels   {'rho'}; or (when 'model_dsms' is supplied) a cell
 %                  {'beta1','beta2',...}.
@@ -83,7 +84,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     >   .type
 %     >     { 'Pearson' }
 %
-% Notes
+% Notes:
+%   - for group analysis, correlations can be fisher-transformed
+%     through:
+%       dcm_ds.samples=atanh(dcm_ds.samples)
 %
 % ACC August 2013, NNO Jan 2015
 
