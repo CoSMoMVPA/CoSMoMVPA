@@ -10,6 +10,10 @@ function test_fmri_cluster_neighborhood
     rp=randperm(numel(imsk));
     ds=cosmo_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
 
+    cosmo_disp(rp,'threshold',inf);
+    cosmo_disp([imsk(rp) imsk(rp(end:-1:1))],'threshold',inf);
+    cosmo_disp(ds,'threshold',inf);
+
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
     nh_sph=cosmo_spherical_neighborhood(ds,'progress',false,...
@@ -40,6 +44,14 @@ function test_fmri_cluster_neighborhood
         msk3=delta<2.5;
         assertEqual(sort(nh3.neighbors{feature_id}),find(msk3));
     end
+
+function test_tiny_fmri_neighborhood
+    ds=cosmo_synthetic_dataset('type','fmri','size','normal');
+    ds=cosmo_slice(ds,[22 22],2);
+
+    % should pass
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+
 
 
 function test_meeg_cluster_neighborhood

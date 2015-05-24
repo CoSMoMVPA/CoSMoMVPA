@@ -207,7 +207,7 @@ function ds2nbrhood=get_dataset2neighborhood_mapping(ds, nbrhood)
     n=prod(dim_sizes);
 
     % mapping from all features to those in nbrhood
-    full2nbrhood=zeros(1,n);
+    full2nbrhood=zeros(n,1);
     full2nbrhood(nbrhood_lin)=1:numel(nbrhood_lin);
 
     % ensure that nbrhood has no features not in ds
