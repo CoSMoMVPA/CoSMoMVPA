@@ -100,7 +100,8 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
     % if input was a struct, output is a cell with structs
     if as_struct();
         p=cell2structs(p, fns);
-    elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
+    elseif convert_to_numeric && ~isempty(p) && ...
+                        all(cellfun(@isnumeric,p(:)))
         % all values are numeric; convert to numeric matrix
         p=reshape([p{:}],size(p));
     end
