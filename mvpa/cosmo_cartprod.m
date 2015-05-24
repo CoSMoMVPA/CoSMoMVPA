@@ -79,69 +79,75 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %
 % NNO Oct 2013
 
-if nargin<2, convert_to_numeric=true; end
+    if nargin<2, convert_to_numeric=true; end
 
-as_struct=isstruct(xs);
+    as_struct=isstruct(xs);
 
-if as_struct
-    % input is a struct; put the values in each field in a cell.
-    [xs,fns]=struct2cell(xs);
-elseif ~iscell(xs)
-    error('Unsupported input: expected a cell or struct');
-end
-
-if isempty(xs)
-    p=cell(1,0);
-    return
-end
-
-ndim=numel(xs);
-
-% get values in first dimension (the 'head')
-xhead=xs{1};
-if isnumeric(xhead) || islogical(xhead)
-    % put numeric arrays in a cell
-    xhead=num2cell(xhead);
-elseif ischar(xhead)
-    xhead={xhead};
-end
-
-% ensure head is a column vector
-xhead=xhead(:);
-
-if ndim==1
-    p=xhead;
-else
-    % use recursion to find cartprod of remaining dimensions (the 'tail')
-    me=str2func(mfilename()); % make imune to renaming of this function
-    xtail=xs(2:end);
-    ptail=me(xtail, false); % ensure output is always a cell
-
-    % get sizes of head and tail
-    nhead=numel(xhead);
-    ntail=size(ptail,1);
-
-    % allocate space for output
-    rows=cell(ntail,1);
-    for k=1:ntail
-        % merge head and tail
-        % ptailk_rep is a repeated version of the k-th tail row
-        % to match the number of rows in head
-        ptailk_rep=repmat(ptail(k,:),nhead,1);
-        rows{k}=cat(2,xhead,ptailk_rep);
+    if as_struct
+        % input is a struct; put the values in each field in a cell.
+        [xs,fns]=struct2cell(xs);
+    elseif ~iscell(xs)
+        error('Unsupported input: expected a cell or struct');
     end
 
-    % stack the rows vertically
-    p=cat(1,rows{:});
-end
+    if isempty(xs)
+        p=cell(1,0);
+        return
+    end
 
-% if input was a struct, output is a cell with structs
-if as_struct();
-    p=cell2structs(p, fns);
-elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
-    % all values are numeric; convert to numeric matrix
-    p=reshape([p{:}],size(p));
-end
+    p=cartprod(xs);
+
+    % if input was a struct, output is a cell with structs
+    if as_struct();
+        p=cell2structs(p, fns);
+    elseif convert_to_numeric && ~isempty(p) && all(cellfun(@isnumeric,p(:)))
+        % all values are numeric; convert to numeric matrix
+        p=reshape([p{:}],size(p));
+    end
+
+function p=cartprod(xs)
+
+    ndim=numel(xs);
+
+    % get values in first dimension (the 'head')
+    xhead=xs{1};
+    if isnumeric(xhead) || islogical(xhead)
+        % put numeric arrays in a cell
+        xhead=num2cell(xhead);
+    elseif ischar(xhead)
+        xhead={xhead};
+    end
+
+    % ensure head is a column vector
+    xhead=xhead(:);
+
+    if ndim==1
+        p=xhead;
+    else
+        % use recursion to find cartprod of remaining dimensions
+        % (the 'tail')
+        xtail=xs(2:end);
+        ptail=cartprod(xtail); % ensure output is always a cell
+
+        % get sizes of head and tail
+        nhead=numel(xhead);
+        ntail=size(ptail,1);
+
+        % allocate space for output
+        rows=cell(ntail,1);
+        for k=1:ntail
+            % merge head and tail
+            % ptailk_rep is a repeated version of the k-th tail row
+            % to match the number of rows in head
+            ptailk_rep=repmat(ptail(k,:),nhead,1);
+            rows{k}=cat(2,xhead,ptailk_rep);
+        end
+
+        % stack the rows vertically
+        p=cat(1,rows{:});
+    end
+
+
 
 function [c,fns]=struct2cell(xs)
     fns=fieldnames(xs);
