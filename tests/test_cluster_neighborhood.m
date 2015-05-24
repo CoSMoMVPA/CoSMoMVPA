@@ -10,10 +10,6 @@ function test_fmri_cluster_neighborhood
     rp=randperm(numel(imsk));
     ds=cosmo_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
 
-    cosmo_disp(rp,'threshold',inf);
-    cosmo_disp([imsk(rp) imsk(rp(end:-1:1))],'threshold',inf);
-    cosmo_disp(ds,'threshold',inf);
-
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
     nh_sph=cosmo_spherical_neighborhood(ds,'progress',false,...
