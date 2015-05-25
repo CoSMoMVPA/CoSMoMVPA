@@ -24,7 +24,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %                       (such as provided by cosmo_dim_transpose).
 %   K,V                 any other key-value pairs necessary for the measure
 %                       m, for example 'classifier' if
-%                       m=@cosmo_crossvalidation_measure
+%                       m=@cosmo_crossvalidation_measure.
 %
 % Output:
 %    result             dataset with ['train_' d] and ['test_' d] as sample
