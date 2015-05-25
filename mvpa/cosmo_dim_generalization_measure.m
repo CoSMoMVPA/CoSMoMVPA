@@ -39,9 +39,9 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %
 %     sz='big';
 %     train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
-%                                                            'nchunks',2);
+%                                              'nchunks',2,'seed',1);
 %     test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
-%                                                            'nchunks',3);
+%                                              'nchunks',3,'seed',2);
 %     % set chunks
 %     train_ds.sa.chunks(:)=1;
 %     test_ds.sa.chunks(:)=2;
@@ -81,7 +81,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     %
 %     % Searchlight example
 %     %
-%     % only to make this example run fast, most channels are elimanated
+%     % only to make this example run fast, most channels are eliminated
 %     % (there is no other reason to do this step)
 %     ds_time=cosmo_dim_slice(ds_time,ds_time.fa.chan<=20,2);
 %     %

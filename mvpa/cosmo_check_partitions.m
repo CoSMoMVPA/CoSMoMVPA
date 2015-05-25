@@ -81,7 +81,7 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     check_double_dipping=true;
 
     % check dataset
-    cosmo_check_dataset(ds);
+    check_dataset(ds);
 
     % ensure it has targets and chunks
     targets=ds.sa.targets;
@@ -170,3 +170,21 @@ function check_range(idxs,nsamples,partition,label)
     if ~isempty(msg)
         error('partition %d: .%s_indices are %s',partition,label,msg);
     end
+
+function check_dataset(ds)
+    persistent cached_sa;
+    if isstruct(ds) && isfield(ds,'sa')
+        if ~isequal(ds.sa,cached_sa)
+            cosmo_check_dataset(ds);
+            cached_sa=ds.sa;
+        end
+        return
+    end
+
+    error('illegal dataset input');
+
+
+
+
+
+

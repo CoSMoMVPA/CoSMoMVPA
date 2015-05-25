@@ -63,7 +63,7 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     >   [ 2         3         5         6 ]                     }
 %
 %     % get neighbors in time-lock MEEG dataset from the neuromag306
-%     % system (subset of channels), with combined planar and 
+%     % system (subset of channels), with combined planar and
 %     % axial channels
 %     ds_meg=cosmo_synthetic_dataset('type','meeg',...
 %                          'size','normal',...

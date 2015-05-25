@@ -118,6 +118,15 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
 
 
 function [sizes,seed]=process_input(varargin)
+    persistent cached_varargin;
+    persistent cached_sizes;
+    persistent cached_seed;
+    if isequal(varargin,cached_varargin)
+        sizes=cached_sizes;
+        seed=cached_seed;
+        return;
+    end
+
     n=numel(varargin);
 
     seed=0;
@@ -156,6 +165,10 @@ function [sizes,seed]=process_input(varargin)
     if isempty(sizes)
         sizes=1;
     end
+
+    cached_varargin=varargin;
+    cached_sizes=sizes;
+    cached_seed=seed;
 
 function ensure_positive_scalar(k,arg)
     ensure_positive_vector(k,arg);
