@@ -63,22 +63,22 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     >   [ 2         3         5         6 ]                     }
 %
 %     % get neighbors in time-lock MEEG dataset from the neuromag306
-%     % system, with combined planar and axial channels
+%     % system (subset of channels), with combined planar and 
+%     % axial channels
 %     ds_meg=cosmo_synthetic_dataset('type','meeg',...
-%                          'size','big',...
+%                          'size','normal',...
 %                          'sens','neuromag306_planar_combined+axial');
 %     nh_meg=cosmo_cluster_neighborhood(ds_meg,'progress',false);
 %     % neighbors are seperate for axial channels (odd features)
 %     % and planar_combined channels (even features)
 %     cosmo_disp(nh_meg.neighbors)
-%     > { [ 1         9        53  ...  309       359       363 ]@1x12
-%     >   [ 2        10        54  ...  310       360       364 ]@1x12
-%     >   [ 3        53        55  ...  359       361       363 ]@1x16
-%     >                                      :
-%     >   [ 1.07e+03 1.12e+03 1.16e+03 ... 1.37e+03 1.38e+03 1.43e+03 ]@1x12
-%     >   [ 1.07e+03 1.12e+03 1.12e+03 ... 1.38e+03 1.42e+03 1.43e+03 ]@1x18
-%     >   [ 1.07e+03 1.12e+03 1.12e+03 ... 1.38e+03 1.42e+03 1.43e+03 ]@1x18 }@1428x1
-%
+%     > { [ 1         3         4         6 ]
+%     >   [ 2         5 ]
+%     >   [ 1         3         4         6 ]
+%     >   [ 1         3         4         6 ]
+%     >   [ 2         5 ]
+%     >   [ 1         3         4         6 ] }
+%     %
 %     % get neighbors in EEG dataset, either with clustering over all
 %     % feature dimensions (channels x time x freq) or with all feature
 %     % dimensions except for channels (i.e., time x freq)
