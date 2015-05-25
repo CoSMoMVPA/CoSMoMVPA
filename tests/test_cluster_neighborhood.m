@@ -54,7 +54,7 @@ function test_meeg_cluster_neighborhood
     if cosmo_skip_test_if_no_external('fieldtrip')
         return
     end
-    ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+    ds=cosmo_synthetic_dataset('type','timefreq','size','normal');
     nf=size(ds.samples,2);
     imsk=find(rand(1,nf)>.4);
     rp=randperm(numel(imsk));
@@ -71,7 +71,7 @@ function test_meeg_cluster_neighborhood
 
     assertEqual(ds.a.fdim.values(1),chan_nbrhood.a.fdim.values(1));
 
-    ncombi=1; % test one out of 7 possibilities
+    ncombi=7; % all 7 possibilities
     test_range=ceil(rand(1,ncombi)*7);
     nfeatures_test=3;
 
