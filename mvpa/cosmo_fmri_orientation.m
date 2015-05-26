@@ -31,7 +31,7 @@ function [orient,cano_rot]=cosmo_fmri_orientation(ds)
 %     For example, 'LPI' (used in Talairach/MNI) means that
 %       * the first dimension goes from left to right
 %       * the second dimension goes from posterior to anterior
-%       * the second dimension goes from inferior to superior
+%       * the third dimension goes from inferior to superior
 %
 % NNO Dec 2014
 
