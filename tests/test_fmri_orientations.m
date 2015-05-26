@@ -15,7 +15,7 @@ function test_orientations()
     orients=get_orients();
     norient=numel(orients);
 
-    fmts={'.nii','.nii.gz','+orig.HEAD','+tlrc.HEAD'};
+    fmts={'nii','afni'};
     nfmt=numel(fmts);
 
     nperm=nfmt*norient;
@@ -35,9 +35,10 @@ function test_orientations()
         orient_idx=get_feature_index(ds,ijk);
         xyz=ds.a.vol.mat*ijk;
 
-        % verify equality with re-orirented dataset
+        % verify equality with re-oriented dataset
         ds_ro=cosmo_fmri_reorient(ds,orient);  % using CoSMoMVPA
         assertEqual(cosmo_fmri_orientation(ds_ro),orient);
+        assertEqual(cosmo_fmri_orientation(ds_ro.a.vol.mat),orient);
 
         ijk_ro=ds_ro.a.vol.mat\xyz;
         idx_ro=get_feature_index(ds_ro,ijk_ro);
@@ -49,7 +50,19 @@ function test_orientations()
         % verify that going back works fine
         ds2=cosmo_fmri_reorient(ds_ro,orig_orient);
         assertEqual(ds,ds2);
+
+        % check mapping to and from fmri dataset
+        img=cosmo_map2fmri(ds, ['-' fmt]);
+        ds3=cosmo_fmri_dataset(img);
+        assertEqual(ds.a,ds3.a);
     end
+
+function test_fmri_orientations_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_fmri_orientation(varargin{:}),'');
+    aet([1 2 3]);
+    aet({})
+    aet(zeros(4));
 
 function test_fmri_orientations_with_afni_binary()
     if cosmo_skip_test_if_no_external('afni_bin')
