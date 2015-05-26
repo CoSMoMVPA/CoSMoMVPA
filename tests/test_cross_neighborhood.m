@@ -6,19 +6,26 @@ function test_cross_neighborhood_basis()
     can_use_chan_nbrhood=cosmo_check_external('fieldtrip',false);
 
     ds_full=cosmo_synthetic_dataset('type','timefreq','size','big');
+    msk=cosmo_match(ds_full.fa.chan,@(x)x<20);
+    ds_full=cosmo_dim_slice(ds_full,msk,2);
 
     % make it sparse
     nfeatures=size(ds_full.samples,2);
     nkeep=round(nfeatures/4);
+    fdim_values=ds_full.a.fdim.values;
+    nchan=numel(fdim_values{1});
+    nfreq=numel(fdim_values{2});
+    ntime=numel(fdim_values{3});
+
     while true
         rp=randperm(nfeatures);
         ds=cosmo_dim_slice(ds_full,rp(1:nkeep),2);
         n=numel(ds.a.fdim.values{1});
         ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
 
-        if numel(unique(ds.fa.chan))==306 && ...
-                    numel(unique(ds.fa.freq))==7 && ...
-                    numel(unique(ds.fa.time))==5
+        if numel(unique(ds.fa.chan))==nchan && ...
+                    numel(unique(ds.fa.freq))==nfreq && ...
+                    numel(unique(ds.fa.time))==ntime
             break
         end
     end
