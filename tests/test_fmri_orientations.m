@@ -15,7 +15,7 @@ function test_orientations()
     orients=get_orients();
     norient=numel(orients);
 
-    fmts={'nii','afni'};
+    fmts={'nii'};
     nfmt=numel(fmts);
 
     nperm=nfmt*norient;
