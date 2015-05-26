@@ -37,6 +37,21 @@ function predicted=cosmo_classify_meta_feature_selection(samples_train, targets_
 %     > [ 0.28      0.52 ]
 %
 % NNO Aug 2013
+    [ntrain,nfeatures]=size(samples_train);
+    [ntrain__,one__]=size(targets_train);
+    nfeatures__=size(samples_test,2);
+
+    if ntrain~=ntrain__
+        error('sample count mismatch between samples and targets');
+    end
+
+    if nfeatures~=nfeatures__
+        error('feature count mismatch between train and test data');
+    end
+
+    if one__~=1
+        error('targets must be a column vector');e
+    end
 
     classifier=opt.child_classifier;
     feature_selector=opt.feature_selector;
