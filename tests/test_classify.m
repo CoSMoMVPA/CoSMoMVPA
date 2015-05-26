@@ -23,10 +23,9 @@ function test_classify_meta_feature_selection
     opt.feature_selector=@cosmo_anova_feature_selector;
     opt.feature_selection_ratio_to_keep=.6;
     handle=get_predictor(cfy,opt);
-    fprintf('%d ', handle());
     assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
                                     9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
-    assert_throws_illegal_input_exceptions(cfy)
+    assert_throws_illegal_input_exceptions(cfy,opt)
 
 function test_classify_nn
     cfy=@cosmo_classify_nn;
@@ -43,7 +42,7 @@ function test_classify_knn
     handle=get_predictor(cfy,opt);
     assert_predictions_equal(handle,[7 3 6 1 7 2 8 7 9 4 7 5 7 1 ...
                                     7 7 7 8 1 6 1 1 9 5 8 1 9]');
-    assert_throws_illegal_input_exceptions(@(x,y,z)cfy(x,y,z,opt));
+    assert_throws_illegal_input_exceptions(cfy,opt);
 
 function test_classify_matlabsvm
     cfy=@cosmo_classify_matlabsvm;
@@ -125,7 +124,12 @@ function test_classify_svm
     assert_predictions_equal(handle,pred);
     assert_throws_illegal_input_exceptions(cfy)
 
-function assert_throws_illegal_input_exceptions(cfy)
+function assert_throws_illegal_input_exceptions(cfy_base,opt)
+    if nargin<2
+        cfy=cfy_base;
+    else
+        cfy=@(x,y,z)cfy_base(x,y,z,opt);
+    end
     assertExceptionThrown(@()cfy([1 2],[1;2],[1 2]),'')
     assertExceptionThrown(@()cfy([1;2],[1 2],[1 2]),'')
     assertExceptionThrown(@()cfy([1 2],[1 2],[1 2]),'')
@@ -135,7 +139,11 @@ function assert_throws_illegal_input_exceptions(cfy)
     assertExceptionThrown(@()cfy([1 2; 3 4; 5 6],[1;1;1],[1 2 3]),'')
 
     % should pass
-    can_handle_single_class=~isequal(cfy,@cosmo_classify_matlabsvm_2class);
+    non_single_class_classifiers={@cosmo_classify_matlabsvm_2class,...
+                                  @cosmo_classify_meta_feature_selection};
+
+    can_handle_single_class=~any(cellfun(@(x)isequal(cfy_base,x),...
+                                    non_single_class_classifiers));
 
     if can_handle_single_class
         cfy([1 2; 3 4],[1;1],[1 2]);
