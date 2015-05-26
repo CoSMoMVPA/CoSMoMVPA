@@ -15,6 +15,19 @@ function test_classify_naive_bayes
                                     8 2 7 7 7 1 2 7 1 7 2 7 1 9 ]');
     assert_throws_illegal_input_exceptions(cfy)
 
+
+function test_classify_meta_feature_selection
+    cfy=@cosmo_classify_meta_feature_selection;
+    opt=struct();
+    opt.child_classifier=@cosmo_classify_lda;
+    opt.feature_selector=@cosmo_anova_feature_selector;
+    opt.feature_selection_ratio_to_keep=.6;
+    handle=get_predictor(cfy,opt);
+    fprintf('%d ', handle());
+    assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
+                                    9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
+    assert_throws_illegal_input_exceptions(cfy)
+
 function test_classify_nn
     cfy=@cosmo_classify_nn;
     handle=get_predictor(cfy);
