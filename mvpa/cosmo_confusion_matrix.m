@@ -74,7 +74,7 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %
 % NNO Aug 2013
 
-    [targets,predicted,is_ds]=get_data(ds,varargin{:});
+    [targets,predicted]=get_data(ds,varargin{:});
 
     % see which classes there are
     [class_indices,classes]=cosmo_index_unique(targets);
@@ -110,7 +110,7 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 
 
 
-function [targets,predicted,is_ds]=get_data(ds, predicted)
+function [targets,predicted]=get_data(ds, predicted)
     has_predicted=nargin>=2;
     is_ds=isstruct(ds);
     if is_ds
