@@ -4,7 +4,8 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 % ds_stacked=cosmo_stack(datasets[,dim,merge])
 %
 % Inputs
-%   datasets     Nx1 cell with input datasets
+%   datasets     cell with input datasets. Each input dataset must be a
+%                struct and have a field .samples
 %   dim          dimension over which data is stacked. This should be
 %                either 1 (stack .samples and .sa) or 2 (stack features
 %                and .fa).
@@ -15,19 +16,21 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %                - 'drop'            drop all elements
 %                - 'drop_nonunique'  elements differing are dropped
 %                - 'unique'          raise an exception if elements differ
-%                - I                 use data from datasets{I}
-%                The default is drop_nonunique
-%   check        Check for proper size of the input datasets. The default
-%                is true; setting this to false makes this function run
-%                faster but will give less informative error messages (if
-%                any). Use this option only if you are sure that the inputs
-%                have proper dimensions.
+%                - I                 integer; use data from datasets{I}
+%                The default is 'drop_nonunique'
+%   check        Boolean indicating whether to check for the proper size of
+%                the input datasets. The default is true; setting this to
+%                false makes this function run faster but, if the input
+%                dataset do not have proper sizes, will result in less
+%                informative error messages (if any). Use this option only
+%                if you are sure that the inputs have proper dimensions.
 %
 % Ouput:
 %   ds_stacked   Stacked dataset. If dim==1 [or dim==2] and the K-th
-%                dataset has size M_K x N_K, then it is required that all
-%                N_* [M_*] are the same, and the output has size
-%                sum(M_*) x N_1 [M_1 x sum(N_*)]. It is also required that
+%                dataset has .samples with size M_K x N_K, then it is
+%                required that all N_* [M_*] are the same, and the output
+%                has size sum(M_*) x N_1 [M_1 x sum(N_*)].
+%                It is also required that
 %                all input datasets have the same values across all
 %                the feature [sample] attributes.
 %
@@ -93,20 +96,20 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %     > error('value mismatch: .sa.targets')
 %
 % Note:
-%   this function is like the inverse of cosmo_split, in the sense that if
-%       ds_splits=cosmo_split(ds, split_by, dim),
-%   produces output (i.e., does not throw an error), then using
-%       ds_humpty_dumpty=cosmo_stack(ds_splits,dim)
-%   means that ds and ds_humpty_dumpty contain the same data, except that
-%   the order of the data (in the rows [or columns] of .samples, and values
-%   in .sa [.fa]) may be in different order if dim==1 [dim==2].
+%   - This function is like the inverse of cosmo_split, i.e. if
+%         ds_splits=cosmo_split(ds, split_by, dim),
+%     produces output (i.e., does not throw an error), then using
+%         ds_humpty_dumpty=cosmo_stack(ds_splits,dim)
+%     means that ds and ds_humpty_dumpty contain the same data, except that
+%     the order of the data (in the rows [or columns] of .samples, and
+%     values in .sa [.fa]) may be in different order if dim==1 [dim==2].
 %
 % See also: cosmo_split
 %
 % NNO Sep 2013
 
 
-    [dim, merge, check]=process_parameters(ds_cell, varargin{:});
+    [dim, merge_method, check]=process_parameters(ds_cell, varargin{:});
 
 
     n=numel(ds_cell);
@@ -147,7 +150,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
     to_merge_attr=get_struct_values(ds_cell, merge_key);
     if ~isempty(to_merge_attr)
-        ds_stacked.(merge_key)=merge_structs(to_merge_attr,merge,...
+        ds_stacked.(merge_key)=merge_structs(to_merge_attr,merge_method,...
                                     ['.' merge_key]);
     end
 
@@ -155,7 +158,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 
     to_merge_a=get_struct_values(ds_cell, 'a');
     if ~isempty(to_merge_a)
-        ds_stacked.a=merge_structs(to_merge_a,merge,'.a');
+        ds_stacked.a=merge_structs(to_merge_a,merge_method,'.a');
     end
 
 
@@ -224,19 +227,19 @@ function keys=get_struct_keys(struct_cell)
     end
 
 
-function s=merge_structs(vs, merge, where)
-    if strcmp(merge,'drop')
+function s=merge_structs(vs, merge_method, where)
+    if strcmp(merge_method,'drop')
         s=struct();
         return;
-    elseif isnumeric(merge)
-        if ~isscalar(merge) || merge<1 || ...
-                merge>numel(vs) || round(merge)~=merge
+    elseif isnumeric(merge_method)
+        if ~isscalar(merge_method) || merge_method<1 || ...
+                merge_method>numel(vs) || round(merge_method)~=merge_method
             error(['''merge'' parameter, when an integer, must be in'...
                         'the range 1:%d'],numel(vs));
         end
-        s=vs{merge};
+        s=vs{merge_method};
         return;
-    elseif ~cosmo_match({merge},{'drop_nonunique','unique'})
+    elseif ~cosmo_match({merge_method},{'drop_nonunique','unique'})
         error('illegal value for ''merge'' parameter');
     end
 
@@ -255,7 +258,7 @@ function s=merge_structs(vs, merge, where)
         [has_unique_elem, unique_elem]=get_single_unique_element(values);
 
         if ~has_unique_elem
-            switch merge
+            switch merge_method
                 case 'drop_nonunique'
                     % do not store values
                     continue;
@@ -265,7 +268,7 @@ function s=merge_structs(vs, merge, where)
                             where, key);
 
                 otherwise
-                    error('illegal value for merge: %s', merge);
+                    error('illegal value for merge: %s', merge_method);
             end
         end
 
