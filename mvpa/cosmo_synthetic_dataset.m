@@ -194,6 +194,9 @@ function ds=cosmo_synthetic_dataset(varargin)
     % for MEEG
     default.sens='neuromag306_all';
 
+    % for MEEG source
+    default.data_field='pow'; % 'pow' or 'mom'
+
     opt=cosmo_structjoin(default,varargin);
 
     [ds, nfeatures]=get_fdim_fa(opt);
@@ -297,11 +300,22 @@ function a=dim_labels_values(opt)
             values={1:4000};
 
         case 'source'
-            labels={'pos'};
             xyz=cosmo_cartprod({-70:10:70,-60:10:60,-110:10:110})';
             [unused,i]=sort(sum(abs(xyz),1));
-            values={xyz(:,i)};
-            a.meeg.samples_field='trial.pow';
+            switch opt.data_field
+                case 'pow'
+                    labels={'pos','time'};
+                    values={xyz(:,i),-1:.5:14};
+                    a.meeg.samples_field='trial.pow';
+
+                case 'mom'
+                    labels={'pos','mom','time'};
+                    values={xyz(:,i),{'x','y','z'},-1:.5:14};
+                    a.meeg.samples_field='trial.mom';
+                otherwise
+                    error('illegal data_field ''%s''', opt.data_field);
+            end
+
 
         otherwise
             error('Unsupported type ''%s''', data_type);
@@ -578,7 +592,7 @@ function labels=get_neuromag_chan(chan_type)
     labels=labels(:);
 
 
-function dim_size=get_dim_size(size_label)
+function dim_size=get_dim_size(size_label,opt)
     % get dimension size. NaN means use input size
     size2dim=struct();
     size2dim.tiny=[2 1 1];
@@ -594,6 +608,13 @@ function dim_size=get_dim_size(size_label)
 
     dim_size=size2dim.(size_label);
 
+    if strcmp(opt.type,'source')
+        dim_size(1)=4;
+        if strcmp(opt.data_field,'mom')
+            dim_size(2)=3;
+        end
+    end
+
 
 function [ds, nfeatures]=get_fdim_fa(opt)
     data_type=opt.type;
@@ -606,7 +627,7 @@ function [ds, nfeatures]=get_fdim_fa(opt)
     a=rmfield(a,'fdim');
 
     % get dimension values
-    dim_sizes=get_dim_size(size_label);
+    dim_sizes=get_dim_size(size_label,opt);
     nlabel=numel(labels);
     if nlabel==1
         % surface case
