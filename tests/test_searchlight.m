@@ -39,3 +39,37 @@ function test_searchlight_
     assertEqual(m.fa.j,[2 1]);
     assertEqual(m.fa.k,[1 5]);
 
+    sa=struct();
+    sa.time=(1:6)';
+    sdim=struct();
+    sdim.values={10:15};
+    sdim.labels={'time'};
+
+    nh4=cosmo_spherical_neighborhood(ds,'radius',0);
+    measure2=@(x,opt)cosmo_structjoin('samples',mean(x.samples,2),...
+                                       'sa',sa,...
+                                       'a',cosmo_structjoin('sdim',sdim));
+    m2=cosmo_searchlight(ds,nh4,measure2,'progress',false);
+    assertEqual(m2.sa,sa);
+    assertEqual(m2.a.sdim,sdim);
+    assertElementsAlmostEqual(m2.samples,ds.samples);
+
+
+
+function test_searchlight_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_searchlight(varargin{:},...
+                            'progress',0),'');
+    ds=cosmo_synthetic_dataset();
+    nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
+    measure=@(x,opt)cosmo_structjoin('samples',mean(x.samples,2));
+
+    aet(struct,nh,measure);
+    aet(ds,ds,measure);
+    aet(ds,measure,nh);
+
+    measure_bad=@(x,opt)cosmo_structjoin('samples',mean(x.samples,1));
+    aet(ds,nh,measure_bad);
+
+
+
