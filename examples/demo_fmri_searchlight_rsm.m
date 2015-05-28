@@ -125,6 +125,13 @@ cosmo_disp(measure_args);
 % run searchlight
 ds_rsm_binary=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
+% Note: when these results are used for group analysis across multiple
+% participants, it may be good to Fisher-transform the correlation values,
+% so that they are more normally distributed. This can be done by:
+%
+% ds_rsm_binary.samples=atanh(ds_rsm_binary.samples);
+
+
 % show results
 cosmo_plot_slices(ds_rsm_binary);
 
@@ -178,6 +185,12 @@ end
 % run searchlight
 ds_rsm_linear=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 
+% Note: when these results are used for group analysis across multiple
+% participants, it may be good to Fisher-transform the correlation values,
+% so that they are more normally distributed. This can be done by:
+%
+% ds_rsm_linear.samples=atanh(ds_rsm_linear.samples);
+
 % show results
 cosmo_plot_slices(ds_rsm_linear);
 
@@ -209,6 +222,12 @@ measure_args.target_dsm=target_dsm;
 
 % run searchlight
 ds_rsm_behav=cosmo_searchlight(ds,nbrhood,measure,measure_args);
+
+% Note: when these results are used for group analysis across multiple
+% participants, it may be good to Fisher-transform the correlation values,
+% so that they are more normally distributed. This can be done by:
+%
+% ds_rsm_behav.samples=atanh(ds_rsm_behav.samples);
 
 % show results
 cosmo_plot_slices(ds_rsm_behav);
