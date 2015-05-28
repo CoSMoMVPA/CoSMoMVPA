@@ -75,9 +75,6 @@ install:
       fi
 
     # optionally install gifti library
-    # TODO: update URL to refer to original website:
-    #   http://www.artefact.tk/software/matlab/gifti/
-    # when updated to version 1.5
     - if [[ "$EXTERNALS" = *"gifti"* ]]; then
           GIFTI_VERSION=1.5;
           GIFTI_NAME=gifti-${GIFTI_VERSION};
