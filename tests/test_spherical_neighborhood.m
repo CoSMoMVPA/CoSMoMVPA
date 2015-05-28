@@ -212,14 +212,16 @@ function test_meeg_source_dataset
     mp=cosmo_align(ds_unq.fa.pos',nh.fa.pos');
     ds_al=cosmo_slice(ds_unq,mp,2);
     assertEqual(nh.fa.pos,ds_al.fa.pos);
-    assertEqual(nh.a,ds.a);
+    assertEqual(nh.a.fdim.labels{1},ds.a.fdim.labels{1});
+    assertEqual(nh.a.fdim.values{1},ds.a.fdim.values{1});
     assertEqual(numel(nh.neighbors),numel(pos_idx));
 
     count=ceil(4/3*pi*(radius)^3 * .5);
     nh2=cosmo_spherical_neighborhood(ds_full,'count',count,...
                                                 'progress',false);
     assertEqual(nh2.fa.pos,ds_al.fa.pos);
-    assertEqual(nh2.a,ds.a);
+    assertEqual(nh2.a.fdim.labels{1},ds.a.fdim.labels{1});
+    assertEqual(nh2.a.fdim.values{1},ds.a.fdim.values{1});
     assertEqual(numel(nh2.neighbors),numel(pos_idx));
 
     pos_al=ds_al.a.fdim.values{1}(:,ds_al.fa.pos);

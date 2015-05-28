@@ -219,7 +219,7 @@ function test_cluster_neighborhood_source
 
 
     [unused,rp]=sort(cosmo_rand(1,nf));
-    rp=rp(1:10);
+    rp=rp(1:4);
 
     grid_spacing=10;
     ds_pos=ds.a.fdim.values{1}(:,ds.fa.pos)/grid_spacing;
