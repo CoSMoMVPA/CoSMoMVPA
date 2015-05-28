@@ -79,10 +79,12 @@ install:
     #   http://www.artefact.tk/software/matlab/gifti/
     # when updated to version 1.5
     - if [[ "$EXTERNALS" = *"gifti"* ]]; then
-          git clone git://github.com/nno/matlab_GIfTI;
-          BUILDCMD="${BUILDCMD}cd('${PTH}/matlab_GIfTI/@gifti/private');";
+          GIFTI_VERSION=1.5
+          GIFTI_NAME=gifti-${GIFTI_VERSION}
+          wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip
+          BUILDCMD="${BUILDCMD}cd('${PTH}/${GIFTI_NAME}/@gifti/private');";
           BUILDCMD="${BUILDCMD}mex('zstream.c');";
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/matlab_GIfTI";
+          OCTAVEPTH="${OCTAVEPTH}:${PTH}/${GIFTI_NAME}";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('gifti');";
       fi
 
