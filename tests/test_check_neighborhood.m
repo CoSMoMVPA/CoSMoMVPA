@@ -136,17 +136,24 @@ function test_check_neighborhood_exceptions
     nh=struct();
     nh.sa=ds.sa;
     nh.neighbors={1;2};
-
     aet(nh,ds);
     aet_wo(nh,ds);
     aet_wo(nh);
     aet(nh);
 
+    % should pass
     nh.neighbors={1;2;4;3};
     is_ok(nh,ds);
     ok_wo(nh,ds);
     ok_wo(nh);
     is_ok(nh);
+
+    % cannot have both .sa and .fa
+    nh2=nh;
+    nh2.fa=struct();
+    aet(nh2,ds);
+
+
 
     % different .a.vol.dim
     nh.origin.a.vol.dim=[4 0 0];
