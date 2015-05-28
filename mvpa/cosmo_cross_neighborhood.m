@@ -222,7 +222,7 @@ function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress, use_fast)
             map_idxs(2:end,pos)=tail_map(:,j);
         end
         if show_progress
-            msg=sprintf('MEEG neighbors');
+            msg=sprintf('crossing neighborhoods');
             prev_msg=cosmo_show_progress(clock_start,j/ntail,msg,prev_msg);
         end
     end
