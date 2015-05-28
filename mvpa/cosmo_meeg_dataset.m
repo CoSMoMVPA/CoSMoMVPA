@@ -220,7 +220,7 @@ function [data,samples_field,fdim]=get_ft_data(ft,opt)
     fdim.values=dim_values;
 
     if is_ft_source_struct(ft)
-        fdim=add_ft_mom_field_if_present(fdim, samples_field);
+        fdim=add_ft_mom_field_if_present(fdim, samples_field, size(data));
         [data,fdim]=fix_ft_lcmv_if_necessary(data,fdim);
     end
 
@@ -267,17 +267,27 @@ function [data,fdim]=fix_ft_lcmv_if_necessary(data,fdim)
 
 
 
-function fdim=add_ft_mom_field_if_present(fdim, samples_field)
+function fdim=add_ft_mom_field_if_present(fdim, samples_field, size_data)
     % insert .mom field for source struct
     samples_field_split=cosmo_strsplit(samples_field,'.');
     has_mom=numel(samples_field_split)==2 && ...
                     strcmp(samples_field_split{2},'mom');
     if has_mom
+        ndim=size_data(3);
         fdim.labels=[fdim.labels(1);...
                                 {'mom'};...
                                 fdim.labels(2:end)];
+        switch ndim
+            case 1
+                values={'xyz'};
+            case 3
+                values={'x','y','z'};
+            otherwise
+                error('Unsupported number of dimensions for %s: %d',...
+                            samples_field,ndim);
+        end
         fdim.values=[fdim.values(1);...
-                                {{'x','y','z'}};...
+                                {values};...
                                 fdim.values(2:end)];
     end
 

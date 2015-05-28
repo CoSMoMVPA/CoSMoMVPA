@@ -3,7 +3,8 @@ function test_suite=test_meeg_source()
     initTestSuite;
 
 function test_meeg_dataset()
-    tps={'freq_pow','time_mom','rpt_trial_mom',...
+    tps={'freq_pow','time_mom','rpt_trial_mom','rpt_trial_mom_1d',...
+                        'time_mom_1d',...
                         'rpt_trial_pow','strange_ft_lcmv_pow'};
     for j=1:numel(tps)
         is_ft_strange_lcmv_avg_pow=isequal(cosmo_strsplit(tps{j},'_',1),...
@@ -153,7 +154,8 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
     nsamples=2;
     freq=[3 5 7 9];
     time=[-1 0 1 2];
-    mom_labels={'x','y','z'};
+    mom_labels_3d={'x','y','z'};
+    mom_labels_1d={'xyz'};
 
     ft.dim=cellfun(@numel,dim_pos_range);
     ft.pos=cosmo_cartprod(dim_pos_range);
@@ -173,9 +175,17 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
         case 'time_mom'
             ft.time=time;
             ft.method='average';
-            ft.avg=generate_data(ft.inside,numel(time),1,'mom');
+            ft.avg=generate_data(ft.inside,numel(time),1,'mom3d');
             fdim.labels={'pos';'mom';'time'};
-            fdim.values={ft.pos';mom_labels;time(:)'};
+            fdim.values={ft.pos';mom_labels_3d;time(:)'};
+            data_label={'avg','mom'};
+
+        case 'time_mom_1d';
+            ft.time=time;
+            ft.method='average';
+            ft.avg=generate_data(ft.inside,numel(time),1,'mom1d');
+            fdim.labels={'pos';'mom';'time'};
+            fdim.values={ft.pos';mom_labels_1d;time(:)'};
             data_label={'avg','mom'};
 
 
@@ -190,9 +200,17 @@ function [ft,fdim,data_label]=generate_ft_source(tp)
         case 'rpt_trial_mom';
             ft.time=time;
             ft.method='rawtrial';
-            ft.trial=generate_data(ft.inside,numel(time),nsamples,'mom');
+            ft.trial=generate_data(ft.inside,numel(time),nsamples,'mom3d');
             fdim.labels={'pos';'mom';'time'};
-            fdim.values={ft.pos';mom_labels;time(:)'};
+            fdim.values={ft.pos';mom_labels_3d;time(:)'};
+            data_label={'trial','mom'};
+
+        case 'rpt_trial_mom_1d';
+            ft.time=time;
+            ft.method='rawtrial';
+            ft.trial=generate_data(ft.inside,numel(time),nsamples,'mom1d');
+            fdim.labels={'pos';'mom';'time'};
+            fdim.values={ft.pos';mom_labels_1d;time(:)'};
             data_label={'trial','mom'};
 
         case 'strange_ft_lcmv_pow'
@@ -221,8 +239,10 @@ function d=generate_data(inside,nfeatures,nsamples,fld)
     end
 
     switch fld
-        case 'mom'
-            d=generate_mom(inside,nfeatures,nsamples);
+        case 'mom3d'
+            d=generate_mom(inside,nfeatures,nsamples,3);
+        case 'mom1d'
+            d=generate_mom(inside,nfeatures,nsamples,1);
         case 'pow'
             d=generate_pow(inside,nfeatures,nsamples);
         otherwise
@@ -247,12 +267,12 @@ function all_trials=generate_pow(inside,nfeatures,nsamples)
     all_trials=cat(1,all_trials_cell{:})';
 
 
-function all_trials=generate_mom(inside,nfeatures,nsamples)
+function all_trials=generate_mom(inside,nfeatures,nsamples,ndim)
     nf=numel(inside);
     i=find(inside);
     ni=numel(i);
 
-    data=cosmo_rand(3,nfeatures,ni);
+    data=cosmo_rand(ndim,nfeatures,ni);
 
     all_trials_cell=cell(1,nsamples);
     for j=1:nsamples
