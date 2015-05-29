@@ -264,4 +264,33 @@ Run group analysis
 
 
 
+Use LIBSVM
+----------
+
+    Download LIBSVM, then in Matlab or Octave, do
+
+         .. code-block:: matlab
+
+            cd libsvm; % change this to the directory where you put LIBSVM
+            cd matlab  % go to matlab sub-directory
+            make       % compile libsvm mex functions; requires a working compiler
+            rmpath(pwd)   % } ensure directory is on top
+            addpath(pwd)  % } of the search path
+
+            % verify it worked.
+            cosmo_check_external('libsvm'); % should not give an error
+
+    If you want to store the path, you can also do
+
+         .. code-block:: matlab
+
+            savepath
+
+    so that the next time you start Matlab or Octave, the correct path is used.
+
+    Matlab also provides an SVM implementation in the ``stats`` (and possible other) toolboxes, and the naming of the training functions are not compatible with LIBSVM. Thus, you can use either Matlab's SVM or LIBSVM, but not both at the same time. To select which SVM implementation is used, set the Matlab search path so that either LIBSVM is on top (comes earlier; to use LIBSVM) or at the bottom (comes later; to use Matlab's SVM).
+
+
+
+
     .. include:: links.txt
