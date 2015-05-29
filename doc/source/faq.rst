@@ -319,7 +319,9 @@ Use LIBSVM
             % verify it worked.
             cosmo_check_external('libsvm'); % should not give an error
 
-    If you want to store the path, you can also do
+    + If the ``make`` command failed, make sure you are in the LIBSVM's ``matlab`` subdirectory, and that you have a working `compiler under Matlab`_ or `compiler under Octave`_.
+
+    + If you want to store the path, you can also do
 
          .. code-block:: matlab
 
@@ -330,6 +332,7 @@ Use LIBSVM
     Matlab also provides an SVM implementation in the ``stats`` (and possible other) toolboxes, and the naming of the training functions are not compatible with LIBSVM. Thus, you can use either Matlab's SVM or LIBSVM, but not both at the same time. To select which SVM implementation is used, set the Matlab search path so that either LIBSVM is on top (comes earlier; to use LIBSVM) or at the bottom (comes later; to use Matlab's SVM).
 
 
-
+.. _compiler under Matlab: http://it.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html
+.. _compiler under Octave: https://www.gnu.org/software/octave/doc/interpreter/Getting-Started-with-Mex_002dFiles.html
 
     .. include:: links.txt
