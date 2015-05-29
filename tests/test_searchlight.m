@@ -45,7 +45,7 @@ function test_searchlight_
     sdim.values={10:15};
     sdim.labels={'time'};
 
-    nh4=cosmo_spherical_neighborhood(ds,'radius',0);
+    nh4=cosmo_spherical_neighborhood(ds,'radius',0,'progress',false);
     measure2=@(x,opt)cosmo_structjoin('samples',mean(x.samples,2),...
                                        'sa',sa,...
                                        'a',cosmo_structjoin('sdim',sdim));
