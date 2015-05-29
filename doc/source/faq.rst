@@ -267,7 +267,7 @@ Run group analysis
 Use LIBSVM
 ----------
 
-    Download LIBSVM, then in Matlab or Octave, do
+    Download LIBSVM_, then in Matlab or Octave, do
 
          .. code-block:: matlab
 
