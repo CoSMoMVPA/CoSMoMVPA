@@ -19,7 +19,7 @@ function test_dissimilarity_matrix_measure_basics()
     dsm=cosmo_unflatten(dsm_ds,1,'set_missing_to',NaN);
 
     pd=cosmo_pdist(ds.samples,'correlation');
-    pd_sq=squareform(pd);
+    pd_sq=cosmo_squareform(pd);
 
     n=size(pd_sq,1);
 
