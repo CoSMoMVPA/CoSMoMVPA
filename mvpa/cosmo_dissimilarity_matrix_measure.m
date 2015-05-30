@@ -237,10 +237,6 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     % set sample dimensions
     add_labels={'targets1','targets2'};
     add_values={targets, targets};
-    if cosmo_isfield(ds_dsm,'.a.sdim')
-        ds_dsm.a.sdim.labels=[ds_dsm.a.sdim.labels add_labels];
-        ds_dsm.a.sdim.values=[ds_dsm.a.sdim.values add_values];
-    else
-        ds_dsm.a.sdim.labels=add_labels;
-        ds_dsm.a.sdim.values=add_values;
-    end
+    ds_dsm.a.sdim.labels=add_labels;
+    ds_dsm.a.sdim.values=add_values;
+
