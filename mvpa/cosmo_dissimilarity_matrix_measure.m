@@ -196,7 +196,7 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 % NNO updated Sep 2013 to return a struct
 
     % check input
-    cosmo_isfield(ds,'sa.targets',true);
+    cosmo_isfield(ds,{'sa.targets','samples'},true);
 
     args=cosmo_structjoin('metric','correlation',varargin);
 
