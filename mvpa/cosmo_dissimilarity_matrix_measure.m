@@ -34,6 +34,7 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 % Example:
 %     % ds is a dataset struct with ds.sa.targets=(11:16)';
+%     ds=struct();
 %     ds.samples=[1 2 3; 1 2 3; 1 0 1; 1 1 2; 1 1 2];
 %     ds.sa.targets=(11:15)';
 %     %
@@ -98,7 +99,7 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 %     % Searchlight using this measure
 %     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
-%     % (in this toy example there are only 6 voxels, and the radisu
+%     % (in this toy example there are only 6 voxels, and the radius
 %     %  of the searchlight is 1 voxel. Real-life examples use larger
 %     %  datasets and a larger radius)
 %     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
