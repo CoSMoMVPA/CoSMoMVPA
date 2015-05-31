@@ -14,7 +14,8 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %
 % Output:
 %    partitions      A struct with fields .train_indices and .test_indices.
-%                    Each of these is an Nx1 cell (for N partitions), where
+%                    Each of these is an Nx1 cell (N=1 when type='half',
+%                    N=2 when type='full'.).
 %                    .train_indices{k} and .test_indices{k} contain the
 %                    sample indices for the sets of unique chunks
 %                    alternatingly
@@ -54,12 +55,11 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %     >       7 ] }
 %
 % Notes:
-% - More generally, this function is intended as an exercise. If
-%   chunks is different from 1:K for all K, then it may yield non-optimal
-%   partitions.
-%   Is is thus advised to use cosmo_nchoosek_partitioner(chunks,.5);
+%   - typically, the 'half' option can be used with
+%     cosmo_correlation_measure, because correlations are symmetric; the
+%     'full' option can be used with cosmo_crossvalidation_measure.
 %
-% See also cosmo_nchoosek_partitioner
+% See also: cosmo_nchoosek_partitioner
 %
 % NNO Aug 2013
 
@@ -88,7 +88,7 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
     % there are two partitions, unless do_half_partition in which case
     % there is one
 
-    if do_half_partition && mod(nparts,2)==0
+    if do_half_partition
         npartitions=1;
     else
         npartitions=2;
