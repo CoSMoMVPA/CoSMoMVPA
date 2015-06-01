@@ -90,10 +90,10 @@ function [tail_values, idxs]=cosmo_tail(values, to_select)
 
 
 function check_input(values, to_select)
-    if ~isvector(values) && ~iscellstr(values)
+    if ~(isvector(values) && (isnumeric(values) || iscellstr(values)))
         error('Only vector or cell with strings input is supported');
     end
 
-    if ~isscalar(to_select)
+    if ~(isscalar(to_select) && isnumeric(to_select))
         error('Second argument must be scalar');
     end
