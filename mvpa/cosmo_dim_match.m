@@ -5,10 +5,10 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %
 % Inputs:
 %   ds                dataset struct or neighborhood struct
-%   haystack*         numeric vector, or cell with strings. A string is
-%                     also allowed and interpreted as the name of a feature
-%                     dimension ('i','j' or 'k' in fmri datasets; 'chan',
-%                     'time', or 'freq' in MEEG datasets), and its
+%   haystack*         numeric vector, or cell with strings, or string.
+%                     A string is interpreted as the name of a feature
+%                     dimension (e.g. 'i','j' or 'k' in fmri datasets;
+%                     'chan', 'time', or 'freq' in MEEG datasets), and its
 %                     respective values (from ds.a.fdim.values{dim}, where
 %                     dim is the dimension corresponding to haystack) as
 %                     indexed by ds.fa.(haystack) are used as haystack.
