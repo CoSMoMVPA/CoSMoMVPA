@@ -5,7 +5,7 @@
 
 .. figure:: _static/cosmomvpa_banner.png
 
-A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab for cognitive neuroscientists.
+A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab / GNU Octave for cognitive neuroscientists.
 
 CoSMoMVPA
 ---------
