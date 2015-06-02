@@ -205,7 +205,8 @@ switch numel(vo)
         fo=f;
     case 1
         % subsample the surface
-        [vo,fo]=surfing_subsample_surface(vi,f,vo,opt.subsample_min_ratio);
+        [vo,fo]=surfing_subsample_surface(vi,f,vo,...
+                                opt.subsample_min_ratio, opt.progress);
 end
 
 % find mapping from low to high res surface
