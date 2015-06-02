@@ -1,7 +1,7 @@
-function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
+function msk=cosmo_dim_match(ds, varargin)
 % return a mask indicating match of dataset dimensions with values
 %
-% msk=cosmo_match(ds, haystack1, needle1[, needle2, haystack2, ...])
+% msk=cosmo_match(ds, dim_label, dim_values1[...]
 %
 % Inputs:
 %   ds                dataset struct or neighborhood struct
@@ -19,7 +19,7 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %                     the corresponding value in ds.a.fdim.values.
 %   dim               If the last argument, it sets the dimension along
 %                     which dim_label has to be found. If omitted it
-%                     finds the dimension in the dataset
+%                     finds the dimension in the dataset.
 %
 % Output:
 %   msk               boolean array of the same size as haystack, with
@@ -40,7 +40,7 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 %     > [ 1         2         3  ...  18        19        20 ]@1x6460
 %     msk=cosmo_dim_match(ds,'i',5:10);
 %     ds_sel=cosmo_slice(ds,msk,2);
-%     % no pruning, so the fdim.values are not changed. A subset fo
+%     % no pruning, so the fdim.values are not changed. A subset of
 %     % features is selected
 %     cosmo_disp(ds_sel.a.fdim.values{1});
 %     > [ 1         2         3  ...  18        19        20 ]@1x20
@@ -111,71 +111,113 @@ function msk=cosmo_dim_match(ds, dim_label, dim_values, varargin)
 % See also: cosmo_match, cosmo_dim_prune
 %
 % NNO Oct 2013
-    if ~isstruct(ds)
-        error('expected a struct as input');
+    [dim_labels, dim_values, expected_dim]=process_input(ds, varargin{:});
+
+    ndim=numel(dim_labels);
+    for k=1:ndim
+        dim_label=dim_labels{k};
+        dim_value=dim_values{k};
+        [haystack, needle, found_dim]=match_single_dim(ds, dim_label, ...
+                                                           dim_value);
+
+        if ~isempty(expected_dim) && expected_dim~=found_dim
+            error(['label ''%s'' was expected in dimension %d, '...
+                                'was found in %d'],...
+                            dim_label, expected_dim, found_dim);
+        end
+
+        dim_msk=cosmo_match(haystack, needle);
+
+        if k==1
+            msk_length=numel(haystack);
+            assert_mask_of_proper_length(msk_length, ds, found_dim);
+
+            msk=dim_msk;
+        else
+            if ~isequal(size(msk),size(dim_msk))
+                error('size mismatch for dimension label ''%s''',...
+                        dim_label);
+            end
+            msk=msk & dim_msk;
+            expected_dim=found_dim;
+        end
     end
 
-    if ~isfield(ds,'neighbors')
+
+function assert_mask_of_proper_length(msk_length, ds, dim)
+    % since the calling function ensures the size is properly set,
+    % the size should be fine; this function should never throw an error
+    if isfield(ds,'neighbors')
+        assert(numel(ds.neighbors)==msk_length)
+    else
+        assert(size(ds.samples,dim)==msk_length);
+    end
+
+
+function [dim_labels, dim_values, dim]=process_input(ds, varargin)
+% get dimension labels and values
+% if the number of arguments in varargin is odd, then the last element is
+% the dimension along which dim_labels and dim_values are to be found;
+% otherwise it is set to empty
+    if ~isstruct(ds)
+        error('first argument must be a struct');
+    end
+
+    is_neighborhood=isfield(ds,'neighbors');
+    if is_neighborhood
+        cosmo_check_neighborhood(ds);
+    else
         cosmo_check_dataset(ds);
     end
 
-    dim=[];
-    has_dim=nargin>3 && mod(nargin,2)==0;
-    if has_dim
+    narg=numel(varargin);
+    ndim=floor(narg/2);
+    dim_labels=varargin(1:2:(ndim*2));
+    dim_values=varargin(2:2:(ndim*2));
+    for k=1:ndim
+        dim_label=dim_labels{k};
+
+        if ~ischar(dim_label)
+            error('argument %d must be a string', k*2);
+        end
+
+        dim_value=dim_values{k};
+
+        if ~isvector(dim_value)
+            error('argument %d must be a vector', k*2+1);
+        end
+
+        if ~(ischar(dim_value) || ...
+                    iscellstr(dim_value) || ...
+                    isnumeric(dim_value) || ...
+                    isa(dim_value,'function_handle'))
+            error(['argument %d must be a string, cell string, '...
+                        'numeric vector, or function handle']);
+        end
+    end
+
+    if mod(narg,2)==1
         dim=varargin{end};
-        if ~isnumeric(dim) || (dim~=1 && dim~=2)
-            error(['odd number of arguments; last (dim) argument '...
-                    'must be 1 or 2']);
-        end
-    end
-
-    if ischar(dim_label)
-        [dim_label, dim_values]=match_single_dim(ds, dim_label, ...
-                                                    dim_values, dim);
-    end
-
-    msk=cosmo_match(dim_label, dim_values);
-
-    if nargin>3
-        me=str2func(mfilename());
-        msk_other=me(ds, varargin{:});
-
-        if ~isequal(size(msk),size(msk_other))
-            error('Mask size mismatch: %d x %d ~= %d x %d', ...
-                    size(msk),size(msk_other))
-        end
-
-        % conjunction mask
-        msk=msk & msk_other;
+    else
+        dim=[];
     end
 
 
-function [dim_label, dim_values]=match_single_dim(ds, dim_label, ...
-                                                            dim_values, dim)
-    has_dim=~isempty(dim);
+function [haystack, needle, found_dim]=match_single_dim(ds, haystack, ...
+                                                          needle)
 
     % get value for needle and haystack
-    [dim_, index, attr_name, dim_name]=cosmo_dim_find(ds, ...
-                                                dim_label, true);
-    if has_dim && dim_~=dim
-        error('dim specified as %d, but found %s in dim %d',...
-                dim, dim_label, dim_);
-    else
-        dim=dim_;
-    end
+    [found_dim, index, attr_name, dim_name]=cosmo_dim_find(ds, ...
+                                                haystack, true);
 
     vs=ds.a.(dim_name).values{index};
-    if isa(dim_values,'function_handle')
-        if isnumeric(vs)
-            match_mask=dim_values(vs);
-        else
-            match_mask=cellfun(dim_values,vs,'UniformOutput',true);
-        end
+    if isa(needle,'function_handle')
+        match_mask=needle(vs);
     else
-        match_mask=cosmo_match(vs,dim_values);
+        match_mask=cosmo_match(vs,needle);
     end
 
     % set new value based on indices of the matching mask
-    dim_values=find(match_mask);
-    dim_label=ds.(attr_name).(ds.a.(dim_name).labels{index});
+    needle=find(match_mask);
+    haystack=ds.(attr_name).(ds.a.(dim_name).labels{index});
 
