@@ -248,7 +248,8 @@ function msg=ext_get_what_to_do_message(ext,env)
 function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     if cosmo_wtf('is_matlab')
         toolbox_dir=fullfile(toolboxdir(''),toolbox_name);
-        is_ok=isdir(toolbox_dir);
+        % directory must exist and be in the path
+        is_ok=isdir(toolbox_dir) && toolbox_in_matlab_path(toolbox_dir);
     else
         is_ok=false;
     end
@@ -256,6 +257,11 @@ function is_ok=check_matlab_toolbox(toolbox_name,raise_)
         error('The matlab toolbox ''%s'' seems absent',...
                             toolbox_name);
     end
+
+function tf=toolbox_in_matlab_path(toolbox_dir)
+    paths=cosmo_strsplit(path(),pathsep());
+    starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
+    tf=any(cellfun(starts_with_toolbox_dir,paths));
 
 
 function s=url2str(url)
