@@ -67,7 +67,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                        } edge)
 %                        } These three options are mutually exclusive
 %    'metric',metric     distance metric along cortical surface. One of
-%                        'geodesic' (default), 'dijkstra' or 'euclidian'.
+%                        'geodesic' (default), 'dijkstra' or 'euclidean'.
 %    'line_def',line_def definition of lines from inner to outer surface
 %                        See surfing_nodeidxs2coords
 %    'progress', p       Show progress every p centers (default: 100)
