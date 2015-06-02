@@ -261,6 +261,9 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
     function y=slice_array(x, to_select, dim, do_check)
         if do_check
             check_size(x, to_select, dim);
+            if ~isscalar(dim) || ~isnumeric(dim)
+                error('dim must be 1 or 2');
+            end
         end
 
         if dim==1
@@ -268,7 +271,7 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
         elseif dim==2
             y=x(:,to_select);
         else
-            error('dim should be 1 or 2');
+            error('dim must be 1 or 2');
         end
 
 
