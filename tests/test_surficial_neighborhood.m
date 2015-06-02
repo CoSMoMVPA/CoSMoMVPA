@@ -179,11 +179,11 @@ function test_surficial_neighborhood_volume_geodesic
     opt.progress=false;
 
     ds=cosmo_synthetic_dataset();
-    vertices=[-2 0 2 -2 0 2;
-                -1 -1 -1 1 1 1
+    vertices=[-2 0 2 -2 0 2;...
+                -1 -1 -1 1 1 1;...
                 -1 -1 -1 -1 -1 -1]';
-    faces= [ 3 2 3 2
-                2 1 5 4
+    faces= [ 3 2 3 2;...
+                2 1 5 4;...
                 5 4 6 5 ]';
 
     pial=vertices;
@@ -252,9 +252,40 @@ function test_surficial_neighborhood_exceptions
     ds=cosmo_synthetic_dataset('type','surface');%,'size','normal');
     [vertices,faces]=get_synthetic_surface();
 
-    aet=@(x)assertExceptionThrown(@()...
-    cosmo_surficial_neighborhood(x{:},'progress',false),'');
-    aet({ds,{vertices,faces}});
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_surficial_neighborhood(varargin{:},...
+                                        'progress',false),'');
+    aet(ds,{vertices,faces});
+
+    % need surfaces
+    aet(ds,{},'radius',2);
+
+    % center_ids not supported for surface dataset
+    aet(ds,{vertices,faces},'radius',2,'center_ids',1);
+
+    % cannot have duplicate feature ids
+    ds_double=cosmo_stack({ds,ds},2);
+    ds_double.a.fdim.values{1}=[1:6,1:6];
+    aet(ds_double,{vertices,faces},'radius',2);
+
+    % outside range
+    ds_double.a.fdim.values{1}=[1:5,1:5];
+    aet(ds_double,{vertices,faces},'radius',2);
+
+    % cannot have fmri and surface dataset combined
+    ds2=cosmo_synthetic_dataset();
+    ds2.a.fdim.values{end+1}=ds.a.fdim.values{1};
+    ds2.a.fdim.labels{end+1}=ds.a.fdim.labels{1};
+    ds2.fa.node_indices=ds.fa.node_indices;
+    aet(ds2,{vertices,faces},'radius',2);
+
+    % cannot have MEEG dataset
+    ds_meeg=cosmo_synthetic_dataset('type','meeg');
+    aet(ds_meeg,{vertices,faces},'radius',2);
+
+    % need positive scalar radius
+    aet(ds,{vertices,faces},'radius',-1);
+    aet(ds,{vertices,faces},'radius',eye(2));
 
 
 function check_partial_neighborhood(ds,nh,args)
