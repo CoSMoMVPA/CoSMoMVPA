@@ -285,6 +285,7 @@ elseif ds_is_volume
     nbrhood=struct();
     nbrhood.a.fdim.labels={'node_indices'};
     nbrhood.a.fdim.values={unq_center_ids};
+    nbrhood.a.vol=vol_def;
     nbrhood.fa.node_indices=center_ids_mapping(:)';
 
     % set neighbors while considering the masked nature of the input dataset
@@ -307,6 +308,7 @@ origin=struct();
 origin.a=ds.a;
 origin.fa=ds.fa;
 nbrhood.origin=origin;
+
 
 cosmo_check_neighborhood(nbrhood,ds);
 
