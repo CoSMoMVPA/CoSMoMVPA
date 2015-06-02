@@ -136,6 +136,7 @@ function test_check_neighborhood_exceptions
     nh=struct();
     nh.sa=ds.sa;
     nh.neighbors={1;2};
+    nh.origin.a=ds.a;
     aet(nh,ds);
     aet_wo(nh,ds);
     aet_wo(nh);
@@ -171,10 +172,18 @@ function aet_wo(nh,varargin)
     % assert exception thrown without origin
     nh=remove_origin(nh);
 
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     assertExceptionThrown(@()...
                 cosmo_check_neighborhood(nh,varargin{:}),'');
 
 function ok_wo(nh,varargin)
     % is ok without origin
     nh=remove_origin(nh);
+
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
     cosmo_check_neighborhood(nh,varargin{:});
