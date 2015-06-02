@@ -403,6 +403,152 @@ function check_partial_neighborhood(ds,nh,args)
     end
 
 
+function test_surface_subsampling
+    vertices=[0 -1 -2 -1  1  2  1  3  4  3;
+          0 -2  0  2  2  0 -2  2  0 -2;
+          0  0  0  0  0  0  0  0  0  0]';
+
+    faces=[1 1 1 1 1 1 5 8 6  6;
+           2 3 4 5 6 7 8 9 9 10;
+           3 4 5 6 7 2 6 6 10 7]';
+
+    % make custom volume
+    ds=cosmo_synthetic_dataset('size','small');
+    cp=cosmo_cartprod({1:7,1:3})';
+    ds.fa.i=cp(1,:);
+    ds.fa.j=cp(2,:);
+    ds.fa.k=ds.fa.i*0+1;
+
+    ds.a.fdim.values={1:7;1:3;1};
+    ds.samples=zeros(numel(ds.sa.targets),numel(ds.fa.i));
+    ds.a.vol.dim=cellfun(@numel,ds.a.fdim.values)';
+    ds.a.vol.mat(2,4)=-4;
+    ds.a.vol.mat(3,4)=-1;
+    ds.a.vol.mat(1,1)=1;
+    ds.a.vol.mat(2,2)=2;
+    ds.a.vol.mat(3,3)=1;
+
+    surfs={vertices,faces,[-4 5]};
+
+    opt=struct();
+    opt.progress=false;
+    opt.radius=3;
+    opt.metric='euclidean';
+    nh=cosmo_surficial_neighborhood(ds,surfs,opt);
+
+    assertEqual(nh.neighbors,{ [ 2 4 8 10 12 16 18 ]
+                             [ 2 4 8 10 ]
+                             [ 2 8 10 16 ]
+                             [ 8 10 16 18 ]
+                             [ 10 12 16 18 20 ]
+                             [ 4 6 10 12 14 18 20 ]
+                             [ 2 4 6 10 12 ]
+                             [ 12 14 18 20 ]
+                             [ 6 12 14 20 ]
+                             [ 4 6 12 14 ] });
+    assertEqual(nh.origin.fa,ds.fa);
+    assertEqual(nh.origin.a,ds.a);
+
+    % test subsampling
+    subsample=2;
+    surfs={vertices,faces,[-4 5],subsample};
+    nh2=cosmo_surficial_neighborhood(ds,surfs,opt);
+    assertEqual(nh2.neighbors,{ [ 2 4 8 10 ]
+                                 [ 2 8 10 16 ]
+                                 [ 8 10 16 18 ]
+                                 [ 10 12 16 18 20 ]
+                                 [ 2 4 6 10 12 ]
+                                 [ 12 14 18 20 ]
+                                 [ 6 12 14 20 ]
+                                 [ 4 6 12 14 ] });
+
+    assertEqual(nh2.origin.fa,ds.fa);
+    assertEqual(nh2.origin.a,ds.a);
+
+    % subsampling with pial surface
+    pial=bsxfun(@plus,vertices,[0 0 1]);
+    white=bsxfun(@plus,vertices,[0 0 -1]);
+    [vo,fo]=surfing_subsample_surface(vertices,faces,2,.2,0);
+    surfs={pial,white,faces,vo,fo};
+    nh3=cosmo_surficial_neighborhood(ds,surfs,opt);
+    assertEqual(nh2,nh3);
+
+    % check center ids options
+    slice_ids=[5 3 2];
+    nh4=cosmo_surficial_neighborhood(ds,surfs,opt,'center_ids',slice_ids);
+    nh4_sl=struct();
+    nh4_sl.neighbors=nh3.neighbors(slice_ids);
+    nh4_sl.fa=cosmo_slice(nh3.fa,slice_ids,2,'struct');
+    nh4_sl.a=nh3.a;
+
+    assertEqual(nh4.a.fdim.values{1}(nh4.fa.node_indices),...
+                    nh4_sl.a.fdim.values{1}(nh4_sl.fa.node_indices));
+    assertEqual(nh4.neighbors,nh4_sl.neighbors);
+
+
+    % try with file names
+    fn_pial=cosmo_make_temp_filename('pial','.asc');
+    fn_white=cosmo_make_temp_filename('white','.asc');
+    fn_tiny=cosmo_make_temp_filename('tiny','.asc');
+
+    cleaner1=onCleanup(@()delete(fn_pial));
+    cleaner2=onCleanup(@()delete(fn_white));
+    cleaner3=onCleanup(@()delete(fn_tiny));
+
+    surfing_write(fn_pial, pial, faces);
+    surfing_write(fn_white, white, faces);
+    surfing_write(fn_tiny, vo, fo);
+
+    surfs={fn_pial,fn_white,fn_tiny};
+    nh5=cosmo_surficial_neighborhood(ds,surfs,opt);
+    assertEqual(nh2,nh5);
+
+    % should work with alternative voldef
+    ds_bad_vol=ds;
+    ds_bad_vol.a.vol.mat(:)=NaN;
+    ds_bad_vol.a.vol.dim(:)=NaN;
+    nh6=cosmo_surficial_neighborhood(ds_bad_vol,surfs,opt,...
+                                            'vol_def',ds.a.vol);
+    nh6.origin.a.vol=ds.a.vol;
+    assertEqual(nh5,nh6);
+
+    % check exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_surficial_neighborhood(varargin{:}),'');
+
+    surfs={fn_pial,fn_pial,fn_tiny};
+    aet(ds,surfs,opt);
+
+    white_bad=white;
+    white_bad=white_bad(2:end,:);
+    aet(ds,{pial,white_bad,faces},opt);
+
+    % missing faces for output surface
+    aet(ds,{fn_pial,fn_white,vo},opt);
+
+
+    % face mismatch
+    faces_bad=faces;
+    faces_bad=faces_bad(end:-1:1,:);
+
+    surfing_write(fn_white, white, faces_bad);
+    aet(ds,{fn_pial,fn_white},opt);
+
+
+
+    % too many surf arguments
+    aet(ds,{fn_pial,fn_white,fn_tiny,fn_tiny},opt);
+    aet(ds,{pial,white,faces,pial,white,white},opt);
+    aet(ds,{pial,white,faces,fn_pial,white},opt);
+
+    % surfs are not a cell
+    aet(ds,struct,opt);
+    aet(ds,{pial,white,{}});
+
+
+
+
+
 
 function [vertices,faces]=get_synthetic_surface()
     % return the following surface (face indices in [brackets])
