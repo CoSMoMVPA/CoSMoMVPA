@@ -304,6 +304,11 @@ function msg=check_dim(ds)
         end
 
         attrs_str=[suffix 'a'];
+        if ~isfield(ds, attrs_str)
+            msg=sprintf('Missing field .%s',attrs_str);
+            return
+        end
+
         attrs=ds.(attrs_str);
         dim_attrs=ds.a.([suffix 'dim']);
         msg=check_dim_helper(attrs, dim_attrs, attrs_str, dim_attrs_str);

@@ -135,6 +135,12 @@ function test_check_dataset_exceptions()
     ds_c.fa.node_indices(:)=0.5;
     aet(ds_c);
 
+    % missing .fa with .fdim present
+    ds_c=ds;
+    ds_c=rmfield(ds_c,'fa');
+    aet(ds_c);
+
+
 
 
 
