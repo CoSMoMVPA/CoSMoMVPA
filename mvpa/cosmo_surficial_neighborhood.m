@@ -510,7 +510,7 @@ function ds_type=get_ds_type(ds)
     end
 
     % maybe it is not a dataset at all, check this possibility
-    cosmo_check(dataset(ds));
+    cosmo_check_dataset(ds);
 
     % it is a valid dataset but not fmri or surface;
     % try to give an appropriate error message
