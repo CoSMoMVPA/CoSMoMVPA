@@ -154,6 +154,17 @@ function test_surficial_neighborhood_surface_geodesic
     assertEqual(nh.fa.node_indices,1:6);
     assertEqual(nh.fa.radius,[sqrt(.5)+1 1 sqrt(2) sqrt(2) 1 sqrt(.5)+1]);
 
+    vertices2=[NaN NaN NaN; vertices;NaN NaN NaN];
+    faces2=[faces+1; 1 1 8];
+    args={{vertices2,faces2},'count',4,opt};
+    nh2=cosmo_surficial_neighborhood(ds,args{:});
+
+    assertEqual(nh2.neighbors,{ zeros(1,0)
+                                 [ 2 3 5 6 ]
+                                 [ 3 2 4 6 ]
+                                 [ 4 3 6 2 ]
+                                 [ 5 2 6 3 ]
+                                 [ 6 3 5 4 ] });
 
 function test_surficial_neighborhood_volume_geodesic
     if cosmo_skip_test_if_no_external('fast_marching') || ...
