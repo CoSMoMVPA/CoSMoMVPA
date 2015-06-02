@@ -202,7 +202,7 @@ function msg=check_origin_matches(nbrhood, ds)
         xdim=origin.a.(dim_name);
 
         if cosmo_isfield(ds, ['a.' dim_name '.labels']) && ...
-                    ~isequal(ds.a.(dim_name),xdim)
+                    ~isequaln(ds.a.(dim_name),xdim)
             msg=sprintf(['.a.%s mismatch between dataset '...
                             'and neighborhood', dim_name]);
             return
@@ -215,7 +215,7 @@ function msg=check_origin_matches(nbrhood, ds)
             key=keys{k};
 
             if ~cosmo_isfield(origin,[attr_name '.' key]) || ...
-                    ~isequal(ds.(attr_name).(key),...
+                    ~isequaln(ds.(attr_name).(key),...
                             origin.(attr_name).(key))
                 msg=sprintf(['.%sa.%s mismatch between dataset and '...
                         'neighborhood'],infix,key);
@@ -225,7 +225,7 @@ function msg=check_origin_matches(nbrhood, ds)
     end
 
     if isfield(origin,'a') && ~(isfield(ds,'a') && ...
-                                isequal(origin.a, ds.a))
+                                isequaln(origin.a, ds.a))
         error('.a mismatch between dataset and neighborhood');
     end
 
