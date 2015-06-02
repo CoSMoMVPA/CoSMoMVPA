@@ -14,10 +14,14 @@ function test_pdist_()
     avae(cosmo_pdist(data,'euclidean'),d_eucl);
     avae(cosmo_pdist(data,'correlation'),d_corr);
 
-    has_pdist=cosmo_check_external('@stats',false);
-    if has_pdist
+    has_matlab_pdist=cosmo_check_external('@stats',false);
+    if has_matlab_pdist
         avae(pdist(data),d_eucl);
         avae(pdist(data,'euclidean'),d_eucl);
         avae(pdist(data,'correlation'),d_corr);
         avae(pdist(data,'cosine'),cosmo_pdist(data,'cosine'))
+    else
+        assertExceptionThrown(@()cosmo_pdist(data,'cosine'),'');
     end
+
+
