@@ -538,7 +538,7 @@ function tf=is_ds_type_like(ds, type)
             end
 
             if cosmo_isfield(ds,'a.fdim.values') && ...
-                        cosmo_match({'node_indices'},ds.a.fdim.values)
+                        isequal({'node_indices'},ds.a.fdim.values)
                 tf=true;
                 return;
             end
