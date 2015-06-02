@@ -160,9 +160,31 @@ function test_slice_datasets()
             end
 
         end
-
-
-
     end
 
+function test_slice_datasets_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_slice(varargin{:}),'');
 
+    % struct must have field .samples
+    aet(struct,1);
+
+    % cannot have function handle as first input
+    aet(@abs,1);
+
+    % slicing a struct with size mismatch gives an error
+    ds=struct();
+    ds.foo=[1 2];
+    ds.bar=[1;2];
+    aet(ds,1,1,'struct');
+    aet(ds,1,2,'struct');
+
+    % dim must be 1 or 2
+    aet(zeros(2),1,3);
+    aet(zeros(2),1,'foo');
+    aet(zeros(2),1,[1 2]);
+    aet(zeros(2),1,[1 1]);
+
+    % selector must be a vector
+    aet(zeros(2),ones(2),1);
+    aet(zeros(2),ones(2),2);
