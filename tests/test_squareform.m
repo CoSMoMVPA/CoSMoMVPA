@@ -8,12 +8,21 @@ function test_squareform_()
 
     sf=@cosmo_squareform;
 
-
+    % numeric input
     assertElementsAlmostEqual(sf(vec),mx);
     assertElementsAlmostEqual(sf(vec,'tomatrix'),mx);
     assertElementsAlmostEqual(sf(mx),vec);
     assertElementsAlmostEqual(sf(mx,'tovector'),vec);
 
+    % logical input
+    vec2=logical(vec);
+    mx2=logical(mx);
+    assertEqual(sf(vec2),mx2);
+    assertEqual(sf(vec2,'tomatrix'),mx2);
+    assertEqual(sf(mx2),vec2);
+    assertEqual(sf(mx2,'tovector'),vec2);
+
+    % exceptions
     assertExceptionThrown(@() sf(vec,'foo'),'');
     assertExceptionThrown(@() sf(mx,'foo'),'');
     assertExceptionThrown(@() sf(vec,struct()),...
@@ -21,6 +30,8 @@ function test_squareform_()
     assertExceptionThrown(@() sf(struct()),'');
     assertExceptionThrown(@() sf(struct(),'tovector'),'');
     assertExceptionThrown(@() sf(struct(),'tomatrix'),'');
+    assertExceptionThrown(@() sf(zeros(2,3),'tovector'),'');
+    assertExceptionThrown(@() sf(zeros(2),'tomatrix'),'');
     assertExceptionThrown(@() sf(zeros([2,2,2])),'');
     assertExceptionThrown(@() sf(zeros([2,2,2]),'tovector'),'');
     assertExceptionThrown(@() sf(zeros([2,2,2]),'tomatrix'),'');
