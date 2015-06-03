@@ -10,7 +10,7 @@ function s=cosmo_type(fn)
 % NNO Feb 2014
 
 fid=fopen(fn);
-s=fread(fid,inf,'char=>char');
+s=fread(fid,inf,'char=>char')';
 fclose(fid);
 
 if nargout==0
