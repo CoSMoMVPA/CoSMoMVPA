@@ -81,7 +81,7 @@ function s=to_matrix(x)
         return;
     end
     if ~isvector(x)
-        error('direction ''to_vector'' requires a vector as input');
+        error('direction ''to_matrix'' requires a vector as input');
     end
     n=numel(x);
 
@@ -102,8 +102,6 @@ function s=to_matrix(x)
         s=zeros(side);
         s(msk)=x;
         s=s+s';
-    else
-        error('Unsupported data type ''%s''', class(x));
     end
 
 function direction=get_direction(x,varargin)
@@ -111,12 +109,8 @@ function direction=get_direction(x,varargin)
         sz=size(x);
         if sz(1)==sz(2) && sz(1)~=1
             direction='tovector';
-            return
-        elseif ismatrix(x)
-            direction='tomatrix';
-            return;
         else
-            error('first argument must be a matrix or vector')
+            direction='tomatrix';
         end
     elseif ischar(varargin{1})
         direction=varargin{1};
