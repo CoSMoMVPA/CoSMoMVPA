@@ -289,8 +289,6 @@ function test_surficial_neighborhood_exceptions
 
 
 function check_partial_neighborhood(ds,nh,args)
-    % TODO: enable this test
-
     % see if when have a partial dataset, the neighborbood reflects
     % that too
 
@@ -316,11 +314,6 @@ function check_partial_neighborhood(ds,nh,args)
     assertEqual(numel(nh_sel.a.fdim.values),numel(nh.a.fdim.values));
 
     assertEqual(ds_sel.a,nh_sel.a);
-    %assertEqual(sort(nh.a.fdim.values{1}(nh.fa.node_indices(keep_sel))),...
-    %            sort(nh_sel.a.fdim.values{1}(nh_sel.fa.node_indices)));
-
-
-
 
     opt=cosmo_structjoin(args(2:end));
 
