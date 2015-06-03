@@ -404,6 +404,9 @@ function check_partial_neighborhood(ds,nh,args)
 
 
 function test_surface_subsampling
+    if cosmo_skip_test_if_no_external('surfing')
+        return;
+    end
     vertices=[0 -1 -2 -1  1  2  1  3  4  3;
           0 -2  0  2  2  0 -2  2  0 -2;
           0  0  0  0  0  0  0  0  0  0]';
