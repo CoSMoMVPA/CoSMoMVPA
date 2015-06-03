@@ -11,6 +11,8 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %                           cosmo_meeg_chan_neighborhood
 %      raise                (optional) if set to true (the default), an
 %                           error is thrown if nbrhood is not kosher
+%      'show_warning',w   If true (the default), then a warning is shown
+%                           if nbrhood has no origin
 %
 % Output:
 %      is_ok                true if nbrhood is kosher, false otherwise
@@ -49,7 +51,7 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %
 % NNO Dec 2014
 
-    [raise, ds]=process_input(varargin{:});
+    [raise, ds, show_warning]=process_input(varargin{:});
 
     is_ok=false;
 
@@ -60,7 +62,7 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 
     for j=1:numel(checkers)
         checker=checkers{j};
-        msg=checker(nbrhood, ds);
+        msg=checker(nbrhood, ds, show_warning);
         if ~isempty(msg)
             if raise
                 error([func2str(checker) ': ' msg]);
@@ -101,7 +103,7 @@ function [infix, absent_infix]=get_attr_infix(nbrhood)
         absent_infix='s';
     end
 
-function msg=check_basis(nbrhood, ds)
+function msg=check_basis(nbrhood, ds, show_warning)
     msg='';
     if ~isstruct(nbrhood)
         msg='neighborhood is not a struct';
@@ -126,7 +128,7 @@ function tf=is_positive_int_row_vector(x)
             (isrow(x) && min(x)>=1 && all(round(x)==x));
 
 
-function msg=check_neighbors(nbrhood, ds)
+function msg=check_neighbors(nbrhood, ds, show_warning)
     msg='';
 
     nbrs=nbrhood.neighbors;
@@ -174,11 +176,11 @@ function msg=check_neighbors(nbrhood, ds)
     end
 
 
-function msg=check_origin_matches(nbrhood, ds)
+function msg=check_origin_matches(nbrhood, ds, show_warning)
     msg='';
 
     % legacy neighborhood, do not throw an exception
-    if ~isfield(nbrhood,'origin')
+    if show_warning && ~isfield(nbrhood,'origin')
         cosmo_warning(['Legacy warning: newer versions of CoSMoMVPA '...
                         'require a field .origin in the neighborhood '...
                         'struct']);
@@ -231,11 +233,15 @@ function msg=check_origin_matches(nbrhood, ds)
 
 
 
-function [raise, ds]=process_input(varargin)
+function [raise, ds, show_warning]=process_input(varargin)
     raise=true;
     ds=[];
+    show_warning=true;
 
-    for k=1:numel(varargin)
+    narg=numel(varargin);
+    k=0;
+    while k<narg
+        k=k+1;
         arg=varargin{k};
 
         if islogical(arg)
@@ -243,6 +249,17 @@ function [raise, ds]=process_input(varargin)
         elseif isstruct(arg)
             ds=arg;
             cosmo_check_dataset(ds);
+        elseif ischar(arg)
+            if k==narg
+                error('missing argument after ''show_warning''');
+            end
+            switch arg
+                case 'show_warning'
+                    k=k+1;
+                    show_warning=varargin{k};
+                otherwise
+                    error('illegal argument at position %d', k);
+            end
         end
     end
 
