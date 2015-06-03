@@ -129,7 +129,7 @@ function check_matrix(neighbors)
     end
 
 function check_struct(nbrhood)
-    cosmo_check_neighborhood(nbrhood);
+    cosmo_check_neighborhood(nbrhood,'show_warning',false);
 
 function check_cell(neighbors)
     check_struct(convert_cell2struct(neighbors));
