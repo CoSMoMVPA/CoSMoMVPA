@@ -157,11 +157,16 @@ function test_check_neighborhood_exceptions
 
 
     % different .a.vol.dim
-    nh.origin.a.vol.dim=[4 0 0];
-    aet(nh,ds);
-    ok_wo(nh,ds);
-    ok_wo(nh);
-    is_ok(nh);
+    nh2=nh;
+    nh2.origin.a.vol.dim=[4 0 0];
+    aet(nh2,ds);
+    ok_wo(nh2,ds);
+    ok_wo(nh2);
+    is_ok(nh2);
+
+    % some exceptions for show_warning
+    aet(ds,nh,'show_warning');
+    aet(ds,nh,'foo');
 
 function nh=remove_origin(nh)
     if isfield(nh,'origin')
