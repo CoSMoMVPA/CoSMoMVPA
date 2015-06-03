@@ -25,13 +25,9 @@ function s=cosmo_squareform(x, varargin)
 %
 % NNO Jul 2014
 
-    check_input(x)
-    direction=get_direction(x,varargin{:});
+    check_input(x);
 
-    if isempty(x)
-        s=x;
-        return
-    end
+    direction=get_direction(x,varargin{:});
 
     switch direction
         case 'tomatrix'
@@ -58,12 +54,11 @@ function check_input(x)
 
 
 function s=to_vector(x)
-    [side,side_]=size(x);
-    if side~=side_
+
+    [n_rows,n_columns]=size(x);
+    if n_rows~=n_columns
         error('direction ''to_vector'' requires a square matrix as input');
     end
-
-
 
     dg=diag(x);
     if any(dg)
@@ -74,13 +69,17 @@ function s=to_vector(x)
         error('square matrix must be symmetric');
     end
 
-    msk=bsxfun(@gt,(1:side)',1:side);
+    msk=bsxfun(@gt,(1:n_rows)',1:n_rows);
 
     s=x(msk);
     s=s(:)';
 
 
 function s=to_matrix(x)
+    if isempty(x)
+        s=[];
+        return;
+    end
     if ~isvector(x)
         error('direction ''to_vector'' requires a vector as input');
     end
@@ -109,11 +108,12 @@ function s=to_matrix(x)
 
 function direction=get_direction(x,varargin)
     if numel(varargin)<1
-        if isvector(x)
-            direction='tomatrix';
+        sz=size(x);
+        if sz(1)==sz(2) && sz(1)~=1
+            direction='tovector';
             return
         elseif ismatrix(x)
-            direction='tovector';
+            direction='tomatrix';
             return;
         else
             error('first argument must be a matrix or vector')
