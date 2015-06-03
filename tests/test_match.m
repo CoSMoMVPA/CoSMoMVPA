@@ -37,6 +37,11 @@ function test_match_()
     % can use a single string
     assertEqual(cosmo_match({'b','c','d','e','b'},'b'),b([1 0 0 0 1]));
 
+    % can use function handles
+    assertEqual(cosmo_match(1:4,@(x)mod(x,2)==0),b([0 1 0 1]));
+    assertEqual(cosmo_match({'b','c','d','c'},@(x)x=='c'),b([0 1 0 1]));
+
+
     % cannot deal with logical arrays
     assertExceptionThrown(@()cosmo_match(5:-1:1,b([0,0,1,1,0])),'');
 
@@ -66,3 +71,10 @@ function test_match_()
     assertExceptionThrown(@()cosmo_match(struct(),''),'');
     assertExceptionThrown(@()cosmo_match([],struct()),'');
     assertExceptionThrown(@()cosmo_match({},struct()),'');
+
+    % needs even number of arguments
+    assertExceptionThrown(@()cosmo_match({'a'}),'');
+    assertExceptionThrown(@()cosmo_match({'a'},{'b'},{'c'}),'');
+
+    % function handle has to return boolean output
+    assertExceptionThrown(@()cosmo_match(1:4,@(x)x+1),'');
