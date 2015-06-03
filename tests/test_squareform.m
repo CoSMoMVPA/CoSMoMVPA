@@ -27,12 +27,38 @@ function test_squareform_()
 
     assertExceptionThrown(@() sf([vec 1]),'');
     assertExceptionThrown(@() sf([vec 1],'tomatrix'),'');
+    assertExceptionThrown(@() sf(cell(0,0),'tomatrix'),'');
+    assertExceptionThrown(@() sf(cell(0,0),'tovector'),'');
+    assertExceptionThrown(@() sf(cell(0,0),''),'');
+
 
     assertExceptionThrown(@() sf(eye(4)+mx),'');
     assertExceptionThrown(@() sf(eye(4)+mx,'tovector'),'');
 
     mx(2,1)=3;
     assertExceptionThrown(@() sf(mx,'tovector'),'');
+
+function test_squareform_matlab_agreement()
+    if cosmo_wtf('is_octave') || ~cosmo_check_external('@stats',false)
+        cosmo_notify_test_skipped('Matlab''s squareform is not available');
+        return
+    end
+
+    for side=1:10
+        n=side*(side-1)/2;
+        data=rand(n,1);
+
+        assert_squareform_equal(data);
+        assert_squareform_equal(data,'tomatrix');
+        assert_squareform_equal(data','tomatrix');
+
+        mx=squareform(data);
+        assert_squareform_equal(mx);
+        assert_squareform_equal(mx,'tovector');
+    end
+
+function assert_squareform_equal(varargin)
+    assertEqual(squareform(varargin{:}),cosmo_squareform(varargin{:}));
 
 
 
