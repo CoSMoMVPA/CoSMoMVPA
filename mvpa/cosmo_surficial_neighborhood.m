@@ -4,7 +4,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 % [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, ...)
 %
 % Inputs:
-%    ds            fMRI-like volumetric dataset
+%    ds            fMRI-like volumetric or surface-based dataset
 %    surfs         cell with specification of surfaces. The following
 %                  formats are valid options:
 %                  # Volumetric datasets:
@@ -18,8 +18,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                           from the center of a hemisphere. For example,
 %                           if surface coordinates are in mm (which is
 %                           typical), start=-3 and stop=2 means selecting
-%                           voxels that are 3 mm or closer to the surface on
-%                           the white-matter side, up to voxels that are
+%                           voxels that are 3 mm or closer to the surface
+%                           on the white-matter side, up to voxels that are
 %                           2 mm from the surface on the pial matter side
 %                         + niter is the number of subsampling (mesh
 %                           decimation) iterations to use for the output
