@@ -44,46 +44,46 @@ function joined=cosmo_strjoin(strings, delim)
 % NNO Sep 2013
 
 
-if nargin<2
-    delim=' ';
-end
+    if nargin<2
+        delim=' ';
+    end
 
-if ~iscellstr(strings)
-    error('first input must be cell of strings');
-end
+    if ~iscellstr(strings)
+        error('first input must be cell of strings');
+    end
 
-n=numel(strings);
+    n=numel(strings);
 
-if n==0
-    joined='';
-    return;
-end
+    if n==0
+        joined='';
+        return;
+    end
 
-if ischar(delim)
-    delim=repmat({delim},1,n-1);
-else
-    if ~iscellstr(delim)
-        error('second input must be string, or cell of strings');
+    if ischar(delim)
+        delim=repmat({delim},1,n-1);
     else
-        ndelim=numel(delim);
-        if ndelim+1 ~= n
-            error('number of delimiters should be %d, found %d',...
-                     n, ndelim);
+        if ~iscellstr(delim)
+            error('second input must be string, or cell of strings');
+        else
+            ndelim=numel(delim);
+            if ndelim+1 ~= n
+                error('number of delimiters should be %d, found %d',...
+                         n, ndelim);
+            end
         end
     end
-end
 
-% make space for output
-joined_cells=cell(1,n*2-1);
+    % make space for output
+    joined_cells=cell(1,n*2-1);
 
-% set string and delim values alternatingly
-for k=1:n
-    joined_cells{k*2-1}=strings{k};
-    if k<n
-        joined_cells{k*2}=sprintf(delim{k});
+    % set string and delim values alternatingly
+    for k=1:n
+        joined_cells{k*2-1}=strings{k};
+        if k<n
+            joined_cells{k*2}=sprintf(delim{k});
+        end
     end
-end
 
-% join them
-joined=[joined_cells{:}];
+    % join them
+    joined=[joined_cells{:}];
 
