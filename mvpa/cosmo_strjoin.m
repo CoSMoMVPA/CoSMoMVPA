@@ -48,7 +48,7 @@ if nargin<2
     delim=' ';
 end
 
-if ~is_cell_of_strings(strings)
+if ~iscellstr(strings)
     error('first input must be cell of strings');
 end
 
@@ -62,7 +62,7 @@ end
 if ischar(delim)
     delim=repmat({delim},1,n-1);
 else
-    if ~is_cell_of_strings(delim)
+    if ~iscellstr(delim)
         error('second input must be string, or cell of strings');
     else
         ndelim=numel(delim);
@@ -87,7 +87,3 @@ end
 % join them
 joined=[joined_cells{:}];
 
-
-function b=is_cell_of_strings(strings)
-    % simple helper
-    b=iscell(strings) && all(cellfun(@ischar,strings));
