@@ -23,8 +23,8 @@ function c=cosmo_corr(x,y,corr_type)
 %
 % Example:
 %   % generate some pseudo-random data.
-%   x=reshape(mod(3:7:7e5,41),100,[]);
-%   y=reshape(mod(1:7:7e5,37),100,[]);
+%   x=reshape(mod(2:7:100,41),5,[]);
+%   y=reshape(mod(1:7:100,37),5,[]);
 %   % compute builtin corr with cosmo_corr
 %   % call the function first to avoid lookup delays; then measure time
 %   c=corr(x,y);
