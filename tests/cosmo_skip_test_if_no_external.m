@@ -1,5 +1,5 @@
 function skip_test=cosmo_skip_test_if_no_external(external)
-% Notify that test is skipped if no external is present
+% Notify that test in the test suite is skipped if no external is present
 %
 % skip_test=cosmo_skip_test_if_no_external(external)
 %
@@ -16,6 +16,21 @@ function skip_test=cosmo_skip_test_if_no_external(external)
 %                           display a warning.
 %
 % Notes:
+%   - This function can be used for three different test suite
+%     use case scenarios:
+%     * runtests  (from the xUnit framework):
+%         calling this function shows a warning message and does not raise
+%         an exception.
+%     * cosmo_run_tests (using the xUnit framework):
+%         calling this function does not show a warning message, nor does
+%         it raise an exception. Instead, cosmo_notify_test_skipped is
+%         called, so that after all tests are run, cosmo_run_tests shows a
+%         summary of skipped tests.
+%     * moxunit_runtests (using MOxUnit):
+%         calling this function does not show a warning message, but it
+%         does raise an exception. This exception is caught by MOxUnit,
+%         so that after all tests are run, moxunit_runtests shows a summary
+%         of skipped tests.
 %   - Because xUnit does not support skipping tests directly, recommended
 %     usage within a unit test is:
 %
