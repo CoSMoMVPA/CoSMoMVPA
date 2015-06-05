@@ -127,7 +127,7 @@ function run_doctest(preamb, expr, wants, filename, line)
             end
 
             [ve,me]=CosmoDocTestCase__evalc(to_evaluate);
-            exception_was_thrown=~isequal(me,[]);
+            exception_was_thrown=~isempty(me);
 
             preamble_exception=~preamble_with_expr && exception_was_thrown;
             wrong_exception=preamble_with_expr && ...
@@ -203,6 +203,7 @@ function [CosmoDocTestCase__eval_res,CosmoDocTestCase__eval_me]=...
     try
         CosmoDocTestCase__eval_res=evalc(expr);
     catch CosmoDocTestCase__eval_me
+        % do nothing
     end
 end
 
