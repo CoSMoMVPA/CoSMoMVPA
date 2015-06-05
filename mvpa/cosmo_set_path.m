@@ -28,7 +28,7 @@ function cosmo_set_path()
     me_pth=fileparts(which(mfilename()));
 
     % get CoSMoMVPA root path
-    root_pth=fullfile(me_pth,'..');
+    root_pth=fileparts(me_pth);
 
     % get matlab path, each path in a cell
     pathsep_=pathsep(); % store path separator
