@@ -90,7 +90,7 @@ install:
     - BUILDCMD="${BUILDCMD}fprintf('path:\n%s\n', path());"
 
     # save path for when the script is being run
-    - BUILDCMD="${BUILDCMD};savepath();exit();"
+    - BUILDCMD="${BUILDCMD};cd('$PTH');savepath();exit();"
 
     # run build commands
     - $OCTAVE --path "${OCTAVEPTH}" --eval "${BUILDCMD}"
@@ -98,11 +98,14 @@ install:
 
 before_script:
     # add path for CoSMoMVPA
+    - PTH=`pwd`
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/mvpa"
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/tests"
     - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
-    - TESTCMD="more('off');";
+    - TESTCMD="more('off');"
+    - TESTCMD="${TESTCMD}fprintf('pwd:%s\n',pwd());"
     - TESTCMD="${TESTCMD}cosmo_set_path();"
+    - TESTCMD="${TESTCMD}fprintf('path:%s\n',path());"
     - TESTCMD="${TESTCMD}${CHECKEXTCMD}"
 
     # randomize number generator and print the state
