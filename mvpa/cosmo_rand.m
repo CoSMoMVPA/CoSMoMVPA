@@ -91,7 +91,7 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
     mersenne_mult=uint64(1812433253);
 
     for j=1:623
-        v=mersenne_mult*bitxor(state(j),bitshift(state(j),-30))+uint64(j);
+        v=mersenne_mult.*bitxor(state(j),bitshift(state(j),-30))+uint64(j);
         state(j+1)=bitand(v,max_uint32);
     end
 
