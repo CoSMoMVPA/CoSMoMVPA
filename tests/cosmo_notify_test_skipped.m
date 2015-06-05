@@ -1,5 +1,5 @@
 function varargout=cosmo_notify_test_skipped(reason)
-% notify that a test is skipped
+% notify that a test in the test suite is skipped
 %
 % Usages:
 %   - cosmo_notify_test_skipped(reason)
