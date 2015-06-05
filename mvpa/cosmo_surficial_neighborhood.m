@@ -53,7 +53,14 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                         + f are Qx3 node indices for Q faces on the pial
 %                           and white surfaces
 %                         + v_o and f_o are the nodes and vertices of an
-%                           intermediate output surface
+%                           intermediate output surface. It is required
+%                           that the vertices in v_o are a subset of the
+%                           pair-wise averages of vertices in v1 and v2. A
+%                           typical use case is using standard topologies
+%                           from AFNI's MapIcosahedron, where the v1 and v2
+%                           are high-res with X linear divisions, v_o is
+%                           low-res with Y linear divisions, and Y<X and X
+%                           is an integer multiple of Y.
 %                         + niter is the number of subsampling (mesh
 %                           decimation) iterations to use for the output
 %                           surface.
