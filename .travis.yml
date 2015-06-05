@@ -105,6 +105,7 @@ before_script:
     - TESTCMD="more('off');"
     - TESTCMD="${TESTCMD}fprintf('pwd:%s\n',pwd());"
     - TESTCMD="${TESTCMD}cosmo_set_path();"
+    - TESTCMD="${TESTCMD}addpath('${PTH}/CoSMoMVPA/tests');"
     - TESTCMD="${TESTCMD}fprintf('path:%s\n',path());"
     - TESTCMD="${TESTCMD}${CHECKEXTCMD}"
 
