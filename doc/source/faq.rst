@@ -335,4 +335,16 @@ Use LIBSVM
 .. _compiler under Matlab: http://it.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html
 .. _compiler under Octave: https://www.gnu.org/software/octave/doc/interpreter/Getting-Started-with-Mex_002dFiles.html
 
-    .. include:: links.txt
+
+Use surface-based mapping with a low-resolution output surface
+--------------------------------------------------------------
+The typical use case scenarion is using FreeSurfer_ pial and white matter surfaces that are resampled to standard topology using MapIcosahedron. Then, the high-resolution surfaces are used to define which voxels are associated with each searchlight, whereas the low-resolution surface is used as centers for the searchlight. The former aims to result in more precise selection of voxels; the latter in fewer centers, and thus reduced execution time for the searchlight.
+
+In this scenario, it is required that the vertices in low-resolution surface are a subset of the pair-wise averages of vertices in the high-resolution pial and white surfaces. A typical use case is using standard topologies from AFNI's MapIcosahedron, where the high resolution surfaces are constructed using X linear divisionsof the triangles of an icosahedron, the low-resolution surface is constructed with Y linear divisions, and Y<X and X is an integer multiple of Y.
+
+The pymvpa2-prep-afni-surf_ script (part of PyMVPA_, which is required to run it) provides exactly this functionality. It will resample the surfaces to various resolutions, ranging from 4 linear divisions (162 nodes per hemisphere) to 128 linear divisions (163842 nodes per hemisphere) in steps of powers of two. It will also generate intermediate surfaces (pair-wise avarages of the nodes of the pial and white matter surfaes), and merge left (``lh``) and right (``rh``) hemisphere into a single hemisphere (``mh``). The merged surfaces have the advantages that the searchlight has to be run only once to get results for both hemispheres.
+
+
+.. _pymvpa2-prep-afni-surf: https://github.com/PyMVPA/PyMVPA/blob/master/bin/pymvpa2-prep-afni-surf
+
+.. include:: links.txt
