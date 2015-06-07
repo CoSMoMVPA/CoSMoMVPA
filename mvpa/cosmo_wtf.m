@@ -49,7 +49,9 @@ params2func.version=version_;
 params2func.java=java_;
 params2func.cosmo_externals=@cosmo_externals;
 params2func.toolboxes=@toolboxes;
+params2func.cosmo_config=@cosmo_config_helper;
 params2func.cosmo_files=@cosmo_files;
+
 
 has_param=nargin>=1 && ~isempty(param);
 if has_param;
@@ -121,7 +123,7 @@ function s=cosmo_files()
     d=cosmo_dir(pth,'cosmo_*.m'); % list files
     s=dir2str(d);
 
-function s=cosmo_config()
+function s=cosmo_config_helper()
     try
         c=cosmo_config();
         fns=fieldnames(c);
