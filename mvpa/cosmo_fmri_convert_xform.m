@@ -156,21 +156,21 @@ function [x,y]=get_mapping(fmt)
     % mapping from codes to
     switch fmt
         case 'nii'
-            codes={'scanner_anat',1;
-                    'aligned_anat',2;
-                    'talairach',3;
-                    'mni_152',4;
+            codes={'scanner_anat',1;...
+                    'aligned_anat',2;...
+                    'talairach',3;...
+                    'mni_152',4;...
                     'scanner_anat',NaN}; % default
 
         case 'afni'
-            codes={'scanner_anat',0;
-                   'aligned_anat',1; % ACPC
-                   'talairach',2;
-                   'mni_152',2;
+            codes={'scanner_anat',0;...
+                   'aligned_anat',1;... % ACPC
+                   'talairach',2;...
+                   'mni_152',2;...
                    'scanner_anat',NaN}; % default
 
         case 'bv'
-            codes={'talairach',0;
+            codes={'talairach',0;...
                     'talairach',NaN}; %
 
         otherwise
