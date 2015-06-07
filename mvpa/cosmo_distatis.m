@@ -256,7 +256,7 @@ function [ew,v]=get_weights(x, feature_id, nkeep, opt)
             v=0;
 
         otherwise
-            error('illegal weight %s', opt.weight);
+            error('illegal weight %s', opt.weights);
     end
 
 
