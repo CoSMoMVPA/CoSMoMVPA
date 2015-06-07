@@ -120,9 +120,8 @@ function check_matrix(neighbors)
     if ~ismatrix(neighbors)
         error('input is not a matrix');
     end
-    if ~isnumeric(neighbors)
-        error('input is not a numeric matrix');
-    end
+
+    assert(isnumeric(neighbors));
 
     if ~isequal(round(neighbors),neighbors)
         error('input has non-integer values');
