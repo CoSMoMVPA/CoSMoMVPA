@@ -80,8 +80,6 @@ function s=environment()
         s='octave';
     elseif environment_is_matlab()
         s='matlab';
-    else
-        assert(false,'This should not happen');
     end
 
 function tf=environment_is_octave()
