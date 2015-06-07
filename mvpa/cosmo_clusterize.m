@@ -162,7 +162,7 @@ function check_input_sizes(sample,nbrhood_mat)
         error('sample input must be numeric or logical');
     end
 
-    if ~ismatrix(nbrhood_mat)
+    if numel(size(nbrhood_mat))~=2
         error('neighborhood matrix must be a matrix');
     end
 

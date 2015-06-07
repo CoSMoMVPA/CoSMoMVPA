@@ -81,7 +81,7 @@ function check_dataset(ds, baseline_label)
 function bl=baseline_correct(samples, mu, method)
     assert(size(samples,1)==size(mu,1));
     assert(isvector(mu));
-    assert(ismatrix(samples));
+    assert(numel(size(samples))==2);
 
     switch method
         case 'absolute'

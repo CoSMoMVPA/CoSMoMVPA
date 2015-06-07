@@ -43,7 +43,7 @@ function s=cosmo_squareform(x, varargin)
 
 
 function check_input(x)
-    if ~ismatrix(x)
+    if numel(size(x))~=2
         error('first input must be matrix or vector');
     end
 

@@ -117,7 +117,7 @@ function y=convert_struct(x,output_type)
     end
 
 function check_matrix(neighbors)
-    if ~ismatrix(neighbors)
+    if numel(size(neighbors))~=2
         error('input is not a matrix');
     end
 

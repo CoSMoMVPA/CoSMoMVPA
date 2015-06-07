@@ -136,7 +136,7 @@ function [targets,predicted]=get_data(ds, predicted)
         error('targets must be column vector');
     end
 
-    if ~ismatrix(predicted)
+    if numel(size(predicted))~=2
         error('predictions must be matrix');
     end
 

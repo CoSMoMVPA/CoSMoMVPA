@@ -323,7 +323,7 @@ function check_input_sizes(sample,nbrhood_mx)
         error('sample input must be numeric or logical');
     end
 
-    if ~ismatrix(nbrhood_mx)
+    if numel(size(nbrhood_mx))~=2
         error(['neighborhood matrix must be a matrix '...
                 '(use cosmo_convert_neighborhood to convert a '...
                 'neighborhood struct to matrix representation']);
