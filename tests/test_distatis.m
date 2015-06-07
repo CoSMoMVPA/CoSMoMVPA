@@ -35,29 +35,7 @@ function test_statis_
         0.0010    0.0240    0.0670    0.0010         0    0.0070
         0.0020    0.0040    0.0530    0.0080    0.0070         0];
 
-    nsubj=numel(d);
-    ds_all=cell(nsubj,1);
-    for k=1:nsubj
-        ds=struct();
-        sq=cosmo_squareform(d{k});
-        ds.samples=sq(:);
-        nd=size(d{k},1);
-
-        ns=size(ds.samples,1);
-        ds.sa.subject=k*ones(ns,1);
-
-        [i,j]=find(triu(repmat(1:nd,nd,1)',1)');
-
-        ds.sa.targets1=i;
-        ds.sa.targets2=j;
-        faces={'f1','f2','f3','f4','f5','f6'}';
-        ds.a.sdim.values={faces,faces};
-        ds.a.sdim.labels={'targets1','targets2'};
-
-        ds_all{k}=ds;
-    end
-
-    ds=cosmo_stack(ds_all);
+    ds=get_distance_dataset(d);
     ds=cosmo_stack({ds,ds,ds},2);
 
     cosmo_check_dataset(ds);
@@ -94,6 +72,81 @@ function test_statis_
     resvec=cosmo_distatis(ds,opt);
     assertElementsAlmostEqual(resvec.samples(:,1),sq');
 
+    vec_samples=mat2cell(ds.samples(:,1),ones(4,1)*15,1);
+    resvec2=cosmo_distatis(vec_samples,opt);
+    assertElementsAlmostEqual(resvec2.samples,resvec.samples(:,1));
 
+
+    opt.weights='uniform';
+    resvec=cosmo_distatis(ds,opt);
+    assertElementsAlmostEqual(resvec.samples(:,1)',...
+                                  [0.3156 0.8625 0.3704 0.6043 0.4646 ...
+                                   0.6572 0.4788 0.5489 0.5783 1.3221 ...
+                                   1.1576 0.9885 0.3644 0.5068 0.4037],...
+                                   'absolute',.001);
+
+    % test exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_distatis(varargin{:},'progress',false),'');
+
+    % no compromise possible
+    d2=d;
+    d2{4}(1,5)=3;
+    d2{4}(5,1)=3;
+    opt.weights='eig';
+    ds2=get_distance_dataset(d2);
+    aet(ds2,opt);
+
+
+
+    ds.sa.chunks=ds.sa.subject;
+    opt=struct();
+    opt.shape='foo';
+    aet(ds,opt);
+
+    opt=struct();
+    opt.weights='foo';
+    aet(ds,opt);
+
+    opt=struct();
+    opt.return='foo';
+    aet(ds,opt);
+
+    opt=struct();
+    % cannot deal with empty input
+    aet({},opt);
+
+    % needs dataset or numeric input
+    aet({false,true},opt);
+
+    % cannot take non-matrix input
+    aet({zeros([2 2 2])},opt);
+
+
+
+function ds=get_distance_dataset(d)
+    nsubj=numel(d);
+    ds_all=cell(nsubj,1);
+    for k=1:nsubj
+        ds=struct();
+        sq=cosmo_squareform(d{k});
+        ds.samples=sq(:);
+        nd=size(d{k},1);
+
+        ns=size(ds.samples,1);
+        ds.sa.subject=k*ones(ns,1);
+
+        [i,j]=find(triu(repmat(1:nd,nd,1)',1)');
+
+        ds.sa.targets1=i;
+        ds.sa.targets2=j;
+        faces={'f1','f2','f3','f4','f5','f6'}';
+        ds.a.sdim.values={faces,faces};
+        ds.a.sdim.labels={'targets1','targets2'};
+
+        ds_all{k}=ds;
+    end
+
+    ds=cosmo_stack(ds_all);
 
 
