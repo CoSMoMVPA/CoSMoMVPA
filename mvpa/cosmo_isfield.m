@@ -46,7 +46,10 @@ function tf=cosmo_isfield(s, name, raise)
 %
 % Notes:
 %  - Unlike the builtin 'isfield' function
-%    * only structs with at most one element (empty or 1x1) are supported
+%    * if a struct x has more than one element (i.e. numel(x)>1), then
+%      the presence of sub-fields in the struct is not supported; in this
+%      case, either an error is thrown (if raise=true), or false is
+%      returned (if raise=false).
 %    * this function can check for multiple fields in one call and can
 %      check for the presence of nested structs
 %    * this function accepts non-structs as the first input argument; the
