@@ -15,6 +15,8 @@ function test_convert_neighborhood_basis()
     assertEqual(mx,mx2);
     mx3=cosmo_convert_neighborhood(nh.neighbors);
     assertEqual(mx,mx3);
+    mx4=cosmo_convert_neighborhood(mx,'matrix');
+    assertEqual(mx,mx4);
 
     %
     % conversion to cell
@@ -29,10 +31,12 @@ function test_convert_neighborhood_basis()
     assertEqual(nb,nb2)
     nb3=cosmo_convert_neighborhood(mx,'cell');
     assertEqual(nb,nb3)
+    nb4=cosmo_convert_neighborhood(nb,'cell');
+    assertEqual(nb,nb4);
 
     % verify matrix conversion
-    mx4=cosmo_convert_neighborhood(nb2);
-    assertEqual(mx4,mx);
+    mx5=cosmo_convert_neighborhood(nb2);
+    assertEqual(mx5,mx);
     % conversion to struct
 
     % conversion to struct
@@ -42,19 +46,32 @@ function test_convert_neighborhood_basis()
     assert(isfield(nh2,'a'));
     nh3=cosmo_convert_neighborhood(mx,'struct');
     assertEqual(nh2,nh3)
+    nh4=cosmo_convert_neighborhood(nh2,'struct');
+    assertEqual(nh2,nh4)
+
 
     % test exceptions
-    aet=@(x)assertExceptionThrown(@()cosmo_convert_neighborhood(x{:}),'');
-    aet({'foo','foo'});
-    aet({ds});
-    aet({ds,'foo'});
-    mx(1)=NaN;
-    aet({mx});
-    nh.neighbors{1}=NaN;
-    aet({nh});
-    nb{1}=NaN;
-    aet({nb});
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_convert_neighborhood(varargin{:}),'');
+    aet('foo','foo');
+    aet(ds);
+    aet(ds,'foo');
 
+    aet(mx,'foo');
+    aet(nb,'foo');
+    aet(nh,'foo');
+
+    mx(1)=NaN;
+    aet(mx);
+    nh.neighbors{1}=NaN;
+    aet(nh);
+    nb{1}=NaN;
+    aet(nb);
+
+    mx=zeros([2 2 2]);
+    aet(mx);
+    mx=[false true];
+    aet(mx);
 
 
 
