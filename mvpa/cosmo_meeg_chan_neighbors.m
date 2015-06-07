@@ -421,9 +421,7 @@ function nbrs_msk=pairwise_nearest_neighbors(pos,msk,count)
 
 function nbrs_msk=pairwise_delaunay_neighbors(pos,msk,steps)
     % compute steps-th order neighbors
-    if size(pos,2)~=3 && ~ismatrix(pos)
-        error('positions must be in Mx2 matrix');
-    end
+    raise_error_if_not_two_column_matrix(pos);
 
     if islogical(steps)
         steps=0+steps;
@@ -549,10 +547,7 @@ function nbrs_msk=nearest_neighbors_from_distance(d,msk,count)
 
 
 function d=pairwise_euclidean_distance(pos)
-    two=size(pos,2);
-    if two~=2 && ~ismatrix(pos)
-        error('positions must be in Mx2 matrix');
-    end
+    raise_error_if_not_two_column_matrix(pos);
 
     px=pos(:,1);
     py=pos(:,2);
@@ -561,7 +556,11 @@ function d=pairwise_euclidean_distance(pos)
 
     d=sqrt(dx.^2+dy.^2);
 
-
+function raise_error_if_not_two_column_matrix(pos)
+    is_ok=size(pos,2)==2 && numel(size(pos))==2;
+    if ~is_ok
+        error('positions must be in Mx2 matrix');
+    end
 
 function chan_labels=get_dataset_channel_label(ds)
     % helper function to get labels from dataset
