@@ -95,7 +95,7 @@ function has_key=single_isfield(s, name, raise)
             return;
         end
 
-        if numel(value)~=1
+        if numel(value)~=1 && j~=nkeys
             if raise
                 error('Unsupported non-singleton struct');
             end
@@ -106,7 +106,7 @@ function has_key=single_isfield(s, name, raise)
 
         if ~isfield(value,key)
             if raise
-                error('Struct has missing field .%s',key_name(keys,j));
+                error('Struct does not have field .%s',key_name(keys,j));
             end
             return;
         end
