@@ -76,7 +76,7 @@ function test_dim_generalization_measure_basics
                 te_tr=cosmo_dim_transpose(te,'time',2);
 
 
-                both=cosmo_stack({tr_tr,te_tr});
+                both=cosmo_stack({tr_tr,te_tr},1,'drop_nonunique');
                 both.a.fdim.values=both.a.fdim.values(1);
                 both.a.fdim.labels=both.a.fdim.labels(1);
                 pos=pos+1;

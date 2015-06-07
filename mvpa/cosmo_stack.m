@@ -17,7 +17,7 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %                - 'drop_nonunique'  elements differing are dropped
 %                - 'unique'          raise an exception if elements differ
 %                - I                 integer; use data from datasets{I}
-%                The default is 'drop_nonunique'
+%                The default is 'unique'
 %   check        Boolean indicating whether to check for the proper size of
 %                the input datasets. The default is true; setting this to
 %                false makes this function run faster but, if the input
@@ -175,7 +175,7 @@ function [dim, merge, check]=process_parameters(ds_cell, varargin)
     end
 
     if narg<2 || isempty(varargin{2})
-        merge='drop_nonunique';
+        merge='unique';
     else
         merge=varargin{2};
         if ~isnumeric(merge) && ...
