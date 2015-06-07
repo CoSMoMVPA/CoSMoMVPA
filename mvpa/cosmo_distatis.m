@@ -492,7 +492,7 @@ function [dsm, dim_labels, dim_values, is_ds]=get_dsm(data)
             dsm(i(pos),j(pos),:)=data(pos,:);
         end
 
-        sq1=squareform(data(:,1));
+        sq1=cosmo_squareform(data(:,1));
         dsm1=dsm(:,:,1);
         assert(isequal(sq1,dsm1+dsm1'));
 
