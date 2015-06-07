@@ -153,7 +153,11 @@ function [xd,yd]=get_default(x,y)
 
 
 function [x,y]=get_mapping(fmt)
-    % mapping from codes to
+    if ~ischar(fmt)
+        error('first argument must be a string');
+    end
+
+    % mapping from codes to indices
     switch fmt
         case 'nii'
             codes={'scanner_anat',1;...
