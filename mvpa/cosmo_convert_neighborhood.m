@@ -15,11 +15,11 @@ function conv_nbrhood=cosmo_convert_neighborhood(nbrhood, output_type)
 %                                      values indicating no index), with M
 %                                      the maximum number of features in a
 %                                      single neighborhood
-%     output_type           Optional, one of ''cell'', ''matrix'', or
-%                           ''struct''.
+%     output_type           Optional, one of 'cell', 'matrix', or
+%                           'struct'.
 %                           If empty or omitted, then output_type is set to
-%                           ''matrix'', unless nbrhood is a matrix, in
-%                           which case it is set to ''cell''.
+%                           'matrix', unless nbrhood is a matrix, in
+%                           which case it is set to 'cell'.
 % Output:
 %     conv_nbrhood          Neighborhood information converted to cell,
 %                           struct, or matrix (see above)
