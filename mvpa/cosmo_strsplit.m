@@ -73,12 +73,18 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %
 % NNO Sep 2013
 
+if ~ischar(string)
+    error('first argument must be a string');
+end
+
 if nargin<2 || (~ischar(delim) && isequal(delim,[]))
     % split by white-space
     split=regexp(string,'(\S)*','match');
-else
+elseif ischar(delim)
     pat=regexptranslate('escape',sprintf(delim));
     split=regexp(string,pat,'split');
+else
+    error('Second argument, if provided, must be a string');
 end
 
 nsplit=numel(split);

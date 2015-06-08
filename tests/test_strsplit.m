@@ -26,6 +26,11 @@ function test_suite = test_strsplit_basics
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_strsplit(varargin{:}),'');
     aet('A*A','A',1:2);
+    aet('A*A',struct());
+    aet('A*A',{});
+    aet(struct(),'A*A');
+    aet({},'A*A');
+    aet({});
 
 
 
