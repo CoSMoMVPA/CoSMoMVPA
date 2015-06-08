@@ -49,6 +49,8 @@ function x=do_nothing(x)
 
 function save_and_load(format)
     ds=cosmo_synthetic_dataset('type','surface','nchunks',1);
+    nfeatures=size(ds.samples,2);
+    ds.fa.node_indices=ds.fa.node_indices(randperm(nfeatures));
     ds.sa=struct();
     ds.sa.stats={'Ftest(3,4)';'Zscore()'};
     ds.sa.labels={'label1';'label2'};
@@ -101,12 +103,14 @@ function save_and_load(format)
 
 
 function assert_dataset_equal(x,y,format)
-    assertElementsAlmostEqual(x.samples,y.samples,'absolute',1e-4);
-    assertEqual(x.fa,y.fa);
-    assertEqual(x.a,y.a);
+    mp=cosmo_align(y.fa.node_indices,x.fa.node_indices);
+    z=cosmo_slice(y,mp,2);
+    assertElementsAlmostEqual(x.samples,z.samples,'absolute',1e-4);
+    assertEqual(x.fa,z.fa);
+    assertEqual(x.a,z.a);
 
     if ~strcmp(format,'gii')
-        assertEqual(x.sa,y.sa);
+        assertEqual(x.sa,z.sa);
     end
 
 
