@@ -281,7 +281,6 @@ class CoSMoModules(object):
                      'classify_nn',
                      'classify_selective_naive_bayes',
                      'classify_svm',
-                     'meta_feature_selection_classifier',
                      'crossvalidate',
                      'crossvalidation_measure',
                      'winner_indices',
@@ -290,8 +289,6 @@ class CoSMoModules(object):
                      ],
 
         operations=['slice',
-                    'dataset_slice_fa',
-                    'dataset_slice_sa',
                     'stack',
                     'split',
                     'dim_prune',
@@ -422,6 +419,11 @@ class CoSMoModules(object):
                     'vol_grid_convert',
                     'vol_coordinates',
                     ],
+
+        deprecated=['dataset_slice_fa',
+                    'dataset_slice_sa',
+                    'meta_feature_selection_classifier',
+                   ],
         )
 
 
@@ -441,7 +443,9 @@ class CoSMoModules(object):
                 ('stats','Univariate statistics'),
                 ('utils','Utility functions'),
                 ('helpers','Misceleanous helper functions'),
-                ('develop','Developer functions')]
+                ('develop','Developer functions'),
+                ('deprecated','Deprecated - to be removed in the future'),
+                ]
 
     def __init__(self, source_dir='../mvpa',prefix='cosmo_',ext='.m'):
         self.source_dir=source_dir
