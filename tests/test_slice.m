@@ -162,6 +162,29 @@ function test_slice_datasets()
         end
     end
 
+function test_slice_sa_fa
+    % dataset_slice_{fa,sa} are deprecated, so shows a warning
+    warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    ds=cosmo_synthetic_dataset();
+    sz=size(ds);
+
+    for dim=1:2
+        n=sz(dim);
+        rp=randperm(n);
+        rp=rp(1:round(n/2));
+
+        x=cosmo_slice(ds,rp,dim);
+        if dim==1
+            y=cosmo_dataset_slice_sa(ds,rp);
+        else
+            y=cosmo_dataset_slice_fa(ds,rp);
+        end
+        assertEqual(x,y);
+    end
+
 function test_slice_datasets_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_slice(varargin{:}),'');
