@@ -1,5 +1,5 @@
 function ds=cosmo_dataset_slice_fa(ds, to_select)
-% Slice a dataset by features (columns)
+% Slice a dataset by features (columns) [deprecated]
 %
 % sliced_ds=cosmo_dataset_slice_fa(ds, to_select)
 %
@@ -101,11 +101,17 @@ function ds=cosmo_dataset_slice_fa(ds, to_select)
 %     >     { 'vt'  'v1' }
 %
 % Note:
-%   - this function is intended as an exercise. For a more powerful
-%     implementation that deals with cell inputs correctly,
-%     consider using comso_slice(dataset, to_select, 2).
+%   - This function was, in 2013, intended as an exercise.
+%   - This function is deprecated and will be removed in the future;
+%     it is strongly recommended to use:
+%           comso_slice(dataset, to_select, 2).
 %
-% See also: cosmo_slice, cosmo_dataset_slice_fa
+% See also: cosmo_slice
+
+
+    cosmo_warning(['%s is deprecated and will be removed in the future;'...
+                ' use cosmo_slice(...,...,2) instead'],...
+                  mfilename());
 
     % First slice the features array by columns
 
