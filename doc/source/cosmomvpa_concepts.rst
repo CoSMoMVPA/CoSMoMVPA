@@ -301,18 +301,16 @@ A neighborhood is a ``struct`` with fields:
     - ``.neighbors``: an ``Nx1`` cell for N neighborhoods, where ``.neighbors{k}`` is a vector with features indices in the *source* domain associated with the ``k``-th neighborhood.
     - (optional) ``.fa`` the feature attributes for the target domain. Each field element ``.fa.field`` should have ``N`` elements in the second (i.e. feature) dimension.
     - (optional) ``.a`` the dataset attributes for the target domain.
+    - (optional) ``.origin``, with subfields ``.a`` and ``.fa``, with attributes in the source domain. If present, this information is used when a neighborhood is applied to a dataset: if they do not match the attributes, an error is thrown. This can help in accidentally using the wrong neighborhood for a particular dataset.
 
 When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`_ (see below), data from ``.fa`` and ``.a`` from the neighborhood are combined with the ``.samples`` and ``.sa`` output from the measure to form a full dataset structure with fields ``.samples``, ``.sa``, ``.fa``, and ``.a``.
 
 Neighborhood-related functions include:
 
-    - :ref:`cosmo_spherical_neighborhood`: fMRI spherical volume-based searchlight (c.f. Kriegeskorte et al 2006).
-    - :ref:`cosmo_surficial_neighborhood`: fMRI surface-based searchlight (c.f. Oosterhof et al 2011).
-    - :ref:`cosmo_interval_neighborhood`: MEEG searchlight for time or frequency domain.
-    - Currently under development (not present in ``master``-branch):
-
-        + *cosmo_meeg_chan_neighborhood*: MEEG searchlight over sensors.
-        + *cosmo_meeg_source_neighborhood*: MEEG searchlight over source space.
+    - :ref:`cosmo_spherical_neighborhood`: for fMRI spherical volume-based searchlight (c.f. Kriegeskorte et al 2006), and MEEG source-space searchlight.
+    - :ref:`cosmo_surficial_neighborhood`: for fMRI surface-based searchlight (c.f. Oosterhof et al 2011).
+    - :ref:`cosmo_interval_neighborhood`: for MEEG searchlight for time or frequency domain.
+    - :ref:`cosmo_meeg_chan_neighborhood`: for MEEG searchlight over sensors.
 
 The :ref:`cosmo_cross_neighborhood` can *cross* different neighborhoods, which provides functionality for:
 
