@@ -55,6 +55,9 @@ function s=cosmo_map2surface(ds, fn, varargin)
 % See also: cosmo_surface_dataset
 %
 % NNO May 2014
+    if ~ischar(fn)
+        error('second argument must be a string');
+    end
 
     defaults=struct();
     opt=cosmo_structjoin(defaults,varargin);
