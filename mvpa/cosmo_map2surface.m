@@ -197,14 +197,21 @@ function write_niml_dset(fn,s,opt)
 function s=build_bv_smp(ds)
     s=xff('new:smp');
 
-    nsamples=size(ds.samples,1);
+    [nsamples,nfeatures]=size(ds.samples);
+    [data, node_indices]=get_surface_data_and_node_indices(ds);
+    if ~isequal(node_indices,1:nfeatures)
+        error(['BrainVoyager smp only support data with all node '...
+                'present and with .a.fdim.values{1}=1:N, where N '...
+                'is the number of nodes']);
+    end
+
     stats=cosmo_statcode(ds,'bv');
 
     maps=cell(1,nsamples);
     for k=1:nsamples
         t=xff('new:smp');
         map=t.Map;
-        map.SMPData=cosmo_unflatten(cosmo_slice(ds,k));
+        map.SMPData=data(k,:);
 
         if k==1
             % store the number of features
