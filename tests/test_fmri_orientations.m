@@ -64,6 +64,14 @@ function test_fmri_orientations_exceptions()
     aet({})
     aet(zeros(4));
 
+function test_fmri_reorient_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_fmri_reorient(varargin{:}),'');
+    ds=cosmo_synthetic_dataset();
+    aet(ds,'  RAI');
+    aet(ds,'  RAA');
+
+
 function test_fmri_orientations_with_afni_binary()
     if cosmo_skip_test_if_no_external('afni_bin')
         return
