@@ -13,10 +13,12 @@ function [ds_useful,msk]=cosmo_remove_useless_data(ds, dim, type)
 %                   'variable'  : keep non-constant data
 %                   'finite'    : keep non-finite (NaN or Inf) data
 %                   'all'       : keep variable and finite data
-%                   default: all
+%                   default: 'all'
 % Output:
 %   ds_useful       dataset struct sliced so that useless data along the
-%                   dim-th dimension is removed.
+%                   dim-th dimension is removed. Data is not considered as
+%                   constant if it is not NaN and there is a single row (or
+%                   column).
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset('nchunks',2);
@@ -116,6 +118,8 @@ function tf=variable(d, dim)
             d_first=d(:,1);
     end
 
-    tf=sum(bsxfun(@ne, d_first, d), dim)>0 & ~any(isnan(d),dim);
-
+    tf=~any(isnan(d),dim);
+    if size(d,dim)>1
+        tf=tf & sum(bsxfun(@ne, d_first, d), dim)>0;
+    end
 
