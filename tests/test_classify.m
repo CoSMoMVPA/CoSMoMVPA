@@ -27,6 +27,22 @@ function test_classify_meta_feature_selection
                                     9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
     assert_throws_illegal_input_exceptions(cfy,opt)
 
+function test_cosmo_meta_feature_selection_classifier
+    % deprecated, so shows a warning
+    warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    cfy=@cosmo_meta_feature_selection_classifier;
+    opt=struct();
+    opt.child_classifier=@cosmo_classify_lda;
+    opt.feature_selector=@cosmo_anova_feature_selector;
+    opt.feature_selection_ratio_to_keep=.6;
+    handle=get_predictor(cfy,opt);
+    assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
+                                    9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
+    assert_throws_illegal_input_exceptions(cfy,opt)
+
 function test_classify_nn
     cfy=@cosmo_classify_nn;
     handle=get_predictor(cfy);
@@ -139,11 +155,12 @@ function assert_throws_illegal_input_exceptions(cfy_base,opt)
     assertExceptionThrown(@()cfy([1 2; 3 4; 5 6],[1;1;1],[1 2 3]),'')
 
     % should pass
-    non_single_class_classifiers={@cosmo_classify_matlabsvm_2class,...
-                                  @cosmo_classify_meta_feature_selection};
+    non_one_class_classifiers={@cosmo_classify_matlabsvm_2class,...
+                               @cosmo_classify_meta_feature_selection,...
+                               @cosmo_meta_feature_selection_classifier};
 
     can_handle_single_class=~any(cellfun(@(x)isequal(cfy_base,x),...
-                                    non_single_class_classifiers));
+                                    non_one_class_classifiers));
 
     if can_handle_single_class
         cfy([1 2; 3 4],[1;1],[1 2]);
