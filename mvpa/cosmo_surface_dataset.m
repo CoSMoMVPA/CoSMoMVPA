@@ -97,31 +97,29 @@ function ds=cosmo_surface_dataset(fn, varargin)
     if cosmo_check_dataset(fn,'surface',false)
         % it is already a dataset, so return it
         ds=fn;
-        return
+    else
+        [data,node_indices,sa]=read(fn);
+        nfeatures=size(data,2);
+        if nfeatures~=numel(node_indices)
+            error(['The number of features (%d) does not match the number '...
+                    'of node indices (%d)'],nfeatures,numel(node_indices));
+        end
+
+        ds=struct();
+        ds.samples=data;
+
+        % set sample attributes
+        ds.sa=sa;
+
+        % set feature attributes
+        ds.fa.node_indices=1:nfeatures;
+
+        % set dataset attributes
+        fdim=struct();
+        fdim.labels={'node_indices'};
+        fdim.values={node_indices(:)'};
+        ds.a.fdim=fdim;
     end
-
-
-    [data,node_indices,sa]=read(fn);
-    nfeatures=size(data,2);
-    if nfeatures~=numel(node_indices)
-        error(['The number of features (%d) does not match the number '...
-                'of node indices (%d)'],nfeatures,numel(node_indices));
-    end
-
-    ds=struct();
-    ds.samples=data;
-
-    % set sample attributes
-    ds.sa=sa;
-
-    % set feature attributes
-    ds.fa.node_indices=1:nfeatures;
-
-    % set dataset attributes
-    fdim=struct();
-    fdim.labels={'node_indices'};
-    fdim.values={node_indices(:)'};
-    ds.a.fdim=fdim;
 
      % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);

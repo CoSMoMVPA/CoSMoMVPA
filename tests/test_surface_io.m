@@ -76,6 +76,16 @@ function save_and_load(format)
 
     assert_dataset_equal(ds,ds3,format);
 
+    targets=[3 4];
+    chunks=5;
+    ds4=cosmo_surface_dataset(ds3,'targets',targets,'chunks',chunks);
+    ds4_expected=ds3;
+    ds4_expected.sa.chunks=[chunks; chunks];
+    ds4_expected.sa.targets=targets(:);
+    assertEqual(ds4,ds4_expected);
+
+
+    % make illegal dataset
     fid=fopen(tmp_fn,'w');
     fprintf(fid,'foo');
     fclose(fid);
