@@ -61,10 +61,10 @@ function test_onesample_ttest_montecarlo_cluster_stat
     opt=struct();
     opt.h0_mean=-10;
     opt.progress=false;
-    opt.niter=10;
+    opt.niter=14;
     z_ds6=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
     assertElementsAlmostEqual(z_ds6.samples,...
-                        repmat(1.2816,1,6),...
+                        repmat(1.4652,1,6),...
                         'absolute',1e-4);
 
 function test_twosample_ttest_montecarlo_cluster_stat
@@ -105,19 +105,19 @@ function test_twosample_ttest_montecarlo_cluster_stat
 
     % lots of signal, should work with no seed specified
     opt=struct();
-    opt.niter=10;
+    opt.niter=15;
     opt.progress=false;
     msk1=ds.sa.targets==1;
     ds.samples(msk1,:)=ds.samples(msk1,:)+10;
     z_ds3=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds3.samples,...
-                    repmat(1.2816,1,6),...
+                    repmat(1.5011,1,6),...
                     'absolute',1e-4);
 
     opt.cluster_stat='foo';
     aet(ds,nh1,opt);
-    opt=rmfield(opt,'cluster_stat');
 
+    opt=rmfield(opt,'cluster_stat');
     opt.h0_mean=3;
     aet(ds,nh1,opt);
 
@@ -224,6 +224,7 @@ function test_null_data_montecarlo_cluster_stat
     aet(ds,nh_bad,opt);
 
 
+    % check with standard datasets
     opt.null=null_ds_cell;
     opt.seed=1;
     opt.h0_mean=0;
@@ -239,6 +240,15 @@ function test_null_data_montecarlo_cluster_stat
                     'absolute',1e-4);
 
 
+    opt=rmfield(opt,'seed');
+    for k=1:numel(opt.null)
+        opt.null{k}.samples=opt.null{k}.samples-10;
+    end
+    opt.h0_mean=-10;
+    z_ds3=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
+    assertElementsAlmostEqual(z_ds3.samples,...
+                    repmat(1.2816,1,6),...
+                    'absolute',1e-4);
 
 
 
