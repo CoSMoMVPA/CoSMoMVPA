@@ -67,6 +67,7 @@ function test_remove_useless_data_exceptions
     aet(data,'foo');
     aet(data,1,'foo');
     aet(data,2,'foo');
+    aet(data,2,struct());
     aet(data,3);
     aet(data,3,'variable');
 
@@ -74,6 +75,7 @@ function test_remove_useless_data_exceptions
     aet(ds,'foo');
     aet(ds,1,'foo');
     aet(ds,2,'foo');
+    aet(ds,2,struct());
     aet(ds,3);
     aet(ds,3,'variable');
 
