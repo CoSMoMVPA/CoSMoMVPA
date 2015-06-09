@@ -102,15 +102,15 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     p=cosmo_nchoosek_partitioner(ds,'half');
 %     cosmo_disp(p);
 %     > .train_indices
-%     >   { [ 3    [ 2    [ 2
-%     >       4      4      3
-%     >       5      5      6
-%     >       6 ]    7 ]    7 ] }
-%     > .test_indices
 %     >   { [ 1    [ 1    [ 1
 %     >       2      3      4
 %     >       7      6      5
 %     >       8 ]    8 ]    8 ] }
+%     > .test_indices
+%     >   { [ 3    [ 2    [ 2
+%     >       4      4      3
+%     >       5      5      6
+%     >       6 ]    7 ]    7 ] }
 %     %
 %     % test on samples with chunk=3 only using take-one-fold out
 %     p=cosmo_nchoosek_partitioner(ds,1,'chunks',3);
@@ -449,8 +449,8 @@ if all(cosmo_match(chunks,[1 2]))
 
     partitions=struct();
     if is_symmetric
-        partitions.train_indices={chunk2_idxs};
-        partitions.test_indices={chunk1_idxs};
+        partitions.train_indices={chunk1_idxs};
+        partitions.test_indices={chunk2_idxs};
     else
         partitions.train_indices={chunk1_idxs,chunk2_idxs};
         partitions.test_indices={chunk2_idxs,chunk1_idxs};
@@ -480,8 +480,8 @@ if is_symmetric && mod(nclasses,2)==0
     matches=bsxfun(@eq,sort(check_combis,2),1:nclasses);
     assert(all(matches(:)),'nchoosek behaves weirdly');
 
-    % we're good - just take the first half and update npartitions
-    combis=combis(1:nhalf,:);
+    % we're good - just take the second half and update npartitions
+    combis=combis(npartitions:-1:(nhalf+1),:);
     npartitions=nhalf;
 end
 

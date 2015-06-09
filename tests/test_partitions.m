@@ -80,8 +80,8 @@ function test_nchoosek_partitioner_half()
                 te_idx=find(cosmo_match(ds.sa.chunks-offset,...
                                                         combis(n-k+1,:)));
 
-                assertEqual(p.train_indices{k},te_idx);
-                assertEqual(p.test_indices{k},tr_idx);
+                assertEqual(p.train_indices{k},tr_idx);
+                assertEqual(p.test_indices{k},te_idx);
             end
         end
     end
