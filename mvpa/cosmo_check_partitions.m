@@ -84,6 +84,7 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     check_dataset(ds);
 
     % ensure it has targets and chunks
+    cosmo_isfield(ds,{'sa.targets','sa.chunks'},true);
     targets=ds.sa.targets;
     chunks=ds.sa.chunks;
 
@@ -91,10 +92,16 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
         [classes,unused,sample2class]=unique(targets);
     end
 
-    % ensure equal number of partitions for train and test
+    % must have .train_indices and .test_indices
+    cosmo_isfield(partitions,{'train_indices','test_indices'},true);
     train_indices=partitions.train_indices;
     test_indices=partitions.test_indices;
 
+    if ~iscell(train_indices) || ~iscell(test_indices)
+        error('.train_indices and .test_indices must be a cell');
+    end
+
+    % ensure equal number of partitions for train and test
     npartitions=numel(train_indices);
     if npartitions~=numel(test_indices)
         error('Partition count mismatch for train and test: %d ~= %d',...
@@ -157,14 +164,13 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     is_ok=true;
 
 function check_range(idxs,nsamples,partition,label)
-    if isempty(idxs)
-        return;
-    end
     msg='';
-    if ~isequal(idxs,round(idxs))
+    if isempty(idxs)
+        msg='empty';
+    elseif ~isequal(idxs,round(idxs))
         msg='not integers';
     elseif min(idxs)<1 || max(idxs)>nsamples
-        msg=sprintf('outside range 1..%d',nsamples);
+        msg=sprintf('outside range 1:%d',nsamples);
     end
 
     if ~isempty(msg)
@@ -181,7 +187,7 @@ function check_dataset(ds)
         return
     end
 
-    error('illegal dataset input');
+    error('second input must be a dataset struct');
 
 
 
