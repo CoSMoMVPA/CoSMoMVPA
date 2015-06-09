@@ -259,9 +259,24 @@ function is_ok=check_matlab_toolbox(toolbox_name,raise_)
     end
 
 function tf=toolbox_in_matlab_path(toolbox_dir)
-    paths=cosmo_strsplit(path(),pathsep());
-    starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
-    tf=any(cellfun(starts_with_toolbox_dir,paths));
+    persistent cached_toolbox_dir;
+    persistent cached_tf;
+    persistent cached_path;
+
+    cur_path=path();
+    if ~(isequal(cur_path, cached_path) && isequal(toolbox_dir, cached_toolbox_dir))
+         paths=cosmo_strsplit(path(),pathsep());
+        starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
+        cached_tf=any(cellfun(starts_with_toolbox_dir,paths));
+        cached_path=cur_path;
+        cached_toolbox_dir=toolbox_dir;
+    end
+
+    tf=cached_tf;
+
+    %paths=cosmo_strsplit(path(),pathsep());
+    %starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
+    %f=any(cellfun(starts_with_toolbox_dir,paths));
 
 
 function s=url2str(url)
