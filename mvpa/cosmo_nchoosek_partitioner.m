@@ -448,9 +448,9 @@ if all(cosmo_match(chunks,[1 2]))
     chunk2_idxs=find(~chunk_msk1);
 
     partitions=struct();
-    if strcmp(k,'half')
-        partitions.train_indices={chunk1_idxs};
-        partitions.test_indices={chunk2_idxs};
+    if is_symmetric
+        partitions.train_indices={chunk2_idxs};
+        partitions.test_indices={chunk1_idxs};
     else
         partitions.train_indices={chunk1_idxs,chunk2_idxs};
         partitions.test_indices={chunk2_idxs,chunk1_idxs};
