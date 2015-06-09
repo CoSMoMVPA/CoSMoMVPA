@@ -423,7 +423,8 @@ if ischar(k)
     else
         error('illegal string k')
     end
-elseif isnumeric(k)
+end
+if isnumeric(k)
     if ~isscalar(k)
         error('k must be a scalar');
     end
