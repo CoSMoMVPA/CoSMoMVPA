@@ -304,7 +304,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 
     if nargin<3
         return;
-    elseif nargin==3
+    elseif mod(nargin,2)~=0
         error('Need even number of arguments');
     else
         nsamples=numel(chunks);
