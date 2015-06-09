@@ -408,23 +408,7 @@ function partitions=group_by(partitions, group_values, test_group_by)
 function partitions=nchoosek_partitioner(chunks,k)
 % straightfoward partitioner
 
-% little optimization: if just two chunks, the split is easy
-if all(cosmo_match(chunks,[1 2]))
 
-    chunk_msk1=chunks==1;
-    chunk1_idxs=find(chunk_msk1);
-    chunk2_idxs=find(~chunk_msk1);
-
-    partitions=struct();
-    if strcmp(k,'half')
-        partitions.train_indices={chunk1_idxs};
-        partitions.test_indices={chunk2_idxs};
-    else
-        partitions.train_indices={chunk1_idxs,chunk2_idxs};
-        partitions.test_indices={chunk2_idxs,chunk1_idxs};
-    end
-    return
-end
 
 
 [unq,unused,chunk_indices]=unique(chunks);
@@ -439,15 +423,38 @@ if ischar(k)
     else
         error('illegal string k')
     end
+elseif isnumeric(k)
+    if ~isscalar(k)
+        error('k must be a scalar');
+    end
+
+    if k ~= round(k)
+        k=round(nclasses*k);
+    end
+
+    if ~any(k==1:(nclasses-1))
+        error('illegal k=%d: test class count should be between 1 and %d', ...
+                    k, nclasses-1);
+    end
+else
+    error('illegal parameter for k');
 end
 
-if k ~= round(k)
-    k=round(nclasses*k);
-end
+% little optimization: if just two chunks, the split is easy
+if all(cosmo_match(chunks,[1 2]))
+    chunk_msk1=chunks==1;
+    chunk1_idxs=find(chunk_msk1);
+    chunk2_idxs=find(~chunk_msk1);
 
-if ~any(k==1:(nclasses-1))
-    error('illegal k=%d: test class count should be between 1 and %d', ...
-                k, nclasses-1);
+    partitions=struct();
+    if strcmp(k,'half')
+        partitions.train_indices={chunk1_idxs};
+        partitions.test_indices={chunk2_idxs};
+    else
+        partitions.train_indices={chunk1_idxs,chunk2_idxs};
+        partitions.test_indices={chunk2_idxs,chunk1_idxs};
+    end
+    return
 end
 
 npartitions=nchoosek(nclasses,k);
