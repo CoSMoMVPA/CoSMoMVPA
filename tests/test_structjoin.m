@@ -25,9 +25,17 @@ function test_structjoin_
     assertEqual(sj(cell(0)),struct);
 
     % check exceptions
-    ar=@(args) assertExceptionThrown(@()cosmo_structjoin(args{:}),'');
-    ar({'a'});
-    ar({struct,'a'});
-    ar({1});
-    ar({ar});
-    ar({[]});
+    aet=@(varargin) assertExceptionThrown(@()...
+                            cosmo_structjoin(varargin{:}),'');
+    aet('a');
+    aet(struct,'a');
+    aet(1);
+    aet(aet);
+    aet([]);
+
+    s=struct();
+    s.a=2;
+    s.b=3;
+    s2=cat(1,s,s);
+    aet(s2);
+

@@ -8,7 +8,9 @@ function s=cosmo_structjoin(varargin)
 %               - if a cell, then it should contain structs or key-value
 %                 pairs
 %               - if a struct, then value=arg{X}.(key) for each key in
-%                 fieldnames(arg{X}) is stored as s.(key)=value
+%                 fieldnames(arg{X}) is stored as s.(key)=value.
+%                 In this case, it is required that the struct is of size
+%                 1x1.
 %               - if a string, then it is stored as s.(arg{X})=arg{X+1}
 %
 % Returns:
@@ -106,11 +108,9 @@ function s=structjoin_wrapper(varargin)
         end
 
         if isstruct(v)
-            if isempty(v)
-                continue;
-            elseif isempty(s)
-                s=v;
-                continue;
+            if numel(v)~=1
+                error(['only singleton structs (of size 1x1) '...
+                            'are supported']);
             end
 
             % overwrite any values in s
