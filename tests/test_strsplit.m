@@ -5,6 +5,7 @@ function test_suite = test_strsplit_basics
     aeq=@(a,varargin)assertEqual(cosmo_strsplit(varargin{:}),a);
 
     aeq({'A','AbbAbA','AbA','A','Ab'},'A*AbbAbA*AbA*A*Ab','*');
+    aeq({'','A','AbbAbA','','AbA','A','Ab',''},'*A*AbbAbA**AbA*A*Ab*','*');
     aeq({'','bbAb','b','*Ab'},'A*AbbAbA*AbA*A*Ab','A*A');
     aeq('bbAb','A*AbbAbA*AbA*A*Ab','A*A',2);
     aeq('*Ab','A*AbbAbA*AbA*A*Ab','A*A',-1);
