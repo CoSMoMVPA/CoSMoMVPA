@@ -84,7 +84,7 @@ function ds=bv_force_fit(ds)
     dim=[ds.a.vol.dim(:);1];
     rot=mat(1:3,1:3);
     vox_size=sqrt(sum(rot.^2,1)); %.*sign(sum(rot,1));
-    resolution=1/round(mean(abs(vox_size)));
+    resolution=prod(vox_size).^(1/3);
 
     % put the center defined by the original matrix close to the center
     % defined by the new matrix
