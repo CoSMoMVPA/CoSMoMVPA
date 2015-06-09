@@ -178,6 +178,8 @@ function test_nchoosek_partitioner_exceptions()
         aet(struct,1);
         aet(ds,'foo');
         aet(ds,.5,'foo');
+        aet(ds,struct);
+        aet(ds,1,1);
 
         ds.sa.modality=3; % size mismatch
         aet(ds,1,'modality',1);
