@@ -184,6 +184,9 @@ function assert_throws_illegal_input_exceptions(cfy_base,opt)
     assertEqual(size(res),[2 1]);
     assertTrue(all(res==1 | res==2));
 
+    res2=cfy(zeros(4,0),[1 1 2 2]',zeros(2,0));
+    assertEqual(res,res2);
+
 function handle=get_predictor(cfy,opt,nclasses)
     if nargin<3
         nclasses=9;
@@ -198,6 +201,10 @@ function handle=get_predictor(cfy,opt,nclasses)
 function assert_predictions_equal(handle, targets)
     pred=handle();
     assertEqual(pred, targets);
+
+    % test caching, if implemented
+    pred2=handle();
+    assertEqual(pred,pred2);
 
 
 function [tr_samples,tr_targets,te_samples]=generate_data(nclasses)
