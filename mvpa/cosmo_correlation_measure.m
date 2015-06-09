@@ -298,8 +298,8 @@ switch params.output
         ds_sa.samples=mean(cat(2,pdata{:}),2);
 
         nclasses=numel(classes);
-        ds_sa.sa.half1=reshape(repmat((1:nclasses),nclasses,1),[],1);
-        ds_sa.sa.half2=reshape(repmat((1:nclasses)',nclasses,1),[],1);
+        ds_sa.sa.half1=reshape(repmat((1:nclasses)',nclasses,1),[],1);
+        ds_sa.sa.half2=reshape(repmat((1:nclasses),nclasses,1),[],1);
 
         ds_sa.a.sdim=struct();
         ds_sa.a.sdim.labels={'half1','half2'};
