@@ -49,7 +49,8 @@ function test_dim_generalization_measure_basics
     % partitions not allowed
     aet(ds,opt,'partitions',cosmo_nfold_partitioner(ds));
 
-    ds.samples=bsxfun(@plus,(ds.fa.chan-1)*12,6*(ds.sa.time-1)+3*(ds.sa.chunks-1)+ds.sa.targets);
+    ds.samples=bsxfun(@plus,(ds.fa.chan-1)*12,...
+                    6*(ds.sa.time-1)+3*(ds.sa.chunks-1)+ds.sa.targets);
 
     ds.a.sdim.values{1}(end+1)=2;
     tr_ds=cosmo_slice(ds,ds.sa.chunks==1);
@@ -114,7 +115,8 @@ function test_dim_generalization_measure_basics
     assertFalse(isequal(ds_perm,ds));
 
     opt.radius=1;
-    assertExceptionThrown(@()cosmo_dim_generalization_measure(ds_perm,opt),'')
+    assertExceptionThrown(@()cosmo_dim_generalization_measure(...
+                                                    ds_perm,opt),'')
     %result_perm=cosmo_dim_generalization_measure(ds_perm,opt);
     %assertEqual(result_perm,result);
 
