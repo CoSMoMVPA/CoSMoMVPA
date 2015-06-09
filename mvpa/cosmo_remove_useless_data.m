@@ -80,32 +80,26 @@ function [ds_useful,msk]=cosmo_remove_useless_data(ds, dim, type)
 %
 % NNO Aug 2014
 
-if nargin<3 || isempty(type), type='all'; end
-if nargin<2 || isempty(dim), dim=1; end;
+    if nargin<3 || isempty(type), type='all'; end
+    if nargin<2 || isempty(dim), dim=1; end;
 
-if isstruct(ds)
-    data=ds.samples;
-elseif isnumeric(ds) || islogical(ds)
-    data=ds;
-else
-    error('illegal input: expect array or dataset struct');
-end
+    check_inputs(dim,type);
 
-n=size(data,1);
+    data=get_data(ds);
 
-switch type
-    case 'finite'
-        msk=finite(data, dim);
-    case 'variable'
-        msk=variable(data, dim);
-    case 'all'
-        msk=finite(data, dim) & variable(data, dim);
-    otherwise
-        error('illegal type %s', type);
-end
+    switch type
+        case 'finite'
+            msk=finite(data, dim);
+        case 'variable'
+            msk=variable(data, dim);
+        case 'all'
+            msk=finite(data, dim) & variable(data, dim);
+        otherwise
+            error('illegal type %s', type);
+    end
 
-other_dim=3-dim;
-ds_useful=cosmo_slice(ds, msk, other_dim);
+    other_dim=3-dim;
+    ds_useful=cosmo_slice(ds, msk, other_dim);
 
 function tf=finite(d, dim)
     tf=all(isfinite(d),dim);
@@ -122,4 +116,33 @@ function tf=variable(d, dim)
     if size(d,dim)>1
         tf=tf & sum(bsxfun(@ne, d_first, d), dim)>0;
     end
+
+function data=get_data(ds)
+    if isstruct(ds)
+        cosmo_isfield(ds,'samples',true);
+        data=ds.samples;
+    else
+        data=ds;
+    end
+
+    if ~isnumeric(data)
+        error('illegal input: expected numerical data');
+    end
+
+    if numel(size(data))>2
+        error('illegal input: expected data in matrix');
+    end
+
+function check_inputs(dim,type)
+    if ~(isscalar(dim) && isnumeric(dim) && (dim==1 || dim==2))
+        error('second argument must be 1 or 2');
+    end
+
+    if ~ischar(type)
+        error('third argument must be a string');
+    end
+
+
+
+
 
