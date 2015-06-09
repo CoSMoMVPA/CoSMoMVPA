@@ -108,6 +108,10 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 % NNO Sep 2013
     if nargin<2 || isempty(dim), dim=2; end
 
+    if ~(isnumeric(dim) && isscalar(dim))
+        error('second argument must be numeric');
+    end
+
     defaults=struct();
     defaults.set_missing_to=0;
     defaults.matrix_labels=cell(0);
