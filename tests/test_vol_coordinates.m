@@ -133,6 +133,36 @@ function test_vol_coordinates_afni()
         end
     end
 
+function test_test_vol_coordinates_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_vol_coordinates(varargin{:}),'');
+
+    ds=cosmo_synthetic_dataset();
+
+    % not 1xP or 3xP
+    aet(ds, ones(2));
+    aet(ds, [1;2]);
+
+    % not in fdim
+    ds_bad=ds;
+    ds_bad=cosmo_dim_transpose(ds_bad,'i',1);
+    aet(ds_bad,1);
+
+    % size mismatch
+    ds_bad=ds;
+    ds_bad.a.vol.dim=ds_bad.a.vol.dim+1;
+    aet(ds_bad,1);
+
+    % no matrix
+    ds_bad=ds;
+    ds_bad.a.vol=rmfield(ds_bad.a.vol,'mat');
+    aet(ds_bad,1);
+
+    % not 4x4 matrix
+    ds_bad=ds;
+    ds_bad.a.vol.mat=eye(5);
+    aet(ds_bad,1);
+
 
 
 
