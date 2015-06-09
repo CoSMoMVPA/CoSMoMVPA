@@ -105,3 +105,19 @@ function run_helper_test_flatten(nsamples, nfdim, dim)
     assertEqual(values,expected_values);
     aet_unfl(ds,3-dim);
 
+
+
+    % test exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_unflatten(varargin{:}),'');
+    ds2=cosmo_stack({ds,ds},dim);
+    aet(ds2,dim);
+
+    ds_bad=ds;
+    ds_bad.a.(attr_dim).values=ds_bad.a.(attr_dim).values(1:(end-1));
+    aet(ds_bad,dim,opt);
+
+    % illegal dim argument
+    aet(ds,3);
+    aet(ds,[1 1]*dim,opt);
+
