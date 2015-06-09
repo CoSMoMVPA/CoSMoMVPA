@@ -53,6 +53,56 @@ function test_fmri_io_mat()
     save_and_load_dataset_with_extension('.mat');
 
 
+function test_fmri_io_bv_vmp_oblique()
+    ds=cosmo_synthetic_dataset('size','normal','ntargets',1,'nchunks',1);
+
+    % make dataset oblique (manually)
+    ds.a.vol.mat(1,1)=.8*2;
+    ds.a.vol.mat(2,1)=.6*2;
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_map2fmri(varargin{:}),'');
+    aet(ds,'-bv_vmp');
+    aet(ds,'-bv_vmp','deoblique',false);
+
+    ds_deob=cosmo_fmri_deoblique(ds);
+    bv_vmp=cosmo_map2fmri(ds,'-bv_vmp','deoblique',true);
+    ds2=cosmo_fmri_dataset(bv_vmp);
+    ds3=cosmo_fmri_reorient(ds2,cosmo_fmri_orientation(ds_deob));
+
+    % require that rotation matrix is ok
+    assert_dataset_equal(ds3,ds_deob,'.vmr');
+
+function test_fmri_io_bv_vmp_noniso()
+    ds=cosmo_synthetic_dataset('size','normal','ntargets',1,'nchunks',1);
+
+    % make dataset oblique (manually)
+    ds.a.vol.mat(1,1)=1;
+    ds.a.vol.mat(2,2)=3;
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_map2fmri(varargin{:}),'');
+    aet(ds,'-bv_vmp');
+    aet(ds,'-bv_vmp','deoblique',false);
+    aet(ds,'-bv_vmp','deoblique',true);
+    aet(ds,'-bv_vmp','deoblique',true,'bv_force_fit',false);
+
+    bv_vmp=cosmo_map2fmri(ds,'-bv_vmp','bv_force_fit',true);
+    ds2=cosmo_fmri_dataset(bv_vmp);
+    ds3=cosmo_fmri_reorient(ds2,cosmo_fmri_orientation(ds));
+
+    vox_size=diag(ds.a.vol.mat);
+    resolution=prod(vox_size(1:3)).^(1/3);
+
+    assertElementsAlmostEqual(ds3.a.vol.mat(1:3,1:3),...
+                                            eye(3)*resolution);
+
+    ds.a.vol.mat=ds3.a.vol.mat;
+
+    % require that rotation matrix is ok
+    assert_dataset_equal(ds3,ds,'.vmr');
+
+
 function save_and_load_dataset_with_extension(ext, multi_volume)
     if nargin<2
         multi_volume=true;
