@@ -136,6 +136,11 @@ function test_nchoosek_partitioner_grouping()
 
                 assertEqual(visited_count,ones(1,n_folds));
 
+                % also possible with indices
+                p2=cosmo_nchoosek_partitioner(ds.sa.chunks,n_test,...
+                                            ds.sa.modality,moda_arg);
+                assertEqual(p,p2);
+
 
             end
         end
@@ -179,7 +184,9 @@ function test_nchoosek_partitioner_exceptions()
         aet(ds,'foo');
         aet(ds,.5,'foo');
         aet(ds,struct);
-        aet(ds,1,1);
+        aet(ds,1,1,1);
+        aet(ds.sa.chunks,1,'chunks',1);
+        aet(ds.sa.chunks,1,'chunks',1,'chunks');
 
         ds.sa.modality=3; % size mismatch
         aet(ds,1,'modality',1);
