@@ -54,6 +54,9 @@ function test_fmri_io_mat()
 
 
 function test_fmri_io_bv_vmp_oblique()
+    if cosmo_skip_test_if_no_external('neuroelf')
+        return;
+    end
     ds=cosmo_synthetic_dataset('size','normal','ntargets',1,'nchunks',1);
 
     % make dataset oblique (manually)
@@ -74,6 +77,9 @@ function test_fmri_io_bv_vmp_oblique()
     assert_dataset_equal(ds3,ds_deob,'.vmr');
 
 function test_fmri_io_bv_vmp_noniso()
+    if cosmo_skip_test_if_no_external('neuroelf')
+        return;
+    end
     ds=cosmo_synthetic_dataset('size','normal','ntargets',1,'nchunks',1);
 
     % make dataset oblique (manually)
