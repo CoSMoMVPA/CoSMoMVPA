@@ -490,24 +490,10 @@ end
 train_indices=cell(1,npartitions);
 test_indices=cell(1,npartitions);
 
-% fancy helper function. Given a list of class indices in the range
-% 1:nclasses, it returns postive values where the class indices match
-% chunks.
-%
-% The following function is equivalent (assuming chunk_indices is given):
-%   function any_matching_mat_column=alt(idx, chunk_indices)
-%       nidx=numel(idx);
-%       nchunk_indices=numel(chunk_indices);
-%       idx_mat=repmat(idx',1,nchunk_indices);
-%       chunk_indices_mat=repmat(chunk_indices',nidx,1);
-%       matching_mat=idx_mat==chunk_indices_mat;
-%       any_matching_mat_column=sum(matching_mat,1);
-chunk_idx2count=@(idx) sum(bsxfun(@eq,idx',chunk_indices'),1)';
-
 % make all partitions
 for j=1:npartitions
     combi=combis(j,:);
-    sample_count=chunk_idx2count(combi);
+    sample_count=cosmo_match(chunk_indices,combi);
     test_indices{j}=find(sample_count);
     train_indices{j}=find(~sample_count);
 end
