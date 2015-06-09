@@ -20,6 +20,22 @@ function test_structjoin_
     assertEqual(sj(ya),y_);
     assertEqual(sj(ya{:}),y_);
 
+    % can override subfield
+    x=struct();
+    x.a.foo=1;
+    x.b.bar=2;
+
+    y=struct();
+    y.a.foo=3;
+    y.c.baz=3;
+
+    z=struct();
+    z.a.foo=3;
+    z.b.bar=2;
+    z.c.baz=3;
+    assertEqual(sj(x,y),z);
+
+
     % deal with empty struct fine
     assertEqual(sj(struct),struct);
     assertEqual(sj(cell(0)),struct);
