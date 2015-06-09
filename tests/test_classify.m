@@ -6,7 +6,19 @@ function test_classify_lda
     handle=get_predictor(cfy);
     assert_predictions_equal(handle,[1 3 9 8 5 6 8 9 7 5 7 5 4 ...
                                     9 2 7 7 7 1 2 1 1 7 6 7 1 7 ]');
-    assert_throws_illegal_input_exceptions(cfy)
+    assert_throws_illegal_input_exceptions(cfy);
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_classify_lda(varargin{:}),'');
+    x=randn(5,3);
+    y=randn(2,3);
+    aet(x,[1 1 1 2 2],y);
+
+    % too many features
+    x=zeros(1,1e4);
+    y=zeros(1,1e4);
+    aet(x,1,1e4);
+
 
 function test_classify_naive_bayes
     cfy=@cosmo_classify_naive_bayes;
