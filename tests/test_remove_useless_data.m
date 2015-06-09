@@ -45,6 +45,42 @@ function test_remove_useless_data_vec
     assert_equal_sliced(ds2,[1 3 4 5 6],1,2,'variable');
     assert_equal_sliced(ds2,[1 3 5 6],1,2,'finite');
 
+function test_remove_useless_data_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_remove_useless_data(varargin{:}),'');
+    aet(struct);
+    aet({});
+
+    % must have samples
+    ds=struct();
+    ds.foo=[];
+    aet(ds);
+
+    % input must be matrix
+    data=randn([2,3,2]);
+    aet(data);
+    ds=struct();
+    ds.samples=data;
+
+    % last argument must be kosher
+    data=randn(2,3);
+    aet(data,'foo');
+    aet(data,1,'foo');
+    aet(data,2,'foo');
+    aet(data,3);
+    aet(data,3,'variable');
+
+    ds.samples=data;
+    aet(ds,'foo');
+    aet(ds,1,'foo');
+    aet(ds,2,'foo');
+    aet(ds,3);
+    aet(ds,3,'variable');
+
+
+
+
+
 
 function assert_equal_sliced(ds, select, dim, varargin)
     [ds_useful,msk]=cosmo_remove_useless_data(ds, varargin{:});
