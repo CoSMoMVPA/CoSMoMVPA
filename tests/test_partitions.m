@@ -59,6 +59,32 @@ function test_nchoosek_partitioner()
         assertEqual(counts,ones(20,1)*j*2+2);
     end
 
+function test_nchoosek_partitioner_half()
+    offset=floor(rand()*10+20);
+
+    for nchunks=2:2:8
+
+        ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',3);
+        ds.sa.chunks=ds.sa.chunks+offset;
+
+        p=cosmo_nchoosek_partitioner(ds,'half');
+        combis=nchoosek(1:nchunks,nchunks/2);
+
+        n=size(combis,1);
+        assertEqual(numel(p.train_indices),n/2);
+        assertEqual(numel(p.test_indices),n/2);
+
+        for k=1:n/2
+            tr_idx=find(cosmo_match(ds.sa.chunks-offset,combis(k,:)));
+            te_idx=find(cosmo_match(ds.sa.chunks-offset,combis(n-k+1,:)));
+
+            assertEqual(p.train_indices{k},te_idx);
+            assertEqual(p.test_indices{k},tr_idx);
+        end
+    end
+
+
+
 function test_nchoosek_partitioner_grouping()
     nchunks=5;
     ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',6);
