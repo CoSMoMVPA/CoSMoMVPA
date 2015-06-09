@@ -74,13 +74,13 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     > .sa
 %     >   .half1
 %     >     [ 1
-%     >       1
 %     >       2
+%     >       1
 %     >       2 ]
 %     >   .half2
 %     >     [ 1
-%     >       2
 %     >       1
+%     >       2
 %     >       2 ]
 %     > .a
 %     >   .sdim
@@ -94,8 +94,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     % P=1)
 %     matrices=cosmo_unflatten(c_raw,1);
 %     cosmo_disp(matrices)
-%     > [  0.447    -0.538
-%     >   -0.525     0.959 ]
+%     > [  0.447    -0.525
+%     >   -0.538     0.959 ]
 %
 %     % compute for each fold separately. .ds.chunks in the output
 %     % reflects the test chunk in each partition

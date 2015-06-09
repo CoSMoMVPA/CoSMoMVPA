@@ -66,13 +66,13 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %     > .sa
 %     >   .half1
 %     >     [ 1
-%     >       1
 %     >       2
+%     >       1
 %     >       2 ]
 %     >   .half2
 %     >     [ 1
-%     >       2
 %     >       1
+%     >       2
 %     >       2 ]
 %     > .a
 %     >   .sdim
@@ -87,8 +87,8 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %     %
 %     % yields a 2x2x1 matrix (matlab omits the last, singleton dimension)
 %     cosmo_disp(unfl)
-%     > [  0.447    -0.538
-%     >   -0.525     0.959 ]
+%     > [  0.447    -0.525
+%     >   -0.538     0.959 ]
 %     %
 %     cosmo_disp(labels)
 %     > { 'half1'  'half2' }
