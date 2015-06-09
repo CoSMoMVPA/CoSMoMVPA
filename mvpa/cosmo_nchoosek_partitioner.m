@@ -474,13 +474,11 @@ if is_symmetric && mod(nclasses,2)==0
     % correlations.
     nhalf=npartitions/2;
 
-    %check_combis=[combis(1:nhalf,:) combis(npartitions:-1:(nhalf+1),:)];
+    check_combis=[combis(1:nhalf,:) combis(npartitions:-1:(nhalf+1),:)];
 
     % each row, when sorted, should be 1:nchunks
-    %matches=bsxfun(@eq,sort(check_combis,2),1:nclasses);
-    %if ~all(matches(:))
-    %    error('Unexpected result from nchoosek');
-    %end
+    matches=bsxfun(@eq,sort(check_combis,2),1:nclasses);
+    assert(all(matches(:)),'nchoosek behaves weirdly');
 
     % we're good - just take the first half and update npartitions
     combis=combis(1:nhalf,:);
