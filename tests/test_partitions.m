@@ -34,16 +34,15 @@ function test_nchoosek_partitioner()
     q=cosmo_nchoosek_partitioner(ds,.2);
     assertEqual(p,q);
 
-    assertExceptionThrown(@()cosmo_nchoosek_partitioner(ds,-1),'');
-    assertExceptionThrown(@()cosmo_nchoosek_partitioner(ds,0),'');
-    assertExceptionThrown(@()cosmo_nchoosek_partitioner(ds,1.01),'');
-    assertExceptionThrown(@()cosmo_nchoosek_partitioner(ds,.99),'');
 
     p=cosmo_nchoosek_partitioner(ds,3);
     q=cosmo_nchoosek_partitioner(ds,.6);
 
     assertEqual(p,q);
     assertFalse(isequal(p, cosmo_nchoosek_partitioner(ds,.4)));
+
+    q2=cosmo_nchoosek_partitioner(ds.sa.chunks,3);
+    assertEqual(p,q2);
 
     fns={'train_indices';'test_indices'};
     for j=1:2
@@ -58,5 +57,98 @@ function test_nchoosek_partitioner()
             counts(w)=counts(w)+1;
         end
         assertEqual(counts,ones(20,1)*j*2+2);
+    end
+
+function test_nchoosek_partitioner_grouping()
+    nchunks=5;
+    ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',6);
+    ds.sa.modality=mod(ds.sa.targets,2)+1;
+    ds.sa.targets=floor(ds.sa.targets/2);
+
+    for n_test=1:3
+        for moda_idx=1:4
+
+            if moda_idx==3
+                modas={1 2};
+                moda_arg={1 2};
+            elseif moda_idx==4
+                modas={1,2};
+                moda_arg=[];
+            else
+                modas={moda_idx};
+                moda_arg=moda_idx;
+            end
+
+            n_moda=numel(modas);
+
+            p=cosmo_nchoosek_partitioner(ds,n_test,'modality',moda_arg);
+            combis=nchoosek(1:nchunks,n_test);
+            n_combi=size(combis,1);
+
+            n_folds=numel(p.train_indices);
+            assertEqual(numel(p.test_indices),n_folds);
+            assertEqual(n_folds,n_combi*n_moda);
+
+            visited_count=zeros(1,n_folds);
+            for m=1:n_moda
+                for j=1:n_combi
+                    tr_msk=~cosmo_match(ds.sa.chunks,combis(j,:)) & ...
+                                ~cosmo_match(ds.sa.modality,modas{m});
+                    te_msk=cosmo_match(ds.sa.chunks,combis(j,:)) & ...
+                                cosmo_match(ds.sa.modality,modas{m});
+                    tr_idx=find_fold(p.train_indices,tr_msk);
+                    te_idx=find_fold(p.test_indices,te_msk);
+                    assertEqual(tr_idx,te_idx);
+                    visited_count(tr_idx)=visited_count(tr_idx)+1;
+                end
+            end
+
+            assertEqual(visited_count,ones(1,n_folds));
+
+
+        end
+    end
+
+function pos=find_fold(folds, msk)
+    idxs=find(msk);
+    n=numel(folds);
+
+    pos=[];
+    for k=1:n
+        if isequal(sort(folds{k}(:)),sort(idxs(:)))
+
+            % no duplicates
+            assert(isempty(pos));
+            pos=k;
+        end
+    end
+    assert(~isempty(pos));
+
+
+function assert_disjoint(vs,i,j)
+    common=intersect(vs(i),vs(j));
+    if ~isempty(common)
+        assertFalse(true,sprintf('element in common: %d', common(1)));
+
+    end
+function test_nchoosek_partitioner_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_nchoosek_partitioner(varargin{:}),'');
+    for nchunks=2:3
+        ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',4);
+
+
+        aet(ds,-1);
+        aet(ds,0);
+        aet(ds,1.01);
+        aet(ds,[1 1]);
+        aet(ds,.99);
+        aet(struct,1);
+        aet(ds,'foo');
+        aet(ds,.5,'foo');
+
+        ds.sa.modality=3; % size mismatch
+        aet(ds,1,'modality',1);
+
     end
 
