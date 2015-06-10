@@ -14,6 +14,7 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          'surfing'   surfing toolbox
 %                          'gifti'     GIfTI library for matlab
 %                          'xunit'     xUnit unit test framework
+%                          'moxunit'   MOxUnit unit test framework
 %                          'matlabsvm' SVM classifier in matlab stats
 %                                      toolbox
 %                          'svm'       Either matlabsvm or libsvm
@@ -482,6 +483,13 @@ function externals=get_externals_helper()
                                     '~peyre/matlab/fast-marching/'...
                                     'content.html]'];
     externals.fast_marching.url=externals.surfing.url;
+
+    externals.moxunit.is_present=@() has('moxunit_runtests');
+    externals.moxunit.is_recent=yes;
+    externals.moxunit.label=['Matlab/Octave MOxUnit '...
+                                        'Test Framework]'];
+    externals.moxunit.authors={'Nikolaas N. Oosterhof'};
+    externals.moxunit.url='https://github.com/nno/MOxUnit';
 
 
 function version=get_libsvm_version()

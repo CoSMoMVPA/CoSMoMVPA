@@ -129,20 +129,14 @@ function did_pass=cosmo_run_tests(varargin)
 %     9) The suite passes if all tests pass
 %
 % NNO Jul 2014
-
-    cosmo_check_external('xunit');
+    test_suite_name=find_external();
 
     defaults=struct();
     defaults.verbose=true;
     defaults.output=1;     % standard out
     defaults.filename=[];
 
-    if ~isempty(varargin) && numel(varargin)==1 && ischar(varargin{1})
-        opt=defaults;
-        opt.filename=varargin{1};
-    else
-        opt=cosmo_structjoin(defaults,varargin{:});
-    end
+    opt=get_opt(defaults,varargin{:});
 
     % store original directory
     orig_pwd=pwd();
@@ -178,12 +172,12 @@ function did_pass=cosmo_run_tests(varargin)
 
     if do_open_output_file
         fid=fopen(opt.output,'w');
+        file_closer=onCleanup(@()fclose(fid));
     else
         fid=opt.output;
     end
 
-    c=onCleanup(@()~isempty(cd(orig_pwd)) && ...
-                    do_open_output_file && fclose(fid));
+    path_resetter=onCleanup(@()cd(orig_pwd));
 
     % avoid setting the path for CosmoDocTest{Case,Suite} classes;
     % instead, cd to the tests directory and run the tests from there.
@@ -192,72 +186,124 @@ function did_pass=cosmo_run_tests(varargin)
     % reset set of skipped tests
     cosmo_notify_test_skipped('on');
 
-    % start with empty test suite
-    suite=TestSuite();
+    verbosity=opt.verbose+1;
 
-    % collect unit tests
-    if has_unittest
-        unittest_suite=TestSuite.fromName(unittest_location);
-        suite.add(unittest_suite);
-        fprintf(fid, 'Unit test suite: %d tests\n',suite.numTestCases);
-    else
-        fprintf(fid, 'Unit test suite: no tests for %s\n', opt.filename);
+    switch test_suite_name
+        case 'xunit'
+            % start with empty test suite
+            suite=TestSuite();
+
+            % collect unit tests
+            if has_unittest
+                unittest_suite=TestSuite.fromName(unittest_location);
+                suite.add(unittest_suite);
+            end
+
+            unit_test_count=unittest_suite.numTestCases;
+
+            if has_doctest
+                doctest_suite=CosmoDocTestSuite(doctest_location);
+                suite.add(doctest_suite);
+            end
+
+            doc_test_count=doctest_suite.numTestCases;
+
+            monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
+            monitor_constructor=monitor_constructors{verbosity};
+
+            report_test_skipped=true;
+
+        case 'moxunit'
+            suite=MOxUnitTestSuite();
+            if isdir(unittest_location)
+                suite=addFromDirectory(suite,unittest_location);
+            else
+                suite=addFromFile(suite,unittest_location);
+            end
+
+            unit_test_count=countTestCases(suite);
+            doc_test_count=NaN;
+
+            verbosity=opt.verbose+1;
+            monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
+
+            report_test_skipped=true;
     end
 
-    % collect doc tests
-    if has_doctest
-        doctest_suite=CosmoDocTestSuite(doctest_location);
-        suite.add(doctest_suite);
-        fprintf(fid, 'Doc test suite: %d tests\n',suite.numTestCases);
-    else
-        fprintf(fid, 'Doc test suite: no tests for %s\n', opt.filename);
-    end
-
-    % build unit test monitor
-    if opt.verbose
-        monitor_constructor=@VerboseTestRunDisplay;
-    else
-        monitor_constructor=@TestRunDisplay;
-    end
+    show_test_count(fid, 'unit',unit_test_count);
+    show_test_count(fid, 'doc',doc_test_count);
 
     monitor = monitor_constructor(fid);
 
     % run the tests
-    did_pass=suite.run(monitor);
+    switch test_suite_name
+        case 'xunit'
+            did_pass=suite.run(monitor);
 
-    % show skipped tests, if any
-    report_test_result(fid, opt.verbose, did_pass);
+        case 'moxunit'
+            test_result=run(suite, monitor);
+            disp(test_result);
 
-    % close file, if one was opened earlier
-    if do_open_output_file
-        fclose(fid);
+            did_pass=wasSuccessful(test_result);
     end
 
+    % show skipped tests, if any
+    report_test_result(fid, opt.verbose, did_pass, report_test_skipped);
 
 
-function report_test_result(fid, verbose, did_pass)
+function show_test_count(fid, label, count)
+    if isnan(count)
+        postfix='no tests (not supported on this platform)';
+    else
+        postfix=sprintf('%d tests', count);
+    end
+    fprintf(fid,'%s test suite: %s\n', label, postfix);
+
+
+function report_test_result(fid, verbosity, did_pass, report_test_skipped)
     if did_pass
         prefix='OK';
     else
         prefix='FAILED';
     end
 
-    skipped_descs=cosmo_notify_test_skipped();
-    nskip=numel(skipped_descs);
+    postfix='';
 
-    if nskip==0
-        postfix='';
-    else
-        if verbose
-            for k=1:nskip
-                fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
+    if report_test_skipped
+        skipped_descs=cosmo_notify_test_skipped();
+        nskip=numel(skipped_descs);
+
+        if nskip>0
+            if verbosity>=2
+                for k=1:nskip
+                    fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
+                end
             end
         end
 
         postfix=sprintf(' (skips=%d)', nskip);
-
     end
 
     fprintf(fid,'%s%s\n',prefix,postfix);
 
 
+function external=find_external()
+    if cosmo_wtf('is_octave')
+        external='moxunit';
+    else
+        external_candidates={'xunit','moxunit'};
+        has_external=cosmo_check_external(external_candidates,false);
+        if ~any(has_external)
+            cosmo_check_external(external_candidates,true);
+        end
+        i=find(has_external,1,'first');
+        external=external_candidates{i};
+    end
+
+function opt=get_opt(defaults,varargin)
+    if ~isempty(varargin) && numel(varargin)==1 && ischar(varargin{1})
+        opt=defaults;
+        opt.filename=varargin{1};
+    else
+        opt=cosmo_structjoin(defaults,varargin{:});
+    end
