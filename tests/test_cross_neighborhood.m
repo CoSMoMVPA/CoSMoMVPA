@@ -142,14 +142,27 @@ function test_cross_neighborhood_exceptions()
     aet({time_nbrhood,time_nbrhood});
     aet({ds});
 
+    % should be fine
     assertEqual(cosmo_cross_neighborhood(ds,{time_nbrhood}),time_nbrhood);
-    time_nbrhood.neighbors{1}=1e9;
-    aet({time_nbrhood});
-    time_nbrhood.neighbors{1}=1.5;
+
+    % no values too big
+    time_nbrhood2=time_nbrhood;
+    time_nbrhood2.neighbors{1}=1e9;
+    aet({time_nbrhood2});
+
+    % non-integers not supported
+    time_nbrhood2=time_nbrhood;
+    time_nbrhood2.neighbors{1}=1.5;
+    aet({time_nbrhood2});
+
+    % illegal labels
+    time_nbrhood2=time_nbrhood;
+    time_nbrhood2.a.fdim.labels{1}='foo';
+    time_nbrhood2.fa.foo=time_nbrhood.fa.time;
     aet({time_nbrhood});
 
-    time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
-    time_nbrhood.a.fdim.labels{1}='foo';
-    time_nbrhood.fa.foo=time_nbrhood.fa.time;
-    aet({time_nbrhood});
+    % duplicate labels
+    aet({time_nbrhood,time_nbrhood});
+
+
 
