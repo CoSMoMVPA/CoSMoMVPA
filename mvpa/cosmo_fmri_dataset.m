@@ -96,7 +96,9 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 %  - SPM data can also be specified as filename:format, where format
 %    can be 'beta', 'con' or 'spm' (e.g. 'SPM.mat:beta', 'SPM.mat:con', or
 %    'SPM.mat:spm') to load beta, contrast, or statistic images,
-%    respectively. If format is omitted it is set to 'beta'.
+%    respectively. When using 'beta', estimates for motion parameters and
+%    intercepts (which in most cases are estimates of no interest) are
+%    not returned. If format is omitted it is set to 'beta'.
 %  - If SPM data contains a field .Sess (session) then .sa.chunks are set
 %    according to its contents
 %
