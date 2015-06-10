@@ -203,6 +203,8 @@ Get ECoG data in a CoSMoMVPA struct
 
     When the data is in this form, one can analyse how well information :ref:`generalizes over time <demo_meeg_timeseries_generalization>` .
 
+.. _faq_run_group_analysis:
+
 Run group analysis
 ------------------
 
@@ -279,6 +281,8 @@ Run group analysis
                                         'mask',common_mask);
             end
 
+            result=cosmo_stack(result_cell);
+
     Assuming that ``result`` was constructed as above, a group analysis using Threshold-Free Cluster Enhancement and using 1000 permutations can now by done quite easily. For a one-sample t-test (one sample per participant, it is however required to specify the mean under the null hypothesis. When the :ref:`cosmo_correlation_measure` or :ref:`cosmo_target_dsm_corr_measure` is used, this is typically zero, whereas for :ref:`cosmo_crossvalidation_measure`, this is typically 1 divided by the number of classes (e.g. ``0.25`` for 4-class discrimination).
 
         .. code-block:: matlab
@@ -299,6 +303,61 @@ Run group analysis
                                                     'niter', niter,...
                                                     'h0_mean', h0_mean);
 
+
+
+Run group analysis on time-by-time generalization measures
+----------------------------------------------------------
+    'I used :ref:`cosmo_dim_generalization_measure` on MEEG data to get time-by-time generalization results. How do I run group analysis with cluster correction (:ref:`cosmo_montecarlo_cluster_stat`) on these?'
+
+    Let's assume the data from all subjects is stored in a cell ``ds_cell``, with ``ds_cell{k}`` is a dataset struct with the output from  :ref:`cosmo_dim_generalization_measure` for the ``k``-th subject. Each dataset has the ``train_time`` and ``test_time`` attribute in the sample dimension, and they have to be moved to the feature dimension to use :ref:`cosmo_montecarlo_cluster_stat`):
+
+        .. code-block:: matlab
+
+            n_subjects=numel(ds_cell);
+            ds_cell_tr=cell(n_subjects,1);
+            for k=1:n_subjects
+                ds_cell_tr{k}=cosmo_dim_transpose(ds_cell{k},...
+                                    {'train_time','test_time'},2);
+            end
+
+   Then, it is almost always necessary to set the ``.sa.targets`` and ``.sa.chunks`` attributes. The former refers to conditions; the latter to (in this case) the subject. See :ref:`cosmo_montecarlo_cluster_stat` how to define these generally for various tests. In the simple case of a one-sample t-test, these would be set as follows:
+
+        .. code-block:: matlab
+
+            for k=1:n_subjects
+                % here we assume a single output (sample) for each
+                % searchlight. For statistical analysis later, where
+                % we want to do a one-sample t-test, we set
+                % .sa.targets to 1 (any constant value will do) and
+                % .sa.chunks to the subject number.
+                % nsamples=size(result.samples,1);
+                %
+                % Notes:
+                % - these values can also be set after the analysis is run,
+                %   although that may be more error-prone
+                % - for other statistical tests, such as one-way ANOVA,
+                %   repeated-measures ANOVA, paired-sample t-test and
+                %   two-sample t-tests, chunks and targets have to be
+                %   set differently. See the documentation of
+                %   cosmo_montecarlo_cluster_stat for details.
+
+                ds_cell_tr{k}.sa.chunks=k;  % k-th subject
+                ds_cell_tr{k}.sa.targets=1; % all same condition
+
+            end
+
+    and results would be joined into a single dataset by:
+
+            ds_tr=cosmo_stack(ds_cell_tr);
+
+    Now group analysis can proceed using :ref:`cosmo_montecarlo_cluster_stat` as described in faq_run_group_analysis_.
+
+    To convert the output (say ``stat_map``) from  :ref:`cosmo_montecarlo_cluster_stat` to matrix form (time by time), do
+
+        .. code-block:: matlab
+
+            [data, labels, values]=cosmo_unflatten(stat_map,2);
+            data_mat=squeeze(data);
 
 
 
