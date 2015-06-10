@@ -20,10 +20,15 @@ function test_clusterize_basics
                     [3 6]',28});
 
     % test exceptions
-    aet=@(x)assertExceptionThrown(@()cosmo_clusterize(x{:}),'');
-    aet({'foo',[]});
-    aet({sample,[]});
-    aet({sample,-1});
-    aet({'foo',nh});
-    aet({zeros([2 2 2 ]),nh});
-    aet({[sample;sample],nh});
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_clusterize(varargin{:}),'');
+    aet('foo',[]);
+    aet(sample,[]);
+    aet(sample,-1);
+    aet('foo',nh);
+    aet(zeros([2 2 2 ]),nh);
+    aet([sample;sample],nh);
+    aet(sample,zeros([1 1 6]));
+    aet(sample,ones(1,7));
+    aet(sample,[true;false;true;true;true;false]);
+
