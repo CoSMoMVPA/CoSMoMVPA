@@ -105,7 +105,6 @@ before_script:
     - TESTCMD="more('off');"
     - TESTCMD="${TESTCMD}fprintf('pwd:%s\n',pwd());"
     - TESTCMD="${TESTCMD}cosmo_set_path();"
-    - TESTCMD="${TESTCMD}addpath('${PTH}/CoSMoMVPA/tests');"
     - TESTCMD="${TESTCMD}fprintf('path:%s\n',path());"
     - TESTCMD="${TESTCMD}${CHECKEXTCMD}"
 
@@ -116,7 +115,7 @@ before_script:
 
     # run tests, and quit with error if any test fails or errors
     - TESTDIR="CoSMoMVPA/tests"
-    - TESTCMD="${TESTCMD}passed=moxunit_runtests('-verbose','${TESTDIR}');"
+    - TESTCMD="${TESTCMD}passed=cosmo_run_tests('-verbose','${TESTDIR}');"
     - TESTCMD="${TESTCMD}if(~passed),cosmo_wtf();end;"
     - TESTCMD="${TESTCMD}exit(~passed);"
 script:
