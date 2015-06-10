@@ -227,7 +227,8 @@ function did_pass=cosmo_run_tests(varargin)
             verbosity=opt.verbose+1;
             monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
 
-            report_test_skipped=true;
+            % MOxUnit reports which tests were skipped
+            report_test_skipped=false;
     end
 
     show_test_count(fid, 'unit',unit_test_count);
