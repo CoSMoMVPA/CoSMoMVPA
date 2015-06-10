@@ -20,9 +20,35 @@ function test_synthetic_dataset_basics()
     assertEqual(ds.sa.targets,[1 2 3 1 2 3]');
     assertEqual(ds.sa.chunks,[1 1 1 2 2 2]');
 
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',2,'chunks',4);
+    assertEqual(ds.sa.targets,[1 2 3 1 2 3]');
+    assertEqual(ds.sa.chunks,[4 4 4 4 4 4]');
+
+function test_synthetic_dataset_meeg()
+
+    ds=cosmo_synthetic_dataset('type','meeg',...
+                                'sens','neuromag306_planar');
+    assertEqual(ds.a.fdim.values{1},{'MEG0112','MEG0113','MEG0212'});
+
+    ds=cosmo_synthetic_dataset('type','meeg',...
+                                'sens','neuromag306_axial');
+    assertEqual(ds.a.fdim.values{1},{'MEG0111','MEG0211','MEG0311'});
+
+
+function test_synthetic_dataset_source()
+     ds=cosmo_synthetic_dataset('type','source','data_field','mom');
+     assertEqual(ds.a.fdim.labels,{'pos','mom','time'});
+     assertEqual(ds.a.fdim.values{2},{'x','y','z'});
 
 function test_synthetic_dataset_exceptions()
-    aet=@(varargin)assertExceptionThrown(...
+    aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_synthetic_dataset(varargin{:}),'');
     aet('size','foo');
-    aet('
+    aet('type','source','data_field','foo');
+    aet('type','foo');
+    aet('type','meeg','sens','foo');
+    aet('targets',[2 2]);
+    aet('targets',1.5);
+    aet('type','meeg','sens','neuromag306_foo');
+
+
