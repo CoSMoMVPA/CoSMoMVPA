@@ -118,22 +118,9 @@ function check_nbrhoods(nbrhoods,ds)
                 'is a neighborhood structure']);
     end
 
-    nfeatures=size(ds.samples,2);
-
     for k=1:numel(nbrhoods)
         nbrhood=nbrhoods{k};
         cosmo_check_neighborhood(nbrhood,ds);
-
-        is_ok=@(x) isempty(x) || ...
-                    (min(x)>=1 && max(x)<=nfeatures && all(round(x)==x));
-
-        ok_msk=cellfun(is_ok,nbrhood.neighbors);
-        if any(~ok_msk)
-            i=find(~ok_msk,1);
-            error(['%d-th neighborhood .neighbors{%d} is not '...
-                    'in range 1..%d or not all integer'],...
-                    k, i, nfeatures);
-        end
     end
 
 
