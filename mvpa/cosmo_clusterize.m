@@ -68,10 +68,7 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
     nfeatures=size(sample,2);
     [maxnbrs,nfeatures_matrix]=size(nbrhood_mat);
 
-    if nfeatures~=nfeatures_matrix
-        error('nbrhood has %d features, data has %d', ...
-                nfeatures_matrix, nfeatures);
-    end
+    assert(nfeatures==nfeatures_matrix);
 
     queue=zeros(nfeatures,1); % queue of nodes to add to current cluster
     queue_end=0; % last position where a value in q was stored
