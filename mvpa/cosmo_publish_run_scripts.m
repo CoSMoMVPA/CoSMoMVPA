@@ -140,7 +140,8 @@ function is_built=publish_wrapper(srcfn,trgfn)
         try
             publish(srcnm, struct('outputDir',trgdir,'catchError',false));
             is_built=true;
-        catch me
+        catch
+            me=lasterror();
             if exist(trgfn,'file')
                 delete(trgfn);
             end
