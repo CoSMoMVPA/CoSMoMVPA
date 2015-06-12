@@ -160,6 +160,7 @@ function res=cosmo_distatis(ds, varargin)
     for k=1:nfeatures
         feature_id=feature_ids(k);
         x=zeros(nclasses*nclasses,nsubj);
+
         for j=1:nsubj
             dsm=dsms{j}(:,:,feature_id);
             x(:,j)=distance2crossproduct(dsm, opt.autoscale);
@@ -248,7 +249,7 @@ function feature_ids=get_feature_ids(nfeatures, opt)
 function [ew,v]=get_weights(x, feature_id, nkeep, opt)
     switch opt.weights
         case 'eig'
-            [ew,v]=eigen_weights(x, feature_id, opt);
+            [ew,v]=eigen_weights(x, feature_id);
 
         case 'uniform'
             % all the same (allowing for comparison with 'eig')
@@ -273,32 +274,22 @@ function subject_cell=get_subject_data(ds,opt)
     end
 
 
-function [ew,v]=eigen_weights(x, feature_id, opt)
-    persistent correlation_warning_shown
+function [ew,v]=eigen_weights(x, feature_id)
 
     c=cosmo_corr(x);
 
-    if any(c(:)<0)
-        msg=sprintf(['negative correlations found for feature %d '...
-                            ', minimum=%d'],feature_id,min(c(:)));
-        if opt.abs_correlation
-            if isempty(correlation_warning_shown)
-                msg=sprintf(['%s\nthe absolute value of the correlations '...
-                        'is taken because .abscorrelation=true, but '...
-                        'this feature is ***experimental*** and not '...
-                        'properly validated. Interpret results with '...
-                        'care'],msg);
-                cosmo_warning(msg);
-                correlation_warning_shown=true;
-            end
-            c=abs(c);
-        else
-            msg=sprintf(['%s\nIf you know what you are doing (as a '...
-                'litmus test, you would be able to  '...
-                'implement DISTATIS), consider to use the option:  '...
-                '''abs_correlation'',true'],msg);
-            error(msg);
-        end
+    negative_c=c<0;
+
+    if any(negative_c(:))
+        [i,j]=find(negative_c);
+        error(['feature %d has negative correlation between '...
+                'sample %d and %d, which is not supported by '...
+                'distatis. DISTATIS assumes that the similarity '...
+                'data from all samples (typically: participants) '...
+                'correlate positively. Because that is not the '...
+                'case, you cannot use DISTATIS analysis on this '...
+                'data. '],...
+                feature_id,i,j);
     end
 
     [v,e]=fast_eig1(c);
@@ -335,6 +326,12 @@ function z=crossproduct2distance(x)
 
 function assert_symmetric(x, tolerance)
     if nargin<2, tolerance=1e-8; end
+
+    % assert x is a square matrix
+    sz=size(x);
+    assert(isequal(sz,sz([2 1])));
+
+
     xx=x'-x;
 
     msk=xx>tolerance;
