@@ -412,7 +412,9 @@ function nbrhood=ensure_neighbors_row_vectors(nbrhood)
 function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
     % helper function to get surfaces
 
-    [v1,v2,f,vo,fo]=parse_surfs_arguments(surfs);
+    ds_is_surface=strcmp(ds_type,'surface');
+
+    [v1,v2,f,vo,fo]=parse_surfs_arguments(ds_is_surface, surfs);
 
     if numel(v2)~=2 && (numel(f)==2 || isempty(f))
         % swap position
@@ -421,12 +423,11 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
         v2=temp;
     end
 
-    check_surf_arguments(ds_type,v1,v2,f,vo,fo);
+    check_surf_arguments(ds_is_surface,v1,v2,f,vo,fo);
 
 
-function check_surf_arguments(ds_type,v1,v2,f,vo,fo)
-    % checks
-    ds_is_surface=strcmp(ds_type,'surface');
+function check_surf_arguments(ds_is_surface,v1,v2,f,vo,fo)
+
 
     if isempty(v1) || (isempty(v2) && ~ds_is_surface) || isempty(f)
         error('Not enough arguments for surfaces and topology');
@@ -456,12 +457,13 @@ function check_surf_arguments(ds_type,v1,v2,f,vo,fo)
         surfing_check_surface(vo,fo);
     end
 
+
+
+function [v1,v2,f,vo,fo]=parse_surfs_arguments(ds_is_surface,surfs)
     if ~iscell(surfs)
         error('surfs argument must be a cell');
     end
 
-
-function [v1,v2,f,vo,fo]=parse_surfs_arguments(surfs)
     n=numel(surfs);
 
     % space for output
