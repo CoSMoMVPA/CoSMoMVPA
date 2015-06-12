@@ -353,14 +353,28 @@ function z_vec=distance2crossproduct(x, autoscale)
     else
         z=y;
     end
-    assert_symmetric(z)
+    assert_symmetric(z);
     % equivalent, but slower:
     % z=(1/eigs(y,1))*y(:);
 
     z_vec=z(:);
 
 function [lambda,pivot]=fast_eig1(x)
-    [pivot,lambda]=eigs(x,1);
+    % returns the first eigenvalue in lambda, and the corresponding
+    % eigenvector in pivot
+    if cosmo_wtf('is_matlab')
+        [pivot,lambda]=eigs(x,1);
+    else
+        % There seems a bug in Octave for 'eigs',
+        % so use 'eig' instead.
+        % http://savannah.gnu.org/bugs/?44004
+        [e,v]=eig(x);
+        diag_v=diag(v);
+
+        % find largest eigenvalue and eigenvector
+        [lambda,i]=max(diag_v);
+        pivot=e(:,i);
+    end
 
     % The code below is disabled because under certain circumstances
     % it would return a near-zero eigenvalue if indeed one eigenvalue (but
@@ -404,7 +418,7 @@ function y=ensure_distance_vector(x)
     xsq=xsq-diag(dx);
 
     delta=xsq-xsq';
-    assert(all(delta(:)<tolerance))
+    assert(all(delta(:)<tolerance));
 
     xsq=.5*(xsq+xsq');
     y=xsq(:);
@@ -473,7 +487,7 @@ function [dsm, dim_labels, dim_values, is_ds]=get_dsm(data)
         [msk,i,j]=distance_matrix_mask(side);
         dsm=zeros([side,side,nfeatures]);
 
-        assert(numel(i)==n)
+        assert(numel(i)==n);
         for pos=1:n
             dsm(i(pos),j(pos),:)=data(pos,:);
         end
