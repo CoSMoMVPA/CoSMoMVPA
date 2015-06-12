@@ -145,6 +145,13 @@ function res=find_files_recursively(root_dir,file_re)
         res=cat(1,res_keep{:});
     else
         % no files found, return empty struct
-        res=cell2struct(cell(5,0),...
-                    {'name','date','bytes','isdir','datenum'});
+        if cosmo_wtf('is_octave')
+            labels={'name','date','bytes','isdir',...
+                        'datenum','statinfo'};
+        else
+            labels={'name','date','bytes','isdir',...
+                        'datenum'};
+        end
+        n_labels=numel(labels);
+        res=cell2struct(cell(n_labels,0),labels);
     end
