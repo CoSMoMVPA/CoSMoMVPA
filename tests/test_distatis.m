@@ -97,8 +97,7 @@ function test_statis_
     ds2=get_distance_dataset(d2);
     aet(ds2,opt);
 
-
-
+    % illegal arguments
     ds.sa.chunks=ds.sa.subject;
     opt=struct();
     opt.shape='foo';
