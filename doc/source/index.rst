@@ -11,9 +11,11 @@ CoSMoMVPA
 ---------
 - Provides simple, lightweight Matlab implementations of the most common types of MVPA of cognitive neuroscience data, such as region-of-interest analysis, searchlight analyses, classification, correlations, representational similarity analysis.
 - Supports most common fMRI (including NIFTI, ANALYZE, BrainVoyager, AFNI, GIFTI) and MEEG (FieldTrip, EEGLab)  data formats.
-- Handles fMRI volumetric, fMRI surface-based, and MEEG data in a uniform manner (e.g. in searchlight analyses).
+- Handles fMRI volumetric, fMRI surface-based, and MEEG data through a uniform data structure.
+- Supports searchlights in the volume, on the surface, over sensors, time bins, and frquency bands, and any combinations of these (e.g. sensor by time by frequency).
+- Supports multiple-comparison correction using Threshold-Free Cluster Enhancement.
 - Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
-- Uses an automated test suite and continuous integration testing (through `Travis-ci`_) to enhance quality control
+- Uses an automated test suite and continuous integration testing (through `Travis-ci`_).
 - Is Free/Open Source Software (MIT License).
 
 **Note: CoSMoMVPA is currently in a pre-first-release state. Code, features and documentation may change rapidly.**
