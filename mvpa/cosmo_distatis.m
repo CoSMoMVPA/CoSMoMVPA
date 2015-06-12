@@ -302,33 +302,17 @@ function [ew,v]=eigen_weights(x, feature_id, opt)
     end
 
     [v,e]=fast_eig1(c);
+
+    if all(e<0)
+        e=-e;
+    end
+
     assert(all(e>0));
     assert(v>0);
 
     % normalize first eigenvector
     ew=e/sum(e);
 
-
-
-% currently unused
-% function r=rc_coefficient(x)
-%     [n2,nsamples]=size(x);
-%     n=sqrt(n2);
-%     r=zeros(nsamples);
-%     for k=1:nsamples
-%         y=reshape(x(:,k),n,n);
-%         for j=1:nsamples
-%             z=reshape(x(:,j),n,n);
-%             tyz=trace(y'*z);
-%             ty=trace(y'*y);
-%             tz=trace(z'*z);
-%
-%             r(k,j)=tyz/sqrt(ty*tz);
-%         end
-%     end
-%
-%
-%
 
 function result=convert_compromise(compromise, opt)
     switch opt.return
@@ -379,32 +363,37 @@ function z_vec=distance2crossproduct(x, autoscale)
     z_vec=z(:);
 
 function [lambda,pivot]=fast_eig1(x)
-    % compute first (largest) eigenvalue and corresponding eigenvector
-    % using power iteration method; benchmarking suggests this can be up to
-    % five times as fast as using eigs(x,1)
-    n=size(x,1);
-    pivot=ones(n,1);
-    tolerance=1e-8;
-    max_iter=1000;
-
-    old_lambda=NaN;
-    for k=1:max_iter
-        z=x*pivot;
-        pivot=z / norm(z);
-
-        lambda=pivot'*z;
-        if abs(lambda-old_lambda)/lambda<tolerance
-            z=x*pivot;
-            pivot=z / sqrt(sum(z.^2));
-
-            lambda=pivot'*z;
-            return
-        end
-        old_lambda=lambda;
-    end
-
-    % matlab fallback
     [pivot,lambda]=eigs(x,1);
+
+    % The code below is disabled because under certain circumstances
+    % it would return a near-zero eigenvalue if indeed one eigenvalue (but
+    % not the largest one) is zero.
+    % % compute first (largest) eigenvalue and corresponding eigenvector
+    % % using power iteration method; benchmarking suggests this can be up to
+    % % five times as fast as using eigs(x,1)
+    % n=size(x,1);
+    % pivot=ones(n,1);
+    % tolerance=1e-8;
+    % max_iter=1000;
+    %
+    % old_lambda=NaN;
+    % for k=1:max_iter
+    %     z=x*pivot;
+    %     pivot=z / norm(z);
+    %
+    %     lambda=pivot'*z;
+    %     if abs(lambda-old_lambda)/lambda<tolerance
+    %         z=x*pivot;
+    %         pivot=z / sqrt(sum(z.^2));
+    %
+    %         lambda=pivot'*z;
+    %         return
+    %     end
+    %     old_lambda=lambda;
+    % end
+    %
+    % % matlab fallback
+    % [pivot,lambda]=eigs(x,1);
 
 function y=ensure_distance_vector(x)
     tolerance=1e-8;
