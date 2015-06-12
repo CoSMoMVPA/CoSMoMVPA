@@ -1,5 +1,5 @@
-function files=cosmo_dir(directory,file_pattern)
-% list files recursively in a directory, optionally matching a pattern
+function files=cosmo_dir(varargin)
+% list files recursively in a directory
 %
 % files=cosmo_dir([directory][,file_pattern])
 %
@@ -27,93 +27,117 @@ function files=cosmo_dir(directory,file_pattern)
 %
 % Examples:
 %  % list recursively all files in the current directory
-%  >> d=cosmo_dir()
+%  d=cosmo_dir();
 %
-%  % list recursively all files in my_dir
-%  >> d=cosmo_dir('my_dir')
+%  % Assuming that the directory 'my_dir' exists, list recursively all
+%  % files the directory contains
+%  d=cosmo_dir('my_dir');
 %
-%  % list recursively all files in the current directory with extension
+%  % Assuming that the directory 'my_file' does not exist, return
+%  % either a struct with a single entry (if a file named 'my_file'
+%  % exists), or an emtpy struct (if no such file exists)
+%  d=cosmo_dir('my_file');%
+%
+%  % list recursively all files in the current directory for which the name
+%  % ends with '.jpg'
+%  d=cosmo_dir('*.jpg')
+%
+%  % list recursively all files in the directory 'my_dir' with extension
 %  % '.jpg'
-%  >> d=cosmo_dir('my_d)
-%
-%  % list recursively all files in my_dir with extension '.jpg'
-%  >> d=cosmo_dir('my_dir', '*.jpg')
+%  d=cosmo_dir('my_dir', '*.jpg')
 %
 %  % list recursively all files in my_dir that are two characters long,
 %  % followed by the extension '.jpg'
-%  >> d=cosmo_dir('my_dir', '??.jpg')
+%  d=cosmo_dir('my_dir', '??.jpg')
 %
 %  % list recursively all files in my_dir that start with 'a', followed by
 %  % any character, followed by 'b', followed by any number of characters,
 %  % followed by '.jpg'
-%  >> d=cosmo_dir('my_dir', 'a?b*.jpg')
+%  d=cosmo_dir('my_dir', 'a?b*.jpg')
 %
 % See also: dir
 %
 % NNO Apr 2014
 
-if nargin<1
-    % use current directory
-    directory='.';
-end
+    [root_dir,file_pat]=process_arguments(varargin{:});
 
-if nargin<2 || isempty(file_pattern)
-    % list all files
-    file_pattern='*';
-end
+    file_re=['^' ... % start of the string
+             regexptranslate('wildcard',file_pat) ...
+             '$'];   % end of the string
 
-if ~isdir(directory)
-    file_pattern=directory;
-    directory='.';
-end
 
-me=[]; % in case of recursion, this is set to a handle of this function
+    files=find_files_recursively(root_dir,file_re);
 
-% translate to regular expression
-% (the '^' and '$' characters indicate the beginning and end of the string)
-reg_pattern=['^' regexptranslate('wildcard',file_pattern) '$'];
-
-% list of all files in directory
-d=dir(directory);
-
-% allocate space for result
-n=numel(d);
-files=cell(1,n);
-
-pos=0; % last position where a result was stored
-for k=1:n
-    name=d(k).name;
-    full_path=fullfile(directory,name);
-    if isdir(full_path)
-        if any(cosmo_match({'.','..'},name));
-            % ignore current and parent directory
-            continue
-        end
-
-        if isempty(me)
-            % prepare first recursive call; make immune to function rename
-            me=str2func(mfilename());
-        end
-
-        % get all files in this directory through recursion
-        r=me(full_path,file_pattern);
-
-        if ~isempty(r)
-            % store result
-            pos=pos+1;
-            files{pos}=r;
-        end
-    elseif ~isempty(regexp(name,reg_pattern,'once'))
-        % filename matches pattern, store result
-        pos=pos+1;
-        d(k).name=fullfile(directory,d(k).name);
-        d(k).name;
-        files{pos}=d(k);
+function [root_dir,file_pat]=process_arguments(varargin)
+    narg=numel(varargin);
+    if narg>2
+        error('need at most two arguments');
     end
-end
 
-% only keep the entries that have data
-files=files(1:pos);
+    if ~iscellstr(varargin)
+        error('arguments must be strings');
+    end
 
-% combine the structs
-files=cat(1,files{:});
+    root_dir='';
+    file_pat='*';
+
+    if narg>=1
+        arg1=varargin{1};
+        if isdir(arg1)
+            root_dir=arg1;
+            if narg>=2
+                file_pat=varargin{2};
+            end
+        else
+            if narg>=2
+                error('Directory not found: ''%s''', arg1);
+            end
+            root_dir='';
+            file_pat=arg1;
+        end
+    end
+
+
+function res=find_files_recursively(root_dir,file_re)
+    if isempty(root_dir)
+        dir_arg={};
+    else
+        dir_arg={root_dir};
+    end
+
+    d=dir(dir_arg{:});
+    n=numel(d);
+
+    res_cell=cell(n,1);
+    keep_msk=false(n,1);
+    for k=1:n
+        d_k=d(k);
+        fn=d_k.name;
+
+        ignore_fn=strcmp(fn,'.') || strcmp(fn,'..');
+
+        if ~ignore_fn
+            path_fn=fullfile(root_dir, fn);
+
+            if isdir(path_fn)
+                res=find_files_recursively(path_fn,file_re);
+            elseif ~isempty(regexp(fn,file_re,'once'));
+                d_k.name=path_fn;
+                res=d_k;
+            else
+                continue;
+            end
+
+            res_cell{k}=res;
+            keep_msk(k)=true;
+        end
+    end
+
+    if any(keep_msk)
+        res_keep=res_cell(keep_msk);
+        res=cat(1,res_keep{:});
+    else
+        % no files found, return empty struct
+        res=cell2struct(cell(5,0),...
+                    {'name','date','bytes','isdir','datenum'});
+    end
