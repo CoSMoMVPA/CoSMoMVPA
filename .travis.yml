@@ -116,7 +116,7 @@ before_script:
     # run tests, and quit with error if any test fails or errors
     - TESTDIR="CoSMoMVPA/tests"
     - TESTCMD="${TESTCMD}passed=cosmo_run_tests('-verbose','${TESTDIR}');"
-    - TESTCMD="${TESTCMD}if(~passed),cosmo_wtf();end;"
+    - TESTCMD="${TESTCMD}if(~passed),fprintf('\n\n');disp(cosmo_wtf());end;"
     - TESTCMD="${TESTCMD}exit(~passed);"
 script:
     - $OCTAVE --path "${OCTAVEPTH}" --eval "${TESTCMD}"
