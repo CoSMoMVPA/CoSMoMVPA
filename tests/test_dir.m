@@ -3,7 +3,7 @@ function test_suite=test_dir
 
 function test_dir_basics()
     tmp_dir=cosmo_make_temp_filename();
-    cleaner=onCleanup(@()rmdir(tmp_dir,'s'));
+    cleaner=onCleanup(@()remove_directory(tmp_dir));
 
     files={'foo.m',...          % 1
            'bar/foo.m',...      % 2
@@ -95,6 +95,15 @@ function result=touch_single_file(in_dir,fn)
     result=1;
 
 
+function remove_directory(dir_name)
+    is_octave=cosmo_wtf('is_octave');
+    if is_octave
+        % do not ask for confirmation
+        confirm_val=confirm_recursive_rmdir(false);
+        cleaner=onCleanup(@()confirm_recursive_rmdir(confirm_val));
+    end
+
+    rmdir(dir_name,'s');
 
 
 
