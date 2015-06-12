@@ -54,7 +54,6 @@ function msk=cosmo_match(haystack, needle, varargin)
 %
 % NNO Sep 2013
 
-
     if nargin<2
         error('Need at least two input arguments');
     elseif mod(nargin,2) ~= 0
@@ -67,8 +66,8 @@ function msk=cosmo_match(haystack, needle, varargin)
 
     msk=match(needle,haystack);
 
-    for argpos=3:2:nargin
-        other_msk=match(varargin{argpos+[0,1]});
+    for argpos=1:2:(nargin-2);
+        other_msk=match(varargin{argpos+[1,0]});
 
         % check the size is the same
         if numel(msk) ~= numel(other_msk)
