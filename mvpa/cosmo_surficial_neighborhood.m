@@ -411,12 +411,57 @@ function nbrhood=ensure_neighbors_row_vectors(nbrhood)
 
 function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
     % helper function to get surfaces
+
+    [v1,v2,f,vo,fo]=parse_surfs_arguments(surfs);
+
+    if numel(v2)~=2 && (numel(f)==2 || isempty(f))
+        % swap position
+        temp=f;
+        f=v2;
+        v2=temp;
+    end
+
+    check_surf_arguments(ds_type,v1,v2,f,vo,fo);
+
+
+function check_surf_arguments(ds_type,v1,v2,f,vo,fo)
+    % checks
+    ds_is_surface=strcmp(ds_type,'surface');
+
+    if isempty(v1) || (isempty(v2) && ~ds_is_surface) || isempty(f)
+        error('Not enough arguments for surfaces and topology');
+    end
+
+    % c2 can be vector with two elements indicating the size of the curved
+    % cylinder with a circle as basis; if not, it should be a surface with
+    % the same size as c1
+    one_surface=numel(v2)==2;
+
+    if ~(one_surface || ds_is_surface || isequal(size(v1),size(v2)))
+        error('Size mismatch between surfaces: %dx%d != %dx%d',...
+                    size(v1), size(v2));
+    end
+
+    surfing_check_surface(v1,f);
+    if ~(one_surface || ds_is_surface)
+        surfing_check_surface(v2,f);
+    end
+
+    if isempty(fo)
+        if numel(vo)>1
+            % if not a scaler (niter) then throw an error
+            error('Topology missing for output surface');
+        end
+    else
+        surfing_check_surface(vo,fo);
+    end
+
     if ~iscell(surfs)
         error('surfs argument must be a cell');
     end
 
-    ds_is_surface=strcmp(ds_type,'surface');
 
+function [v1,v2,f,vo,fo]=parse_surfs_arguments(surfs)
     n=numel(surfs);
 
     % space for output
@@ -463,43 +508,6 @@ function [v1,v2,f,vo,fo]=parse_surfs(surfs, ds_type)
         else
             error('Expected surface filename or array at position %d', k);
         end
-    end
-
-    if numel(v2)~=2 && (numel(f)==2 || isempty(f))
-        % swap position
-        temp=f;
-        f=v2;
-        v2=temp;
-    end
-
-    if isempty(v1) || (isempty(v2) && ~ds_is_surface) || isempty(f)
-        error('Not enough arguments for surfaces and topology');
-    end
-
-
-
-    % c2 can be vector with two elements indicating the size of the curved
-    % cylinder with a circle as basis; if not, it should be a surface with
-    % the same size as c1
-    one_surface=numel(v2)==2;
-
-    if ~(one_surface || ds_is_surface || isequal(size(v1),size(v2)))
-        error('Size mismatch between surfaces: %dx%d != %dx%d',...
-                    size(v1), size(v2));
-    end
-
-    surfing_check_surface(v1,f);
-    if ~(one_surface || ds_is_surface)
-        surfing_check_surface(v2,f);
-    end
-
-    if isempty(fo)
-        if numel(vo)>1
-            % if not a scaler (niter) then throw an error
-            error('Topology missing for output surface');
-        end
-    else
-        surfing_check_surface(vo,fo);
     end
 
 
