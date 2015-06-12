@@ -114,17 +114,23 @@ function res=find_files_recursively(root_dir,file_re)
         d_k=d(k);
         fn=d_k.name;
 
+        % do not return current and parent directorys
         ignore_fn=strcmp(fn,'.') || strcmp(fn,'..');
 
         if ~ignore_fn
             path_fn=fullfile(root_dir, fn);
 
             if isdir(path_fn)
+                % recursive call
                 res=find_files_recursively(path_fn,file_re);
+
             elseif ~isempty(regexp(fn,file_re,'once'));
+                % file matches the pattern
                 d_k.name=path_fn;
                 res=d_k;
+
             else
+                % ignore file
                 continue;
             end
 
@@ -134,6 +140,7 @@ function res=find_files_recursively(root_dir,file_re)
     end
 
     if any(keep_msk)
+        % at least one file found
         res_keep=res_cell(keep_msk);
         res=cat(1,res_keep{:});
     else
