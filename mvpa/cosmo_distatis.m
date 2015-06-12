@@ -11,8 +11,8 @@ function res=cosmo_distatis(ds, varargin)
 %    'return', d      d can be 'distance' (default) or 'crossproduct'.
 %                     'distance' returns a distance matrix, whereas
 %                     'crossproduct' returns a crossproduct matrix
-%    'split_by', s    sample attribute that discriminates chunks (subjects)
-%                     (default: 'chunks')
+%    'split_by', s    sample attribute that discriminates chunks
+%                     (participants) (default: 'chunks')
 %    'shape', sh      shape of output if it were unflattened using
 %                     cosmo_unflatten, either 'square' (default) or
 %                     'triangle' (which gives the lower diagonal of the
@@ -121,7 +121,7 @@ function res=cosmo_distatis(ds, varargin)
 %
 % Notes:
 %   - DISTATIS tries to find an optimal compromise distance matrix across
-%     the
+%     the different samples (participants)
 %   - Output can be reshape to matrix or array form using
 %     cosmo_unflatten(res,1)
 %
