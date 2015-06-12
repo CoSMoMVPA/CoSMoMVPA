@@ -12,11 +12,12 @@ function filename=cosmo_make_temp_filename(prefix,suffix)
 %
 % Output:
 %   filename            filename that does not exist when this function was
-%                       called, starting with prefix, ending with suffix,
-%                       and with a random infix string.
-%                       If suffix is a cellstring, then filename is a cellstring with as
-%                       many elements as suffix, and each with the same
-%                       prefix and random infix.
+%                       called (in the current directory), starting with
+%                       prefix, ending with suffix, and with a random infix
+%                       string.
+%                       If suffix is a cellstring, then filename is a
+%                       cellstring with as many elements as suffix,
+%                       each with the same prefix and random infix.
 %
 % Examples:
 %   % generate random filename
