@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = ./matlab2rst.py && ./summarize_git_log.py && sphinx-build  #NNO little hack to run conversion first
+SPHINXBUILD   = tools/matlab2rst.py && tools/summarize_git_log.py && sphinx-build  #NNO little hack to run conversion first
 PAPER         =
 BUILDDIR      = build
 
