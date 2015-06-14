@@ -19,6 +19,7 @@ Overview
    contribute
    thanks
    copyright
+   references
 
 Detailed
 --------
