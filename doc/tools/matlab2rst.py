@@ -15,17 +15,43 @@
 #
 # NNO Aug 2013
 
-
-
 import os
 import glob
 import sys
-from os.path import join, split, getmtime, isfile
-matlab_dir='../mvpa'
-example_dir='../examples'
-test_dir='../tests'
+from os.path import join, split, getmtime, isfile, abspath, basename
+from os import pardir
 
-output_root_abs='source'
+def get_absolute_root_dir():
+    parent_dir=lambda x:abspath(join(x,pardir))
+    pth=parent_dir(__file__)
+
+    cosmo_directories=['mvpa','doc','examples','tests']
+
+    max_levels=30;
+
+    for k in xrange(max_levels):
+        pth_parent=parent_dir(pth)
+        print pth, pth_parent
+
+        contents=glob.glob(join(pth_parent,'*'))
+        contents_rel=map(basename, contents)
+
+        if set.issubset(set(cosmo_directories), set(contents_rel)):
+            return pth
+
+        pth=pth_parent
+
+    raise ValueError('Could not find root directory')
+
+
+doc_root_dir=get_absolute_root_dir()
+root_sub_dir=lambda x: join(doc_root_dir,x)
+
+matlab_dir=root_sub_dir('../mvpa')
+example_dir=root_sub_dir('../examples')
+test_dir=root_sub_dir('../tests')
+
+output_root_abs=root_sub_dir('source')
 output_index_abs=output_root_abs
 output_mat_rel='matlab'
 output_mat_abs=join(output_root_abs, output_mat_rel)
