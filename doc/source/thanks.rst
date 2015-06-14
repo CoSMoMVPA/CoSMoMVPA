@@ -55,10 +55,10 @@ Citations
 CoSMoMVPA uses external toolboxes to provide certain functionality. If you use certain features in CoSMoMVPA, please cite the appropriate toolboxes/packages (in addition to citing CoSMoMVPA). Note that you can get a citation list in matlab by running ``cosmo_check_external('-cite')`` after running your analysis.
 
 + *GIFTI data:* G. Flandin, GIfTI library for matlab. available online from www.artefact.tk/software/matlab/gifti
-+ *FieldTrip MEG data:* R. Oostenveld, P. Fries, E. Maris, J.-M. Schoffelen, FieldTrip: Open Source Software for Advanced Analysis of MEG, EEG, and Invasive Electrophysiological Data, Computational Intelligence and Neuroscience, vol. 2011, Article ID 156869, 9 pages, 2011.doi:10.1155/2011/156869. FieldTrip toolbox available online from http://fieldtrip.fcdonders.nl
++ :cite:`DM04` *FieldTrip MEG data:* R. Oostenveld, P. Fries, E. Maris, J.-M. Schoffelen, FieldTrip: Open Source Software for Advanced Analysis of MEG, EEG, and Invasive Electrophysiological Data, Computational Intelligence and Neuroscience, vol. 2011, Article ID 156869, 9 pages, 2011.doi:10.1155/2011/156869. FieldTrip toolbox available online from http://fieldtrip.fcdonders.nl
 + *NIFTI/ANALYZE fMRI data*: J. Shen, NIFTI toolbox. available online from http://www.mathworks.com/matlabcentral/fileexchange/8797-tools-for-nifti-and-analyze-image
 + *AFNI fMRI data*: Z. Saad, G. Chen, AFNI Matlab library. available online from http://afni.nimh.nih.gov/afni/matlab/
-+ *Surface-based searchlight*: N. N. Oosterhof, T Wiestler, J. Diedrichsen, A comparison of volume-based and surface-based multi-voxel pattern analysis. Neuroimage 56 (2), 593-600. Surfing toolbox available online from http://github.com/nno/surfing
++ :cite:`OTD12` *Surface-based searchlight*: N. N. Oosterhof, T Wiestler, J. Diedrichsen, A comparison of volume-based and surface-based multi-voxel pattern analysis. Neuroimage 56 (2), 593-600. Surfing toolbox available online from http://github.com/nno/surfing
 + *Brainvoyager fMRI data*: J. Weber, NeuroElf toolbox. available online from http://neuroelf.net
 
 .. include:: links.txt
