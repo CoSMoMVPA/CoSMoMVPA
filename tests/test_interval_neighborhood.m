@@ -40,7 +40,7 @@ function test_interval_neighborhood_basis()
             % should properly deal with permutations
             ds2=cosmo_slice(ds,randperm(nf),2);
             ds2.a.fdim.values=cellfun(@transpose,ds2.a.fdim.values,...
-                                        'UniformOutput',false);
+                                        'UniformOutput',false)';
             nh2=cosmo_interval_neighborhood(ds2,'time','radius',radius);
             assertEqual(nh.fa,nh2.fa);
             assertEqual(nh.a,nh2.a);
