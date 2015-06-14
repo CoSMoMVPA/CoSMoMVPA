@@ -93,6 +93,33 @@ pygments_style = 'emacs'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# citation settings using sphinxcontrib-bibtex
+
+from pybtex.style.formatting.alpha import Style as AlphaStyle
+from pybtex.plugin import register_plugin
+from pybtex.richtext import Tag, Text, Symbol
+from pybtex.style.names.lastfirst import NameStyle as AuthorNameStyle
+
+class CoSMoRefStyle(AlphaStyle):
+    def format_article(self, e):
+        text=super(CoSMoRefStyle,self).format_article(e)
+
+        summary=e.fields.get('cosmomvpa-summary',None)
+        if summary is not None:
+            summary_text=Tag('emph',Text('[ %s ]' % summary))
+            text.extend([Symbol('newblock'),summary_text])
+
+        return text
+
+    default_name_style = 'abbr_lastfirst'
+
+class AbbrLastFirstNameStyle(AuthorNameStyle):
+    def format(self, person, abbr=True):
+        return super(AbbrLastFirstNameStyle,self).format(person,True)
+
+register_plugin('pybtex.style.names','abbr_lastfirst',AbbrLastFirstNameStyle)
+register_plugin('pybtex.style.formatting', 'cosmoref', CoSMoRefStyle)
+
 
 # -- Options for HTML output ---------------------------------------------------
 
