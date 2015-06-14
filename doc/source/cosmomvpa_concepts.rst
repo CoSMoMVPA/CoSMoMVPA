@@ -287,7 +287,7 @@ Examples of measures include:
 
 Neighborhood
 ^^^^^^^^^^^^
-The tradional (volume-based fMRI) searchlight was introduced by Kriegskorte et al (2006) as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.
+The tradional (volume-based fMRI) searchlight was introduced :cite:`KGB06` as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.
 
 CoSMoMVPA_ overloads the *searchlight* concept through a more versatile *neighborhood* concept. A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses (:ref:`cosmo_searchlight`), where the concept of a traditional fMRI volumetric searchlight is generalized to other types of datasets as well. For example:
 
@@ -307,16 +307,16 @@ When running a searchlight (:ref:`cosmo_searchlight`) with a `cosmomvpa_measure`
 
 Neighborhood-related functions include:
 
-    - :ref:`cosmo_spherical_neighborhood`: for fMRI spherical volume-based searchlight (c.f. Kriegeskorte et al 2006), and MEEG source-space searchlight.
-    - :ref:`cosmo_surficial_neighborhood`: for fMRI surface-based searchlight (c.f. Oosterhof et al 2011).
-    - :ref:`cosmo_interval_neighborhood`: for MEEG searchlight for time or frequency domain.
+    - :ref:`cosmo_spherical_neighborhood`: for fMRI spherical volume-based searchlight (c.f. :cite:`KGB06`), and MEEG source-space searchlight.
+    - :ref:`cosmo_surficial_neighborhood`: for fMRI surface-based searchlight (c.f. :cite:`OWD+11`).
+    - :ref:`cosmo_interval_neighborhood`: for MEEG searchlight for time or frequency domain (c.f. :cite:`LTO+14`).
     - :ref:`cosmo_meeg_chan_neighborhood`: for MEEG searchlight over sensors.
 
 The :ref:`cosmo_cross_neighborhood` can *cross* different neighborhoods, which provides functionality for:
 
     - fMRI time-space searchlight, if multiple time points are associated with each trial condition; achieved by crossing a spherical or surficial neighborhood with an interval neighborhood (for the time dimension).
     - MEEG time-space searchlight; achieved by crossing a an interval neighborhood (for the time dimension) with a channel or source MEEG neighorhood.
-    - MEEG time-space-frequency searchlight: achieved by crossing two interval neighborhoods (for the time and frequency dimensions) with a channel or source MEEG neighborhood.
+    - MEEG time-space-frequency searchlight: achieved by crossing two interval neighborhoods (for the time and frequency dimensions) with a third (channel or source MEEG) neighborhood (:cite:`LTO+14`).
 
 
 .. include:: links.txt
