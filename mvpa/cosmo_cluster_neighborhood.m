@@ -149,7 +149,7 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
     nbrhood=struct();
     nbrhood.neighbors=full_nbrhood.neighbors(ds2nbrhood);
     nbrhood.fa=cosmo_slice(full_nbrhood.fa,ds2nbrhood,2,'struct');
-    nbrhood.a=ds.a;
+    nbrhood.a=full_nbrhood.a;
 
     origin=struct();
     origin.a=ds.a;
@@ -178,7 +178,6 @@ function nbrhood=set_feature_sizes(nbrhood)
 
 function ds2nbrhood=get_dataset2neighborhood_mapping(ds, nbrhood)
     % ensure matching .fa for ds and nbrhood
-    assert(isequal(nbrhood.a.fdim.values(:),ds.a.fdim.values(:)));
     assert(isequal(nbrhood.a.fdim.labels(:),ds.a.fdim.labels(:)));
 
     dim_labels=ds.a.fdim.labels;
