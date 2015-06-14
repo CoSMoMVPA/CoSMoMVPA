@@ -144,6 +144,61 @@ function test_tiny_meeg_cluster_neighborhood
     half_neighbors={[1 4];[2 3 5 6];[2 3 5 6]};
     assertEqual(nh.neighbors,repmat(half_neighbors,2,1));
 
+    % transpose of fdim elements should be fine
+    ds2=ds;
+    ds2.a.fdim.values={ds2.a.fdim.values{1}', ds2.a.fdim.values{2}'};
+    nh2=cosmo_cluster_neighborhood(ds2,'progress',false);
+    cosmo_check_neighborhood(nh2,ds);
+    cosmo_check_neighborhood(nh,ds);
+    assertEqual(nh.a,nh2.a);
+    assertEqual(nh.fa,nh2.fa);
+    assertEqual(nh.neighbors,nh2.neighbors);
+
+    % different fdim elements i not ok
+    ds3=ds2;
+    ds3.a.fdim.values{1}=ds3.a.fdim.values{1}(end:-1:1);
+
+function test_cluster_neighborhood_transpose
+    opt=struct();
+    opt.progress=false;
+    ds=cosmo_synthetic_dataset('type','timefreq','size','normal');
+    ds=cosmo_dim_remove(ds,'chan');
+
+    nh=cosmo_cluster_neighborhood(ds,opt);
+
+    cp=cosmo_cartprod(repmat({[false,true]},4,1));
+    n=size(cp,1);
+
+    for k=1:n
+        t_label=cp{k,1};
+        t_value=cp{k,2};
+        t_elem1=cp{k,3};
+        t_elem2=cp{k,4};
+
+        ds2=ds;
+
+        if t_label
+            ds2.a.fdim.labels=ds2.a.fdim.labels';
+        end
+
+        if t_value
+            ds2.a.fdim.values=ds2.a.fdim.values';
+        end
+
+        if t_elem1
+            ds2.a.fdim.values{1}=ds2.a.fdim.values{1}';
+        end
+
+        if t_elem2
+            ds2.a.fdim.values{2}=ds2.a.fdim.values{2}';
+        end
+
+        nh2=cosmo_cluster_neighborhood(ds2,opt);
+        assertEqual(nh2.a,nh.a);
+        assertEqual(nh2.fa,nh.fa);
+        assertEqual(nh2.neighbors,nh.neighbors);
+    end
+
 
 
 function test_cluster_neighborhood_surface
