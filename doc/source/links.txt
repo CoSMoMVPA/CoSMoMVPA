@@ -35,6 +35,7 @@
 .. _Searchmight: http://minerva.csbmb.princeton.edu/searchmight
 .. _Sphinx: http://sphinx-doc.org
 .. _`sphinxcontrib-matlabdomain`: https://pypi.python.org/pypi/sphinxcontrib-matlabdomain
+.. _`sphinxcontrib-bibtex`: https://pypi.python.org/pypi/sphinxcontrib-bibtex
 .. _SPM: http://www.fil.ion.ucl.ac.uk/spm/
 .. _`Travis-ci`: https://travis-ci.org/CoSMoMVPA/CoSMoMVPA
 .. _`Unix-like`: http://en.wikipedia.org/wiki/Unix-like

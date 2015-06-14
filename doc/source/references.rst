@@ -4,7 +4,8 @@
 References
 ==========
 
-See :cite:`HHS+09a` 
-
 .. bibliography:: references.bib
     :all:
+    :style: cosmoref
+
+
