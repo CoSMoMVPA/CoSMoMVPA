@@ -86,8 +86,8 @@ Code for the workshop
 Sample Dataset
 ++++++++++++++
 
-We have preprocessed data for 8 subjects from Connolly et al., 2012.
-A slow event-related design with six different types of animals. Details published `here <http://www.jneurosci.org/content/32/8/2608>`_.
+We have preprocessed data for 8 subjects from :cite:`CGG+12`.
+A slow event-related design with six different types of animals.
 
 .. image:: _static/fmri_design.png
     :width: 400px

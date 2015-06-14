@@ -6,7 +6,7 @@ Classification analysis
 Background
 ++++++++++
 
-This exercise shows a more advanced MVPA topic, the use of a classifier. Using a classifier involves two steps:
+This exercise shows a more advanced MVPA topic, the use of a classifier (first reported in :cite:`CS03`). Using a classifier involves two steps:
 
 - training: a set of ``samples`` (the patterns) with associated ``.sa.targets`` (conditions) together are called the *training set*. The training set is used so that the classifiers *learns* which patterns are associated with each condition.
 

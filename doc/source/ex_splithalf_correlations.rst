@@ -5,7 +5,7 @@ Split-half correlation-based MVPA with group analysis
 
 Background
 ++++++++++
-This exercise the most simple and most popular type of MVPA, that was first reported in Haxby et al 2001.
+This exercise the most simple and most popular type of MVPA, that was first reported in :cite:`HGF+01`.
 The intuition is to split the data in two halves (e.g. odd and even runs) and estimate the response for each category, voxel and half seperately. If an area represents categories in a distributed manner (over voxels), then correlations (over voxels) of matching categories may be higher than correlations of non-matching categories. If categories are not represented in such a way, one would expect no differences between correlations of matching and non-matching categories.
 
 Briefly, the procedure can be visualized as follows:
