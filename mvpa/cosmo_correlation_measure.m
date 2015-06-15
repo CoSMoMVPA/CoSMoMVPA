@@ -134,6 +134,9 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r)).
 %     The rationale is to make data more normally distributed under the
 %     null hypothesis.
+%     Note: Fisher-transformed correlations can be transformed back to
+%     their original correlation values using 'tanh', which is the inverse
+%     of 'atanh'.
 %   - if multiple samples are present with the same chunk and target, they
 %     are averaged *prior* to computing the correlations
 %   - if multiple partitions are present, then the correlations are
