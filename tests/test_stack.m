@@ -32,6 +32,13 @@ function test_stack_samples
     s5=cosmo_stack({ds,ds2},1,2);
     assertEqual(s5.fa,ds2.fa);
 
+    % should properly deal with NaNs
+    ds.fa.i(2:4)=NaN;
+    ds1.fa.i(2:4)=NaN;
+    s=cosmo_stack({ds,ds1});
+    assertEqual(s.fa,ds1.fa);
+
+
 
 function test_stack_features
     ds=cosmo_synthetic_dataset();
@@ -66,6 +73,12 @@ function test_stack_features
     s6=cosmo_stack({ds},1);
     assertEqual(s6,ds);
 
+    % should properly deal with NaNs
+    ds.sa.targets(2:4)=NaN;
+    ds1.sa.targets(2:4)=NaN;
+    s=cosmo_stack({ds,ds},2);
+    assertEqual(s.sa,ds1.sa);
+
 function test_stack_exceptions
     % test exceptions
     ds=cosmo_synthetic_dataset();
@@ -74,11 +87,24 @@ function test_stack_exceptions
     aet({ds},3);
     aet({ds},1,'foo');
 
+    % sample size mismatch
     ds1=ds;
     ds1.samples=ones(1,5);
     aet({ds,ds1});
+
+    % .sa size mismatch
     ds1=ds;
     ds1.sa.targets=1;
     aet({ds,ds1});
+
+    % non-matching elements
+    ds1=ds;
+    ds2=ds;
+    ds2.sa.targets=ds2.sa.targets(end:-1:1);
+    aet({ds1,ds2},2);
+
+    ds2=ds;
+    ds2.fa.i=ds2.fa.i(end:-1:1);
+    aet({ds1,ds2},1);
 
 

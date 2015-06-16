@@ -55,6 +55,30 @@ function test_searchlight_
     assertElementsAlmostEqual(m2.samples,ds.samples);
 
 
+function test_searchlight_partial_classification
+    ds=cosmo_synthetic_dataset('nchunks',6);
+
+    partitions=struct();
+    train_msk=mod(ds.sa.chunks,2)==0;
+    partitions.train_indices={find(train_msk)};
+    partitions.test_indices={find(~train_msk)};
+
+    measure=@cosmo_crossvalidation_measure;
+    opt=struct();
+    opt.classifier=@cosmo_classify_lda;
+    opt.partitions=partitions;
+    opt.progress=false;
+    opt.output='predictions';
+
+
+    nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
+    res=cosmo_searchlight(ds,nh,measure,opt);
+
+    assertEqual(res.samples([3 4 7 8 11 12],:),NaN(6,6))
+    s=res.samples([1 2 5 6 9 10],:);
+    assertTrue(all(s(:)==1 | s(:)==2));
+
+
 
 function test_searchlight_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
