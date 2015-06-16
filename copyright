@@ -13,21 +13,21 @@ Files: doc/source/*
 Copyright: 2013, 2014, 2015 Nikolaas N. Oosterhof
            2013 Andrew C. Connolly
            2014, 2015 CoSMoMVPA contributors
-License: CC-BY 3.0
+License: Expat or CC-BY 3.0
 
 Files: doc/source/static/cosmomvpa_logo.png 
 Copyright: 2013 Gunnar Blohm
-License: CC-BY 3.0
+License: Expat or CC-BY 3.0
 
 Files: doc/source/static/icon_*.png doc/source/static/cosmomvpa_banner.png
 Copyright 2013 Gunnar Blohm
           2013 Nikolaas N. Oosterhof
-License: CC-BY 3.0          
+License: Expat or CC-BY 3.0
 
 Files: externals/NIfTI_*
 Copyright: 2014 Jimmy Shen
            2014, 2015 Nikolaas N. Oosterhof
-License: Expat
+License: BSD-2-clause
 
 
 
@@ -49,6 +49,31 @@ License: Expat
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
+
+
+License: BSD-2-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are
+ met:
+
+     * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+     * Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in
+       the documentation and/or other materials provided with the distribution
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+
 
 License: CC-BY 3.0
  *Note*: A human-readable summary of this license is available from 
