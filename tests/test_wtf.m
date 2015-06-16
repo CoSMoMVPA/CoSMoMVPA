@@ -2,6 +2,10 @@ function test_suite=test_wtf
     initTestSuite;
 
 function test_wtf_basics()
+    warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     h=cosmo_wtf();
 
     [c,m,e]=computer();
