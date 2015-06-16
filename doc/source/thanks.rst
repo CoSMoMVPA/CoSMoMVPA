@@ -1,11 +1,6 @@
+.. include:: ../../AUTHOR
+
 .. thanks
-
-Developers
-----------
-CoSMoMVPA is developed by:
-
-- `Nikolaas N. Oosterhof <http://www5.unitn.it/People/en/Web/Persona/PER0120101>`_
-- `Andrew C. Connolly <http://haxbylab.dartmouth.edu/ppl/andy.html>`_
 
 Acknowledgements
 ----------------
