@@ -182,8 +182,18 @@ function test_target_dsm_corr_measure_exceptions
 
     aet(ds,'target_dsm',mat1,'glm_dsm',{mat1});
     aet(ds,'regress_dsm',mat1,'glm_dsm',{mat1});
+    aet(ds,'target_dsm',mat1,'glm_dsm',repmat({mat1},15,1));
+    aet(ds,'regress_dsm',mat1,'glm_dsm',repmat({mat1},15,1));
     aet(ds,'glm_dsm',struct());
     aet(ds,'glm_dsm',{[mat1 1]});
+
+    mat2_ds=struct();
+    mat2_ds.samples=mat1;
+
+    % requires numeric input
+    mat2_ds_rep=repmat({mat2_ds},1,15);
+    mat2_ds_stacked=cat(1,mat2_ds_rep{:});
+    aet(ds,'target_dsm',mat2_ds_stacked);
 
 
 

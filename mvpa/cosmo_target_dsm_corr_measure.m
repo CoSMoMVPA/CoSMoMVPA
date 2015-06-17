@@ -217,7 +217,11 @@ function dsm_vec=get_dsm_vec_from_struct(params,name,npairs_dataset)
 
 
 function dsm_vec=get_dsm_vec(dsm,npairs_dataset,name)
-     % helper funciton to get dsm in vector form
+    % helper function to get dsm in vector form
+    if ~isnumeric(dsm)
+        error('dsm inputs must be numeric, found %s', class(dsm));
+    end
+
     if isrow(dsm)
         dsm_vec=dsm';
     elseif iscolumn(dsm)
