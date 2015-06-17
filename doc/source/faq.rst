@@ -81,7 +81,7 @@ Does it integrate with PyMVPA?
 ------------------------------
     Yes. Dataset structures are pretty much identical in CoSMoMVPA_ (PyMVPA_ provided inspiration for the data structures). The ``mvpa2/datasets/cosmo.py`` module in PyMVPA_ provides input and output support between CoSMoMVPA and PyMVPA datasets and neighborhoods. This means that, for example, searchlights defined in CoSMoMVPA can be run in PyMVPA (possibly benefitting from its multi-threaded implementation), and the results converted back to CoSMoMVPA format.
 
-Does it run on Octave?
+Does it run on GNU Octave?
 ----------------------
     Allmost all functionality runs in Octave_, including unit tests through MOxUnit_, but there may be parts that function not so well:
 
