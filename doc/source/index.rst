@@ -19,7 +19,7 @@ CoSMoMVPA
 - Runs both in Matlab and GNU Octave.
 - Is Free/Open Source Software (MIT License).
 
-**Note: CoSMoMVPA is currently in a pre-first-release state. Code, features and documentation may change rapidly.**
+**Note: CoSMoMVPA is currently in a pre-first-release state. Features, code and documentation are relatively stable, but small changes may occur**
 
 
 .. toctree::
