@@ -252,6 +252,11 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
             case 'chan'
                 dim_type='chan';
                 neighborhood_func=@chan_neighborhood;
+
+            case 'mom'
+                dim_type='mom';
+                neighborhood_func=@mom_neighborhood;
+
             otherwise
                 % typically for 'time' and 'freq'
                 dim_type=dim_label;
@@ -298,6 +303,19 @@ function nbrhood=fmri_neighborhood(ds,dim_pos,connectivity,opt)
 function nbrhood=source_neighborhood(ds,dim_pos,connectivity,opt)
     labels={'pos'};
     nbrhood=spherical_neighborhood(ds,dim_pos,connectivity,labels,opt);
+
+function nbrhood=mom_neighborhood(ds,dim_pos,connectivity,opt)
+    dim_values=ds.a.fdim.values{dim_pos};
+    if numel(dim_values)~=1
+        error(['When using a dataset with a .mom field, it can only '...
+                'have a single value, because clustering for '...
+                'datasets with multiple orientations of dipole '...
+                'fields is (to the best knowledge of the CoSMoMVPA '...
+                'developers) not properly defined. (If you have an '...
+                'idea how such clustering can be defined meaningfully, '...
+                'please do not hesitate to contact them']);
+    end
+    nbrhood=cosmo_interval_neighborhood(ds,'mom','radius',1);
 
 
 function nbrhood=spherical_neighborhood(ds,dim_pos,connectivity,labels,opt)

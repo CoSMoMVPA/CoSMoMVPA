@@ -306,6 +306,70 @@ function test_cluster_neighborhood_source
         end
     end
 
+function test_cluster_neighborhood_source_mom
+    ds=cosmo_synthetic_dataset('size','normal','type','source',...
+                                        'data_field','mom');
+    nf=size(ds.samples,2);
+    [unused,idxs]=sort(cosmo_rand(1,nf*3));
+    rps=mod(idxs-1,nf)+1;
+    rp=rps(round(nf/2)+(1:(2*nf)));
+    ds=cosmo_slice(ds,rp,2);
+
+    grid_spacing=10;
+
+
+
+    for connectivity=0:3
+        if connectivity==0
+            radius=sqrt(3)+.001;
+            args={};
+        else
+            args={'source',connectivity};
+            radius=sqrt(connectivity)+.001;
+        end
+
+        for has_3d_mom=[false true]
+            ds2=ds;
+            if has_3d_mom
+                assertExceptionThrown(@()...
+                        cosmo_cluster_neighborhood(ds,...
+                                    'progress',false,args),'');
+                continue;
+            end
+
+            keep_dim=ceil(rand()*3);
+
+            keep_msk=ds2.fa.mom==keep_dim;
+
+            ds2=cosmo_slice(ds,keep_msk,2);
+            ds2.fa.mom(:)=1;
+            ds2.a.fdim.values{2}=ds2.a.fdim.values{2}(keep_dim);
+
+            ds2_pos=ds2.a.fdim.values{1}(:,ds2.fa.pos)/grid_spacing;
+
+            nf=size(ds2.samples,2);
+            [unused,rp]=sort(cosmo_rand(1,nf));
+            rp=rp(1:4);
+
+            nh=cosmo_cluster_neighborhood(ds2,'progress',false,args);
+            nh_pos=nh.a.fdim.values{1}(:,nh.fa.pos)/grid_spacing;
+
+            for r=rp
+                idxs=nh.neighbors{r};
+
+                d=sum(bsxfun(@minus,nh_pos(:,r),...
+                                    ds2_pos).^2,1).^.5;
+
+                d_inside=d(idxs);
+                outside_mask=true(size(d));
+                outside_mask(d <= radius)=false;
+                d_outside=d(outside_mask);
+                assert(all(d_inside<=radius));
+                assert(all(d_outside>radius));
+            end
+        end
+    end
+
 
 function test_cluster_neighborhood_exceptions
     ds=cosmo_synthetic_dataset();
