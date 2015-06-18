@@ -59,7 +59,7 @@ install:
     # (PR: https://github.com/fieldtrip/fieldtrip/pull/54)
     # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
     - if [[ "$EXTERNALS" = *"fieldtrip"* ]]; then
-          git clone -b octave git://github.com/nno/fieldtrip.git;
+          git clone -b _enh/octave git://github.com/nno/fieldtrip.git;
           BUILDCMD="${BUILDCMD}ft_defaults();"
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('fieldtrip');";
