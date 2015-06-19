@@ -54,13 +54,13 @@ Dataset attributes contain general information about the whole dataset.
     In fMRI these are typically:
 
     * A ``.a.vol`` field containing information about the voxel-to-world mapping. This is required to map the spatial location of each voxel from `voxel coordinates` (integer indices) to `world coordinates` (metric units, typically milimeters). Currently this is stored in a 4x4 ``.a.vol.mat``  affine transformation matrix that follows the ``LPI`` (left-to-right, posterior-to-anterior, inferior-to-superior) convention (non-affine transformations are currently not supported).
-    * The range of indices used in ``.fa.i``, ``.fa.j`` and ``.fa.k``, stored in ``.a.dim.values``.
-    * The names of the spatial feature attributes, stored in ``.a.dim.labels``.
+    * The range of indices used in ``.fa.i``, ``.fa.j`` and ``.fa.k``, stored in ``.a.fdim.values``.
+    * The names of the spatial feature attributes, stored in ``.a.fdim.labels``.
 
     In MEEG these are, for a dataset with data in time-frequency space:
 
-    * The names of the feature attribtues (``chan``, ``time``, and ``freq``), stored in ``.a.dim.labels`` .
-    * channel names are stored in the field ``.a.dim.values{1}``, time-points in ``.a.dim.values{2}``, and frequencies in ``.a.dim.values{3}``.
+    * The names of the feature attribtues (``chan``, ``time``, and ``freq``), stored in ``.a.fdim.labels`` .
+    * channel names are stored in the field ``.a.fdim.values{1}``, time-points in ``.a.fdim.values{2}``, and frequencies in ``.a.fdim.values{3}``.
 
 .. _`cosmomvpa_targets`:
 
