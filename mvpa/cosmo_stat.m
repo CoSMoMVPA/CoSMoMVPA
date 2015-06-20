@@ -15,13 +15,14 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                           contrasting samples with unq(1) minus unq(2)
 %                           where unq=unique(ds.sa.targets)
 %                     'F' : one-way ANOVA or repeated measures ANOVA.
-%   output_stat_name  (optional) 'z', 'p', 'left', 'right', 'both', or
+%   output_stat_name  (optional) 'left', 'right', 'both', 'z', 'p', or
 %                      empty (default).
-%                     - 'z' returns a z-score.
 %                     - 'left', 'right', and 'both' return a p-value with
 %                        the specified tail.
 %                     - 'p' returns a p-value, with tail='right' if
 %                        stat_name='F' and tail='both' otherwise.
+%                     - 'z' returns a z-score corresponding to the p-value
+%                     - '' (empty) returns the t or F statistic.
 %
 % Returns:
 %   stat_ds          dataset struct with fields:
