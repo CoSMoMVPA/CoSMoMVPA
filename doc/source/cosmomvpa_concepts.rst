@@ -60,7 +60,7 @@ Dataset attributes contain general information about the whole dataset.
     In MEEG these are, for a dataset with data in time-frequency space:
 
     * The names of the feature attribtues (``chan``, ``time``, and ``freq``), stored in ``.a.fdim.labels`` .
-    * channel names are stored in the field ``.a.fdim.values{1}``, time-points in ``.a.fdim.values{2}``, and frequencies in ``.a.fdim.values{3}``.
+    * channel names are stored in the field ``.a.fdim.values{1}``, time-points in ``.a.fdim.values{2}``, and frequencies in ``.a.fdim.values{3}``. In such a dataset, the feature attribute ``.fa.chan``, ``.fa.time``, and ``.fa.freq``, contain integers that index the corresponding elements in ``.a.fdim.values``.
 
 .. _`cosmomvpa_targets`:
 
