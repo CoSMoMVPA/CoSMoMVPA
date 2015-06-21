@@ -209,6 +209,7 @@ Notes on committing
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature or functionality.
+    + ``OCTV``: Change in GNU Octave compatibility.
     + ``OPT``: Optimalization. It should be used when the new code runs faster or uses less memory.
     + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
     + ``RUN``: Change in runnable example scripts (in ``examples/``).
