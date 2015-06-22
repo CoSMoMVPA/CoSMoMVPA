@@ -211,7 +211,8 @@ function did_pass=cosmo_run_tests(varargin)
             monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
             monitor_constructor=monitor_constructors{verbosity};
 
-            report_test_skipped=true;
+            % xUnit does not report which tests were skipped
+            do_report_test_result=true;
 
         case 'moxunit'
             suite=MOxUnitTestSuite();
@@ -228,7 +229,7 @@ function did_pass=cosmo_run_tests(varargin)
             monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
 
             % MOxUnit reports which tests were skipped
-            report_test_skipped=false;
+            do_report_test_result=false;
     end
 
     show_test_count(fid, 'unit',unit_test_count);
@@ -248,8 +249,9 @@ function did_pass=cosmo_run_tests(varargin)
             did_pass=wasSuccessful(test_result);
     end
 
-    % show skipped tests, if any
-    report_test_result(fid, opt.verbose, did_pass, report_test_skipped);
+    if do_report_test_result
+        report_test_result(fid, did_pass);
+    end
 
 
 function show_test_count(fid, label, count)
@@ -261,29 +263,23 @@ function show_test_count(fid, label, count)
     fprintf(fid,'%s test suite: %s\n', label, postfix);
 
 
-function report_test_result(fid, verbosity, did_pass, report_test_skipped)
+function report_test_result(fid, did_pass)
     if did_pass
         prefix='OK';
     else
         prefix='FAILED';
     end
 
-    postfix='';
+    skipped_descs=cosmo_notify_test_skipped();
+    nskip=numel(skipped_descs);
 
-    if report_test_skipped
-        skipped_descs=cosmo_notify_test_skipped();
-        nskip=numel(skipped_descs);
-
-        if nskip>0
-            if verbosity>=2
-                for k=1:nskip
-                    fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
-                end
-            end
+    if nskip>0
+        for k=1:nskip
+            fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
         end
-
-        postfix=sprintf(' (skips=%d)', nskip);
     end
+
+    postfix=sprintf(' (skips=%d)', nskip);
 
     fprintf(fid,'%s%s\n',prefix,postfix);
 
