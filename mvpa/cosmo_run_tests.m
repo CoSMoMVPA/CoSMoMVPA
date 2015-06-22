@@ -225,7 +225,6 @@ function did_pass=cosmo_run_tests(varargin)
             unit_test_count=countTestCases(suite);
             doc_test_count=NaN;
 
-            verbosity=opt.verbose+1;
             monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
 
             % MOxUnit reports which tests were skipped
