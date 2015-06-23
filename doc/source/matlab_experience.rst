@@ -44,10 +44,10 @@ In addition, the *proficient* user should be familar with:
 - ``bsxfun`` and ``cellfun``.
 - recursion.
 - the debugging mode and using break points.
-- assessing space- and time complexity of an algorithm.
-- all there is to know about data structures and their limiations.
+- space- and time complexity.
+- data structures.
 - basic linear algebra.
-- using linear indexing whenever possible.
+- linear- and sub-indexing.
 - modular design of functions.
 - namespaces and closures.
 - profiling.
