@@ -909,7 +909,9 @@ Generally it is good to check the input arguments, although there is a subjectiv
 CoSMoMPVA-specific guidelines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-+ To indicate that a code block is an exercise, place a line containing ``% >@@>`` before the block and one containing ``% <@@<`` after the block. When using the build system (see above), this will replace the corresponding block by a message saying ``%%%% Your code comes here %%%%`` in the online documentation.
+Writing exercises
++++++++++++++++++
+To indicate that a code block is an exercise, place a line containing ``% >@@>`` before the block and one containing ``% <@@<`` after the block. When using the build system (see above), this will replace the corresponding block by a message saying ``%%%% Your code comes here %%%%`` in the online documentation.
 
     **example:**
 
@@ -924,9 +926,15 @@ CoSMoMPVA-specific guidelines
             % <@@<
         end
 
-+ When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+Documentation tests
++++++++++++++++++++
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
+
+Compatibility notes
++++++++++++++++++++
+CoSMoMVPA_ aims to be compatible with GNU Octave 3.8 and later, and with Matlab versions from at least 2010b onwards. Features not supported by these platforms should not be used.
 
 
 Test suite
