@@ -23,14 +23,22 @@ function test_check_partitions_exceptions()
     p.test_indices={[3 4 5 6],[3 4 6]};
     is_ok(p,ds);
 
-    % error for unbalance in train indices, unless overridden
+    % error for unbalance in unique targets, unless overridden
     p.train_indices={[1 2],1};
+    aet(p,ds);
+    aet(p,ds,'unbalanced_partitions_ok',false);
+    is_ok(p,ds,'unbalanced_partitions_ok',true);
+
+    % error for unbalance over chunks, unless overridden
+    p.train_indices={[1 2],[1 2 3]};
+    p.test_indices={[5 6],[5 6]};
     aet(p,ds);
     aet(p,ds,'unbalanced_partitions_ok',false);
     is_ok(p,ds,'unbalanced_partitions_ok',true);
 
     % indices must be integers not exceeding range
     p.train_indices={[1 2],[4 7]};
+    p.test_indices={[3 4 5 6],[3 4 6]};
     aet(p,ds);
     p.train_indices={[1 2],[4.5 5.5]};
     aet(p,ds);
@@ -50,6 +58,18 @@ function test_check_partitions_exceptions()
     ds.sa=struct();
     aet(p,ds);
     ds=struct();
+    aet(p,ds);
+
+    % it's fine to have missing targets...
+    ds=cosmo_synthetic_dataset('ntargets',3);
+    p=struct();
+    p.train_indices={[2 3 5 6], [5 6 8 9]};
+    p.test_indices={[8 9],[1 3]};
+    is_ok(p,ds);
+
+    % ...but if so it must be consistent across the folds
+    p.train_indices={[1 2 4 5],[5 6 8 9]};
+    p.test_indices={[8 9],[1 3]};
     aet(p,ds);
 
 

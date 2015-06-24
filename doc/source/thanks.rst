@@ -24,6 +24,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Talia Brandman
 + Robert W. Cox
 + Sarah Belinda Aimee Degosciu
++ Hanna Gertz
 + Yaroslav Halchenko
 + Thomas Hartmann
 + James Haxby
