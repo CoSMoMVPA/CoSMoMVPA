@@ -188,6 +188,9 @@ function did_pass=cosmo_run_tests(varargin)
 
     verbosity=opt.verbose+1;
 
+    unit_test_count=NaN;
+    doc_test_count=NaN;
+
     switch test_suite_name
         case 'xunit'
             % start with empty test suite
@@ -197,16 +200,14 @@ function did_pass=cosmo_run_tests(varargin)
             if has_unittest
                 unittest_suite=TestSuite.fromName(unittest_location);
                 suite.add(unittest_suite);
+                unit_test_count=unittest_suite.numTestCases;
             end
-
-            unit_test_count=unittest_suite.numTestCases;
 
             if has_doctest
                 doctest_suite=CosmoDocTestSuite(doctest_location);
                 suite.add(doctest_suite);
+                doc_test_count=doctest_suite.numTestCases;
             end
-
-            doc_test_count=doctest_suite.numTestCases;
 
             monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
             monitor_constructor=monitor_constructors{verbosity};
@@ -223,7 +224,6 @@ function did_pass=cosmo_run_tests(varargin)
             end
 
             unit_test_count=countTestCases(suite);
-            doc_test_count=NaN;
 
             monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
 
