@@ -8,7 +8,7 @@ General
 ^^^^^^^
 - For general questions, comments, etc. please see the `CoSMoMVPA Google group`_.
 - For contributions, issues and bugs, see the GitHub_ page.
-- To contact us personally, please send an email to a@c or b@c, where a=andrew.c.connolly, b=nikolaas.n.oosterhof, c=dartmouth.edu.
+- To contact us personally, please send an email to a@c or b@d, where a=andrew.c.connolly, b=nikolaas.n.oosterhof, c=dartmouth.edu, d=unitn.it.
 
 
 Bugs and other issues
