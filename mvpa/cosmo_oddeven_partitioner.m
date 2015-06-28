@@ -8,9 +8,11 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %                    indices (for P samples).
 %    type            One of:
 %                    - 'full': two partitions are returned, training on odd
-%                       and testing on even and vice versa (default)
+%                       unique chunks and testing on even unique chunks,
+%                       and vice versa (default)
 %                    - 'half': a single partition is returned, training on
-%                       odd and testing on even only.
+%                       odd unique chunks and testing on even unique chunks
+%                       only.
 %
 % Output:
 %    partitions      A struct with fields .train_indices and .test_indices.
@@ -58,6 +60,11 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %   - typically, the 'half' option can be used with
 %     cosmo_correlation_measure, because correlations are symmetric; the
 %     'full' option can be used with cosmo_crossvalidation_measure.
+%   - this function returns partitions based on the sorted unique values
+%     in chunks, not the chunk values themselves. For example, if the
+%     sorted unique values of .sa.chunks are [2,4,5,8], then the values
+%     2 and 5 are at the 'odd' position (1 and 3), and 4 and 8 are at the
+%     'even' position.
 %
 % See also: cosmo_nchoosek_partitioner
 %
