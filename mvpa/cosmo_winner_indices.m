@@ -50,7 +50,7 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %   multiple winners. That is, using the present implementation, repeatedly
 %   calling this function with identical input yields identical output,
 %   but unbiased with respect to which class is the 'winner' sample-wise.
-% - Samples with no winner are assigned a value of NaN.
+% - Samples with no predictions are assigned a value of NaN.
 %
 % See also: cosmo_classify_matlabsvm, cosmo_crossvalidate
 %
