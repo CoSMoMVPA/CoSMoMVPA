@@ -150,6 +150,7 @@ function did_pass=cosmo_run_tests(varargin)
 
     has_filename=~isempty(opt.filename);
     if has_filename
+        % test a single file
         unittest_location=opt.filename;
         doctest_location=opt.filename;
 
@@ -158,6 +159,7 @@ function did_pass=cosmo_run_tests(varargin)
         has_unittest=is_in_dir(unittest_dir,filename_dir);
         has_doctest=is_in_dir(doctest_dir,filename_dir);
     else
+        % test a set of files in directories
         unittest_location=unittest_dir;
         doctest_location=doctest_dir;
 
@@ -249,6 +251,7 @@ function did_pass=cosmo_run_tests(varargin)
     end
 
     if do_report_test_result
+        % only for xunit
         report_test_result(fid, did_pass);
     end
 
@@ -285,21 +288,28 @@ function report_test_result(fid, did_pass)
 
 function external=find_external()
     if cosmo_wtf('is_octave')
+        % xunit is not supported
         external='moxunit';
     else
         external_candidates={'xunit','moxunit'};
         has_external=cosmo_check_external(external_candidates,false);
         if ~any(has_external)
+            % raise an error
             cosmo_check_external(external_candidates,true);
         end
+
+        % prefer xunit, because through CoSMoMVPA integration it
+        % supports unit tests
         i=find(has_external,1,'first');
         external=external_candidates{i};
     end
 
 function opt=get_opt(defaults,varargin)
     if ~isempty(varargin) && numel(varargin)==1 && ischar(varargin{1})
+        % test a single file
         opt=defaults;
         opt.filename=varargin{1};
     else
+        % use all defaults
         opt=cosmo_structjoin(defaults,varargin{:});
     end
