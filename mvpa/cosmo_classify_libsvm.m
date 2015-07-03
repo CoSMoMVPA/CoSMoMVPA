@@ -52,7 +52,10 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     opt_str=libsvm_opt2str(opt);
 
     % auto-scale is the default
-    autoscale=~isstruct(opt)||(isfield(opt,'autoscale') && opt.autoscale);
+    autoscale= ~isstruct(opt) || ...
+                ~isfield(opt,'autoscale') || ...
+                isempty(opt.autoscale) || ...
+                opt.autoscale;
 
     % perform autoscale if necessary
     if autoscale

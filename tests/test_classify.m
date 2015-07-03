@@ -88,7 +88,6 @@ function test_classify_matlabsvm
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
     assert_throws_illegal_input_exceptions(cfy);
 
-
 function test_classify_matlabsvm_2class
     cfy=@cosmo_classify_matlabsvm_2class;
     handle=get_predictor(cfy);
@@ -118,6 +117,45 @@ function test_classify_matlabsvm_2class
                 [0 0; 0 1; 1 0; 1 1; ],[1 2 2 1],NaN(2),opt);
 
 
+
+function test_classify_libsvm_with_autoscale
+    cfy=@cosmo_classify_libsvm;
+    opt=struct();
+    opt.autoscale=true;
+    handle=get_predictor(cfy,opt);
+    if no_external('libsvm')
+        assertExceptionThrown(handle,'');
+        return;
+    end
+
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
+                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
+    assert_throws_illegal_input_exceptions(cfy,opt);
+
+function test_classify_libsvm_no_autoscale
+    cfy=@cosmo_classify_libsvm;
+    opt=struct();
+    opt.autoscale=false;
+    handle=get_predictor(cfy,opt);
+    if no_external('libsvm')
+        assertExceptionThrown(handle,'');
+        return;
+    end
+
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 5 4 ...
+                                    9 7 7 7 8 1 2 8 1 9 6 7 1 7]');
+    assert_throws_illegal_input_exceptions(cfy,opt);
+
+
+
 function test_classify_libsvm
     cfy=@cosmo_classify_libsvm;
     handle=get_predictor(cfy);
@@ -125,8 +163,10 @@ function test_classify_libsvm
         assertExceptionThrown(handle,'');
         return
     end
-    assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 5 4 ...
-                                    9 7 7 7 8 1 2 8 1 9 6 7 1 7]');
+
+    % libsvm uses autoscale by default
+    assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
+                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
     assert_throws_illegal_input_exceptions(cfy)
 
 function test_classify_svm
@@ -139,7 +179,7 @@ function test_classify_svm
 
     % matlab and libsvm show slightly different results
     if cosmo_check_external('libsvm',false)
-        pred=[1 3 6 8 6 6 8 7 7 5 7 5 4 9 7 7 7 8 1 2 8 1 9 6 7 1 7]';
+        pred=[1 3 6 8 6 6 8 3 7 5 7 5 4 5 7 7 7 8 1 2 8 1 5 5 7 1 7 ]';
     else
         % do not show warning message
         warning_state=cosmo_warning();
