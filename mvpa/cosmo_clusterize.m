@@ -6,10 +6,9 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
 % Inputs:
 %   ds        A vector of size 1xN, or a dataset struct with a field
 %             .samples of size 1xN.
-%   nbrhood   Neighborhood definition, consisting of either:
-%             - PxN matrix, if each feature has P neighbors at most
-%             - Nx1 cell with neighborhood indices for each feature in ds
-%             - struct with a .neighborhood cell containing indices
+%   nbrhood   PxN neighborhood definition, if each feature has P
+%             neighbors at most. Values of zero can be used as
+%             fillers if a feature has less than P neighbors.
 %
 % Output:
 %   clusters  1xQ cell with cluster indices, if Q clusters are found.
