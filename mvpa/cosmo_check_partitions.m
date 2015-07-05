@@ -222,7 +222,7 @@ function check_dataset(ds)
         return
     end
 
-    error('second input must be a dataset struct');
+    error('second input must be a dataset struct with field .sa');
 
 
 
