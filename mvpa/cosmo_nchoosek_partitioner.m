@@ -281,6 +281,69 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >   { [ 1    [ 5    [  9   ... [ 51    [ 55    [ 59
 %     >       2 ]    6 ]    10 ]       52 ]    56 ]    60 ]   }@1x30
 %
+% Notes:
+%   - this function can be used for cross-decoding analyses. Doing so may
+%     require a re-assignment of .sa.targets, and adding another sample
+%     attribute to specify which samples are used for training and testing.
+%     For example, consider the following dataset with six unique
+%     conditions as specified in the sample attribute field .sa:
+%
+%       .targets    .chunks     .labels
+%       1           1           'vis_dog'
+%       2           1           'vis_cat'
+%       3           1           'vis_frog'
+%       4           1           'aud_dog'
+%       5           1           'aud_cat'
+%       6           1           'aud_frog'
+%       1           2           'vis_dog'
+%       2           2           'vis_cat'
+%       :           :               :
+%       6           8           'aud_frog'
+%
+%    This dataset has 8 chunks, each with 6 conditions: three for visual
+%    stimuli of dogs, cats, and frogs, and three for auditory stimuli for
+%    the same animals. The field .labels is not required, but used for a
+%    human-readable description of the condition of each sample.
+%
+%    Suppose that one wants to do cross-decoding to see
+%    if discrimination of animals generalizes between the visual and
+%    auditory modalities.
+%    To do so, the user has to:
+%       * change the .targets field, to indicate the anima species,
+%       * add another field (here 'modality') indicating which samples are
+%         used for the cross-decoding
+%
+%    In this example, the sample attribute field .sa can be set as follows:
+%
+%       .targets    .chunks     .labels     .modality
+%       1           1           'vis_dog'   1
+%       2           1           'vis_cat'   1
+%       3           1           'vis_frog'  1
+%       1           1           'aud_dog'   2
+%       2           1           'aud_cat'   2
+%       3           1           'aud_frog'  2
+%       1           2           'vis_dog'   1
+%       2           2           'vis_cat'   1
+%       :           :               :
+%       6           8           'aud_frog'  2
+%
+%    so that:
+%     * .modality corresponds to the visual (=1) and auditory (=2)
+%       modality.
+%     * .targets corresponds to the dog (=1), cat (=2), and frog (=3)
+%       species.
+%
+%    With this re-assignment of .targets, testing on the auditory modality
+%    and training on the visual modality with take-one-chunk out
+%    cross-validation can be done using:
+%
+%       test_modality=2; % train on all other modalities (here: only 1)
+%       partitions=cosmo_nchoosek_partitioner(ds,1,...
+%                                   'modality',test_modality);
+%
+%    If test_modality is set to empty ([]), then both modalities are used
+%    for training and for testing (in separate folds).
+%
 % See also: cosmo_nfold_partitioner, cosmo_balance_partitions
 %
 % NNO Sep 2013
