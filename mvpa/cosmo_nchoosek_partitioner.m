@@ -42,17 +42,6 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %                    by the product of the number of values in
 %                    test_group_by*.
 %
-% Notes:
-%  - When k=1 and two input arguments, this function behaves equivalently
-%    to cosmo_nfold_partitioner. Thus, in the most simple case
-%    (nfold-partitioning), cosmo_nfold_partitioner with k=1 can be used
-%    as well as this function.
-%  - This function does not consider any .sa.targets (trial condition)
-%    or .samples information.
-%  - As shown in the examples below, this function can be used for
-%    cross-modal and/or cross-participant cross-validation.
-%  - For cross-validation it is recommended to balance partitions using
-%    cosmo_balance_partitions.
 %
 % Examples:
 %     % make a simple dataset with 4 chunks, 2 samples each
@@ -282,6 +271,16 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     >       2 ]    6 ]    10 ]       52 ]    56 ]    60 ]   }@1x30
 %
 % Notes:
+%    - When k=1 and two input arguments, this function behaves equivalently
+%      to cosmo_nfold_partitioner. Thus, in the most simple case
+%      (nfold-partitioning), cosmo_nfold_partitioner with k=1 can be used
+%      as well as this function.
+%    - This function does not consider any .sa.targets (trial condition)
+%      or .samples information.
+%    - As shown in the examples below, this function can be used for
+%      cross-modal and/or cross-participant cross-validation.
+%    - For cross-validation it is recommended to balance partitions using
+%      cosmo_balance_partitions.
 %   - this function can be used for cross-decoding analyses. Doing so may
 %     require a re-assignment of .sa.targets, and adding another sample
 %     attribute to specify which samples are used for training and testing.
