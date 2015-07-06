@@ -75,6 +75,9 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
 %       * the first dimension goes from left to right
 %       * the second dimension goes from posterior to anterior
 %       * the third dimension goes from inferior to superior
+%   - this function chances the orientation information by adjusting
+%     information in .fa and .a.fdim; contents of .samples remains
+%     unchanged.
 %
 % NNO Dec 2014
 
