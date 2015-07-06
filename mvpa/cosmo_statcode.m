@@ -22,6 +22,9 @@ function stat_repr=cosmo_statcode(ds, output_format)
 %                    are the same; empty otherwise (NIFTI does not support
 %                    different stat codes for different samples).
 %
+% Notes:
+%   - this function is intended for fmri datasets
+%
 % NNO Feb 2014
 
     if nargin<2, output_format=''; end
