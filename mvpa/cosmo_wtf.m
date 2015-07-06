@@ -15,9 +15,6 @@ function s=cosmo_wtf(param)
 %               'toolboxes', 'cosmo_externals', 'cosmo_files', or 'java',
 %               then the information of that parameter is returned.
 %
-% Notes:
-%  - this function is intended to get system information in user support
-%    situations.
 %
 % Examples:
 %   % print the information to standard out (the command window)
@@ -28,6 +25,10 @@ function s=cosmo_wtf(param)
 %
 %   % see if this environment is octave
 %   b=cosmo_wtf('is_octave');
+%
+% Notes:
+%  - this function is intended to get system information in user support
+%    situations.
 %
 % NNO Apr 2014
 
