@@ -5,7 +5,7 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %
 % Inputs:
 %   ds              dataset struct with one sample, i.e. size(ds.samples,1)
-%                   must be 1.
+%                   must be 1. NaN values ds.samples are ignored.
 %   nbrhood         neighborhood structure corresponding with dataset, with
 %                   a field .neighbors so that .neighbors{k} contains the
 %                   feature ids of neighbors of feature k.
@@ -26,6 +26,7 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %                       is empty
 %                   - if I_N=setdiff(nbrhood.neighbors{I},I), then
 %                     fitness(ds.samples(I_N))<=fitness(ds.samples(I))
+%
 %
 % Example:
 %     % generate tiny dataset with 6 voxels
@@ -65,6 +66,7 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 % Notes:
 %   - this function can be used to define regions of interest in a
 %     reproducible and objective manner.
+%   - to ignore particular features, set their value to NaN
 %
 % NNO Jan 2015
 
@@ -104,6 +106,10 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
         end
 
         [score,i]=fitness_func(ds.samples(:,ids_to_consider));
+
+        if isnan(score)
+            break;
+        end
 
         id=ids_to_consider(i);
         around_ids=nbrhood.neighbors{id};
