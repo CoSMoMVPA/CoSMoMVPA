@@ -438,4 +438,59 @@ Notes:
     - There is no function for within-subject significance testing; through cosmo_randomize_targets and a ``for``-loop the user can do that themselves.
     - There is also univariate cosmo_stat for one-sample and two-sample t-tests, and one-way and repeated measures ANOVA.
 
+
+Do cross-modal decoding across three modalities
+-----------------------------------------------
+'I have a dataset with three modalities (visual, auditory, tactile) and would like to do both within-modality and cross-modality decoding. How should I proceed?'
+
+:ref:`cosmo_nchoosek_partitioner` can deal with two modalities quite easily, but three or more is not directly supported. Instead you can slice the dataset multiple times to select the samples of interest, as in this example:
+
+    .. code-block:: matlab
+
+        % generate synthetic example data with 3 modalities, 8 chunks
+        n_modalities=3;
+        ds=cosmo_synthetic_dataset('nchunks',n_modalities*8,'sigma',1);
+        ds.sa.modality=mod(ds.sa.chunks,n_modalities)+1; % in range 1:n_modalities
+        ds.sa.chunks=ceil(ds.sa.chunks/n_modalities);    % 8 chunks
+
+        % allocate space for output
+        accuracies=NaN(n_modalities);
+
+        % do all combinations for training and test modalities
+        for train_modality=1:n_modalities
+            for test_modality=1:n_modalities
+
+                % select data in train and test modality
+                msk=cosmo_match(ds.sa.modality,[train_modality test_modality]);
+                ds_sel=cosmo_slice(ds,msk);
+
+
+                if train_modality==test_modality
+                    % within-modality cross-validation
+                    partitions=cosmo_nchoosek_partitioner(ds_sel,1);
+                else
+                    % cross-modality cross-validation
+                    partitions=cosmo_nchoosek_partitioner(ds_sel,1,...
+                                    'modality',test_modality);
+                end
+
+                opt=struct();
+                opt.partitions=partitions;
+                opt.classifier=@cosmo_classify_lda;
+
+                measure=@cosmo_crossvalidation_measure;
+
+                % Run the measure.
+                %
+                % (alternatively a searchlight can be used, through
+                %
+                %   ds_searchlight_result=cosmo_searchlight(ds,nh,measure,opt);
+                %
+                % where nh is a neighborhood)
+                ds_result=measure(ds_sel,opt);
+                accuracies(train_modality,test_modality)=ds_result.samples;
+            end
+        end
+
+
 .. include:: links.txt
