@@ -32,8 +32,8 @@ function test_find_local_maxima_basics
     nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
     ds.samples(:)=NaN;
     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh);
-    assertEqual(feature_ids,[]);
-    assertElementsAlmostEqual(scores,[]);
+    assertEqual(feature_ids,zeros(1,0));
+    assertElementsAlmostEqual(scores,zeros(1,0));
 
 
 function test_find_local_maxima_exceptions
