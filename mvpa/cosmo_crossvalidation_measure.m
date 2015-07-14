@@ -13,7 +13,8 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       @classify_naive_baysian
 %   args.partitions     Partition scheme, for example the output from
 %                       cosmo_nfold_partition
-%   args.output         'accuracy' (default) or 'predictions'
+%   args.output         'accuracy' (default), 'predictions', or
+%                       'accuracy_by_chunk'
 %   args.check_partitions  optional (default: true). If set to false then
 %                          partitions are not checked for being set
 %                          properly.
