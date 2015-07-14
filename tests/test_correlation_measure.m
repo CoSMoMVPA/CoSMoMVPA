@@ -64,6 +64,8 @@ function test_correlation_measure_basis()
     assertEqual(cosmo_correlation_measure(ds4,opt),...
                     cosmo_correlation_measure(ds4_perm,opt));
 
+
+
 function test_correlation_measure_regression()
     helper_test_correlation_measure_regression(false);
 
@@ -178,6 +180,7 @@ function test_correlation_measure_exceptions
 
     ds.sa.targets(:)=1;
     aet(ds);
+    aet(ds,'template',1);
     ds.sa.targets(1)=2;
     aet(ds);
 
