@@ -244,18 +244,32 @@ nsamples=size(targets,1);
 [classes,unused,class_ids]=fast_unique(targets);
 nclasses=numel(classes);
 
-if nclasses<=1
-    error(['At least 2 unique values for .sa.targets are required, '...
-                    'found %d'], nclasses);
-end
-
-if isempty(template)
-    template=(eye(nclasses)-1/nclasses)/(nclasses-1);
-else
-    max_tolerance=1e-8;
-    if abs(sum(template(:)))>max_tolerance
-        error('Template matrix does not have a sum of zero');
-    end
+switch nclasses
+    case 0
+        error('No classes found - this is not supported');
+    case 1
+        if ~isequal(template,1)
+            error([ 'Only one unique value for .sa.targets was found; '...
+                    'this is only allowed when the ''template'' '...
+                    'parameter is explicitly set to 1.\n'...
+                    'Note that this option does not compute the '...
+                    'correlation *difference* between matching and '...
+                    'non-matching values in .sa.targets; instead it '...
+                    'computes the direct correlation '...
+                    'between two halves of the data. A typical use '...
+                    'case is when .samples already contains a '...
+                    'difference score  comparing two different '...
+                    'conditions']);
+        end
+    otherwise
+        if isempty(template)
+            template=(eye(nclasses)-1/nclasses)/(nclasses-1);
+        else
+            max_tolerance=1e-8;
+            if abs(sum(template(:)))>max_tolerance
+                error('Template matrix does not have a sum of zero');
+            end
+        end
 end
 
 

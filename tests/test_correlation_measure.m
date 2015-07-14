@@ -64,6 +64,25 @@ function test_correlation_measure_basis()
     assertEqual(cosmo_correlation_measure(ds4,opt),...
                     cosmo_correlation_measure(ds4_perm,opt));
 
+function test_correlation_measure_single_target
+    for ntargets=2:6
+        ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',ntargets);
+        ds.samples=randn(size(ds.samples));
+        ds.sa.targets(:)=1;
+
+        idxs=cosmo_index_unique(mod(ds.sa.chunks,2));
+        assert(numel(idxs)==2);
+
+        x=mean(ds.samples(idxs{1},:));
+        y=mean(ds.samples(idxs{2},:));
+        r_xy=atanh(corr(x',y'));
+
+        r_ds=cosmo_correlation_measure(ds,'template',1);
+
+        assertElementsAlmostEqual(r_xy, r_ds.samples);
+    end
+
+
 
 
 function test_correlation_measure_regression()
@@ -181,7 +200,6 @@ function test_correlation_measure_exceptions
     % single target throws exception
     ds.sa.targets(:)=1;
     aet(ds);
-    aet(ds,'template',1);
     aet(ds,'template',2);
     aet(ds,'template',eye(2));
 
