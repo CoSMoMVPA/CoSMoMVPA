@@ -178,9 +178,14 @@ function test_correlation_measure_exceptions
     aet(ds,'template',eye(4));
     aet(ds,'output','foo');
 
+    % single target throws exception
     ds.sa.targets(:)=1;
     aet(ds);
     aet(ds,'template',1);
+    aet(ds,'template',2);
+    aet(ds,'template',eye(2));
+
+
     ds.sa.targets(1)=2;
     aet(ds);
 
