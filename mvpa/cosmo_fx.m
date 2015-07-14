@@ -7,12 +7,14 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %    ds         dataset struct
 %    f          function handle
 %    split_by   string or cell of strings of labels of sample or feature
-%               attributes
-%    dim        dimension on which split is done (1=samples, 2=features)
+%               attributes (default: [])
+%    dim        dimension on which split is done (1=samples (default),
+%               2=features)
 %
 % Returns:
 %    f_ds       dataset struct where the samples are the result of applying
-%               f to each unique combiniation of attribtues in split_by
+%               f to the samples of each unique combiniation of attributes
+%               in split_by
 %
 % Example:
 %     % ds is a dataset with several repeats of each target. Compute the
