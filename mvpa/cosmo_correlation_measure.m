@@ -4,13 +4,16 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 % d=cosmo_correlation_measure(ds[, args])
 %
 % Inputs:
-%  ds             dataset structure
-%  args           optional struct with the following optional fields
+%  ds             dataset structure with fields .samples, .sa.targets and
+%                 .sa.chunks
+%  args           optional struct with the following optional fields:
 %    .partitions  struct with fields .train_indices and .test_indices.
 %                 Both should be a Px1 cell for P partitions. If omitted,
 %                 it is set to cosmo_nchoosek_partitioner(ds,'half').
 %    .template    QxQ matrix for Q classes in each chunk. This matrix
-%                 weights the correlations across the two halves. It should
+%                 weights the correlations across the two halves.
+%                 If ds.sa.targets has only one unique value, it must be
+%                 set to the scalar value 1; otherwise it should
 %                 have a mean of zero. If omitted, it has positive values
 %                 of (1/Q) on the diagonal and (-1/(Q*(Q-1)) off the
 %                 diagonal.
@@ -97,7 +100,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     > [  0.447    -0.525
 %     >   -0.538     0.959 ]
 %
-%     % compute for each fold separately. .ds.chunks in the output
+%     % compute for each fold separately, using a custom take-one-chunk
+%     % out partitioning scheme. c.sa.chunks in the output
 %     % reflects the test chunk in each partition
 %     ds=cosmo_synthetic_dataset('type','fmri','nchunks',4);
 %     partitions=cosmo_nfold_partitioner(ds);
@@ -134,16 +138,19 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     The underlying math is z=atanh(r)=.5*log((1+r)./log(1-r)).
 %     The rationale is to make data more normally distributed under the
 %     null hypothesis.
-%     Note: Fisher-transformed correlations can be transformed back to
+%     Fisher-transformed correlations can be transformed back to
 %     their original correlation values using 'tanh', which is the inverse
 %     of 'atanh'.
 %   - if multiple samples are present with the same chunk and target, they
-%     are averaged *prior* to computing the correlations
+%     are averaged *prior* to computing the correlations.
 %   - if multiple partitions are present, then the correlations are
 %     computed separately for each partition, and then averaged (unless
-%     the ''output'' argument is set differently).
+%     the 'output' option is set, and set to a different value than
+%     'mean'.
 %   - When more than two chunks are present in the input, partitions
-%     consist of all half splits. For illustration, up to 6 chunks, the
+%     consist of all possible half splits for which the number of unique
+%     chunks in the train and test set differ by 1 at most.
+%     For illustration, up to 6 chunks, the
 %     partitions are:
 %       - 2 chunks   -  partition #1
 %         chunks first  half: {    1
