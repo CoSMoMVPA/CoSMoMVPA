@@ -8,7 +8,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     .samples      NS x NF
 %     .sa           with fields .targets and .chunks
 %   'ratio', ratio  ratio (between 0 and 1) of samples to select for
-%                   each average. Not compatible with 'ratio' (default: 1).
+%                   each average. Not compatible with 'count' (default: 1).
 %   'count', c      number of samples to select for each average.
 %                   Not compatible with 'ratio'.
 %   'repeats', r    number of repeated sampling operations for each
