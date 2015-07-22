@@ -493,4 +493,18 @@ Do cross-modal decoding across three modalities
         end
 
 
+Compute classification accuracies manually
+------------------------------------------
+'I computed predictions using :ref:`cosmo_crossvalidation_measure` with the ``output`` option set to ``'predictions'``, but now I would like to compute the classification accuracies afterwards. How can I do that?'
+
+If ``pred_ds`` is the dataset with predictions, then accuracies can be computed by:
+
+    .. code-block:: matlab
+
+        acc_ds=cosmo_slice(pred_ds,1);  % take single slice
+        acc_ds.sa=struct();             % reset sample attributes
+        acc_ds.samples=nanmean(bsxfun(@eq,pred_ds.samples,pred_ds.sa.targets));
+
+
+
 .. include:: links.txt
