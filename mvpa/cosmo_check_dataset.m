@@ -8,8 +8,10 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %   ds                     dataset struct.
 %   ds_type                string indicating the specific type of dataset.
 %                          Currently  supports 'fmri' and 'meeg'.
-%   error_if_not_ok        if true (the default), an error is raised if the
-%                          dataset is not kosher (see below).
+%   error_if_not_ok        if true (the default) or a string, an error is
+%                          raised if the dataset is not kosher (see below).
+%                          If a string, then it is prefixed in the error
+%                          message. If false, then no error is raised.
 %
 % Returns:
 %   is_ok                  boolean indicating kosherness of ds.
@@ -105,6 +107,14 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
         error_if_not_ok=true;
     end
 
+    if ischar(error_if_not_ok)
+        error_prefix=error_if_not_ok;
+        error_if_not_ok=true;
+    else
+        error_prefix='';
+    end
+
+
     % list check functions
     checkers={@check_fields,...
               @check_samples,...
@@ -124,7 +134,7 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
     is_ok=isempty(msg);
 
     if ~is_ok && error_if_not_ok
-        error(msg);
+        error('%s: %s', error_prefix, msg);
     end
 
 function msg=run_checkers(checkers,ds)
