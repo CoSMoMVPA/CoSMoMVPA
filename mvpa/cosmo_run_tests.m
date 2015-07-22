@@ -143,10 +143,9 @@ function did_pass=cosmo_run_tests(varargin)
 
     % set paths for unit tests and doc tests
     mvpa_func='cosmo_fmri_dataset';
-    test_subdir=fullfile('..','tests');
 
     doctest_dir=fileparts(which(mvpa_func));
-    unittest_dir=fullfile(doctest_dir,test_subdir);
+    unittest_dir=fullfile(fileparts(doctest_dir),'tests');
 
     has_filename=~isempty(opt.filename);
     if has_filename
