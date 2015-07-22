@@ -467,10 +467,7 @@ function check_null_datasets(ds,null_datasets)
     % ensure each null dataset is similar to the original
     for k=1:n
         elem=null_datasets{k};
-        if ~cosmo_check_dataset(elem,false);
-            error_msg='not a valid dataset';
-            break;
-        end
+        cosmo_check_dataset(elem);
 
         if ~isequal(size(elem.samples),size(ds.samples))
             error_msg='.samples size mismatch with dataset';
