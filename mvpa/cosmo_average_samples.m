@@ -77,7 +77,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 % NNO Jan 2014
 
     % deal with input parameters
-    defaults.nrep=1;
+
     defaults.seed=[];
 
     opt=cosmo_structjoin(defaults, varargin);
