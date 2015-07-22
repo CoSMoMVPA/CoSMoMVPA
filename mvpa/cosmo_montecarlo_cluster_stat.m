@@ -458,16 +458,19 @@ function ds=select_null_data(null_datasets, chunk_pos, seed)
 function check_null_datasets(ds,null_datasets)
     % ensure data all datasets are in agreement with the input dataset
     if ~iscell(null_datasets)
-        error('null data must be a cell');
+        error('null data must be a cell with datasets');
     end
 
     n=numel(null_datasets);
 
     error_msg='';
+
     % ensure each null dataset is similar to the original
     for k=1:n
         elem=null_datasets{k};
-        cosmo_check_dataset(elem);
+        error_prefix=sprintf('%d-th null dataset: ',k);
+
+        cosmo_check_dataset(elem,[],error_prefix);
 
         if ~isequal(size(elem.samples),size(ds.samples))
             error_msg='.samples size mismatch with dataset';
@@ -499,7 +502,7 @@ function check_null_datasets(ds,null_datasets)
     end
 
     if ~isempty(error_msg)
-        error('%d-th null dataset: %s', k, error_msg);
+        error([error_prefix error_msg]);
     end
 
 
