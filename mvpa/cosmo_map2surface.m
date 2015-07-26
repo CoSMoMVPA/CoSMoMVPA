@@ -188,14 +188,9 @@ function write_gifti(fn,g,opt)
 
 
 function s=build_niml_dset(ds)
-    if ~isequal(ds.a.fdim.labels,{'node_indices'})
-        error('Expected a.fdim.labels={''node_indices''}');
-    end
-
-    s=struct();
-
     [data, node_indices]=get_surface_data_and_node_indices(ds);
 
+    s=struct();
     s.node_indices=node_indices-1; % base 1 -> base 0
     s.data=data';
 
