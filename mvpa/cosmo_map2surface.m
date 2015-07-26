@@ -1,14 +1,38 @@
 function s=cosmo_map2surface(ds, fn, varargin)
 % maps a dataset structure to AFNI/SUMA NIML dset or BV SMP file
 %
-% Usage 1: s=cosmo_map2surface(ds, '-{FMT}) returns a struct s
-% Usage 2: cosmo_map2surface(ds, fn) saves a dataset to a file.
+% s=cosmo_map2surface(ds, output, ...)
 %
-% In Usage 1, {FMT} can be one of 'niml_dset', 'bv_smp', or 'gii'
-% In Usage 2, fn should end with '.niml.dset' or '.smp', or '.gii'
+% Inputs:
+%   ds                  dataset struct with surface-based data
+%   output              String, indicating either the output format or the
+%                       filename.
+%                       - If output starts with a '-', then it must be one
+%                         of:
+%                           '-niml_dset'    AFNI NIML
+%                           '-bv_smp'       BrainVoyager surface map
+%                           '-gii'          GIFTI
+%                       - otherwise it must be a string indicating a file
+%                         name, and end with one of
+%                           '.niml.dset'    AFNI NIML
+%                           '.smp'          BrainVoyager surface map
+%                           '.gii'          GIFTI
+%  'encoding', e        Optional encoding for AFNI NIML or GIFTI. Depending
+%                       on the output format, supported values for e are:
+%                       - NIML:  'ascii', 'binary',
+%                                'binary.lsbfirst', 'binary.msbfirst'
+%                         (the 'binary' option uses the machine's native
+%                         format with either the least or most significant
+%                         byte first)
+%                       - GIFTI: 'ASCII', 'Base64Binary',
+%                                'GZipBase64Binary'
+%                       The encoding argument is ignored for BrainVoyager
+%                       output.
 %
-% Optionally the third argument can be 'format':
-% - for NIML, this can be 'binary' or 'ascii' (default: 'binary')
+% Output:
+%   s                   Structure containing the surface based data based
+%                       on the output format; either a struct with
+%                       NIML data, an xff object, or a GIFTI object.
 %
 % Examples:
 %     ds=cosmo_synthetic_dataset('type','surface');
