@@ -196,7 +196,7 @@ function s=build_niml_dset(ds)
 
     [data, node_indices]=get_surface_data_and_node_indices(ds);
 
-    s.node_indices=node_indices-1;
+    s.node_indices=node_indices-1; % base 1 -> base 0
     s.data=data';
 
     if isfield(ds,'sa')
