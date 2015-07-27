@@ -476,6 +476,11 @@ function partitions=nchoosek_partitioner(chunks,k)
 [unq,unused,chunk_indices]=unique(chunks);
 nclasses=numel(unq);
 
+if nclasses<2
+    error(['at least two unique values for .sa.chunks are required, '...
+                    'found %d'], nclasses);
+end
+
 % deal with special 'half' case
 is_symmetric=false;
 if ischar(k)
