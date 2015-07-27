@@ -265,9 +265,18 @@ function tf=toolbox_in_matlab_path(toolbox_dir)
     persistent cached_path;
 
     cur_path=path();
-    if ~(isequal(cur_path, cached_path) && isequal(toolbox_dir, cached_toolbox_dir))
-         paths=cosmo_strsplit(path(),pathsep());
-        starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
+    if ~(isequal(cur_path, cached_path) && ...
+                isequal(toolbox_dir, cached_toolbox_dir))
+
+        toolbox_dir_esc=toolbox_dir;
+        if isequal(filesep,'\')
+            toolbox_dir_esc=strrep(toolbox_dir_esc,'\','\\');
+        end
+
+
+        paths=cosmo_strsplit(path(),pathsep());
+        starts_with_toolbox_dir=@(x)isempty(...
+                                    cosmo_strsplit(x,toolbox_dir_esc,1));
         cached_tf=any(cellfun(starts_with_toolbox_dir,paths));
         cached_path=cur_path;
         cached_toolbox_dir=toolbox_dir;
