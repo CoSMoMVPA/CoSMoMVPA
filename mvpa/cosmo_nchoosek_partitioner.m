@@ -474,11 +474,11 @@ function partitions=nchoosek_partitioner(chunks,k)
 
 
 [unq,unused,chunk_indices]=unique(chunks);
-nclasses=numel(unq);
+nchunks=numel(unq);
 
-if nclasses<2
+if nchunks<2
     error(['at least two unique values for .sa.chunks are required, '...
-                    'found %d'], nclasses);
+                    'found %d.'], nchunks);
 end
 
 % deal with special 'half' case
@@ -497,12 +497,12 @@ if isnumeric(k)
     end
 
     if k ~= round(k)
-        k=round(nclasses*k);
+        k=round(nchunks*k);
     end
 
-    if ~any(k==1:(nclasses-1))
+    if ~any(k==1:(nchunks-1))
         error('illegal k=%d: test class count should be between 1 and %d', ...
-                    k, nclasses-1);
+                    k, nchunks-1);
     end
 else
     error('illegal parameter for k');
@@ -525,10 +525,10 @@ if all(cosmo_match(chunks,[1 2]))
     return
 end
 
-npartitions=nchoosek(nclasses,k);
-combis=nchoosek(1:nclasses,k); % make all combinations
+npartitions=nchoosek(nchunks,k);
+combis=nchoosek(1:nchunks,k); % make all combinations
 
-if is_symmetric && mod(nclasses,2)==0
+if is_symmetric && mod(nchunks,2)==0
     % when nclasses is even, return the first half of the permutations:
     % the current implementation of nchoosek results is that
     % combis(k,:) and combis(npartitions+1-k) are complementary
@@ -544,7 +544,7 @@ if is_symmetric && mod(nclasses,2)==0
     check_combis=[combis(1:nhalf,:) combis(npartitions:-1:(nhalf+1),:)];
 
     % each row, when sorted, should be 1:nchunks
-    matches=bsxfun(@eq,sort(check_combis,2),1:nclasses);
+    matches=bsxfun(@eq,sort(check_combis,2),1:nchunks);
     assert(all(matches(:)),'nchoosek behaves weirdly');
 
     % we're good - just take the second half and update npartitions
