@@ -1,4 +1,4 @@
-function f_ds=cosmo_fx(ds, f, split_by, dim)
+function f_ds=cosmo_fx(ds, f, split_by, dim, check)
 % apply a function to unique combinations of .sa or .fa values
 %
 % f_ds=cosmo_fx(ds, f, split_by, dim)
@@ -10,6 +10,8 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 %               attributes (default: [])
 %    dim        dimension on which split is done (1=samples (default),
 %               2=features)
+%    check      boolean indicating whether the input ds is checked as being
+%               a proper dataset (default: true)
 %
 % Returns:
 %    f_ds       dataset struct where the samples are the result of applying
@@ -61,6 +63,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
 
     if nargin<3, split_by=[]; end
     if nargin<4, dim=1; end
+    if nargin<5, check=true; end
 
     if ~isa(f, 'function_handle')
         error('f must be a function handle');
@@ -71,7 +74,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim)
     size_other_dim=size(ds.samples,other_dim);
 
     % split the dataset
-    ds_split=cosmo_split(ds, split_by, dim);
+    ds_split=cosmo_split(ds, split_by, dim, check);
 
     nsplits=numel(ds_split);
     res=cell(nsplits,1); % allocate space for output

@@ -101,8 +101,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
         for j=1:nrepeat
             sample_ids=split_sample_ids{k,j};
-            ds_split_sel=cosmo_slice(ds_split,sample_ids);
-            res{k,j}=cosmo_fx(ds_split_sel,averager,[]);
+            ds_split_sel=cosmo_slice(ds_split,sample_ids,1,false);
+            res{k,j}=cosmo_fx(ds_split_sel,averager,[],1,false);
         end
     end
 

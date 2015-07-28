@@ -1,4 +1,4 @@
-function ds_splits=cosmo_split(ds, split_by, dim)
+function ds_splits=cosmo_split(ds, split_by, dim, check)
 % splits a dataset by unique values in (a) sample or feature attribute(s).
 %
 % cosmo_split(ds, split_by[, dim])
@@ -11,6 +11,8 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 %               dataset is split by the set of combinations from these
 %               fieldnames.
 %   dim         1 (split by samples; default) or 2 (split by features).
+%   check       boolean indicating whether the input ds is checked as being
+%               a proper dataset (default: true)
 %
 % Returns:
 %   ds_splits   1xP cell, if there are P unique values for the (set of)
@@ -106,13 +108,19 @@ function ds_splits=cosmo_split(ds, split_by, dim)
 % NNO Sep 2013
 
     % set default dim & check input
+    if nargin<4
+        check=true;
+    end
+
     if nargin<3 || isempty(dim)
         dim=1;
     elseif dim~=1 && dim~=2
         error('dim should be 1 or 2');
     end
 
-    cosmo_check_dataset(ds);
+    if check
+        cosmo_check_dataset(ds);
+    end
 
     % if empty split return just the dataset itself
     if isempty(split_by)
