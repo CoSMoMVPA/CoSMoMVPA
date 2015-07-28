@@ -99,7 +99,8 @@ function test_average_samples_with_repeats
 
     for count=[1,ceil(rand()*count_min)];
         for repeats=[1,ceil(rand()*nrepeats)]
-            mu=cosmo_average_samples(dsb,'count',count,'repeats',repeats,'seed',1);
+            mu=cosmo_average_samples(dsb,'count',count,'repeats',...
+                                        repeats,'seed',1);
             [chunks,targets,ids]=unbinarize_ds(mu, bws, count);
 
             nsamples=size(ids,1);
