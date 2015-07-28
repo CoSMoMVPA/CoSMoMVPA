@@ -153,12 +153,13 @@ function test_average_samples_with_repeats
                 % Decode repeats; multiple repeats can be present.
                 % As there can be multiple repeats, the averaging is undone
                 % and then each bit represents just one repeat
-                v_id=quick_dec2bin(mod(ds.samples(k,j)*count,2^bws(end)), ...
-                                                        bws(end));
+                v_id=quick_dec2bin(mod(ds.samples(k,j)*count,...
+                                                    2^bws(end)),...
+                                                            bws(end));
                 ids{k,j}=bws(end)-find(v_id)+1;
 
                 % decode chunks, targets, ids
-                v=decode(floor(ds.samples(k,j)/2^bws(end)), bws(1:(end-1)));
+                v=decode(floor(ds.samples(k,j)/2^bws(end)),bws(1:(end-1)));
                 assertEqual(log2(v(1))+1,j);
                 c=log2(v(2))+1;
                 t=log2(v(3))+1;
@@ -231,17 +232,6 @@ function test_average_samples_with_repeats
         arr(bw-numel(xbs)+1:end)=(xbs=='1');
         return
 
-
-        xx=x;
-        arr=zeros(1,bw);
-        pos=bw;
-        while xx>0
-            r=mod(xx,2);
-
-            arr(pos)=r;
-            xx=(xx-r)/2;
-            pos=pos-1;
-        end
 
     function x=quick_bin2dec(arr)
         % convert binary array to decimal number
