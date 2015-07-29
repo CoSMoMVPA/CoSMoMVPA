@@ -149,6 +149,19 @@ function test_average_samples_with_repeats
         end
     end
 
+    for resamplings=[0,1,2+round(rand()*4)]
+        count=ceil(rand()*ncombi_min);
+        if resamplings==0
+            repeats=floor(ncombi_min/count);
+            args={'count',count};
+        else
+            repeats=floor(resamplings*ncombi_min/count);
+            args={'count',count,'resamplings',resamplings};
+        end
+
+        check_with(args,count,repeats);
+    end
+
 
 
 
