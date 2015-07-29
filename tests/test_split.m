@@ -47,10 +47,17 @@ function test_split_()
     assertEqual(cosmo_split(ds,[],1),{ds});
     assertEqual(cosmo_split(ds,[],2),{ds});
 
-    aet=@(x,y)assertExceptionThrown(@()cosmo_split(ds,x,y),'');
-    aet('i',1);
-    aet('chunks',2);
-    aet('chunks',3);
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_split(varargin{:}),'');
+    aet(ds,'i',1);
+    aet(ds,'chunks',2);
+    aet(ds,'chunks',3);
 
     ds.sa.targets=[ds.sa.targets ds.sa.targets];
     assertExceptionThrown(@()cosmo_split(ds,'targets',1),'');
+
+    x=struct();
+    x.samples=randn(4);
+    aet(x,'chunks');
+    x.sa=struct();
+    aet(x,'chunks');

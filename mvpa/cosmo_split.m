@@ -155,6 +155,8 @@ function ds_splits=cosmo_split(ds, split_by, dim, check)
 function values=get_attr_values(ds, split_by, dim)
     attrs_fns={'sa','fa'};
     attrs_fn=attrs_fns{dim};
+
+    cosmo_isfield(ds,attrs_fn,true); % check presence
     attrs=ds.(attrs_fn);
 
     n=numel(split_by);
