@@ -87,7 +87,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     averager=@(x)mean(x,1); % to average samples
 
     % split by unique target-chunk combinations
-    ds_splits=cosmo_split(ds,{'targets','chunks'});
+    ds_splits=cosmo_split(ds,{'targets','chunks'},1);
     nsplits=numel(ds_splits);
     bin_counts=cellfun(@(x)size(x.samples,1),ds_splits);
 
