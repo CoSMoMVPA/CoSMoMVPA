@@ -62,7 +62,7 @@ function test_average_samples_with_repeats
     sp=cosmo_split(ds,{'targets','chunks'});
     n_splits=numel(sp);
 
-    % select subset of samples, each with at least nrepeats_min repeats
+    % select subset of samples, each with at least ncombi_min repeats
     combi_count=zeros(nchunks,ntargets);
 
     for k=1:n_splits
