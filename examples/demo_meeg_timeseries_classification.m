@@ -91,6 +91,11 @@ measure=@cosmo_crossvalidation_measure;
 measure_args=struct();
 measure_args.classifier=@cosmo_classify_naive_bayes;
 measure_args.partitions=partitions;
+% for example if we want to average 5 trials in the training set
+mean_train = {false, true};
+ntrl_mean_train = [1, 5];
+navg_types = numel(mean_train);
+
 
 %% Run time-series searchlight on magneto- and gradio-meters seperately
 % compute and plot accuracies for magnetometers and gradiometers separatelyplanar2cmb
@@ -103,40 +108,49 @@ nchantypes=numel(chantypes);
 
 ds_chantypes=cosmo_meeg_chantype(ds_tl);
 
-for k=1:nchantypes
-    parent_type=chantypes{k};
+for i=1:navg_types
+    for k=1:nchantypes
+        parent_type=chantypes{k};
 
-    % find feature indices of channels matching the parent_type
-    chantype_idxs=find(cosmo_match(ds_chantypes,parent_type));
+        % find feature indices of channels matching the parent_type
+        chantype_idxs=find(cosmo_match(ds_chantypes,parent_type));
 
-    % define mask with channels matching those feature indices
-    chan_msk=cosmo_match(ds_tl.fa.chan,chantype_idxs);
+        % define mask with channels matching those feature indices
+        chan_msk=cosmo_match(ds_tl.fa.chan,chantype_idxs);
 
-    % slice the dataset to select only the channels matching the channel
-    % types
-    ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, 2);
+        % slice the dataset to select only the channels matching the channel
+        % types
+        ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, 2);
 
-    % define neighborhood over time; for each time point the time
-    % point itself is included, as well as the two time points before and
-    % the two time points after it
-    nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',...
-                                            'radius',time_radius);
+        % define neighborhood over time; for each time point the time
+        % point itself is included, as well as the two time points before and
+        % the two time points after it
+        nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',...
+                                                'radius',time_radius);
 
-    % run the searchlight using the measure, measure arguments, and
-    % neighborhood defined above.
-    sl_map=cosmo_searchlight(ds_tl_sel,nbrhood,measure,measure_args);
-    fprintf('The output has feature dimensions: %s\n', ...
-                    cosmo_strjoin(sl_map.a.fdim.labels,', '));
+        % run the searchlight using the measure, measure arguments, and
+        % neighborhood defined above.
+        
+        % set up averaging params
+        measure_args.mean_train = mean_train{i};
+        measure_args.ntrl_mean_train = ntrl_mean_train(i);
+        
+        sl_map=cosmo_searchlight(ds_tl_sel,nbrhood,measure,measure_args);
+        fprintf('The output has feature dimensions: %s\n', ...
+                        cosmo_strjoin(sl_map.a.fdim.labels,', '));
 
-    subplot(1,nchantypes,k);
+        subplot(navg_types,nchantypes,k+navg_types*(i-1));
 
-    time_values=sl_map.a.fdim.values{1}; % first dim (channels got nuked)
-    plot(time_values,sl_map.samples);
-    title(strrep(parent_type,'_',' '));
-    ylim([.4 .8])
-    xlim([min(time_values),max(time_values)]);
-    ylabel('classification accuracy (chance=.5)');
-    xlabel('time');
+        time_values=sl_map.a.fdim.values{1}; % first dim (channels got nuked)
+        plot(time_values,sl_map.samples);
+        title(strrep(parent_type,'_',' '));
+        ylim([.4 .8])
+        xlim([min(time_values),max(time_values)]);
+        ylbl_sfx = sprintf('avg of %d trials in training set', ...
+            measure_args.ntrl_mean_train);
+        ylabel({'classification accuracy (chance=.5)', ylbl_sfx});
+        xlabel('time');
+    end
 end
 % Show citation information
 cosmo_check_external('-cite');

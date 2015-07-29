@@ -114,6 +114,8 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     if nargin<4,opt=struct(); end
     if ~isfield(opt, 'normalization'), opt.normalization=[]; end
     if ~isfield(opt, 'check_partitions'), opt.check_partitions=true; end
+    if ~isfield(opt, 'mean_train'), opt.mean_train=false; end
+    if ~isfield(opt, 'ntrl_mean_train'), opt.ntrl_mean_train=1; end
 
     if ~isempty(opt.normalization);
         normalization=opt.normalization;
@@ -130,7 +132,9 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     test_indices = partitions.test_indices;
 
     npartitions=numel(train_indices);
-
+    % XXX: if I'm not averaging the test set, then this doesn't matter,
+    % otherwise I need to change the nsamples to reflect the averaging of
+    % the test set
     nsamples=size(ds.samples,1);
 
     % space for output (one column per partition)
@@ -158,7 +162,14 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         train_data = ds.samples(train_idxs,:);
         test_data = ds.samples(test_idxs,:);
         % <@@<
-
+        
+        % if wanted we average training set prior to normalization
+        train_targets = targets(train_idxs);
+        if opt.mean_train
+            [train_data, train_targets]=...
+                cosmo_meansamples(train_data, train_targets, opt.ntrl_mean_train); 
+        end
+        
         % apply normalization
         if ~isempty(normalization)
             [train_data,params]=cosmo_normalize(train_data,normalization);
@@ -169,7 +180,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         % then get predictions for the training samples using
         % the classifier, and store these in the k-th column of all_pred.
 
-        train_targets = targets(train_idxs);
+        %train_targets = targets(train_idxs);
         p = classifier(train_data, train_targets, test_data, opt);
 
         all_pred(test_idxs,k) = p;
