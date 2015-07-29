@@ -49,34 +49,34 @@ function test_average_samples_
 function test_average_samples_with_repeats
     nchunks=ceil(rand()*4+3);
     ntargets=ceil(rand()*4+3);
-    nrepeats_max=ceil(rand()*3+4);
+    ncombi_max=ceil(rand()*3+4);
 
     max_cyc=5;
 
-    nrepeats_min=ceil(nrepeats_max/2);
+    ncombi_min=ceil(ncombi_max/2);
 
     ds=cosmo_synthetic_dataset('nchunks',nchunks,...
                                 'ntargets',ntargets,...
-                                'nreps',nrepeats_max);
+                                'nreps',ncombi_max);
     ds.sa=rmfield(ds.sa,'rep');
     sp=cosmo_split(ds,{'targets','chunks'});
     n_splits=numel(sp);
 
     % select subset of samples, each with at least nrepeats_min repeats
-    repeat_count=zeros(nchunks,ntargets);
+    combi_count=zeros(nchunks,ntargets);
 
     for k=1:n_splits
         if k==1
             % ensure at least one with minimum
-            nkeep=nrepeats_min;
+            nkeep=ncombi_min;
         else
-            nkeep=nrepeats_min+floor(rand()*(nrepeats_max-nrepeats_min));
+            nkeep=ncombi_min+floor(rand()*(ncombi_max-ncombi_min));
         end
 
         ds_k=cosmo_slice(sp{k},1:nkeep);
         ds_k.sa.repeats=(1:nkeep)';
 
-        repeat_count(ds_k.sa.chunks(1),ds_k.sa.targets(1))=nkeep;
+        combi_count(ds_k.sa.chunks(1),ds_k.sa.targets(1))=nkeep;
 
         sp{k}=ds_k;
     end
@@ -87,7 +87,7 @@ function test_average_samples_with_repeats
     [nsamples,nfeatures]=size(ds.samples);
 
     % bit widths for features, chunks, targets, and repeats
-    bws=[nfeatures,nchunks,ntargets,ceil(log2(max_cyc+1))+nrepeats_max];
+    bws=[nfeatures,nchunks,ntargets,ceil(log2(max_cyc+1))+ncombi_max];
 
     % encode features, chunks, targets and repeats into single number
     dsb=binarize_ds(ds,bws);
@@ -97,15 +97,15 @@ function test_average_samples_with_repeats
                  count,...
                  repeats) check_with_helper(dsb,args,count,repeats,...
                                                 nchunks,ntargets,...
-                                                nrepeats_max,bws);
+                                                ncombi_max,bws);
 
-    for repeats=[1,ceil(rand()*nrepeats_max)]
-        for count=[1,ceil(rand()*nrepeats_min)];
+    for repeats=[1,ceil(rand()*ncombi_max)]
+        for count=[1,ceil(rand()*ncombi_min)];
             check_with({'count',count,'repeats',repeats},...
                                         count,repeats);
         end
         for ratio=[.5,.3+rand()*.7];
-            count=round(ratio*min(repeat_count(:)));
+            count=round(ratio*min(combi_count(:)));
             check_with({'ratio',ratio,'repeats',repeats},...
                                         count,repeats);
         end
@@ -115,7 +115,7 @@ function test_average_samples_with_repeats
 
 
 function  check_with_helper(dsb, args, count, repeats,...
-                    nchunks, ntargets, nrepeats_max, bws)
+                    nchunks, ntargets, ncombi_max, bws)
 
     mu=cosmo_average_samples(dsb,args{:});
     [chunks,targets,ids]=unbinarize_ds(mu, bws, count);
@@ -124,7 +124,7 @@ function  check_with_helper(dsb, args, count, repeats,...
     nfeatures=size(dsb.samples,2);
 
     % chunk, target, repeat count
-    ctr_count=zeros(nchunks,ntargets,nrepeats_max);
+    ctr_count=zeros(nchunks,ntargets,ncombi_max);
 
 
     % keep track of each target and chunk combination
