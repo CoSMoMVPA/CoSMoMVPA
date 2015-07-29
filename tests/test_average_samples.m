@@ -46,6 +46,44 @@ function test_average_samples_
     assertElementsAlmostEqual(delta*3000,round(delta*3000));
 
 
+function test_average_samples_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_average_samples(varargin{:}),'');
+    ds=cosmo_synthetic_dataset('nreps',5);
+
+    aet([]);
+    x=struct();
+    x.samples=randn(4);
+    aet(x);
+
+
+    % illegal count
+    aet(ds,'count',6)
+    aet(ds,'count',[2 2])
+    aet(ds,'count',3.5);
+    aet(ds,'count',0);
+
+    % illegal ratio
+    aet(ds,'ratio',1.2)
+    aet(ds,'ratio',-0.2);
+    aet(ds,'ratio',[.5 .5]);
+
+    % mutually exclusive
+    aet(ds,'ratio',.5,'count',2);
+
+    aet(ds,'repeats',[2 2])
+    aet(ds,'repeats',-1);
+    aet(ds,'resamplings',[2 2]);
+    aet(ds,'resamplings',-1);
+    aet(ds,'resamplings',1,'repeats',1);
+
+
+
+
+
+
+
+
 function test_average_samples_with_repeats
     nchunks=ceil(rand()*4+3);
     ntargets=ceil(rand()*4+3);

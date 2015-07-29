@@ -154,26 +154,51 @@ function [nselect,nrepeat]=get_selection_params(bin_counts,opt)
 
     end
 
-    if ~isscalar(nselect) || round(nselect)~=nselect
-        error('Number of elements to select must be a scalar integer');
-    end
+    ensure_in_range('Number of elements to select',nselect,...
+                                            1,min(bin_counts));
 
-    wrong_nselect_mask=nselect<=0 || nselect>min(bin_counts);
-    if any(wrong_nselect_mask)
-        wrong_pos=find(wrong_nselect_mask,1);
-        error('cannot select %d samples, as only %d are present',...
-                nselect(wrong_pos), bin_counts(wrong_pos));
-    end
 
-    [idx2,value2]=get_mutually_exclusive_param(opt,{'resamplings',...
-                                                'repeats',},1,1);
+    repeat_labels={'resamplings','repeats'};
+    [idx2,value2]=get_mutually_exclusive_param(opt,repeat_labels,1,1);
     switch idx2
         case 1
-            nrepeat=round(value2*min(bin_counts./nselect));
+            nrepeat=floor(value2*min(bin_counts./nselect));
         case 2
             nrepeat=value2;
     end
 
+    ensure_in_range(sprintf('Value for ''%s''',repeat_labels{idx2}),...
+                            nrepeat,1,Inf);
+
+function ensure_in_range(label, val, min_val, max_val)
+    postfix=[];
+    while true
+        if ~isscalar(val) || ~isnumeric(val)
+            postfix='must be numeric scalar';
+            break;
+        end
+
+        if round(val)~=val
+            postfix='must be an integer';
+        end
+
+        if val<min_val
+            postfix=sprintf('cannot be less than %d', min_val);
+            break;
+        end
+
+        if val<min_val
+            postfix=sprintf('cannot be greater than %d', max_val);
+            break;
+        end
+
+        break;
+    end
+
+    if ~isempty(postfix)
+        msg=[label postfix];
+        error(msg);
+    end
 
 
 function sample_ids=get_split_sample_ids(bin_counts,opt)
