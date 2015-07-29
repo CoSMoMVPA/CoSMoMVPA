@@ -34,7 +34,14 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       if cluster_stat is not 'tfce')
 %   'null', null_data   (optional) 1xP cell with null datasets, for example
 %                       from cosmo_randomize_targets. Each dataset in
-%                       null_data{i} must have the same size as ds.
+%                       null_data{i} must have the same size as ds, but
+%                       must contain null data. For example, if a
+%                       one-sample t-test across participants is used to
+%                       test classification  accuracies against chance
+%                       level (with the 'h0_mean' option), then each
+%                       dataset null{i} should contain classification
+%                       accuracies for each participant that were computed
+%                       using randomized values for .sa.targets.
 %                       If this option is provided, then null data is
 %                       sampled from null_data. According to Stelzer et al
 %                       (see References), about 100 null datasets per
@@ -52,15 +59,18 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       The type of feature-wise statistic (one-sample
 %                       t-test, two-sample t-test, one-way ANOVA, or
 %                       repeated-measures ANOVA) depends on the contents of
-%                       ds.sa.targets and ds.sa.chunks.
+%                       ds.sa.targets and ds.sa.chunks (see Notes).
 %                       For example, at alpha=0.05, these can be
 %                       interpreted as:
 %                       - For a one-tailed test:
-%                           z < -1.6449  statistic is below expected mean
-%                           z >  1.6449  statistic is above expected mean
+%                           z < -1.6449   statistic is below expected mean
+%                          |z|<  1.6449   statistic is not significant
+%                           z >  1.6449   statistic is above expected mean
 %                       - For a two-tailed test:
 %                           z < -1.9600  statistic is below expected mean
+%                          |z|<  1.9600  statistic is not significant
 %                           z >  1.9600  statistic is above expected mean
+%                       where |z| denotes the absolute value of z.
 %                       Use normcdf to convert the z-scores to p-values.
 %
 % Example:
@@ -153,7 +163,12 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     z-scores. For publication-quality papers, 10,000 iterations is
 %     recommended.
 %   - The neighborhood used for clustering can, for almost all use cases,
-%     be computed using cosmo_cluster_neighborhood
+%     be computed using cosmo_cluster_neighborhood.
+%   - The rationale for returning z-scores (instead of p-values) that are
+%     corrected for multiple comparisons is that extreme values are the
+%     most significant; when visualized using an external package, a
+%     threshold can be applied to see which features (e.g. voxels or nodes)
+%     survive a particular cluster-corrected significance threshold.
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
@@ -167,7 +182,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     multi-voxel pattern analysis (MVPA): Random permutations and cluster
 %     size control. NeuroImage, Volume 65, 69-82.
 %
-% Se also: cosmo_cluster_neighborhood
+% See also: cosmo_cluster_neighborhood
 %
 % NNO Jan 2015
 

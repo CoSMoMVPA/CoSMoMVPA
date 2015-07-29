@@ -32,6 +32,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Daniel Kaiser
 + James Keidel
 + Sukhbinder Kumar
++ Cristina Lava
 + Sam Nastase
 + Nicholas Peatfield
 + Liuba Papeo
