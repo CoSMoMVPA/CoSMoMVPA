@@ -147,14 +147,18 @@ function [nselect,nrepeat]=get_selection_params(bin_counts,opt)
     switch idx
         case 1
             % ratio
-            nselect=round(value*bin_counts);
+            nselect=round(value*min(bin_counts));
         case 2
             % count
-            nselect=ones(size(bin_counts))*value;
+            nselect=value;
 
     end
 
-    wrong_nselect_mask=any(nselect<=0 | nselect>min(bin_counts));
+    if ~isscalar(nselect) || round(nselect)~=nselect
+        error('Number of elements to select must be a scalar integer');
+    end
+
+    wrong_nselect_mask=nselect<=0 || nselect>min(bin_counts);
     if any(wrong_nselect_mask)
         wrong_pos=find(wrong_nselect_mask,1);
         error('cannot select %d samples, as only %d are present',...

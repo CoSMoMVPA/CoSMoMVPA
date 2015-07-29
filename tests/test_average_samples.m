@@ -4,7 +4,6 @@ function test_suite = test_average_samples
 function test_average_samples_
     ds=cosmo_synthetic_dataset();
 
-
     a=cosmo_average_samples(ds);
 
     assertElementsAlmostEqual(sort(a.samples), sort(ds.samples));
@@ -102,13 +101,13 @@ function test_average_samples_with_repeats
 
     for repeats=[1,ceil(rand()*nrepeats)]
         for count=[1,ceil(rand()*count_min)];
-
             check_with({'count',count,'repeats',repeats},...
                                         count,count*repeats);
         end
         for ratio=[.5,.3+rand()*.7];
+            count=round(ratio*min(repeat_count(:)));
             check_with({'ratio',ratio,'repeats',repeats},...
-                                        count,round(repeats*repeat_count*ratio));
+                                        count,count*repeats);
         end
     end
 
@@ -145,7 +144,7 @@ function  check_with_helper(dsb, args, counts, expected_ct_count, ...
         assert(all(diff(id_sorted)>0));
 
         % count should match
-        assertEqual(numel(id),counts(j,k));
+        assertEqual(numel(id),counts);
 
         ctr_count(chunks(j),targets(j),id)=...
                     ctr_count(chunks(j),targets(j),id)+1;
@@ -173,7 +172,7 @@ function [chunks,targets,ids]=unbinarize_ds(ds, bws, counts)
             % Decode repeats; multiple repeats can be present.
             % As there can be multiple repeats, the averaging is undone
             % and then each bit represents just one repeat
-            v_id=quick_dec2bin(mod(ds.samples(k,j)*counts(k,j),...
+            v_id=quick_dec2bin(mod(ds.samples(k,j)*counts,...
                                                 2^bws(end)),...
                                                         bws(end));
             ids{k,j}=bws(end)-find(v_id)+1;
