@@ -11,8 +11,11 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %                   each average. Not compatible with 'count' (default: 1).
 %   'count', c      number of samples to select for each average.
 %                   Not compatible with 'ratio'.
-%   'repeats', r    number of repeated sampling operations for each
-%                   combination of targets and chunks (default: 1).
+%   'resamplings',s Maximum number of times each sample in ds is used for
+%                   averaging. Not compatible with 'repeats' (default: 1)
+%   'repeats', r    Number of times an average is computed for each unique
+%                   combination of targets and chunks. Not compatible with
+%                   'resamplings'
 %
 % Returns
 %   ds_avg          dataset struct with field:
@@ -86,9 +89,9 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     % split by unique target-chunk combinations
     ds_splits=cosmo_split(ds,{'targets','chunks'});
     nsplits=numel(ds_splits);
-    split_counts=cellfun(@(x)size(x.samples,1),ds_splits);
+    bin_counts=cellfun(@(x)size(x.samples,1),ds_splits);
 
-    split_sample_ids=get_split_sample_ids(split_counts,opt);
+    split_sample_ids=get_split_sample_ids(bin_counts,opt);
     nrepeat=size(split_sample_ids,2);
     assert(size(split_sample_ids,1)==nsplits);
 
@@ -101,8 +104,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
         for j=1:nrepeat
             sample_ids=split_sample_ids{k,j};
-            ds_split_sel=cosmo_slice(ds_split,sample_ids);
-            res{k,j}=cosmo_fx(ds_split_sel,averager,[]);
+            ds_split_sel=cosmo_slice(ds_split,sample_ids,1,false);
+            res{k,j}=cosmo_fx(ds_split_sel,averager,[],1,false);
         end
     end
 
@@ -110,38 +113,74 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     ds_avg=cosmo_stack(res);
 
 
-function [nselect,nrepeat]=get_selection_params(split_counts,opt)
-    if isfield(opt,'count') && ~isempty(opt.count)
-        if isfield(opt,'ratio') && ~isempty(opt.ratio)
-            error(['''count'' and ''ratio'' options are mutually '...
-                        'exclusive']);
+function [idx, value]=get_mutually_exclusive_param(opt, names, ...
+                                        default_idx, default_value)
+    idx=[];
+    value=[];
+
+    n=numel(names);
+
+    for k=1:n
+        key=names{k};
+        if isfield(opt,key)
+            value=opt.(key);
+            if ~isempty(value)
+                if isempty(idx)
+                    idx=k;
+                else
+                    error(['The options ''%s'' and ''%s'' are mutually '...
+                            'exclusive '], key, names{idx});
+                end
+            end
         end
-        nselect=opt.count*ones(size(split_counts));
-    elseif isfield(opt,'ratio') && ~isempty(opt.ratio)
-        nselect=round(opt.ratio*split_counts);
-    else
-        nselect=split_counts;
     end
 
-    wrong_nselect_mask=any(nselect<=0 | nselect>split_counts);
+    if isempty(idx)
+        idx=default_idx;
+        value=default_value;
+    end
+
+
+function [nselect,nrepeat]=get_selection_params(bin_counts,opt)
+    [idx,value]=get_mutually_exclusive_param(opt,{'ratio','count'},1,1);
+
+    switch idx
+        case 1
+            % ratio
+            nselect=round(value*min(bin_counts));
+        case 2
+            % count
+            nselect=value;
+
+    end
+
+    if ~isscalar(nselect) || round(nselect)~=nselect
+        error('Number of elements to select must be a scalar integer');
+    end
+
+    wrong_nselect_mask=nselect<=0 || nselect>min(bin_counts);
     if any(wrong_nselect_mask)
         wrong_pos=find(wrong_nselect_mask,1);
         error('cannot select %d samples, as only %d are present',...
-                nselect(wrong_pos), split_counts(wrong_pos));
+                nselect(wrong_pos), bin_counts(wrong_pos));
     end
 
-    if isfield(opt,'repeats') && ~isempty(opt.repeats)
-        nrepeat=opt.repeats;
-    else
-        nrepeat=1;
+    [idx2,value2]=get_mutually_exclusive_param(opt,{'resamplings',...
+                                                'repeats',},1,1);
+    switch idx2
+        case 1
+            nrepeat=round(value2*min(bin_counts./nselect));
+        case 2
+            nrepeat=value2;
     end
 
 
-function sample_ids=get_split_sample_ids(split_counts,opt)
-    [nselect,nrepeat]=get_selection_params(split_counts,opt);
 
-    nsplits=numel(split_counts);
-    nsamples=sum(split_counts);
+function sample_ids=get_split_sample_ids(bin_counts,opt)
+    [nselect,nrepeat]=get_selection_params(bin_counts,opt);
+
+    nsplits=numel(bin_counts);
+    nsamples=sum(bin_counts);
 
     if isfield(opt,'seed') && ~isempty(opt.seed)
         rp=cosmo_rand(nsamples, nrepeat, 'seed', opt.seed);
@@ -154,11 +193,11 @@ function sample_ids=get_split_sample_ids(split_counts,opt)
     row_first=1;
 
     for k=1:nsplits
-        row_last=row_first+split_counts(k)-1;
+        row_last=row_first+bin_counts(k)-1;
 
         for r=1:nrepeat
             [unused,i]=sort(rp(row_first:row_last,r));
-            sample_ids{k,r}=i(1:nselect(k));
+            sample_ids{k,r}=i(1:nselect);
         end
 
         row_first=row_last+1;
