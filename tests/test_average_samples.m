@@ -78,12 +78,6 @@ function test_average_samples_exceptions
     aet(ds,'resamplings',1,'repeats',1);
 
 
-
-
-
-
-
-
 function test_average_samples_with_repeats
     nchunks=ceil(rand()*4+3);
     ntargets=ceil(rand()*4+3);
