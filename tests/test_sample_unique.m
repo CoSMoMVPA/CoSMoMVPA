@@ -65,17 +65,15 @@ function test_sample_unique_difference_sequences()
     c=5+from_range_randomly(10);
 
     seed=1+from_range_randomly(1e5);
-    for use_seed=[false,true]
+    last_args={{'seed',seed},{'seed',[]'},{}};
+    for k=1:numel(last_args)
         all_same=true;
 
-        if use_seed
-            last_args={'seed',seed};
-        else
-            last_args={};
-        end
+        last_arg=last_args{k};
+        use_seed=numel(last_arg)==2 && ~isempty(last_arg{2});
 
         for tries=1:5
-            i=cosmo_sample_unique(k,n,c,last_args{:});
+            i=cosmo_sample_unique(k,n,c,last_arg{:});
             if tries==1
                 i_first=i;
             elseif ~isequal(i_first,i)

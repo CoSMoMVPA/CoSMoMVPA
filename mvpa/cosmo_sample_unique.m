@@ -88,7 +88,7 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
 function r=random_permutations(n,count,opt)
     % output r has in each column the values 1:count in randomly permuted
     % order
-    if isfield(opt,'seed')
+    if isfield(opt,'seed') && ~isempty(opt.seed)
         args={'seed',opt.seed};
     else
         args={};
