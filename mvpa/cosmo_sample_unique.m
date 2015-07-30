@@ -47,7 +47,7 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
     opt=cosmo_structjoin(varargin{:});
 
     % random elements, each column is a permutation of 1:count
-    rs_mat=random_permutations(n,count,opt);
+    rs_mat=random_permutations(n,count+1,opt);
 
     % vectorize
     rs=rs_mat(:);
@@ -56,7 +56,7 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
     samples=zeros(k,count);
 
     % keep track of which elements in rs were visited
-    visited=false(k*count+1,1);
+    visited=false((k+1)*count,1);
 
     first_non_visited_pos=1;
     in_bin=false(n,k); % re-use this for each column
