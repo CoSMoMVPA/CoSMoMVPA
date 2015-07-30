@@ -141,6 +141,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         cosmo_check_partitions(partitions, ds);
     end
 
+    % see if samples in training set are to be averaged
     [do_average_train, average_train_opt]=get_average_train_opt(opt);
 
     train_indices = partitions.train_indices;
