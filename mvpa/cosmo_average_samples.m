@@ -114,7 +114,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
         end
     end
 
-    ds_avg=cosmo_slice(ds,slice_ids);
+    ds_avg=cosmo_slice(ds,slice_ids,1,false);
     ds_avg.samples=mu;
 
 
