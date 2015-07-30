@@ -22,6 +22,7 @@ function test_sample_unique_basics
                     continue;
                 else
                     i=cosmo_sample_unique(args{:});
+                    assertEqual(sort(i,1),i);
 
                     % check size
                     assert(isequal(size(i),[k,ncol]))

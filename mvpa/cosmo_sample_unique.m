@@ -83,6 +83,8 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
         end
     end
 
+    samples=sort(samples,1);
+
 function r=random_permutations(n,count,opt)
     % output r has in each column the values 1:count in randomly permuted
     % order
