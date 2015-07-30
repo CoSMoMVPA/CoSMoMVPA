@@ -90,21 +90,20 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     nsplits=numel(split_idxs);
     bin_counts=cellfun(@numel,split_idxs);
 
-    split_sample_ids=get_split_sample_ids(bin_counts,opt);
+    [split_sample_ids,nrepeat]=get_split_sample_ids(bin_counts,opt);
 
     nfeatures=size(ds.samples,2);
-    nrepeat=size(split_sample_ids,2);
 
-    ds_avg_cell=cell(nsplits,1);
     mu=zeros(nrepeat*nsplits,nfeatures);
     slice_ids=zeros(nrepeat*nsplits,1);
 
     row=0;
     for k=1:nsplits
         split_idx=split_idxs{k};
+        split_ids=split_sample_ids{k};
 
         for j=1:nrepeat
-            sample_ids=split_idx(split_sample_ids{k,j});
+            sample_ids=split_idx(split_ids(:,j));
 
             row=row+1;
             mu(row,:)=mean(ds.samples(sample_ids,:),1);
@@ -114,42 +113,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
     ds_avg=cosmo_slice(ds,slice_ids);
     ds_avg.samples=mu;
-    return
 
-
-
-
-
-
-
-
-    averager=@(x)mean(x,1); % to average samples
-
-    % split by unique target-chunk combinations
-    ds_splits=cosmo_split(ds,{'targets','chunks'},1);
-    nsplits=numel(ds_splits);
-    bin_counts=cellfun(@(x)size(x.samples,1),ds_splits);
-
-    split_sample_ids=get_split_sample_ids(bin_counts,opt);
-    nrepeat=size(split_sample_ids,2);
-    assert(size(split_sample_ids,1)==nsplits);
-
-    % allocate space for output
-
-    res=cell(nsplits,nrepeat);
-
-    for k=1:nsplits
-        ds_split=ds_splits{k};
-
-        for j=1:nrepeat
-            sample_ids=split_sample_ids{k,j};
-            ds_split_sel=cosmo_slice(ds_split,sample_ids,1,false);
-            res{k,j}=cosmo_fx(ds_split_sel,averager,[],1,false);
-        end
-    end
-
-    % join results
-    ds_avg=cosmo_stack(res);
 
 function split_idxs=get_split_indices(ds)
     if ~(isstruct(ds) && ...
@@ -253,22 +217,19 @@ function ensure_in_range(label, val, min_val, max_val)
     end
 
 
-function sample_ids=get_split_sample_ids(bin_counts,opt)
+function [sample_ids,nrepeat]=get_split_sample_ids(bin_counts,opt)
     [nselect,nrepeat]=get_selection_params(bin_counts,opt);
 
     % number of saples for each unique chunks-targets combination
     nsplits=numel(bin_counts);
 
     % allocate space for output
-    sample_ids=cell(nsplits, nrepeat);
+    sample_ids=cell(nsplits,1);
 
     % select samples randomly, but in a manner so that each one is used
     % approximately equally often
     for k=1:nsplits
         bin_count=bin_counts(k);
-
-        idxs=cosmo_sample_unique(nselect,bin_count,nrepeat);
-
-        sample_ids(k,:)=mat2cell(idxs,nselect,ones(1,nrepeat));
+        sample_ids{k}=cosmo_sample_unique(nselect,bin_count,nrepeat);
     end
 
