@@ -52,6 +52,21 @@ function test_crossvalidation_measure_basics
     assertEqual(res7.samples,10+[1 2 3 5 5 6 4 6 5 4 6 6 6 ...
                                     2 3 4 5 5 1 5 3 1 3 1]');
 
+    % test with averaging samples
+    opt=rmfield(opt,'normalization');
+    opt.average_train_count=1;
+    res8=cosmo_crossvalidation_measure(ds,opt);
+    assertEqual(res8.samples,10+[1 2 3 1 5 6 4 6 5 4 6 6 6 ...
+                                    2 3 4 2 5 1 2 3 4 3 1]');
+
+    opt.average_train_count=2;
+    opt.average_train_resamplings=5;
+    res9=cosmo_crossvalidation_measure(ds,opt);
+    assertEqual(res9.samples,10+[1 2 3 4 5 6 4 6 2 4 6 6 1 ...
+                                    2 3 4 5 6 1 2 3 4 5 1]');
+
+
+
 function test_crossvalidation_measure_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_crossvalidation_measure(varargin{:}),'');
