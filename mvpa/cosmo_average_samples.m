@@ -61,13 +61,17 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     % times. Each sample in 'ds' is used twice (=.5*4) as an element
 %     % to compute an average. The output has 24 samples
 %     ds_avg2=cosmo_average_samples(ds,'ratio',.5,'repeats',4);
-%     cosmo_disp([ds_avg2.sa.targets ds_avg2.sa.chunks]);
+%     cosmo_disp([ds_avg2.sa.targets ds_avg2.sa.chunks],'edgeitems',5);
 %     > [ 1         1
+%     >   1         1
+%     >   1         1
+%     >   1         1
 %     >   1         2
-%     >   1         3
 %     >   :         :
-%     >   2         1
 %     >   2         2
+%     >   2         3
+%     >   2         3
+%     >   2         3
 %     >   2         3 ]@24x2
 %
 % Notes:
@@ -186,7 +190,9 @@ function [nselect,nrepeat]=get_selection_params(bin_counts,opt)
             nrepeat=value2;
     end
 
-    ensure_in_range(sprintf('Value for ''%s''',repeat_labels{idx2}),...
+    ensure_in_range(sprintf(['Number of repeats is set to %d based on '...
+                            'the value for ''%s'', which'],...
+                            nrepeat,repeat_labels{idx2}),...
                             nrepeat,1,Inf);
 
 function ensure_in_range(label, val, min_val, max_val)
@@ -206,7 +212,7 @@ function ensure_in_range(label, val, min_val, max_val)
             break;
         end
 
-        if val<min_val
+        if val>max_val
             postfix=sprintf('cannot be greater than %d', max_val);
             break;
         end
@@ -215,7 +221,7 @@ function ensure_in_range(label, val, min_val, max_val)
     end
 
     if ~isempty(postfix)
-        msg=[label postfix];
+        msg=[label ' ' postfix];
         error(msg);
     end
 
