@@ -82,8 +82,47 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     % deal with input parameters
 
     defaults.seed=[];
+    defaults.check=true;
 
     opt=cosmo_structjoin(defaults, varargin);
+    split_idxs=get_split_indices(ds);
+
+    nsplits=numel(split_idxs);
+    bin_counts=cellfun(@numel,split_idxs);
+
+    split_sample_ids=get_split_sample_ids(bin_counts,opt);
+
+    nfeatures=size(ds.samples,2);
+    nrepeat=size(split_sample_ids,2);
+
+    ds_avg_cell=cell(nsplits,1);
+    mu=zeros(nrepeat*nsplits,nfeatures);
+    slice_ids=zeros(nrepeat*nsplits,1);
+
+    row=0;
+    for k=1:nsplits
+        split_idx=split_idxs{k};
+
+        for j=1:nrepeat
+            sample_ids=split_idx(split_sample_ids{k,j});
+
+            row=row+1;
+            mu(row,:)=mean(ds.samples(sample_ids,:),1);
+            slice_ids(row)=sample_ids(1);
+        end
+    end
+
+    ds_avg=cosmo_slice(ds,slice_ids);
+    ds_avg.samples=mu;
+    return
+
+
+
+
+
+
+
+
     averager=@(x)mean(x,1); % to average samples
 
     % split by unique target-chunk combinations
@@ -111,6 +150,19 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
     % join results
     ds_avg=cosmo_stack(res);
+
+function split_idxs=get_split_indices(ds)
+    if ~(isstruct(ds) && ...
+                isfield(ds,'samples') && ...
+                isfield(ds,'sa') && ...
+                isfield(ds.sa,'targets') && ...
+                isfield(ds.sa,'chunks'))
+        error(['First input must be dataset struct with fields '...
+                '.samples, .sa.targets and .sa.chunks']);
+    end
+
+    split_idxs=cosmo_index_unique({ds.sa.targets,ds.sa.chunks});
+
 
 
 function [idx, value]=get_mutually_exclusive_param(opt, names, ...
