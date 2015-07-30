@@ -16,6 +16,10 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %   'repeats', r    Number of times an average is computed for each unique
 %                   combination of targets and chunks. Not compatible with
 %                   'resamplings'
+%   'seed', d       Use seed d for pseudo-random sampling (optional). If
+%                   this option is omitted, then different calls to this
+%                   function may (usually: will) return different results.
+%
 %
 % Returns
 %   ds_avg          dataset struct with field:
@@ -82,7 +86,6 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     % deal with input parameters
 
     defaults.seed=[];
-    defaults.check=true;
 
     opt=cosmo_structjoin(defaults, varargin);
     split_idxs=get_split_indices(ds);
@@ -230,6 +233,6 @@ function [sample_ids,nrepeat]=get_split_sample_ids(bin_counts,opt)
     % approximately equally often
     for k=1:nsplits
         bin_count=bin_counts(k);
-        sample_ids{k}=cosmo_sample_unique(nselect,bin_count,nrepeat);
+        sample_ids{k}=cosmo_sample_unique(nselect,bin_count,nrepeat,opt);
     end
 
