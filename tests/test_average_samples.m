@@ -135,7 +135,8 @@ function test_average_samples_with_repeats
                  count,...
                  repeats) check_with_helper(dsb,args,count,repeats,...
                                                 nchunks,ntargets,...
-                                                ncombi_max,bws);
+                                                ncombi_max,combi_count,...
+                                                bws);
 
     for repeats=[1,ceil(rand()*ncombi_max)]
         for count=[1,ceil(rand()*ncombi_min)];
@@ -166,7 +167,7 @@ function test_average_samples_with_repeats
 
 
 function  check_with_helper(dsb, args, count, repeats,...
-                    nchunks, ntargets, ncombi_max, bws)
+                    nchunks, ntargets, ncombi_max, combi_count, bws)
 
     mu=cosmo_average_samples(dsb,args{:});
     [chunks,targets,ids]=unbinarize_ds(mu, bws, count);
@@ -202,6 +203,22 @@ function  check_with_helper(dsb, args, count, repeats,...
 
     end
 
+    % ensure each sample selected about equally often
+    [nchunks,ntargets]=size(combi_count);
+    for k=1:nchunks
+        for j=1:ntargets
+            c=squeeze(ctr_count(k,j,:));
+
+            pre=c(1:combi_count(k,j));
+            assert(max(pre)-min(pre)<=1);
+
+            post=c((combi_count(k,j)+1):end);
+            assert(all(post==0));
+        end
+    end
+
+    % check each target and chunk combination was used the correct number
+    % of times to form the average
     ct_count=sum(ctr_count,3);
 
     expected_ct_count=count*repeats*ones(nchunks,ntargets);

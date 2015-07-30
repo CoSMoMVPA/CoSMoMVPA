@@ -204,27 +204,19 @@ function ensure_in_range(label, val, min_val, max_val)
 function sample_ids=get_split_sample_ids(bin_counts,opt)
     [nselect,nrepeat]=get_selection_params(bin_counts,opt);
 
+    % number of saples for each unique chunks-targets combination
     nsplits=numel(bin_counts);
-    nsamples=sum(bin_counts);
 
-    if isfield(opt,'seed') && ~isempty(opt.seed)
-        rp=cosmo_rand(nsamples, nrepeat, 'seed', opt.seed);
-    else
-        rp=cosmo_rand(nsamples, nrepeat);
-    end
-
+    % allocate space for output
     sample_ids=cell(nsplits, nrepeat);
 
-    row_first=1;
-
+    % select samples randomly, but in a manner so that each one is used
+    % approximately equally often
     for k=1:nsplits
-        row_last=row_first+bin_counts(k)-1;
+        bin_count=bin_counts(k);
 
-        for r=1:nrepeat
-            [unused,i]=sort(rp(row_first:row_last,r));
-            sample_ids{k,r}=i(1:nselect);
-        end
+        idxs=cosmo_sample_unique(nselect,bin_count,nrepeat);
 
-        row_first=row_last+1;
+        sample_ids(k,:)=mat2cell(idxs,nselect,ones(1,nrepeat));
     end
 
