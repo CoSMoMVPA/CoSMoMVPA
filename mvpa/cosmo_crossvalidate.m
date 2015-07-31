@@ -18,6 +18,11 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                       and applied to the testing data.
 %    .check_partitions  optional (default: true). If set to false then
 %                       partitions are not checked for being set properly.
+%    .average_train_X   average the samples in the train set using
+%                       cosmo_average_samples. For X, use any parameter
+%                       supported by cosmo_average_samples, i.e. either
+%                       'count' or 'ratio', and optionally, 'resamplings'
+%                       or 'repeats'.
 %
 % Output
 %   pred                Qx1 array with predicted class labels.
@@ -107,13 +112,23 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 % Notes:
 %   - to apply this to a dataset struct as a measure (for searchlights),
 %     consider using cosmo_crossvalidation_measure
+%   - to average samples in the training set prior to training, use the
+%     options provided by cosmo_average_samples prefixed by
+%     'average_train_'. For example, to take averages of 5 samples, and use
+%     each sample in the input approximately 4 times, use:
+%           opt.average_train_count=5;
+%           opt.average_train_resamplings=4;
 %
-% See also: cosmo_crossvalidation_measure
+% See also: cosmo_crossvalidation_measure, cosmo_average_samples
 %
 % NNO Aug 2013
     if nargin<4,opt=struct(); end
-    if ~isfield(opt, 'normalization'), opt.normalization=[]; end
-    if ~isfield(opt, 'check_partitions'), opt.check_partitions=true; end
+    if ~isfield(opt, 'normalization'),
+        opt.normalization=[];
+    end
+    if ~isfield(opt, 'check_partitions'),
+        opt.check_partitions=true;
+    end
 
     if ~isempty(opt.normalization);
         normalization=opt.normalization;
@@ -125,6 +140,9 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     if opt.check_partitions
         cosmo_check_partitions(partitions, ds);
     end
+
+    % see if samples in training set are to be averaged
+    [do_average_train, average_train_opt]=get_average_train_opt(opt);
 
     train_indices = partitions.train_indices;
     test_indices = partitions.test_indices;
@@ -154,10 +172,24 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         test_idxs=test_indices{k};
         % for each partition get the training and test data, store in
         % train_data and test_data
-        % >@@>
         train_data = ds.samples(train_idxs,:);
+        train_targets = targets(train_idxs);
+
+        if do_average_train
+            % make a minimal dataset, then use cosmo_average_samples to
+            % compute averages
+            n_train=numel(train_idxs);
+            ds_train=struct();
+            ds_train.samples=train_data;
+            ds_train.sa.chunks=ones(n_train,1);
+            ds_train.sa.targets=train_targets;
+
+            ds_train_avg=cosmo_average_samples(ds_train,average_train_opt);
+            train_data=ds_train_avg.samples;
+            train_targets=ds_train_avg.sa.targets;
+        end
+
         test_data = ds.samples(test_idxs,:);
-        % <@@<
 
         % apply normalization
         if ~isempty(normalization)
@@ -165,11 +197,11 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
             test_data=cosmo_normalize(test_data,params);
         end
 
+
+
         % >@@>
         % then get predictions for the training samples using
         % the classifier, and store these in the k-th column of all_pred.
-
-        train_targets = targets(train_idxs);
         p = classifier(train_data, train_targets, test_data, opt);
 
         all_pred(test_idxs,k) = p;
@@ -204,3 +236,34 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     ntotal = numel(correct_mask);
 
     accuracy = ncorrect/ntotal;
+
+function [do_average_train, average_train_opt]=get_average_train_opt(opt)
+    persistent cached_opt;
+    persistent cached_do_average_train;
+    persistent cached_average_train_opt;
+
+    if ~isequal(cached_opt,opt)
+        cached_average_train_opt=struct();
+        cached_do_average_train=false;
+        prefix='average_train_';
+        keys=fieldnames(opt);
+        for k=1:numel(keys)
+            key=keys{k};
+            sp=cosmo_strsplit(key,prefix);
+            if isempty(sp{1})
+                % starts with average_train, so take the rest of the key
+                % and flag cached_do_average_train
+                cached_average_train_opt.(sp{2})=opt.(key);
+                cached_do_average_train=true;
+            end
+        end
+
+        cached_opt=opt;
+    end
+
+
+    do_average_train=cached_do_average_train;
+    average_train_opt=cached_average_train_opt;
+
+
+

@@ -24,6 +24,11 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       first or second dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%   args.average_train_X  average the samples in the train set using
+%                       cosmo_average_samples. For X, use any parameter
+%                       supported by cosmo_average_samples, i.e. either
+%                       'count' or 'ratio', and optionally, 'resamplings'
+%                       or 'repeats'.
 %
 % Output:
 %    ds_sa        Struct with fields:
@@ -136,7 +141,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 % Notes:
 %   - using this function, crossvalidation can be run using a searchlight
 %
-% See also: cosmo_searchlight
+% See also: cosmo_searchlight, cosmo_average_samples
 %
 % ACC. Modified to conform to signature of generic datset 'measure'
 % NNO Aug 2013 made this a wrapper function
