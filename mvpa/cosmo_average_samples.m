@@ -82,6 +82,43 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %  - as a result the number of trials in each chunk and target is
 %    identical, so balancing of partitions is not necessary for data from
 %    this function.
+%  - the default behaviour of this function computes a single average for
+%    each unique combination of chunks and targets.
+%  - if the number of samples differs for different combinations of chunks
+%    and targets, then some samples may not be used to compute averages,
+%    as the least number of samples across combinations is used to set
+%  - As illustration, consider a dataset with the following number of
+%    samples for each unique targets and chunks combiniation
+%
+%    .sa.chunks     .sa.targets         number of samples
+%    ----------     -----------         -----------------
+%       1               1                   12
+%       1               2                   16
+%       2               1                   15
+%       2               2                   24
+%
+%    The least number of samples is 12, which determines how many averages
+%    are computed. Different parameters result in a different number of
+%    averages; some examples:
+%
+%       parameters                      number of output samples for each
+%                                       combination of targets and chunks
+%       ----------                      ---------------------------------
+%       'count', 2                      6 averages from 2 samples [*]
+%       'count', 3                      4 averages from 3 samples [*]
+%       'ratio', .25                    4 averages from 3 samples [*]
+%       'ratio', .5                     2 averages from 6 samples [*]
+%       'ratio', .5, 'repeats', 3       6 averages from 6 samples
+%       'ratio', .5, 'resamplings', 3   12 averages from 6 samples
+%
+%    [*]: not all samples in the input are used to compute averages from
+%         the output.
+%
+%    Briefly, 'ratio' or 'count' determine, together with the least number
+%    of samples, how many samples are averaged for each output sample.
+%    'resamplings' and 'repeats' determine how many averages are taken,
+%    based on how many samples are averaged for each output sample.
+%
 %
 % See also: cosmo_balance_partitions
 %
