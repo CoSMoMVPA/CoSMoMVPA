@@ -63,4 +63,4 @@ function test_fmri_convert_xform_basics
     aet('unknown','talairach')
     aet('unknown',1)
     aet(struct(),1);
-    aet(cell(0),1);
+    aet(cell(1),1);
