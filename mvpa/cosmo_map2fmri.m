@@ -114,7 +114,7 @@ function check_plump_orientation(ds)
                 'For options (1) and (2), the spatial location of the '...
                 'voxels will change. It is recommended to inspect the '...
                 'results visually when using one of these options.'],...
-                mfilename())
+                mfilename());
     end
 
 function check_isotropic_voxels(ds)
@@ -134,7 +134,7 @@ function check_isotropic_voxels(ds)
                 'For option (1), the spatial location of the '...
                 'voxels will change. It is recommended to inspect the '...
                 'results visually when using one of these options.'],...
-                mfilename())
+                mfilename());
     end
 
 
@@ -536,7 +536,7 @@ function afni_info=new_afni(ds)
     afni_info.FileFormat='BRIK';
 
     [unused, unused, endian_ness] = computer();
-    afni_info.BYTEORDER_STRING = [endian_ness 'SB_FIRST'];
+    afni_info.BYTEORDER_STRING = sprintf('%sSB_FIRST', endian_ness);
 
     set_empty={'BRICK_LABS','BRICK_KEYWORDS',...
                 'BRICK_STATS','BRICK_FLOAT_FACS',...

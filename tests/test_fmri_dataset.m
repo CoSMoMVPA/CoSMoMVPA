@@ -13,14 +13,22 @@ function test_afni_fmri_dataset()
 
     ds=get_base_dataset();
     afni=cosmo_map2fmri(ds,'-afni');
-    assertAlmostEqualWithTol(afni, get_expected_afni());
+    afni_expected=get_expected_afni();
+
+    assertAlmostEqualWithTol(afni.img, afni_expected.img);
+    afni_no_img=rmfield(afni,'img');
+    afni_expected_no_img=rmfield(afni_expected,'img');
+    assertEqual(afni_no_img,afni_expected_no_img);
+
     ds_afni=cosmo_fmri_dataset(afni);
     assert_dataset_equal(ds,ds_afni);
 
 function test_nii_sform_fmri_dataset()
     ds=get_base_dataset();
     nii=cosmo_map2fmri(ds,'-nii');
-    assertAlmostEqualWithTol(nii, get_expected_nii_sform());
+    nii_expected=get_expected_nii_sform();
+    assertEqual(nii.hdr, nii_expected.hdr);
+    assertAlmostEqualWithTol(nii.img,nii_expected.img);
     ds_nii=cosmo_fmri_dataset(nii);
     assert_dataset_equal(ds,ds_nii);
 
@@ -224,7 +232,7 @@ function ds=get_uint8_dataset()
     ds.samples=uint8((ds.samples-mn)/(mx-mn)*255);
 
 function assertAlmostEqualWithTol(x,y)
-    assertAlmostEqual(x,y,'relative',1e-3);
+    assertElementsAlmostEqual(x,y,'relative',1e-3);
 
 
 function assert_dataset_equal(x,y,opt)
@@ -232,23 +240,23 @@ function assert_dataset_equal(x,y,opt)
         opt='';
     end
     % dataset equality, without .sa
-    assertAlmostEqualWithTol(double(x.samples), double(y.samples));
-    assertAlmostEqualWithTol(x.fa, y.fa)
+    assertAlmostEqualWithTol(x.samples, y.samples);
+    assertEqual(x.fa, y.fa)
 
     switch opt
         case 'rotation'
             % BV VMR cannot store orientation, just check the rotation part
-            assertAlmostEqualWithTol(x.a.fdim, y.a.fdim);
+            assertEqual(x.a.fdim, y.a.fdim);
             assertAlmostEqualWithTol(x.a.vol.dim,y.a.vol.dim);
             assertAlmostEqualWithTol(x.a.vol.mat(1:3,1:3),...
                             y.a.vol.mat(1:3,1:3));
         case 'translation'
             % BV VMP cannot store xform, just check the matrix
-            assertAlmostEqualWithTol(x.a.fdim, y.a.fdim);
+            assertEqual(x.a.fdim, y.a.fdim);
             assertAlmostEqualWithTol(x.a.vol.dim,y.a.vol.dim);
             assertAlmostEqualWithTol(x.a.vol.mat,y.a.vol.mat);
         otherwise
-            assertAlmostEqualWithTol(x.a, y.a)
+            assertEqual(x.a, y.a)
     end
 
 
@@ -426,7 +434,7 @@ function afni=get_expected_afni()
     afni.WARP_TYPE=[0 0];
     afni.FileFormat='BRIK';
     [unused, unused, endian_ness] = computer();
-    afni.BYTEORDER_STRING = [endian_ness 'SB_FIRST'];
+    afni.BYTEORDER_STRING = sprintf('%sSB_FIRST',endian_ness );
 
     % data
     data=zeros(3,2,1,2);
