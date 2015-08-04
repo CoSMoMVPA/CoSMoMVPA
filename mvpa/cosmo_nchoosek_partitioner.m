@@ -355,7 +355,7 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
             ds=chunks_or_ds;
             chunks=ds.sa.chunks;
         else
-            error('illegal struct input')
+            error('illegal struct input');
         end
     else
         chunks=chunks_or_ds;

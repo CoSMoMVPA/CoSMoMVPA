@@ -258,7 +258,7 @@ function nbrs=get_neighbors(ds, varargin)
         nbrs=cosmo_meeg_chan_neighbors(ds,varargin{:});
     end
 
-    verify_neighbors(nbrs)
+    verify_neighbors(nbrs);
 
 function tf=is_neighborhood_struct(nbrs)
     tf=isstruct(nbrs) && ...

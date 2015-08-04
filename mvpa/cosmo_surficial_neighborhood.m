@@ -299,7 +299,7 @@ elseif ds_is_volume
     neighbors=cell(ncenters,1);
     for k=1:ncenters
         msk_indices=all2msk_indices(double(n2v{k}));
-        assert(all(msk_indices>0))
+        assert(all(msk_indices>0));
         neighbors{k}=msk_indices;
     end
     nbrhood.neighbors=neighbors;

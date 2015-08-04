@@ -148,7 +148,7 @@ function assert_mask_of_proper_length(msk_length, ds, dim)
     % since the calling function ensures the size is properly set,
     % the size should be fine; this function should never throw an error
     if isfield(ds,'neighbors')
-        assert(numel(ds.neighbors)==msk_length)
+        assert(numel(ds.neighbors)==msk_length);
     else
         assert(size(ds.samples,dim)==msk_length);
     end

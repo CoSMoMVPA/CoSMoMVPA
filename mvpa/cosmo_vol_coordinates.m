@@ -26,7 +26,7 @@ function [transformed, outside]=cosmo_vol_coordinates(ds, coords)
     % if no coords, return coordinates of all features
     if nargin<2, coords=zeros(1,0); end
 
-    check_input(ds)
+    check_input(ds);
 
     % convert either from or to coordinates
     one_or_three=size(coords,1);

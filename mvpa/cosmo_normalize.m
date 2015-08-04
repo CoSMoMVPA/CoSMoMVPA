@@ -214,7 +214,7 @@ else
 end
 
 function params=get_method_and_dim(params,dim_arg)
-    assert(ischar(params))
+    assert(ischar(params));
     assert(numel(params)>0);
 
     dim=[];

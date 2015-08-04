@@ -282,7 +282,7 @@ function nbrhoods=get_dimension_neighborhoods(ds,opt)
             radius=dim_opt;
             if ~(isempty(radius) || (isscalar(radius) && radius>=0))
                 error('radius for %s must be non-negative scalar',...
-                        dim_type)
+                        dim_type);
             end
             nbrhood=neighborhood_func(ds,i,radius,opt);
         end

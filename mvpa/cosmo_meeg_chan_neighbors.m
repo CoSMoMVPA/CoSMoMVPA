@@ -265,7 +265,7 @@ function neighbors=reorder_neighbors(ds,neighbors)
     nbr_cell=cellfun(@(x){x},nbr_label,'UniformOutput',false);
 
     overlap=cosmo_overlap(ds_cell,nbr_cell);
-    assert(all(sum(overlap,1)) &&all(sum(overlap,2)))
+    assert(all(sum(overlap,1)) &&all(sum(overlap,2)));
 
     [i,j]=find(overlap);
     n=numel(i);

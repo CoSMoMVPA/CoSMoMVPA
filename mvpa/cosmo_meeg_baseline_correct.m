@@ -66,7 +66,7 @@ else
 end
 
 baseline_label='time';
-check_dataset(ds, baseline_label)
+check_dataset(ds, baseline_label);
 bl_ds=f(ds, reference, baseline_label, method);
 
 function check_dataset(ds, baseline_label)

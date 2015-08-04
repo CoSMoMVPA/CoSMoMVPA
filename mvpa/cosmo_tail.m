@@ -62,7 +62,7 @@ function [tail_values, idxs]=cosmo_tail(values, to_select)
 %
 % NNO Nov 2014
 
-    check_input(values, to_select)
+    check_input(values, to_select);
 
     right_tail=to_select>0;
     tail_value=abs(to_select);

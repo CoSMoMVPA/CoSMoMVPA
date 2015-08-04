@@ -50,7 +50,7 @@ function predicted=cosmo_classify_meta_feature_selection(samples_train, targets_
     end
 
     if one__~=1
-        error('targets must be a column vector');e
+        error('targets must be a column vector');
     end
 
     classifier=opt.child_classifier;

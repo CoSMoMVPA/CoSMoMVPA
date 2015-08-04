@@ -126,7 +126,7 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
     feature_sizes=get_feature_sizes(sample,opt);
 
     % check input size
-    check_input_sizes(sample,nbrhood_mat)
+    check_input_sizes(sample,nbrhood_mat);
 
     % set cluster parameters depending on method; outputs are:
     %   delta_thr      value by which the threshold is increased for every

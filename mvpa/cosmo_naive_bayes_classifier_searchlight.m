@@ -219,7 +219,7 @@ function pred=naive_bayes_predict(model,nbrhood_mat,samples_train)
 
     if nfeatures~=size(model.mus,2)
         error(['size mismatch in number of features between training '...
-                'and test set'])
+                'and test set']);
     end
 
 

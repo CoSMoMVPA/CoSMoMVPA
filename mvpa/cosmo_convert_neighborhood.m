@@ -91,7 +91,7 @@ function y=convert_cell(x,output_type)
 
 
 function y=convert_matrix(x,output_type)
-    check_matrix(x)
+    check_matrix(x);
     switch output_type
         case {'','cell'}
             y=convert_matrix2cell(x);
@@ -104,7 +104,7 @@ function y=convert_matrix(x,output_type)
     end
 
 function y=convert_struct(x,output_type)
-    check_struct(x)
+    check_struct(x);
     switch output_type
         case 'cell'
             y=convert_struct2cell(x);
