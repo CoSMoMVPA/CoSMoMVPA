@@ -36,7 +36,7 @@ function [transformed, outside]=cosmo_vol_coordinates(ds, coords)
         case 3
             [transformed, outside]=xyz2fa_indices(ds, coords);
         otherwise
-            error('Input must be 1xP or 3xP ')
+            error('Input must be 1xP or 3xP ');
     end
 
 
