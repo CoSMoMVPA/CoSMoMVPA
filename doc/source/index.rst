@@ -17,7 +17,7 @@ CoSMoMVPA
 - Supports multiple-comparison correction using Threshold-Free Cluster Enhancement.
 - Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
 - Uses an automated test suite and continuous integration testing (through `Travis-ci`_).
-- Runs both in Matlab and GNU Octave.
+- Runs on Matlab and GNU Octave.
 - Is Free/Open Source Software (MIT License).
 
 **Note: CoSMoMVPA is currently in a pre-first-release state. Features, code and documentation are relatively stable, but small changes may occur**
