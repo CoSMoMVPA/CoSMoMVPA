@@ -96,6 +96,8 @@ We're in the process of preparing a manuscript. In the meantime, please use:
 
     Oosterhof, N.N., Connolly, A.C, & Haxby, J.V. (in preparation). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Toolbox available from http://cosmomvpa.org.
 
+(We hope to publish a paper soon, and will announce this on the mailinglist when that happens).
+
 How fast does it run?
 -----------------------
     CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). The naive Bayes searchlights takes a few seconds for whole-brain fMRI per classification fold. Analyses on regions of interest are typically completed in seconds.
