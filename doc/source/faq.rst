@@ -82,13 +82,19 @@ Does it integrate with PyMVPA?
     Yes. Dataset structures are pretty much identical in CoSMoMVPA_ (PyMVPA_ provided inspiration for the data structures). The ``mvpa2/datasets/cosmo.py`` module in PyMVPA_ provides input and output support between CoSMoMVPA and PyMVPA datasets and neighborhoods. This means that, for example, searchlights defined in CoSMoMVPA can be run in PyMVPA (possibly benefitting from its multi-threaded implementation), and the results converted back to CoSMoMVPA format.
 
 Does it run on GNU Octave?
-----------------------
-    Allmost all functionality runs in Octave_, including unit tests through MOxUnit_, but there may be parts that function not so well:
+--------------------------
+    Allmost all functionality runs in Octave_ 3.8, including unit tests through MOxUnit_, but there may be parts that function not so well:
 
-        - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``.
+        - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``).
         - Support of visualization of MEEG results in FieldTrip_ is limited, because FieldTrip_ provided limited Octave_ compatibility.
         - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
 
+
+How should I cite CoSMoMVPA?
+----------------------------
+We're in the process of preparing a manuscript. In the meantime, please use:
+
+    Oosterhof, N.N., Connolly, A.C, & Haxby, J.V. (in preparation). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Toolbox available from http://cosmomvpa.org.
 
 How fast does it run?
 -----------------------
