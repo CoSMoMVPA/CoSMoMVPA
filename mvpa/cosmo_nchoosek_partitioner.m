@@ -488,7 +488,7 @@ if ischar(k)
         k=.5;
         is_symmetric=true;
     else
-        error('illegal string k')
+        error('illegal string k');
     end
 end
 if isnumeric(k)
