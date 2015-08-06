@@ -262,8 +262,6 @@ function assert_throws_illegal_input_exceptions(cfy_base,opt)
     assertEqual(res,res2);
 
 function handle=get_predictor(cfy,opt,nclasses)
-    clear(func2str(cfy));
-
     if nargin<3
         nclasses=9;
     end
