@@ -132,8 +132,8 @@ function test_classify_libsvm_with_autoscale
     cleaner=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
 
-    assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
-                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
+    assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                    1 2 7 7 7 1 2 8 1 9 6 7 1 3 ]');
     assert_throws_illegal_input_exceptions(cfy,opt);
 
 function test_classify_libsvm_no_autoscale
@@ -150,15 +150,49 @@ function test_classify_libsvm_no_autoscale
     cleaner=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
 
-    assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 5 4 ...
-                                    9 7 7 7 8 1 2 8 1 9 6 7 1 7]');
+    assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                    1 2 7 7 7 1 2 8 1 9 6 7 1 3]');
     assert_throws_illegal_input_exceptions(cfy,opt);
 
 
 
-function test_classify_libsvm
+function test_classify_libsvm_t0
+    % test with default (linear kernel) type t=0
     cfy=@cosmo_classify_libsvm;
-    handle=get_predictor(cfy);
+
+    % with or without some of the default options; all should give the same
+    % result
+    params={{},...
+            {'t','0'},...
+            {'t',0},...
+            {'t',0,'autoscale',false,'s','0','r',0,'c',1,'h',1}};
+    n=numel(params);
+
+    for k=1:n
+        param=params{k};
+        if isempty(param)
+            opt=[];
+            opt_struct=struct();
+        else
+            opt=cosmo_structjoin(param);
+            opt_struct=opt;
+        end
+        handle=get_predictor(cfy,opt);
+        if no_external('libsvm')
+            assertExceptionThrown(handle,'');
+            return
+        end
+
+        assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                        1 2 7 7 7 1 2 8 1 9 6 7 1 3]');
+        assert_throws_illegal_input_exceptions(cfy,opt_struct)
+    end
+
+function test_classify_libsvm_t2
+    cfy=@cosmo_classify_libsvm;
+    opt=struct();
+    opt.t=2;
+    handle=get_predictor(cfy,opt);
     if no_external('libsvm')
         assertExceptionThrown(handle,'');
         return
@@ -166,8 +200,8 @@ function test_classify_libsvm
 
     % libsvm uses autoscale by default
     assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
-                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
-    assert_throws_illegal_input_exceptions(cfy)
+                                    5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
+    assert_throws_illegal_input_exceptions(cfy,opt)
 
 function test_classify_svm
     cfy=@cosmo_classify_svm;
@@ -179,7 +213,7 @@ function test_classify_svm
 
     % matlab and libsvm show slightly different results
     if cosmo_check_external('libsvm',false)
-        pred=[1 3 6 8 6 6 8 3 7 5 7 5 4 5 7 7 7 8 1 2 8 1 5 5 7 1 7 ]';
+        pred=[8 3 3 8 6 6 1 3 7 5 7 6 4 1 2 7 7 7 1 2 8 1 9 6 7 1 3]';
     else
         % do not show warning message
         warning_state=cosmo_warning();
@@ -228,14 +262,18 @@ function assert_throws_illegal_input_exceptions(cfy_base,opt)
     assertEqual(res,res2);
 
 function handle=get_predictor(cfy,opt,nclasses)
+    clear(func2str(cfy));
+
     if nargin<3
         nclasses=9;
     end
-    if nargin<2
-        opt=struct();
+    if nargin<2 || isempty(opt)
+        opt_arg={};
+    else
+        opt_arg={opt};
     end
     [tr_samples,tr_targets,te_samples]=generate_data(nclasses);
-    handle=@()cfy(tr_samples,tr_targets,te_samples,opt);
+    handle=@()cfy(tr_samples,tr_targets,te_samples,opt_arg{:});
 
 
 function assert_predictions_equal(handle, targets)
