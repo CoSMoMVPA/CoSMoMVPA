@@ -37,7 +37,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 % NNO Feb 2014
 
     if nargin<4
-        opt=[];
+        opt=struct();
     end
 
     [ntrain, nfeatures]=size(samples_train);
@@ -75,49 +75,44 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 
 
 function opt_str=libsvm_opt2str(opt)
-    % always be quiet (no output to terminal window)
-    default_postfix='-q';
-    if isempty(opt)
-        opt_str=default_postfix;
-        return
-    end
-
-    % this function may be called many times. cache the loast opt
-    % that was used so that it can be returned
     persistent cached_opt
     persistent cached_opt_str
 
-    if isequal(opt, cached_opt)
-        opt_str=cached_opt_str;
-        return;
-    end
+    if ~isequal(opt, cached_opt)
+        default_opt={'t','q';...
+                        '0',''};
+        n_default=size(default_opt,2);
 
+        libsvm_opt_keys={'s','t','d','g','r','c','n','p',...
+                         'm','e','h','n','wi','v'};
+        opt_struct=cosmo_structjoin(opt);
 
-    % options supported to libsvm
-    fns=intersect(fieldnames(opt),{'s','t','d','g','r','c','n','p',...
-                                    'm','e','h','n','wi','v'});
+        keys=intersect(fieldnames(opt_struct),libsvm_opt_keys);
+        n_keys=numel(keys);
 
-    if isempty(fns)
-        opt_cell=cell(1);
-    else
-        n=numel(fns);
-        opt_cell=cell(1,2*n+1);
-        for k=1:numel(fns)
-            fn=fns{k};
-            opt_cell{2*k-1}=['-' fn];
+        use_defaults=true(1,n_default);
 
-            v=opt.(fn);
-            if isnumeric(v)
-                v=sprintf('%d',v);
+        libsvm_opt=cell(2,n_keys);
+        for k=1:n_keys
+            key=keys{k};
+            default_pos=find(cosmo_match(default_opt(1,:),(key)),1);
+
+            if ~isempty(default_pos)
+                use_defaults(default_pos)=false;
             end
 
-            opt_cell{2*k}=v;
+            value=opt_struct.(key);
+            if isnumeric(value)
+                value=sprintf('%d',value);
+            end
+
+            libsvm_opt(:,k)={key;value};
         end
+
+        all_opt=[libsvm_opt default_opt(:, use_defaults)];
+
+        cached_opt_str=sprintf('-%s %s ', all_opt{:});
+        cached_opt=opt;
     end
 
-    opt_cell{end}=default_postfix;
-    opt_str=cosmo_strjoin(opt_cell,' ');
-
-    cached_opt=opt;
-    cached_opt_str=opt_str;
-
+    opt_str=cached_opt_str;

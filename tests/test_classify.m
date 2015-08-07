@@ -6,7 +6,7 @@ function test_classify_lda
     handle=get_predictor(cfy);
     assert_predictions_equal(handle,[1 3 9 8 5 6 8 9 7 5 7 5 4 ...
                                     9 2 7 7 7 1 2 1 1 7 6 7 1 7 ]');
-    assert_throws_illegal_input_exceptions(cfy);
+    general_test_classifier(cfy);
 
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_classify_lda(varargin{:}),'');
@@ -25,7 +25,7 @@ function test_classify_naive_bayes
     handle=get_predictor(cfy);
     assert_predictions_equal(handle,[1 7 3 9 2 2 8 9 7 4 7 2 4 ...
                                     8 2 7 7 7 1 2 7 1 7 2 7 1 9 ]');
-    assert_throws_illegal_input_exceptions(cfy)
+    general_test_classifier(cfy)
 
 
 function test_classify_meta_feature_selection
@@ -37,7 +37,7 @@ function test_classify_meta_feature_selection
     handle=get_predictor(cfy,opt);
     assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
                                     9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
-    assert_throws_illegal_input_exceptions(cfy,opt)
+    general_test_classifier(cfy,opt)
 
 function test_cosmo_meta_feature_selection_classifier
     % deprecated, so shows a warning
@@ -53,14 +53,14 @@ function test_cosmo_meta_feature_selection_classifier
     handle=get_predictor(cfy,opt);
     assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
                                     9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
-    assert_throws_illegal_input_exceptions(cfy,opt)
+    general_test_classifier(cfy,opt)
 
 function test_classify_nn
     cfy=@cosmo_classify_nn;
     handle=get_predictor(cfy);
     assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 7 4 ...
                                     9 7 7 7 7 1 2 7 1 5 6 7 1 9]');
-    assert_throws_illegal_input_exceptions(cfy)
+    general_test_classifier(cfy)
 
 function test_classify_knn
     cfy=@cosmo_classify_knn;
@@ -70,7 +70,7 @@ function test_classify_knn
     handle=get_predictor(cfy,opt);
     assert_predictions_equal(handle,[7 3 6 1 7 2 8 7 9 4 7 5 7 1 ...
                                     7 7 7 8 1 6 1 1 9 5 8 1 9]');
-    assert_throws_illegal_input_exceptions(cfy,opt);
+    general_test_classifier(cfy,opt);
 
 function test_classify_matlabsvm
     cfy=@cosmo_classify_matlabsvm;
@@ -86,7 +86,7 @@ function test_classify_matlabsvm
 
     assert_predictions_equal(handle,[1 3 9 7 6 6 9 3 7 5 6 6 4 ...
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
-    assert_throws_illegal_input_exceptions(cfy);
+    general_test_classifier(cfy);
 
 function test_classify_matlabsvm_2class
     cfy=@cosmo_classify_matlabsvm_2class;
@@ -104,7 +104,7 @@ function test_classify_matlabsvm_2class
     handle=get_predictor(cfy,struct(),2);
 
     assert_predictions_equal(handle,[1 2 2 2 1 2]');
-    assert_throws_illegal_input_exceptions(cfy);
+    general_test_classifier(cfy);
 
      % test non-convergence
     aet=@(exc,varargin)assertExceptionThrown(@()...
@@ -132,9 +132,9 @@ function test_classify_libsvm_with_autoscale
     cleaner=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
 
-    assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
-                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
-    assert_throws_illegal_input_exceptions(cfy,opt);
+    assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                    1 2 7 7 7 1 2 8 1 9 6 7 1 3 ]');
+    general_test_classifier(cfy,opt);
 
 function test_classify_libsvm_no_autoscale
     cfy=@cosmo_classify_libsvm;
@@ -150,15 +150,49 @@ function test_classify_libsvm_no_autoscale
     cleaner=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
 
-    assert_predictions_equal(handle,[1 3 6 8 6 6 8 7 7 5 7 5 4 ...
-                                    9 7 7 7 8 1 2 8 1 9 6 7 1 7]');
-    assert_throws_illegal_input_exceptions(cfy,opt);
+    assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                    1 2 7 7 7 1 2 8 1 9 6 7 1 3]');
+    general_test_classifier(cfy,opt);
 
 
 
-function test_classify_libsvm
+function test_classify_libsvm_t0
+    % test with default (linear kernel) type t=0
     cfy=@cosmo_classify_libsvm;
-    handle=get_predictor(cfy);
+
+    % with or without some of the default options; all should give the same
+    % result
+    params={{},...
+            {'t','0'},...
+            {'t',0},...
+            {'t',0,'autoscale',false,'s','0','r',0,'c',1,'h',1}};
+    n=numel(params);
+
+    for k=1:n
+        param=params{k};
+        if isempty(param)
+            opt=[];
+            opt_struct=struct();
+        else
+            opt=cosmo_structjoin(param);
+            opt_struct=opt;
+        end
+        handle=get_predictor(cfy,opt);
+        if no_external('libsvm')
+            assertExceptionThrown(handle,'');
+            return
+        end
+
+        assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
+                                        1 2 7 7 7 1 2 8 1 9 6 7 1 3]');
+        general_test_classifier(cfy,opt_struct)
+    end
+
+function test_classify_libsvm_t2
+    cfy=@cosmo_classify_libsvm;
+    opt=struct();
+    opt.t=2;
+    handle=get_predictor(cfy,opt);
     if no_external('libsvm')
         assertExceptionThrown(handle,'');
         return
@@ -166,8 +200,8 @@ function test_classify_libsvm
 
     % libsvm uses autoscale by default
     assert_predictions_equal(handle,[1 3 6 8 6 6 8 3 7 5 7 5 4 ...
-                                     5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
-    assert_throws_illegal_input_exceptions(cfy)
+                                    5 7 7 7 8 1 2 8 1 5 5 7 1 7]');
+    general_test_classifier(cfy,opt)
 
 function test_classify_svm
     cfy=@cosmo_classify_svm;
@@ -179,7 +213,7 @@ function test_classify_svm
 
     % matlab and libsvm show slightly different results
     if cosmo_check_external('libsvm',false)
-        pred=[1 3 6 8 6 6 8 3 7 5 7 5 4 5 7 7 7 8 1 2 8 1 5 5 7 1 7 ]';
+        pred=[8 3 3 8 6 6 1 3 7 5 7 6 4 1 2 7 7 7 1 2 8 1 9 6 7 1 3]';
     else
         % do not show warning message
         warning_state=cosmo_warning();
@@ -190,14 +224,59 @@ function test_classify_svm
     end
 
     assert_predictions_equal(handle,pred);
-    assert_throws_illegal_input_exceptions(cfy)
+    general_test_classifier(cfy)
 
-function assert_throws_illegal_input_exceptions(cfy_base,opt)
+function general_test_classifier(cfy_base,opt)
     if nargin<2
         cfy=cfy_base;
     else
         cfy=@(x,y,z)cfy_base(x,y,z,opt);
     end
+    assert_chance_null_data(cfy);
+    assert_above_chance_informative_data(cfy);
+    assert_throws_expected_exceptions(cfy_base,cfy);
+
+function assert_chance_null_data(cfy)
+    assert_accuracy_in_range(cfy, 0, 0.3, 0.7);
+
+function assert_above_chance_informative_data(cfy)
+    assert_accuracy_in_range(cfy, 10, 0.8, 1);
+
+function assert_accuracy_in_range(cfy, sigma, min_val, max_val)
+    [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma);
+
+    pred=cfy(tr_s, tr_t, te_s);
+    acc=mean(pred==te_t);
+
+    assertTrue(acc>=min_val);
+    assertTrue(acc<=max_val);
+
+
+
+function [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma)
+    nclasses=2;
+    nsamples_per_class=200;
+    nsamples=nclasses*nsamples_per_class;
+    nfeatures=10;
+
+    common_s=randn(1,nfeatures)*sigma;
+    targets=repmat((1:nclasses)',nsamples_per_class,1);
+
+    tr_s=randn(nsamples,nfeatures);
+    te_s=randn(nsamples,nfeatures);
+    tr_t=targets;
+    te_t=targets;
+
+    for k=1:nfeatures
+        msk=targets==(mod(k-1,nclasses)+1);
+        tr_s(msk,k)=tr_s(msk,k)+common_s(:,k);
+        te_s(msk,k)=te_s(msk,k)+common_s(:,k);
+    end
+
+
+
+function assert_throws_expected_exceptions(cfy_base,cfy)
+
     assertExceptionThrown(@()cfy([1 2],[1;2],[1 2]),'')
     assertExceptionThrown(@()cfy([1;2],[1 2],[1 2]),'')
     assertExceptionThrown(@()cfy([1 2],[1 2],[1 2]),'')
@@ -231,11 +310,13 @@ function handle=get_predictor(cfy,opt,nclasses)
     if nargin<3
         nclasses=9;
     end
-    if nargin<2
-        opt=struct();
+    if nargin<2 || isempty(opt)
+        opt_arg={};
+    else
+        opt_arg={opt};
     end
     [tr_samples,tr_targets,te_samples]=generate_data(nclasses);
-    handle=@()cfy(tr_samples,tr_targets,te_samples,opt);
+    handle=@()cfy(tr_samples,tr_targets,te_samples,opt_arg{:});
 
 
 function assert_predictions_equal(handle, targets)
