@@ -232,7 +232,7 @@ function ds=get_uint8_dataset()
     ds.samples=uint8((ds.samples-mn)/(mx-mn)*255);
 
 function assertAlmostEqualWithTol(x,y)
-    assertElementsAlmostEqual(x,y,'relative',1e-3);
+    assertElementsAlmostEqual(double(x),double(y),'relative',1e-3);
 
 
 function assert_dataset_equal(x,y,opt)
