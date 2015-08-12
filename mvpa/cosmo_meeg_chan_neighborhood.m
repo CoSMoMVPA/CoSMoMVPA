@@ -4,7 +4,11 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 % nbrhood=cosmo_meeg_chan_neighborhood(ds, ...)
 %
 % Inputs:
-%   ds                  MEEG dataset struct
+%   ds                  MEEG dataset struct, or a neighborhood struct with
+%                       fields .label and .neighblabel such as produced by
+%                       FieldTrip's ft_prepare_neighbors. In the latter
+%                       case, it must be the only argument to this
+%                       function; other arguments are ignored.
 %   'label', lab        Optional labels to return in output, one of:
 %                       'layout'    : determine neighbors based on layout
 %                                     associated with ds (default). All
@@ -191,6 +195,8 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     >       .samples_label
 %     >         'rpt'
 %
+%
+% Notes:
 %
 % See also: cosmo_meeg_chan_neighbors
 %
