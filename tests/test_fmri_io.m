@@ -235,8 +235,13 @@ function test_fmri_io_mask
 
 
 function test_fmri_io_spm()
+    directories={'',cosmo_make_temp_filename()};
+    cellfun(@helper_test_fmri_io_spm_in_directory,directories);
+
+
+function helper_test_fmri_io_spm_in_directory(directory)
     cleaner=onCleanup(@()register_or_delete_all_files());
-    [spm_fn,SPM]=write_spm_dot_mat();
+    [spm_fn,SPM]=write_spm_dot_mat(directory);
 
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
     ds_spm=cosmo_fmri_dataset(spm_fn);
@@ -263,7 +268,7 @@ function test_fmri_io_spm()
                             'relative',1e-4);
 
         is_beta=k<=1;
-        if is_beta
+        if is_beta && isempty(directory)
             ds_spm2=cosmo_fmri_dataset(SPM);
             assertEqual(ds_spm2, ds_spm);
         end
@@ -271,8 +276,13 @@ function test_fmri_io_spm()
 
 
 
-function [spm_fn,SPM]=write_spm_dot_mat()
+function [spm_fn,SPM]=write_spm_dot_mat(directory)
     register_or_delete_all_files();
+    prefix_with_directory=@(fn)fullfile(directory,fn);
+
+    if ~isempty(directory)
+        mkdir(directory);
+    end
 
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
     nsamples=size(ds.samples,1);
@@ -282,7 +292,6 @@ function [spm_fn,SPM]=write_spm_dot_mat()
 
 
     input_keys=fieldnames(input_types);
-
 
     SPM=struct();
     SPM.SPMid=[];
@@ -302,8 +311,12 @@ function [spm_fn,SPM]=write_spm_dot_mat()
         for j=1:nsamples
             tmp_fns=cosmo_make_temp_filename('XX',{'.hdr','.img','.mat'});
             tmp_hdr_fn=tmp_fns{1};
-            tmp_img_fn=tmp_fns{2};
-            tmp_mat_fn=tmp_fns{3};
+
+            tmp_pth_fns=cellfun(prefix_with_directory,tmp_fns,...
+                                    'UniformOutput',false);
+            tmp_hdr_pth_fn=tmp_pth_fns{1};
+            tmp_img_pth_fn=tmp_pth_fns{2};
+            tmp_mat_pth_fn=tmp_pth_fns{3};
 
             vol=ds.a.vol;
             vol.fname=tmp_hdr_fn;
@@ -311,12 +324,12 @@ function [spm_fn,SPM]=write_spm_dot_mat()
 
             ds_sample=cosmo_slice(ds,j);
             ds_sample.samples=ds_sample.samples+samples_offset;
-            cosmo_map2fmri(ds_sample,tmp_hdr_fn);
+            cosmo_map2fmri(ds_sample,tmp_hdr_pth_fn);
             sample_labels{j}=sprintf('sample_%d',j);
 
-            register_or_delete_all_files(tmp_hdr_fn);
-            register_or_delete_all_files(tmp_img_fn);
-            register_or_delete_all_files(tmp_mat_fn);
+            register_or_delete_all_files(tmp_hdr_pth_fn);
+            register_or_delete_all_files(tmp_img_pth_fn);
+            register_or_delete_all_files(tmp_mat_pth_fn);
 
             if ~is_beta
                 xcon=xCon_cell{j};
@@ -346,7 +359,7 @@ function [spm_fn,SPM]=write_spm_dot_mat()
 
     SPM.xCon=cat(1,xCon_cell{:});
 
-    spm_fn='_tmp_SPM.mat';
+    spm_fn=prefix_with_directory('_tmp_SPM.mat');
     register_or_delete_all_files(spm_fn);
     save(spm_fn,'SPM');
 
@@ -437,26 +450,47 @@ function x=get_base_dataset()
     x.sa.stats={'Beta(17,2)';'';'Zscore()';'Ftest(2,3)'};
 
 function ds_again=save_and_load(ds,ext,varargin)
-    sib_exts=get_sibling_exts(ext);
+    directories={'',cosmo_make_temp_filename()};
 
+    ds_again_cell=cellfun(@(directory)save_and_load_in_directory(...
+                                directory,ds,ext,varargin),directories,...
+                         'UniformOutput',false);
+    ds_again=ds_again_cell{1};
+
+    % all datasets must give the same dataset
+    assertTrue(all(cellfun(@(ds)isequal(ds_again,ds),...
+                            ds_again_cell(2:end))))
+
+
+
+function ds_again=save_and_load_in_directory(directory,ds,ext,varargin)
+    sib_exts=get_sibling_exts(ext);
     all_exts=[{ext} sib_exts];
 
     temp_fns=cosmo_make_temp_filename('' ,all_exts);
-    main_temp_fn=temp_fns{1};
-    cleaner=onCleanup(@()delete_files(temp_fns));
+
+    temp_pth_fns=cellfun(@(fn)fullfile(directory,fn),temp_fns,...
+                            'UniformOutput',false);
+
+    if ~isempty(directory)
+        mkdir(directory);
+    end
+
+    main_temp_pth_fn=temp_pth_fns{1};
+    cleaner=onCleanup(@()delete_files(temp_pth_fns));
 
     switch ext
         case '.mat'
-            save(main_temp_fn,'ds');
+            save(main_temp_pth_fn,'ds');
         otherwise
             % disable automask warning
             warning_state=cosmo_warning();
             state_resetter=onCleanup(@()cosmo_warning(warning_state));
             cosmo_warning('off');
-            cosmo_map2fmri(ds,main_temp_fn);
+            cosmo_map2fmri(ds,main_temp_pth_fn);
     end
 
-    ds_again=cosmo_fmri_dataset(main_temp_fn,varargin{:});
+    ds_again=cosmo_fmri_dataset(main_temp_pth_fn,varargin{:});
 
 function sib_exts=get_sibling_exts(ext)
     sib_exts=cell(1,0);
@@ -481,10 +515,23 @@ function sib_exts=get_sibling_exts(ext)
 
 
 function delete_files(fns)
+    % delete files. If they are all in the same directory and the
+    % directory is not empty, then the directory is removed as well
     for k=1:numel(fns)
         fn=fns{k};
         if ~isempty(fn) && exist(fn,'file')
             delete(fn);
         end
+
+        pth=fileparts(fn);
+        if k==1
+            first_pth=pth;
+        elseif ~isequal(pth,first_pth)
+            error('paths differ: %s ~= %s', first_pth, pth);
+        end
+    end
+
+    if ~isempty(pth)
+        rmdir(pth);
     end
 

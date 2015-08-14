@@ -194,11 +194,13 @@ function ds_all=convert_to_dataset(fn, params)
     % main data reader function
 
     if string_endswith(fn,'.mat')
-        fn=fast_import_data(fn);
+        data=fast_import_data(fn);
+    else
+        data=fn;
     end
 
     img_formats_collection=get_img_formats;
-    label=find_img_format(fn, img_formats_collection);
+    label=find_img_format(data, img_formats_collection);
     img_format=img_formats_collection.(label);
 
     % make sure the required externals exists
@@ -210,17 +212,19 @@ function ds_all=convert_to_dataset(fn, params)
     has_data_reader=isfield(img_format,'data_reader');
 
     % verify the input
-    input_is_filename=~img_format.matcher(fn);
-    if input_is_filename && ~ischar(fn)
-        error('illegal input of type ''%s''', class(fn));
+    input_is_filename=~img_format.matcher(data);
+    if input_is_filename && ~ischar(data)
+        error('illegal input of type ''%s''', class(data));
     end
 
     if input_is_filename
         % read header from file
-        raw_header=img_format.header_reader(fn);
+        raw_header=img_format.header_reader(data);
+    elseif isfield(img_format, 'struct_header_reader')
+        raw_header=img_format.struct_header_reader(fn,data);
     else
         % input is a struct or object, no reading required
-        raw_header=fn;
+        raw_header=data;
     end
 
     % get dataset header
@@ -268,7 +272,7 @@ function ds_all=convert_to_dataset(fn, params)
             % selecting subset of volumes is done by the data_reader,
             % so that only part of the whole file has to be read
             data_reader=img_format.data_reader;
-            data=data_converter(data_reader(fn, raw_header, ...
+            data=data_converter(data_reader(data, raw_header, ...
                                                 volumes_or_empty), []);
         else
             % all data is probably already in memory, so select subset
@@ -721,6 +725,8 @@ function img_formats=get_img_formats()
     % .exts               file name extensions
     % .externals          required externals
     % .header_reader      file name -> native header
+    % [.struct_header_reader] (file name, native header) -> native header
+    %                     (used for SPM.mat, to avoid re-loading the file)
     % .header_converter   (native header, params)  -> (minimal dataset,
     %                                                   nvolumes)
     % [.data_reader]      (file name,
@@ -792,6 +798,7 @@ function img_formats=get_img_formats()
     img_formats.spm.exts={'mat:con','mat:beta','mat:spm'};
     img_formats.spm.externals=img_formats.nii.externals;
     img_formats.spm.matcher=@isa_spm;
+    img_formats.spm.struct_header_reader=@read_spm_struct_header;
     img_formats.spm.header_reader=@read_spm_header;
     img_formats.spm.header_converter=@convert_spm_header;
     img_formats.spm.data_reader=@read_spm_data;
@@ -1480,14 +1487,41 @@ function b=isa_spm(hdr)
 
 
 function hdr=read_spm_header(fn)
+    hdr=read_spm_struct_header(fn, []);
+
+function hdr=read_spm_struct_header(fn_with_input_type, spm_header)
     % input can be 'SPM.mat', 'SPM.mat:beta', 'SPM.mat:con', or
     % 'SPM.mat:spm'. Output is the SPM struct with extra fields 'path' and
     % 'input_type' added, so that convert_spm_header can get the correct
     % fields
-    path=fileparts(fn);
 
+    if isa_spm(fn_with_input_type)
+        fn_with_input_type='SPM.mat';
+    end
+
+    [fn,input_type]=get_spm_input_type(fn_with_input_type);
+
+    if isempty(spm_header)
+        % .mat file must be loaded still
+        spm_struct=load(fn);
+        if ~isstruct(spm_struct) || ...
+                ~isequal(fieldnames(spm_struct),{'SPM'})
+            error('expected data with struct ''SPM'' in file ''%s''',fn);
+        end
+        spm_header=spm_struct.SPM;
+    end
+
+    hdr=spm_header;
+    hdr.path=fileparts(fn);
+    hdr.input_type=input_type;
+
+    get_and_check_data(hdr, [], @isa_spm);
+
+function [fn,input_type]=get_spm_input_type(fn_with_input_type)
     sep=':';
-    input_type=cosmo_strsplit(fn,sep,-1);
+    input_type=cosmo_strsplit(fn_with_input_type,sep,-1);
+    fn=fn_with_input_type;
+
     switch input_type
         case {'beta','con','spm'}
             fn=fn(1:(end-numel(input_type)-numel(sep)));
@@ -1495,20 +1529,6 @@ function hdr=read_spm_header(fn)
             input_type='beta'; % the default; function will crash
                                % if fn is not a proper filename
     end
-
-    % 'load' is faster than 'importdata'
-    % (use 'spm_' instead of 'spm' to avoid name space conflicts)
-    spm_struct=load(fn);
-    if ~isstruct(spm_struct) || ~isequal(fieldnames(spm_struct),{'SPM'})
-        error('expected data with struct ''SPM'' in file ''%s''',fn);
-    end
-    hdr=spm_struct.SPM;
-
-    hdr.path=path;
-    hdr.input_type=input_type;
-
-    get_and_check_data(hdr, [], @isa_spm);
-
 
 
 function [hdr_ds,nsamples]=convert_spm_header(spm_struct, params)
