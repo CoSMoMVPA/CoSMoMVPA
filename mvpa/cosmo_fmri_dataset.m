@@ -325,7 +325,7 @@ function ids_mask=get_binary_dataset_mask(ds_mask, ds)
     % features.
 
     % this should always be fine
-    check_datasets_in_same_spacs(ds_mask, ds);
+    check_datasets_in_same_space(ds_mask, ds);
     assert(islogical(ds_mask.samples));
 
 
@@ -431,10 +431,10 @@ function ds_mask=align_mask_to_ds_space(ds_mask, ds_hdr)
         ds_mask=cosmo_fmri_reorient(ds_mask, ds_orient);
     end
 
-    check_datasets_in_same_spacs(ds_mask, ds_hdr);
+    check_datasets_in_same_space(ds_mask, ds_hdr);
 
 
-function check_datasets_in_same_spacs(ds_mask, ds_hdr)
+function check_datasets_in_same_space(ds_mask, ds_hdr)
     % ensure the mask is compatible with the dataset
     if ~isequal(ds_mask.a.fdim,ds_hdr.a.fdim)
         error('.a.fdim mismatch between data and mask');
