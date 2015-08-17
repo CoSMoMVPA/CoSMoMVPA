@@ -7,8 +7,8 @@ function ds=cosmo_synthetic_dataset(varargin)
 %   'size', s               determines the number of features. One of
 %                           'tiny', 'small', 'normal', 'big', or 'huge'
 %   'type', t               type of dataset. One of 'fmri', 'meeg',
-%                           'timelock', 'timefreq', 'surface'. 'meeg' is
-%                           equivalent to 'timelock'
+%                           'timelock', 'timefreq', 'surface', or 'source'.
+ %                          'meeg' is equivalent to 'timelock'
 %   'sens', c               for meeg datasets ('time{lock}, 'meeg'), this
 %                           sets which sensor type is used. Supported are
 %                           - neuromag306{all,planar,combined,mag}
@@ -16,6 +16,8 @@ function ds=cosmo_synthetic_dataset(varargin)
 %                           - 4d{1,2}48[planar]
 %                           - yokogawa{64,160}[planar]
 %                           - eeg10{05,10,20}
+%   'data_field', f         If the type t is 'source', this can be 'pow' or
+%                           'mom'.
 %   'sigma', sigma          parameter to influence class distance. The
 %                           larger this value, the more discrimable the
 %                           classes are.
