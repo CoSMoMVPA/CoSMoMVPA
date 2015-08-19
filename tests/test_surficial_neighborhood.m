@@ -19,6 +19,7 @@ function test_surficial_neighborhood_surface_dijkstra
     % dijkstra neighborhood fixed number of voxels
     args={{vertices,faces},'count',4,'metric','dijkstra',opt};
     nh1=cosmo_surficial_neighborhood(ds,args{:});
+    assertFalse(isfield(nh1.a,'vol'));
     assert_equal_cell(nh1.neighbors,{ [ 1 2 4 3 ]
                                         [ 2 1 3 5 ]
                                         [ 3 2 6 5 ]
@@ -240,6 +241,7 @@ function test_surficial_neighborhood_volume_dijkstra
                                         [ 6 3 5 2 ] });
     assertEqual(nh3.fa.node_indices,1:6);
     assert_equal_cell(nh4.neighbors,nh3.neighbors);
+    assertFalse(isfield(nh3.a,'vol'));
 
     % TODO
     % check_partial_neighborhood(ds,nh3,args3);
@@ -540,9 +542,6 @@ function test_surface_subsampling
     % surfs are not a cell
     aet(ds,struct,opt);
     aet(ds,{pial,white,{}});
-
-
-
 
 
 
