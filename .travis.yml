@@ -22,10 +22,14 @@ before_install:
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
 
-    # get Octave 3.8
+    # get Octave 4.0
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
+
+    # purge openBLAS, because (as of July 2015) it results in
+    # a non-working Octave 4.0 using the PPA above
+    - travis_retry sudo apt-get purge libopenblas-base
 
     # go up one level to retrieve MOxUnit
     - cd ..
