@@ -1,19 +1,10 @@
 #!/usr/bin/env python
 #
 
-# builds git summaries using tags used in CoSMoMVPA commits
-import datetime
-import subprocess
+# builds gallery with demonstrations
+
 import os
-import textwrap
 import math
-
-
-
-def make_rst_link(prefix):
-    link_pattern = 'matlab/%s.html'
-    return link_pattern % prefix
-
 
 
 class Image(object):
