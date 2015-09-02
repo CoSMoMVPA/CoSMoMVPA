@@ -514,5 +514,50 @@ If ``pred_ds`` is the dataset with predictions, then accuracies can be computed 
         acc_ds.samples=nanmean(bsxfun(@eq,pred_ds.samples,pred_ds.sa.targets));
 
 
+Merge surface data from two hemispheres
+---------------------------------------
+'I have surface-based data from two hemispheres. How can I combine these into a single surface dataset structure?'
+
+In the following example, ``ds_left`` and ``ds_right`` are two dataset structs (for example, obtained through :ref:`cosmo_surface_dataset`) from the left and right hemisphere. They can be combined into a single dataset as follows:
+
+    .. code-block:: matlab
+
+        % generate synthetic left and right hemisphere data
+        % (this is just example data for illustration)
+        ds_left=cosmo_synthetic_dataset('type','surface','seed',1);
+        ds_right=cosmo_synthetic_dataset('type','surface','seed',2);
+
+        % Set the number of vertices of the left surface.
+        % If the surface is sparse (it does not have data for all nodes), it *may*
+        % be necessary to adjust this value manually. In that case, consider to:
+        %
+        %  - compute the number of vertices, if it is a standardized surface from
+        %    MapIcosahedron. If the ld parameter was set to 64, then the number of
+        %    vertices is 10*64^2+2=40962.
+        %  - get the number of vertices using:
+        %       [v,f]=surfing_read('left_surface.asc');
+        %       nverts=max(size(v));
+        %
+        [unused, index]=cosmo_dim_find(ds_left, 'node_indices');
+        nverts_left=max(ds_left.a.fdim.values{index});
+
+        % update node indices to support indexing data from two hemispheres
+        node_indices=[ds_left.a.fdim.values{index}, ...
+                        nverts_left+ds_right.a.fdim.values{index}];
+        ds_left.a.fdim.values{index}=node_indices;
+        ds_right.a.fdim.values{index}=node_indices;
+
+        % update node indices for right hemisphere
+        offset_left=numel(ds_left.a.fdim.values{index});
+        assert(all(ds_left.fa.node_indices<=offset_left)); % safety check
+        ds_right.fa.node_indices=ds_right.fa.node_indices+offset_left;
+
+        % merge hemisphes
+        ds_left_right=cosmo_stack({ds_left,ds_right},2);
+
+
+
+The resulting dataset ``ds_left_right`` can be stored in a file using :ref:`cosmo_map2surface`.
+
 
 .. include:: links.txt
