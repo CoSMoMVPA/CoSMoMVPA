@@ -64,7 +64,7 @@ CoSMoMVPA
    :target: thanks.html
 
 .. include:: news.rst
-
+.. include:: _static/demo_gallery.txt
 .. include:: _static/git_summary.txt
 
 
