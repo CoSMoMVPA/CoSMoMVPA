@@ -1,6 +1,7 @@
 %% MEEG time-frequency searchlight
 %
-% This example shows MVPA analyses performed on MEEG data.
+% This example shows MVPA analyses performed on MEEG data, using a
+% searchlight across the time, frequency and channel dimensions
 %
 % The input dataset involved a paradigm with electrical median nerve
 % stimulation for durations of 2s at 20Hz.
@@ -143,7 +144,7 @@ fprintf('The output uses layout %s\n', layout.name);
 sl_tf_ft=cosmo_map2meeg(sl_tf_ds);
 
 % show figure
-close(gcf)
+figure()
 cfg = [];
 cfg.interactive = 'yes';
 cfg.showlabels = 'yes';
