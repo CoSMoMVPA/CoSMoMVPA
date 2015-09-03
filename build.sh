@@ -46,40 +46,6 @@ case $targets in
         ls $outputdir
     ;;
 
-    matlab)
-        # zip matlab stuff
-        matdir=mvpa
-        extdir=external
-
-        seldir=cosmo_mvpa_basic
-        if [ ! -e $seldir ]; then
-            mkdir $seldir
-        else
-            rm $seldir *
-        fi
-
-        for i in `find $matdir -name '*.m'`; do
-            if [ `cat $i | grep '% >>' | wc -l` -eq 0 ]; then
-                cp $i ${seldir}/
-                echo "Adding $i"
-            fi
-        done
-
-        zip -r ${pf}_scripts.zip $seldir $extdir
-
-        #rm -f ${p}/${matdir}/*.m
-        #rm -f ${p}/${extdir}/*.m
-        #rmdir ${p}/${extdir}
-        #rmdir ${p}/${matdir}
-
-        mv ${pf}_scripts.zip $outputdir
-        rm ${seldir}/*.m
-        rmdir $seldir
-
-        ls $outputdir
-
-    ;;
-
     website)
         case $USER in
             nick)
@@ -92,14 +58,21 @@ case $targets in
         esac 
         webdir=doc/build/html/
         #scp -r ${webdir}/* ${host}:~/web/
-        rsync -vcru ${webdir}/* db:~/web/
+        rsync -vcru ${webdir}/* ${host}:~/web/
     ;;
 
     xx)
-        # hidden option: build and push
+        # hidden option: build and push to the website
+        # Only intended for use by Nick Oosterhof
         for i in cleandoc website; do
             $0 $i || exit 1
         done
+
+        documentation_files="doc/build AUTHOR copyright README.rst"
+        zip -qr CoSMoMVPA_documentation_html.zip ${documentation_files}
+        tar -zcf CoSMoMVPA_documentation_html.tar.gz ${documentation_files}
+        rsync -vcru --remove-source-files CoSMoMVPA_documentation_html.* \
+                                            db:~/web/_static/ || exit 1
     ;;
 
     *)
