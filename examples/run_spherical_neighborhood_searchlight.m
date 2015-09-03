@@ -86,9 +86,10 @@ for k=1:ncenters
 end
 
 %% store the output
-% this uses the neighborhood from spherical voxel selection
+% this uses the neighborhood from spherical voxel selection,
+% after removing the fields neighbors and origin
 res_map=nbrhood;
-res_map=rmfield(res_map,'neighbors');
+res_map=rmfield(res_map,{'neighbors','origin'});
 res_map.samples=accs;
 
 % little sanity check
