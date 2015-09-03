@@ -11,6 +11,15 @@ Download instructions
 Get the code and example data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+For the impatient
++++++++++++++++++
+
+.. include:: quick_download.txt
+
+For the patient
++++++++++++++++
+
+
 The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <cimec2014>` and the :ref:`demos <contents_demo.rst>`.
 
 * Get the CoSMoMVPA_ source code:

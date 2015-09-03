@@ -36,7 +36,9 @@ Consider the :ref:`demos <contents_demo.rst>` to see how MVPA can be performed u
 Get your environment ready
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To get started, you need the CoSMoMVPA_ code and optionally the tutorial data; see :ref:`here <download>` for instructions.
+To get started, you need the CoSMoMVPA_ code and optionally the tutorial data; see :ref:`here <download>` for instructions. For the impatient:
+
+.. include:: quick_download.txt
 
 ^^^^^^^^^^
 Next steps
@@ -49,6 +51,9 @@ Once you are ready:
 - try the :ref:`exercises <ex_toc>`.
 - explore the :ref:`CoSMoMVPA functions <modindex>`.
 
+Some examples of analyses that can be run with CoSMoMVPA_:
+
+.. include:: _static/demo_gallery.txt
 
 .. include:: links.txt
 
