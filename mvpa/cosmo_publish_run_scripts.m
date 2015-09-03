@@ -51,7 +51,7 @@ function cosmo_publish_run_scripts(varargin)
     srcfns=dir(fullfile(srcdir,[srcpat srcext]));
     nsrc=numel(srcfns);
     if nsrc==0
-        error('No files found matching %s%s in %s',[srcpat srcext],srcdir);
+        error('No files found matching %s%s in %s',srcpat,srcext,srcdir);
     end
 
     outputs=cell(nsrc,1);
@@ -86,7 +86,12 @@ function cosmo_publish_run_scripts(varargin)
             cd(srcpth);
             clock_start=clock();
 
-            is_built=publish_wrapper(srcfn,trgfn);
+            if dryrun
+                fprintf('<dry run>');
+                is_built=true;
+            else
+                is_built=publish_wrapper(srcfn,trgfn);
+            end
 
             clock_end=clock();
             time_took=etime(clock_end,clock_start);
@@ -140,8 +145,7 @@ function is_built=publish_wrapper(srcfn,trgfn)
         try
             publish(srcnm, struct('outputDir',trgdir,'catchError',false));
             is_built=true;
-        catch
-            me=lasterror();
+        catch me
             if exist(trgfn,'file')
                 delete(trgfn);
             end
