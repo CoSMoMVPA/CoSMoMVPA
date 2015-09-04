@@ -52,6 +52,11 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       conservative, in other words has less power)
 %   'progress',p        Show progress every p steps (default: 10). Use
 %                       p=false to not show progress.
+%   'seed',s            Use seed s for pseudo-random number generation. If
+%                       this option is provided, then this function behaves
+%                       deterministically. If this option is omitted (the
+%                       default), then repeated calls with the same input
+%                       may lead to slightly different results.
 %
 % Output:
 %   ds_z                Dataset struct with (two-tailed) z-scores for each
@@ -188,7 +193,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 
 
     defaults=struct();
-    defaults.dh=.1; % undocumented feature for auto-TFCE dh
+    defaults.dh=.1;
     defaults.cluster_stat='tfce';
     defaults.progress=10;
 
