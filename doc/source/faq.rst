@@ -541,6 +541,9 @@ In the following example, ``ds_left`` and ``ds_right`` are two dataset structs (
         [unused, index]=cosmo_dim_find(ds_left, 'node_indices');
         nverts_left=max(ds_left.a.fdim.values{index});
 
+        % get the offset to set the feature attribute index later
+        offset_left=numel(ds_left.a.fdim.values{index});
+
         % update node indices to support indexing data from two hemispheres
         node_indices=[ds_left.a.fdim.values{index}, ...
                         nverts_left+ds_right.a.fdim.values{index}];
@@ -548,13 +551,11 @@ In the following example, ``ds_left`` and ``ds_right`` are two dataset structs (
         ds_right.a.fdim.values{index}=node_indices;
 
         % update node indices for right hemisphere
-        offset_left=numel(ds_left.a.fdim.values{index});
         assert(all(ds_left.fa.node_indices<=offset_left)); % safety check
         ds_right.fa.node_indices=ds_right.fa.node_indices+offset_left;
 
         % merge hemisphes
         ds_left_right=cosmo_stack({ds_left,ds_right},2);
-
 
 
 The resulting dataset ``ds_left_right`` can be stored in a file using :ref:`cosmo_map2surface`.
