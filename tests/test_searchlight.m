@@ -2,7 +2,27 @@ function test_suite = test_searchlight
     initTestSuite;
 
 
-function test_searchlight_
+function test_searchlight_singlethread()
+    opt=struct();
+    opt.progress=false;
+    helper_test_searchlight(opt);
+
+function test_searchlight_matlab_multithread()
+    has_function=@(x)~isempty(which(x));
+    has_parallel_toolbox=all(cellfun(has_function, {'gcp','parpool'}));
+
+    if ~has_parallel_toolbox
+        cosmo_notify_test_skipped('Matlab parallel toolbox not available');
+        return;
+    end
+
+    opt=struct();
+    opt.progress=false;
+    opt.nproc=2;
+    helper_test_searchlight(opt);
+
+
+function helper_test_searchlight(opt)
 
     ds=cosmo_synthetic_dataset('size','normal');
     m=any(abs(ds.samples)>3,1);
@@ -11,7 +31,7 @@ function test_searchlight_
     measure=@(x,a) cosmo_structjoin('samples',size(x.samples,2));
     nh=cosmo_spherical_neighborhood(ds,'radius',2,'progress',0);
 
-    m=cosmo_searchlight(ds,nh,measure,'progress',false);
+    m=cosmo_searchlight(ds,nh,measure,opt);
 
     assertEqual(m.samples,[8 12 10 9 12 10 16 13 12 17 14 15 ...
                             13 11 15 14 10 9 14 11 5 7 6 7]);
@@ -21,7 +41,7 @@ function test_searchlight_
     assertEqual(m.a,ds.a);
 
     nh2=cosmo_spherical_neighborhood(ds,'count',17,'progress',0);
-    m=cosmo_searchlight(ds,nh2,measure,'progress',0);
+    m=cosmo_searchlight(ds,nh2,measure,opt);
     assertEqual(m.samples,[17 17 17 17 17 17 17 17 17 17 18 16 ...
                                 17 17 16 15 17 17 17 17 17 17 17 17]);
 
@@ -31,7 +51,7 @@ function test_searchlight_
     nh3=cosmo_spherical_neighborhood(ds,'radius',2,...
                                 cosmo_structjoin('progress',0));
     m=cosmo_searchlight(ds, nh3, measure,...
-                            'center_ids',[4 21],'progress',0);
+                            'center_ids',[4 21],opt);
 
     assertVectorsAlmostEqual(m.samples, [0.9742,-.0273]...
                                         ,'relative',.001);
@@ -49,7 +69,7 @@ function test_searchlight_
     measure2=@(x,opt)cosmo_structjoin('samples',mean(x.samples,2),...
                                        'sa',sa,...
                                        'a',cosmo_structjoin('sdim',sdim));
-    m2=cosmo_searchlight(ds,nh4,measure2,'progress',false);
+    m2=cosmo_searchlight(ds,nh4,measure2,opt);
     assertEqual(m2.sa,sa);
     assertEqual(m2.a.sdim,sdim);
     assertElementsAlmostEqual(m2.samples,ds.samples);

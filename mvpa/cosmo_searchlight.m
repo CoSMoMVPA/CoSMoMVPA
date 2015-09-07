@@ -37,6 +37,13 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 %                        output results_map.samples has size N in the 2nd
 %                        dimension.
 %   'progress', p        Show progress every p steps
+%   'nproc', np          If the Matlab parallel processing toolbox is
+%                        available, use np parallel threads. To use all
+%                        available threads, set np=true. (Using multiple
+%                        threads may speed up searchlight computations).
+%                        If parallel processing is not available, or if
+%                        this option is not provided, then a single thread
+%                        is used.
 %   K, V                 any key-value pair (K,V) with arguments for the
 %                        measure function handle. Alternatively a struct
 %                        can be used
@@ -127,6 +134,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     sl_defaults=struct();
     sl_defaults.center_ids=[];
     sl_defaults.progress=1/50;
+    sl_defaults.nproc=1;
 
     % get options for the searchlight function
     sl_opt=cosmo_structjoin(sl_defaults,varargin);
@@ -147,16 +155,69 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         center_ids=1:numel(neighbors); % all output features
     end
 
+    % get number of processes for searchlight
+    nproc=get_nproc(sl_opt);
+
+    % split neighborhood in multiple parts, so that each thread can do a
+    % subset of all the work
+    nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,nproc);
+
+    % set options for each process
+    worker_opt_cell=cell(1,nproc);
+    for p=1:nproc
+        worker_opt=struct();
+        worker_opt.ds=ds;
+        worker_opt.measure=measure;
+        worker_opt.measure_opt=measure_opt;
+        worker_opt.worker_id=p;
+        worker_opt.nworkers=nproc;
+        worker_opt.progress=sl_opt.progress;
+
+        worker_opt.nbrhood=nbrhood_cell{p};
+        worker_opt_cell{p}=worker_opt;
+    end
+
+    if nproc>1
+        result_cell=cell(1,nproc);
+        % use parallel searchlight
+        parfor p=1:nproc
+            result_cell{p}=run_searchlight_with_worker(worker_opt_cell{p})
+        end
+
+        % join results from each worker
+        results_map=cosmo_stack(result_cell,2);
+    else
+        % single thread
+        assert(numel(worker_opt_cell)==1)
+        results_map=run_searchlight_with_worker(worker_opt_cell{1});
+    end
+
+    cosmo_check_dataset(results_map);
+
+function results_map=run_searchlight_with_worker(worker_opt)
+% run searchlight using the options in worker_opt
+    ds=worker_opt.ds;
+    nbrhood=worker_opt.nbrhood;
+    measure=worker_opt.measure;
+    measure_opt=worker_opt.measure_opt;
+    worker_id=worker_opt.worker_id;
+    nworkers=worker_opt.nworkers;
+    progress=worker_opt.progress;
+
+    neighbors=nbrhood.neighbors;
+
     % allocate space for output. res_cell contains the output
     % of the measure applied to each group of features defined in
     % nbrhood. Afterwards the elements in res_cell are combined.
-    ncenters=numel(center_ids);
+    ncenters=numel(nbrhood.neighbors);
     res_cell=cell(ncenters,1);
 
     % see if progress is to be reported
-    show_progress=~isempty(sl_opt.progress) && sl_opt.progress;
+    show_progress=~isempty(progress) && ...
+                        progress && ...
+                        worker_id==1;
     if show_progress
-        progress_step=sl_opt.progress;
+        progress_step=progress;
         if progress_step<1
             progress_step=ceil(ncenters*progress_step);
         end
@@ -164,14 +225,11 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         clock_start=clock();
     end
 
-    visitorder=randperm(ncenters); % get better progress time estimates
-
     % if measure gave the wrong result one wants to know sooner rather than
     % later. here only the first result is checked. (other errors may only
     % be caught after this 'for'-loop)
     % this is a compromise between execution speed and error reporting.
     checked_first_output=false;
-
 
     % Core searchlight code.
     % For each center_id:
@@ -180,10 +238,8 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     % - apply the measure to this sliced dataset with its arguments "args"
     % - store the result in "res"
     %
-    for k=1:ncenters
+    for center_id=1:ncenters
         % >@@>
-        center_idx=visitorder(k);
-        center_id=center_ids(center_idx);
         neighbor_feature_ids=neighbors{center_id};
 
         % slice the dataset (with disabled kosherness-check for every
@@ -227,16 +283,30 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         end
         % <@@<
 
-        res_cell{center_idx}=res;
+        res_cell{center_id}=res;
 
         % show progress
-        if show_progress && (k<10 || ~mod(k,progress_step) || k==ncenters)
-            msg='';
+        if show_progress && (center_id<10 || ...
+                                ~mod(center_id,progress_step) || ...
+                                center_id==ncenters)
+            if nworkers>1
+                if center_id==ncenters
+                    % other workers may be slower than first worker
+                    msg=sprintf(['worker %d has completed; waiting for '...
+                                    'other workers to finish...\n']);
+                else
+                    % can only show progress from a single worker;
+                    % therefore show progress of first worker
+                    msg=sprintf('for worker %d / %d\n', 1, nworkers);
+                end
+            else
+                % no specific message
+                msg='';
+            end
             prev_progress_msg=cosmo_show_progress(clock_start, ...
-                            k/ncenters, msg, prev_progress_msg);
+                            center_id/ncenters, msg, prev_progress_msg);
         end
     end
-
 
     % prepare the output
     results_map=struct();
@@ -245,7 +315,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     results_map.a=nbrhood.a;
 
     % slice the feature attributes
-    results_map.fa=cosmo_slice(nbrhood.fa,center_ids,2,'struct');
+    results_map.fa=nbrhood.fa;
 
     % join the outputs from the measure for each searchlight position
     res_stacked=cosmo_stack(res_cell,2);
@@ -261,11 +331,32 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         results_map.a.sdim=res_stacked.a.sdim;
     end
 
-    % set center_ids for the output dataset
-    results_map.fa.center_ids=center_ids(:)';
 
-    % sanity check of the output
-    cosmo_check_dataset(results_map);
+function nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,nproc)
+% splits the neighborhood in multiple smaller neighborhoods that can be
+% used in parallel
+    ncenters=numel(center_ids);
+
+    block_size=ceil(ncenters/nproc);
+    nbrhood_cell=cell(nproc,1);
+
+    first=1;
+    for block=1:nproc
+        last=min(first+block_size-1,ncenters);
+        block_idxs=first:last;
+
+        block_center_ids=center_ids(block_idxs);
+
+        block_nbrhood=struct();
+        block_nbrhood.neighbors=nbrhood.neighbors(block_center_ids);
+        block_nbrhood.a=nbrhood.a;
+        block_nbrhood.fa=cosmo_slice(nbrhood.fa,block_center_ids,2,'struct');
+        block_nbrhood.fa.center_ids=block_center_ids(:)';
+
+        nbrhood_cell{block}=block_nbrhood;
+
+        first=last+1;
+    end
 
 
 function check_input(ds, nbrhood, measure, opt)
@@ -275,9 +366,54 @@ function check_input(ds, nbrhood, measure, opt)
         raise_parameter_exception();
     end
 
+    nproc=opt.nproc;
+    if ~((isnumeric(nproc) || islogical(nproc)) && ...
+            isscalar(nproc) && ...
+            round(nproc)==nproc && ...
+            nproc>=1)
+        error('nproc must be positive scalar');
+    end
 
     cosmo_check_dataset(ds);
     cosmo_check_neighborhood(nbrhood,ds);
+
+
+function nproc=get_nproc(sl_opt)
+% get number of processes available from Matlab parallel processing pool.
+% return nproc=1 if no parallel processing pool available
+    nproc=sl_opt.nproc;
+
+    if (islogical(nproc) && nproc) || nproc>1
+        if has_matlab_parallel_toolbox()
+            pool = gcp();
+
+            if isempty(pool)
+                cosmo_warning(['Parallel toolbox is available, but '...
+                                'unable to open pool. Using nproc=1']);
+                nproc=1;
+            else
+                nworkers=pool.NumWorkers();
+
+                if islogical(nproc)
+                    nproc=nworkers;
+                elseif nproc>nworkers
+                    cosmo_warning(['nproc=%d requested but only %d workers '...
+                                    'available; setting nproc=%d'],...
+                                    nproc,nworkers);
+                    nproc=nworkers;
+                end
+            end
+        else
+            cosmo_warning(['Parallel computing not available, using '...
+                            'single thread']);
+            nproc=1;
+        end
+    end
+
+function tf=has_matlab_parallel_toolbox()
+    has_function=@(x)~isempty(which(x));
+    tf=all(cellfun(has_function, {'gcp','parpool'}));
+
 
 function raise_parameter_exception()
     error(['Illegal syntax, use:\n\n',...
