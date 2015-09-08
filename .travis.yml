@@ -13,19 +13,24 @@ env:
     - OCTAVE=octave
  matrix:
     - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel"
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
-    # Prepare to get Octave
+    # get Octave 4.0
     - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
-
-    # get Octave 4.0
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
+
+    # use Clang
+    - travis_retry sudo apt-get -y install clang
+    - sudo update-alternatives --set c++ /usr/bin/clang++
+    - sudo ln -f -s /usr/bin/clang++ /usr/bin/g++
+    - c++ --version
+    - g++ --version
 
     # go up one level to retrieve MOxUnit
     - cd ..
@@ -84,6 +89,12 @@ install:
           BUILDCMD="${BUILDCMD}mex('zstream.c');";
           OCTAVEPTH="${OCTAVEPTH}:${PTH}/${GIFTI_NAME}";
           CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('gifti');";
+      fi
+
+    # optionally enable Octave parallel package
+    - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
+          BUILDCMD="${BUILDCMD}pkg('install','-forge','parallel');";
+          CHECKEXTCMD="${CHECKEXTCMD}pkg('load','parallel');";
       fi
 
     # show path
