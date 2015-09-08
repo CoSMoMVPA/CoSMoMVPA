@@ -21,6 +21,21 @@ function test_searchlight_matlab_multithread()
     opt.nproc=2;
     helper_test_searchlight(opt);
 
+function test_searchlight_octave_multithread()
+    has_function=@(x)~isempty(which(x));
+    has_parallel_toolbox=all(cellfun(has_function, {'parcellfun',...
+                                                    'pararrayfun'}));
+
+    if ~has_parallel_toolbox
+        cosmo_notify_test_skipped('Octave parallel toolbox not available');
+        return;
+    end
+
+    opt=struct();
+    opt.progress=false;
+    opt.nproc=2;
+    helper_test_searchlight(opt);
+
 
 function helper_test_searchlight(opt)
 
