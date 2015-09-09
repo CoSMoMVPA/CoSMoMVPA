@@ -1,4 +1,3 @@
-
 function test_suite = test_crossvalidation_measure
     initTestSuite;
 

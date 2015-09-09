@@ -1,7 +1,7 @@
 function test_suite = test_strsplit
     initTestSuite;
 
-function test_suite = test_strsplit_basics
+function test_strsplit_basics
     aeq=@(a,varargin)assertEqual(cosmo_strsplit(varargin{:}),a);
 
     aeq({'A','AbbAbA','AbA','A','Ab'},'A*AbbAbA*AbA*A*Ab','*');
