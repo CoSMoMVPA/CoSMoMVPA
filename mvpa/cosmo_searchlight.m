@@ -382,7 +382,8 @@ function nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,nproc)
         block_nbrhood=struct();
         block_nbrhood.neighbors=nbrhood.neighbors(block_center_ids);
         block_nbrhood.a=nbrhood.a;
-        block_nbrhood.fa=cosmo_slice(nbrhood.fa,block_center_ids,2,'struct');
+        block_nbrhood.fa=cosmo_slice(nbrhood.fa,block_center_ids,2,...
+                                                            'struct');
         block_nbrhood.fa.center_ids=block_center_ids(:)';
 
         nbrhood_cell{block}=block_nbrhood;
