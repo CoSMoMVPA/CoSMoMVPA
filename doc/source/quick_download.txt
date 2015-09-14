@@ -1,0 +1,14 @@
+- CoSMoMVPA Matlab / Octave code:
+
+    + ``git`` users::
+
+        git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+
+    + also available as `zip archive`_.
+
+- CoSMOMVPA tutorial data in `zip format <http://cosmomvpa.org/datadb.zip>`_.
+
+- CoSMOMVPA documentation in HTML format (for off-line viewing) is available in `zip <http://cosmomvpa.org/_static/CoSMoMVPA_documentation_html.zip>`_ and `gzipped tar archive <http://cosmomvpa.org/_static/CoSMoMVPA_documentation_html.tar.gz>`_.
+
+
+
