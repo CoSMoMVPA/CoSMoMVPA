@@ -7,6 +7,7 @@ import os
 import math
 
 
+
 class Image(object):
     def __init__(self, label, prefix, index):
         self.label = label
@@ -17,11 +18,26 @@ class Image(object):
         return '<%s>' % label
 
     def to_rst(self):
-        image_dir = '_static/publish'
-
-        relative_to_image_dir = '../source'
-        image_patterns = ('%s_%02d.png', '%s%d.png')
         image_scale = .3
+
+        image_ref = self.get_image_ref()
+
+        if image_ref is None:
+            print('Not found: image %s (# %d)' % (self.prefix, self.index))
+
+        rst = '.. |%s| image:: %s\n    :target: %s\n    :scale: %d%%\n' % (
+            self.get_image_link(), image_ref,
+            self.get_code_link(), image_scale * 100,)
+
+        return rst
+
+    def file_exists(self):
+        return self.get_image_ref() is not None
+
+    def get_image_ref(self):
+        image_dir = '_static/publish'
+        image_patterns = ('%s_%02d.png', '%s%d.png')
+        relative_to_image_dir = '../source'
 
         root_dir = os.path.join(os.path.dirname(__file__),
                                 relative_to_image_dir)
@@ -32,14 +48,9 @@ class Image(object):
 
             if os.path.exists(image_path_fn):
                 image_ref = os.path.join(image_dir, image_fn)
+                return image_ref
 
-                rst = '.. |%s| image:: %s\n    :target: %s\n    :scale: %d%%\n' % (
-                    self.get_image_link(), image_ref,
-                    self.get_code_link(), image_scale * 100,)
-
-                return rst
-
-        raise ValueError('Not found: image %s (# %d)' % (self.prefix, self.index))
+        return None
 
     def get_image_link(self):
         return 'gallery_%s_%d' % (self.prefix, self.index)
@@ -118,6 +129,10 @@ class Cell(object):
     @classmethod
     def tabelize(cls, cells, n_columns, hor_sep, ver_sep, edge_sep):
         n_cells = len(cells)
+
+        if n_cells == 0:
+            return cls([[]])
+
         n_rows = int(math.ceil(float(n_cells) / n_columns))
 
         n_missing = n_rows * n_columns - n_cells
@@ -168,8 +183,9 @@ class ImageCollection(object):
     def __init__(self):
         self.images = []
 
-    def append(self, x):
-        self.images.append(x)
+    def append(self, img):
+        if img.file_exists():
+            self.images.append(img)
 
     @classmethod
     def from_dict(cls, demos):
@@ -184,6 +200,9 @@ class ImageCollection(object):
         return '%d images' % (len(self.images))
 
     def to_rst(self):
+        if len(self) == 0:
+            return ''
+
         header = 'Analysis gallery'
         header_rst = '%s\n%s' % (header, '=' * len(header))
 
@@ -243,5 +262,16 @@ if __name__ == '__main__':
              }
 
     c = ImageCollection.from_dict(demos)
-    print "Found %d elements for gallery " % len(c)
+
+    n_images = len(c)
+
+    if n_images == 0:
+        msg = ("No elements found for gallery. To build the gallery, "
+               "run cosmo_publish_run_scripts from Matlab or GNU Octave")
+    else:
+        msg = "Found %d elements for gallery " % n_images
+
+    print msg
+
     c.write()
+
