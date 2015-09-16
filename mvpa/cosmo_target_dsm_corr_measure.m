@@ -36,16 +36,19 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  provided; it cannot cannot used together with
 %                  .target_dsm or regress_dsm.
 %                  When using this option, the 'type' option is ignored.
+%                  For this option, the output has as many rows (samples)
+%                  as there are elements (dissimilarity matrices) in
+%                  .glm_dsm.
 %
 % Output:
 %    ds_sa         Dataset struct with fields:
 %      .samples    Scalar correlation value between the pair-wise
 %                  distances of the samples in ds and target_dsm; or
-%                  (when 'model_dsms' is supplied) a vector with
-%                  normalized beta coefficients. These correlations
-%                  are untransformed (e.g. there is no Fisher transform)
+%                  (when 'glm_dsms' is supplied) a column vector with
+%                  normalized beta coefficients. These values
+%                  are untransformed (e.g. there is no Fisher transform).
 %      .sa         Struct with field:
-%        .labels   {'rho'}; or (when 'model_dsms' is supplied) a cell
+%        .labels   {'rho'}; or (when 'glm_dsm' is supplied) a cell
 %                  {'beta1','beta2',...}.
 %
 % Examples:
