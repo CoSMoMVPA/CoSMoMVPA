@@ -34,10 +34,6 @@ function test_correlation_measure_basis()
     assertEqual({'half1','half2'},c2.a.sdim.labels);
     assertEqual({20+(1:4)',20+(1:4)'},c2.a.sdim.values);
 
-    c3=cosmo_correlation_measure(ds,'output','one_minus_correlation');
-    assertElementsAlmostEqual(1-c2.samples,c3.samples);
-    assertEqual(c3.sa,c2.sa);
-
     c4=cosmo_correlation_measure(ds3,'output','mean_by_fold');
     %
     for j=1:3
@@ -175,14 +171,6 @@ function params=get_regression_test_params(test_spearman)
                                 'half2' [ 1 1 1 2 2 2 3 3 3 ] },...
                     { 'labels' { 'half1' 'half2' },...
                                 'values' { [ 1 2 3 ]' [ 1 2 3 ]' } }
-                },...
-                {{ 'output' 'one_minus_correlation' },...
-                    [ 1.65 0.932 0.655 0.874 0.357 0.587 ...
-                                 0.734 0.601 0.907 ],...
-                    { 'half1' [ 1 2 3 1 2 3 1 2 3 ],...
-                                'half2' [ 1 1 1 2 2 2 3 3 3 ] },...
-                    { 'labels' { 'half1' 'half2' },...
-                                'values' { [ 1 2 3 ]' [ 1 2 3 ]' } }
                 }};
 
     end
@@ -196,6 +184,7 @@ function test_correlation_measure_exceptions
     ds=cosmo_synthetic_dataset('nchunks',2);
     aet(ds,'template',eye(4));
     aet(ds,'output','foo');
+    aet(ds,'output','one_minus_correlation');
 
     % single target throws exception
     ds.sa.targets(:)=1;
@@ -206,6 +195,3 @@ function test_correlation_measure_exceptions
 
     ds.sa.targets(1)=2;
     aet(ds);
-
-
-

@@ -39,7 +39,13 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %    ds_sa        Struct with fields:
 %      .samples   Scalar indicating how well the template matrix
 %                 correlates with the correlation matrix from the two
-%                 halves (averaged over partitions).
+%                 halves (averaged over partitions). By default:
+%                 - this value is based on Fisher-transformed correlation
+%                   values, not raw correlation values
+%                 - this is the average of the (Fisher-transformed)
+%                   on-diagonal minus the average of the
+%                   (Fisher-transformed) off-diagonal elements of the
+%                   correlation matrix based on the two halves of the data.
 %      .sa        Struct with field:
 %        .labels  if output=='corr'
 %        .half1   } if output=='raw': (N^2)x1 vectors with indices of data
@@ -141,6 +147,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     Fisher-transformed correlations can be transformed back to
 %     their original correlation values using 'tanh', which is the inverse
 %     of 'atanh'.
+%   - To disable the (by default used) Fisher-transformation, set the
+%     'post_corr_func' option to [].
 %   - if multiple samples are present with the same chunk and target, they
 %     are averaged *prior* to computing the correlations.
 %   - if multiple partitions are present, then the correlations are
@@ -318,7 +326,7 @@ switch params.output
     case 'mean'
         ds_sa.samples=mean(cat(2,pdata{:}),2);
         ds_sa.sa.labels={'corr'};
-    case {'raw','correlation','one_minus_correlation'}
+    case {'raw','correlation'}
         ds_sa.samples=mean(cat(2,pdata{:}),2);
 
         nclasses=numel(classes);
@@ -351,7 +359,9 @@ function agg_c=aggregate_correlations(c,template,template_msk,output)
         case {'raw','correlation'}
             agg_c=c(:);
         case 'one_minus_correlation'
-            agg_c=1-c(:);
+            error(['the ''output'' option ''one_minus_correlation'' '...
+                        'has been removed. Please contact CoSMoMVPA''s '...
+                        'authors if you really need this option']);
         otherwise
             error('Unsupported output %s',output);
     end
