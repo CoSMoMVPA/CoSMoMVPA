@@ -134,9 +134,31 @@ function save_and_load_dataset_with_extension(ext, multi_volume)
     end
 
     y_sel=save_and_load(x,ext,'volumes',volumes);
-
     assert_dataset_equal(x_sel,y_sel,ext);
 
+    if ext_supports_block_loading(ext)
+        helper_test_save_and_load_in_blocks(x,ext);
+    end
+
+
+
+function tf=ext_supports_block_loading(ext)
+    ext_with_block_loading={'+orig.HEAD','+orig.BRIK',...
+                            '+tlrc.HEAD','+tlrc.BRIK',...
+                            '.nii'};
+    tf=cosmo_match({ext},ext_with_block_loading);
+
+function helper_test_save_and_load_in_blocks(x,ext)
+    msk_ds=cosmo_slice(x,1);
+    msk_ds.samples=x.fa.i>3 & x.fa.j<5;
+
+    ds_once=save_and_load(x,ext,'mask',msk_ds);
+    nsamples=size(ds_once.samples,1);
+    for block_size=[0,1,2,(nsamples+1)]
+        ds_blocked=save_and_load(x,ext,'mask',msk_ds,...
+                                    'block_size',block_size);
+        assert_dataset_equal(ds_once,ds_blocked,ext);
+    end
 
 
 function test_fmri_io_exceptions()

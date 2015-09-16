@@ -217,9 +217,12 @@ function ds_all=convert_to_dataset(fn, params)
         error('illegal input of type ''%s''', class(data));
     end
 
+    data_filename=NaN;
+
     if input_is_filename
         % read header from file
         raw_header=img_format.header_reader(data);
+        data_filename=data;
     elseif isfield(img_format, 'struct_header_reader')
         raw_header=img_format.struct_header_reader(fn,data);
     else
@@ -269,10 +272,11 @@ function ds_all=convert_to_dataset(fn, params)
         end
 
         if input_is_filename && has_data_reader
+            assert(ischar(data_filename));
             % selecting subset of volumes is done by the data_reader,
             % so that only part of the whole file has to be read
             data_reader=img_format.data_reader;
-            data=data_converter(data_reader(data, raw_header, ...
+            data=data_converter(data_reader(data_filename, raw_header, ...
                                                 volumes_or_empty), []);
         else
             % all data is probably already in memory, so select subset
@@ -514,7 +518,7 @@ function volumes_cell=partition_volumes(n_volumes_total, n_voxels, ...
         first_index=1;
         for block=1:n_blocks
             last_index=min(n_volumes_to_load, ...
-                            first_index+n_volumes_per_block);
+                            first_index+n_volumes_per_block-1);
 
             volumes_cell{block}=volumes(first_index:last_index);
 
