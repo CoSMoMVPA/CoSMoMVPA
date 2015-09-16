@@ -3,8 +3,11 @@ function test_suite = test_randomize_targets()
 
 function test_randomize_targets_basics()
     ds=cosmo_synthetic_dataset('ntargets',4,'nchunks',10);
-    x1=cosmo_randomize_targets(ds);
+    [x1,perm1]=cosmo_randomize_targets(ds);
     assertEqual(size(ds.sa.targets),[40 1])
+    assertEqual(x1,ds.sa.targets(perm1))
+    assertEqual(sort(perm1),(1:size(ds.samples,1))');
+
     x2=cosmo_randomize_targets(ds);
     assert(any(x1~=x2)); % probablity of failing less than 1e-13
     assert(any(x1~=ds.sa.targets));

@@ -1,4 +1,4 @@
-function randomized_targets=cosmo_randomize_targets(ds,varargin)
+function [randomized_targets,permutation]=cosmo_randomize_targets(ds,varargin)
 % provides randomized target labels
 %
 % randomized_targets=cosmo_randmize_targets(ds[,'seed',seed)
@@ -10,7 +10,7 @@ function randomized_targets=cosmo_randomize_targets(ds,varargin)
 %                         pseudo-random number generation
 %
 %
-% Output:
+% Outputs:
 %   randomized_targets    P x 1 with randomized targets
 %                         If ds defines a repeated-measures design (which
 %                         requires that each chunk has the same set of
@@ -20,6 +20,8 @@ function randomized_targets=cosmo_randomize_targets(ds,varargin)
 %                         exactly one sample, i.e. all samples are
 %                         independent), the targets are randomized
 %                         without considering the chunk values.
+%   permutation           P x 1 with indices of permutation. It holds that
+%                         randomized_targets == ds.sa.targets(permutation).
 %
 % Example:
 %     % generate tiny dataset with 15 chunks, each with two targets
