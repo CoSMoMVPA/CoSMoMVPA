@@ -217,12 +217,9 @@ function ds_all=convert_to_dataset(fn, params)
         error('illegal input of type ''%s''', class(data));
     end
 
-    data_filename=NaN;
-
     if input_is_filename
         % read header from file
         raw_header=img_format.header_reader(data);
-        data_filename=data;
     elseif isfield(img_format, 'struct_header_reader')
         raw_header=img_format.struct_header_reader(fn,data);
     else
@@ -272,11 +269,17 @@ function ds_all=convert_to_dataset(fn, params)
         end
 
         if input_is_filename && has_data_reader
-            assert(ischar(data_filename));
             % selecting subset of volumes is done by the data_reader,
             % so that only part of the whole file has to be read
             data_reader=img_format.data_reader;
-            data=data_converter(data_reader(data_filename, raw_header, ...
+
+            % make a copy of the filename or SPM struct
+            is_first_block=block==1;
+            if is_first_block
+                original_data=data;
+            end
+
+            data=data_converter(data_reader(original_data, raw_header, ...
                                                 volumes_or_empty), []);
         else
             % all data is probably already in memory, so select subset
@@ -514,6 +517,11 @@ function volumes_cell=partition_volumes(n_volumes_total, n_voxels, ...
         n_volumes_to_load=numel(volumes);
         n_blocks=ceil(n_volumes_to_load / n_volumes_per_block);
 
+        if n_blocks<1
+            n_blocks=n_volumes_to_load;
+            n_volumes_per_block=1;
+        end
+
         volumes_cell=cell(1, n_blocks);
         first_index=1;
         for block=1:n_blocks
@@ -524,6 +532,8 @@ function volumes_cell=partition_volumes(n_volumes_total, n_voxels, ...
 
             first_index=last_index+1;
         end
+
+        assert(all(cellfun(@numel,volumes_cell)>=1));
     else
         volumes_cell={volumes};
     end
@@ -1644,7 +1654,7 @@ function data=convert_spm_data(hdr, volumes)
 
     % allocate space for output
     dim=hdr_ds.a.vol.dim;
-    data=zeros([dim n_files]);
+    data=zeros([dim n_volumes]);
 
     %
     for k=1:n_volumes

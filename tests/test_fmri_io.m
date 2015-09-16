@@ -153,8 +153,9 @@ function helper_test_save_and_load_in_blocks(x,ext)
     msk_ds.samples=x.fa.i>3 & x.fa.j<5;
 
     ds_once=save_and_load(x,ext,'mask',msk_ds);
-    nsamples=size(ds_once.samples,1);
-    for block_size=[0,1,2,(nsamples+1)]
+    [nsamples,nfeatures]=size(ds_once.samples);
+    block_sizes=[0,1,2*nfeatures,(nsamples+1)*nfeatures,Inf];
+    for block_size=block_sizes
         ds_blocked=save_and_load(x,ext,'mask',msk_ds,...
                                     'block_size',block_size);
         assert_dataset_equal(ds_once,ds_blocked,ext);
@@ -272,6 +273,20 @@ function helper_test_fmri_io_spm_in_directory(directory)
     assertEqual(ds_spm.sa.beta_index,(1:2)')
     assertEqual(ds_spm.sa.labels,{'sample_1';'sample_2'});
     assertElementsAlmostEqual(ds.samples+1,ds_spm.samples,'relative',1e-4);
+
+    msk_ds=cosmo_slice(ds,1);
+    msk_ds.samples=msk_ds.fa.i~=3;
+    block_sizes=[0,1,6,13,Inf];
+
+    ds_spm_msk=cosmo_fmri_dataset(spm_fn,'mask',msk_ds);
+    assertEqual(ds_spm_msk,cosmo_slice(ds_spm,msk_ds.samples,2));
+
+    for block_size=block_sizes
+        ds_spm_msk_blocked=cosmo_fmri_dataset(spm_fn,'mask',msk_ds,...
+                                    'block_size',block_size);
+        assertEqual(ds_spm_msk_blocked,ds_spm_msk);
+    end
+
 
     input_keys={'beta','con','spm'};
     for k=0:numel(input_keys)
