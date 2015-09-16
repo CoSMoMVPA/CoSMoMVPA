@@ -497,8 +497,8 @@ function [dsm, dim_labels, dim_values, is_ds]=get_dsm(data)
         assert(isequal(sq1,dsm1+dsm1'));
 
 
-        dim_labels={'targets1';'targets2'};
-        dim_values={1:n;1:n};
+        dim_labels={'targets1','targets2'};
+        dim_values={(1:side)',(1:side)'};
     else
         error('illegal input: expect dataset struct, or cell with arrays');
     end

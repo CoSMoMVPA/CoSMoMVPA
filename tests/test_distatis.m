@@ -36,7 +36,7 @@ function test_statis_
         0.0020    0.0040    0.0530    0.0080    0.0070         0];
 
     ds=get_distance_dataset(d);
-    ds=cosmo_stack({ds,ds,ds},2);
+    ds=cosmo_stack({ds,ds,ds},2); % features
 
     cosmo_check_dataset(ds);
 
@@ -72,10 +72,20 @@ function test_statis_
     resvec=cosmo_distatis(ds,opt);
     assertElementsAlmostEqual(resvec.samples(:,1),sq');
 
+    % test numeric input
     vec_samples=mat2cell(ds.samples(:,1),ones(4,1)*15,1);
     resvec2=cosmo_distatis(vec_samples,opt);
     assertElementsAlmostEqual(resvec2.samples,resvec.samples(:,1));
+    assertEqual(cellfun(@numel,resvec2.a.sdim.values),...
+                    cellfun(@numel,resvec.a.sdim.values));
+    resvec2.a.sdim.values=resvec.a.sdim.values;
 
+    resvec_single_feature=cosmo_slice(resvec,1,2);
+    assertAlmostEqual(resvec_single_feature.samples,resvec2.samples);
+    assertAlmostEqual(resvec_single_feature.fa.quality,resvec2.fa.quality);
+    resvec2.samples=resvec_single_feature.samples;
+    resvec2.fa.quality=resvec_single_feature.fa.quality;
+    assertEqual(resvec2,resvec_single_feature);
 
     opt.weights='uniform';
     resvec=cosmo_distatis(ds,opt);
@@ -84,6 +94,8 @@ function test_statis_
                                    0.6572 0.4788 0.5489 0.5783 1.3221 ...
                                    1.1576 0.9885 0.3644 0.5068 0.4037],...
                                    'absolute',.001);
+
+
 
     % test exceptions
     aet=@(varargin)assertExceptionThrown(@()...
