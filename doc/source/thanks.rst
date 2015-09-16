@@ -12,12 +12,16 @@ We would like to thank the following people for specific contributions:
 +  **Michael Hanke**, **Yaroslav Halchenko**, and **James Haxby**: for their work on and support of PyMVPA, which inspired the semantics and data structure of datasets in CoSMoMVPA.
 +  **Stephania Bracci**: for providing sample datasets in BrainVoyager.
 +  **Jimmy Shen**: for providing a free/open source NIFTI library.
-+  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier.
++  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier, and contributions to the surfing toolbox.
 +  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing an MEEG dataset.
-+  **S. Eddins** for the MATLAB xUnit_ Test Framework.
-+  **T. Smith** for inspiration for the doctest functionality.
-+  **J. Shen** for providing the NIfTI toolbox.
++  **Steve Eddins** for the MATLAB xUnit_ Test Framework.
++  **Thomas Smith** for inspiration for the doctest functionality.
++  **Jimmy Shen** for providing the NIfTI toolbox.
 +  **Jens Scharzbach** for help with improving and adding exercises.
++  **Guillaume Flandin** for the GIfTI library for Matlab.
++  **Robert Oostenveld** et al for the FieldTrip package.
++  **Ziad Saad** and **Gang Chen** for the AFNI Matlab toolbox.
++  **Jochen Weber** for the NeuroElf toolbox.
 
 The following people have provided valuable suggestions, advice, support, or code to CoSMoMVPA:
 
