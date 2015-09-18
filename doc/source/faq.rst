@@ -83,11 +83,12 @@ Does it integrate with PyMVPA?
 
 Does it run on GNU Octave?
 --------------------------
-    Allmost all functionality runs in Octave_ 3.8, including unit tests through MOxUnit_, but there may be parts that function not so well:
+    Almost all functionality runs in Octave_ 3.8, including unit tests through MOxUnit_, but there may be parts that function with limitations:
 
         - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``).
-        - Support of visualization of MEEG results in FieldTrip_ is limited, because FieldTrip_ provided limited Octave_ compatibility.
+        - Support of visualization of MEEG results in FieldTrip_ is limited, because FieldTrip_ provides limited Octave_ compatibility. At the moment we maintain our own branch: `FieldTrip branch with improved GNU Octave compatibility`_.
         - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
+
 
 
 How should I cite CoSMoMVPA?

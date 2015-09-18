@@ -154,6 +154,10 @@ Certain functionality require certain external toolboxes:
 - Matlab_'s Support Vector Machine (SVM) classifier (accessed through :ref:`cosmo_classify_svm`), and some other functions that use statistical computations, require the `Matlab statistics`_ toolbox.
 - LIBSVM_'s Support Vector Machine (SVM) classifier (accessed through  :ref:`cosmo_classify_libsvm`) requires the LIBSVM_ toolbox.
 - MEEG data requires FieldTrip_ for almost all MEEG-related functions.
+
+    + GNU Octave users: consider using our `FieldTrip branch with improved GNU Octave compatibility`_.
+
+
 - On Octave_, the ``io``, ``nan``, ``statistics``, ``miscellaneous`` and ``general`` are required; they are available from `Octave-Forge`_. See :ref:`here <get_octave_packages>` for details.
 
 For operations that require external toolboxes, CoSMoMVPA_ will check their presence. If a required external toolbox is not available, an error message is given with download instructions.
