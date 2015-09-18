@@ -560,5 +560,32 @@ In the following example, ``ds_left`` and ``ds_right`` are two dataset structs (
 
 The resulting dataset ``ds_left_right`` can be stored in a file using :ref:`cosmo_map2surface`.
 
+Visualize and store multiple fMRI volumes
+-----------------------------------------
+'I have an fMRI volumetric dataset with three volumes. :ref:`cosmo_plot_slices` gives an error when trying to visualize this dataset. How can I visualize the volumes and store them as NIFTI files?'
+
+In this example, ``ds`` is a dataset structure with three volumes. To visualize and store the third volume, do:
+
+    .. code-block:: matlab
+
+        ds3=cosmo_slice(ds,3);              % select third sample (volume)
+
+        cosmo_plot_slices(ds3);             % visualization in CoSMoMVPA
+
+        cosmo_map2fmri(ds3,'volume3.nii');  % for visualization in
+                                            % other programs
+
+Note that several fMRI visualization packages can also visualize fMRI datasets with multiple volumes. To store all volumes in a single NIFTI file, simply do:
+
+    .. code-block:: matlab
+
+        cosmo_map2fmri(ds,'all_volumes.nii');
+
+For example, MRIcron_ can be used to visualize each of the volumes in the resulting NIFTI file.
+
+
+
+
+
 
 .. include:: links.txt
