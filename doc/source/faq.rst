@@ -418,11 +418,11 @@ The pymvpa2-prep-afni-surf_ script (part of PyMVPA_, which is required to run it
 
 Correct for multiple comparisons
 --------------------------------
-For second level (group analysis), cosmo_montecarlo_cluster_stat [3] provides cluster-based correction.
+For second level (group analysis), :ref:`cosmo_montecarlo_cluster_stat` provides cluster-based correction.
 
-There are three ‘components’ in this, and they can be crossed arbitrarily:
+There are three *components* in this, and they can be crossed arbitrarily:
 
-    1) clustering method: either ‘standard’ fixed-uncorrected thresholding, or using Threshold-Free Cluster Enhancement (TFCE). The latter seems to have several advantages (Nichols & Smith, 2009, Neuroimage), including:
+    1) clustering method: either ‘standard’ fixed-uncorrected thresholding, or using Threshold-Free Cluster Enhancement (TFCE). The latter is the default in CoSMoMVPA, as it has been proposed it has several advantages (Nichols & Smith, 2009, Neuroimage), including:
         - "TFCE gives generally better sensitivity than other methods over a wide range of test signal shapes and SNR values".
         - avoids "the need to define the initial cluster-forming threshold (e.g., threshold the raw t-statistic image at t>2.5)".
         - avoids the issue that "initial hard thresholding introduces instability in the overall processing chain; small variations in the data around the threshold level can have a large effect on the final output."
@@ -439,7 +439,7 @@ There are three ‘components’ in this, and they can be crossed arbitrarily:
 
         In the case of multiple dimensions (such as time x channel x frequency) it is possible to cluster only over a subset of the dimensions. For example, a time x channel x frequency dataset can be clustered over all dimensions, or clustered over channel x frequency (which allows for more precise temporal inferences), or over channel x time (for more precise frequency inferences).
 
-    3) support for either standard permutation test, or the method by Stelzer et al. (For using the Stelzer approach, the user has to generate null datasets themselves. cosmo_randomize_targets can be used for this, but requires using a for-loop to generate multiple null datasets.)
+    3) support for either standard permutation test, or the method by Stelzer et al. (2012). To use the Stelzer approach, the user has to generate null datasets themselves. :ref:`cosmo_randomize_targets` can be used for this, but requires using a for-loop to generate multiple null datasets.
 
 Because components 1-3 can be crossed arbitrarily, it allows for multiple comparison correction for a wide variety of applications.
 
