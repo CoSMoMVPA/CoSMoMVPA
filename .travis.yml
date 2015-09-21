@@ -11,6 +11,9 @@ cache:
 env:
  global:
     - OCTAVE=octave
+    - OCTAVE --eval=octave --eval
+    - COSMOPATH=`pwd`
+    - MVPAPATH=${COSMOPATH}/mvpa
  matrix:
     - EXTERNALS=""
     - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel"
@@ -35,26 +38,26 @@ before_install:
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
+    - cd MOxUnit
+    - make install
+    - cd ..
 install:
     - PTH=`pwd`
-    - BUILDCMD="more('off');"
-    - OCTAVEPTH="${PTH}"
+    - OCTAVERC=~/.octaverc
+    - OCTAVEPTH="${MVPAPATH}"
     - CHECKEXTCMD=""
     # optionally enable surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
-          BUILDCMD="${BUILDCMD}cd('${PTH}/surfing');";
-          BUILDCMD="${BUILDCMD}surfing_compile_mex();";
-          BUILDCMD="${BUILDCMD}surfing_set_path();";
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/surfing:${PTH}/surfing/surfing";
-          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('surfing');";
+          $OCTAVE --eval "cd('${PTH}/surfing');surfing_compile_mex;
+                        cd('${PTH}/surfing/surfing');
+                        surfing_set_path;savepath()";
       fi
 
     # optionally install afni
     - if [[ "$EXTERNALS" = *"afni"* ]]; then
           git clone git://github.com/afni/afni.git --depth 1;
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/afni/src/matlab";
-          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('afni');";
+          $OCTAVE --eval "addpath('${PTH}/afni/src/matlab');savepath();";
       fi
 
     # optionally install FieldTrip
@@ -65,18 +68,18 @@ install:
     # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
     - if [[ "$EXTERNALS" = *"fieldtrip"* ]]; then
           git clone -b _enh/octave git://github.com/nno/fieldtrip.git;
-          BUILDCMD="${BUILDCMD}ft_defaults();"
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/fieldtrip";
-          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('fieldtrip');";
+          $OCTAVE --eval "cd('${PTH}/fieldtrip');
+                            ft_defaults();
+                            savepath();";
       fi
 
     # optionally install libsvm
     - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
           git clone git://github.com/cjlin1/libsvm.git;
-          BUILDCMD="${BUILDCMD}cd('${PTH}/libsvm/matlab');";
-          BUILDCMD="${BUILDCMD}make;";
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/libsvm/matlab";
-          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('libsvm');";
+          $OCTAVE --eval "cd('${PTH}/libsvm/matlab');
+                        make;
+                        addpath(pwd);
+                        savepath();";
       fi
 
     # optionally install gifti library
@@ -85,50 +88,31 @@ install:
           GIFTI_NAME=gifti-${GIFTI_VERSION};
           wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;
           unzip ${GIFTI_NAME}.zip;
-          BUILDCMD="${BUILDCMD}cd('${PTH}/${GIFTI_NAME}/@gifti/private');";
-          BUILDCMD="${BUILDCMD}mex('zstream.c');";
-          OCTAVEPTH="${OCTAVEPTH}:${PTH}/${GIFTI_NAME}";
-          CHECKEXTCMD="${CHECKEXTCMD}cosmo_check_external('gifti');";
+          $OCTAVE --eval "cd('${PTH}/${GIFTI_NAME}/@gifti/private');
+                          mex('zstream.c');
+                          addpath('${PTH}/${GIFTI_NAME}');
+                          savepath();";
       fi
 
     # optionally enable Octave parallel package
     - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
-          BUILDCMD="${BUILDCMD}pkg('install','-forge','parallel');";
-          CHECKEXTCMD="${CHECKEXTCMD}pkg('load','parallel');";
+          $OCTAVE --eval "pkg('install','-forge','parallel');";
+          echo "" >> ~/.octaverc;
+          echo "pkg load parallel;" >> $OCTAVERC;
       fi
 
-    # show path
-    - BUILDCMD="${BUILDCMD}fprintf('path:\n%s\n', path());"
+    # disable "more"
+    - echo "more('off');" >> $OCTAVERC
 
-    # save path for when the script is being run
-    - BUILDCMD="${BUILDCMD};cd('$PTH');savepath();exit();"
+    # verify that externals are all there
+    - for i in $EXTERNALS; do
+          $OCTAVE --eval "addpath('$MVPAPATH');
+                          fprintf('External %s:\n','$i');
+                          r=cosmo_check_external('$i');
+                          exit(~r)" || exit 1;
+      done
 
-    # run build commands
-    - $OCTAVE --path "${OCTAVEPTH}" --eval "${BUILDCMD}"
-
-
-before_script:
-    # add path for CoSMoMVPA
-    - PTH=`pwd`
-    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/mvpa"
-    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/CoSMoMVPA/tests"
-    - OCTAVEPTH="${OCTAVEPTH}:${PTH}/MOxUnit/MOxUnit"
-    - TESTCMD="more('off');"
-    - TESTCMD="${TESTCMD}fprintf('pwd:%s\n',pwd());"
-    - TESTCMD="${TESTCMD}cosmo_set_path();"
-    - TESTCMD="${TESTCMD}fprintf('path:%s\n',path());"
-    - TESTCMD="${TESTCMD}${CHECKEXTCMD}"
-
-    # randomize number generator and print the state
-    - TESTCMD="${TESTCMD}prng_state=round(1000*clock());"
-    - TESTCMD="${TESTCMD}disp('PRNG state:');disp(prng_state);fprintf('\n');"
-    - TESTCMD="${TESTCMD}rand('state',prng_state);"
-
-    # run tests, and quit with error if any test fails or errors
-    - TESTDIR="CoSMoMVPA/tests"
-    - TESTCMD="${TESTCMD}passed=cosmo_run_tests('-verbose','${TESTDIR}');"
-    - TESTCMD="${TESTCMD}if(~passed),fprintf('\n\n');disp(cosmo_wtf());end;"
-    - TESTCMD="${TESTCMD}exit(~passed);"
 script:
-    - $OCTAVE --path "${OCTAVEPTH}" --eval "${TESTCMD}"
+    - cd ${COSMOPATH}
+    - make test
 
