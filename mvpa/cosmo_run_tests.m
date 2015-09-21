@@ -153,17 +153,10 @@ function did_pass=cosmo_run_tests(varargin)
         unittest_location=opt.filename;
         doctest_location=opt.filename;
 
-        filename_dir=which(opt.filename);
-        is_in_dir=@(parent, fn) ~isempty(strmatch(parent,fileparts(fn)));
-        has_unittest=is_in_dir(unittest_dir,filename_dir);
-        has_doctest=is_in_dir(doctest_dir,filename_dir);
     else
         % test a set of files in directories
         unittest_location=unittest_dir;
         doctest_location=doctest_dir;
-
-        has_unittest=true;
-        has_doctest=true;
     end
 
     % if opt.output is numeric it's assumed to be a file descriptor;
@@ -189,79 +182,242 @@ function did_pass=cosmo_run_tests(varargin)
 
     verbosity=opt.verbose+1;
 
-    unit_test_count=NaN;
-    doc_test_count=NaN;
+    unit_suite=get_suite(unittest_location,...
+                            unittest_dir,'unit');
+    doc_suite=get_suite(doctest_location,...
+                            doctest_dir,'doc');
 
-    switch test_suite_name
-        case 'xunit'
-            % start with empty test suite
-            suite=TestSuite();
+    did_pass=run_suites(fid,verbosity,{unit_suite,doc_suite});
 
-            % collect unit tests
-            if has_unittest
-                unittest_suite=TestSuite.fromName(unittest_location);
-                suite.add(unittest_suite);
-                unit_test_count=unittest_suite.numTestCases;
-            end
+function did_all_pass=run_suites(fid, verbosity, all_suites)
+    keep_msk=~cellfun(@isempty,all_suites);
+    suites=all_suites(keep_msk);
 
-            if has_doctest
-                doctest_suite=CosmoDocTestSuite(doctest_location);
-                suite.add(doctest_suite);
-                doc_test_count=doctest_suite.numTestCases;
-            end
+    show_test_count(suites,fid);
 
-            monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
-            monitor_constructor=monitor_constructors{verbosity};
+    suites=merge_suites(suites);
+    n_suites=numel(suites);
 
-            % xUnit does not report which tests were skipped
-            do_report_test_result=true;
-
-        case 'moxunit'
-            suite=MOxUnitTestSuite();
-            if isdir(unittest_location)
-                suite=addFromDirectory(suite,unittest_location);
-            else
-                suite=addFromFile(suite,unittest_location);
-            end
-
-            unit_test_count=countTestCases(suite);
-
-            monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
-
-            % MOxUnit reports which tests were skipped
-            do_report_test_result=false;
+    did_all_pass=true;
+    reporters=cell(n_suites,1);
+    for k=1:n_suites
+        suite_k=suites{k};
+        monitor_constructor=get_test_monitor_constructor(suite_k, ...
+                                                        verbosity);
+        [did_pass,reporters{k}]=run_single_suite(suite_k,...
+                                                monitor_constructor,fid);
+        did_all_pass=did_all_pass & did_pass;
     end
 
-    show_test_count(fid, 'unit',unit_test_count);
-    show_test_count(fid, 'doc',doc_test_count);
+    for k=1:n_suites
+        reporters{k}();
+    end
 
+function [did_pass,reporter]=run_single_suite(suite, ...
+                                monitor_constructor, fid)
     monitor = monitor_constructor(fid);
 
-    % run the tests
-    switch test_suite_name
-        case 'xunit'
+    switch get_suite_class(suite)
+        case 'TestSuite'
             did_pass=suite.run(monitor);
+            reporter=@()report_test_result(fid, did_pass);
 
-        case 'moxunit'
+        case 'MOxUnitTestSuite'
             test_result=run(suite, monitor);
-            disp(test_result);
+            reporter=@()disp(test_result);
 
             did_pass=wasSuccessful(test_result);
     end
 
-    if do_report_test_result
-        % only for xunit
-        report_test_result(fid, did_pass);
+function show_test_count(suite,fid)
+    if iscell(suite)
+        cellfun(@(s)show_test_count(s,fid),suite);
+        return;
+    end
+
+    count=suite_count(suite);
+    postfix=sprintf('%d tests', count);
+    fprintf(fid,'%s test suite: %s\n', class(suite), postfix);
+
+
+function merged=merge_suites(suites)
+    if numel(suites)==0
+        error('No suites found');
+    end
+
+    suite_classes=get_suite_class(suites);
+    if numel(suites)>0 && ...
+            all(strcmp(suite_classes{1},suite_classes(2:end)))
+        one_suite=suites{1};
+        one_class=suite_classes{1};
+
+        for k=2:numel(suites)
+            suite_k=suites{k};
+            switch one_class
+                case 'TestSuite'
+                    one_suite.add(suite_k);
+
+                case 'MOxUnitTestSuite'
+                    one_suite=addFromSuite(one_suite,suite_k);
+            end
+        end
+
+        merged={one_suite};
+
+        return;
+    end
+
+    merged=suites;
+
+
+function suite=get_suite(location,parent_dir,type)
+    suite=get_empty_suite(type);
+    if ~isempty(suite)
+        suite=suite_add_from_location(suite,location,parent_dir,type);
     end
 
 
-function show_test_count(fid, label, count)
-    if isnan(count)
-        postfix='no tests (not supported on this platform)';
+function suite=get_empty_suite(type)
+
+    switch get_suite_runner_name(type)
+        case 'moxunit'
+            suite=MOxUnitTestSuite();
+
+        case 'xunit'
+            suite=TestSuite();
+
+        case ''
+            suite=[];
+    end
+
+function monitor_constructor=get_test_monitor_constructor(suite, verbosity)
+    switch get_suite_class(suite)
+        case 'MOxUnitTestSuite'
+            monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
+
+        case 'TestSuite'
+            monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
+            monitor_constructor=monitor_constructors{verbosity};
+    end
+
+function tf=skip_location(location,parent_dir)
+    if isdir(location)
+        location_dir=location;
     else
-        postfix=sprintf('%d tests', count);
+        location_dir=fileparts(location);
     end
-    fprintf(fid,'%s test suite: %s\n', label, postfix);
+
+    if strcmp(location_dir,parent_dir)
+        tf=false;
+        return;
+    end
+
+    which_location=which(location);
+    if ~isempty(which_location);
+        location_dir=fileparts(which_location);
+        tf=~strcmp(location_dir,parent_dir);
+    end
+
+function suite_class=get_suite_class(suite)
+    if iscell(suite)
+        suite_class=cellfun(@get_suite_class,suite,...
+                                'UniformOutput',false);
+        return;
+    end
+
+    super_classes={'TestSuite','MOxUnitTestSuite'};
+    for k=1:numel(super_classes)
+        super_class=super_classes{k};
+        if isa(suite,super_class)
+            suite_class=super_class;
+        end
+    end
+
+
+function suite=suite_add_from_location(suite,location,parent_dir,type)
+    if skip_location(location,parent_dir)
+        return;
+    end
+
+    switch get_suite_class(suite)
+        case 'MOxUnitTestSuite'
+            if isdir(location)
+                suite=addFromDirectory(suite,location);
+            else
+                suite=addFromFile(suite,location);
+            end
+
+        case 'TestSuite'
+            location=regexprep(location,'\.m$','');
+
+            switch type
+                case 'doc'
+                    suite_to_add=CosmoDocTestSuite(location);
+
+                case 'unit'
+                    suite_to_add=TestSuite.fromName(location);
+
+            end
+
+            suite.add(suite_to_add);
+
+        otherwise
+            assert(false);
+    end
+
+function count=suite_count(suite)
+    switch get_suite_class(suite)
+        case 'MOxUnitTestSuite'
+            count=countTestCases(suite);
+
+
+        case 'TestSuite'
+            count=suite.numTestCases;
+    end
+
+function runner_name=get_suite_runner_name(type)
+    % helper function to get unit and doc test runner name
+    % result is 'moxunit' or 'xunit', or '' if not runner was found
+    has_moxunit=cosmo_check_external('moxunit',false);
+    has_xunit=cosmo_check_external('xunit',false);
+
+    if ~(has_moxunit || has_xunit)
+        if cosmo_wtf('is_matlab')
+            % on Matlab, suggest to use xunit because it provides doctest
+            % functionality
+            cosmo_check_external('xunit');
+        else
+            % on Octave, suggest to use moxunit because doctest
+            % functionality cannot be provided anyways
+            cosmo_check_external('moxunit');
+        end
+    end
+
+    which_dir=@(x)fileparts(which(x));
+    which_dir_init=which_dir('initTestSuite');
+    assert(~isempty(which_dir_init));
+
+    init_moxunit=isequal(which_dir_init,which_dir('moxunit_runtests'));
+    init_xunit=isequal(which_dir_init,which_dir('runtests'));
+
+    if init_moxunit
+        assert(~init_xunit)
+        if strcmp(type,'doc')
+            if has_xunit
+                runner_name='xunit';
+            else
+                runner_name='';
+            end
+        else
+            runner_name='moxunit';
+        end
+    else
+        assert(~init_moxunit);
+        runner_name='xunit';
+    end
+
+
+
 
 
 function report_test_result(fid, did_pass)
