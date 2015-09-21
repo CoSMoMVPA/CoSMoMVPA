@@ -503,9 +503,20 @@ function externals=get_externals_helper()
     externals.moxunit.is_present=@() has('moxunit_runtests');
     externals.moxunit.is_recent=yes;
     externals.moxunit.label=['Matlab/Octave MOxUnit '...
-                                        'Test Framework]'];
+                                        'Test Framework'];
     externals.moxunit.authors={'N. N. Oosterhof'};
-    externals.moxunit.url='https://github.com/nno/MOxUnit';
+    externals.moxunit.url='https://github.com/MOxUnit/MOxUnit';
+
+    externals.octave_pkg_parallel.is_present=@() cosmo_wtf(...
+                                                        'is_octave') && ...
+                                                    has('parcellfun');
+    externals.octave_pkg_parallel.is_recent=yes;
+    externals.octave_pkg_parallel.label=['GNU Octave parallel package'];
+    externals.octave_pkg_parallel.authors={'Hayato Fujiwara',...
+                                            'Jaroslav Hajek, Olaf Till'};
+    externals.octave_pkg_parallel.url=['http://http://octave.'...
+                                        'sourceforge.net/parallel/'];
+
 
 
 function version=get_libsvm_version()

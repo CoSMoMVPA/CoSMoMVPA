@@ -444,7 +444,7 @@ function nproc=get_nproc_available(sl_opt, environment)
 function nproc_available=get_nproc_available_matlab(nproc_wanted)
     matlab_parallel_functions={'gcp','parpool'};
 
-    if platform_has_functions(matlab_parallel_functions)
+    if usejava('jvm') && platform_has_functions(matlab_parallel_functions)
         pool = gcp();
 
         if isempty(pool)
@@ -467,7 +467,7 @@ function nproc_available=get_nproc_available_matlab(nproc_wanted)
         nproc_available=1;
         if nproc_wanted>nproc_available
             cosmo_warning(['nproc=%d requested but parallel toolbox '...
-                            'not available; using nproc=%d'], ...
+                            'or java not available; using nproc=%d'], ...
                             nproc_wanted, nproc_available);
         end
     end
@@ -477,8 +477,7 @@ function nproc_available=get_nproc_available_octave(nproc_wanted)
 % otherwise
 % (the parallel package does not support returning the number
 % of CPUs available)
-    octave_parallel_functions={'parcellfun','pararrayfun'};
-    if platform_has_functions(octave_parallel_functions)
+    if cosmo_check_external('octave_pkg_parallel',false)
         nworkers=nproc('all');
 
         if nproc_wanted>nworkers
