@@ -1,10 +1,16 @@
 function test_suite=test_cross_neighborhood()
     initTestSuite;
 
+function test_cross_neighborhood_time_freq()
+    helper_test_cross_neighborhood(false);
 
-function test_cross_neighborhood_basis()
-    can_use_chan_nbrhood=cosmo_check_external('fieldtrip',false);
+function test_cross_neighborhood_chan_time_freq()
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+    helper_test_cross_neighborhood(true);
 
+function helper_test_cross_neighborhood(can_use_chan_nbrhood)
     ds_full=cosmo_synthetic_dataset('type','timefreq','size','big');
     msk=cosmo_match(ds_full.fa.chan,@(x)x<20);
     ds_full=cosmo_dim_slice(ds_full,msk,2);
@@ -54,6 +60,7 @@ function test_cross_neighborhood_basis()
         use_time=mod(ceil(i/2),2)==1;
 
         if ~can_use_chan_nbrhood && use_chan
+            % no support for channel neighborhood, skip
             continue;
         end
 
@@ -121,11 +128,6 @@ function test_cross_neighborhood_basis()
             end
             assertEqual(nbrhood.neighbors{pos},find(dim_nbr_msk));
         end
-    end
-
-    if ~can_use_chan_nbrhood
-        cosmo_notify_test_skipped('channel neighborhood not available');
-        return;
     end
 
 function test_cross_neighborhood_transpose
