@@ -16,6 +16,10 @@ function test_searchlight_matlab_multithread()
         return;
     end
 
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
+
     opt=struct();
     opt.progress=false;
     opt.nproc=2;
@@ -30,6 +34,10 @@ function test_searchlight_octave_multithread()
         cosmo_notify_test_skipped('Octave parallel toolbox not available');
         return;
     end
+
+    warning_state=warning();
+    warning_resetter=onCleanup(@()warning(warning_state));
+    warning('off');
 
     opt=struct();
     opt.progress=false;
