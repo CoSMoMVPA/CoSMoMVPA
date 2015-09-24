@@ -1,7 +1,7 @@
-function chunks=cosmo_chunkize(ds,nchunks)
+function chunks=cosmo_chunkize(ds,nchunks_out)
 % assigns chunks that are as balanced as possible based on targets.
 %
-% chunks=cosmo_chunkize(ds_targets,nchunks)
+% chunks_out=cosmo_chunkize(ds_targets,nchunks_out)
 %
 % Inputs:
 %   ds             A dataset struct with fields:
@@ -9,11 +9,11 @@ function chunks=cosmo_chunkize(ds,nchunks)
 %    .sa.chunks    Px1 initial chunks for P samples; different values mean
 %                  that the corresponding data can be assumed to be
 %                  independent
-%   nchunks        scalar indicating how many different chunks should be
+%   nchunks_out    scalar indicating how many different chunks should be
 %                  assigned.
 %
 % Output:
-%   chunks         Px1 chunks assigned, in the range 1:nchunks. It is
+%   chunks_out     Px1 chunks assigned, in the range 1:nchunks. It is
 %                  required that N=numel(unique(ds.sa.targets)) is greater
 %                  than or equal to nchunks.
 %
@@ -51,11 +51,11 @@ function chunks=cosmo_chunkize(ds,nchunks)
 %     % Show result
 %     cosmo_disp([ds.sa.targets ds.sa.chunks])
 %     > [ 1         1
-%     >   2         2
-%     >   1         3
+%     >   2         1
+%     >   1         1
 %     >   :         :
-%     >   2         2
-%     >   1         3
+%     >   2         3
+%     >   1         4
 %     >   2         4 ]@48x2
 %
 % Notes:
@@ -76,37 +76,118 @@ function chunks=cosmo_chunkize(ds,nchunks)
 
     check_input(ds);
 
-    nsamples=size(ds.samples,1);
+    [idxs_tc,unq_tc]=cosmo_index_unique([ds.sa.targets ds.sa.chunks]);
+    nunq_ct=size(unq_tc,1);
 
-    [idxs_ct,unq_ct]=cosmo_index_unique(...
-                                        [ds.sa.chunks ds.sa.targets]);
+    [c_idxs,c_unq]=cosmo_index_unique(ds.sa.chunks);
+    nchunks_in=numel(c_unq);
 
-    [idxs_c,unq_c]=cosmo_index_unique(unq_ct(:,1));
-    [unused,unq_t]=cosmo_index_unique(unq_ct(:,2));
+    [t_unq,unused,t_mapping]=unique(ds.sa.targets);
+    nt=numel(t_unq);
 
-    nunq_c=numel(unq_c);
-    nunq_t=numel(unq_t);
-    nunq_ct=size(unq_ct,1);
-
-    if nunq_c*nunq_t<nunq_ct
+    if nunq_ct>nchunks_in*nt
         error(['Balance mismatch: there are %d unique chunks and '...
                 '%d unique targets, but the number of unique '...
-                'combinations is more than that, only %d'],...
-                nunq_c,nunq_t,nunq_ct);
+                'combinations is more than that: %d'],...
+                nchunks_in,nt,nunq_ct);
     end
 
-    if nchunks>nunq_c
+    if nchunks_out>nchunks_in
         error('Cannot make %d chunks, only %d are present',...
-                    nchunks,nunq_c);
+                    nchunks_out,nchunks_in);
     end
 
-    chunks=zeros(nsamples,1);
-
-    for k=1:nunq_c
-        rows=cat(1,idxs_ct{idxs_c{k}});
-        chunks(rows)=mod(k-1,nchunks)+1;
+    % Count for each chunk how often each target appears
+    %
+    % In the resulting histogram h_in, h_in(k,j)=c means that the k-th chunk
+    % contains the j-th target c times
+    h_in=zeros(nchunks_in,nt);
+    for k=1:nchunks_in
+        sample_idxs=c_idxs{k};
+        t_idxs=t_mapping(sample_idxs);
+        for j=1:numel(t_idxs)
+            t_idx=t_idxs(j);
+            h_in(k,t_idx)=h_in(k,t_idx)+1;
+        end
     end
 
+    % find best way to partition the nchunks_in chunks into
+    % nchunks_out sets
+    c_out_idxs=find_best_chunkization(h_in,nchunks_out);
+
+    nsamples=size(ds.samples,1);
+    chunks=NaN(nsamples,1);
+    for j=1:nchunks_out
+        sample_idxs=cat(1,c_idxs{c_out_idxs{j}});
+        chunks(sample_idxs)=j;
+    end
+    assert(~any(isnan(chunks)));
+
+function c_out_idxs=find_best_chunkization(h_in,nchunks_out)
+    [nchunks_in,nt]=size(h_in);
+
+    % keep a histogram of number of targets in each output chunk
+    h_out=zeros(nchunks_out,nt);
+
+    % allocate space for output
+    c_out_idxs=cell(nchunks_out,1);
+
+    % use a big cost to get a nice histogram for the output
+    big_cost=sum(h_in(:));
+
+    % keep track of which chunks have been used
+    visited=false(nchunks_in,1);
+
+    % in every iteration, find a new source chunk to add to the target
+    % indices. each chunk can have multiple targets.
+
+    % there are many ways to merge different chunks into one. Here a cost
+    % function is used that tries to spread samples from different chunks
+    % as evenly as possible
+
+    while ~all(visited)
+        min_cost=Inf;
+        for k=1:nchunks_in
+            if visited(k)
+                continue;
+            end
+            for j=1:nchunks_out
+                % try to add each chunk, one by one, and use the one that
+                % has the lowest cost
+                h_out_candidate=h_out;
+                h_out_candidate(j,:)=h_out_candidate(j,:)+h_in(k,:);
+
+                % compute variance
+                % (builtin 'var' function is much slower)
+                mu=sum(h_out_candidate,1)/nchunks_out;
+                cost=max(bsxfun(@minus,mu,h_out_candidate).^2)/...
+                                            (big_cost*nchunks_out);
+
+                % avoid empty rows or columns in h_in
+                mx=max(h_out_candidate,[],2);
+                mn=min(h_out_candidate,[],2);
+                delta=max(mx)-min(mx)+max(mn)-min(mn);
+
+                cost=cost+delta*big_cost;
+
+                if cost<=min_cost
+                    best_k=k;
+                    best_j=j;
+                    min_cost=cost;
+                end
+                if cost==0
+                    break;
+                end
+            end
+            if cost==0
+                break;
+            end
+        end
+
+        c_out_idxs{best_j}=[c_out_idxs{best_j} best_k];
+        h_out(best_j,:)=h_out(best_j,:)+h_in(best_k,:);
+        visited(best_k)=true;
+    end
 
 function check_input(ds)
     cosmo_check_dataset(ds);
