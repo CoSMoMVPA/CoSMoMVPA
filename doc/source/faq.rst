@@ -357,6 +357,8 @@ Run group analysis on time-by-time generalization measures
 
     and results would be joined into a single dataset by:
 
+        .. code-block:: matlab
+
             ds_tr=cosmo_stack(ds_cell_tr);
 
     Now group analysis can proceed using :ref:`cosmo_montecarlo_cluster_stat` as described in faq_run_group_analysis_.
