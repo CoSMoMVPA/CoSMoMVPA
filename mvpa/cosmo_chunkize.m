@@ -124,6 +124,60 @@ function chunks=cosmo_chunkize(ds,nchunks_out)
     assert(~any(isnan(chunks)));
 
 function c_out_idxs=find_best_chunkization(h_in,nchunks_out)
+    nsamples_per_chunk=sum(h_in,2);
+    is_all_independent=all(nsamples_per_chunk==0) || ...
+                all(nsamples_per_chunk==1);
+    if is_all_independent
+        % optimization in case of all independent chunks
+        chunkizer=@get_independent_chunkization;
+    else
+        is_balanced=all(h_in(1)==h_in(:));
+        if is_balanced
+            % optimization in case of balanced chunks
+            chunkizer=@get_balanced_chunkization;
+        else
+            % use slow function
+            chunkizer=@get_good_nondependent_chunkization;
+        end
+    end
+    c_out_idxs=chunkizer(h_in,nchunks_out);
+
+
+function c_out_idxs=get_independent_chunkization(h_in,nchunks_out)
+    assert(all(sum(h_in,2)==1));
+
+    nt=size(h_in,2);
+    c_out_idxs=cell(nchunks_out,1);
+    chunk_id=0;
+    for k=1:nt
+        rows=find(h_in(:,k));
+
+        for j=1:numel(rows)
+            chunk_id=mod(chunk_id,nchunks_out)+1;
+            c_out_idxs{chunk_id}=[c_out_idxs{chunk_id} rows(j)];
+        end
+    end
+
+function c_out_idxs=get_balanced_chunkization(h_in,nchunks_out)
+    assert(all(h_in(1)==h_in(:)));
+
+    [nchunks_in,nt]=size(h_in);
+    c_out_idxs=cell(nchunks_out,1);
+
+    for k=1:nchunks_out
+        chunk_ids=k:nchunks_out:nchunks_in;
+        c_out_idxs{k}=chunk_ids;
+    end
+
+
+function c_out_idxs=get_good_nondependent_chunkization(h_in,nchunks_out)
+% this function is used when h_in
+%
+% it involves trying to find a partiion of the rows in h_in so that
+% for each target, the number of samples for each target is approximately
+% equal across each partition element. The current algorithm is somewhat
+% slow and may also not find the 'best' possible partition.
+
     [nchunks_in,nt]=size(h_in);
 
     % keep a histogram of number of targets in each output chunk

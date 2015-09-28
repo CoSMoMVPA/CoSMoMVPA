@@ -56,8 +56,37 @@ function test_all_unique_chunks_tiny()
 
     assertExceptionThrown(@()cosmo_chunkize(ds,6),'');
 
+function test_chunkize_very_unbalanced_chunks_big()
+    % all chunks are unique, want a similar number of targets in each
+    % output chunk
+    ds=cosmo_synthetic_dataset('nreps',6,'ntargets',5);
 
-function test_all_unique_chunks_big()
+    nsamples=size(ds.samples,1);
+    ds.sa.chunks(:)=repmat((1:nsamples/10),1,10);
+
+    n_combis=max(ds.sa.chunks)*max(ds.sa.targets);
+
+    targets=ds.sa.targets;
+    n_swap=5;
+
+    while true
+        rp=randperm(nsamples);
+        ds.sa.targets=targets;
+        ds.sa.targets(rp(1:n_swap))=ds.sa.targets(rp(n_swap:-1:1));
+        idxs=cosmo_index_unique({ds.sa.targets,ds.sa.chunks});
+        n=cellfun(@numel,idxs);
+        if min(n)>=1 && max(n)<=3 && std(n)<.1 && numel(n)==n_combis
+            % not too unbalanced
+            break;
+        end
+    end
+
+    nchunks=ceil(3+rand()*4);
+    res=cosmo_chunkize(ds,nchunks);
+    assert_chunkize_ok(ds,res,nchunks);
+
+
+function test_chunkize_slight_unbalanced_chunks_big()
     % all chunks are unique, want a similar number of targets in each
     % output chunk
     ds=cosmo_synthetic_dataset('nreps',6,'ntargets',5);
@@ -66,36 +95,56 @@ function test_all_unique_chunks_big()
     ds.sa.chunks(:)=repmat((1:nsamples/2),1,2);
     ds.sa.targets(1:5)=ds.sa.targets(2:6); % slight imbalance
 
-    nchunks=ceil(rand()*10);
+    nchunks=ceil(rand()*5);
     res=cosmo_chunkize(ds,nchunks);
     assert_chunkize_ok(ds,res,nchunks);
 
 
-function test_all_unique_chunks_fully_balanceble()
+function test_chunkize_all_unique_independent_chunks()
+% each sample has its own unique chunk value
     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',6*6);
     nsamples=size(ds.samples,1);
     ds.sa.chunks(:)=ceil(rand()*10)+(1:nsamples);
     ds.sa.targets=ds.sa.targets(randperm(nsamples));
 
     nchunks_candidates=[1 2 3 4 6 12 18];
-    idx=ceil(rand()*numel(nchunks_candidates));
-    nchunks=nchunks_candidates(idx);
+    for nchunks=nchunks_candidates
+        chunks=cosmo_chunkize(ds,nchunks);
+        assert_chunkize_ok(ds,chunks,nchunks);
 
-    chunks=cosmo_chunkize(ds,nchunks);
-    assert_chunkize_ok(ds,chunks,nchunks);
+        idxs=cosmo_index_unique([ds.sa.targets chunks]);
+        n=cellfun(@numel,idxs);
 
-    idxs=cosmo_index_unique([ds.sa.targets chunks]);
-    n=cellfun(@numel,idxs);
-
-    % require full balance
-    assert(all(n(1)==n(2:end)));
-
-
-function assert_chunkize_ok(src_ds,chunks,count)
-    if nargin<3
-        count=numel(unique(src_ds.sa.chunks));
+        % require full balance
+        assert(all(n(1)==n(2:end)));
     end
 
+function test_chunkize_dependent_balanced_chunks()
+% each combination of chunks and targets occurs equally often
+    ntargets=ceil(2+rand()*4);
+    nreps=ceil(2+rand()*4);
+    nchunks=36;
+    ds=cosmo_synthetic_dataset('ntargets',ntargets,...
+                                'nchunks',nchunks,'nreps',nreps);
+    nsamples=size(ds.samples,1);
+    ds=cosmo_slice(ds,randperm(nsamples));
+
+    rep_idxs=cosmo_index_unique({ds.sa.chunks,ds.sa.targets});
+    assert(all(cellfun(@numel,rep_idxs)==nreps));
+
+    nchunks_candidates=[1 2 3 4 6 12 18];
+    for nchunks=nchunks_candidates
+        chunks=cosmo_chunkize(ds,nchunks);
+        assert_chunkize_ok(ds,chunks,nchunks);
+
+        idxs=cosmo_index_unique([ds.sa.targets chunks]);
+        n=cellfun(@numel,idxs);
+
+        % require full balance
+        assert(all(n(1)==n(2:end)));
+    end
+
+function assert_chunkize_ok(src_ds,chunks,count)
     % number of items must match input dataset
     assertEqual(numel(src_ds.sa.chunks),numel(chunks));
 
@@ -119,7 +168,7 @@ function assert_chunks_targets_balanced(src_ds,chunks)
     % cannot test for 'optimal' balance due to combinatorial explosion;
     % this is a decent approach to make sure that chunks are not too
     % imbalanced
-    assert(std(n)<=1);
+    assert(std(n)<=1.5);
     assert(min(n)+2>=max(n));
 
 
