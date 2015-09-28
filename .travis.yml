@@ -11,7 +11,6 @@ cache:
 env:
  global:
     - OCTAVE=octave
-    - OCTAVE --eval=octave --eval
     - COSMOPATH=`pwd`
     - MVPAPATH=${COSMOPATH}/mvpa
  matrix:
@@ -44,7 +43,7 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH="${MVPAPATH}"
     - CHECKEXTCMD=""
-    # optionally enable surfing toolbox
+    # optionally install surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
           make -C surfing install;
