@@ -11,7 +11,6 @@ cache:
 env:
  global:
     - OCTAVE=octave
-    - OCTAVE --eval=octave --eval
     - COSMOPATH=`pwd`
     - MVPAPATH=${COSMOPATH}/mvpa
  matrix:
@@ -38,20 +37,16 @@ before_install:
     # go up one level to retrieve MOxUnit
     - cd ..
     - git clone git://github.com/nno/MOxUnit.git
-    - cd MOxUnit
-    - make install
-    - cd ..
+    - make -C MOxUnit install
 install:
     - PTH=`pwd`
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH="${MVPAPATH}"
     - CHECKEXTCMD=""
-    # optionally enable surfing toolbox
+    # optionally install surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
-          $OCTAVE --eval "cd('${PTH}/surfing');surfing_compile_mex;
-                        cd('${PTH}/surfing/surfing');
-                        surfing_set_path;savepath()";
+          make -C surfing install;
       fi
 
     # optionally install afni
