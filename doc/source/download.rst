@@ -22,37 +22,40 @@ For the patient
 
 The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <cimec2014>` and the :ref:`demos <contents_demo.rst>`.
 
-* Get the CoSMoMVPA_ source code:
+* Installation of CoSMoMVPA:
 
-    + ``git`` users::
+    - Users on the Unix platform using the command line::
 
-        git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+            git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+            make -C CoSMoMVPA install
 
-    + everybody else: download the `zip archive`_.
+    - Everybody else:
 
-* Add the source code directories to the Matlab_ / Octave_ path, by changing the directory to the CoSMoMVPA_ ``/mvpa`` directory, then running
+        + Download the `zip archive`_.
 
-    .. code-block:: matlab
+        +  Add the source code directories to the Matlab_ / Octave_ path, by changing the directory to the CoSMoMVPA_ ``/mvpa`` directory, then run:
 
-        cosmo_set_path
+            .. code-block:: matlab
 
-    (alternatively, add the ``mvpa`` and ``external`` directories, and their subdirectories to the path).
+                cosmo_set_path
 
-    Then run
+            (alternatively, add the ``mvpa`` and ``external`` directories, and their subdirectories to the path).
 
-    .. code-block:: matlab
+            Then run
 
-        savepath
+            .. code-block:: matlab
 
-    to store the new path permanently.
+                savepath
 
-    To check that things are working, run:
+            to store the new path permanently.
 
-    .. code-block:: matlab
+            To check that things are working, run:
 
-        cosmo_wtf
+            .. code-block:: matlab
 
-    which should provide a report of available system information.
+                cosmo_wtf
+
+            which should provide a report of available system information.
 
 .. _`get_octave_packages`:
 
@@ -92,7 +95,7 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 .. _`get_tutorial_data`:
 
-* Download the tutorial data:
+* To download the tutorial data:
 
     - Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
     - Advanced Unix users: ``cd`` to the CoSMoMVPA directory, then run::
@@ -125,8 +128,6 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
         ds=cosmo_fmri_dataset(fullfile(data_path,'vt_mask.nii'),'mask',true);
         cosmo_map2fmri(ds,fullfile(config.output_data_path,'test.nii'));
 
-    (Running these commands may give a warning message ``flip_orient field found``, which can safely be ignored.)
-
     If no errors are raised and a file ``test.nii`` is created in the output_data_path, then you are good to go.
 
 .. _`keep_code_up_to_date`:
@@ -142,7 +143,7 @@ CoSMoMVPA_ code may change rapidly. To stay up to date:
     git checkout master
     git pull origin master
 
-* everybody else: you would have to re-download the `zip archive`_ and update your local Matlab files. (At the moment we do not provide automatic detection of code that is out of date.)
+* everybody else: you would have to re-download the `zip archive`_ and update your local ``.m`` files. (At the moment we do not provide automatic detection of code that is out of date.)
 
 
 External dependencies

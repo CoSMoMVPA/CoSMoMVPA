@@ -3,6 +3,7 @@
     + ``git`` users::
 
         git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
+        make -C CoSMoMVPA install
 
     + also available as `zip archive`_.
 
