@@ -103,9 +103,9 @@ function rps=randperms_with_size(sizes,opt)
     % single call to cosmo_rand, because this call is computationally
     % expensive
     if isfield(opt,'seed')
-        r=cosmo_rand(cum_size,'seed',opt.seed);
+        r=cosmo_rand(1,cum_size,'seed',opt.seed);
     else
-        r=cosmo_rand(cum_size);
+        r=cosmo_rand(1,cum_size);
     end
 
     n=numel(sizes);
