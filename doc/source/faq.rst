@@ -586,6 +586,54 @@ Note that several fMRI visualization packages can also visualize fMRI datasets w
 
 For example, MRIcron_ can be used to visualize each of the volumes in the resulting NIFTI file.
 
+Average along features in a neighborhood
+---------------------------------------
+'I have defined a :ref:`neighborhood <cosmomvpa_neighborhood>` for my dataset, and now I would like to compute the average across features at each searchlight location. How can I do that?'
+
+To average along features, you can define a new measure:
+
+    .. code-block:: matlab
+
+        function ds_mean=my_averaging_measure(ds)
+        % compute the average along features, and copies .sa
+        % and .a.sdim, if present
+
+            ds_mean=struct();
+            ds_mean.samples=mean(ds.samples,2);
+
+            if cosmo_isfield(ds,'sa')
+                ds_mean.sa=ds.sa;
+            end
+
+            if cosmo_isfield(ds,'a.sdim')
+                ds_mean.a.sdim=ds.a.sdim;
+            end
+
+This measure can then be used directly with :ref:`cosmo_searchlight`. Note that the output has the same number of samples as the input dataset (i.e., ``.samples`` has the same number of rows); depending on how the neighborhood is defined, the number of features in the output dataset may either be the same as or different from the input dataset.
+
+It is also possible to define such a measure *inline*; for example, if the input dataset has ``.sa`` but not ``.a.sdim`` (this is the most common case; but exceptions are outputs from :ref:`cosmo_dim_generalization_measure` and :ref:`cosmo_dissimilarity_matrix_measure`), then the following computes the average across voxels at each neighborhood location:
+
+    .. code-block:: matlab
+
+        % tiny dataset: 6 voxels
+        ds=cosmo_synthetic_dataset();
+
+        % tiny radius: 1 voxel
+        nh=cosmo_spherical_neighborhood(ds,'radius',1);
+
+        % define averaging measure inline
+        my_averageing_measure=@(x,opt) cosmo_structjoin(...
+                                            'samples',mean(x.samples,2),...
+                                            'sa',x.sa);
+
+        % compute average in each neighorhood location across features (voxels)
+        ds_mean=cosmo_searchlight(ds,nh,my_averageing_measure);
+
+The line approach may be a bit slower than defining a separate function, but the speed difference is usually not substantial.
+
+
+
+
 
 
 
