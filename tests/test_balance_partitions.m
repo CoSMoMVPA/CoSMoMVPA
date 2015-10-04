@@ -145,7 +145,7 @@ function test_balance_partitions_nmin
     nclasses=4;
     [p,ds]=get_sample_data(nsamples,nchunks,nclasses);
 
-    nmin=10;
+    nmin=8+round(rand()*4);
     args={'nmin',nmin};
     b=cosmo_balance_partitions(p,ds,args{:});
 

@@ -16,6 +16,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %                     nmin times in each training set (some samples may
 %                     be repeated more often than than). This option, if
 %                     provided, is not compatible with 'nrepeats'.
+%   'balance_test'    If set to false, indices in the test set are not
+%                     necessarility balanced. The default is true
 %
 % Ouput:
 %   bpartitions    similar struct as input partitions, except that
