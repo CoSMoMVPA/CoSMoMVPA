@@ -104,8 +104,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 % NNO Dec 2013
 
     defaults=struct();
-    defaults.nrep=1;
     defaults.seed=1;
+    defaults.balance_test=false;
     params=cosmo_structjoin(defaults,varargin);
 
     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true);
@@ -120,35 +120,40 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
     for j=1:nfolds_in
         tr_idx=partitions.train_indices{j};
         te_idx=partitions.test_indices(j);
-        targets=ds.sa.targets(tr_idx);
-        [fold_classes,fold_class_pos]=get_classes(targets);
+        tr_targets=ds.sa.targets(tr_idx);
+        [tr_fold_classes,tr_fold_class_pos]=get_classes(tr_targets);
 
-        if ~isequal(fold_classes,classes)
-            missing=setdiff(classes,fold_classes);
+        if ~isequal(tr_fold_classes,classes)
+            missing=setdiff(classes,tr_fold_classes);
             error('missing class %d in fold %d', missing(1), j);
         end
 
         % see how many output folds for the current input fold
-        nfolds_out=get_nfolds_out(fold_class_pos,params);
+        tr_nfolds_out=get_nfolds_out(tr_fold_class_pos,params);
 
-        % sample from the indices
-        folds_out=sample_class_pos(fold_class_pos,nfolds_out,params);
+        train_indices_out{j}=sample_indices(tr_idx,tr_fold_class_pos,...
+                                            tr_nfolds_out,params);
 
-        % assing training indices
-        tr_folds_out=cell(1,nfolds_out);
-        for k=1:nfolds_out
-            tr_folds_out{k}=tr_idx(folds_out{k});
-        end
-        train_indices_out{j}=tr_folds_out;
-
-        % copy test indices
-        test_indices_out{j}=repmat(te_idx,1,nfolds_out);
+        assert(~params.balance_test);
+        test_indices_out{j}=repmat(te_idx,1,tr_nfolds_out);
     end
 
     bal_partitions=struct();
     bal_partitions.train_indices=cat(2,train_indices_out{:});
     bal_partitions.test_indices=cat(2,test_indices_out{:});
 
+
+function tr_folds_out=sample_indices(target_idx,fold_class_pos,...
+                                        nfolds_out,params)
+    % sample from the indices
+    tr_folds_out_indices=sample_class_pos(fold_class_pos,...
+                                            nfolds_out,params);
+
+    % assing training indices
+    tr_folds_out=cell(1,nfolds_out);
+    for k=1:nfolds_out
+        tr_folds_out{k}=target_idx(tr_folds_out_indices{k});
+    end
 
 
 function [classes,class_pos]=get_classes(targets)
