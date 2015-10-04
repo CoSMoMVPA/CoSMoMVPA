@@ -107,7 +107,7 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 
     defaults=struct();
     defaults.seed=1;
-    defaults.balance_test=false;
+    defaults.balance_test=true;
     params=cosmo_structjoin(defaults,varargin);
 
     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true);
@@ -121,23 +121,35 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 
     for j=1:nfolds_in
         tr_idx=partitions.train_indices{j};
-        te_idx=partitions.test_indices(j);
+        te_idx=partitions.test_indices{j};
         tr_targets=ds.sa.targets(tr_idx);
         [tr_fold_classes,tr_fold_class_pos]=get_classes(tr_targets);
 
+
         if ~isequal(tr_fold_classes,classes)
             missing=setdiff(classes,tr_fold_classes);
-            error('missing class %d in fold %d', missing(1), j);
+            error('missing training class %d in fold %d', missing(1), j);
         end
 
         % see how many output folds for the current input fold
-        tr_nfolds_out=get_nfolds_out(tr_fold_class_pos,params);
+        nfolds_out=get_nfolds_out(tr_fold_class_pos,params);
 
         train_indices_out{j}=sample_indices(tr_idx,tr_fold_class_pos,...
-                                            tr_nfolds_out,params);
+                                            nfolds_out,params);
 
-        assert(~params.balance_test);
-        test_indices_out{j}=repmat(te_idx,1,tr_nfolds_out);
+        if params.balance_test
+            te_targets=ds.sa.targets(te_idx);
+
+            [te_fold_classes,te_fold_class_pos]=get_classes(te_targets);
+            if ~isequal(te_fold_classes,classes)
+                missing=setdiff(classes,tr_fold_classes);
+                error('missing test class %d in fold %d', missing(1), j);
+            end
+            test_indices_out{j}=sample_indices(te_idx,te_fold_class_pos,...
+                                            nfolds_out,params);
+        else
+            test_indices_out{j}=repmat({te_idx},1,nfolds_out);
+        end
     end
 
     bal_partitions=struct();
