@@ -166,7 +166,7 @@ function nfolds=get_nfolds_out(class_pos,params)
     % class
     if isfield(params,'nmin')
         if isfield(params,'nrepeats')
-            error(['options ''nmin'' and nrepeat'' are '...
+            error(['options ''nmin'' and nrepeats'' are '...
                         'mutually exclusive']);
         else
             targets_hist=cellfun(@numel,class_pos);
