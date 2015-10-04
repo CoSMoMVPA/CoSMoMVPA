@@ -58,10 +58,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     >       7 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 2
-%     >       4      3
-%     >       5      7
-%     >       6 ]    8
-%     >              9 ] }
+%     >       5      3
+%     >       6 ]    7 ] }
 %     %
 %     % make balancing where each sample in each training fold is used at
 %     % least once
@@ -73,10 +71,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     >       7 ]    9 ]    8 ]    6 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 1    [ 1    [ 2    [ 2
-%     >       4      4      4      3      3
-%     >       5      5      5      7      7
-%     >       6 ]    6 ]    6 ]    8      8
-%     >                            9 ]    9 ] }
+%     >       5      4      5      3      3
+%     >       6 ]    6 ]    6 ]    7 ]    9 ] }
 %     %
 %     % triple the number of partitions and sample from training indices
 %     q=cosmo_balance_partitions(p,ds,'nrepeats',3);
@@ -87,10 +83,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     >       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
 %     > .test_indices
 %     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
-%     >       4      4      4      3      3      3
-%     >       5      5      5      7      7      7
-%     >       6 ]    6 ]    6 ]    8      8      8
-%     >                            9 ]    9 ]    9 ] }
+%     >       5      4      5      3      3      3
+%     >       6 ]    6 ]    6 ]    7 ]    9 ]    8 ] }
 %
 % Notes:
 % - this function is intended for datasets where the number of
