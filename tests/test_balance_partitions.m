@@ -27,24 +27,116 @@ function test_balance_partitions_repeats
         for j=1:nfolds
             pi=p.train_indices{j};
             pt=ds.sa.targets(pi);
-            pc=ds.sa.chunks(pi);
 
             for k=1:nrep
-                bi=b.train_indices{(j-1)*nrep+k};
+                fold_i=(j-1)*nrep+k;
+                bi=b.train_indices{fold_i};
                 bt=ds.sa.targets(bi);
-                bc=ds.sa.chunks(bi);
-                assertEqual(unique(bt)',1:nclasses);
                 h=histc(bt,1:nclasses)';
                 assertTrue(all(min(histc(pt,1:nclasses))==h));
-
-                % no new targets introduced
-                assertEqual(setdiff(bt,pt),zeros(0,1));
-
-                % no double dipping
-                assertEqual(unique(pc),unique(bc));
             end
         end
+
+        assert_partitions_ok(ds,b,false);
+        assert_balanced_partitions_subset(p,b);
     end
+
+function assert_balanced_partitions_subset(unbal_partitions,bal_partitions)
+% each training and test fold in bal_partitions must correspond to
+% a fold in the original partitions
+    nsamples=max([cellfun(@max,unbal_partitions.train_indices) ...
+                    cellfun(@max,unbal_partitions.test_indices)]);
+    unbal_nfolds=numel(unbal_partitions.train_indices);
+
+    % see which indices were used in each fold
+    msk_train=find_member(unbal_partitions,'train_indices',nsamples);
+    msk_test=find_member(unbal_partitions,'test_indices',nsamples);
+
+    unbal_was_used=false(unbal_nfolds,1);
+
+    bal_nfolds=numel(bal_partitions.train_indices);
+    for fold_i=1:bal_nfolds
+        bal_train=bal_partitions.train_indices{fold_i};
+        bal_test=bal_partitions.test_indices{fold_i};
+
+        candidate_msk=all(msk_train(:,bal_train),2) & ...
+                            all(msk_test(:,bal_test),2);
+
+        assert(any(candidate_msk));
+        unbal_was_used(candidate_msk)=true;
+    end
+
+    assertEqual(unbal_was_used,true(unbal_nfolds,1));
+
+function msk=find_member(partitions, label, nsamples)
+    folds=partitions.(label);
+    nfolds=numel(folds);
+    msk=false(nfolds,nsamples);
+    for k=1:nfolds
+        msk(k,folds{k})=true;
+    end
+
+function assert_partitions_ok(ds, partitions, balanced_test_indices)
+    assertEqual(sort(fieldnames(partitions)),sort({'train_indices';...
+                                                   'test_indices'}));
+    nfolds=numel(partitions.train_indices);
+    assertEqual(numel(partitions.test_indices),nfolds);
+
+    for fold_i=1:nfolds
+        assert_fold_balanced(ds,partitions,fold_i, 'train_indices');
+        if balanced_test_indices
+            assert_fold_balanced(ds,partitions,fold_i, 'test_indices');
+        end
+        assert_fold_no_double_dipping(ds,partitions,fold_i);
+        assert_fold_targets_match(ds,partitions,fold_i);
+        assert_fold_indices_unique(partitions,fold_i);
+    end
+
+function assert_fold_no_double_dipping(ds, partitions, fold)
+    train_indices=partitions.train_indices;
+    test_indices=partitions.test_indices;
+
+    train_chunks=ds.sa.chunks(train_indices{fold});
+    test_chunks=ds.sa.chunks(test_indices{fold});
+
+    assert(isempty(intersect(train_chunks,test_chunks)));
+
+
+function assert_fold_balanced(ds, partitions, fold, label)
+    all_indices=partitions.(label);
+    indices=all_indices{fold};
+
+    unq_targets=unique(ds.sa.targets);
+    targets=ds.sa.targets(indices);
+
+    assertEqual(unique(targets),unq_targets);
+    h=histc(targets,unq_targets);
+    assertEqual(h(1)*ones(size(h)),h);
+
+function assert_fold_targets_match(ds,partitions,fold)
+    train_indices=partitions.train_indices{fold};
+    test_indices=partitions.test_indices{fold};
+
+    nsamples=size(ds.samples,1);
+    assert_all_int_with_max(train_indices,nsamples);
+    assert_all_int_with_max(test_indices,nsamples);
+
+    train_targets=ds.sa.targets(train_indices);
+    test_targets=ds.sa.targets(test_indices);
+    assertEqual(unique(train_targets),unique(test_targets));
+
+function assert_fold_indices_unique(partitions,fold)
+    train_indices=partitions.train_indices{fold};
+    test_indices=partitions.test_indices{fold};
+
+    assert(isequal(sort(train_indices),unique(train_indices)));
+    assert(isequal(sort(test_indices),unique(test_indices)));
+
+function assert_all_int_with_max(indices,max_value)
+    assert(min(indices)>=1);
+    assert(max(indices)<=max_value);
+    assert(all(round(indices)==indices));
+
 
 
 function test_balance_partitions_nmin
@@ -81,6 +173,9 @@ function test_balance_partitions_nmin
         assert(min(counter(msk,k))>=nmin);
         assert(all(counter(~msk,k)==0));
     end
+
+    assert_partitions_ok(ds,b,false);
+    assert_balanced_partitions_subset(p,b);
 
 function test_balance_partitions_exceptions
 
