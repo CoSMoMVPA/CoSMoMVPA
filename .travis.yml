@@ -98,6 +98,7 @@ install:
 
     # optionally enable Octave statitics package
     - if [[ "$EXTERNALS" = *"octave_pkg_statistics"* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','io');";
           $OCTAVE --eval "pkg('install','-forge','statistics');";
           echo "pkg load statistics;" >> $OCTAVERC;
       fi
