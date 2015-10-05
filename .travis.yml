@@ -15,7 +15,7 @@ env:
     - MVPAPATH=${COSMOPATH}/mvpa
  matrix:
     - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics"
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -96,6 +96,12 @@ install:
           echo "pkg load parallel;" >> $OCTAVERC;
       fi
 
+    # optionally enable Octave statitics package
+    - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','statistics');";
+          echo "pkg load statistics;" >> $OCTAVERC;
+      fi
+
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
 
@@ -104,6 +110,7 @@ install:
           $OCTAVE --eval "addpath('$MVPAPATH');
                           fprintf('External %s:\n','$i');
                           r=cosmo_check_external('$i');
+                          disp(r);
                           exit(~r)" || exit 1;
       done
 
