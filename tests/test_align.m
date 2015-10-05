@@ -62,5 +62,23 @@ function test_align_basics
 
     aet({'b','c','d','d'},{'d','b','c','d'});
 
+function test_align_multiple_nans
+    n_rows_half=20+ceil(rand()*20);
+    x=ceil(rand(n_rows_half*2,2)*sqrt(n_rows_half));
+    rp=randperm(2*n_rows_half);
 
+    rp1=rp(1:n_rows_half);
+    rp2=rp(n_rows_half+(1:n_rows_half));
+
+    % half of the rows become NaN
+    x(rp1,1)=NaN;
+    x(rp1,2)=1:n_rows_half;
+    x(rp2,1)=1:n_rows_half;
+    x(rp2,2)=1:n_rows_half;
+
+    rp2=randperm(n_rows_half*2);
+    y=x(rp2,:);
+
+    assertExceptionThrown(@()cosmo_align(...
+                            {x(:,1),x(:,2)},{y(:,1),y(:,2)}),'');
 

@@ -140,11 +140,7 @@ function [idxs,input_is_array]=index_unique_per_value(values)
     for k=1:ndim
         vs=values{k};
 
-        if ~is_1d(vs)
-            error('element %d is not one-dimensional',k);
-        end
-
-        [unused,unused,idx]=unique(vs);
+        idx=unique_indices_from_vector(vs);
 
         % ensure all elements in values have the same size
         nv=numel(idx);
@@ -160,6 +156,14 @@ function [idxs,input_is_array]=index_unique_per_value(values)
 
         idxs(:,k)=idx;
     end
+
+function idx=unique_indices_from_vector(vs)
+    if ~is_1d(vs)
+        error('element %d is not one-dimensional',k);
+    end
+
+    [unused,unused,idx]=unique(vs);
+
 
 function tf=is_1d(x)
     tf=sum(size(x)>1)<=1;

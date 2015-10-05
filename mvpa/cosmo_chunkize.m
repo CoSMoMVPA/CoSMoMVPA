@@ -52,7 +52,7 @@ function chunks=cosmo_chunkize(ds,nchunks_out)
 %     cosmo_disp([ds.sa.targets ds.sa.chunks])
 %     > [ 1         1
 %     >   2         1
-%     >   1         1
+%     >   1         2
 %     >   :         :
 %     >   2         3
 %     >   1         4
