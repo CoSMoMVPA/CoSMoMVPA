@@ -43,6 +43,21 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH="${MVPAPATH}"
     - CHECKEXTCMD=""
+
+    # optionally enable Octave parallel package
+    - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','parallel');";
+          echo "" >> ~/.octaverc;
+          echo "pkg load parallel;" >> $OCTAVERC;
+      fi
+
+    # optionally enable Octave statitics package
+    - if [[ "$EXTERNALS" = *"octave_pkg_statistics"* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','io');";
+          $OCTAVE --eval "pkg('install','-forge','statistics');";
+          echo "pkg load statistics;" >> $OCTAVERC;
+      fi
+
     # optionally install surfing toolbox
     - if [[ "$EXTERNALS" = *"surfing"* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
@@ -87,20 +102,6 @@ install:
                           mex('zstream.c');
                           addpath('${PTH}/${GIFTI_NAME}');
                           savepath();";
-      fi
-
-    # optionally enable Octave parallel package
-    - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','parallel');";
-          echo "" >> ~/.octaverc;
-          echo "pkg load parallel;" >> $OCTAVERC;
-      fi
-
-    # optionally enable Octave statitics package
-    - if [[ "$EXTERNALS" = *"octave_pkg_statistics"* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','io');";
-          $OCTAVE --eval "pkg('install','-forge','statistics');";
-          echo "pkg load statistics;" >> $OCTAVERC;
       fi
 
     # disable "more"
