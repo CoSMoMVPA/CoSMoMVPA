@@ -507,9 +507,8 @@ function externals=get_externals_helper()
     externals.moxunit.authors={'N. N. Oosterhof'};
     externals.moxunit.url='https://github.com/MOxUnit/MOxUnit';
 
-    externals.octave_pkg_parallel.is_present=@() cosmo_wtf(...
-                                                        'is_octave') && ...
-                                                    has('parcellfun');
+    externals.octave_pkg_parallel.is_present=@() has_octave_package(...
+                                                    'parallel');
     externals.octave_pkg_parallel.is_recent=yes;
     externals.octave_pkg_parallel.label=['GNU Octave parallel package'];
     externals.octave_pkg_parallel.authors={'Hayato Fujiwara',...
@@ -517,7 +516,17 @@ function externals=get_externals_helper()
     externals.octave_pkg_parallel.url=['http://http://octave.'...
                                         'sourceforge.net/parallel/'];
 
+    externals.octave_pkg_statistics.is_present=@() has_octave_package(...
+                                                    'parallel');
+    externals.octave_pkg_statistics.is_recent=yes;
+    externals.octave_pkg_statistics.label=['GNU Octave statistics '...
+                                                'package'];
+    externals.octave_pkg_statistics.authors={'Arno Onken'};
+    externals.octave_pkg_statistics.url=['http://http://octave.'...
+                                        'sourceforge.net/statistics/'];
 
+function tf=has_octave_package(label)
+    tf=cosmo_wtf('is_octave') && ~isempty(pkg('list',label));
 
 function version=get_libsvm_version()
     svm_root=fileparts(fileparts(noerror_which('svmpredict')));

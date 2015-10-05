@@ -106,15 +106,6 @@ install:
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
 
-    # verify that externals are all there
-    - for i in $EXTERNALS; do
-          $OCTAVE --eval "addpath('$MVPAPATH');
-                          fprintf('External %s:\n','$i');
-                          r=cosmo_check_external('$i');
-                          disp(r);
-                          exit(~r)" || exit 1;
-      done
-
 script:
     - cd ${COSMOPATH}
     - make test
