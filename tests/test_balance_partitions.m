@@ -7,17 +7,39 @@ function test_balance_partitions_repeats
     nclasses=4;
     [p,ds]=get_sample_data(nsamples,nchunks,nclasses);
 
+    opt_cell={{ {'balance_test',false},...
+            {'balance_test',true},...
+            {},...
+          },...
+          { {'nrepeats',1},...
+            {'nrepeats',5},...
+            {}...
+          },...
+          { {'opt_as_struct',false},...
+            {'opt_as_struct',true},...
+          }};
+    opt_prod=cosmo_cartprod(opt_cell);
 
-    for pos=[0 1 5]
-        if pos==0
-            nrep=1;
-            args={};
+    defaults=struct();
+    defaults.nrepeats=1;
+    defaults.balance_test=true;
+
+    for k=1:size(opt_prod,1)
+        opt=opt_prod(k,:);
+        opt_struct=cosmo_structjoin(opt);
+        opt_as_struct=opt_struct.opt_as_struct;
+        opt_struct=rmfield(opt_struct,'opt_as_struct');
+        if opt_as_struct;
+            args=opt_struct;
         else
-            nrep=pos;
-            args={'nrepeats',nrep};
+            args=[fieldnames(opt_struct) struct2cell(opt_struct)]';
         end
 
-        b=cosmo_balance_partitions(p,ds,args{:});
+        b=cosmo_balance_partitions(p,ds,args);
+
+        full_args=cosmo_structjoin(defaults,args);
+        nrep=full_args.nrepeats;
+        balance_test=full_args.balance_test;
 
         assertEqual(numel(b.train_indices),nrep*nchunks);
         assertEqual(numel(b.test_indices),nrep*nchunks);
@@ -37,7 +59,7 @@ function test_balance_partitions_repeats
             end
         end
 
-        assert_partitions_ok(ds,b,false);
+        assert_partitions_ok(ds,b,balance_test);
         assert_balanced_partitions_subset(p,b);
     end
 
@@ -146,36 +168,49 @@ function test_balance_partitions_nmin
     [p,ds]=get_sample_data(nsamples,nchunks,nclasses);
 
     nmin=8+round(rand()*4);
-    args={'nmin',nmin};
-    b=cosmo_balance_partitions(p,ds,args{:});
+    args=struct();
+    args.nmin=nmin;
+    args.balance_test=[false,true];
 
-    counter=zeros(nsamples,nchunks);
+    arg_prod=cosmo_cartprod(args);
 
-    for j=1:numel(b.train_indices)
-        bi=b.train_indices{j};
-        bj=b.test_indices{j};
+    for arg_i=1:numel(arg_prod)
+        arg=arg_prod{arg_i};
+        b=cosmo_balance_partitions(p,ds,arg);
 
-        ch=unique(ds.sa.chunks(bj));
-        assert(numel(ch)==1);
+        counter=zeros(nsamples,nchunks);
 
-        assertEqual(bj,p.test_indices{ch});
+        for j=1:numel(b.train_indices)
+            bi=b.train_indices{j};
+            bj=b.test_indices{j};
 
-        bt=ds.sa.targets(bi);
+            ch=unique(ds.sa.chunks(bj));
+            assert(numel(ch)==1);
 
-        h=histc(bt,1:nclasses);
-        assertEqual(ones(nclasses,1)*h(1),h);
+            if arg.balance_test
+                % no other indices
+                assertEqual(setdiff(bj,p.test_indices{ch}),zeros(0,1));
+            else
+                assertEqual(sort(bj),p.test_indices{ch});
+            end
 
-        counter(bi,ch)=counter(bi,ch)+1;
+            bt=ds.sa.targets(bi);
+
+            h=histc(bt,1:nclasses);
+            assertEqual(ones(nclasses,1)*h(1),h);
+
+            counter(bi,ch)=counter(bi,ch)+1;
+        end
+
+        for k=1:nchunks
+            msk=ds.sa.chunks~=k;
+            assert(min(counter(msk,k))>=nmin);
+            assert(all(counter(~msk,k)==0));
+        end
+
+        assert_partitions_ok(ds,b,arg.balance_test);
+        assert_balanced_partitions_subset(p,b);
     end
-
-    for k=1:nchunks
-        msk=ds.sa.chunks~=k;
-        assert(min(counter(msk,k))>=nmin);
-        assert(all(counter(~msk,k)==0));
-    end
-
-    assert_partitions_ok(ds,b,false);
-    assert_balanced_partitions_subset(p,b);
 
 function test_balance_partitions_exceptions
 

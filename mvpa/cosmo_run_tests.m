@@ -401,7 +401,7 @@ function runner_name=get_suite_runner_name(type)
     init_xunit=isequal(which_dir_init,which_dir('runtests'));
 
     if init_moxunit
-        assert(~init_xunit)
+        assert(~init_xunit);
         if strcmp(type,'doc')
             if has_xunit
                 runner_name='xunit';

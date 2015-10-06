@@ -110,3 +110,48 @@ function test_index_unique_()
     aetp({[1,2],{1,2}},id_different_classes);
     aet(ones([2 2 2]));
 
+function test_unique_with_nans
+    n_rows_half=100+ceil(rand()*20);
+    %n_rows_half=2;
+    n_rows=n_rows_half*2;
+    x=ceil(rand(n_rows,2)*sqrt(n_rows_half));
+
+    rp=get_non_identity_randperm(n_rows);
+
+    rp1=rp(1:n_rows_half);
+    rp2=rp(n_rows_half+(1:n_rows_half));
+
+    % first column, half of the rows become NaN
+    x(rp1,1)=NaN;
+    x(rp1,2)=1:n_rows_half;
+    x(rp2,1)=1:n_rows_half;
+    x(rp2,2)=1:n_rows_half;
+
+
+    rp_y=get_non_identity_randperm(n_rows);
+
+    y=x(rp_y,:);
+
+    % test with numeric input
+    [x_idx,x_unq]=cosmo_index_unique(x);
+    [y_idx,y_unq]=cosmo_index_unique(y);
+
+    assertFalse(isequal(x_unq,y_unq));
+    % due to NaNs, the indices must be different
+    assertFalse(isequal([x_idx{:}],rp_y([y_idx{:}])));
+
+    % test with cell input
+    [xx_idx,xx_unq]=cosmo_index_unique({x(:,1),x(:,2)});
+    [yy_idx,yy_unq]=cosmo_index_unique({y(:,1),y(:,2)});
+
+    assertFalse(isequal(xx_unq,yy_unq));
+    % due to NaNs, the indices must be different
+    assertFalse(isequal([xx_idx{:}],rp_y([yy_idx{:}])));
+
+function rp=get_non_identity_randperm(n)
+    while true
+        rp=randperm(n);
+        if ~isequal(rp,1:n)
+            break;
+        end
+    end

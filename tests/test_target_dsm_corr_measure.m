@@ -16,6 +16,8 @@ function test_target_dsm_corr_measure_pearson
 
     sq1=cosmo_squareform(mat1);
     dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',sq1);
+    assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
+    dcm2.samples=dcm1.samples;
     assertEqual(dcm1,dcm2);
 
     dcm3=cosmo_target_dsm_corr_measure(ds,'target_dsm',sq1,...

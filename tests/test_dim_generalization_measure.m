@@ -171,6 +171,9 @@ function test_dim_generalization_measure_basics
     result1=cosmo_slice(result,result.sa.train_time==2 & ...
                                         result.sa.test_time==1);
     result1.sa=rmfield(result1.sa,'transpose_ids');
+    r=set_nan_chunks_unique(r);
+    result1=set_nan_chunks_unique(result1);
+
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 
@@ -196,9 +199,19 @@ function test_dim_generalization_measure_basics
                                         result.sa.test_time==1);
     result1.sa=rmfield(result1.sa,'transpose_ids');
 
+    r_msk=~isnan(r.sa.chunks);
+    result1_msk=~isnan(result1.sa.chunks);
+
+    r=cosmo_slice(r,r_msk);
+    result1=cosmo_slice(result1,result1_msk);
+
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 
+function ds=set_nan_chunks_unique(ds)
+    nan_msk=isnan(ds.sa.chunks);
+    nsamples=numel(nan_msk);
+    ds.sa.chunks(nan_msk)=nsamples+(1:sum(nan_msk));
 
 function pred=my_stupid_classifier(x,y,z,unused)
     [foo,i]=sort(x(:));

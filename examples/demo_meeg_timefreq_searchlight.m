@@ -146,12 +146,18 @@ sl_tf_ft=cosmo_map2meeg(sl_tf_ds);
 % show figure
 figure()
 cfg = [];
-cfg.interactive = 'yes';
-cfg.showlabels = 'yes';
+if cosmo_wtf('is_octave')
+    % GNU Octave does not show data when labels are shown
+    cfg.interactive='no';
+    cfg.showlabels='no';
+else
+    % Matlab supports interactive viewing and labels
+    cfg.interactive = 'yes';
+    cfg.showlabels = 'yes';
+end
 cfg.zlim='maxabs';
 cfg.layout       = layout;
 ft_multiplotTFR(cfg, sl_tf_ft);
-
 
 % Show citation information
 cosmo_check_external('-cite');
