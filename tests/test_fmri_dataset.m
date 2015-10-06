@@ -217,6 +217,22 @@ function test_set_sa_fmri_dataset()
 
     assertExceptionThrown(@()cosmo_fmri_dataset(ds,'targets',[1 2]),'');
 
+function test_nan_warning_fmri_dataset()
+    ds=cosmo_synthetic_dataset();
+    ds.samples(1)=NaN;
+    msk_ds=cosmo_slice(ds,2);
+
+    orig_warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('off');
+
+    cosmo_fmri_dataset(ds,'mask',msk_ds);
+    warning_state=cosmo_warning();
+
+    warning_pos=strmatch('The input dataset has NaN',...
+                    warning_state.shown_warnings);
+    assert(~isempty(warning_pos));
+
 
 function tf=can_test_bv()
     tf=~cosmo_skip_test_if_no_external('neuroelf');

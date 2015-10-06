@@ -96,16 +96,18 @@ function varargout=cosmo_warning(message, varargin)
         full_message=message;
     end
 
+    has_warning=iscellstr(full_message) && ...
+                    ~cosmo_match({full_message},shown_warnings);
+    if ~has_warning
+        if isnumeric(shown_warnings)
+            shown_warnings=cell(0);
+        end
+        shown_warnings{end+1}=full_message;
+    end
+
     switch when_show_warning
         case 'once'
-            if isnumeric(shown_warnings)
-                shown_warnings=cell(0);
-            end
-
-            show_warning=~cosmo_match({full_message},shown_warnings);
-            if show_warning
-
-                shown_warnings{end+1}=full_message;
+            if ~has_warning
                 me=mfilename();
                 postfix=sprintf(['\n\nThis warning is shown only once, '...
                                'but the underlying issue may occur '...
