@@ -53,27 +53,19 @@ function test_stat_correspondence
 
         tail=tails{k};
 
-        if is_matlab
-            if strcmp(tail,'p')
-                ttest_arg=cell(0);
-            else
-                ttest_arg={'tail',tail};
-            end
 
-            % test t-statistic
-            [h,p,ci,stats]=ttest(ds.samples,0,ttest_arg{:});
-
-            tt=cosmo_stat(ds1,'t');
-            assertVectorsAlmostEqual(stats.tstat,tt.samples);
-            assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
+        if strcmp(tail,'p')
+            ttest_arg=cell(0);
         else
-            if strcmp(tail,'p')
-                ttest_arg=cell(0);
-            else
-                ttest_arg={tail};
-            end
-            [h,p]=ttest(ds.samples,0,.05,ttest_arg{:});
+            ttest_arg={'tail',tail};
         end
+
+        % test t-statistic
+        [h,p,ci,stats]=ttest_wrapper(ds.samples,0,ttest_arg{:});
+
+        tt=cosmo_stat(ds1,'t');
+        assertVectorsAlmostEqual(stats.tstat,tt.samples);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
 
         pp=cosmo_stat(ds1,'t',tail);
         assertVectorsAlmostEqual(p,pp.samples);
@@ -90,15 +82,12 @@ function test_stat_correspondence
         x=ds_sp{1}.samples;
         y=ds_sp{2}.samples;
 
-        if is_matlab
-            [h,p,ci,stats]=ttest2(x,y,ttest_arg{:});
-            [tt]=cosmo_stat(ds2,'t2');
+        [h,p,ci,stats]=ttest2_wrapper(x,y,ttest_arg{:});
+        tt=cosmo_stat(ds2,'t2');
 
-            assertVectorsAlmostEqual(stats.tstat,tt.samples);
-            assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
-        else
-            [h,p]=ttest2(x,y,.05,ttest_arg{:});
-        end
+        assertVectorsAlmostEqual(stats.tstat,tt.samples);
+        assertEqual(tt.sa.stats,{sprintf('Ttest(%d)',stats.df(1))});
+
 
         pp=cosmo_stat(ds2,'t2',tail);
         assertVectorsAlmostEqual(p,pp.samples);
@@ -150,6 +139,42 @@ function test_stat_contrast()
     aet(ds,'F');
     aet(ds,'t');
     aet(ds,'t2');
+
+function [h,p,ci,stats]=ttest_wrapper(varargin)
+    [h,p,ci,stats]=general_ttestX_wrapper(@ttest,varargin{:});
+
+function [h,p,ci,stats]=ttest2_wrapper(varargin)
+    [h,p,ci,stats]=general_ttestX_wrapper(@ttest2,varargin{:});
+
+function [h,p,ci,stats]=general_ttestX_wrapper(func,varargin)
+    args=varargin;
+    switch nargin(func)
+        case {5,6}
+            % old Matlab
+            args=remove_keys_from_arguments(2,{'alpha','tail','dim'},args);
+        case -3
+            % GNU Octave and recent Matlab
+
+        otherwise
+            assert(false);
+    end
+
+    [h,p,ci,stats]=func(args{:});
+
+function short_args=remove_keys_from_arguments(skip_count,keys,args)
+    n=numel(keys);
+    short_args=cell(1,skip_count+n);
+    short_args(1:skip_count)=args(1:skip_count);
+    for k=1:n
+        key=keys{k};
+        i=strmatch(key,args((skip_count+1):2:end));
+        if isempty(i)
+            short_arg=[];
+        else
+            short_arg=args{skip_count+i*2};
+        end
+        short_args{skip_count+k}=short_arg;
+    end
 
 
 
