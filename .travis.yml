@@ -45,38 +45,38 @@ install:
     - CHECKEXTCMD=""
 
     # optionally enable Octave parallel package
-    - if [[ "$EXTERNALS" = *"octave_pkg_parallel"* ]]; then
+    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
           $OCTAVE --eval "pkg('install','-forge','parallel');";
           echo "" >> ~/.octaverc;
           echo "pkg load parallel;" >> $OCTAVERC;
       fi
 
     # optionally enable Octave statitics package
-    - if [[ "$EXTERNALS" = *"octave_pkg_statistics"* ]]; then
+    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
           $OCTAVE --eval "pkg('install','-forge','io');";
           $OCTAVE --eval "pkg('install','-forge','statistics');";
           echo "pkg load statistics;" >> $OCTAVERC;
       fi
 
     # optionally install surfing toolbox
-    - if [[ "$EXTERNALS" = *"surfing"* ]]; then
+    - if [[ " $EXTERNALS " = *" surfing "* ]]; then
           git clone git://github.com/nno/surfing.git --depth 1;
           make -C surfing install;
       fi
 
     # optionally install afni
-    - if [[ "$EXTERNALS" = *"afni"* ]]; then
+    - if [[ " $EXTERNALS " = *" afni "* ]]; then
           git clone git://github.com/afni/afni.git --depth 1;
           $OCTAVE --eval "addpath('${PTH}/afni/src/matlab');savepath();";
       fi
 
     # optionally install FieldTrip
-    # Hopefull soon the official FieldTrip code can be used
-    # currently (Apr 2015) we use our own version that
-    # is compatible with Octave
+    # Hopefull soon the official FieldTrip code can be used.
+    # Currently (Oct 2015) we use our own version that
+    # is more compatible with GNU Octave
     # (PR: https://github.com/fieldtrip/fieldtrip/pull/54)
     # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
-    - if [[ "$EXTERNALS" = *"fieldtrip"* ]]; then
+    - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           git clone -b _enh/octave git://github.com/nno/fieldtrip.git;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
@@ -84,7 +84,7 @@ install:
       fi
 
     # optionally install libsvm
-    - if [[ "$EXTERNALS" = *"libsvm"* ]]; then
+    - if [[ " $EXTERNALS " = *" libsvm "* ]]; then
           git clone git://github.com/cjlin1/libsvm.git;
           $OCTAVE --eval "cd('${PTH}/libsvm/matlab');
                         make;
@@ -93,7 +93,7 @@ install:
       fi
 
     # optionally install gifti library
-    - if [[ "$EXTERNALS" = *"gifti"* ]]; then
+    - if [[ " $EXTERNALS " = *" gifti "* ]]; then
           GIFTI_VERSION=1.5;
           GIFTI_NAME=gifti-${GIFTI_VERSION};
           wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;
