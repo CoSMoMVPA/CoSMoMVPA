@@ -118,6 +118,23 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
         ds_sa=correlation_dsm(ds_pdist,params);
     end
 
+    check_output(ds,ds_sa);
+
+function check_output(input_ds,output_ds_sa)
+    if any(isnan(output_ds_sa.samples))
+        if any(isnan(input_ds.samples(:)))
+            msg=['Input dataset has NaN values, which results in '...
+                    'NaN values in the output. Consider masking the '...
+                    'dataset to remove NaN values'];
+        else
+            msg=['Output has NaN values, even though the input does '...
+                    'not. This is weird. When in doubt how do deal '...
+                    'this, please contact the CoSMoMVPA developers'];
+        end
+        cosmo_warning(msg);
+    end
+
+
 function ds_sa=correlation_dsm(ds_pdist,params)
     npairs_dataset=numel(ds_pdist);
 

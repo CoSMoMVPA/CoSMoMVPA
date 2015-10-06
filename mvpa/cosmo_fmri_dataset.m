@@ -101,6 +101,10 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 %    not returned. If format is omitted it is set to 'beta'.
 %  - If SPM data contains a field .Sess (session) then .sa.chunks are set
 %    according to its contents
+%  - If a mask is supplied, then all features that are in the mask are
+%    returned, even if some voxels contain NaN. To remove such features,
+%    consider applying cosmo_remove_useless_data to the output of this
+%    function.
 %
 % Dependencies:
 % -  for NIfTI, analyze (.hdr/.img) and SPM.mat files, it requires the
@@ -185,6 +189,8 @@ function ds=cosmo_fmri_dataset(filename, varargin)
     if param_specifies_auto_mask(params)
         auto_mask=compute_auto_mask(ds.samples, params.mask);
         ds=cosmo_slice(ds,auto_mask,2);
+    else
+        warn_if_nan_present_in_dataset(ds)
     end
 
 
@@ -351,7 +357,22 @@ function ids_mask=get_binary_dataset_mask(ds_mask, ds)
 function mask=samples_to_binary_mask(samples)
     mask=samples~=0 & ~isnan(samples);
 
-
+function warn_if_nan_present_in_dataset(ds)
+    nsamples=size(ds.samples,1);
+    for k=1:nsamples
+        if any(isnan(ds.samples(k,:)))
+            cosmo_warning(['The input dataset has NaN (not a number) '...
+                            'values, which may cause the output '...
+                            'of subsequent analyses to contain NaNs as '...
+                            'well. For many use cases, NaNs are not '...
+                            'desirabe. To remove features (voxels) '...
+                            'with NaN values, consider using:\n\n'...
+                            '  ds_clean=cosmo_remove_useless_data(ds)'...
+                            '\n\nwhere ds is the output from this '...
+                            'function (%s)'],mfilename());
+            return
+        end
+    end
 
 function [lin_ids, vol_dim]=get_linear_feature_ids(ds)
     % get linear ids for each feature
