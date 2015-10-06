@@ -59,14 +59,14 @@ function test_vol_coordinates_afni()
     data4d=zeros([nsamples,dim_sizes]);
 
     ds=cosmo_flatten(data4d,dim_labels,dim_values);
-    ds.sa.labels=cellfun(@(x) sprintf('sample%d'),num2cell(1:nsamples)',...
+    ds.sa.labels=cellfun(@(x) sprintf('sample%d',x),...
+                                    num2cell(1:nsamples)',...
                                     'UniformOutput',false);
     ds.sa.stats=repmat({'Ftest(10,1)'},nsamples,1);
     ds.a.vol.mat=[diag(vox_sizes),origin';[0 0 0 1]];
     ds.a.vol.dim=dim_sizes;
 
 
-    [ns,nf]=size(ds.samples);
     ds.sa.labels=ds.sa.labels(:,1);
 
     center_distance=20;
@@ -79,57 +79,57 @@ function test_vol_coordinates_afni()
     xyz=cosmo_vol_coordinates(ds,fa_indices); % recompute
     ds.samples(:,fa_indices)=repmat(1:ncoord,nsamples,1); % 1 to 8
 
-    if cosmo_check_external('afni_bin',false);
-        tmp_dir='/tmp/';
+    % make temporary directory
+    tmp_dir=cosmo_make_temp_filename();
+    tmp_dir_cleaner=onCleanup(@()remove_dir_helper(tmp_dir));
 
-        ext_postfix={'.nii',{''};
-                     '+orig',{'.BRIK','.BRIK.gz','.HEAD'}};
-        for j=1:size(ext_postfix,1)
-            ext=ext_postfix{j,1};
-            postfixes=ext_postfix{j,2};
+    mkdir(tmp_dir);
 
-            get_fn=@(x) sprintf('%s/%s%s',tmp_dir,x,ext);
-            get_to_delete=@(x,exts) cellfun(@(y) sprintf('%s%s',...
-                                get_fn(x),y),postfixes,'UniformOutput',false);
+    % generate AFNI files
+    ext_postfix={'.nii',{''};
+                 '+orig',{'.BRIK','.BRIK.gz','.HEAD'}};
+    for j=1:size(ext_postfix,1)
+        ext=ext_postfix{j,1};
+        postfixes=ext_postfix{j,2};
 
-            base_fn=get_fn('base');
-            cosmo_map2fmri(ds,base_fn);
+        get_fn=@(x) fullfile(tmp_dir,[x ext]);
+        get_to_delete=@(x,exts) cellfun(@(y) sprintf('%s%s',...
+                            get_fn(x),y),postfixes,'UniformOutput',false);
 
-            orients={'lpi','rai','asr'};
+        base_fn=get_fn('base');
+        cosmo_map2fmri(ds,base_fn);
 
-            for k=1:numel(orients)
-                orient=orients{k};
-                fn=get_fn(orient);
-                cmd=sprintf('3dresample -overwrite -orient %s -prefix %s -input %s',...
-                                orient, fn, base_fn);
-                r=unix(cmd);
-                assert(r==0);
-                cmd=sprintf(['3dclust -orient LPI -1clip .5 0 0 %s''[0]'' '...
-                            '2>/dev/null | grep --invert-match ''#'''], fn);
-                [r,v]=unix(cmd);
-                assert(r==0);
+        orients={'lpi','rai','asr'};
 
-                to_delete=get_to_delete(orient,postfixes);
-                cmd=sprintf('rm -f %s', cosmo_strjoin(to_delete,' '));
-                unix(cmd);
+        for k=1:numel(orients)
+            orient=orients{k};
+            fn=get_fn(orient);
+            cmd=sprintf('3dresample -overwrite -orient %s -prefix %s -input %s',...
+                            orient, fn, base_fn);
+            r=unix(cmd);
+            assert(r==0);
+            cmd=sprintf(['3dclust -orient LPI -1clip .5 0 0 %s''[0]'' '...
+                        '2>/dev/null | grep --invert-match ''#'''], fn);
+            [r,v]=unix(cmd);
+            assert(r==0);
 
-                s=sscanf(v,'%f');
-                table=reshape(s,16,[]);
-
-                % sort by voxel value
-                [unused,i]=sort(table(11,:));
-                table=table(:,i);
-
-                line1=ones(1,ncoord);
-                line0=0*line1;
-                line_inc=1:ncoord;
-                expected_table=[line1; xyz; kron(xyz,[1 1]'); ...
-                                    line_inc; line0; line_inc; xyz];
-                assertEqual(table, expected_table)
-            end
-
-            to_delete=get_to_delete('base',postfixes);
+            to_delete=get_to_delete(orient,postfixes);
             cmd=sprintf('rm -f %s', cosmo_strjoin(to_delete,' '));
+            unused=unix(cmd);
+
+            s=sscanf(v,'%f');
+            table=reshape(s,16,[]);
+
+            % sort by voxel value
+            [unused,i]=sort(table(11,:));
+            table=table(:,i);
+
+            line1=ones(1,ncoord);
+            line0=0*line1;
+            line_inc=1:ncoord;
+            expected_table=[line1; xyz; kron(xyz,[1 1]'); ...
+                                line_inc; line0; line_inc; xyz];
+            assertEqual(table, expected_table)
         end
     end
 
@@ -165,7 +165,11 @@ function test_test_vol_coordinates_exceptions()
 
 
 
-
+function remove_dir_helper(tmp_dir)
+    if cosmo_wtf('is_octave')
+        confirm_recursive_rmdir(false,'local');
+    end
+    rmdir(tmp_dir,'s');
 
 
 
