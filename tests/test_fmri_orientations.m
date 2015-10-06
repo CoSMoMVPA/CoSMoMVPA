@@ -83,15 +83,20 @@ function test_fmri_orientations_with_afni_binary()
     i=ceil(rand()*numel(orients));
     orient=orients{i};
 
+    nfeatures=size(ds.samples,2);
+    xyz=cosmo_vol_coordinates(ds);
+
     ds_rs=afni_resample(ds,fmt,orient); % in AFNI
     assertEqual(cosmo_fmri_orientation(ds_rs),orient);
 
-    % verify equality with resampled dataset
-    ijk_rs=ds_rs.a.vol.mat\xyz;
-    idx_rs=get_feature_index(ds_rs,ijk_rs);
-    assertElementsAlmostEqual(ds.samples(:,orient_idx),...
-                              ds_rs.samples(:,idx_rs),...
-                              'absolute',1e-5);
+    xyz_rs=cosmo_vol_coordinates(ds_rs);
+
+    xyz_cell=mat2cell(xyz,[1 1 1],nfeatures);
+    xyz_rs_cell=mat2cell(xyz_rs,[1 1 1],nfeatures);
+
+    mp=cosmo_align(xyz_cell,xyz_rs_cell);
+    assertElementsAlmostEqual(ds.samples(:,mp),ds_rs.samples,...
+                                    'absolute',1e-5)
 
 
 function idxs=get_feature_index(ds, ijk)
