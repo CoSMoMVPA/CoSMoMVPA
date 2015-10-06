@@ -301,6 +301,7 @@ function monitor_constructor=get_test_monitor_constructor(suite, verbosity)
     end
 
 function tf=skip_location(location,parent_dir)
+    tf=true;
     if isdir(location)
         location_dir=location;
     else
