@@ -298,18 +298,12 @@ function results_map=run_searchlight_with_worker(worker_opt)
             end
         catch
             caught_error=lasterror();
-            if cosmo_wtf('is_matlab')
-                parent_exception=MException(caught_error.identifier,...
-                                            '%s',caught_error.message);
-                % indicate where the error was
-                child_exception=MException('',['Searchlight call on '...
-                                 'feature id %d caused an exception'],...
-                                    center_id);
-                exception=addCause(parent_exception,child_exception);
-                throw(exception);
-            else
-                rethrow(caught_error);
-            end
+            caught_error.message=sprintf(['In %s, center id %d caused '...
+                                           'an exception:\n%s'],...
+                                           mfilename(),...
+                                           center_id,...
+                                           caught_error.message);
+            rethrow(caught_error);
         end
         % <@@<
 
