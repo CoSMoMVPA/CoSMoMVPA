@@ -115,7 +115,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
                     mfilename(),mem_required_mb);
         end
 
-        classes=unique(targets_train);
+        classes=fast_vector_unique(targets_train);
         nclasses=numel(classes);
 
         class_mean=zeros(nclasses,nfeatures);   % class means
@@ -178,3 +178,8 @@ function predicted=test(model, samples_test)
 
     [unused,class_idxs]=max(class_proj);
     predicted=classes(class_idxs);
+
+function unq_xs=fast_vector_unique(xs)
+    xs_sorted=sort(xs);
+    idxs=([true;diff(xs_sorted)>0]);
+    unq_xs=xs_sorted(idxs);
