@@ -2,15 +2,20 @@ function varargout=cosmo_warning(message, varargin)
 % show a warning message; by default just once for each message
 %
 % cosmo_warning(message, ...)
+% cosmo_warning(state)
+% state=cosmo_warning()
 %
 % Inputs:
 %   message      warning message to be shown, or one of:
 %                'on'   : show all warning messages
 %                'off'  : show no warning messages
 %                'once' : show each warning message once [default]
+%                'reset':
 %   ...          if a warning message is provided according with
 %                placeholders as used in sprintf, then the subsequent
 %                arguments should contain their values
+%   state        if a struct, then this queries or sets the state of
+%                cosmo_warning.
 %
 % Notes:
 %   - this function works more or less like matlab's warning function,
@@ -59,15 +64,19 @@ function varargout=cosmo_warning(message, varargin)
     show_warning=true;
 
     if cosmo_match({lmessage},{'on','off','once','reset'})
-        when_show_warning=lmessage;
-        show_warning=false;
         if strcmp(lmessage,'reset')
             shown_warnings=[];
         end
 
+        show_warning=false;
+        if strcmp(lmessage,'reset')
+            shown_warnings=[];
+        else
+            when_show_warning=lmessage;
+        end
     end
 
-    if cosmo_match({message},{'on','off','query'})
+    if cosmo_match({message},{'on','off'})
         if nargout>0
             varargout{1}=warning(message,varargin{:});
         else
@@ -81,12 +90,10 @@ function varargout=cosmo_warning(message, varargin)
     end
 
     args=varargin;
-    has_args=numel(args)>0;
-
-    has_identifier=has_args && any(args{1}==':') && ~any(args{1}=='%');
+    has_identifier=numel(args)>0 && has_warning_identifier(message);
     if has_identifier
         identifier=message;
-        message=args(1);
+        message=args{1};
         args=args(2:end);
     end
 
@@ -138,3 +145,8 @@ function varargout=cosmo_warning(message, varargin)
         end
 
     end
+
+function tf=has_warning_identifier(s)
+    alpha_num='([a-z_A-Z0-9]+)';
+    pat=sprintf('^%s(:%s)?:%s$',alpha_num,alpha_num,alpha_num);
+    tf=~isempty(regexp(s,pat,'once'));
