@@ -38,7 +38,8 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 % - this classifier does not support a prior, that is it assumes that all
 %   classes have the same number of samples. If that is not the case an
 %   error is thrown.
-% - a safety limit of
+% - a safety limit of opt.max_feature_count is implemented because a large
+%   number of features can crash Matlab / Octave, and/or make it very slow.
 %
 % Joern Diedrichsen, Tobias Wiestler, NNO Nov 2008; NNO updated Aug 2013
 
