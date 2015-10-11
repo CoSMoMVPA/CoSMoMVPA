@@ -2,7 +2,8 @@
         install-matlab install-octave install \
         uninstall-matlab uninstall-octave uninstall \
         test-matlab test-octave test \
-        html clean-html website
+        html clean-html website \
+		html-archive-dir html-zip-archive html-targz-archive
 
 MATLAB?=matlab
 OCTAVE?=octave
@@ -11,11 +12,13 @@ TESTDIR=$(CURDIR)/tests
 ROOTDIR=$(CURDIR)
 MVPADIR=$(ROOTDIR)/mvpa
 DOCDIR=$(CURDIR)/doc
-HTMLDIR=$(DOCDIR)/build/html
+DOCBUILDDIR=$(DOCDIR)/build
+HTMLDOCBUILDDIR=$(DOCBUILDDIR)/html
 WEBSITEROOT=db:~/web
 WEBSITESTATIC=$(WEBSITEROOT)/_static
 DOCUMENTATION_HTML_PREFIX=CoSMoMVPA_documentation_html
-DOCUMENTATION_ZIPFILES=doc/build AUTHOR copyright README.rst
+DOCARCHIVEDIR=$(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX)
+DOCUMENTATION_FILES_TO_ARCHIVE=AUTHOR copyright README.rst
 
 
 ADDPATH="cd('$(MVPADIR)');cosmo_set_path()"
@@ -68,7 +71,7 @@ endif
 MATLAB_RUN_CLI=$(MATLAB_BIN) -nojvm -nodisplay -nosplash -r
 OCTAVE_RUN_CLI=$(OCTAVE_BIN) --no-gui --quiet --eval
 
-	
+
 install-matlab:
 	@if [ -n "$(MATLAB_BIN)" ]; then \
 		$(MATLAB_RUN_CLI) $(INSTALL); \
@@ -90,7 +93,7 @@ install:
 	fi;
 	$(MAKE) install-matlab
 	$(MAKE) install-octave
-	
+
 
 uninstall-matlab:
 	@if [ -n "$(MATLAB_BIN)" ]; then \
@@ -98,14 +101,14 @@ uninstall-matlab:
 	else \
 		echo "matlab binary could not be found, skipping"; \
 	fi;
-	
+
 uninstall-octave:
 	@if [ -n "$(OCTAVE_BIN)" ]; then \
 		$(OCTAVE_RUN_CLI) $(UNINSTALL); \
 	else \
 		echo "octave binary could not be found, skipping"; \
 	fi;
-	
+
 uninstall:
 	@if [ -z "$(MATLAB_BIN)$(OCTAVE_BIN)" ]; then \
 		@echo "Neither matlab binary nor octave binary could be found" \
@@ -142,13 +145,32 @@ html:
 
 clean-html:
 	@cd $(DOCDIR) && $(MAKE) clean
-	$(MAKE) html
 
-website: clean-html
-	rsync -vrcu $(HTMLDIR)/* $(WEBSITEROOT)/
-	zip -qr CoSMoMVPA_documentation_html.zip $(DOCUMENTATION_ZIPFILES); \
-        tar -zcf $(DOCUMENTATION_HTML_PREFIX).tar.gz $(DOCUMENTATION_ZIPFILES); \
-        rsync -vcru --remove-source-files $(DOCUMENTATION_HTML_PREFIX).* \
-                                            $(WEBSITESTATIC)/ || exit 1
-	
+
+html-archive-dir: html
+	if [ ! -d "$(DOCARCHIVEDIR)" ]; then \
+		mkdir -p $(DOCARCHIVEDIR); \
+	fi
+	ln -fs $(HTMLDOCBUILDDIR) $(DOCARCHIVEDIR)
+	for fn in $(DOCUMENTATION_FILES_TO_ARCHIVE); do \
+		ln -fs $(CURDIR)/$$fn $(DOCARCHIVEDIR)/$$fn; \
+	done
+
+
+html-zip-archive: html-archive-dir
+	cd $(DOCBUILDDIR); \
+		zip -qr $(DOCUMENTATION_HTML_PREFIX).zip \
+				$(DOCUMENTATION_HTML_PREFIX)
+
+html-targz-archive: html-archive-dir
+	cd  $(DOCBUILDDIR); \
+		tar -zchf $(DOCUMENTATION_HTML_PREFIX).tar.gz \
+			$(DOCUMENTATION_HTML_PREFIX)
+
+
+website:
+	rsync -vrcu $(HTMLDOCBUILDDIR)/* $(WEBSITEROOT)/
+	rsync -vcru --remove-source-files \
+				 $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
+				 $(WEBSITESTATIC)/
 
