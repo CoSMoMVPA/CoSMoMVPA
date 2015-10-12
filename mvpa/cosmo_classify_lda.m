@@ -182,6 +182,6 @@ function predicted=test(model, samples_test)
     predicted=classes(class_idxs);
 
 function unq_xs=fast_vector_unique(xs)
-    xs_sorted=sort(xs);
+    xs_sorted=sort(xs(:));
     idxs=([true;diff(xs_sorted)>0]);
     unq_xs=xs_sorted(idxs);

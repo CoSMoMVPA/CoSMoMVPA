@@ -10,13 +10,13 @@ function test_classify_lda
 
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_classify_lda(varargin{:}),'');
+    % size mismatch
     x=randn(5,3);
     y=randn(2,3);
     aet(x,[1 1 1 2 2],y);
 
     % too many features
     x=zeros(1,1e4);
-    y=zeros(1,1e4);
     aet(x,1,1e4);
 
 
