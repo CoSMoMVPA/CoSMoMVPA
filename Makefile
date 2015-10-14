@@ -148,29 +148,28 @@ clean-html:
 
 
 html-archive-dir: html
-	if [ ! -d "$(DOCARCHIVEDIR)" ]; then \
+	@if [ ! -d "$(DOCARCHIVEDIR)" ]; then \
 		mkdir -p $(DOCARCHIVEDIR); \
 	fi
-	ln -fs $(HTMLDOCBUILDDIR) $(DOCARCHIVEDIR)
-	for fn in $(DOCUMENTATION_FILES_TO_ARCHIVE); do \
+	@ln -fs $(HTMLDOCBUILDDIR) $(DOCARCHIVEDIR)
+	@for fn in $(DOCUMENTATION_FILES_TO_ARCHIVE); do \
 		ln -fs $(CURDIR)/$$fn $(DOCARCHIVEDIR)/$$fn; \
 	done
 
 
 html-zip-archive: html-archive-dir
-	cd $(DOCBUILDDIR); \
-		zip -qr $(DOCUMENTATION_HTML_PREFIX).zip \
+	@cd $(DOCBUILDDIR); \
+	zip -qr $(DOCUMENTATION_HTML_PREFIX).zip \
 				$(DOCUMENTATION_HTML_PREFIX)
 
 html-targz-archive: html-archive-dir
-	cd  $(DOCBUILDDIR); \
-		tar -zchf $(DOCUMENTATION_HTML_PREFIX).tar.gz \
+	@cd  $(DOCBUILDDIR); \
+	tar -zchf $(DOCUMENTATION_HTML_PREFIX).tar.gz \
 			$(DOCUMENTATION_HTML_PREFIX)
 
 
-website:
-	rsync -vrcu $(HTMLDOCBUILDDIR)/* $(WEBSITEROOT)/
-	rsync -vcru --remove-source-files \
-				 $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
+website: html html-zip-archive html-targz-archive
+	@rsync -vrcu $(HTMLDOCBUILDDIR)/* $(WEBSITEROOT)/
+	@rsync -vcru $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
 				 $(WEBSITESTATIC)/
 
