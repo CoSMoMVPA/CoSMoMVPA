@@ -95,32 +95,19 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
     % allocate space for output
     neighbors=cell(nvalues,1);
 
-    % go over all dimension values and find the neighborhood.
-    % first_pos and last_pos point to the position in fa_idxs.
-    % this works because fa_unq is sorted, so a window can be taken that
-    % moves from left to right
-    first_pos=1;
+    % mapping from all values to the ones present in fa
+    all2unq=zeros(nvalues,1);
+    all2unq(fa_unq)=1:nunq;
 
     for center_id=1:nvalues
-        % find left edge
-        while first_pos<nunq && fa_unq(first_pos)<center_id-radius
-            first_pos=first_pos+1;
-        end
+        first_pos=max(center_id-radius,1);
+        last_pos=min(center_id+radius,nvalues);
 
-        last_pos=first_pos;
-        % find right edge
-        while last_pos<nunq && fa_unq(last_pos)<center_id+radius
-            last_pos=last_pos+1;
-        end
-        if fa_unq(last_pos)>center_id+radius
-            % avoid getting over the edge
-            last_pos=last_pos-1;
-        end
+        around_unq=all2unq(first_pos:last_pos);
+        around_unq=around_unq(around_unq>0); % remove empty ones
 
-        % merge all indices in the neighborhood
-        neighbors{center_id}=sort(cat(1,fa_idxs{first_pos:last_pos}))';
+        neighbors{center_id}=sort(cat(1,fa_idxs{around_unq}))';
     end
-
 
     % store results
     nbrhood=struct();

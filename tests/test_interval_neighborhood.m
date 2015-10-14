@@ -93,3 +93,26 @@ function test_interval_neighborhood_fa()
             assertEqual(nhp.neighbors{k},idx);
         end
     end
+
+function test_sparse_interval_neighborhood
+    ds=cosmo_synthetic_dataset('size','big');
+
+    % make some holes
+    ds=cosmo_slice(ds,ds.fa.i>=4 & ds.fa.i<=16,2);
+    ds=cosmo_slice(ds,mod(ds.fa.i,3)<=1,2);
+
+    for radius=0:5
+        nh=cosmo_interval_neighborhood(ds,'i','radius',radius);
+
+        n_nbrs=numel(nh.neighbors);
+
+        assert(n_nbrs==numel(ds.a.fdim.values{1}));
+        for j=1:n_nbrs
+            nbrs=nh.neighbors{j};
+
+            idx=find(j-radius <= ds.fa.i & ds.fa.i <= j+radius);
+            assertEqual(nbrs(:),idx(:),sprintf(['not equal with '...
+                                        'radius=%d, index=%d'],...
+                                        radius,j))
+        end
+    end
