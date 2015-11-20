@@ -9,7 +9,7 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %                       most M neighbors. nbrhood_mx(:,k) should contain
 %                       the feature ids of the neighbors of feature k
 %                       (values of zero indicate no neighbors)
-%   cluster_stat        'tfce', 'max', 'maxsize', or 'maxsum',
+%   cluster_stat        'tfce', 'max', 'maxsize', or 'maxsum'.
 %   'dh',dh             when method is 'tfce', the integral step size
 %   'threshold',t       if method is anything but 'tfce', the threshold
 %                       level
@@ -17,7 +17,8 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %                       exponent, default E=0.5
 %   'H', E              (optional) when method is 'tfce': the height
 %                       exponent, default H=2
-%   'feature_sizes', s  (optional) 1xP element size of each feature.
+%   'feature_sizes', s  (optional) 1xP element size of each feature;
+%                       default is a vector with all elements equal to 1.
 %
 % Output:
 %   cval           1xP data array with cluster values.
@@ -90,8 +91,9 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %   - unlike FieldTrip's clusterstat, a value is returned for each feature
 %     (rather than each cluster).
 %   - TFCE is advised in the general case, because it finds a compromise
-%     between magnitude of values and extent of clusters
-%   - this function
+%     between magnitude of values and extent of clusters.
+%   - this function is used by cosmo_montecarlo_cluster_stat for
+%     non-parametric cluster-based correction for multiple comparisons.
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
@@ -101,7 +103,7 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %   - Maris, E., Oostenveld, R. Nonparametric statistical testing of EEG-
 %     and MEG-data. Journal of Neuroscience Methods (2007).
 %
-% See also: cosmo_convert_neighborhood, cosmo
+% See also: cosmo_convert_neighborhood, cosmo_montecarlo_cluster_stat
 %
 % NNO Oct 2013, updated Jan 2015
 
