@@ -90,10 +90,23 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 % - this function is intended for datasets where the number of
 %   samples across targets is not equally distributed. A typical
 %   application is MEEG datasets.
-% - Using this function means that chance accuracy is equal to the inverse
-%   of the number of unique targets.
-% - This function balances the training indices only, not the test_indices.
-%   Test_indices may be repeated
+% - By default both the train and test indices are balanced, so that
+%   chance accuracy is equal to the inverse of the number of unique
+%   targets (1/C with C the number of classes).
+%   Balancing is necessary, because otherwise:
+%   * Suppose the entire dataset has 75% samples of
+%     class A and 25% samples of class B, but the data does not contain
+%     any information that allows for discrimination between the classes.
+%     A classifier trained on a subset may always predict the class that
+%     occured most often in the training set, which is class A. If the test
+%     set also contains 75% of class A, then classification accuracy would
+%     be 75%, which is higher than 1/2 (with 2 the number of classes).
+%   * Balancing the training set only would accomodate this issue, but it
+%     may still be the case that a classifier (in particular, non-linear
+%     classifiers) consistently predicts one class more often than other
+%     classes. While this may be unbiased with respect to predictions of
+%     one particular class over many dataset instances, it could lead to
+%     biases (either above or below chance) in particular instances.
 %
 % See also: cosmo_nchoosek_partitioner, cosmo_nfold_partitioner
 %
