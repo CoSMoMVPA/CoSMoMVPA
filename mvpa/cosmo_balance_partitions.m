@@ -93,7 +93,7 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 % - By default both the train and test indices are balanced, so that
 %   chance accuracy is equal to the inverse of the number of unique
 %   targets (1/C with C the number of classes).
-%   Balancing is necessary, because otherwise:
+%   Balancing is considered a *Good Thing*:
 %   * Suppose the entire dataset has 75% samples of
 %     class A and 25% samples of class B, but the data does not contain
 %     any information that allows for discrimination between the classes.
