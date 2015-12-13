@@ -293,7 +293,7 @@ function suite=get_empty_suite(type)
 function monitor_constructor=get_test_monitor_constructor(suite, verbosity)
     switch get_suite_class(suite)
         case 'MOxUnitTestSuite'
-            monitor_constructor=@(fid)MOxUnitTestResult(verbosity,fid);
+            monitor_constructor=@(fid)MOxUnitTestReport(verbosity,fid);
 
         case 'TestSuite'
             monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
