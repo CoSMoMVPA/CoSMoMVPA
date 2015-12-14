@@ -27,9 +27,18 @@ function test_corr_with_type
     aeaa(cosmo_corr(x,'Pearson'),corr(x,'type','Pearson'));
     aeaa(cosmo_corr(x,'Spearman'),corr(x,'type','Spearman'));
 
-
     aeaa(cosmo_corr(x,'Pearson'),corr(x,'type','Pearson'));
     aeaa(cosmo_corr(x,y,'Pearson'),corr(x,y,'type','Pearson'));
+
+function test_corr_assert_symmetric
+    % ensure that correlating a matrix with itself gives a symmetric matrix
+    for k=1:10
+        nrows=ceil(rand()*5+3);
+        ncols=ceil(rand()*2000+30);
+
+        c=cosmo_corr(randn(ncols,nrows));
+        assertEqual(c-c',zeros(nrows));
+    end
 
 function test_corr_exceptions
     if cosmo_wtf('is_octave')

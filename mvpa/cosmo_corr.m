@@ -76,6 +76,7 @@ function c=cosmo_corr(x,y,corr_type)
 
             if y_as_x
                 % ensure diagonal elements are 1
+                c=(c+c')*.5;
                 dc=diag(c);
                 c=(c-diag(dc))+eye(numel(dc));
             end
