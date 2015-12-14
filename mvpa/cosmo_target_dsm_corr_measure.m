@@ -39,6 +39,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  For this option, the output has as many rows (samples)
 %                  as there are elements (dissimilarity matrices) in
 %                  .glm_dsm.
+%     .center_data If set to true, then the mean of each feature (column in
+%                  ds.samples) is subtracted from each column prior to
+%                  computing the pairwise distances for all samples in ds.
+%                  Default: false
 %
 % Output:
 %    ds_sa         Dataset struct with fields:
@@ -91,12 +95,17 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %   - for group analysis, correlations can be fisher-transformed
 %     through:
 %       dcm_ds.samples=atanh(dcm_ds.samples)
+%   - it may be a good idea to set the 'center_data' to true when using
+%     the default 'correlation' metric, as this removes a main effect
+%     common to all samples; but note that this option is disabled by
+%     default
 %
 % ACC August 2013, NNO Jan 2015
 
     % process input arguments
     params=cosmo_structjoin('type','Pearson',... % set default
                             'metric','correlation',...
+                            'center_data',false,...
                             varargin);
 
     check_input(ds);
@@ -105,7 +114,12 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     % - compute the pair-wise distance between all dataset samples using
     %   cosmo_pdist
 
-    ds_pdist = cosmo_pdist(ds.samples, params.metric)';
+    samples=ds.samples;
+    if params.center_data
+        samples=bsxfun(@minus,samples,mean(samples,1));
+    end
+
+    ds_pdist = cosmo_pdist(samples, params.metric)';
 
     % number of pairwise distances; should match that of target_dsm_vec
     % below

@@ -167,6 +167,42 @@ function test_target_dsm_corr_measure_glm_dsm_matlab_correspondence
     ds_beta=cosmo_target_dsm_corr_measure(ds,'glm_dsm',{mat1,mat2});
     assertElementsAlmostEqual(beta, ds_beta.samples);
 
+function test_target_dsm_random_data_with_cosmo_functions
+    ntargets=ceil(rand()*5+3);
+    nfeatures=ceil(rand()*20+30);
+
+    ds=struct();
+    ds.sa.targets=(1:ntargets)';
+    ds.sa.chunks=ceil(rand()*10+3);
+
+    % assume working pdist (tested elsewhere)
+    target_dsm=cosmo_pdist(randn(ntargets,2*nfeatures));
+
+    for center_data=[-1,0,1]
+
+        ds.samples=randn(ntargets,nfeatures);
+        samples=ds.samples;
+
+        opt=struct();
+        opt.target_dsm=target_dsm;
+        if center_data>0
+            opt.center_data=logical(center_data);
+
+            if opt.center_data
+                samples=bsxfun(@minus,samples,mean(samples,1));
+            end
+        end
+
+        result=cosmo_target_dsm_corr_measure(ds,opt);
+
+        c=1-cosmo_corr(samples');
+        expected_samples=cosmo_corr(cosmo_squareform(c)',target_dsm');
+        assertElementsAlmostEqual(result.samples,expected_samples)
+    end
+
+
+
+
 
 
 % test exceptions
