@@ -122,7 +122,29 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     For most use cases this is recommended; it should only be used if you
 %     really know what you are doing.
 %   - To avoid making clusters along a particular dimension d, use
-%     cosmo_cluster_neighborhood (...,d,false).
+%     cosmo_cluster_neighborhood (...,d,false). For example, an MEEG
+%     time-by-chan dataset ds could be clustered using:
+%         1a) nh1a=cosmo_cluster_neighborhood(ds);
+%         1b) nh1b=cosmo_cluster_neighborhood(ds,'time',true);
+%         2)  nh2 =cosmo_cluster_neighborhood(ds,'time',false);
+%     where 1a and 1b are equivalent, and both different from 2.
+%     When used with cosmo_montecarlo_cluster_stat to correct for multiple
+%     comparisons, the interpretation of any surviving cluster depends on
+%     which approach was used:
+%     * In approach 2, clusters are not connected by neighboring time
+%        points; each cluster spans a single time point. For example, if a
+%        cluster is  found at 200ms relative to stimulus onset, one can
+%        infer a significant effect at 200 ms.
+%     * In approach 1, clusters are connected over neighboring time points,
+%       and each cluster can span multiple time points. If a cluster is
+%       found spanning a time interval between 200 and 300ms, one *cannot*
+%       infer a significant effect at 200 ms. One *can* infer a significant
+%       effect for the time interval between 200 and 300 ms.
+%     (Note that in both approaches clusters, are connected over
+%     neighboring channels; spatial inferences over individual channels
+%     cannot be made in either approach).
+%     To summarize: in approach 1, the threshold to pass significance is
+%     lower, but less strong inferences can be made than with approach 2.
 %
 % See also: cosmo_montecarlo_cluster_stat
 %
