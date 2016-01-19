@@ -55,3 +55,13 @@ function test_structjoin_
     s2=cat(1,s,s);
     aet(s2);
 
+    % verify overriding field
+    s=struct();
+    s.a.b=2;
+    s.c=4;
+    sa=struct();
+    sa.b=3;
+    s2=struct();
+    s2.a.b=3;
+    s2.c=4;
+    assertEqual(sj(s,'a',sa),s2);
