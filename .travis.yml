@@ -2,20 +2,21 @@
 # travis-ci.org definition for CoSMoMVPA build (based on PyMVPA, which is
 # based on nipype configuration, which in turn was based on nipy)
 #
-# We pretend to be erlang because we need GNU Octave which is not 
+# We pretend to be java because we need GNU Octave which is not 
 # available (as of April 2015)
 
-language: erlang
+language: java
 cache:
   - apt
 env:
- global:
+  global:
     - OCTAVE=octave
     - COSMOPATH=`pwd`
     - MVPAPATH=${COSMOPATH}/mvpa
- matrix:
+  matrix:
     - EXTERNALS=""
     - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics" WITH_COVERAGE=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -38,7 +39,8 @@ before_install:
 
     # go up one level to retrieve MOxUnit
     - cd ..
-    - git clone git://github.com/nno/MOxUnit.git
+    - rm -rf MOxUnit
+    - git clone -b _nf/mocov_dir git://github.com/nno/MOxUnit.git
     - make -C MOxUnit install
 install:
     - PTH=`pwd`
@@ -62,12 +64,14 @@ install:
 
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
+          rm -rf surfing;
           git clone git://github.com/nno/surfing.git --depth 1;
           make -C surfing install;
       fi
 
     # optionally install afni
     - if [[ " $EXTERNALS " = *" afni "* ]]; then
+          rm -rf afni;
           git clone git://github.com/afni/afni.git --depth 1;
           $OCTAVE --eval "addpath('${PTH}/afni/src/matlab');savepath();";
       fi
@@ -79,6 +83,7 @@ install:
     # (PR: https://github.com/fieldtrip/fieldtrip/pull/54)
     # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
+          rm -rf fieldtrip;
           git clone -b _enh/octave git://github.com/nno/fieldtrip.git;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
@@ -87,6 +92,7 @@ install:
 
     # optionally install libsvm
     - if [[ " $EXTERNALS " = *" libsvm "* ]]; then
+          rm -rf libsvm;
           git clone git://github.com/cjlin1/libsvm.git;
           $OCTAVE --eval "cd('${PTH}/libsvm/matlab');
                         make;
@@ -98,6 +104,7 @@ install:
     - if [[ " $EXTERNALS " = *" gifti "* ]]; then
           GIFTI_VERSION=1.5;
           GIFTI_NAME=gifti-${GIFTI_VERSION};
+          rm -rf ${GIFTI_NAME}.zip;
           wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;
           unzip ${GIFTI_NAME}.zip;
           $OCTAVE --eval "cd('${PTH}/${GIFTI_NAME}/@gifti/private');
@@ -108,8 +115,33 @@ install:
 
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
+    # prevent shippable from re-using old test results
+    - if [[  "$SHIPPABLE" == "true"  ]]; then
+          rm -f shippable/testresults/*.xml;
+      fi
+ 
+
 
 script:
-    - cd ${COSMOPATH}
-    - make test
+    - pwd
+    - ls
+    - cd CoSMoMVPA
+    - ls
+    - if [[  "$WITH_COVERAGE" == "true" ]]; then
+          TEST_ARGS=WITH_COVERAGE=true;
+          COVER_ARGS=COVER=`pwd`/mvpa;
+
+          if [[  "$SHIPPABLE" == "true"  ]]; then
+              OUTPUT_ARGS=COVER_XML_FILE=shippable/codecoverage/coverage.xml;
+          elif [[  "$TRAVIS" == "true"  ]]; then
+              OUTPUT_ARGS=COVER_JSON_FILE=`pwd`/coveralls.json;
+              AFTER_SCRIPT="curl --verbose -F json_file=@`pwd`/coveralls.json https://coveralls.io/api/v1/jobs";
+          fi;
+      elif [[  "$SHIPPABLE" == "true"  ]]; then
+          RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
+      fi
+    - echo Test arguments $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
+    - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
+    - $AFTER_SCRIPT
+
 
