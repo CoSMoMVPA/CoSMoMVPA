@@ -21,17 +21,17 @@ function test_naive_bayes_classifier_searchlight_basics
     assertEqual(xacc.samples,mean(bsxfun(@eq,x.samples,x.sa.targets)));
     assert_same_output_as_classifical_searchlight(ds,nh,opt);
 
-    
-    
+
+
 function assert_same_output_as_classifical_searchlight(ds,nh,opt)
     opt.progress=false;
     x=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
-    
+
     opt.classifier=@cosmo_classify_naive_bayes;
     y=cosmo_searchlight(ds,nh,@cosmo_crossvalidation_measure,opt);
-    
+
     assertEqual(x,y);
-    
+
 
 function test_naive_bayes_classifier_searchlight_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
@@ -56,9 +56,14 @@ function test_naive_bayes_classifier_searchlight_partial_partitions
     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',nchunks,...
                         'size','small');
     nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
+
     partitions=cosmo_nfold_partitioner(ds);
+    nsamples=size(ds.samples,1);
+    prediction_count=zeros(nsamples,1);
     for k=1:nchunks
-        partitions.test_indices{k}=partitions.test_indices{k}(2:end);
+        with_missing=partitions.test_indices{k}(2:end);
+        partitions.test_indices{k}=with_missing;
+        prediction_count(with_missing)=prediction_count(with_missing)+1;
     end
 
     opt=struct();
@@ -67,8 +72,15 @@ function test_naive_bayes_classifier_searchlight_partial_partitions
     opt.output='predictions';
 
     res=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
-    assertEqual(res.sa,ds.sa);
+
+    ds_sa=ds.sa;
+    ds_sa.chunks(prediction_count==0)=NaN;
+    assertEqual(res.sa,ds_sa);
     cosmo_check_dataset(res);
+
+    assert_same_output_as_classifical_searchlight(ds,nh,opt);
+
+
 
 
 
