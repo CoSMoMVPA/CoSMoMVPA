@@ -41,6 +41,27 @@ function test_naive_bayes_classifier_searchlight_exceptions
     opt.partitions=cosmo_nfold_partitioner(ds);
     aet(ds,nh,opt);
 
+function test_naive_bayes_classifier_searchlight_partial_partitions
+    nchunks=4;
+    ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',nchunks,...
+                        'size','small');
+    nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false)
+    partitions=cosmo_nfold_partitioner(ds);
+    for k=1:nchunks
+        partitions.test_indices{k}=partitions.test_indices{k}(2:end);
+    end
+
+    opt=struct();
+    opt.progress=false;
+    opt.partitions=partitions;
+    opt.output='predictions';
+
+    res=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
+    assertEqual(res.sa,ds.sa);
+    cosmo_check_dataset(res);
+
+
+
 
 
 

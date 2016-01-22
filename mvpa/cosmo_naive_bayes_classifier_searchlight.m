@@ -173,13 +173,14 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 
         case 'predictions'
             result.samples=predictions;
-            result.sa=cosmo_slice(ds.sa,has_prediction,1,'struct');
+            result.sa=ds.sa;
 
         otherwise
             error(['illegal output ''%s'', must be '...
                     '''accuracy'' or ''predictions'''], opt.output);
     end
 
+    cosmo_check_dataset(result);
 
 
 
