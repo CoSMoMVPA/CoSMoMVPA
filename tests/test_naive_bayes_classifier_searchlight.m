@@ -14,14 +14,24 @@ function test_naive_bayes_classifier_searchlight_basics
     assertEqual(x.a,nh.a);
 
     % compare with standard searchlight
-    opt.classifier=@cosmo_classify_naive_bayes;
-    y=cosmo_searchlight(ds,nh,@cosmo_crossvalidation_measure,opt);
-
-    assertEqual(x,y);
+    assert_same_output_as_classifical_searchlight(ds,nh,opt);
 
     opt.output='accuracy';
     xacc=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
     assertEqual(xacc.samples,mean(bsxfun(@eq,x.samples,x.sa.targets)));
+    assert_same_output_as_classifical_searchlight(ds,nh,opt);
+
+    
+    
+function assert_same_output_as_classifical_searchlight(ds,nh,opt)
+    opt.progress=false;
+    x=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
+    
+    opt.classifier=@cosmo_classify_naive_bayes;
+    y=cosmo_searchlight(ds,nh,@cosmo_crossvalidation_measure,opt);
+    
+    assertEqual(x,y);
+    
 
 function test_naive_bayes_classifier_searchlight_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
@@ -45,7 +55,7 @@ function test_naive_bayes_classifier_searchlight_partial_partitions
     nchunks=4;
     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',nchunks,...
                         'size','small');
-    nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false)
+    nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
     partitions=cosmo_nfold_partitioner(ds);
     for k=1:nchunks
         partitions.test_indices{k}=partitions.test_indices{k}(2:end);

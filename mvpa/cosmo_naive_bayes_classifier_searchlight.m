@@ -169,7 +169,7 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
             is_correct=bsxfun(@eq,predictions(has_prediction,:),...
                                     ds.sa.targets(has_prediction));
             result.samples=mean(is_correct,1);
-            result.sa.labels={'Accuracy'};
+            result.sa.labels={'accuracy'};
 
         case 'predictions'
             result.samples=predictions;
