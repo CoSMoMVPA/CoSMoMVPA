@@ -125,7 +125,7 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
     npartitions=numel(train_idxs);
 
     predictions=NaN(nsamples,ncenters);
-    has_prediction=false(nsamples,1);
+    prediction_count=zeros(nsamples,1);
 
     if show_progress
         clock_start=clock();
@@ -148,7 +148,7 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 
         % store predictions
         predictions(test_idx,:)=pred;
-        has_prediction(test_idx)=true;
+        prediction_count(test_idx)=prediction_count(test_idx)+1;
 
         if show_progress && (fold<10 || ~mod(fold,opt.progress) || ...
                                                 fold==ncenters)
@@ -158,6 +158,8 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
         end
 
     end
+
+    has_prediction=prediction_count>0;
 
     result=struct();
     result.a=nbrhood.a;
@@ -169,17 +171,19 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
             is_correct=bsxfun(@eq,predictions(has_prediction,:),...
                                     ds.sa.targets(has_prediction));
             result.samples=mean(is_correct,1);
-            result.sa.labels={'Accuracy'};
+            result.sa.labels={'accuracy'};
 
         case 'predictions'
             result.samples=predictions;
-            result.sa=cosmo_slice(ds.sa,has_prediction,1,'struct');
+            result.sa=ds.sa;
+            result.sa.chunks(~has_prediction)=NaN;
 
         otherwise
             error(['illegal output ''%s'', must be '...
                     '''accuracy'' or ''predictions'''], opt.output);
     end
 
+    cosmo_check_dataset(result);
 
 
 
