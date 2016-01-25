@@ -19,7 +19,11 @@ function test_meeg_senstype_collection_
 
     % test each one
     n=numel(senstype_props);
+
+    clear('cosmo_meeg_senstype_collection');
     stc=cosmo_meeg_senstype_collection();
+    stc_cached=cosmo_meeg_senstype_collection();
+    assertEqual(stc,stc_cached);
     for k=1:n
         prop=senstype_props{k};
         key=prop{1};
