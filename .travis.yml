@@ -37,11 +37,21 @@ before_install:
     - c++ --version
     - g++ --version
 
-    # go up one level to retrieve MOxUnit
+    # go up one level
     - cd ..
+
+    # retrieve MOxUnit
     - rm -rf MOxUnit
-    - git clone -b _nf/mocov_dir git://github.com/nno/MOxUnit.git
+    - git clone -b coverage git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
+
+    # optionally retrieve MOcov
+    - if [[ "WITH_COVERAGE" = "true" ]]; then
+          rm -rf MOcov;
+          git clone git://github.com/MOcov/MOcov.git;
+          make -C MOcov install;
+      fi
+
 install:
     - PTH=`pwd`
     - OCTAVERC=~/.octaverc
