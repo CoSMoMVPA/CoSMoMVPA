@@ -1,5 +1,5 @@
-CoSMoMVPA |build-status|
-========================
+CoSMoMVPA |build-status| |coverage-status|
+==========================================
 
 .. |build-status|
    image:: https://secure.travis-ci.org/CoSMoMVPA/CoSMoMVPA.png
