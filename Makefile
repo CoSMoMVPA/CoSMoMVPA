@@ -55,9 +55,6 @@ ifdef WITH_COVERAGE
 endif
 		
 	
-export RUNTESTS_ARGS
-
-
 ADDPATH="cd('$(MVPADIR)');cosmo_set_path()"
 RMPATH="cd('$(MVPADIR)'); \
 		ds=cosmo_strsplit(genpath('$(ROOTDIR)'),pathsep()); \
@@ -92,7 +89,16 @@ help:
 	@echo "                     path"
 	@echo "  test-matlab        to run tests using Matlab"
 	@echo "  test-octave        to run tests using GNU Octave"
-	@echo " "
+	@echo ""
+	@echo "------------------------------------------------------------------"
+	@echo ""
+	@echo "Environmental variables:"
+	@echo "  WITH_COVERAGE      Enable line coverage registration"
+	@echo "  COVER              Directory to compute line coverage for"
+	@echo "  COVER_XML_FILE    	Coverage XML output filename	"
+	@echo "  COVER_JSON_FILE    Coverage JSON output filename"
+	@echo "  COVER_HTML_DIR     Coverage HTML output directory"
+	@echo "  COVER_HTML_DIR     Coverage HTML output directory"
 	@echo ""
 
 
