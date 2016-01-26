@@ -46,7 +46,7 @@ before_install:
     - make -C MOxUnit install
 
     # optionally retrieve MOcov
-    - if [[ "$WITH_COVERAGE" = "true" ]]; then
+    - if [[ "$WITH_COVERAGE" == "true" ]]; then
           rm -rf MOcov;
           git clone git://github.com/MOcov/MOcov.git;
           make -C MOcov install;
