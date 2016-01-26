@@ -20,7 +20,41 @@ DOCUMENTATION_HTML_PREFIX=CoSMoMVPA_documentation_html
 DOCARCHIVEDIR=$(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX)
 DOCUMENTATION_FILES_TO_ARCHIVE=AUTHOR copyright README.rst
 
+RUNTESTS_ARGS?='-verbose'
+	
+ifdef JUNIT_XML
+	RUNTESTS_ARGS +=,'-junit_xml','$(JUNIT_XML)'
+endif
 
+ifdef WITH_COVERAGE
+	ifndef COVER
+		#$(error COVER variable must be set when using WITH_COVERAGE)
+	endif
+	RUNTESTS_ARGS+=,'-with_coverage','-cover','$(COVER)'
+	export COVER
+
+	ifdef COVER_XML_FILE
+		 RUNTESTS_ARGS+=,'-cover_xml_file','$(COVER_XML_FILE)'
+		 export COVER_XML_FILE
+	endif
+
+	ifdef COVER_HTML_DIR
+		 RUNTESTS_ARGS+=,'-cover_html_dir','$(COVER_HTML_DIR)'
+		 export COVER_HTML_DIR
+	endif
+
+	ifdef COVER_JSON_FILE
+		 RUNTESTS_ARGS+=,'-cover_json_file','$(COVER_JSON_FILE)'
+		 export COVER_JSON_FILE
+	endif
+
+	ifdef JUNIT_XML_FILE
+		 RUNTESTS_ARGS+=,'-junit_xml_file','$(JUNIT_XML_FILE)'
+		 export JUNIT_XML_FILE
+	endif
+endif
+		
+	
 ADDPATH="cd('$(MVPADIR)');cosmo_set_path()"
 RMPATH="cd('$(MVPADIR)'); \
 		ds=cosmo_strsplit(genpath('$(ROOTDIR)'),pathsep()); \
@@ -32,7 +66,7 @@ INSTALL=$(ADDPATH)";"$(SAVEPATH)
 UNINSTALL=$(RMPATH)";"$(SAVEPATH)
 TEST=$(ADDPATH)"; \
      cd('$(TESTDIR)'); \
-     success=cosmo_run_tests(); \
+     success=cosmo_run_tests($(RUNTESTS_ARGS)); \
      exit(~success);"
 
 help:
@@ -55,7 +89,16 @@ help:
 	@echo "                     path"
 	@echo "  test-matlab        to run tests using Matlab"
 	@echo "  test-octave        to run tests using GNU Octave"
-	@echo " "
+	@echo ""
+	@echo "------------------------------------------------------------------"
+	@echo ""
+	@echo "Environmental variables:"
+	@echo "  WITH_COVERAGE      Enable line coverage registration"
+	@echo "  COVER              Directory to compute line coverage for"
+	@echo "  COVER_XML_FILE    	Coverage XML output filename	"
+	@echo "  COVER_JSON_FILE    Coverage JSON output filename"
+	@echo "  COVER_HTML_DIR     Coverage HTML output directory"
+	@echo "  COVER_HTML_DIR     Coverage HTML output directory"
 	@echo ""
 
 
@@ -119,14 +162,14 @@ uninstall:
 
 
 test-matlab:
-	@if [ -n "$(MATLAB_BIN)" ]; then \
+	if [ -n "$(MATLAB_BIN)" ]; then \
 		$(MATLAB_RUN_CLI) $(TEST); \
 	else \
 		echo "matlab binary could not be found, skipping"; \
 	fi;
 
 test-octave:
-	@if [ -n "$(OCTAVE_BIN)" ]; then \
+	if [ -n "$(OCTAVE_BIN)" ]; then \
 		$(OCTAVE_RUN_CLI) $(TEST); \
 	else \
 		echo "octave binary could not be found, skipping"; \

@@ -83,7 +83,11 @@ function test_meeg_layout_collection_
 
     % test each one
     n=numel(lay_props);
+
+    clear('cosmo_meeg_layout_collection');
     lc=cosmo_meeg_layout_collection();
+    lc_cached=cosmo_meeg_layout_collection();
+    assertEqual(lc,lc_cached);
     lc_names=cellfun(@(x) x.name,lc,'UniformOutput',false);
     for k=1:n
         lay_prop=lay_props{k};

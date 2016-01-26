@@ -4,10 +4,12 @@ function did_pass=cosmo_run_tests(varargin)
 % did_pass=cosmo_run_tests(['verbose',v]['output',fn])
 %
 % Inputs:
-%   'verbose',v     run doctest with verbose output (optional,
-%                   default=true)
-%   'output',fn     store output in a file named fn (optional, if omitted
-%                   output is written to the terminal window
+%   '-verbose'        do not run with verbose output
+%   '-logfile',fn     store output in a file named fn (optional, if omitted
+%                     output is written to the terminal window)
+%   'file.m'          run tests in 'file.m'
+%   '-no_doctest'     skip doctest
+%   '-no_unittest'    skip unittest
 %
 % Examples:
 %   % run tests with defaults
@@ -129,343 +131,225 @@ function did_pass=cosmo_run_tests(varargin)
 %     9) The suite passes if all tests pass
 %
 % NNO Jul 2014
-    test_suite_name=find_external();
 
-    defaults=struct();
-    defaults.verbose=true;
-    defaults.output=1;     % standard out
-    defaults.filename=[];
-
-    opt=get_opt(defaults,varargin{:});
-
-    % store original directory
     orig_pwd=pwd();
+    pwd_resetter=onCleanup(@()cd(orig_pwd));
 
-    % set paths for unit tests and doc tests
-    mvpa_func='cosmo_fmri_dataset';
+    [opt,args]=get_opt(varargin{:});
 
-    doctest_dir=fileparts(which(mvpa_func));
-    unittest_dir=fullfile(fileparts(doctest_dir),'tests');
+    run_doctest=~opt.no_doctest;
+    run_unittest=~opt.no_unittest;
+    opt.doctest_location=[];
 
-    has_filename=~isempty(opt.filename);
-    if has_filename
-        % test a single file
-        unittest_location=opt.filename;
-        doctest_location=opt.filename;
+    has_logfile=~isempty(opt.logfile);
 
-    else
-        % test a set of files in directories
-        unittest_location=unittest_dir;
-        doctest_location=doctest_dir;
+    if has_logfile && run_doctest && run_unittest
+        error('Cannot have logfile with both doctest and unittest');
     end
 
-    % if opt.output is numeric it's assumed to be a file descriptor;
-    % output is written to the corresponding file but the file is not
-    % closed afterwards
-    do_open_output_file=~isnumeric(opt.output);
+    runners={@run_doctest_helper,@run_unittest_helper};
+    did_pass=all(cellfun(@(runner) runner(opt,args),runners));
 
-    if do_open_output_file
-        fid=fopen(opt.output,'w');
+
+function did_pass=run_doctest_helper(opt,unused)
+    did_pass=true;
+
+    location=opt.doctest_location;
+    if ~ischar(location)
+        return;
+    elseif isempty(location)
+        location=get_default_dir('doc');
+    end
+
+    if cosmo_wtf('is_octave')
+        cosmo_warning('Doctest not (yet) available for GNU Octave, skip');
+        return
+    end
+
+    % xUnit is required
+    cosmo_check_external('xunit');
+
+    % run test using custom CosmoDocTestSuite
+    cd(opt.run_from_dir);
+    suite=CosmoDocTestSuite(location);
+    if opt.verbose
+        monitor_constructor=@VerboseTestRunDisplay;
+    else
+        monitor_constructor=@TestRunDisplay;
+    end
+
+    has_logfile=ischar(opt.logfile);
+    if has_logfile
+        fid=fopen(opt.logfile,'w');
         file_closer=onCleanup(@()fclose(fid));
     else
-        fid=opt.output;
+        fid=1;
     end
 
-    path_resetter=onCleanup(@()cd(orig_pwd));
+    monitor=monitor_constructor(fid);
+    did_pass=suite.run(monitor);
 
-    % avoid setting the path for CosmoDocTest{Case,Suite} classes;
-    % instead, cd to the tests directory and run the tests from there.
-    cd(unittest_dir);
 
-    % reset set of skipped tests
-    cosmo_notify_test_skipped('on');
+function did_pass=run_unittest_helper(opt,args)
+    did_pass=true;
 
-    verbosity=opt.verbose+1;
-
-    unit_suite=get_suite(unittest_location,...
-                            unittest_dir,'unit');
-    doc_suite=get_suite(doctest_location,...
-                            doctest_dir,'doc');
-
-    did_pass=run_suites(fid,verbosity,{unit_suite,doc_suite});
-
-function did_all_pass=run_suites(fid, verbosity, all_suites)
-    keep_msk=~cellfun(@isempty,all_suites);
-    suites=all_suites(keep_msk);
-
-    show_test_count(suites,fid);
-
-    suites=merge_suites(suites);
-    n_suites=numel(suites);
-
-    did_all_pass=true;
-    reporters=cell(n_suites,1);
-    for k=1:n_suites
-        suite_k=suites{k};
-        monitor_constructor=get_test_monitor_constructor(suite_k, ...
-                                                        verbosity);
-        [did_pass,reporters{k}]=run_single_suite(suite_k,...
-                                                monitor_constructor,fid);
-        did_all_pass=did_all_pass & did_pass;
-    end
-
-    for k=1:n_suites
-        reporters{k}();
-    end
-
-function [did_pass,reporter]=run_single_suite(suite, ...
-                                monitor_constructor, fid)
-    monitor = monitor_constructor(fid);
-
-    switch get_suite_class(suite)
-        case 'TestSuite'
-            did_pass=suite.run(monitor);
-            reporter=@()report_test_result(fid, did_pass);
-
-        case 'MOxUnitTestSuite'
-            test_result=run(suite, monitor);
-            reporter=@()disp(test_result);
-
-            did_pass=wasSuccessful(test_result);
-    end
-
-function show_test_count(suite,fid)
-    if iscell(suite)
-        cellfun(@(s)show_test_count(s,fid),suite);
+    location=opt.unittest_location;
+    if ~ischar(location)
         return;
+    elseif isempty(location)
+        location=get_default_dir('unit');
+        args{end+1}=location;
     end
 
-    count=suite_count(suite);
-    postfix=sprintf('%d tests', count);
-    fprintf(fid,'%s test suite: %s\n', class(suite), postfix);
+    cd(opt.run_from_dir);
+
+    test_runner=get_test_field('runner');
+    did_pass=test_runner(args{:});
 
 
-function merged=merge_suites(suites)
-    if numel(suites)==0
-        error('No suites found');
+
+function s=get_all_test_runners_struct()
+    s=struct();
+    s.moxunit.runner=@moxunit_runtests;
+    s.moxunit.arg_with_value={'-cover',...
+                              '-cover_xml_file',...
+                              '-cover_html_dir',...
+                              '-cover_json_file',...
+                              '-with_coverage',...
+                              '-junit_xml_file',...
+                              '-cover_method'};
+
+    s.xunit.runner=@runtests;
+    s.xunit.arg_with_value={};
+
+function key=get_test_runner_name()
+    runners_struct=get_all_test_runners_struct();
+    keys=fieldnames(runners_struct);
+
+    present_ids=find(cosmo_check_external(keys,false));
+
+    if isempty(present_ids)
+        raise_exception=true;
+        cosmo_check_external(keys, raise_exception);
     end
 
-    suite_classes=get_suite_class(suites);
-    if numel(suites)>0 && ...
-            all(strcmp(suite_classes{1},suite_classes(2:end)))
-        one_suite=suites{1};
-        one_class=suite_classes{1};
-
-        for k=2:numel(suites)
-            suite_k=suites{k};
-            switch one_class
-                case 'TestSuite'
-                    one_suite.add(suite_k);
-
-                case 'MOxUnitTestSuite'
-                    one_suite=addFromSuite(one_suite,suite_k);
-            end
-        end
-
-        merged={one_suite};
-
-        return;
-    end
-
-    merged=suites;
+    key=keys{present_ids};
 
 
-function suite=get_suite(location,parent_dir,type)
-    suite=get_empty_suite(type);
-    if ~isempty(suite)
-        suite=suite_add_from_location(suite,location,parent_dir,type);
+function value=get_test_field(sub_key)
+    key=get_test_runner_name();
+    s=get_all_test_runners_struct();
+    value=s.(key).(sub_key);
+
+
+function d=get_default_dir(name)
+    switch name
+        case 'root'
+            d=fileparts(fileparts(mfilename('fullpath')));
+
+        case 'unit'
+            d=fullfile(get_default_dir('root'),'tests');
+
+        case 'doc'
+            d=fullfile(get_default_dir('root'),'mvpa');
     end
 
 
-function suite=get_empty_suite(type)
+function [opt,passthrough_args]=get_opt(varargin)
+    defaults=struct();
+    defaults.verbose=false;
+    defaults.no_doctest=false;
+    defaults.no_unittest=false;
+    defaults.logfile=[];
+    defaults.unittest_location='';
+    defaults.doctest_location='';
 
-    switch get_suite_runner_name(type)
-        case 'moxunit'
-            suite=MOxUnitTestSuite();
+    n_args=numel(varargin);
+    passthrough_args=varargin;
+    keep_in_passthrough=true(1,n_args);
+    k=0;
 
-        case 'xunit'
-            suite=TestSuite();
+    arg_with_value=get_test_field('arg_with_value');
+    opt=defaults;
+    opt.run_from_dir=get_default_dir('unit');
 
-        case ''
-            suite=[];
-    end
+    while k<n_args
+        k=k+1;
+        arg=varargin{k};
 
-function monitor_constructor=get_test_monitor_constructor(suite, verbosity)
-    switch get_suite_class(suite)
-        case 'MOxUnitTestSuite'
-            monitor_constructor=@(fid)MOxUnitTestReport(verbosity,fid);
+        switch arg
+            case '-verbose'
+                opt.verbose=true;
 
-        case 'TestSuite'
-            monitor_constructors={@TestRunDisplay,@VerboseTestRunDisplay};
-            monitor_constructor=monitor_constructors{verbosity};
-    end
+            case '-no_doctest'
+                opt.no_doctest=true;
+                keep_in_passthrough(k)=false;
 
-function tf=skip_location(location,parent_dir)
-    tf=true;
-    if isdir(location)
-        location_dir=location;
-    else
-        location_dir=fileparts(location);
-    end
+            case '-no_unittest'
+                opt.no_unittest=true;
+                keep_in_passthrough(k)=false;
 
-    if strcmp(location_dir,parent_dir)
-        tf=false;
-        return;
-    end
+            case '-logfile'
+                [opt.logfile,k]=next_arg(varargin,k);
 
-    which_location=which(location);
-    if ~isempty(which_location);
-        location_dir=fileparts(which_location);
-        tf=~strcmp(location_dir,parent_dir);
-    end
+            otherwise
+                is_option=~isempty(regexp(arg,'^-','once'));
 
-function suite_class=get_suite_class(suite)
-    if iscell(suite)
-        suite_class=cellfun(@get_suite_class,suite,...
-                                'UniformOutput',false);
-        return;
-    end
+                if is_option
+                    arg_has_value=~isempty(strmatch(arg,arg_with_value));
+                    if arg_has_value
+                        k=k+1;
+                    end
+                else
+                    test_location=get_location(arg);
+                    passthrough_args{k}=test_location;
 
-    super_classes={'TestSuite','MOxUnitTestSuite'};
-    for k=1:numel(super_classes)
-        super_class=super_classes{k};
-        if isa(suite,super_class)
-            suite_class=super_class;
+                    opt.unittest_location=test_location;
+                    opt.doctest_location=test_location;
+                end
         end
     end
 
-
-function suite=suite_add_from_location(suite,location,parent_dir,type)
-    if skip_location(location,parent_dir)
-        return;
+    passthrough_args=passthrough_args(keep_in_passthrough);
+    if opt.no_unittest
+        opt.unittest_location=[];
     end
 
-    switch get_suite_class(suite)
-        case 'MOxUnitTestSuite'
-            if isdir(location)
-                suite=addFromDirectory(suite,location);
-            else
-                suite=addFromFile(suite,location);
+    if opt.no_doctest
+        opt.doctest_location=[];
+    end
+
+function full_path=get_location(location)
+    parent_dirs={'',get_default_dir('unit'),get_default_dir('doc')};
+    n=numel(parent_dirs);
+    for use_which=[false,true]
+        for k=1:n
+            full_path=fullfile(parent_dirs{k},location);
+            if isdir(full_path) || ~isempty(dir(full_path))
+                return;
             end
 
-        case 'TestSuite'
-            location=regexprep(location,'\.m$','');
-
-            switch type
-                case 'doc'
-                    suite_to_add=CosmoDocTestSuite(location);
-
-                case 'unit'
-                    suite_to_add=TestSuite.fromName(location);
-
+            if use_which && isdir(parent_dirs{k})
+                orig_pwd=pwd();
+                cleaner=onCleanup(@()cd(orig_pwd));
+                cd(parent_dirs{k});
+                full_path=which(location);
+                if ~isempty(full_path)
+                    return;
+                end
+                clear cleaner;
             end
-
-            suite.add(suite_to_add);
-
-        otherwise
-            assert(false);
-    end
-
-function count=suite_count(suite)
-    switch get_suite_class(suite)
-        case 'MOxUnitTestSuite'
-            count=countTestCases(suite);
-
-
-        case 'TestSuite'
-            count=suite.numTestCases;
-    end
-
-function runner_name=get_suite_runner_name(type)
-    % helper function to get unit and doc test runner name
-    % result is 'moxunit' or 'xunit', or '' if not runner was found
-    has_moxunit=cosmo_check_external('moxunit',false);
-    has_xunit=cosmo_check_external('xunit',false);
-
-    if ~(has_moxunit || has_xunit)
-        if cosmo_wtf('is_matlab')
-            % on Matlab, suggest to use xunit because it provides doctest
-            % functionality
-            cosmo_check_external('xunit');
-        else
-            % on Octave, suggest to use moxunit because doctest
-            % functionality cannot be provided anyways
-            cosmo_check_external('moxunit');
         end
     end
 
-    which_dir=@(x)fileparts(which(x));
-    which_dir_init=which_dir('initTestSuite');
-    assert(~isempty(which_dir_init));
 
-    init_moxunit=isequal(which_dir_init,which_dir('moxunit_runtests'));
-    init_xunit=isequal(which_dir_init,which_dir('runtests'));
+    error('Unable to find ''%s''',location);
 
-    if init_moxunit
-        assert(~init_xunit);
-        if strcmp(type,'doc')
-            if has_xunit
-                runner_name='xunit';
-            else
-                runner_name='';
-            end
-        else
-            runner_name='moxunit';
-        end
-    else
-        assert(~init_moxunit);
-        runner_name='xunit';
+
+function [value,next_k]=next_arg(args,k)
+    n=numel(args);
+    next_k=k+1;
+    if next_k>n
+        error('missing argument after ''%s''',args{k});
     end
-
-
-
-
-
-function report_test_result(fid, did_pass)
-    if did_pass
-        prefix='OK';
-    else
-        prefix='FAILED';
-    end
-
-    skipped_descs=cosmo_notify_test_skipped();
-    nskip=numel(skipped_descs);
-
-    if nskip>0
-        for k=1:nskip
-            fprintf(fid,'[skip] %s\n\n', skipped_descs{k});
-        end
-    end
-
-    postfix=sprintf(' (skips=%d)', nskip);
-
-    fprintf(fid,'%s%s\n',prefix,postfix);
-
-
-function external=find_external()
-    if cosmo_wtf('is_octave')
-        % xunit is not supported
-        external='moxunit';
-    else
-        external_candidates={'xunit','moxunit'};
-        has_external=cosmo_check_external(external_candidates,false);
-        if ~any(has_external)
-            % raise an error
-            cosmo_check_external(external_candidates,true);
-        end
-
-        % prefer xunit, because through CoSMoMVPA integration it
-        % supports unit tests
-        i=find(has_external,1,'first');
-        external=external_candidates{i};
-    end
-
-function opt=get_opt(defaults,varargin)
-    if ~isempty(varargin) && numel(varargin)==1 && ischar(varargin{1})
-        % test a single file
-        opt=defaults;
-        opt.filename=varargin{1};
-    else
-        % use all defaults
-        opt=cosmo_structjoin(defaults,varargin{:});
-    end
+    value=args{next_k};
