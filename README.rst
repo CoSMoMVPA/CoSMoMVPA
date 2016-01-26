@@ -7,6 +7,12 @@ CoSMoMVPA |build-status|
    :target: http://travis-ci.org/CoSMoMVPA/CoSMoMVPA
    :alt: CoSMoMVPA travis-ci build status
 
+.. |coverage-status|
+   image:: https://coveralls.io/repos/github/CoSMoMVPA/CoSMoMVPA/badge.svg
+              ?branch=master
+   :target: https://coveralls.io/github/CoSMoMVPA/CoSMoMVPA?branch=master
+   :alt: CoSMoMVPA coveralls.io coverage status
+
 
 A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab / Octave
 
