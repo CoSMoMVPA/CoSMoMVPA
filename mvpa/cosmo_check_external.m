@@ -298,7 +298,7 @@ function s=url2str(url)
 
 
 function w=noerror_which(varargin)
-    % Octave raises an expection when which is called and a mex-file of
+    % Octave raises an expection when 'which' is called and a mex-file of
     % incompatible architecture is found
     w='';
     try
