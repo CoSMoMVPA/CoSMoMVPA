@@ -529,7 +529,7 @@ function externals=get_externals_helper()
     externals.octave_pkg_statistics.url=['http://http://octave.'...
                                         'sourceforge.net/statistics/'];
 
-    externals.mocov.is_present=@() has('moxunit_runtests');
+    externals.mocov.is_present=@() has('mocov');
     externals.mocov.is_recent=yes;
     externals.mocov.label=['Matlab/Octave MOcov '...
                                         'Coverage report generator'];

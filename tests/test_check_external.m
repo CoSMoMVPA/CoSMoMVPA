@@ -20,7 +20,7 @@ function test_check_external_nifti()
 
     % test list
     externals=cosmo_check_external('-list');
-    assert(~isempty(strmatch({'nifti'},externals)));
+    assert(~isempty(strmatch('nifti',externals,'exact')));
 
     % test tic/toc
     cosmo_check_external('-tic');
@@ -41,6 +41,8 @@ function test_check_external_nifti()
 
 function test_check_external_mocov()
     has_mocov=~isempty(which('mocov'));
+    disp(has_mocov)
+    disp(cosmo_check_external('mocov',false))
     assertEqual(has_mocov,cosmo_check_external('mocov',false));
 
 
