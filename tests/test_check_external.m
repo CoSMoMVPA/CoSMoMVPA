@@ -7,9 +7,10 @@ function test_check_external_nifti()
 
     warning_state=cosmo_warning();
     orig_path=path();
-    cleaner=onCleanup(@()do_sequentially({...
+    run_sequentially=@(varargin)cellfun(@(f)f(),varargin);
+    cleaner=onCleanup(@()run_sequentially(...
                             @()path(orig_path),...
-                            @()cosmo_warning(warning_state)}));
+                            @()cosmo_warning(warning_state)));
 
     % ensure path is set; disable warnings by cosmo_set_path
     cosmo_warning('off');
@@ -38,13 +39,21 @@ function test_check_external_nifti()
     c=cosmo_check_external('-cite');
     assert(~isempty(findstr(c,'NIFTI toolbox')));
 
+    % removing nifti from the path makes it absent
+    rmpath(fileparts(which('load_nii')));
+    assertFalse(cosmo_check_external('nifti',false));
+
+    % throws exception when second argument is true or absent
+    assertExceptionThrown(@()cosmo_check_external('nifti',true),'');
+    assertExceptionThrown(@()cosmo_check_external('nifti'),'');
+
 
 function test_check_external_mocov()
     has_mocov=~isempty(which('mocov'));
-    disp(has_mocov)
-    disp(cosmo_check_external('mocov',false))
     assertEqual(has_mocov,cosmo_check_external('mocov',false));
 
 
-function do_sequentially(f_cell)
-    cellfun(@(x)x(),f_cell);
+function test_check_external_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_check_external(varargin{:}),'');
+    aet('unknown package');
