@@ -17,5 +17,9 @@ function test_check_external_nifti()
     assert(~isempty(strmatch({'nifti'},externals)));
 
 
+function test_check_external_mocov()
+    has_mocov=~isempty(which('mocov'));
+    assertEqual(has_mocov,cosmo_check_external('mocov',false));
+
 
 

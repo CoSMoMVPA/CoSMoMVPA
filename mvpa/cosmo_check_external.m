@@ -525,6 +525,13 @@ function externals=get_externals_helper()
     externals.octave_pkg_statistics.url=['http://http://octave.'...
                                         'sourceforge.net/statistics/'];
 
+    externals.mocov.is_present=@() has('moxunit_runtests');
+    externals.mocov.is_recent=yes;
+    externals.mocov.label=['Matlab/Octave MOcov '...
+                                        'Coverage report generator'];
+    externals.mocov.authors={'N. N. Oosterhof'};
+    externals.mocov.url='https://github.com/MOcov/MOcov';
+
 function tf=has_octave_package(label)
     tf=cosmo_wtf('is_octave') && ~isempty(pkg('list',label));
 
