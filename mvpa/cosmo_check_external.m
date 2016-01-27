@@ -25,7 +25,7 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          external is not present.
 %
 % Returns:
-%   is_ok             boolean indicating whether the external is
+%   is_ok                  boolean indicating whether the external is
 %                          present. A matlab toolbox must be prefixed
 %                          by a '@'. If external is a cell if P elements,
 %                          then the output is a Px1 boolean vector.
@@ -130,8 +130,12 @@ function is_ok=cosmo_check_external(external, raise_)
                 s=sprintf(['If you use CoSMoMVPA and/or some '...
                          'other toolboxes for a publication, '...
                         'please cite:\n\n%s\n'], citation_str);
-                disp(s);
-                is_ok=[];
+                if nargout==0
+                    disp(s);
+                    is_ok=[];
+                else
+                    is_ok=s;
+                end
 
             otherwise
                 error('illegal switch %s', external);
