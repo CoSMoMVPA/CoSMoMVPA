@@ -61,8 +61,10 @@ install:
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
           $OCTAVE --eval "pkg('install','-forge','parallel');";
-          echo "" >> ~/.octaverc;
+          echo "" >> $OCTAVERC;
           echo "pkg load parallel;" >> $OCTAVERC;
+          $OCTAVE --eval "exit(isempty(which('parcellfun')))";
+          $OCTAVE --eval "exit(~isequal(parcellfun(2,@abs,{-1,2},'VerboseLevel',0),[1 2]))";
       fi
 
     # optionally enable Octave statitics package
@@ -70,6 +72,7 @@ install:
           $OCTAVE --eval "pkg('install','-forge','io');";
           $OCTAVE --eval "pkg('install','-forge','statistics');";
           echo "pkg load statistics;" >> $OCTAVERC;
+          $OCTAVE --eval "exit(isempty(which('anderson_darling_test')))";
       fi
 
     # optionally install surfing toolbox
