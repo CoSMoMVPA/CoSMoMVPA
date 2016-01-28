@@ -69,12 +69,12 @@ function f_ds=cosmo_fx(ds, f, split_by, dim, check)
         error('f must be a function handle');
     end
 
+    % split the dataset
+    ds_split=cosmo_split(ds, split_by, dim, check);
+
     % store size in other dimension - it should not change
     other_dim=3-dim;
     size_other_dim=size(ds.samples,other_dim);
-
-    % split the dataset
-    ds_split=cosmo_split(ds, split_by, dim, check);
 
     nsplits=numel(ds_split);
     res=cell(nsplits,1); % allocate space for output
