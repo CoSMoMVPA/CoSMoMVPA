@@ -36,7 +36,6 @@ function did_pass=cosmo_run_tests(varargin)
 
     run_doctest=~opt.no_doctest;
     run_unittest=~opt.no_unittest;
-    opt.doctest_location=[];
 
     has_logfile=~isempty(opt.logfile);
 
@@ -45,6 +44,10 @@ function did_pass=cosmo_run_tests(varargin)
     end
 
     runners={@run_doctest_helper,@run_unittest_helper};
+
+    orig_path=path();
+    path_resetter=onCleanup(@()path(orig_path));
+
     did_pass=all(cellfun(@(runner) runner(opt,args),runners));
 
 
@@ -98,12 +101,21 @@ function did_pass=run_unittest_helper(opt,args)
         args{end+1}=location;
     end
 
-    cd(opt.run_from_dir);
+
+    unittest_dir=get_directory(location);
+    addpath(unittest_dir);
 
     test_runner=get_test_field('runner');
     did_pass=test_runner(args{:});
 
-
+function directory=get_directory(location)
+    if isdir(location)
+        directory=location;
+    elseif exist(location,'file')
+        directory=fileparts(location);
+    else
+        error('illegal location %s',location);
+    end
 
 function s=get_all_test_runners_struct()
     s=struct();
@@ -217,11 +229,22 @@ function [opt,passthrough_args]=get_opt(varargin)
     end
 
 function full_path=get_location(location)
+    if exist(location,'file')
+        p=fileparts(location);
+        if isempty(p)
+            full_path=fullfile(pwd(),location);
+        else
+            full_path=location;
+        end
+        return
+    end
+
     parent_dirs={'',get_default_dir('unit'),get_default_dir('doc')};
     n=numel(parent_dirs);
     for use_which=[false,true]
         for k=1:n
             full_path=fullfile(parent_dirs{k},location);
+
             if isdir(full_path) || ~isempty(dir(full_path))
                 return;
             end

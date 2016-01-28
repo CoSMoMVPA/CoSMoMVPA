@@ -71,16 +71,6 @@ function is_ok=cosmo_check_external(external, raise_)
 %   % list the publications associated with the externals
 %   cosmo_check_external('-cite');
 %
-% Notes:
-%   - For performance reasons this function keeps a persistent variable
-%     with the names of externals that have already been checked for.
-%     Benchmarking suggests a speedup of at least a factor of 30.
-%     If the user changes the path in between successive calls of this
-%     function and removes a toolbox from the path, then this function may
-%     incorrectly report the external present when
-%     using cosmo_check_external, with a less user-friendly error message
-%     as a result
-%
 % NNO Sep 2013
 
     persistent cached_present_names;
