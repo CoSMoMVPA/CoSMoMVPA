@@ -500,6 +500,8 @@ function externals=get_externals_helper()
                                         'Test Framework'];
     externals.moxunit.authors={'N. N. Oosterhof'};
     externals.moxunit.url='https://github.com/MOxUnit/MOxUnit';
+    externals.moxunit.conflicts.xunit=@() same_path({'runtests',...
+                                                'initTestSuite'});
 
     externals.octave_pkg_parallel.is_present=@() has_octave_package(...
                                                     'parallel');
@@ -528,6 +530,11 @@ function externals=get_externals_helper()
 
 function tf=has_octave_package(label)
     tf=cosmo_wtf('is_octave') && ~isempty(pkg('list',label));
+
+function tf=same_path(args)
+    pths=cellfun(@(x)fileparts(which(x)),args,'UniformOutput',false);
+    tf=all(cellfun(@(x)isequal(x,pths{1}),pths(2:end)));
+
 
 function version=get_libsvm_version()
     svm_root=fileparts(fileparts(noerror_which('svmpredict')));
