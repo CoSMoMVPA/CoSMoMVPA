@@ -3,14 +3,14 @@ function test_suite = test_run_tests
 
 function test_run_tests_passing
     test_content='assert(true);';
-    [result,output]=helper_make_and_run_test(test_content);
+    [result,output]=helper_test_make_and_run(test_content);
     assertTrue(result);
     assert(~isempty(findstr('OK',output)));
 
 
 function test_run_tests_failing
     test_content='assert(false);';
-    [result,output]=helper_make_and_run_test(test_content);
+    [result,output]=helper_test_make_and_run(test_content);
     assertFalse(result);
     assert(~isempty(findstr('FAILED',output)));
 
@@ -29,7 +29,7 @@ function test_run_tests_missing_logfile_argument()
     assertExceptionThrown(@()helper_run_tests({'-logfile'}),'');
 
 
-function [result,output]=helper_make_and_run_test(test_content)
+function [result,output]=helper_test_make_and_run(test_content)
     cosmo_test_dir=fileparts(mfilename('fullpath'));
 
     fn=cosmo_make_temp_filename(fullfile(cosmo_test_dir,'test_'),'.m');
