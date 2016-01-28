@@ -137,6 +137,11 @@ function [idxs,input_is_array]=index_unique_per_value(values)
     end
 
     ndim=numel(values);
+    if ndim==0
+        idxs=[];
+        return;
+    end
+
     for k=1:ndim
         vs=values{k};
 
