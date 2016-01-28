@@ -513,7 +513,7 @@ function externals=get_externals_helper()
                                         'sourceforge.net/parallel/'];
 
     externals.octave_pkg_statistics.is_present=@() has_octave_package(...
-                                                    'parallel');
+                                                    'statistics');
     externals.octave_pkg_statistics.is_recent=yes;
     externals.octave_pkg_statistics.label=['GNU Octave statistics '...
                                                 'package'];
