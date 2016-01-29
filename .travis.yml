@@ -58,23 +58,6 @@ install:
     - OCTAVEPTH="${MVPAPATH}"
     - CHECKEXTCMD=""
 
-    # optionally enable Octave parallel package
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','parallel');";
-          echo "" >> $OCTAVERC;
-          echo "pkg load parallel;" >> $OCTAVERC;
-          $OCTAVE --eval "exit(isempty(which('parcellfun')))";
-          $OCTAVE --eval "exit(~isequal(parcellfun(2,@abs,{-1,2},'VerboseLevel',0),[1 2]))";
-      fi
-
-    # optionally enable Octave statitics package
-    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','io');";
-          $OCTAVE --eval "pkg('install','-forge','statistics');";
-          echo "pkg load statistics;" >> $OCTAVERC;
-          $OCTAVE --eval "exit(isempty(which('anderson_darling_test')))";
-      fi
-
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
           rm -rf surfing;
@@ -133,6 +116,23 @@ install:
           rm -f shippable/testresults/*.xml;
       fi
  
+before_script:
+    # (note: Shippable.com does not work properly if the
+    #        Octave pacakges are installed in the "install" section)
+    #
+    # optionally enable Octave parallel package
+    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','parallel');";
+          echo "" >> $OCTAVERC;
+          echo "pkg load parallel;" >> $OCTAVERC;
+      fi
+
+    # optionally enable Octave statitics package
+    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
+          $OCTAVE --eval "pkg('install','-forge','io');";
+          $OCTAVE --eval "pkg('install','-forge','statistics');";
+          echo "pkg load statistics;" >> $OCTAVERC;
+      fi
 
 
 script:
