@@ -2,7 +2,7 @@ function test_suite = test_disp
     initTestSuite;
 
 
-function test_disp_()
+function test_disp_array()
     if ~has_evalc()
         cosmo_notify_test_skipped('No support for ''evalc''');
         return;
@@ -14,6 +14,14 @@ function test_disp_()
     aeq(['[ 1         2         3  ...  '...
                 '8         9        10 ]@1x10'],1:10);
 
+function test_disp_struct()
+    if ~has_evalc()
+        cosmo_notify_test_skipped('No support for ''evalc''');
+        return;
+    end
+
+    aeq=@(s,y) assertEqual([s repmat(sprintf('\n'),size(s,1),1)],...
+                                        evalc('cosmo_disp(y)'));
 
     x=struct();
     x.a_cell={[],{'cell in cell',[1 2; 3 4]}};
