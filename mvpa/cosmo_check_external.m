@@ -25,7 +25,7 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          external is not present.
 %
 % Returns:
-%   is_ok             boolean indicating whether the external is
+%   is_ok                  boolean indicating whether the external is
 %                          present. A matlab toolbox must be prefixed
 %                          by a '@'. If external is a cell if P elements,
 %                          then the output is a Px1 boolean vector.
@@ -70,16 +70,6 @@ function is_ok=cosmo_check_external(external, raise_)
 %
 %   % list the publications associated with the externals
 %   cosmo_check_external('-cite');
-%
-% Notes:
-%   - For performance reasons this function keeps a persistent variable
-%     with the names of externals that have already been checked for.
-%     Benchmarking suggests a speedup of at least a factor of 30.
-%     If the user changes the path in between successive calls of this
-%     function and removes a toolbox from the path, then this function may
-%     incorrectly report the external present when
-%     using cosmo_check_external, with a less user-friendly error message
-%     as a result
 %
 % NNO Sep 2013
 
@@ -130,8 +120,12 @@ function is_ok=cosmo_check_external(external, raise_)
                 s=sprintf(['If you use CoSMoMVPA and/or some '...
                          'other toolboxes for a publication, '...
                         'please cite:\n\n%s\n'], citation_str);
-                disp(s);
-                is_ok=[];
+                if nargout==0
+                    disp(s);
+                    is_ok=[];
+                else
+                    is_ok=s;
+                end
 
             otherwise
                 error('illegal switch %s', external);
@@ -298,7 +292,7 @@ function s=url2str(url)
 
 
 function w=noerror_which(varargin)
-    % Octave raises an expection when which is called and a mex-file of
+    % Octave raises an expection when 'which' is called and a mex-file of
     % incompatible architecture is found
     w='';
     try
@@ -506,6 +500,8 @@ function externals=get_externals_helper()
                                         'Test Framework'];
     externals.moxunit.authors={'N. N. Oosterhof'};
     externals.moxunit.url='https://github.com/MOxUnit/MOxUnit';
+    externals.moxunit.conflicts.xunit=@() same_path({'runtests',...
+                                                'initTestSuite'});
 
     externals.octave_pkg_parallel.is_present=@() has_octave_package(...
                                                     'parallel');
@@ -517,7 +513,7 @@ function externals=get_externals_helper()
                                         'sourceforge.net/parallel/'];
 
     externals.octave_pkg_statistics.is_present=@() has_octave_package(...
-                                                    'parallel');
+                                                    'statistics');
     externals.octave_pkg_statistics.is_recent=yes;
     externals.octave_pkg_statistics.label=['GNU Octave statistics '...
                                                 'package'];
@@ -525,8 +521,20 @@ function externals=get_externals_helper()
     externals.octave_pkg_statistics.url=['http://http://octave.'...
                                         'sourceforge.net/statistics/'];
 
+    externals.mocov.is_present=@() has('mocov');
+    externals.mocov.is_recent=yes;
+    externals.mocov.label=['Matlab/Octave MOcov '...
+                                        'Coverage report generator'];
+    externals.mocov.authors={'N. N. Oosterhof'};
+    externals.mocov.url='https://github.com/MOcov/MOcov';
+
 function tf=has_octave_package(label)
     tf=cosmo_wtf('is_octave') && ~isempty(pkg('list',label));
+
+function tf=same_path(args)
+    pths=cellfun(@(x)fileparts(which(x)),args,'UniformOutput',false);
+    tf=all(cellfun(@(x)isequal(x,pths{1}),pths(2:end)));
+
 
 function version=get_libsvm_version()
     svm_root=fileparts(fileparts(noerror_which('svmpredict')));

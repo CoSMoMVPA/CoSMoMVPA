@@ -88,7 +88,7 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 %     >   [ 0.6      0.74      0.44       0.6       0.7       0.4 ]
 %     > .sa
 %     >   .labels
-%     >     { 'Accuracy' }
+%     >     { 'accuracy' }
 %
 %
 % Notes:

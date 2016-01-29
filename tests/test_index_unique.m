@@ -110,6 +110,7 @@ function test_index_unique_()
     aetp({[1,2],{1,2}},id_different_classes);
     aet(ones([2 2 2]));
 
+
 function test_unique_with_nans
     n_rows_half=100+ceil(rand()*20);
     %n_rows_half=2;
@@ -147,6 +148,20 @@ function test_unique_with_nans
     assertFalse(isequal(xx_unq,yy_unq));
     % due to NaNs, the indices must be different
     assertFalse(isequal([xx_idx{:}],rp_y([yy_idx{:}])));
+
+
+function test_index_unique_empty()
+    empty_args={{},{[],{}},{[]},{{},{}}};
+    for k=1:numel(empty_args)
+        empty_arg=empty_args{k};
+
+        [idxs,unq]=cosmo_index_unique(empty_arg);
+        assertTrue(iscell(idxs));
+        assertTrue(numel(idxs)==1);
+        assertEqual(numel(unq),numel(empty_arg));
+        assertTrue(all(cellfun(@isempty,unq)));
+    end
+
 
 function rp=get_non_identity_randperm(n)
     while true

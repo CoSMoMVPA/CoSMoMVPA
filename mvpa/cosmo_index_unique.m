@@ -137,8 +137,19 @@ function [idxs,input_is_array]=index_unique_per_value(values)
     end
 
     ndim=numel(values);
+    if ndim==0
+        % no values, return
+        idxs=[];
+        return;
+    end
+
     for k=1:ndim
         vs=values{k};
+        if numel(vs)==0
+            % no values, return
+            idxs=[];
+            return;
+        end
 
         idx=unique_indices_from_vector(vs);
 
@@ -153,7 +164,6 @@ function [idxs,input_is_array]=index_unique_per_value(values)
                             k,nv,nv_first);
             end
         end
-
         idxs(:,k)=idx;
     end
 

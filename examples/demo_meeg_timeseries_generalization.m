@@ -267,5 +267,5 @@ ft_topoplotTFR(cfg, ft);
 
 %% show citation information
 
-cosmo_check_external('-cite')
+cosmo_check_external('-cite');
 
