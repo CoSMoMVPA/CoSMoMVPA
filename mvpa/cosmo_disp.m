@@ -329,6 +329,10 @@ function y=strcat_(xs)
             end
 
             x=xs{j,k};
+            if ~ischar(x) && isempty(x)
+                x='';
+            end
+
             sx=size(x);
             to_add=[height width]-sx;
 
