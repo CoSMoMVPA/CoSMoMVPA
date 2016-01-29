@@ -15,8 +15,8 @@ env:
     - MVPAPATH=${COSMOPATH}/mvpa
   matrix:
     - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics"
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics" WITH_COVERAGE=true
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc" WITH_COVERAGE=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -132,6 +132,13 @@ before_script:
           $OCTAVE --eval "pkg('install','-forge','io');";
           $OCTAVE --eval "pkg('install','-forge','statistics');";
           echo "pkg load statistics;" >> $OCTAVERC;
+      fi
+
+    # optionally enable experimental evalc implementation
+    - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
+          mkdir savannah_evalc;
+          wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
+          $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
 

@@ -261,7 +261,7 @@ function y=multi_any2string(x,ndim_post,opt)
 
     if isempty(post)
         s_post={'',''};
-        s_dots='';
+        s_dots={'',''};
     else
         s_post=nd_any2str_helper(xflat,p,post,opt);
         s_dots=cell(1,2);
@@ -271,7 +271,6 @@ function y=multi_any2string(x,ndim_post,opt)
             s_dots{k}=[spaces(1,pos) ':'];
         end
     end
-
     s_all=cat(1,s_pre,s_dots,s_post);
 
     y=strcat_({header;strcat_(s_all)});

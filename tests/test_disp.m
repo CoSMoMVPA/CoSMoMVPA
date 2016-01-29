@@ -3,8 +3,8 @@ function test_suite = test_disp
 
 
 function test_disp_()
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('Octave does not support ''evalc''');
+    if ~has_evalc()
+        cosmo_notify_test_skipped('No support for ''evalc''');
         return;
     end
 
@@ -39,8 +39,8 @@ function test_disp_()
     aeq(s,x);
 
 function test_disp_cases
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('Octave does not support ''evalc''');
+    if ~has_evalc
+        cosmo_notify_test_skipped('No support for ''evalc''');
         return;
     end
 
@@ -198,14 +198,15 @@ function test_disp_cases
       ]);
 
 function test_disp_nosize()
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('Octave does not support ''evalc''');
+    if ~has_evalc() || cosmo_wtf('is_octave');
+        cosmo_notify_test_skipped(['No support for testing evalc '...
+                                    'on data with no size']);
         return;
     end
     orig_pwd=pwd();
     pwd_resetter=onCleanup(@()cd(orig_pwd));
     temp_dir=fullfile(orig_pwd,cosmo_make_temp_filename());
-    dir_cleaner=onCleanup(@()rmdir(temp_dir,'s'));
+    dir_cleaner=onCleanup(@()remove_dir_helper(temp_dir));
 
     % override 'size' method for double
     mkdir(temp_dir);
@@ -217,12 +218,20 @@ function test_disp_nosize()
     fprintf(fid,'function size(varargin)\nerror(''undefined'');');
     fclose(fid);
 
-
-
     cd(temp_dir);
     assert_equal_disp(1,'<double>\n');
 
 
+function tf=has_evalc()
+    tf=exist('evalc','builtin') || ~isempty(which('evalc'));
+
+function remove_dir_helper(tmp_dir)
+    if cosmo_wtf('is_octave')
+        rmdir_state=confirm_recursive_rmdir();
+        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state));
+        confirm_recursive_rmdir(false,'local');
+    end
+    rmdir(tmp_dir,'s');
 
 
 function assert_equal_disp(varargin)
