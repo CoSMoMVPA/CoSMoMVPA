@@ -119,20 +119,23 @@ install:
 before_script:
     # (note: Shippable.com does not work properly if the
     #        Octave pacakges are installed in the "install" section)
-    #
+
+    # load Octave io package
+    - $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','parallel');";
+          $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
           echo "" >> $OCTAVERC;
-          echo "pkg load parallel;" >> $OCTAVERC;
       fi
 
     # optionally enable Octave statitics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $OCTAVE --eval "pkg('install','-forge','io');";
-          $OCTAVE --eval "pkg('install','-forge','statistics');";
-          echo "pkg load statistics;" >> $OCTAVERC;
+          $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
       fi
+
+    # show which packages are installed
+    - $OCTAVE --eval "pkg('list')"
 
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
