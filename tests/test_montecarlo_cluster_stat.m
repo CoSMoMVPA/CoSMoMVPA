@@ -59,7 +59,7 @@ function test_onesample_ttest_montecarlo_cluster_stat
 
     % lots of signal, should work with no seed specified
     opt=struct();
-    opt.h0_mean=-10;
+    opt.h0_mean=-15;
     opt.progress=false;
     opt.niter=14;
     z_ds6=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
