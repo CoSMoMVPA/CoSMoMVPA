@@ -2,8 +2,8 @@ function test_suite=test_show_progress
     initTestSuite;
 
 function test_show_progress_basics
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('Octave does not support ''evalc''');
+    if ~has_evalc()
+        cosmo_notify_test_skipped('''evalc'' is not available');
         return;
     end
 
@@ -41,12 +41,14 @@ function test_show_progress_basics
 
 
 function assert_progress_equal(re,infix,varargin)
-    if isempty(infix)
-        cmd='';
-    else
-        cmd='fprintf(''%s'',infix);';
-    end
-    result=evalc([cmd 'cosmo_show_progress(varargin{:});']);
+%     if isempty(infix)
+%         cmd='';
+%     else
+%         cmd='fprintf(''%s'',infix);';
+%     end
+%     result=evalc([cmd 'cosmo_show_progress(varargin{:});']);
+    expr='helper_print_infix_and_show_progress(infix,varargin{:})';
+    result=evalc(expr);
 
     while true
         % replace a backspace character and the preceeding character by
@@ -60,3 +62,12 @@ function assert_progress_equal(re,infix,varargin)
 
     assert(~isempty(regexp(result,re,'once')))
 
+function helper_print_infix_and_show_progress(infix,varargin)
+    if ~isempty(infix)
+        fprintf('%s',infix);
+    end
+    cosmo_show_progress(varargin{:});
+
+
+function tf=has_evalc()
+    tf=exist('evalc','builtin') || ~isempty(which('evalc'));
