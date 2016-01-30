@@ -8,7 +8,8 @@ function cosmo_publish_run_scripts(varargin)
 %                directory)
 %   '-force'     force rebuild, even if an output file is newer than the
 %                corresponding output file
-%   '-dry'       dry run: show which files would be published
+%   '-dry'       dry run: do not build any files, but show the output that
+%                would be shown.
 %
 % Notes:
 %  - if no filename is given, then all files are rebuilt if necessary
@@ -28,24 +29,24 @@ function cosmo_publish_run_scripts(varargin)
     [force, srcpat, dryrun]=process_input(varargin{:});
 
     % save original working directory
-    pdir=pwd();
-    cleaner1=onCleanup(@()cd(pdir));
+    orig_pwd=pwd();
+    cleaner_reset_pwd=onCleanup(@()cd(orig_pwd));
 
     % run from CoSMoMVPA directory
-    medir=fileparts(which(mfilename()));
-    cd(medir);
+    me_dir=fileparts(which(mfilename()));
+    cd(me_dir);
 
     % set paths, relative to the location of this function
-    srcdir=fullfile(medir,'../examples/');
-    trgdir=fullfile(medir,'..//doc/source/_static/publish/');
+    srcdir=fullfile(me_dir,'../examples/');
+    trgdir=fullfile(me_dir,'..//doc/source/_static/publish/');
 
     srcext='.m';
     trgext='.html';
 
     summaryfn='index.html';
 
-    if ~exist(trgdir,'file');
-        mkdir(trgdir);
+    if ~exist(trgdir,'file') && ~dryrun;
+        mkdir_recursively(trgdir);
     end
 
     srcfns=dir(fullfile(srcdir,[srcpat srcext]));
@@ -56,18 +57,19 @@ function cosmo_publish_run_scripts(varargin)
 
     outputs=cell(nsrc,1);
 
-    p=path();
-    has_pwd=~isempty(strfind(p,medir));
-    if ~has_pwd
-        addpath(medir)
-        cleaner2=onCleanup(@()rmpath(medir));
+    orig_path=path();
+    path_unset=isempty(cosmo_match({me_dir},...
+                    cosmo_strsplit(orig_path,pathsep())));
+    if path_unset
+        cleaner2=onCleanup(@()path(orig_path));
+        addpath(me_dir);
     end
 
     total_time_took=0;
 
     output_pos=0;
     for k=1:nsrc
-        cd(medir);
+        cd(me_dir);
         srcfn=fullfile(srcdir,srcfns(k).name);
         [srcpth,srcnm,unused]=fileparts(srcfn);
         trgfn=fullfile(trgdir,[srcnm trgext]);
@@ -97,7 +99,7 @@ function cosmo_publish_run_scripts(varargin)
             time_took=etime(clock_end,clock_start);
             total_time_took=total_time_took+time_took;
 
-            cd(medir);
+            cd(me_dir);
 
             if is_built
                 outcome_msg=' done';
@@ -119,19 +121,22 @@ function cosmo_publish_run_scripts(varargin)
     fprintf('Processed %d files (%.1f sec)\n',output_pos,total_time_took);
 
     outputfn=fullfile(trgdir, summaryfn);
-    fid=fopen(outputfn,'w');
-    cleaner3=onCleanup(@()fclose(fid));
-    fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
-            '>\n']);
-    fprintf(fid,['<HTML><HEAD><TITLE>Index of matlab outputs</TITLE>'...
-                    '</HEAD>\n<BODY>Matlab output<UL>\n']);
 
-    for k=1:output_pos
-        nm=outputs{k};
-        fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
+    if ~dryrun
+        fid=fopen(outputfn,'w');
+        cleaner3=onCleanup(@()fclose(fid));
+        fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
+                '>\n']);
+        fprintf(fid,['<HTML><HEAD><TITLE>Index of matlab outputs'...
+                        '</TITLE></HEAD>\n<BODY>Matlab output<UL>\n']);
+
+        for k=1:output_pos
+            nm=outputs{k};
+            fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
+        end
+        fprintf(fid,['</UL>Back to <A HREF="../../index.html">index'...
+                        '</A>.</BODY></HTML>\n']);
     end
-    fprintf(fid,['</UL>Back to <A HREF="../../index.html">index</A>.'...
-                    '</BODY></HTML>\n']);
     fprintf('Index written to %s\n', outputfn);
 
 
