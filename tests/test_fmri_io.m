@@ -139,6 +139,10 @@ function tf=has_isotropic_voxels(ds)
 
 
 function test_map2fmri_afni_nonisotropic
+    if cosmo_skip_test_if_no_external('afni')
+        return;
+    end
+
     ds=cosmo_synthetic_dataset();
     % fine because voxels are not oblique
     cosmo_map2fmri(ds,'-afni');
