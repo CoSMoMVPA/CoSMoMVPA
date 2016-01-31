@@ -108,6 +108,52 @@ function test_fmri_io_bv_vmp_noniso()
     % require that rotation matrix is ok
     assert_dataset_equal(ds3,ds,'.vmr');
 
+function test_map2fmri_illegal_name()
+    ds=cosmo_synthetic_dataset();
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_map2fmri(varargin{:}),'');
+    aet(ds,'-nii-nii');
+    aet(ds,'-illegalformat');
+    aet(ds,'fn.illegal_extension');
+
+function test_fmri_io_force_fit()
+    ds=cosmo_synthetic_dataset();
+    ds.a.vol.mat(2,1)=rand();
+
+    assertFalse(has_isotropic_voxels(ds));
+
+    % just converting to nifti and back does not make the voxels isotropic
+    ds2=cosmo_fmri_dataset(cosmo_map2fmri(ds,'-nii'));
+    assertFalse(has_isotropic_voxels(ds2));
+
+    % forcefit makes the voxels isotropic
+    ds3=cosmo_fmri_dataset(cosmo_map2fmri(ds,'-nii','bv_force_fit',true));
+    assertTrue(has_isotropic_voxels(ds3));
+
+function tf=has_isotropic_voxels(ds)
+    % helper function
+    m=ds.a.vol.mat;
+    sz=sum(m(1:3,1:3).^2,1);
+    eps=1e-4;
+    tf=all(abs(sz(1)-sz)<eps);
+
+
+function test_map2fmri_afni_nonisotropic
+    ds=cosmo_synthetic_dataset();
+    % fine because voxels are not oblique
+    cosmo_map2fmri(ds,'-afni');
+
+    % make oblique
+    ds.a.vol.mat(2)=1;
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_map2fmri(varargin{:}),'');
+    aet(ds,'-afni');
+    aet(ds,'-afni','deoblique',false);
+
+    % should be fine with de-obliqued
+    cosmo_map2fmri(ds,'-afni','deoblique',true);
+
 
 function save_and_load_dataset_with_extension(ext, multi_volume)
     if nargin<2
