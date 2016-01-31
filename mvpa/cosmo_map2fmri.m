@@ -469,14 +469,8 @@ function afni_info=new_afni(ds)
     for k=1:3
         % for each spatial dimension, find which row transforms it
         idx=find(mat(1:3,k));
-        switch numel(idx)
-            case 0
-                error('Singular transformation matrix at row %d', k);
-            case 1
-                % ok
-            otherwise
-                error('Cannot deal with non-oblique matrix');
-        end
+        assert(numel(idx)==1); % ds is plump
+
         % store index and transformation matrix
         idxs(k)=idx;
         m(k)=mat(idx,k);
