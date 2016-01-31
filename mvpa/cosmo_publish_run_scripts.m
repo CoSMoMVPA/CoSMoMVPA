@@ -1,4 +1,4 @@
-function cosmo_publish_run_scripts(varargin)
+function is_ok=cosmo_publish_run_scripts(varargin)
 % helper function to publish example scripts (for developers)
 %
 % cosmo_publish_build_html([force|fn])
@@ -26,85 +26,68 @@ function cosmo_publish_run_scripts(varargin)
 %
 % NNO Sep 2014
 
-    [force, srcpat, dryrun]=process_input(varargin{:});
+    [srcfn_cell,opt]=process_input(varargin{:});
+    trgdir=get_output_dir(opt);
 
-    % save original working directory
-    orig_pwd=pwd();
-    cleaner_reset_pwd=onCleanup(@()cd(orig_pwd));
+    trgext=['.' opt.format];
+    summaryfn=['index.' opt.format];
 
-    % run from CoSMoMVPA directory
-    me_dir=fileparts(which(mfilename()));
-    cd(me_dir);
+    orig_path=path();
+    % ensure path is set
+    path_resetter=onCleanup(@()path(orig_path));
+    %addpath(fileparts(mfilename('fullpath')));
+    %cosmo_set_path();
 
-    % set paths, relative to the location of this function
-    srcdir=fullfile(me_dir,'../examples/');
-    trgdir=fullfile(me_dir,'..//doc/source/_static/publish/');
-
-    srcext='.m';
-    trgext='.html';
-
-    summaryfn='index.html';
-
-    if ~exist(trgdir,'file') && ~dryrun;
+    if ~exist(trgdir,'file') && ~opt.dryrun;
         mkdir_recursively(trgdir);
     end
 
-    srcfns=dir(fullfile(srcdir,[srcpat srcext]));
-    nsrc=numel(srcfns);
-    if nsrc==0
-        error('No files found matching %s%s in %s',srcpat,srcext,srcdir);
-    end
-
+    nsrc=numel(srcfn_cell);
     outputs=cell(nsrc,1);
 
-    orig_path=path();
-    path_unset=isempty(cosmo_match({me_dir},...
-                    cosmo_strsplit(orig_path,pathsep())));
-    if path_unset
-        cleaner2=onCleanup(@()path(orig_path));
-        addpath(me_dir);
-    end
-
     total_time_took=0;
-
     output_pos=0;
+    is_ok=true;
+
     for k=1:nsrc
-        cd(me_dir);
-        srcfn=fullfile(srcdir,srcfns(k).name);
-        [srcpth,srcnm,unused]=fileparts(srcfn);
+        srcfn=srcfn_cell{k};
+        [srcpth,srcnm]=fileparts(srcfn);
+
+        if k==1
+            addpath(srcpth);
+        end
+
         trgfn=fullfile(trgdir,[srcnm trgext]);
 
         [needs_update,build_msg]=target_needs_update(srcfn,trgfn);
-        if force
+        if opt.force
             build_msg=sprintf('update forced: %s',srcfn);
         end
 
         fprintf(build_msg);
 
-        do_update=needs_update || force;
+        do_update=needs_update || opt.force;
 
         if do_update
             fprintf('\n   building ... ');
-            cd(srcpth);
             clock_start=clock();
 
-            if dryrun
+            if opt.dryrun
                 fprintf('<dry run>');
                 is_built=true;
             else
-                is_built=publish_wrapper(srcfn,trgfn);
+                is_built=publish_helper(srcfn,trgfn);
             end
 
             clock_end=clock();
             time_took=etime(clock_end,clock_start);
             total_time_took=total_time_took+time_took;
 
-            cd(me_dir);
-
             if is_built
                 outcome_msg=' done';
             else
                 outcome_msg=' !! failed';
+                is_ok=false;
             end
 
             status_msg=sprintf('%s (%.1f sec)', outcome_msg,time_took);
@@ -122,7 +105,7 @@ function cosmo_publish_run_scripts(varargin)
 
     outputfn=fullfile(trgdir, summaryfn);
 
-    if ~dryrun
+    if ~opt.dryrun
         fid=fopen(outputfn,'w');
         cleaner3=onCleanup(@()fclose(fid));
         fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
@@ -140,75 +123,89 @@ function cosmo_publish_run_scripts(varargin)
     fprintf('Index written to %s\n', outputfn);
 
 
-function is_built=publish_wrapper(srcfn,trgfn)
-    [srcdir,srcnm,srcext]=fileparts(srcfn);
-    trgdir=fileparts(trgfn);
-
-    is_built=false;
-
-    if cosmo_wtf('is_matlab')
-        try
-            publish(srcnm, struct('outputDir',trgdir,'catchError',false));
-            is_built=true;
-        catch me
-            if exist(trgfn,'file')
-                delete(trgfn);
-            end
-
-            warning('Unable to build %s%s: %s',srcnm,srcext,...
-                                            me.message);
-            fprintf('%s\n', me.getReport);
-        end
-    else
-        orig_pwd=pwd();
-        orig_path=path();
-
-        cleaner1=onCleanup(@()cd(orig_pwd));
-        cleaner2=onCleanup(@()path(orig_path));
-
-        try
-            addpath(srcdir);
-            cd(trgdir);
-            publish(srcnm,'format','html','imageFormat','png')
-            close all;
-            is_built=true;
-
-        catch
-            if exist(trgfn,'file')
-                delete(trgfn);
-            end
-
-            me=lasterror();
-
-            msg=sprintf('Unable to build %s%s: %s\n',srcnm,srcext,...
-                                            me.message);
-
-            s=me.stack;
-            for j=1:numel(s)
-                msg=sprintf('%s\n  %s:%s', msg, s(j).file, s(j).line);
-            end
-
-            warning('%s',msg);
-        end
+function trgdir=get_output_dir(opt)
+    trgdir=opt.output_dir;
+    if isempty(trgdir)
+        trgdir=fullfile(get_root_dir(),'doc/source/_static/publish/');
     end
 
+function d=get_root_dir()
+    d=fileparts(fileparts(mfilename('fullpath')));
+
+function is_built=publish_helper(srcfn,trgfn)
+    is_built=false;
+    try
+        publish_wrapper(srcfn,trgfn);
+        is_built=true;
+    catch
+        me=lasterror();
+
+        if exist(trgfn,'file')
+            delete(trgfn);
+        end
+
+        msg=sprintf('Unable to build %s: %s\n',srcfn,...
+                                        me.message);
+
+        s=me.stack;
+        for j=1:numel(s)
+            msg=sprintf('%s\n  %s:%s', msg, s(j).file, s(j).line);
+        end
+
+        cosmo_warning('%s',msg);
+    end
+
+function publish_wrapper(srcfn,trgfn)
+    [srcdir,srcnm]=fileparts(srcfn);
+    trgdir=fileparts(trgfn);
+
+    addpath(srcdir);
+    cd(trgdir);
+    if cosmo_wtf('is_matlab')
+        args={struct('outputDir',trgdir,'catchError',false)};
+        post_command=@do_nothing;
+    else
+        args={'format','html','imageFormat','png'};
+        post_command=@()close('all');
+    end
+
+    publish(srcnm,args{:});
+    post_command();
 
 
+function do_nothing()
+    % empty because do nothing
 
 
-function [force, srcpat, dryrun]=process_input(varargin)
-    force=false;
-    srcpat=[];
-    dryrun=false;
+function [srcfn_cell,opt]=process_input(varargin)
+    % set defaults
+    srcpat='';
+
+    opt=struct();
+    opt.force=false;
+    opt.dryrun=false;
+    opt.format='html'; % currently not changeable
+    opt.output_dir='';
+
+    % process arguments
     n=numel(varargin);
 
-    for k=1:n
+    k=0;
+    while k<n
+        k=k+1;
         arg=varargin{k};
         if ischar(arg)
             if strcmp(arg,'-force')
-                force=true;
+                opt.force=true;
             elseif strcmp(arg,'-dry')
-                dryrun=true;
+                opt.dryrun=true;
+            elseif strcmp(arg,'-o')
+                if k==n
+                    error('Missing argument after %s',arg);
+                end
+                k=k+1;
+                opt.output_dir=varargin{k};
+
             elseif ~isempty(srcpat)
                 error('multiple inputs found, this is not supported');
             else
@@ -219,10 +216,39 @@ function [force, srcpat, dryrun]=process_input(varargin)
         end
     end
 
+    srcfn_cell=get_srcfn_cell(srcpat);
 
-    if isequal(srcpat,[])
-        srcpat='*_*';
+function srcfn_cell=get_srcfn_cell(srcpat)
+    if isdir(srcpat)
+        p=srcpat;
+        nms={'run_*','demo_*'};
+        e='.m';
+    else
+        [p,nm,e]=fileparts(srcpat);
+        if isempty(p)
+            p=fullfile(get_root_dir(),'examples');
+        end
+
+        if isempty(nm)
+            nm='*';
+        end
+
+        if isempty(e)
+            e='.m';
+        end
+
+        nms={nm};
     end
+
+    ds=cellfun(@(nm)dir(fullfile(p,[nm e])),nms,'UniformOutput',false);
+    d=cat(1,ds{:});
+    n=numel(d);
+    if n==0
+        error('No input files found');
+    end
+    srcfn_cell=cellfun(@(fn)fullfile(p,fn),{d.name},'UniformOutput',false);
+
+
 
 function [tf,msg]=target_needs_update(srcfn,trgfn)
     % helper function to see if html is out of date

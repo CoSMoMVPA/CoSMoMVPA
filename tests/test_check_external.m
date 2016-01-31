@@ -52,6 +52,28 @@ function test_check_external_mocov()
     has_mocov=~isempty(which('mocov'));
     assertEqual(has_mocov,cosmo_check_external('mocov',false));
 
+function test_check_external_command()
+    commands={'foo','basdfds','disp'};
+    n=numel(commands);
+    for k=1:n
+        command=commands{k};
+        has_command=~isempty(which(command));
+
+        arg=['!' command];
+        if has_command
+            assertTrue(cosmo_check_external(arg));
+            assertTrue(cosmo_check_external(arg,true));
+            assertTrue(cosmo_check_external(arg,false));
+        else
+            assertExceptionThrown(@()cosmo_check_external(arg),'');
+            assertExceptionThrown(@()cosmo_check_external(arg,true),'');
+            assertFalse(cosmo_check_external(arg,false));
+        end
+    end
+
+
+
+
 
 function test_check_external_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...

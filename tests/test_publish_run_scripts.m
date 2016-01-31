@@ -4,20 +4,65 @@ function test_suite = test_publish_run_scripts()
     initTestSuite;
 
 function test_publish_run_scripts_dry_run_all_files()
-    names_to_publish=helper_find_files(false);
-    helper_run_publish_run_scripts(names_to_publish,'');
+    [srcpat,names_to_publish]=helper_find_files(true);
+    helper_run_publish_run_scripts(names_to_publish,srcpat,',''-dry''');
 
 function test_publish_run_scripts_dry_run_single_file()
-    names_to_publish=helper_find_files(true);
+    [srcpat,names_to_publish]=helper_find_files(false);
     assert(numel(names_to_publish)==1);
-    fn=regexprep(names_to_publish{1},'\.m$','');
-    extra_args_str=sprintf(',''%s''',fn);
-    helper_run_publish_run_scripts(names_to_publish,extra_args_str);
+
+    helper_run_publish_run_scripts(names_to_publish,srcpat,',''-dry''');
 
 
-function names_to_publish=helper_find_files(only_single_file)
-    if ~has_evalc()
-        cosmo_notify_test_skipped('No support for ''evalc''');
+function test_publish_run_scripts_run_single_file_pass()
+    cosmo_notify_test_skipped(['publish functionality tests '...
+                                'currently disabled because coverage '
+                                'functionality does not work']);
+    return;
+    result=helper_publish_run_scripts_single_file('disp(''ok'')');
+    assertTrue(result);
+
+function test_publish_run_scripts_run_single_file_error()
+    cosmo_notify_test_skipped(['publish functionality tests '...
+                                'currently disabled because coverage '
+                                'functionality does not work']);
+    return;
+
+    result=helper_publish_run_scripts_single_file('error(''wrong'')');
+    assertFalse(result);
+
+function result=helper_publish_run_scripts_single_file(cmd)
+    if cosmo_skip_test_if_no_external('!publish')
+        return;
+    end
+
+    warning_state=cosmo_warning();
+    cleaner_warning=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    tmp_dir=tempname();
+    cleaner_tmp=onCleanup(@()remove_dir_helper(tmp_dir));
+    mkdir(tmp_dir);
+
+    fn=cosmo_make_temp_filename(fullfile(tmp_dir,'run_'),'.m');
+    fid=fopen(fn,'w');
+    cleaner_fid=onCleanup(@()fclose(fid));
+    fprintf(fid,'%s\n',cmd);
+    clear cleaner_fid;
+
+    [unused,nm,e]=fileparts(fn);
+    args=sprintf(',''-o'',''%s''',tmp_dir);
+
+    result=helper_run_publish_run_scripts({[nm e]},fn,args);
+
+    html_fn=fullfile(tmp_dir,[nm '.html']);
+    assertTrue(logical(exist(html_fn,'file')));
+
+
+
+
+function [srcpat,names_to_publish]=helper_find_files(entire_directory)
+    if cosmo_skip_test_if_no_external('!evalc')
         return;
     end
 
@@ -30,17 +75,29 @@ function names_to_publish=helper_find_files(only_single_file)
     to_publish_all=cat(1,to_publish_runs,to_publish_demos);
 
     names_to_publish={to_publish_all.name};
-    if only_single_file
+
+    if entire_directory
+        srcpat=example_dir;
+    else
         rp=randperm(numel(names_to_publish));
         names_to_publish=names_to_publish(rp(1));
+
+        srcpat=fullfile(example_dir,names_to_publish{1});
     end
 
 
-function helper_run_publish_run_scripts(names_to_publish,extra_args_str)
-    assertTrue(numel(names_to_publish)>0,'example directory not found');
 
-    expr=sprintf('cosmo_publish_run_scripts(''-dry''%s);',extra_args_str);
-    s=evalc(expr);
+
+function result=helper_run_publish_run_scripts(names_to_publish,...
+                                        srcpat,args)
+    assertTrue(numel(names_to_publish)>0,'example directory not found');
+    orig_warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('off');
+
+    expr=sprintf('cosmo_publish_run_scripts(''%s''%s);',...
+                            srcpat,args);
+    [s,result]=run_evalc_helper(expr);
 
     lines=cosmo_strsplit(s,'\n');
     n_lines=numel(lines);
@@ -62,5 +119,19 @@ function helper_run_publish_run_scripts(names_to_publish,extra_args_str)
     assert(all(cosmo_match(names_to_publish,files_processed)));
 
 
-function tf=has_evalc()
-    tf=exist('evalc','builtin') || ~isempty(which('evalc'));
+function [s,result]=run_evalc_helper(expr)
+    orig_path=path();
+    cleaner=onCleanup(@()path(orig_path));
+
+    s=evalc(['result=' expr]);
+
+
+
+function remove_dir_helper(tmp_dir)
+    if cosmo_wtf('is_octave')
+        rmdir_state=confirm_recursive_rmdir();
+        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state));
+        confirm_recursive_rmdir(false,'local');
+    end
+    rmdir(tmp_dir,'s');
+

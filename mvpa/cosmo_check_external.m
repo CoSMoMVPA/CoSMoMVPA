@@ -138,12 +138,25 @@ function is_ok=cosmo_check_external(external, raise_)
     if external(1)=='@'
         toolbox_name=external(2:end);
         is_ok=check_matlab_toolbox(toolbox_name,raise_);
+    elseif external(1)=='!'
+        command_name=external(2:end);
+        is_ok=check_which(command_name,raise_);
+        external='';
     else
         is_ok=check_external_toolbox(external,raise_);
     end
 
-    if is_ok && ~cosmo_match({external},cached_present_names)
+    if is_ok && ...
+                ~isempty(external) && ...
+                ~cosmo_match({external},cached_present_names)
         cached_present_names{end+1}=external;
+    end
+
+function is_ok=check_which(command_name,raise_)
+    is_ok=exist(command_name,'builtin') || ...
+                ~isempty(which(command_name));
+    if ~is_ok && raise_
+        error('Unknown command ''%s''', command_name);
     end
 
 function is_ok=check_external_toolbox(external_name,raise_)

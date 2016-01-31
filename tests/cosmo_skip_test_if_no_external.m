@@ -45,6 +45,10 @@ function skip_test=cosmo_skip_test_if_no_external(external)
     skip_test=~cosmo_check_external(external,false);
 
     if skip_test
-        reason=sprintf('External ''%s'' is absent',external);
+        if external(1)=='!'
+            reason=sprintf('Function %s is absent',external(2:end));
+        else
+            reason=sprintf('External ''%s'' is absent',external);
+        end
         cosmo_notify_test_skipped(reason);
     end
