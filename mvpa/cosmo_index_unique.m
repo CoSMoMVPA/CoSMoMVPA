@@ -121,22 +121,20 @@ function unique_values=get_unique_values(values,first_idx,input_is_array)
         end
     end
 
-function y=array2cell(x)
-    if ~(islogical(x) || isnumeric(x)) || numel(size(x))>2
-        error('input must be matrix or cell');
-    end
-    [nrows,ncols]=size(x);
-    y=mat2cell(x,nrows,ones(1,ncols));
 
 function [idxs,input_is_array]=index_unique_per_value(values)
     % finds the indices of unique elements for each element
     % in values (that must be a cell)
-    input_is_array=~iscell(values);
+    input_is_array=(islogical(values) || isnumeric(values)) && ...
+                        numel(size(values))==2;
     if input_is_array
-        values=array2cell(values);
+        ndim=size(values,2);
+    elseif iscell(values)
+        ndim=numel(values);
+    else
+        error('input must be matrix or cell');
     end
 
-    ndim=numel(values);
     if ndim==0
         % no values, return
         idxs=[];
@@ -144,7 +142,12 @@ function [idxs,input_is_array]=index_unique_per_value(values)
     end
 
     for k=1:ndim
-        vs=values{k};
+        if input_is_array
+            vs=values(:,k);
+        else
+            vs=values{k};
+        end
+
         if numel(vs)==0
             % no values, return
             idxs=[];
@@ -157,6 +160,8 @@ function [idxs,input_is_array]=index_unique_per_value(values)
         nv=numel(idx);
         if k==1
             nv_first=nv;
+
+            % allocate space for output
             idxs=zeros(nv,ndim);
         else
             if nv~=nv_first
@@ -164,6 +169,8 @@ function [idxs,input_is_array]=index_unique_per_value(values)
                             k,nv,nv_first);
             end
         end
+
+        % store indices
         idxs(:,k)=idx;
     end
 
