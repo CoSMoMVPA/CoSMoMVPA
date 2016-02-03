@@ -872,9 +872,24 @@ function img_formats=get_img_formats()
 % General
 
 function data=slice_4d(data, volumes)
-    ndim=numel(size(data));
+    data_size=size(data);
+    ndim=numel(data_size);
     if ndim>4
-        error('Only 3D or 4D is supported, not %dD',ndim);
+        % Could be the AFNI NIFTI conversion syndrome, where the 4th
+        % dimension is singleton and the fifth one contains the data.
+        % Such data is accepted and treated as if the fifth dimension is
+        % the fourth one.
+        time_size=data_size(4:end);
+        if sum(time_size>1)>1
+            error(['More than one singleton dimension found in '...
+                        'time dimension; this is currently not '...
+                        'supported. If you want to be able '...
+                        'to load such data, please get in touch '...
+                        'with the CoSMoMVPA developers']);
+        end
+
+        ntime=prod(time_size);
+        data=reshape(data,[data_size(1:3),ntime]);
     end
 
     if ~isempty(volumes)

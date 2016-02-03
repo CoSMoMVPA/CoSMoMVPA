@@ -65,6 +65,42 @@ function test_nii_pixdim_fmri_dataset()
                                     'absolute',1e-3);
 
 
+function test_nii_sform_afni_5d_singleton_dataset()
+    ds=get_base_dataset();
+    nii=get_expected_nii_sform();
+
+    % header: move 4th to 5th dimension
+    nii.hdr.dime.dim(6)=nii.hdr.dime.dim(5);
+    nii.hdr.dime.dim(5)=1;
+
+    % data: move 4th to 5th dimension
+    orig_size=size(nii.img);
+    nii.img=reshape(nii.img,[orig_size(1:3) 1 orig_size(4)]);
+
+    % test this test: verify size is ok
+    assertEqual(nii.hdr.dime.dim(2:6),size(nii.img));
+
+    ds_nii=cosmo_fmri_dataset(nii);
+    assert_dataset_equal(ds,ds_nii);
+
+function test_nii_sform_afni_5d_nonsingleton_dataset()
+    ds=get_base_dataset();
+    nii=get_expected_nii_sform();
+
+    % header: add extra dimension
+    nrep=ceil(rand()*3+2);
+    nii.hdr.dime.dim(6)=nrep;
+
+    % data: move 4th to 5th dimension
+    img_rep=repmat({nii.img},1,nrep);
+    nii.img=cat(5,img_rep{:});
+
+    % test this test: verify size is ok
+    assertEqual(nii.hdr.dime.dim(2:6),size(nii.img));
+
+    % must not support this
+    assertExceptionThrown(@()cosmo_fmri_dataset(nii),'');
+
 
 function test_nii_sform_and_qform_fmri_dataset()
     ds=get_base_dataset();
