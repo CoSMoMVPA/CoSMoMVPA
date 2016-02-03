@@ -50,6 +50,7 @@ function helper_write_read_config(include_path_settings)
         fprintf(fid,'%s=%s\n',key,value);
         s.(key)=value;
     end
+    fprintf(fid,'\n\n# this is not used\n');
 
     clear file_closer;
 
