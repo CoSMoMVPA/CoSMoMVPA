@@ -236,4 +236,50 @@ function test_target_dsm_corr_measure_exceptions
 
 
 
+function test_target_dsm_corr_measure_warnings_zero()
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',1);
+
+    ds_zero=ds;
+    ds_zero.samples(:)=0;
+
+    helper_target_dsm_corr_measure_with_warning(ds_zero,...
+                                        'target_dsm',[1 2 3]);
+
+function test_target_dsm_corr_measure_warnings_nan()
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',1);
+
+    ds_zero=ds;
+    ds_zero.samples(1)=NaN;
+
+    helper_target_dsm_corr_measure_with_warning(ds_zero,...
+                                        'target_dsm',[1 2 3]);
+
+function test_target_dsm_corr_measure_warnings_constant()
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',1);
+
+    ds_zero=ds;
+
+    helper_target_dsm_corr_measure_with_warning(ds_zero,...
+                                        'target_dsm',[0 0 0]);
+
+function result=helper_target_dsm_corr_measure_with_warning(varargin)
+    % ensure to reset to original state when leaving this function
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+
+    % clear all warnings
+    empty_state=warning_state;
+    empty_state.shown_warnings={};
+    cosmo_warning(empty_state);
+    cosmo_warning('off');
+
+    result=cosmo_target_dsm_corr_measure(varargin{:});
+    w=cosmo_warning();
+    assert(numel(w.shown_warnings)>0)
+    assert(iscellstr(w.shown_warnings));
+
+
+
+
+
 
