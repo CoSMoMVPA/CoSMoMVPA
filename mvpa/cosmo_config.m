@@ -209,8 +209,14 @@ function config=read_config(fn)
 % reads configuration from a file fn
 
     config=struct(); % space for output
+    if isempty(fn)
+        error('Input file not specified - cannot open')
+    end
 
     fid=fopen(fn);
+    if fid==-1
+        error('Unable to open file %s',fn);
+    end
 
     while true
         % read each line

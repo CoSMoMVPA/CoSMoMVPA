@@ -11,6 +11,15 @@ function test_config_reading_empty()
 function test_config_reading_with_paths()
     helper_write_read_config(true);
 
+function test_config_unable_to_find_file()
+    fn=tempname();
+    assertExceptionThrown(@()cosmo_config(fn),'');
+
+function test_config_unable_to_open_file()
+    dirname=fileparts(mfilename('fullpath'));
+    assertExceptionThrown(@()cosmo_config(dirname),'');
+
+
 function helper_write_read_config(include_path_settings)
     tmp_fn=tempname();
     file_deleter=onCleanup(@()delete(tmp_fn));
