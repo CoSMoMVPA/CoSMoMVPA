@@ -241,7 +241,7 @@ function test_fmri_io_exceptions()
     % wrong dimension size
     ds=cosmo_synthetic_dataset();
     nii=cosmo_map2fmri(ds,'-nii');
-    nii.img=zeros(1,1,1,1,5);
+    nii.img=zeros(1,1,1,2,5);
     aet(nii);
 
 function test_fmri_io_mask
