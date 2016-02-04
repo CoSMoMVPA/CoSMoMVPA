@@ -123,7 +123,7 @@ before_script:
     # Shippable.com seems to puke on travis_retry with quoted arguments,
     # so only use travis_retry on travis
     - if [[ "$SHIPPABLE" != "true" ]] && [[  "$TRAVIS" == "true"  ]]; then
-          RETRY=travis_retry
+          RETRY=travis_retry;
       fi
 
     # load Octave io package
