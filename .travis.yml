@@ -42,7 +42,7 @@ before_install:
 
     # retrieve MOxUnit
     - rm -rf MOxUnit
-    - git clone -v git://github.com/MOxUnit/MOxUnit.git
+    - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
 
     # optionally retrieve MOcov
