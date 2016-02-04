@@ -121,17 +121,17 @@ before_script:
     #        Octave pacakges are installed in the "install" section)
 
     # load Octave io package
-    - $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+    - travis_retry $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+          travis_retry $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
           echo "" >> $OCTAVERC;
       fi
 
     # optionally enable Octave statitics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
+          travis_retry $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
       fi
 
     # show which packages are installed
@@ -140,8 +140,8 @@ before_script:
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
-          wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
-          $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
+          travis_retry wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
+          travis_retry $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
 
