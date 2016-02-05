@@ -16,7 +16,7 @@ env:
   matrix:
     - EXTERNALS=""
     - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc"
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc" WITH_COVERAGE=true
+    - WITH_COVERAGE=true EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc"
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
