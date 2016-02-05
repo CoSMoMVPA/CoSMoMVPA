@@ -15,8 +15,8 @@ env:
     - MVPAPATH=${COSMOPATH}/mvpa
   matrix:
     - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc"
-    - WITH_COVERAGE=true EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_savannah_evalc"
+    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_pkg_miscellaneous octave_savannah_evalc"
+    - WITH_COVERAGE=true EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_pkg_miscellaneous octave_savannah_evalc"
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -130,10 +130,16 @@ before_script:
           echo "" >> $OCTAVERC;
       fi
 
-    # optionally enable Octave statitics package
+    # optionally enable Octave statistics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
       fi
+
+    # optionally enable Octave miscellaneous package
+    - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
+      fi
+
 
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
