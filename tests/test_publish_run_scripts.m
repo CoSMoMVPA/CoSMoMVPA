@@ -4,10 +4,18 @@ function test_suite = test_publish_run_scripts()
     initTestSuite;
 
 function test_publish_run_scripts_dry_run_all_files()
+    if cosmo_skip_test_if_no_external('!publish')
+        return;
+    end
+
     [srcpat,names_to_publish]=helper_find_files(true);
     helper_run_publish_run_scripts(names_to_publish,srcpat,',''-dry''');
 
 function test_publish_run_scripts_dry_run_single_file()
+    if cosmo_skip_test_if_no_external('!publish')
+        return;
+    end
+
     [srcpat,names_to_publish]=helper_find_files(false);
     assert(numel(names_to_publish)==1);
 
