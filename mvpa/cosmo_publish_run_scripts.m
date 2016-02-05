@@ -10,6 +10,9 @@ function is_ok=cosmo_publish_run_scripts(varargin)
 %                corresponding output file
 %   '-dry'       dry run: do not build any files, but show the output that
 %                would be shown.
+%   '-o', d      write output in directory d. By default d is
+%                'doc/source/_static/publish/' relative to the CoSMoMVPA
+%                root directory.
 %
 % Notes:
 %  - if no filename is given, then all files are rebuilt if necessary
@@ -26,6 +29,9 @@ function is_ok=cosmo_publish_run_scripts(varargin)
 %
 % NNO Sep 2014
 
+    % ensure 'publish' function is available
+    cosmo_check_external('!publish',true);
+
     [srcfn_cell,opt]=process_input(varargin{:});
     trgdir=get_output_dir(opt);
 
@@ -33,12 +39,9 @@ function is_ok=cosmo_publish_run_scripts(varargin)
     summaryfn=['index.' opt.format];
 
     orig_path=path();
-    % ensure path is set
     path_resetter=onCleanup(@()path(orig_path));
-    %addpath(fileparts(mfilename('fullpath')));
-    %cosmo_set_path();
 
-    if ~exist(trgdir,'file') && ~opt.dryrun;
+    if ~isdir(trgdir) && ~opt.dryrun;
         mkdir_recursively(trgdir);
     end
 
@@ -106,20 +109,33 @@ function is_ok=cosmo_publish_run_scripts(varargin)
     outputfn=fullfile(trgdir, summaryfn);
 
     if ~opt.dryrun
-        fid=fopen(outputfn,'w');
-        cleaner3=onCleanup(@()fclose(fid));
-        fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
-                '>\n']);
-        fprintf(fid,['<HTML><HEAD><TITLE>Index of matlab outputs'...
-                        '</TITLE></HEAD>\n<BODY>Matlab output<UL>\n']);
-
-        for k=1:output_pos
-            nm=outputs{k};
-            fprintf(fid,'<LI><A HREF="%s%s">%s</A></LI>\n',nm,trgext,nm);
-        end
-        fprintf(fid,['</UL>Back to <A HREF="../../index.html">index'...
-                        '</A>.</BODY></HTML>\n']);
+        write_index(outputfn,opt)
     end
+
+function write_index(outputfn,opt)
+    outputdir=fileparts(outputfn);
+    inputdir=fullfile(get_root_dir(),'examples');
+
+    d=dir(fullfile(inputdir,'*.m'));
+
+
+    fid=fopen(outputfn,'w');
+    cleaner3=onCleanup(@()fclose(fid));
+    fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
+            '>\n']);
+    fprintf(fid,['<HTML><HEAD><TITLE>Index of matlab outputs'...
+                    '</TITLE></HEAD>\n<BODY>Matlab output<UL>\n']);
+
+    for k=1:numel(d)
+        [unused,nm]=fileparts(d(k).name);
+        outputfn=sprintf('%s.%s',nm,opt.format);
+        if exist(fullfile(outputdir,outputfn),'file')
+            fprintf(fid,'<LI><A HREF="%s">%s</A></LI>\n',outputfn,nm);
+        end
+    end
+    fprintf(fid,['</UL>Back to <A HREF="../../index.html">index'...
+                    '</A>.</BODY></HTML>\n']);
+
     fprintf('Index written to %s\n', outputfn);
 
 
@@ -159,13 +175,16 @@ function publish_wrapper(srcfn,trgfn)
     [srcdir,srcnm]=fileparts(srcfn);
     trgdir=fileparts(trgfn);
 
+    orig_pwd=pwd();
+    pwd_resetter=onCleanup(@()cd(orig_pwd));
+
     addpath(srcdir);
     cd(trgdir);
     if cosmo_wtf('is_matlab')
         args={struct('outputDir',trgdir,'catchError',false)};
         post_command=@do_nothing;
     else
-        args={'format','html','imageFormat','png'};
+        args={'format','html','imageFormat','jpg'};
         post_command=@()close('all');
     end
 
@@ -324,4 +343,11 @@ function tf=is_in_staging(fn)
 
     basefn=cosmo_strsplit(fn,filesep,-1);
     tf=cosmo_match({basefn},in_staging);
+
+function mkdir_recursively(trgdir)
+    parent=fileparts(trgdir);
+    if ~isdir(parent)
+        mkdir_recursively(parent);
+    end
+    mkdir(trgdir);
 
