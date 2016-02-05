@@ -137,6 +137,9 @@ before_script:
 
     # optionally enable Octave miscellaneous package
     - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
+          # the "general" package is required for the "miscellaneous" package
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
+
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
       fi
 
