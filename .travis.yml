@@ -106,6 +106,7 @@ install:
 
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
+
     # prevent shippable from re-using old test results
     - if [[  "$SHIPPABLE" == "true"  ]]; then
           rm -f shippable/testresults/*.xml;
