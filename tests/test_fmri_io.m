@@ -118,7 +118,7 @@ function test_map2fmri_illegal_name()
 
 function test_fmri_io_force_fit()
     ds=cosmo_synthetic_dataset();
-    ds.a.vol.mat(2,1)=rand();
+    ds.a.vol.mat(2,1)=1+rand();
 
     assertFalse(has_isotropic_voxels(ds));
 
