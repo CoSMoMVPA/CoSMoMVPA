@@ -156,7 +156,7 @@ function is_ok=check_which(command_name,raise_)
     is_ok=exist(command_name,'builtin') || ...
                 ~isempty(which(command_name));
     if ~is_ok && raise_
-        error('Unknown command ''%s''', command_name);
+        error('Function ''%s'' is not available', command_name);
     end
 
 function is_ok=check_external_toolbox(external_name,raise_)
