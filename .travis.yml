@@ -73,14 +73,9 @@ install:
       fi
 
     # optionally install FieldTrip
-    # Hopefull soon the official FieldTrip code can be used.
-    # Currently (Oct 2015) we use our own version that
-    # is more compatible with GNU Octave
-    # (PR: https://github.com/fieldtrip/fieldtrip/pull/54)
-    # TODO: git clone git://github.com/fieldtrip/fieldtrip.git --depth 1
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
-          git clone -b _enh/octave git://github.com/nno/fieldtrip.git;
+          git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
                             savepath();";
