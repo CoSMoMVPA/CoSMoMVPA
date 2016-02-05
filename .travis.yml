@@ -42,7 +42,7 @@ before_install:
 
     # retrieve MOxUnit
     - rm -rf MOxUnit
-    - git clone git://github.com/MOxUnit/MOxUnit.git
+    - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
 
     # optionally retrieve MOcov
@@ -120,18 +120,24 @@ before_script:
     # (note: Shippable.com does not work properly if the
     #        Octave pacakges are installed in the "install" section)
 
+    # Shippable.com seems to puke on travis_retry with quoted arguments,
+    # so only use travis_retry on travis
+    - if [[ "$SHIPPABLE" != "true" ]] && [[  "$TRAVIS" == "true"  ]]; then
+          RETRY=travis_retry;
+      fi
+
     # load Octave io package
-    - $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
           echo "" >> $OCTAVERC;
       fi
 
     # optionally enable Octave statitics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
       fi
 
     # show which packages are installed
@@ -140,14 +146,12 @@ before_script:
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
-          wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
-          $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
+          $RETRY wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
+          $RETRY $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
 
 script:
-    - pwd
-    - ls
     - cd CoSMoMVPA
     - ls
     - if [[  "$WITH_COVERAGE" == "true" ]]; then
