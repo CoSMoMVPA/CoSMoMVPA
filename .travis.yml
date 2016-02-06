@@ -138,8 +138,10 @@ before_script:
 
     # optionally enable Octave miscellaneous package
     # (the "general" package is required for the "miscellaneous" package)
+    # (the "miscellaneous" package also requires "units")
     - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
+          $RETRY sudo apt-get install units
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
       fi
 
