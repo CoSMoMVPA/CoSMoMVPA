@@ -141,7 +141,7 @@ before_script:
     # (the "miscellaneous" package also requires "units")
     - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
-          $RETRY sudo apt-get install units
+          $RETRY sudo apt-get -y -qq install units
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
       fi
 
