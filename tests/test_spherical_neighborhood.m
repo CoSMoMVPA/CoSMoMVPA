@@ -243,6 +243,104 @@ function test_meeg_source_dataset
     assertTrue(mean(dp)>.8);
     assertTrue(mean(dq)>.3);
 
+function test_small_meeg_source_dataset_without_inside_field
+    ds=cosmo_synthetic_dataset('type','source','size','small');
+    voxel_size=10;
+    idx=cosmo_index_unique(ds.fa.pos');
+    n_pos=numel(idx);
+
+    ds_pos=ds.a.fdim.values{1}(:,ds.fa.pos);
+
+    for radius=0:.4:2;
+        nh=cosmo_spherical_neighborhood(ds,...
+                    'radius',radius,...
+                    'progress',false);
+        center_pos=nh.a.fdim.values{1}(:,nh.fa.pos);
+        assertEqual(numel(nh.neighbors),n_pos);
+        for k=1:n_pos
+            sel_idx=nh.neighbors{k};
+
+            delta=bsxfun(@minus,center_pos(:,k),...
+                                 ds_pos);
+            distance=sqrt(sum((delta/voxel_size).^2,1));
+
+            expected_sel_idx=find(distance<=radius);
+
+            assertEqual(sort(sel_idx(:)),sort(expected_sel_idx(:)));
+        end
+    end
+
+
+
+function test_small_meeg_source_dataset_with_inside_field
+    ds=cosmo_synthetic_dataset('type','source','size','small');
+    voxel_size=10;
+    nf=size(ds.samples,2);
+
+    idx=cosmo_index_unique(ds.fa.pos');
+    n_pos=numel(idx);
+
+    for keep_ratio=.4:.3:1;
+        keep=randperm(n_pos);
+        n_keep=round(n_pos*keep_ratio);
+        keep=keep(1:n_keep);
+
+        ds.fa.inside=false(1,nf);
+        for k=1:numel(keep)
+            ds.fa.inside(idx{keep(k)})=true;
+        end
+
+        ds_pos=ds.a.fdim.values{1}(:,ds.fa.pos);
+
+        for radius=0:.4:2;
+            nh=cosmo_spherical_neighborhood(ds,...
+                        'radius',radius,...
+                        'progress',false);
+            center_pos=nh.a.fdim.values{1}(:,nh.fa.pos);
+            assertEqual(numel(nh.neighbors),n_keep);
+            for k=1:n_keep
+                sel_idx=nh.neighbors{k};
+
+                delta=bsxfun(@minus,center_pos(:,k),...
+                                     ds_pos);
+                distance=sqrt(sum((delta/voxel_size).^2,1));
+
+                expected_sel_idx=find(distance<=radius & ds.fa.inside);
+
+                assertEqual(sort(sel_idx(:)),sort(expected_sel_idx(:)));
+            end
+        end
+    end
+
+function test_meeg_source_illegal_inside()
+    ds=cosmo_synthetic_dataset('type','source','size','small');
+    n_features=size(ds.samples,1);
+
+    illegal_values={min(max(ds.samples(1,:),0),1),...
+                    repmat({'foo'},1,n_features)};
+    for k=1:numel(illegal_values)
+        ds.fa.inside=illegal_values{k};
+
+        assertExceptionThrown(@()...
+                cosmo_spherical_neighborhood(ds,'radius',1),'');
+    end
+
+function test_meeg_missing_dimension_label()
+    ds=cosmo_synthetic_dataset();
+    ds=cosmo_dim_remove(ds,'i');
+    assertExceptionThrown(@()...
+                cosmo_spherical_neighborhood(ds,'radius',1),'');
+
+function test_meeg_wrong_dimension_order()
+    ds=cosmo_synthetic_dataset();
+    ds.fa.j(:)=1;
+    ds.fa.k(:)=1;
+    ds.a.fdim.labels([2,3])=ds.a.fdim.labels([3,2]);
+    assertExceptionThrown(@()...
+                cosmo_spherical_neighborhood(ds,'radius',1),'');
+
+
+
 function test_fmri_fixed_number_of_features()
     ds=cosmo_synthetic_dataset('size','normal');
     nf=size(ds.samples,2);
