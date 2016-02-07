@@ -49,7 +49,8 @@ function helper_test_searchlight(opt)
 
     ds=cosmo_synthetic_dataset('size','normal');
     m=any(abs(ds.samples)>3,1);
-    ds=cosmo_dim_slice(ds,~m,2);
+    ds=cosmo_slice(ds,~m,2);
+    ds=cosmo_dim_prune(ds);
 
     measure=@(x,a) cosmo_structjoin('samples',size(x.samples,2));
     nh=cosmo_spherical_neighborhood(ds,'radius',2,'progress',0);

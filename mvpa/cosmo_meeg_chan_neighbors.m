@@ -45,7 +45,8 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %
 %     % simulate the case where some channels are missing; here, every 7-th
 %     % channels is removed
-%     ds=cosmo_dim_slice(ds,mod(ds.fa.chan,7)~=2,2);
+%     ds=cosmo_slice(ds,mod(ds.fa.chan,7)~=2,2);
+%     ds=cosmo_dim_prune(ds);
 %     %
 %     % show remaining channel labels
 %     cosmo_disp(ds.a.fdim.values{1});

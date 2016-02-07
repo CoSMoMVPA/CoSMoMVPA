@@ -13,7 +13,8 @@ function test_cross_neighborhood_chan_time_freq()
 function helper_test_cross_neighborhood(can_use_chan_nbrhood)
     ds_full=cosmo_synthetic_dataset('type','timefreq','size','big');
     msk=cosmo_match(ds_full.fa.chan,@(x)x<20);
-    ds_full=cosmo_dim_slice(ds_full,msk,2);
+    ds_full=cosmo_slice(ds_full,msk,2);
+    ds_full=cosmo_dim_prune(ds_full);
 
     % make it sparse
     nfeatures=size(ds_full.samples,2);
@@ -25,7 +26,8 @@ function helper_test_cross_neighborhood(can_use_chan_nbrhood)
 
     while true
         rp=randperm(nfeatures);
-        ds=cosmo_dim_slice(ds_full,rp(1:nkeep),2);
+        ds=cosmo_slice(ds_full,rp(1:nkeep),2);
+        ds=cosmo_dim_prune(ds);
         n=numel(ds.a.fdim.values{1});
         ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
 

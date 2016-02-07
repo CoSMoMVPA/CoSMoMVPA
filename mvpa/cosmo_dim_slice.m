@@ -59,10 +59,27 @@ function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 %  - use for fMRI or surface data does not make much sense
 %  - this function first slices the data using cosmo_slice, then
 %    prunes the dimenion using cosmo_dim_prune
+%  - This function is deprecated and will be removed in the future;
+%    instead of:
+%
+%           % this is deprecated
+%           result=cosmo_dim_slice(ds, ...)
+%
+%     use:
+%
+%           ds_sliced=cosmo_slice(ds, ...)
+%           result=cosmo_dim_prune(ds_sliced);
 %
 % See also: cosmo_slice, cosmo_dim_prune
-%
-% NNO Nov 2014
+
+    cosmo_warning(['%s is deprecated and will be removed in the future;'...
+                    '     instead of:\n\n'...
+                    '      %% this is deprecated:\n'...
+                    '      result=cosmo_dim_slice(ds, ...)\n\n'...
+                    'use:\n\n'...
+                    '      ds_sliced=cosmo_slice(ds, ...)\n\n'...
+                    '      result=cosmo_dim_prune(ds_sliced);\n'],...
+                    mfilename());
 
 % very simple implementation: first slice, then prune
 sliced_pruned_ds=cosmo_slice(ds, to_select, dim);

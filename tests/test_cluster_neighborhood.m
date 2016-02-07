@@ -58,7 +58,8 @@ function test_meeg_cluster_neighborhood
     nf=size(ds.samples,2);
     imsk=find(rand(1,nf)>.4);
     rp=randperm(numel(imsk));
-    ds=cosmo_dim_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
+    ds=cosmo_slice(ds,[imsk(rp) imsk(rp(end:-1:1))],2);
+    ds=cosmo_dim_prune(ds);
     n=numel(ds.a.fdim.values{1});
     ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
     nf=size(ds.samples,2);
