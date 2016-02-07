@@ -66,4 +66,4 @@ function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 
 % very simple implementation: first slice, then prune
 sliced_pruned_ds=cosmo_slice(ds, to_select, dim);
-sliced_pruned_ds=cosmo_dim_prune(sliced_pruned_ds,[],2);
+sliced_pruned_ds=cosmo_dim_prune(sliced_pruned_ds,'dim',dim);

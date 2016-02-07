@@ -48,6 +48,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Daria Proklova
 + Reshanne Reader
 + Anne Roefs
++ Gaetan Sanchez
 + Jens Schwarzbach
 + Mohamed Tawfik
 + Luca Turella

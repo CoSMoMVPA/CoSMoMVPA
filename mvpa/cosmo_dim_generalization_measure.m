@@ -278,7 +278,7 @@ function halves=split_dataset_in_train_and_test(ds)
 function [values,splits]=split_half_by_dimension(ds,opt)
     % split dataset by ds.a.(opt.dimension)
     dimension=opt.dimension;
-    ds_pruned=cosmo_dim_prune(ds,{dimension},1);
+    ds_pruned=cosmo_dim_prune(ds,'labels',{dimension},'dim',1);
     ds_tr=cosmo_dim_transpose(ds_pruned,dimension,2);
 
     nbrhood=cosmo_interval_neighborhood(ds_tr,dimension,opt);

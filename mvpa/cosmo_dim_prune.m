@@ -1,14 +1,19 @@
-function ds=cosmo_dim_prune(ds, labels, dims)
+function ds=cosmo_dim_prune(ds, varargin)
 % prune dataset dimension values that are not used after slicing
 %
 % ds=cosmo_dim_prune(ds, labels, dims)
 %
 % Inputs:
-%   ds              dataset struct
-%   labels          labels of dimensions to be pruned. If not provided all
-%                   labels are pruned.
-%   dims            dimension(s) along which pruning takes place,
-%                   1=sample dimension, 2=feature dimension. Default: [1 2]
+%   ds                  dataset struct
+%   'labels; l          labels of dimensions to be pruned. If not provided
+%                       all labels are pruned.
+%   'dim',d             dimension(s) along which pruning takes place,
+%                       1=sample dimension, 2=feature dimension.
+%                       Default: [1 2]
+%   'matrix_labels',m   Names of feature dimensions that store dimension
+%                       information in matrix form. (Currently the only use
+%                       case is m={'pos'} for MEEG source datasets.)
+%
 % Output:
 %   ds              dataset struct with pruned dimension values.
 %
@@ -73,22 +78,30 @@ function ds=cosmo_dim_prune(ds, labels, dims)
 %    cosmo_dim_match and cosmo_slice), applying this function ensures that
 %    removed values in a dimension are not mapped back to the original
 %    input size when using cosmo_map2meeg.
+%  - When using this function with MEEG source data that has a 'pos' field,
+%    use
+%           cosmo_dim_prune(ds,'matrix_labels',{'pos'})
+%
+%    to prune the 'pos' feature dimension (if it needs pruning)
 %
 % See also: cosmo_dim_match
 %
 % NNO Aug 2014
 
-if nargin<=3 || isempty(dims), dims=[1 2]; end
-if nargin<=2, labels=[]; end
+opt=process_opt(varargin{:});
 
 cosmo_check_dataset(ds);
 
-ndim=numel(dims);
+dim=opt.dim;
+ndim=numel(dim);
+opt=rmfield(opt,'dim');
 for k=1:ndim
-    ds=prune_single_dim(ds, labels, dims(k));
+    ds=prune_single_dim(ds, dim(k), opt);
 end
 
-function ds=prune_single_dim(ds, labels, dim)
+function ds=prune_single_dim(ds, dim, opt)
+    labels=opt.labels;
+
     infixes='sf';
     infix=infixes(dim);
 
@@ -130,9 +143,60 @@ function ds=prune_single_dim(ds, labels, dim)
             attr=ds.(attr_name).(label);
             [unq_idxs,unused,map_idxs]=unique(attr);
 
+            if isequal(unq_idxs(:),(1:numel(values))')
+                % already pruned, no update necessary
+                continue;
+            end
+
+            values=get_unique(label, dim, values, unq_idxs, opt);
+            ds.a.(dim_name).values{index}=values;
 
             ds.(attr_name).(label)=in_shape(map_idxs);
-            values=values(unq_idxs);
-            ds.a.(dim_name).values{index}=values;
         end
+    end
+
+function values=get_unique(label, dim, values, unq_idxs, opt)
+    if sum(size(values)>1)>1
+        if cosmo_match({label},opt.matrix_labels)
+            if dim==1
+                values=values(unq_idxs,:);
+            else
+                values=values(:,unq_idxs);
+            end
+        else
+            msg=sprintf(['Values for dimension ''%s'' is a matrix, but '...
+                        '''%s'' was not specified as a an element '...
+                        'of the ''matrix_labels'' option.'],...
+                        label,label);
+            if strcmp(label,'pos')
+                msg=sprintf(['%s\nIf this is an MEEG source dataset, '...
+                             'consider using %s(...,'...
+                             '''matrix_labels'',{''pos''})'],...
+                             mfilename());
+            end
+            error(msg);
+        end
+    else
+        values=values(unq_idxs);
+        values=values(:);
+        if dim==2
+            values=values';
+        end
+    end
+
+
+function [opt]=process_opt(varargin)
+    default=struct();
+    default.labels={};
+    default.dim=[1 2];
+    default.matrix_labels={};
+
+    opt=cosmo_structjoin(default,varargin{:});
+
+    if any(~cosmo_match(opt.dim,[1 2]))
+        error('''dims'' must be 1 or 2');
+    end
+
+    if ~iscellstr(opt.matrix_labels)
+        error('''matrix_labels'' option must be a cellstring');
     end
