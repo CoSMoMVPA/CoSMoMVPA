@@ -186,13 +186,14 @@ function test_cross_neighborhood_exceptions()
     time_nbrhood=cosmo_interval_neighborhood(ds,'time','radius',1);
 
     % test exceptions
-    aet=@(x)assertExceptionThrown(@()cosmo_cross_neighborhood(ds,x{:}),'');
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_cross_neighborhood(varargin{:}),'');
 
-    aet({{}});
-    aet({struct});
-    aet({struct,time_nbrhood});
-    aet({time_nbrhood,time_nbrhood});
-    aet({ds});
+    aet(ds,{});
+    aet(ds,struct);
+    aet(ds,struct,time_nbrhood);
+    aet(ds,time_nbrhood,time_nbrhood);
+    aet(ds,ds);
 
     % should be fine
     assertEqual(cosmo_cross_neighborhood(ds,{time_nbrhood}),time_nbrhood);
@@ -200,21 +201,44 @@ function test_cross_neighborhood_exceptions()
     % no values too big
     time_nbrhood2=time_nbrhood;
     time_nbrhood2.neighbors{1}=1e9;
-    aet({time_nbrhood2});
+    aet(ds,{time_nbrhood2});
 
     % non-integers not supported
     time_nbrhood2=time_nbrhood;
     time_nbrhood2.neighbors{1}=1.5;
-    aet({time_nbrhood2});
+    aet(ds,{time_nbrhood2});
 
     % illegal labels
     time_nbrhood2=time_nbrhood;
     time_nbrhood2.a.fdim.labels{1}='foo';
     time_nbrhood2.fa.foo=time_nbrhood.fa.time;
-    aet({time_nbrhood});
+    aet(ds,{time_nbrhood2});
 
     % duplicate labels
-    aet({time_nbrhood,time_nbrhood});
+    aet(ds,{time_nbrhood,time_nbrhood});
 
 
+function test_cross_neighborhood_unsorted_neighbors
+    ds=cosmo_synthetic_dataset();
+    nh=cosmo_interval_neighborhood(ds,'i','radius',1);
+
+    nh_unsorted=nh;
+    nh_unsorted.neighbors=cellfun(@(x)x(randperm(numel(x))),...
+                                nh_unsorted.neighbors,...
+                                'UniformOutput',false);
+    assertEqual(nh,cosmo_cross_neighborhood(ds,{nh_unsorted}));
+
+
+function test_cross_neighborhood_progress()
+    if cosmo_skip_test_if_no_external('!evalc')
+        return;
+    end
+
+    ds=cosmo_synthetic_dataset();
+    nh1=cosmo_interval_neighborhood(ds,'i','radius',0);
+    nh2=cosmo_interval_neighborhood(ds,'j','radius',0);
+    f=@()cosmo_cross_neighborhood(ds,{nh1,nh2});
+    res=evalc('f();');
+    assert(~isempty(strfind(res,'[####################]')));
+    assert(~isempty(strfind(res,'crossing neighborhoods')));
 

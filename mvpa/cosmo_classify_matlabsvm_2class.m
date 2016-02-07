@@ -61,9 +61,13 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
     % matlabsvm
 
     try
+        if ~cached_has_matlabsvm()
+            cosmo_check_external('matlabsvm');
+        end
         % Use svmtrain and svmclassify to get predictions for the testing set.
         % (Hint: 'opt_cell{:}' allows you to pass the options as varargin)
         % >@@>
+
         s = svmtrain(samples_train, targets_train, opt_cell{:});
         predicted=svmclassify(s, samples_test);
         % <@@<
@@ -119,4 +123,16 @@ function opt_cell=opt2cell(opt)
         opt_cell{k*2-1}=fn;
         opt_cell{k*2}=opt.(fn);
     end
+
+
+function tf=cached_has_matlabsvm()
+    persistent cached_tf;
+
+    if isequal(cached_tf,true)
+        tf=true;
+        return
+    end
+
+    cached_tf=cosmo_check_external('matlabsvm');
+    tf=cached_tf;
 

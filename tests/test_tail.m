@@ -44,6 +44,27 @@ function test_tail_basics
     assertEqual(v3,v4);
     assertEqual(i,i4);
 
+
+function test_tail_left_right()
+    n=ceil(10*rand()+10);
+    xs=randn(n,1);
+
+    n_keep=ceil(rand()*3+2);
+    res=cosmo_tail(xs,n_keep);
+    assert(numel(res)==n_keep);
+
+    % ensure results match
+    s=sort(xs);
+    assertEqual(s(end-(0:(n_keep-1))),res);
+
+    % reverse tail and results
+    res_inv=cosmo_tail(xs,-n_keep);
+    assertEqual(s(1:n_keep),res_inv);
+
+
+
+
+
 function test_tail_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_tail(varargin{:}),'');

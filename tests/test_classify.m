@@ -75,8 +75,10 @@ function test_classify_knn
 function test_classify_matlabsvm
     cfy=@cosmo_classify_matlabsvm;
     handle=get_predictor(cfy);
-    if no_external('matlabsvm')
+    if ~cosmo_check_external('matlabsvm',false)
+        assert_throws_illegal_input_exceptions(cfy);
         assertExceptionThrown(handle,'');
+        notify_test_skipped('matlabsvm');
         return;
     end
 
@@ -91,8 +93,10 @@ function test_classify_matlabsvm
 function test_classify_matlabsvm_2class
     cfy=@cosmo_classify_matlabsvm_2class;
     handle=get_predictor(cfy);
-    if no_external('matlabsvm')
+    if ~cosmo_check_external('matlabsvm',false)
+        assert_throws_illegal_input_exceptions(cfy);
         assertExceptionThrown(handle,'');
+        notify_test_skipped('matlabsvm');
         return;
     end
     warning_state=cosmo_warning();
@@ -123,8 +127,9 @@ function test_classify_libsvm_with_autoscale
     opt=struct();
     opt.autoscale=true;
     handle=get_predictor(cfy,opt);
-    if no_external('libsvm')
+    if ~cosmo_check_external('libsvm',false)
         assertExceptionThrown(handle,'');
+        notify_test_skipped('libsvm');
         return;
     end
 
@@ -141,8 +146,9 @@ function test_classify_libsvm_no_autoscale
     opt=struct();
     opt.autoscale=false;
     handle=get_predictor(cfy,opt);
-    if no_external('libsvm')
+    if ~cosmo_check_external('libsvm',false)
         assertExceptionThrown(handle,'');
+        cosmo_notify_test_skipped('libsvm');
         return;
     end
 
@@ -178,8 +184,9 @@ function test_classify_libsvm_t0
             opt_struct=opt;
         end
         handle=get_predictor(cfy,opt);
-        if no_external('libsvm')
+        if ~cosmo_check_external('libsvm',false)
             assertExceptionThrown(handle,'');
+            notify_test_skipped('libsvm');
             return
         end
 
@@ -193,8 +200,9 @@ function test_classify_libsvm_t2
     opt=struct();
     opt.t=2;
     handle=get_predictor(cfy,opt);
-    if no_external('libsvm')
+    if ~cosmo_check_external('libsvm',false)
         assertExceptionThrown(handle,'');
+        notify_test_skipped('libsvm');
         return
     end
 
@@ -204,16 +212,23 @@ function test_classify_libsvm_t2
     general_test_classifier(cfy,opt)
 
 function test_classify_svm
+    clear cosmo_check_external()
     cfy=@cosmo_classify_svm;
     handle=get_predictor(cfy);
-    if no_external('svm')
+    if ~cosmo_check_external('svm',false)
         assertExceptionThrown(handle,'');
+        notify_test_skipped('svm');
         return;
     end
 
     % matlab and libsvm show slightly different results
     if cosmo_check_external('libsvm',false)
         pred=[8 3 3 8 6 6 1 3 7 5 7 6 4 1 2 7 7 7 1 2 8 1 9 6 7 1 3]';
+
+        good_opt=struct();
+        good_opt.svm='libsvm';
+        bad_opt=struct();
+        bad_opt.svm='matlabsvm';
     else
         % do not show warning message
         warning_state=cosmo_warning();
@@ -221,10 +236,17 @@ function test_classify_svm
         cosmo_warning('off');
 
         pred=[1 3 9 7 6 6 9 3 7 5 6 6 4 1 7 7 7 7 1 7 7 1 7 6 7 1 9]';
+
+        good_opt=struct();
+        good_opt.svm='matlabsvm';
+        bad_opt=struct();
+        bad_opt.svm='libsvm';
     end
 
     assert_predictions_equal(handle,pred);
     general_test_classifier(cfy)
+    general_test_classifier(cfy,good_opt)
+    assertExceptionThrown(@()general_test_classifier(cfy,bad_opt),'');
 
 function general_test_classifier(cfy_base,opt)
     if nargin<2
@@ -276,7 +298,10 @@ function [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma)
 
 
 function assert_throws_expected_exceptions(cfy_base,cfy)
+    assert_throws_illegal_input_exceptions(cfy);
+    assert_deals_with_empty_input(cfy_base,cfy);
 
+function assert_throws_illegal_input_exceptions(cfy)
     assertExceptionThrown(@()cfy([1 2],[1;2],[1 2]),'')
     assertExceptionThrown(@()cfy([1;2],[1 2],[1 2]),'')
     assertExceptionThrown(@()cfy([1 2],[1 2],[1 2]),'')
@@ -285,7 +310,9 @@ function assert_throws_expected_exceptions(cfy_base,cfy)
     assertExceptionThrown(@()cfy([1 2; 3 4; 5 6],[1;1],[1 2]),'')
     assertExceptionThrown(@()cfy([1 2; 3 4; 5 6],[1;1;1],[1 2 3]),'')
 
-    % should pass
+
+function assert_deals_with_empty_input(cfy_base,cfy)
+ % should pass
     non_one_class_classifiers={@cosmo_classify_matlabsvm_2class,...
                                @cosmo_classify_meta_feature_selection,...
                                @cosmo_meta_feature_selection_classifier};
@@ -305,6 +332,9 @@ function assert_throws_expected_exceptions(cfy_base,cfy)
 
     res2=cfy(zeros(4,0),[1 1 2 2]',zeros(2,0));
     assertEqual(res,res2);
+
+
+
 
 function handle=get_predictor(cfy,opt,nclasses)
     if nargin<3
@@ -337,6 +367,6 @@ function [tr_samples,tr_targets,te_samples]=generate_data(nclasses)
     tr_samples=ds.samples(tr_msk,:);
     te_samples=ds.samples(te_msk,:);
 
-function is_absent=no_external(external_name)
-    is_absent=cosmo_skip_test_if_no_external(external_name);
+function notify_test_skipped(external)
+    assertTrue(cosmo_skip_test_if_no_external(external));
 

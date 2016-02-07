@@ -162,28 +162,50 @@ function test_slice_datasets()
         end
     end
 
-function test_slice_sa_fa
+function test_slice_sa
+    helper_test_dataset_slice(1);
+
+function test_slice_fa
+    helper_test_dataset_slice(2);
+
+function helper_test_dataset_slice(dim)
     % dataset_slice_{fa,sa} are deprecated, so shows a warning
     warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
+    empty_state=warning_state;
+    empty_state.show_warnings={};
 
     ds=cosmo_synthetic_dataset();
+
+    % select half of samples or features
     sz=size(ds);
+    n=sz(dim);
+    rp=randperm(n);
+    rp=rp(1:round(n/2));
 
-    for dim=1:2
-        n=sz(dim);
-        rp=randperm(n);
-        rp=rp(1:round(n/2));
+    % set selected result
+    expected_result=cosmo_slice(ds,rp,dim);
 
-        x=cosmo_slice(ds,rp,dim);
-        if dim==1
-            y=cosmo_dataset_slice_sa(ds,rp);
-        else
-            y=cosmo_dataset_slice_fa(ds,rp);
-        end
-        assertEqual(x,y);
+    % set warning to empty
+    cosmo_warning(empty_state);
+    cosmo_warning('off');
+
+    % slice dataset
+    if dim==1
+        result=cosmo_dataset_slice_sa(ds,rp);
+    else
+        result=cosmo_dataset_slice_fa(ds,rp);
     end
+
+    % compare with expected result
+    assertEqual(expected_result,result);
+
+    % warning must have been shown
+    w=cosmo_warning();
+    assert(~isempty(w.shown_warnings));
+    assert(iscellstr(w.shown_warnings));
+
+
 
 function test_slice_datasets_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
