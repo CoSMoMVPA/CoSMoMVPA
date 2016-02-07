@@ -163,7 +163,11 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 
     % a position may occur at multiple features; only consider unique
     % positions
-    [center_idxs,unq_pos]=cosmo_index_unique(pos(:,feature_mask)');
+    pos(:,~feature_mask)=Inf;
+    [center_idxs,unq_pos]=cosmo_index_unique(pos');
+    keep_unq_pos=~any(isinf(unq_pos),2);
+    center_idxs=center_idxs(keep_unq_pos);
+    unq_pos=unq_pos(keep_unq_pos,:);
     nunq_centers=numel(center_idxs);
 
     % allocate space for output
@@ -320,11 +324,6 @@ function nbrhood=align_nbrhood_to_ds_if_possible(ds,nbrhood)
    end
 
 
-
-
-
-
-
 function feature_distances=get_distances(center_distances,feature_id_count)
     % get distances based on selected features
     n=numel(center_distances);
@@ -384,12 +383,11 @@ function feature_mask=get_features_mask(ds)
             error('field .fa.inside must be a row vector');
         end
 
-        if islogical(inside)
-            feature_mask=inside;
-        else
-            feature_mask=false(1,nfeatures);
-            feature_mask(inside)=true;
+        if ~islogical(inside)
+            error('field .fa.inside must be logical');
         end
+
+        feature_mask=inside;
     else
         feature_mask=true(1,nfeatures);
     end
