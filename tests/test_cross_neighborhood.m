@@ -239,5 +239,6 @@ function test_cross_neighborhood_progress()
     nh2=cosmo_interval_neighborhood(ds,'j','radius',0);
     f=@()cosmo_cross_neighborhood(ds,{nh1,nh2});
     res=evalc('f();');
-    assert(~isempty(strfind(res,'#####')));
+    assert(~isempty(strfind(res,'[####################]')));
+    assert(~isempty(strfind(res,'crossing neighborhoods')));
 
