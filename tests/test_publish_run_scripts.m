@@ -24,7 +24,7 @@ function test_publish_run_scripts_dry_run_single_file()
 
 function test_publish_run_scripts_run_single_file_pass()
     cosmo_notify_test_skipped(['publish functionality tests '...
-                                'currently disabled because coverage '
+                                'currently disabled because coverage '...
                                 'functionality does not work']);
     return;
     result=helper_publish_run_scripts_single_file('disp(''ok'')');
@@ -32,7 +32,7 @@ function test_publish_run_scripts_run_single_file_pass()
 
 function test_publish_run_scripts_run_single_file_error()
     cosmo_notify_test_skipped(['publish functionality tests '...
-                                'currently disabled because coverage '
+                                'currently disabled because coverage '...
                                 'functionality does not work']);
     return;
 
