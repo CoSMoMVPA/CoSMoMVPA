@@ -140,3 +140,14 @@ function test_searchlight_exceptions
 
 
 
+function test_searchlight_progress()
+    if cosmo_skip_test_if_no_external('!evalc')
+        return;
+    end
+
+    ds=cosmo_synthetic_dataset();
+    nh=cosmo_spherical_neighborhood(ds,'count',2,'progress',false);
+    measure=@(x,opt)cosmo_structjoin('samples',mean(x.samples,2));
+    f=@()cosmo_searchlight(ds,nh,measure);
+    res=evalc('f();');
+    assert(~isempty(strfind(res,'[####################]')));
