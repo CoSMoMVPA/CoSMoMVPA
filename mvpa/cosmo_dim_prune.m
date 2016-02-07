@@ -80,7 +80,7 @@ function ds=cosmo_dim_prune(ds, varargin)
 %    input size when using cosmo_map2meeg.
 %  - When using this function with MEEG source data that has a 'pos' field,
 %    use
-%           cosmo_dim_prune('matrix_labels',{'pos'})
+%           cosmo_dim_prune(ds,'matrix_labels',{'pos'})
 %
 %    to prune the 'pos' feature dimension (if it needs pruning)
 %
@@ -164,10 +164,17 @@ function values=get_unique(label, dim, values, unq_idxs, opt)
                 values=values(:,unq_idxs);
             end
         else
-            error(['Values for dimension ''%s'' is a matrix, but '...
-                    '''%s'' was not specified as a an element '...
-                    'of the ''matrix_labels'' option.'],...
-                    label,label);
+            msg=sprintf(['Values for dimension ''%s'' is a matrix, but '...
+                        '''%s'' was not specified as a an element '...
+                        'of the ''matrix_labels'' option.'],...
+                        label,label);
+            if strcmp(label,'pos')
+                msg=sprintf(['%s\nIf this is an MEEG source dataset, '...
+                             'consider using %s(...,'...
+                             '''matrix_labels'',{''pos''})'],...
+                             mfilename());
+            end
+            error(msg);
         end
     else
         values=values(unq_idxs);
@@ -193,7 +200,3 @@ function [opt]=process_opt(varargin)
     if ~iscellstr(opt.matrix_labels)
         error('''matrix_labels'' option must be a cellstring');
     end
-
-
-
-
