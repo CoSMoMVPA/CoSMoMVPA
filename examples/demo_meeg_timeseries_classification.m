@@ -137,10 +137,11 @@ for j=1:n_average_train_args
         % slice the dataset to select only the channels matching the channel
         % types
         ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, 2);
+        ds_tl_sel=cosmo_dim_prune(ds_tl_sel); % remove non-indexed channels
 
         % define neighborhood over time; for each time point the time
-        % point itself is included, as well as the two time points before and
-        % the two time points after it
+        % point itself is included, as well as the two time points before
+        % and the two time points after it
         nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',...
                                                 'radius',time_radius);
 

@@ -14,7 +14,8 @@ function test_neighbors()
     msk=ds.fa.chan<10 | mod(ds.fa.chan,5)==0 | ds.fa.chan>250;
     imsk=find(msk);
     rp=randperm(numel(imsk));
-    ds=cosmo_dim_slice(ds,imsk(rp),2);
+    ds=cosmo_slice(ds,imsk(rp),2);
+    ds=cosmo_dim_prune(ds);
     n=numel(ds.a.fdim.values{1});
     ds.a.fdim.values{1}=ds.a.fdim.values{1}(randperm(n));
 

@@ -30,7 +30,8 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %     chan_indices=find(cosmo_match(chantypes,'meg_planar'));
 %     planar_msk=cosmo_match(ds.fa.chan,chan_indices);
 %     % slice and prune dataset along feature dimension
-%     ds_planar=cosmo_dim_slice(ds,planar_msk,2);
+%     ds_planar=cosmo_slice(ds,planar_msk,2);
+%     ds=cosmo_dim_prune(ds_planar);
 %     % the output dataset has only the 204 planar channels left
 %     cosmo_disp(ds_planar.a.fdim,'edgeitems',2);
 %     > .labels
