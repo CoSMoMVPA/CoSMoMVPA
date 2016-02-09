@@ -287,6 +287,11 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     nbrhood.a=ds.a;
     nbrhood.a.fdim=fdim;
 
+    % remove sample dimension if present
+    if isfield(nbrhood.a,'sdim')
+        nbrhood.a=rmfield(nbrhood.a,'sdim');
+    end
+
 
     fa_full=cosmo_slice(fa,center_ids,2,'struct');
     nbrhood.fa=cosmo_structjoin('nvoxels',nvoxels,...
