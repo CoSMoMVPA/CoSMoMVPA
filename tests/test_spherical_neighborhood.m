@@ -339,6 +339,14 @@ function test_meeg_wrong_dimension_order()
     assertExceptionThrown(@()...
                 cosmo_spherical_neighborhood(ds,'radius',1),'');
 
+function test_meeg_source_sdim_time
+    ds=cosmo_synthetic_dataset('type','source','size','big');
+    ds_time=cosmo_dim_transpose(ds,'time',1);
+    nh=cosmo_spherical_neighborhood(ds_time,'radius',0,'progress',false);
+
+    assert(~isfield(nh.a,'sdim'));
+    assert(~isfield(nh,'sa'));
+
 
 
 function test_fmri_fixed_number_of_features()
