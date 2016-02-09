@@ -83,7 +83,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     %
 %     % only to make this example run fast, most channels are eliminated
 %     % (there is no other reason to do this step)
-%     ds_time=cosmo_dim_slice(ds_time,ds_time.fa.chan<=20,2);
+%     ds_time=cosmo_slice(ds_time,ds_time.fa.chan<=20,2);
+%     ds_time=cosmo_dim_prune(ds_time);
 %     %
 %     % define neighborhood for channels
 %     nbrhood=cosmo_meeg_chan_neighborhood(ds_time,...

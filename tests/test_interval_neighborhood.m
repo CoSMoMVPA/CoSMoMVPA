@@ -4,7 +4,8 @@ function test_suite = test_interval_neighborhood()
 
 function test_interval_neighborhood_basis()
     ds_full=cosmo_synthetic_dataset('type','meeg','size','big');
-    ds_full=cosmo_dim_slice(ds_full,ds_full.fa.chan<3,2);
+    ds_full=cosmo_slice(ds_full,ds_full.fa.chan<3,2);
+    ds_full=cosmo_dim_prune(ds_full);
 
     sliceargs={1:7,[1 4 7],[2 6]};
     radii=[0 1 2];
@@ -12,7 +13,8 @@ function test_interval_neighborhood_basis()
         slicearg=sliceargs{k};
         narg=numel(slicearg);
 
-        ds=cosmo_dim_slice(ds_full,cosmo_match(ds_full.fa.time,slicearg),2);
+        ds=cosmo_slice(ds_full,cosmo_match(ds_full.fa.time,slicearg),2);
+        ds=cosmo_dim_prune(ds);
         nf=size(ds.samples,2);
         ds=cosmo_slice(ds,randperm(nf),2);
 
