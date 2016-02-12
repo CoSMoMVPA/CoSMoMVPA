@@ -112,14 +112,14 @@ function is_ok=cosmo_publish_run_scripts(varargin)
         write_index(outputfn,opt)
     end
 
-function write_index(outputfn,opt)
-    outputdir=fileparts(outputfn);
+function write_index(index_outputfn,opt)
+    [outputdir,outputnm]=fileparts(index_outputfn);
     inputdir=fullfile(get_root_dir(),'examples');
 
     d=dir(fullfile(inputdir,'*.m'));
 
 
-    fid=fopen(outputfn,'w');
+    fid=fopen(index_outputfn,'w');
     cleaner3=onCleanup(@()fclose(fid));
     fprintf(fid,['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"'...
             '>\n']);
@@ -133,10 +133,11 @@ function write_index(outputfn,opt)
             fprintf(fid,'<LI><A HREF="%s">%s</A></LI>\n',outputfn,nm);
         end
     end
-    fprintf(fid,['</UL>Back to <A HREF="../../index.html">index'...
-                    '</A>.</BODY></HTML>\n']);
 
-    fprintf('Index written to %s\n', outputfn);
+    fprintf(fid,['</UL>Back to <A HREF="../../%s.html">index'...
+                    '</A>.</BODY></HTML>\n'],outputnm);
+
+    fprintf('Index written to %s\n', index_outputfn);
 
 
 function trgdir=get_output_dir(opt)
