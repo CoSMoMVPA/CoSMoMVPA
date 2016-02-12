@@ -17,7 +17,6 @@
 .. _git: http://gitscm.com
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
 .. _FieldTrip: http://fieldtrip.fcdonders.nl
-.. _`FieldTrip branch with improved GNU Octave compatibility`: https://github.com/nno/fieldtrip/tree/_enh/octave
 .. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. |Matlab(TM)| unicode:: MATLAB U+00AE
