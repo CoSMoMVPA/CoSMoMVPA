@@ -587,7 +587,7 @@ Note that several fMRI visualization packages can also visualize fMRI datasets w
 For example, MRIcron_ can be used to visualize each of the volumes in the resulting NIFTI file.
 
 Average along features in a neighborhood
----------------------------------------
+----------------------------------------
 'I have defined a :ref:`neighborhood <cosmomvpa_neighborhood>` for my dataset, and now I would like to compute the average across features at each searchlight location. How can I do that?'
 
 To average along features, you can define a new measure:
@@ -631,12 +631,100 @@ It is also possible to define such a measure *inline*; for example, if the input
 
 The line approach may be a bit slower than defining a separate function, but the speed difference is usually not substantial.
 
+Select a time interval in an MEEG dataset
+-----------------------------------------
+
+To select only a particular time range, consider the following:
+
+    .. code-block:: matlab
+
+        % for this example, generate synthetic data
+        ds=cosmo_synthetic_dataset('type','meeg',...
+                                    'size','huge');
+
+        % Select time points between 50 and 300 ms
+        time_selector=@(t) t>=.04999 & t<=0.3001;
+        time_msk=cosmo_dim_match(ds,'time',time_selector=@);
+        %
+        % (alternative to the above is
+
+        % slice dataset
+        ds_time=cosmo_slice(ds,time_msk,2);
+
+        % Optionally prune the dataset
+        % - without cosmo_dim_prune: the output of map2meeg(ds_time) will
+        %   have all the time points of the original dataset; data for
+        %   missing time points will be set to zero or NaN.
+        % - with cosmo_dim_prune: the output of map2meeg(ds_time) will
+        %   not contain the removed time points.
+
+        ds_time=cosmo_dim_prune(ds_time);
+
+Note that in the example above, the `time_selector` variable is a function handle that is used to specify a time range. The minimal and maximum values of 0.04999 and 0.30001 (instead of 0.05 and 0.30) are used to address potential tiny rounding errors, as it may be the case that the time points stored in the datasets are not exact multiples of `1/1000`. For example, in the following expression:
+
+    .. code-block:: matlab
+
+        (((0:.1:1)/70)*70)-(0:.1:1)
+
+one might expect a vector of only zeros because of the identities `a==(a+b)-b` and `a==(a/b)/b` (for finite, non-zero values of `a` and `b`), yet both Matlab and GNU Octave return:
+
+    .. code-block:: matlab
+
+        ans =
+
+           1.0e-15 *
+
+          Columns 1 through 6
+
+                 0         0         0   -0.0555         0         0
+
+          Columns 7 through 11
+
+                 0    0.1110         0         0         0
+
+See also: :ref:`cosmo_meeg_dim_match`, :ref:`cosmo_slice`, :ref:`cosmo_dim_prune`.
 
 
+Select a particular channel type in an MEEG dataset
+---------------------------------------------------
+To select channels of a particular type, consider the following:
 
 
+  .. code-block:: matlab
+
+        % for this example, generate synthetic data
+        ds=cosmo_synthetic_dataset('type','meeg',...
+                                    'size','huge');
+
+        %%
+        % select channels
+        % (the output of chantypes in the command below
+        %  indicates which channel types can be selected)
+        [chantypes,senstypes]=cosmo_meeg_chantype(ds);
+
+        % in this example, select MEG planar combined channel
+        chan_type_of_interest='meg_planar_combined';
+
+        chan_indices=find(cosmo_match(chantypes,...
+                                  chan_type_of_interest));
+
+        % define channel mask
+        chan_msk=cosmo_match(ds.fa.chan,chan_indices);
+
+        % slice the dataset
+        ds_chan=cosmo_slice(ds,chan_msk,2);
 
 
+        % Optionally prune the dataset
+        % - without cosmo_dim_prune: the output of map2meeg(ds_chan) will
+        %   have all the channels of the original dataset; data for
+        %   missing channels will be set to zero or NaN.
+        % - with cosmo_dim_prune: the output of running map2meeg(ds_chan) will
+        %   not contain the removed channels.
+
+        ds_chan=cosmo_dim_prune(ds_chan); % to really remove channels
+
+See also: :ref:`cosmo_meeg_chantype`, :ref:`cosmo_slice`, :ref:`cosmo_match`, :ref:`cosmo_dim_prune`.
 
 
 .. include:: links.txt
