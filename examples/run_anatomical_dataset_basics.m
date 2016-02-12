@@ -14,7 +14,7 @@ fn=fullfile(data_path, 'brain.nii');
 ds=cosmo_fmri_dataset(fn);
 % <@@<
 
-% Show the dataset contents using cosmo_disp. Where can you see the
+%% Show the dataset contents using cosmo_disp. Where can you see the
 % number of voxels in the three spatial dimensions?
 % >@@>
 cosmo_disp(ds)
@@ -32,7 +32,7 @@ xlabel('intensity');
 ylabel('count');
 % <@@<
 
-% There are a lot of zero values in the dataset. Find all non-zero values
+%% There are a lot of zero values in the dataset. Find all non-zero values
 % in ds.samples, and plot a histogram of those. What do the two bumps
 % represent?
 % >@@>
@@ -43,7 +43,7 @@ xlabel('intensity');
 ylabel('count');
 % <@@<
 
-% Using cosmo_plot_slices, show a saggital view of the dataset
+%% Using cosmo_plot_slices, show a saggital view of the dataset
 % >@@>
 cosmo_plot_slices(ds);
 % <@@<
@@ -51,7 +51,7 @@ cosmo_plot_slices(ds);
 % Make a copy of the dataset
 ds_copy=ds;
 
-% ds.fa.i contains, for each feature (voxel), an index for the
+%% ds.fa.i contains, for each feature (voxel), an index for the
 % anterior-posterior position of that voxel.
 % Set all voxels that have a value of less than 100 for ds.fa.i to zero,
 % and plot the results
@@ -66,6 +66,3 @@ fn_out=fullfile(output_path,'anatomical_dataset_posterior.nii');
 % >@@>
 cosmo_map2fmri(ds_copy,fn_out);
 % <@@<
-
-
-
