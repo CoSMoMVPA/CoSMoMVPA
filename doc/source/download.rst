@@ -24,12 +24,12 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Installation of CoSMoMVPA:
 
-    - Users on the Unix platform using the command line::
+    - Users on a Unix-like (Linux, OSX) platform using the command line::
 
             git clone https://github.com/CoSMoMVPA/CoSMoMVPA.git
             make -C CoSMoMVPA install
 
-    - Everybody else:
+    - Manually:
 
         + Download the `zip archive`_.
 
@@ -49,13 +49,13 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
             to store the new path permanently.
 
-            To check that things are working, run:
+    To check that things are working, run:
 
-            .. code-block:: matlab
+        .. code-block:: matlab
 
-                cosmo_wtf
+            cosmo_wtf
 
-            which should provide a report of available system information.
+        which should provide a report of available system information.
 
 .. _`get_octave_packages`:
 
@@ -97,11 +97,7 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * To download the tutorial data:
 
-    - Standard approach: download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
-    - Advanced Unix users: ``cd`` to the CoSMoMVPA directory, then run::
-
-        wget http://cosmomvpa.org/datadb.zip && unzip datadb.zip && rm datadb.zip
-
+    Download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
     You can move the directory to another location on your file system, if desired.
 
 
@@ -111,18 +107,20 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
     + If you do not know where to store the file, just close and start Matlab afresh (so that it starts in a location that is in the Matlab path), and run
 
-        .. code-block:: matlab
+          .. code-block:: matlab
 
-            edit .cosmomvpa.cfg
+              edit .cosmomvpa.cfg
 
-        Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
+      Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
 
-        For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named Karen), and contain following:
+      For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named Karen), and contain the following:
 
-        .. code-block::
+          .. code-block:: none
 
-            tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
-            output_data_path=/Users/nick/tmp/CoSMoMVPA_output
+              tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
+              output_data_path=/Users/nick/tmp/CoSMoMVPA_output
+
+      It is important that the ``output_data_path`` directory exists; if not, create this directory.
 
 
 .. _`test_local_setup`:
