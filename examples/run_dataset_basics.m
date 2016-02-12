@@ -23,6 +23,9 @@ targets=repmat([1:6]',10,1);
 ds.sa.targets = targets;
 % <@@<
 
+% sanity check
+cosmo_check_dataset(ds);
+
 % set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
@@ -33,6 +36,9 @@ for i=1:10
 end
 ds.sa.chunks = chunks;
 % <@@<
+
+% sanity check
+cosmo_check_dataset(ds);
 
 % Add ds.sa.labels as sample attributes as a 60x1 cell with strings
 % The order is {monkey, lemur, mallard, warbler, ladybug, and lunamoth},

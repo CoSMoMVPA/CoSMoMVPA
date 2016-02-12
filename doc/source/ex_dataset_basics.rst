@@ -4,8 +4,8 @@ Dataset basics
 ==============
 
 
-Nifti basics
-++++++++++++
+fMRI dataset basics
++++++++++++++++++++
 
 Make sure your setup works
 --------------------------
@@ -18,16 +18,18 @@ Before loading any data, please make sure that you:
 
 Load and view anatomical dataset
 --------------------------------
-Before loading data with :ref:`CoSMoMVPA functions <modindex>`, we start loading a single NIFT image of an anatomical scan.
-Use the function ``load_nii`` to load the nifti file of the brain of subject s01 (``brain.nii``) and assign the result to a struct 'ni'. What is contained in this struct?
+Using some basic :ref:`CoSMoMVPA functions <modindex>` we start loading a single NIFTI image of an anatomical scan.
+Use the function :ref:`cosmo_fmri_dataset` to load the nifti file of the brain of subject s01 (``brain.nii``) and assign the result to a struct 'ds'. What is contained in this struct?
 
-Make a histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
+Make a histogram of all voxels, and a second histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
 
-Display a saggital, axial and coronal slice.
+Display the dataset in saggital orientation.
 
-Hint: :ref:`run_nifti_basics_skl`
+Set anterior voxels to zero, and display the result.
 
-Solution: :ref:`run_nifti_basics` / :pb:`nifti_basics`
+Hint: :ref:`run_anatomical_dataset_basics_skl`
+
+Solution: :ref:`run_anatomical_dataset_basics` / :pb:`run_anatomical_dataset_basics_`
 
 
 Loading datasets with different masks
