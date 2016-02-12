@@ -9,19 +9,14 @@ A multi-modal, multi-variate pattern analysis (MVPA) toolbox in Matlab / GNU Oct
 
 CoSMoMVPA
 ---------
-- Provides simple, lightweight implementations of the most common types of MVPA of cognitive neuroscience data, such as classification with cross-validation, correlations, representational similarity analysis, and generalization over time.
-- Supports most common fMRI (including NIFTI, ANALYZE, BrainVoyager, AFNI, GIFTI) and MEEG (FieldTrip, EEGLab)  data formats.
-- Typical MVP analyses require a few lines of code.
+- State-of-the art, yet simple to use MVPA implementations.
+- Runs on the Matlab and GNU Octave platform.
 - Handles fMRI volumetric, fMRI surface-based, and MEEG data through a uniform data structure.
-- Supports searchlights in the volume, on the surface, over sensors, time bins, and frquency bands, and any combinations of these (e.g. sensor by time by frequency).
-- Supports multiple-comparison correction using Threshold-Free Cluster Enhancement.
-- Provides extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
-- Uses an automated test suite and continuous integration testing (through `Travis-ci`_).
-- Runs on Matlab and GNU Octave.
+- Support for a wide range of data formats.
+- Searchlights in the volume, on the surface, over sensors, time bins, and frquency bands.
+- Multiple-comparison correction using Threshold-Free Cluster Enhancement Monte Carlo simulations.
+- Extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
 - Is Free/Open Source Software (MIT License).
-
-**Note: CoSMoMVPA is currently in a pre-first-release state. Features, code and documentation are relatively stable, but small changes may occur**
-
 
 .. toctree::
    :hidden:
