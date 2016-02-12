@@ -117,6 +117,14 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
         Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
 
+        For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named Karen), and contain following:
+
+        .. code-block::
+
+            tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
+            output_data_path=/Users/nick/tmp/CoSMoMVPA_output
+
+
 .. _`test_local_setup`:
 
 * To verify that everything works, run the following in Matlab:
