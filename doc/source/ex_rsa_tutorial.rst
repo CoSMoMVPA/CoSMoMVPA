@@ -132,6 +132,8 @@ The function :ref:`cosmo_target_dsm_corr_measure` implements representational si
 
 It is recommended to center the data using the ``center_data`` option.
 
+Advanced exercise: the :ref:`cosmo_target_dsm_corr_measure` function can also run regression on multiple dissimilarity matrices. Use this function to estimate the contribution of the V1 and behavioural model using a saerchlight.
+
 Hint: :ref:`run_rsm_measure_searchlight_skl`
 
 Solution: :ref:`run_rsm_measure_searchlight` / run_rsm_measure_searchlight_pb_

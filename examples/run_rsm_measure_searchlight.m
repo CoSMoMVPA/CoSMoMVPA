@@ -89,13 +89,12 @@ output_path=config.output_data_path;
 cosmo_map2fmri(glm_dsm_results, ...
             fullfile(output_path,'rsm_searchlight_glm_behav-v1.nii'));
 
-%% Show behavioural seachlight map
+%% Show behavioural seachrlight map
 figure();
 cosmo_plot_slices(cosmo_slice(glm_dsm_results,1));
-title('behav');
-%% Show V1 seachlight map
+
+%% Show V1 searchlight map
 figure();
 cosmo_plot_slices(cosmo_slice(glm_dsm_results,2));
-title('v1');
 
 
