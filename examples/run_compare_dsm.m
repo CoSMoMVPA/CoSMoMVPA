@@ -6,8 +6,6 @@ subjects = {'s01','s02','s03','s04','s05','s06','s07','s08'};
 masks = {'ev_mask.nii','vt_mask.nii'};
 
 
-dsms = [];
-
 config=cosmo_config();
 study_path=fullfile(config.tutorial_data_path,'ak6');
 
@@ -17,7 +15,13 @@ study_path=fullfile(config.tutorial_data_path,'ak6');
 %       demean it, get DSM, save it in dsms
 
 % >@@>
-for m = 1:length(masks)
+
+n_subjects=numel(subjects);
+n_masks=numel(masks);
+
+counter=0;
+
+for m = 1:n_masks
     msk = masks{m};
     for s = 1:length(subjects)
         sub = subjects{s};
@@ -43,11 +47,15 @@ for m = 1:length(masks)
 
         % add to stack
         dsm=cosmo_pdist(ds.samples, 'correlation');
-        if isempty(dsms)
-            dsms=dsm;
-        else
-            dsms = [dsms; dsm];
+
+        if counter==0
+            % first dsm
+            n_pairs=numel(dsm);
+            neural_dsms=zeros(n_subjects*n_masks,n_pairs);
         end
+        counter=counter+1;
+        neural_dsms(counter,:)=dsm;
+
     end
 end
 % <@@<
@@ -63,16 +71,18 @@ v1_model_sf=cosmo_squareform(v1_model);
 behav_model_sf=cosmo_squareform(behav);
 % ensure row vector because Matlab and Octave return
 % row and column vectors, respectively
-dsms = [dsms; v1_model_sf(:)'; behav_model_sf(:)'];
+dsms = [neural_dsms; v1_model_sf(:)'; behav_model_sf(:)'];
 % <@@<
 
 %%
-% Now visualize the cross-correlation matrix. Remember that corrcoef calculates
-% correlation coefficients between columns and we want between rows.
+% Now visualize the cross-correlation matrix. Remember that 'cosmo_corr'
+% (or the builtin 'corr') calculates correlation coefficients between
+% columns and we want between rows, so the data has to be transposed.
 
 % >@@>
-cc = corrcoef(dsms');
-figure(); imagesc(cc);
+cc = cosmo_corr(dsms');
+figure();
+imagesc(cc);
 % <@@<
 
 %%
@@ -82,8 +92,10 @@ figure(); imagesc(cc);
 
 % >@@>
 cc_models = [cc(1:8,17) cc(9:16,17) cc(1:8,18) cc(9:16,18)];
-labs = {'v1 model~EV','v1 model~VT','behav~EV','behav~VT'};
-figure(); boxplot(cc_models); set(gca,'XTick',[1:4],'XTickLabel',labs);
+labels = {'v1 model~EV','v1 model~VT','behav~EV','behav~VT'};
+figure();
+boxplot(cc_models);
+set(gca,'XTick',[1:4],'XTickLabel',labels);
 % <@@<
 
 

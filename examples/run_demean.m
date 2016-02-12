@@ -18,7 +18,7 @@ xlim([-6 6]);
 %% Split the dataset by chunks
 % >@@>
 splits=cosmo_split(ds,{'chunks'},1);
-% >@@>
+% <@@<
 nsplits=numel(splits);
 
 % allocate space for output

@@ -72,11 +72,8 @@ will need to use matlab's subplot function for this.
 
 Hint: :ref:`run_rsa_visualize_skl`.
 
-Solution: :ref:`run_rsa_visualize`.
+Solution: :ref:`run_rsa_visualize` / :pb:`run_rsa_visualize`
 
-Now using the script you wrote to visualize EV and LV, go through the set of
-subjects and see how the patterns change for different subjects. What trends do
-you notice?
 
 Centering the data
 ++++++++++++++++++
@@ -115,12 +112,12 @@ Comparing dissimilarity matrices
 ++++++++++++++++++++++++++++++++
 
 It is easy to compare dissimilarity matrices by computing the
-Pearson correlation between two flattened upper triangle DSMs using matlab's
-**corrcoef** function. For the next exercise, stack flattened DSMs vertically
+Pearson correlation between two flattened upper triangle DSMs using the
+:ref:`cosmo_corr` function. For the next exercise, stack flattened DSMs vertically
 into a single matrix starting with all of the EV DSMs from every subject then
 all of the VT DSM. You should have a 10x15 matrix. Then add the v1 model and the
 behavioral DSMs to make it a 12x15 matrix. Now compute the cross-correlation
-matrix using **corrcoef**. Visualize the cross-correlation matrix with
+matrix using :ref:`cosmo_corr`. Visualize the cross-correlation matrix with
 **imagesc**. Try this with demeaning and without demeaning to compare the
 results. Finally, use matlabs **boxplot** function to view the distributions of
 correlations between neural simiilarities and model/behavioral DSMs.
@@ -129,19 +126,11 @@ Hint: :ref:`run_compare_dsm_skl`.
 
 Solution: :ref:`run_compare_dsm`.
 
-Target dissimilarity matrix correlation measure
-+++++++++++++++++++++++++++++++++++++++++++++++
-
-Now write a function that calculates the correlation between a target
-dissimilarity and the dissimilarity matrix calculated from a dataset. This
-function should conform to the function signature of a dataset measure.
-Use this as a starting point: :ref:`cosmo_target_dsm_corr_measure_skl`
-
-Solution: :ref:`cosmo_target_dsm_corr_measure`
-
 Target dissimilarity matrix searchlight
 +++++++++++++++++++++++++++++++++++++++
-Now use this measure to map where the neural similarity is similar to the behavioural similarity.
+The function :ref:`cosmo_target_dsm_corr_measure` implements representational similarity. Use this measure to map where the neural similarity is similar to the behavioural similarity.
+
+It is recommended to center the data using the ``center_data`` option.
 
 Hint: :ref:`run_rsm_measure_searchlight_skl`
 

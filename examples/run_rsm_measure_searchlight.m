@@ -1,4 +1,4 @@
-%% Searchlight using a data measure
+%% Searchlight for representational similarity analysis
 %
 % Using cosmo_searchlight, run cross-validation with nearest neighbor
 % classifier
@@ -20,33 +20,82 @@ ds = cosmo_fmri_dataset(data_fn, ...
 ds=cosmo_fx(ds, @(x)mean(x,1), 'targets', 1);
 
 models_path=fullfile(study_path,'models');
-load(fullfile(models_path,'v1_model.mat'));
 load(fullfile(models_path,'behav_sim.mat'));
+load(fullfile(models_path,'v1_model.mat'));
 
 %% Set measure
-% Use the rsm measure and set its parameters
-% behav similarity in the measure_args struct.
+% Use the @cosmo_target_dsm_corr_measure measure and set its parameters
+% so that the target_dsm is based on v1_model.mat
 % >@@>
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
 measure_args.target_dsm = behav;
+measure_args.center_data=true;
 % <@@<
 
-% use spherical neighborhood of 3 voxels
-radius=3; % 3 voxels
+%% Run searchlight
+% use spherical neighborhood of 100 voxels
+voxel_count=100;
 % define a neighborhood using cosmo_spherical_neighborhood
 % >@@>
-nbrhood=cosmo_spherical_neighborhood(ds,'radius',radius);
+nbrhood=cosmo_spherical_neighborhood(ds,'count',voxel_count);
 % <@@<
 
 % Run the searchlight
+% >@@>
 results = cosmo_searchlight(ds,nbrhood,measure,measure_args);
+% <@@<
 
 % Save the results to disc using the following command:
-% >> cosmo_map2fmri(results, [data_path 'rsm_measure_searchlight.nii']);
+output_path=config.output_data_path;
+cosmo_map2fmri(results, ...
+            fullfile(output_path,'rsm_searchlight_behav.nii'));
 
-%% Make a histogram of classification accuracies
+%% Make a histogram of correlations
 hist(results.samples,47)
 
 %% Show some slices
 cosmo_plot_slices(results);
+
+
+%% Advanced exercise: regresion-based RSA
+
+% Using @cosmo_target_dsm_corr_measure, investigate the relative
+% contributions of the v1-model and behavioural similarity matrix
+% This requires the .glm_dsm option
+
+% >@@>
+measure = @cosmo_target_dsm_corr_measure;
+measure_args = struct();
+measure_args.glm_dsm = {behav, v1_model};
+measure_args.center_data=true;
+% <@@<
+
+%% Run searchlight
+% use spherical neighborhood of 100 voxels
+voxel_count=100;
+% define a neighborhood using cosmo_spherical_neighborhood
+% >@@>
+nbrhood=cosmo_spherical_neighborhood(ds,'count',voxel_count);
+% <@@<
+
+% Run the searchlight
+% >@@>
+glm_dsm_results = cosmo_searchlight(ds,nbrhood,measure,measure_args);
+% <@@<
+
+% Save the results to disc using the following command:
+output_path=config.output_data_path;
+cosmo_map2fmri(glm_dsm_results, ...
+            fullfile(output_path,'rsm_searchlight_glm_behav-v1.nii'));
+
+%% Show behavioural seachlight map
+figure();
+cosmo_plot_slices(cosmo_slice(glm_dsm_results,1));
+title('behav');
+%% Show V1 seachlight map
+figure();
+cosmo_plot_slices(cosmo_slice(glm_dsm_results,2));
+title('v1');
+
+
