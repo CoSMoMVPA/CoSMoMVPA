@@ -350,7 +350,6 @@ class CoSMoModules(object):
                  'match',
                  'dim_match',
                  'dim_find',
-                 'dim_slice',
                  'isfield',
                  'cartprod',
                  'index_unique',
@@ -358,6 +357,7 @@ class CoSMoModules(object):
                  'tail',
                  'overlap',
                  'align',
+                 'sample_unique'
                  ],
 
 
@@ -365,6 +365,7 @@ class CoSMoModules(object):
                       'interval_neighborhood',
                       'surficial_neighborhood',
                       'meeg_chan_neighborhood',
+                      'neighborhood_split',
                       'cross_neighborhood',
                       'sphere_offsets',
                       'searchlight',
@@ -449,6 +450,7 @@ class CoSMoModules(object):
         deprecated=['dataset_slice_fa',
                     'dataset_slice_sa',
                     'meta_feature_selection_classifier',
+                    'dim_slice',
                    ],
         )
 
