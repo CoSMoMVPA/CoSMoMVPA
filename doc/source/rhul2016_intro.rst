@@ -15,10 +15,10 @@ Prerequisites
 Goals of this course
 ++++++++++++++++++++
 
-    * Describe the typical MVPA approaches (correlation analysis, classification analysis, representational similarity analysis applied to both regions of interest and across the whole brain in a *searchlight* approach) described in the literature.
+    * Describe the typical MVPA approaches (correlation analysis, classification analysis, representational similarity analysis) applied to both regions of interest and across the whole brain in a *searchlight* approach.
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
-        - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*
+        - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
         - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational simillarity matrix) that can be applied to both a single ROI or in a searchlight.
     * Make yourself an independent user, so that you can apply the techniques learnt here to your own datasets.
 
@@ -95,5 +95,33 @@ To cover in this course
     + ROI analysis
     + Searchlight analysis
 
+
+
+(Very!) prelimary schedule
+++++++++++++++++++++++++++
+
+The following schedule is tentative.
+
+============== ==========================================================================================
+Date and time  Description
+============== ==========================================================================================
+We 10:00-12:00 General intro: Get your computer ready to run CoSMoMVPA and use the tutorial dataset
+-------------- ------------------------------------------------------------------------------------------
+We 12:00-14:00 Lunch break
+-------------- ------------------------------------------------------------------------------------------
+We 14:00-17:00 Pratical exercises: Basic dataset operations, correlation analaysis
+-------------- ------------------------------------------------------------------------------------------
+Th 10:00-12:00 Practical exercises: Classification analysis, crossvalidation, measures
+-------------- ------------------------------------------------------------------------------------------
+Th 12:00-14:00 Lunch break
+-------------- ------------------------------------------------------------------------------------------
+Th 14:00-17:00 Pratical exercises: Neighborhoods, searchlights
+-------------- ------------------------------------------------------------------------------------------
+Fr 10:00-12:00 Practical exercises: RSA, group statistics
+-------------- ------------------------------------------------------------------------------------------
+Fr 12:00-14:00 Lunch break
+-------------- ------------------------------------------------------------------------------------------
+Fr 14:00-17:00 Analysis decisions, general discussion, concluding remarks
+============== ==========================================================================================
 
 .. include:: links.txt
