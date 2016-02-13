@@ -93,10 +93,10 @@ To cover in this workshop
 
 
 
-(Very!) prelimary schedule
+Tenative schedule
 ++++++++++++++++++++++++++
 
-The following schedule is tentative.
+The following schedule is tentative and can change any moment depending on user, organizer and/or presenter needs.
 
 ============== ==========================================================================================
 Date and time  Description
