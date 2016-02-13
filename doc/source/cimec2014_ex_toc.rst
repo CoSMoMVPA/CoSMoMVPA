@@ -1,4 +1,4 @@
-.. _ex_toc:
+.. _cimec2014_ex_toc:
 
 Exercises
 =========

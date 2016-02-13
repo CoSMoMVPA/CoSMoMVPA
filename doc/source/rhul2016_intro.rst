@@ -123,4 +123,10 @@ Fr 12:00-14:00 Lunch break
 Fr 14:00-17:00 Analysis decisions, general discussion, concluding remarks
 ============== ==========================================================================================
 
+
+Exercises
++++++++++
+
+See :ref:`rhul2016_ex_toc`.
+
 .. include:: links.txt

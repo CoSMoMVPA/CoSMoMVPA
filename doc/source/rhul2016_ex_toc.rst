@@ -1,3 +1,4 @@
+.. _rhul2016_ex_toc:
 .. _ex_toc:
 
 Exercises
