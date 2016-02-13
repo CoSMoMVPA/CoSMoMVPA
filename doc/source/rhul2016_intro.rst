@@ -30,7 +30,6 @@ Not covered in this course
     * Other dataset types than volumetric fMRI data (MEEG, surface-based fMRI)
     * How to become a CoSMoMVPA developer
 
-
 Code and data needed for this workshop
 --------------------------------------
 
@@ -109,13 +108,13 @@ We 10:00-12:00 General intro: Get your computer ready to run CoSMoMVPA and use t
 -------------- ------------------------------------------------------------------------------------------
 We 12:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
-We 14:00-17:00 Pratical exercises: Basic dataset operations, correlation analaysis
+We 14:00-17:00 Pratical exercises: Basic dataset operations
 -------------- ------------------------------------------------------------------------------------------
-Th 10:00-12:00 Practical exercises: Classification analysis, crossvalidation, measures
+Th 10:00-12:00 Practical exercises: Correlation analysis, basic classification analysis
 -------------- ------------------------------------------------------------------------------------------
 Th 12:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
-Th 14:00-17:00 Pratical exercises: Neighborhoods, searchlights
+Th 14:00-17:00 Pratical exercises: Crossvalidation, neighborhoods, searchlights
 -------------- ------------------------------------------------------------------------------------------
 Fr 10:00-12:00 Practical exercises: RSA, group statistics
 -------------- ------------------------------------------------------------------------------------------
