@@ -118,7 +118,7 @@ opt=struct();
 % recommended
 opt.niter=200;
 
-tfce_z_ds_avg_primate_insects=cosmo_montecarlo_cluster_stat(...
+tfce_z_ds_primate_vs_insects=cosmo_montecarlo_cluster_stat(...
                                     ds_avg_primate_insects,cl_nh,opt);
 % <@@<
-cosmo_plot_slices(tfce_z_ds_avg_primate_insects);
+cosmo_plot_slices(tfce_z_ds_primate_vs_insects);
