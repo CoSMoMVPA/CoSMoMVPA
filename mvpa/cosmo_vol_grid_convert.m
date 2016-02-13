@@ -221,8 +221,9 @@ function direction=get_direction(ds,varargin)
     elseif ds_has_pos(ds)
         guessed_direction='tovol';
     else
-        error(['Input dataset must either have .fa.pos, or '...
-                            'fa.{i,j,k}']);
+        error(['Input dataset must either have .fa.pos '...
+                    '(for MEEG source), or '...
+                    'both fa.{i,j,k} and .a.vol.mat (for fMRI volume)']);
     end
 
     if has_direction
