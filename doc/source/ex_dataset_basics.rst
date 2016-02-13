@@ -18,6 +18,12 @@ Before loading any data, please make sure that you:
 
 Load and view anatomical dataset
 --------------------------------
++++++++++++++++++++++++++++++++++++++
+Before starting this exercise, please make sure you have read about:
+
+- :ref:`cosmomvpa_dataset`
+- :ref:`matlab_octave_logical_masking`
+
 Using some basic :ref:`CoSMoMVPA functions <modindex>` we start loading a single NIFTI image of an anatomical scan.
 Use the function :ref:`cosmo_fmri_dataset` to load the nifti file of the brain of subject s01 (``brain.nii``) and assign the result to a struct 'ds'. What is contained in this struct?
 
@@ -40,6 +46,9 @@ Before starting this exercise, please make sure you have read about:
 - :ref:`cosmomvpa_targets`
 - :ref:`cosmomvpa_chunks`
 - :ref:`cosmomvpa_dataset_operations`
+- :ref:`matlab_octave_logical_masking`
+
+Before starting any analysis, it is usually necessary to indicate the targets (conditions) and chunks (indicating independence of data; for fRMI data, typically runs) for each row in a dataset's ``.samples`` field.
 
 Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 (``glm_T_stats_perrun.nii``).
@@ -58,12 +67,6 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 
 - Now use :ref:`cosmo_fmri_dataset`  with the ``mask``, ``targets`` and ``chunks`` parameters, and verify you get the same as before.
 
-- Slice samples in various ways (using :ref:`cosmo_slice`):
-
-    + Get data in chunks 1 and 2
-    + Get data in conditions 1 and 3 (monkeys and mallards)
-
-
 Hint: :ref:`run_dataset_basics_skl`
 
 Solution: :ref:`run_dataset_basics` / :pb:`dataset_basics`
@@ -71,13 +74,26 @@ Solution: :ref:`run_dataset_basics` / :pb:`dataset_basics`
 Operations on datasets
 ++++++++++++++++++++++
 
-Now that you are familiar with the dataset, let's play around a little. Load the
-``glm_T_stats_perrun.nii`` data with the VT mask for any subject. Now slice the dataset into
-datasets: one that has all the primates results (monkey and lemur) and on that
-has only the bugs data (ladybug and lunamoth). Calculate the average pattern for
-primates and the average pattern for bugs. Now subtract bugs from primates. Save
-the result as a dataset. Now convert the dataset into a nifti format using the
-function :ref:`cosmo_map2fmri`. Visualize the results using ``imagesc`` or :ref:`cosmo_plot_slices`, or save the
+Before starting this exercise, please make sure you have read about:
+
+- :ref:`cosmomvpa_dataset_operations`
+
+Now that you are familiar with the dataset, let's play around a little.
+
+- Load the ``glm_T_stats_perrun.nii`` data with the VT mask for any subject.
+
+- Slice samples in various ways (using :ref:`cosmo_slice`):
+
+    + Get data in chunks 1 and 2
+    + Get data in conditions 1 and 3 (monkeys and mallards)
+    + Get data one that has all the primates results (monkey and lemur) and one that
+has only the bugs data (ladybug and lunamoth).
+    + Calculate the average pattern for primates and the average pattern for bugs.
+    + Subtract bugs from primates.
+
+-  Save the result as a dataset.
+- Convert the dataset into a nifti format using the function :ref:`cosmo_map2fmri`.
+- Visualize the results using ``imagesc`` or :ref:`cosmo_plot_slices`, or save the
 nifti as a file and use some other software like AFNI's or FSL's viewer.
 
 Optional exercise: use a whole-brain mask.

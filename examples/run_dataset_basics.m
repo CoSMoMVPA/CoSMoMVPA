@@ -19,7 +19,7 @@ ds = cosmo_fmri_dataset(fn);
 % set ds.sa.targets (trial conditions) to the 60x1 column vector:
 % [ 1 2 3 4 5 6 1 2 3 ... 5 6 ]'
 % >@@>
-targets=repmat([1:6]',10,1);
+targets=repmat((1:6)',10,1);
 ds.sa.targets = targets;
 % <@@<
 
@@ -35,6 +35,8 @@ for i=1:10
     chunks(idxs)=i;
 end
 ds.sa.chunks = chunks;
+
+% ( alternative:   ds.sa.chunks = ceil((1:60)'/6);     )
 % <@@<
 
 % sanity check
@@ -96,39 +98,3 @@ ds_masked_alt.sa.labels=labels;
 
 % check ds_masked and ds_masked_alt are the same
 assert(isequal(ds_masked_alt,ds_masked));
-
-
-%% Various slicing operations on the samples
-
-% only get data in chunks 1 and 2.
-% Make a logical mask indicating where .ds.chunks less than or equal to 2,
-% then use cosmo_slice to select these samples
-% (hint: you can use cosmo_match or just '<=')
-% >@@>
-chunks12_msk=ds.sa.chunks<=2;
-ds_chunks12=cosmo_slice(ds_masked,chunks12_msk);
-cosmo_disp(ds_chunks12);
-% <@@<
-
-% only get data in conditions 1 and 3
-% >@@>
-% (there are multiple ways of doing this)
-targets_13=ds.sa.targets==1 | ds.sa.targets==3; % element-wise logical 'or'
-ds_targets13=cosmo_slice(ds_masked,targets_13);
-cosmo_disp(ds_targets13);
-
-targets_13_alt=cosmo_match(ds.sa.targets,[1 3]); % using cosmo_match
-ds_targets13_alt=cosmo_slice(ds_masked,targets_13_alt);
-cosmo_disp(ds_targets13_alt);
-
-% sanity check showing they are the same
-assert(isequal(ds_targets13,ds_targets13_alt));
-
-% alterative using cosmo_match and the labels
-labels_monkey_or_mallard=cosmo_match(ds.sa.labels,{'monkey','mallard'});
-ds_targets13_alt2=cosmo_slice(ds_masked,labels_monkey_or_mallard);
-cosmo_disp(ds_targets13_alt2);
-
-% sanity check showing they are the same
-assert(isequal(ds_targets13,ds_targets13_alt2));
-% <@@<
