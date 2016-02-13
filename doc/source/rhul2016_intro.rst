@@ -7,15 +7,15 @@ Prerequisites
 +++++++++++++
 
     * Matlab / Octave :ref:`Advanced beginner level <matlab_experience>`.
-    * fMRI analysis `:ref:`advanced beginner level <cogneuro_experience>`.
+    * fMRI analysis :ref:`advanced beginner level <cogneuro_experience>`.
     * Working Matlab_ or Octave_ installation.
-    *  :ref:`the source code and the example data <get_code_and_example_data>`.
+    * :ref:`CoSMoMVPA source code and tutorial data <get_code_and_example_data>`.
 
 
 Goals of this course
 ++++++++++++++++++++
 
-    * Describe the typical MVPA approaches (correlation analysis, classification analysis, representational similarity analysis) applied to both regions of interest and across the whole brain in a *searchlight* approach.
+    * For fMRI data, describe the typical MVPA approaches (correlation analysis, classification analysis, representational similarity analysis) applied to both regions of interest and across the whole brain in a *searchlight* approach.
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
@@ -29,9 +29,6 @@ Not covered in this course
     * Learning to use Matlab / Octave
     * Other dataset types than volumetric fMRI data (MEEG, surface-based fMRI)
     * How to become a CoSMoMVPA developer
-
-Code and data needed for this workshop
---------------------------------------
 
 Sample Dataset
 ++++++++++++++
@@ -78,8 +75,8 @@ This data is stored in the ``models`` directory::
                                 low-level visual properties of the stimuli.
 
 
-To cover in this course
-+++++++++++++++++++++++
+To cover in this workshop
++++++++++++++++++++++++++
 
 - CoSMoMVPA concepts and dataset structure.
 - Basic operations on datasets.
@@ -123,10 +120,6 @@ Fr 12:00-14:00 Lunch break
 Fr 14:00-17:00 Analysis decisions, general discussion, concluding remarks
 ============== ==========================================================================================
 
-
-Exercises
-+++++++++
-
-See :ref:`rhul2016_ex_toc`.
+:ref:`Back to index <rhul2016>`
 
 .. include:: links.txt
