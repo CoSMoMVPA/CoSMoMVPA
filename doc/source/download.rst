@@ -95,9 +95,12 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 .. _`get_tutorial_data`:
 
-* To download the tutorial data:
+* Get the tutorial data:
 
     Download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
+
+    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <http://cosmomvpa.org/datadb-ak6.zip>`_
+
     You can move the directory to another location on your file system, if desired.
 
 
@@ -111,21 +114,21 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
               edit .cosmomvpa.cfg
 
-      Then add the lines for ``tutorial_data_path=`` and ``output_data_path``, and save the file.
+      Then add the lines for ``tutorial_data_path`` and ``output_data_path``, and save the file.
 
-      For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named Karen), and contain the following:
+      For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named ``karen``), and contain the following:
 
           .. code-block:: none
 
               tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
-              output_data_path=/Users/nick/tmp/CoSMoMVPA_output
+              output_data_path=/Users/karen/tmp/CoSMoMVPA_output
 
-      It is important that the ``output_data_path`` directory exists; if not, create this directory.
+      You can choose in which directory you would like to store the output for from running the examples and demonstrations; just make sture that the ``output_data_path`` directory exists. You can create a new directory for the output if you want.
 
 
 .. _`test_local_setup`:
 
-* To verify that everything works, run the following in Matlab:
+* To verify that everything works, run the following in Matlab / Octave:
 
     .. code-block:: matlab
 
