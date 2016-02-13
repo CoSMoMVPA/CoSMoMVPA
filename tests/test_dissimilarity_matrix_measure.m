@@ -1,4 +1,6 @@
 function test_suite=test_dissimilarity_matrix_measure()
+% tests for cosmo_dissimilarity_matrix_measure
+
     initTestSuite;
 
 function test_dissimilarity_matrix_measure_basics()

@@ -1,4 +1,6 @@
 function test_suite=test_montecarlo_cluster_stat
+% tests for cosmo_montecarlo_cluster_stat
+
     initTestSuite;
 
 function test_onesample_ttest_montecarlo_cluster_stat

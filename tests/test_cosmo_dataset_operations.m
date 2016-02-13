@@ -1,4 +1,6 @@
 function test_suite = test_cosmo_dataset_operations
+% tests for slicing and stacking
+%
     initTestSuite;
 
 function test_test_dataset

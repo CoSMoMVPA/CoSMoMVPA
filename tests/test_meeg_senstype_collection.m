@@ -1,4 +1,6 @@
 function test_suite=test_meeg_senstype_collection
+% tests for cosmo_meeg_senstype_collection
+
     initTestSuite;
 
 function test_meeg_senstype_collection_

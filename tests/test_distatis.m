@@ -1,4 +1,6 @@
 function test_suite = test_distatis
+% tests for cosmo_distatis
+
     initTestSuite;
 
 

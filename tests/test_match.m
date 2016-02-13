@@ -1,4 +1,6 @@
 function test_suite = test_match
+% tests for cosmo_match
+
     initTestSuite;
 
 

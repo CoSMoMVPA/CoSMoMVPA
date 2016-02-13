@@ -1,4 +1,6 @@
 function test_suite = test_fmri_convert_xform()
+% tests for cosmo_fmri_convert_xform
+
     initTestSuite
 
 function test_fmri_convert_xform_basics

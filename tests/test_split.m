@@ -1,4 +1,6 @@
 function test_suite = test_split
+% tests for cosmo_split
+
     initTestSuite;
 
 

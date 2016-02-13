@@ -1,4 +1,6 @@
 function test_suite = test_dim_find()
+% tests for cosmo_dim_find
+
     initTestSuite;
 
 function test_dim_find_basics()

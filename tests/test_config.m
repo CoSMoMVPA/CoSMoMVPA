@@ -1,4 +1,6 @@
 function test_suite=test_config
+% tests for cosmo_config
+
     initTestSuite;
 
 function s=randstr()

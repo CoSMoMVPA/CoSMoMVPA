@@ -1,4 +1,6 @@
 function test_suite = test_confusion_matrix
+% tests for cosmo_confusion_matrix
+
     initTestSuite;
 
 function classes=test_confusion_matrix_basics()

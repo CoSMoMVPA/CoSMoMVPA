@@ -1,4 +1,6 @@
 function test_suite=test_oddeven_partitioner
+% tests for cosmo_oddeven_partitioner
+
     initTestSuite;
 
 function test_test_oddeven_partitioner_basics

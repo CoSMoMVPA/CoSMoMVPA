@@ -1,4 +1,6 @@
 function test_suite = test_randomize_targets()
+% tests for cosmo_randomize_targets
+
     initTestSuite;
 
 function test_randomize_targets_basics()

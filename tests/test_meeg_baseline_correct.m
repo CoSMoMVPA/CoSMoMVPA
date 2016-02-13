@@ -1,4 +1,6 @@
 function test_suite = test_meeg_baseline_correct
+% tests for cosmo_meeg_baseline_correct
+
     initTestSuite;
 
 function test_meeg_baseline_correct_ft_comparison()

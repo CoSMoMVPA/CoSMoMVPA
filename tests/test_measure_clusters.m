@@ -1,4 +1,6 @@
 function test_suite = test_measure_clusters()
+% tests for cosmo_measure_clusters
+
     initTestSuite
 
 function test_measure_clusters_statfun

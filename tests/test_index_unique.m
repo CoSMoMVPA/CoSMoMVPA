@@ -1,4 +1,6 @@
 function test_suite = test_index_unique
+% tests for cosmo_index_unique
+
     initTestSuite;
 
 

@@ -1,4 +1,6 @@
 function test_suite = test_remove_useless_data
+% tests for cosmo_remove_useless_data
+
     initTestSuite;
 
 

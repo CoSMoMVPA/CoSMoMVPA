@@ -1,4 +1,6 @@
 function test_suite = test_disp
+% tests for cosmo_disp
+
     initTestSuite;
 
 

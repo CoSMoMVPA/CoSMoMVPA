@@ -1,4 +1,6 @@
  function test_suite = test_dim_slice
+% tests for cosmo_dim_slice
+
     initTestSuite;
 
 

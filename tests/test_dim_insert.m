@@ -1,4 +1,6 @@
 function test_suite = test_dim_insert()
+% tests for cosmo_dim_insert
+
     initTestSuite;
 
 function test_dim_insert_basics()

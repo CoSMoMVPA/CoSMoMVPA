@@ -1,4 +1,6 @@
 function test_suite=test_check_external()
+% tests for cosmo_check_external
+
     initTestSuite;
 
 function test_check_external_nifti()

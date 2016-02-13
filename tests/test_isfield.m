@@ -1,4 +1,6 @@
 function test_suite=test_isfield
+% tests for cosmo_isfield
+
     initTestSuite;
 
 function test_isfield_basics

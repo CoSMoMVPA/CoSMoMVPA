@@ -1,4 +1,6 @@
 function test_suite = test_sample_unique
+% tests for cosmo_sample_unique
+
     initTestSuite;
 
 function test_sample_unique_basics

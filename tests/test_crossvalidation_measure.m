@@ -1,4 +1,6 @@
 function test_suite = test_crossvalidation_measure
+% tests for cosmo_crossvalidation_measure
+
     initTestSuite;
 
 

@@ -1,4 +1,6 @@
 function test_suite = test_statcode()
+% tests for cosmo_statcode
+
     initTestSuite;
 
 function test_statcode_self()

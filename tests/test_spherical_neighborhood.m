@@ -1,4 +1,6 @@
 function test_suite = test_spherical_neighborhood
+% tests for cosmo_spherical_neighborhood
+
     initTestSuite;
 
 

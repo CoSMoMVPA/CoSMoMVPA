@@ -1,8 +1,10 @@
-function test_suite = test_fmri_orientations
+function test_suite = test_fmri_orientation
+% tests for cosmo_fmri_orientation
+
     initTestSuite;
 
 
-function test_orientations()
+function test_orientation()
     % make dataset
     ds=cosmo_synthetic_dataset('size','big');
     ds=cosmo_slice(ds,1);
@@ -11,7 +13,7 @@ function test_orientations()
     orig_orient=cosmo_fmri_orientation(ds);
     assertEqual(orig_orient,'LPI');
 
-    % get all orientations and
+    % get all orientation and
     orients=get_orients();
     norient=numel(orients);
 
@@ -57,7 +59,7 @@ function test_orientations()
         assertEqual(ds.a,ds3.a);
     end
 
-function test_fmri_orientations_exceptions()
+function test_fmri_orientation_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_fmri_orientation(varargin{:}),'');
     aet([1 2 3]);
@@ -72,7 +74,7 @@ function test_fmri_reorient_exceptions()
     aet(ds,'  RAA');
 
 
-function test_fmri_orientations_with_afni_binary()
+function test_fmri_orientation_with_afni_binary()
     if cosmo_skip_test_if_no_external('afni_bin')
         return
     end

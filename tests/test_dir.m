@@ -1,4 +1,6 @@
 function test_suite=test_dir
+% tests for cosmo_dir
+
     initTestSuite;
 
 function test_dir_basics()

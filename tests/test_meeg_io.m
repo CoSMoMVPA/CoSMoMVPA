@@ -1,4 +1,6 @@
 function test_suite=test_meeg_io()
+% tests for MEEG input/output
+
     initTestSuite;
 
 

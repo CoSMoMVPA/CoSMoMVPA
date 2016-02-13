@@ -1,4 +1,6 @@
 function test_suite = test_squareform
+% tests for cosmo_squareform
+
     initTestSuite;
 
 

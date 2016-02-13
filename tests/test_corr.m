@@ -1,4 +1,6 @@
 function test_suite = test_corr
+% tests for cosmo_corr
+
     initTestSuite;
 
 

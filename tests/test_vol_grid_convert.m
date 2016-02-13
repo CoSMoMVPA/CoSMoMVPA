@@ -1,4 +1,6 @@
 function test_suite = test_vol_grid_convert
+% tests for cosmo_vol_grid_convert
+
     initTestSuite;
 
 

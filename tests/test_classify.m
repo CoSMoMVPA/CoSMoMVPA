@@ -1,4 +1,6 @@
 function test_suite = test_classify
+% tests for cosmo_classify_* functions
+
     initTestSuite;
 
 function test_classify_lda

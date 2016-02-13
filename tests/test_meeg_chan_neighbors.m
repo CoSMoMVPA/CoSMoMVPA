@@ -1,4 +1,6 @@
 function test_suite=test_meeg_chan_neighbors()
+% tests for cosmo_meeg_chan_neighbors
+
     initTestSuite;
 
 

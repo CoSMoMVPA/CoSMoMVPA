@@ -1,4 +1,6 @@
 function test_suite = test_partitions
+% tests for partitioning functions
+
     initTestSuite;
 
 function test_nfold_partitioner()

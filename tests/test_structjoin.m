@@ -1,4 +1,6 @@
 function test_suite=test_structjoin
+% tests for cosmo_structjoin
+
     initTestSuite;
 
 function test_structjoin_

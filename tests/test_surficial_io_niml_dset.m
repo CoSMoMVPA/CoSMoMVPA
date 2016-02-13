@@ -1,4 +1,6 @@
 function test_suite = test_surficial_io_niml_dset
+% tests for AFNI NIML input/output
+
     initTestSuite;
 
 

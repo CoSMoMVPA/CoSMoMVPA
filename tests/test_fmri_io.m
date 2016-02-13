@@ -1,4 +1,6 @@
 function test_suite=test_fmri_io
+% tests for fmri input/output
+%
     initTestSuite;
 
 function test_fmri_io_nii_gz()

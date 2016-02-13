@@ -1,4 +1,6 @@
 function test_suite = test_run_tests
+% tests for cosmo_run_tests
+
     initTestSuite;
 
 function test_run_tests_passing

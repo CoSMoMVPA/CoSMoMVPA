@@ -1,4 +1,6 @@
 function test_suite = test_interval_neighborhood()
+% tests for cosmo_interval_neighborhood
+
     initTestSuite;
 
 

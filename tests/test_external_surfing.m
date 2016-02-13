@@ -1,4 +1,6 @@
 function test_suite=test_external_surfing()
+% regression tests for external "surfing" toolbox
+
     initTestSuite;
 
 function test_surfing_subsample_surface()

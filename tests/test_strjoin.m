@@ -1,4 +1,6 @@
 function test_suite = test_strjoin
+% tests for cosmo_strjoin
+
     initTestSuite;
 
 function test_strjoin_basics

@@ -1,4 +1,6 @@
 function test_suite = test_fx
+% tests for cosmo_fx
+
     initTestSuite;
 
 function test_fx_basics()

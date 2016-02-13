@@ -1,4 +1,6 @@
 function test_suite = test_dim_remove()
+% tests for cosmo_dim_remove
+
     initTestSuite;
 
 

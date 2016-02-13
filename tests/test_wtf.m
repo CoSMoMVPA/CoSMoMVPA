@@ -1,4 +1,6 @@
 function test_suite=test_wtf
+% tests for cosmo_wtf
+
     initTestSuite;
 
 function test_wtf_basics()

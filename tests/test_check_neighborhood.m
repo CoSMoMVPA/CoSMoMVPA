@@ -1,4 +1,6 @@
 function test_suite=test_check_neighborhood
+% tests for cosmo_check_neighborhood
+
     initTestSuite
 
 function test_check_neighborhood_exceptions

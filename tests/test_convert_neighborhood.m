@@ -1,4 +1,6 @@
 function test_suite = test_convert_neighborhood()
+% tests for cosmo_convert_neighborhood
+
     initTestSuite
 
 function test_convert_neighborhood_basis()

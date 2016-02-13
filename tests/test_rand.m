@@ -1,4 +1,6 @@
 function test_suite = test_rand()
+% tests for cosmo_rand
+
     initTestSuite;
 
 function test_rand_basics

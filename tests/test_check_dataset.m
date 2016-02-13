@@ -1,4 +1,6 @@
 function test_suite=test_check_dataset()
+% tests for cosmo_check_dataset
+
     initTestSuite;
 
 function test_check_dataset_exceptions()

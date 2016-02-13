@@ -1,4 +1,6 @@
 function test_suite = test_searchlight
+% tests for cosmo_searchlight
+
     initTestSuite;
 
 

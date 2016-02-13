@@ -1,4 +1,6 @@
 function test_suite=test_stack
+% tests for cosmo_stack
+
     initTestSuite;
 
 function test_stack_samples

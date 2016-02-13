@@ -1,4 +1,6 @@
 function test_suite=test_tail
+% tests for cosmo_tail
+
     initTestSuite;
 
 function test_tail_basics

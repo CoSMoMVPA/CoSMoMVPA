@@ -1,4 +1,6 @@
 function test_suite=test_synthetic_dataset
+% tests for cosmo_synthetic_dataset
+
     initTestSuite;
 
 function test_synthetic_dataset_basics()

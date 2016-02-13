@@ -1,4 +1,6 @@
 function test_suite=test_dim_match
+% tests for cosmo_dim_match
+
     initTestSuite;
 
 function test_dim_match_basics()

@@ -1,4 +1,6 @@
 function test_suite = test_dim_prune()
+% tests for cosmo_dim_prune
+
     initTestSuite;
 
 function test_dim_prune_fmri()

@@ -1,4 +1,6 @@
 function test_suite=test_cross_neighborhood()
+% tests for cosmo_cross_neighborhood
+
     initTestSuite;
 
 function test_cross_neighborhood_time_freq()

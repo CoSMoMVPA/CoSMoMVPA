@@ -1,4 +1,6 @@
 function test_suite=test_target_dsm_corr_measure
+% tests for cosmo_target_dsm_corr_measure
+
     initTestSuite;
 
 function test_target_dsm_corr_measure_pearson

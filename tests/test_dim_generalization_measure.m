@@ -1,4 +1,6 @@
 function test_suite=test_dim_generalization_measure()
+% tests for cosmo_dim_generalization_measure
+
     initTestSuite;
 
 function test_dim_generalization_measure_basics

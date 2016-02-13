@@ -1,4 +1,6 @@
 function test_suite=test_meeg_layout_collection
+% tests for cosmo_meeg_layout_collection
+
     initTestSuite;
 
 

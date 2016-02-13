@@ -1,4 +1,6 @@
 function test_suite = test_stat
+% tests for cosmo_stat
+
     initTestSuite;
 
 

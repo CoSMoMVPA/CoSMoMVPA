@@ -1,4 +1,6 @@
 function test_suite = test_neighborhood_split()
+% tests for cosmo_neighborhood_split
+
     initTestSuite;
 
 function test_neighborhood_split_basics()

@@ -1,4 +1,6 @@
 function test_suite=test_warning
+% tests for cosmo_warning
+
     initTestSuite;
 
 function test_warning_basics

@@ -1,4 +1,6 @@
 function test_suite = test_type()
+% tests for cosmo_type
+
     initTestSuite;
 
 function test_type_basics()

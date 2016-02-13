@@ -1,4 +1,6 @@
 function test_suite = test_cluster_neighborhood
+% tests for cosmo_cluster_neighborhood
+
     initTestSuite;
 
 

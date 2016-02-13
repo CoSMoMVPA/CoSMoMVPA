@@ -1,4 +1,6 @@
 function test_suite = test_cartprod
+% tests for cosmo_cartprod
+
     initTestSuite;
 
 

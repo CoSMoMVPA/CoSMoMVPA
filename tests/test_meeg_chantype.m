@@ -1,4 +1,6 @@
 function test_suite=test_meeg_chantype
+% tests for cosmo_meeg_chantype
+
     initTestSuite;
 
 function test_meeg_chantype_

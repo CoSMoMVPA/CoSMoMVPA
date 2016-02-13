@@ -1,4 +1,6 @@
 function test_suite = test_chunkize
+% tests for cosmo_chunkize
+
     initTestSuite;
 
 

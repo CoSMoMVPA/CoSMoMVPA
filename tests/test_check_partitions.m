@@ -1,4 +1,6 @@
 function test_suite=test_check_partitions()
+% tests for cosmo_check_partitions
+
     initTestSuite;
 
 function test_check_partitions_exceptions()

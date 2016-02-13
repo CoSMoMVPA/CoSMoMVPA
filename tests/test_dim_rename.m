@@ -1,4 +1,6 @@
 function test_suite = test_dim_rename()
+% tests for cosmo_dim_rename
+
     initTestSuite
 
 function test_dim_rename_basics

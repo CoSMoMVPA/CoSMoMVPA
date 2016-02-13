@@ -1,4 +1,6 @@
 function test_suite = test_pdist
+% tests for cosmo_pdist
+
     initTestSuite;
 
 

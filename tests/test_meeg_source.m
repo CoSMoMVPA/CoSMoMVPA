@@ -1,4 +1,6 @@
 function test_suite=test_meeg_source()
+% tests for MEEG datasets in source space
+
     initTestSuite;
 
 function test_meeg_dataset()

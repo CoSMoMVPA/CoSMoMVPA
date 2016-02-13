@@ -1,4 +1,6 @@
 function test_suite = test_surficial_neighborhood
+% tests for cosmo_surficial_neighborhood
+
     initTestSuite;
 
 function test_surficial_neighborhood_surface_dijkstra

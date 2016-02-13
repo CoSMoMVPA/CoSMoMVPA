@@ -1,4 +1,6 @@
 function test_suite = test_fmri_dataset()
+% tests for cosmo_fmri_dataset
+
     initTestSuite;
 
 

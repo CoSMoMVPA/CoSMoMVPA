@@ -1,4 +1,6 @@
 function test_suite = test_fmri_deoblique
+% tests for cosmo_fmri_deoblique
+
     initTestSuite;
 
 

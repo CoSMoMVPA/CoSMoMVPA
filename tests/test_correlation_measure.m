@@ -1,4 +1,6 @@
 function test_suite=test_correlation_measure
+% tests for cosmo_correlation_measure
+
     initTestSuite;
 
 function test_correlation_measure_basis()

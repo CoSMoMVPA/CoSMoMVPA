@@ -1,4 +1,6 @@
 function test_suite=test_show_progress
+% tests for cosmo_show_progress
+
     initTestSuite;
 
 function test_show_progress_basics

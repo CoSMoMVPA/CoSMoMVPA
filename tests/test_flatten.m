@@ -1,4 +1,6 @@
 function test_suite=test_flatten()
+% tests for cosmo_flatten
+
     initTestSuite;
 
 function test_flatten_and_unflatten()

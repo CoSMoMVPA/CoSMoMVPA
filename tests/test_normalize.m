@@ -1,4 +1,6 @@
 function test_suite=test_normalize
+% tests for cosmo_normalize
+
     initTestSuite;
 
 function test_normalize_basics()

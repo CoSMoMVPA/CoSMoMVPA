@@ -1,4 +1,6 @@
 function test_suite=test_naive_bayes_classifier_searchlight
+% tests for cosmo_naive_bayes_classifier_searchlight
+
     initTestSuite;
 
 function test_naive_bayes_classifier_searchlight_basics

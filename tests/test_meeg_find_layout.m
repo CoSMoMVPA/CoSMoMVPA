@@ -1,4 +1,6 @@
 function test_suite=test_meeg_find_layout()
+% tests for cosmo_meeg_find_layout
+
     initTestSuite;
 
 function test_meeg_find_layout_()

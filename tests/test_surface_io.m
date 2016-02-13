@@ -1,4 +1,6 @@
 function test_suite=test_surface_io()
+% tests for surface input/output
+
     initTestSuite;
 
 function test_surface_dataset_gifti()

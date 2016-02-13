@@ -1,4 +1,6 @@
 function test_suite=test_dim_transpose
+% tests for cosmo_dim_transpose
+
     initTestSuite;
 
 function test_dim_transpose_basics()
