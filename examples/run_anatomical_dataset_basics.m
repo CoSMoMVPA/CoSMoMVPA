@@ -66,3 +66,26 @@ fn_out=fullfile(output_path,'anatomical_dataset_posterior.nii');
 % >@@>
 cosmo_map2fmri(ds_copy,fn_out);
 % <@@<
+
+
+%% Advanced exercise: set all voxels around a center voxel at
+% i=150,j=100,k=50 within a 40-voxel radius to zero
+center_ijk=[150; 100; 50];
+radius=40;
+
+ds_copy2=ds;
+all_ijk=[ds_copy2.fa.i; ...
+         ds_copy2.fa.j; ...
+         ds_copy2.fa.k];
+
+% compute difference dimension-wise
+delta=bsxfun(@minus,center_ijk,all_ijk);
+
+squared_distance_from_center=sum(delta.^2,1);
+mask=squared_distance_from_center<=radius^2;
+ds_copy2.samples(:,mask)=0;
+cosmo_plot_slices(ds_copy2);
+
+
+
+

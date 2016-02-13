@@ -32,7 +32,7 @@ Display the dataset in saggital orientation.
 
 Set anterior voxels to zero, and display the result.
 
-Advanced exercise: set all voxels around a center voxel at ``i=80,j=90,i=50`` within a 40-voxel radius to zero, and displauy the result.
+Advanced exercise: set all voxels around a center voxel at ``i=150,j=100,k=50`` within a 40-voxel radius to zero, and displauy the result.
 
 Hint: :ref:`run_anatomical_dataset_basics_skl`
 
@@ -67,6 +67,8 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 - Load the VT mask, find where there are non-zero values in the mask, and apply it to the dataset using :ref:`cosmo_slice`.
 
 - Now use :ref:`cosmo_fmri_dataset`  with the ``mask``, ``targets`` and ``chunks`` parameters; set ``.sa.labels`` as before, and verify you get the same dataset structure as before.
+
+Advanced exercise: using :ref:`cosmo_slice`, can you show the same figure as in the advanved exercise above where all voxels around a center voxels were set to zero?
 
 Hint: :ref:`run_dataset_basics_skl`
 
