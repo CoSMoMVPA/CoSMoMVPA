@@ -81,8 +81,10 @@ function test_statis_
     resvec2.a.sdim.values=resvec.a.sdim.values;
 
     resvec_single_feature=cosmo_slice(resvec,1,2);
-    assertAlmostEqual(resvec_single_feature.samples,resvec2.samples);
-    assertAlmostEqual(resvec_single_feature.fa.quality,resvec2.fa.quality);
+    assertElementsAlmostEqual(resvec_single_feature.samples,...
+                                            resvec2.samples);
+    assertElementsAlmostEqual(resvec_single_feature.fa.quality,...
+                                            resvec2.fa.quality);
     resvec2.samples=resvec_single_feature.samples;
     resvec2.fa.quality=resvec_single_feature.fa.quality;
     assertEqual(resvec2,resvec_single_feature);
