@@ -1,4 +1,6 @@
 function test_suite = test_average_samples
+% tests for cosmo_average_samples
+
     initTestSuite;
 
 function test_average_samples_

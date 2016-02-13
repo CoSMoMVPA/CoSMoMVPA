@@ -1,4 +1,6 @@
 function test_suite=test_balance_partitions
+% tests for cosmo_balance_partitions
+
     initTestSuite;
 
 function test_balance_partitions_repeats

@@ -1,4 +1,6 @@
 function test_suite=test_align
+% tests for cosmo_align
+
     initTestSuite;
 
 function test_align_basics

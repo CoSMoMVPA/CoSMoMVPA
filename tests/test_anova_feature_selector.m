@@ -1,4 +1,5 @@
 function test_suite=test_anova_feature_selector
+% tests for cosmo_anova_feature_selector
     initTestSuite;
 
 function test_anova_feature_selector_basics
