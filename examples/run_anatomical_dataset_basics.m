@@ -69,10 +69,11 @@ cosmo_map2fmri(ds_copy,fn_out);
 
 
 %% Advanced exercise: set all voxels around a center voxel at
-% i=150,j=100,k=50 within a 40-voxel radius to zero
+% i=150,j=100,k=50 within a 40-voxel radius to zero, and display the result
+
 center_ijk=[150; 100; 50];
 radius=40;
-
+% >@@>
 ds_copy2=ds;
 all_ijk=[ds_copy2.fa.i; ...
          ds_copy2.fa.j; ...
@@ -81,10 +82,18 @@ all_ijk=[ds_copy2.fa.i; ...
 % compute difference dimension-wise
 delta=bsxfun(@minus,center_ijk,all_ijk);
 
+% Pythogoras
 squared_distance_from_center=sum(delta.^2,1);
+
+% define mask
 mask=squared_distance_from_center<=radius^2;
+
+% set voxels to zero
 ds_copy2.samples(:,mask)=0;
+
+% show result
 cosmo_plot_slices(ds_copy2);
+% <@@<
 
 
 

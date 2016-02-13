@@ -32,7 +32,7 @@ Display the dataset in saggital orientation.
 
 Set anterior voxels to zero, and display the result.
 
-Advanced exercise: set all voxels around a center voxel at ``i=150,j=100,k=50`` within a 40-voxel radius to zero, and displauy the result.
+Advanced exercise: set all voxels around a center voxel at ``i=150,j=100,k=50`` within a 40-voxel radius to zero, and display the result.
 
 Hint: :ref:`run_anatomical_dataset_basics_skl`
 
