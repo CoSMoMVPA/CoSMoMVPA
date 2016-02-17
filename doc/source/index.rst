@@ -13,7 +13,7 @@ CoSMoMVPA
 - Runs on the Matlab and GNU Octave platform.
 - Handles fMRI volumetric, fMRI surface-based, and MEEG data through a uniform data structure.
 - Support for a wide range of data formats.
-- Searchlights in the volume, on the surface, over sensors, time bins, and frquency bands.
+- Searchlights in the volume, on the surface, over sensors, time bins, and frequency bands.
 - Multiple-comparison correction using Threshold-Free Cluster Enhancement Monte Carlo simulations.
 - Extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
 - Is Free/Open Source Software (MIT License).
