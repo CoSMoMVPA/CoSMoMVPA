@@ -95,8 +95,7 @@ Now that you are familiar with the dataset, let's play around a little.
 
 - Save the result as a dataset.
 - Convert the dataset into a nifti format using the function :ref:`cosmo_map2fmri`.
-- Visualize the results using ``imagesc`` or :ref:`cosmo_plot_slices`, or save the
-nifti as a file and use some other software like AFNI's or FSL's viewer.
+- Visualize the results using ``imagesc`` or :ref:`cosmo_plot_slices`, or save the nifti as a file and use some other software like AFNI's or FSL's viewer.
 
 Optional exercise: use a whole-brain mask.
 
