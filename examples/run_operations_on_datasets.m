@@ -116,7 +116,8 @@ ds_primates_minus_bugs.sa=struct();
 cosmo_check_dataset(ds_primates_minus_bugs); %good practice
 
 % store to disc
-output_fn=fullfile(data_path, 'primates_minus_bugs.nii');
+output_path=config.output_data_path;
+output_fn=fullfile(output_path, 'primates_minus_bugs.nii');
 ni = cosmo_map2fmri(ds_primates_minus_bugs, output_fn);
 % <@@<
 
