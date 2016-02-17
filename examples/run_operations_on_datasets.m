@@ -42,8 +42,10 @@ ds=cosmo_remove_useless_data(ds);
 %% Various slicing operations on the samples
 
 % only get data in chunks 1 and 2.
-% Make a logical mask indicating where .ds.chunks less than or equal to 2,
-% then use cosmo_slice to select these samples
+% Make a logical mask indicating where .ds.chunks less than or equal to 2
+% and store the result in a variable 'chunks12_msk'.
+% Then use cosmo_slice to select these samples and assign it to a variable
+% 'ds_chunks12'
 % (hint: you can use cosmo_match or just '<=')
 % >@@>
 chunks12_msk=ds.sa.chunks<=2;
@@ -51,7 +53,8 @@ ds_chunks12=cosmo_slice(ds,chunks12_msk);
 cosmo_disp(ds_chunks12);
 % <@@<
 
-% only get data in conditions 1 and 3
+% As above, but only select data with targets equal to 1 or 3.
+% (corresponding to {'monkey','mallard'})
 % >@@>
 % (there are multiple ways of doing this)
 targets_13=ds.sa.targets==1 | ds.sa.targets==3; % element-wise logical 'or'
@@ -75,7 +78,7 @@ cosmo_disp(ds_targets13_alt2);
 assert(isequal(ds_targets13,ds_targets13_alt2));
 % <@@<
 
-
+%% Get sample indices for primates and bugs
 % Get the sample indices that correspond to primates and bugs,
 % and assign the result to variables 'primate_idx' and 'bug_idx'
 
@@ -86,8 +89,9 @@ bug_idx = ds.sa.targets > 4;
 
 
 
-%% Slice the dataset
-% use the indices as input to cosmo_slice
+% Slice the dataset
+% use the indices in 'primate_idx' and 'bug_idx' as input to cosmo_slice,
+% and store the result in 'primate_ds' and 'bug_ds', respectively.
 
 % >@@>
 primate_ds = cosmo_slice(ds, primate_idx);

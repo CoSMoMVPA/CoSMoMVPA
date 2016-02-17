@@ -96,7 +96,7 @@ for fold=1:nfolds
 end
 
 % safety check:
-% for this exerice, the following code tests whether the predicted classes
+% for this exercise, the following code tests whether the predicted classes
 % is as they should be (i.e. the correct answer); if not an error is
 % raised.
 
@@ -208,10 +208,9 @@ end
 % >@@>
 accuracy=mean(all_pred==ds.sa.targets);
 % <@@<
-accuracy=mean(all_pred==ds.sa.targets);
 fprintf(['\nLDA all categories n-fold (with partitioner): '...
             'accuracy %.3f\n'], accuracy);
 
 % Note: cosmo_crossvalidation_measure can perform the above operations as
 % well (and in an easier way), but using that function is not part of
-% this exercise
+% this exercise.

@@ -2,7 +2,7 @@
 %
 % Load t-stat data from one subject, apply 'vt' mask, compute difference
 % of (fisher-transformed) between on- and off diagonal split-half
-% correlation values..
+% correlation values.
 
 %% Set analysis parameters
 subject_id='s01';
@@ -50,14 +50,15 @@ half2_samples=half2_ds.samples;
 % compute all correlation values between the two halves, resulting
 % in a 6x6 matrix. Store this matrix in a variable 'rho'.
 % Hint: use cosmo_corr (or builtin corr, if the matlab stats toolbox
-%       is avaible) after transposing the samples in the two halves.
+%       is available) after transposing the samples in the two halves.
 % >@@>
 rho=cosmo_corr(half1_samples',half2_samples');
 % <@@<
 
 % Correlations are limited between -1 and +1, thus they cannot be normally
 % distributed. To make these correlations more 'normal', apply a Fisher
-% transformation and store this in a variable 'z' (use atanh).
+% transformation and store this in a variable 'z'
+% (hint: use atanh).
 % >@@>
 z=atanh(rho);
 % <@@<
@@ -67,8 +68,10 @@ figure
 % >@@>
 imagesc(z);
 colorbar()
-set(gca, 'xtick', 1:numel(half1_ds.sa.labels), 'xticklabel', half1_ds.sa.labels)
-set(gca, 'ytick', 1:numel(half1_ds.sa.labels), 'yticklabel', half1_ds.sa.labels)
+set(gca, 'xtick', 1:numel(half1_ds.sa.labels), ...
+                'xticklabel', half1_ds.sa.labels)
+set(gca, 'ytick', 1:numel(half1_ds.sa.labels), ...
+                'yticklabel', half1_ds.sa.labels)
 title(subject_id)
 % <@@<
 
@@ -94,7 +97,12 @@ title(subject_id)
 % the weighted correlations would indicate more similar patterns for
 % patterns in the same condition (across the two halves) than in different
 % conditions.
+
+% Set the contrast matrix as described above and assign it to a variable
+% named 'contrast_matrix'
+% >@@>
 contrast_matrix=(eye(nClasses)-1/nClasses)/(nClasses-1);
+% <@@<
 
 % sanity check: ensure the matrix has a sum of zero
 if abs(sum(contrast_matrix(:)))>1e-14
@@ -102,16 +110,24 @@ if abs(sum(contrast_matrix(:)))>1e-14
 end
 
 %visualize the contrast matrix
+% >@@>
 figure
 imagesc(contrast_matrix)
 colorbar
 title('Contrast Matrix')
+% <@@<
 
 % Weigh the values in the matrix 'z' by those in the contrast_matrix
 % and then average them (hint: use the '.*' operator for element-wise
-% multiplication). Store the results in a variable 'mean_weighted_z'.
+% multiplication).
+% Store the result in a variable 'mean_weighted_z'.
 % >@@>
 weighted_z=z .* contrast_matrix;
+% <@@<
+
+% Compute the sum of all values in 'weighted_z', and store the result in
+% 'sum_weighted_z'.
+% >@@>
 sum_weighted_z=sum(weighted_z(:)); %Expected value under H0 is 0
 % <@@<
 
@@ -120,4 +136,3 @@ figure
 imagesc(weighted_z)
 colorbar
 title(sprintf('Weighted Contrast Matrix m = %5.3f', sum_weighted_z))
-

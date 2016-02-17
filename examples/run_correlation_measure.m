@@ -34,7 +34,7 @@ ds_odd_even=cosmo_stack({ds_odd, ds_even});
 % remove constant features (due to liberal masking)
 ds_odd_even=cosmo_remove_useless_data(ds_odd_even);
 
-% print dataset
+% display dataset
 fprintf('Dataset input:\n');
 cosmo_disp(ds_odd_even);
 
@@ -54,9 +54,11 @@ fprintf(['Average correlation difference between matching and '...
             mask_label, subject_id, ds_corr.samples);
 
 
-% Part 2: compute the raw Fisher-transformed correlation matrix
-% Hint: use a struct 'args' with args.output='correlation' as second
-% argument for cosmo_correlation_measure
+% Part 2: compute the raw Fisher-transformed correlation matrix,
+% and store the results in 'c_raw'
+%
+% (Hint: use a struct 'args' with args.output='correlation' as second
+% argument for cosmo_correlation_measure)
 % >@@>
 args=struct();
 args.output='correlation';
@@ -81,7 +83,7 @@ nsubjects=numel(subject_ids);
 mask_label='vt_mask';
 
 % allocate a cell for the output of the measure for each subject
-ds_corrs=cell(nsubjects,1);
+ds_corr_cell=cell(nsubjects,1);
 
 % Apply correlation measure for each subject using
 % cosmo_correlation_measure.
@@ -90,7 +92,7 @@ ds_corrs=cell(nsubjects,1);
 % - because statistics are computed later, add to the output:
 %   * .sa.chunks : the subject number
 %   * .sa.targets: 1 (for each subject)
-% - store the result of the k-th subject in ds_corrs{k}
+% - store the result of the k-th subject in ds_corr_cell{k}
 
 for subject_num=1:nsubjects
     subject_id=subject_ids{subject_num};
@@ -126,17 +128,17 @@ for subject_num=1:nsubjects
     ds_corr.sa.targets=1;
     ds_corr.sa.chunks=subject_num;
 
-    % store result in the cell array 'ds_corrs' at the 'subject_num'-th
+    % store result in the cell array 'ds_corr_cell' at the 'subject_num'-th
     % position
     % >@@>
-    ds_corrs{subject_num}=ds_corr;
+    ds_corr_cell{subject_num}=ds_corr;
     % <@@<
 end
 
-% combine the data from all subjects (in 'ds_corrs') into one dataset
+% combine the data from all subjects (in 'ds_corr_cell') into one dataset
 % using cosmo_stack, and assign the result to a variable 'ds_all'
 % >@@>
-ds_all=cosmo_stack(ds_corrs);
+ds_all=cosmo_stack(ds_corr_cell);
 % <@@<
 
 %% Compute group-level statistics

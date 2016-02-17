@@ -25,7 +25,7 @@ ds.sa.labels = repmat(classes,1,10)';
 
 % slice into odd and even runs using ds.sa.chunks attribute, and
 % store in new dataset structs called 'ds_even' and 'ds_odd'.
-% (use the 'mod' function (remainder after division) to see which
+% (hint: use the 'mod' function (remainder after division) to see which
 % chunks are even or odd)
 % >@@>
 even_msk = mod(ds.sa.chunks,2)==0;
@@ -39,9 +39,9 @@ ds_odd = cosmo_slice(ds,odd_msk);
 categories={'mallard','warbler'};
 
 % select samples where .sa.labels match on of the categories
-% for the even and odd runs seperately. Store the result in ds_even_birds
-% and ds_odd_birds
-% (use cosmo_match with .sa.labels and categories to to define a mask,
+% for the even and odd runs seperately. Slice the dataset twice and store
+% the result in 'ds_even_birds' and 'ds_odd_birds'
+% (use cosmo_match with .sa.labels and categories to define a mask,
 % then cosmo_slice to select the data)
 % >@@>
 msk_even_birds=cosmo_match(ds_even.sa.labels,categories);
@@ -58,14 +58,13 @@ cosmo_disp(ds_even_birds);
 fprintf('Odd data:\n')
 cosmo_disp(ds_odd_birds);
 
-
 % train on even, test on odd
-
+%
 % Use cosmo_classify_lda to get predicted targets for the odd runs when
 % training on the even runs, and assign these predictions to
 % a variable 'test_pred'.
-% (hint: use .samples and .sa.targets from both ds_even_birds and
-%        ds_odd_birds)
+% (hint: use .samples and .sa.targets from ds_even_birds, and
+%        use .samples from ds_odd_birds)
 % >@@>
 train_samples=ds_even_birds.samples;
 train_targets=ds_even_birds.sa.targets;
@@ -73,7 +72,9 @@ test_samples=ds_odd_birds.samples;
 
 test_pred=cosmo_classify_lda(train_samples,train_targets,...
                                     test_samples);
+% <@@<
 
+% >@@>
 % Assign the real tagets of the odd runs to a variable 'test_targets'
 test_targets=ds_odd_birds.sa.targets;
 % <@@<
@@ -143,6 +144,8 @@ fprintf('\nLDA all categories odd-even: accuracy %.3f\n', accuracy);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % manually build the confusion matrix for the six categories
+
+% first, allocate space for the confusion matrix
 nclasses=numel(classes); % should be 6
 confusion_matrix=zeros(nclasses); % 6x6 matrix
 

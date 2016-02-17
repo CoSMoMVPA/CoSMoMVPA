@@ -12,7 +12,7 @@ labels = {'monkey'; 'lemur'; 'mallard'; 'warbler'; 'ladybug'; 'lunamoth'};
 nsubjects=numel(subject_ids);
 
 % allocate space for output
-sum_weighted_zs=zeros(nsubjects,1);
+sum_weighted_zs_all=zeros(nsubjects,1);
 
 config=cosmo_config();
 study_path=fullfile(config.tutorial_data_path,'ak6');
@@ -20,15 +20,15 @@ study_path=fullfile(config.tutorial_data_path,'ak6');
 
 %% Loop over rois
 nrois=numel(rois);
-for iRoi = 1:nrois
+for i_roi = 1:nrois
 
     % pre-allocate space weighted correlation difference
     % in each subject
-    sum_weighted_zs=zeros(nsubjects,1);
+    sum_weighted_zs_all=zeros(nsubjects,1);
 
     %% Computations for each subject
-    for j=1:nsubjects
-        subject_id=subject_ids{j};
+    for i_subj=1:nsubjects
+        subject_id=subject_ids{i_subj};
 
         data_path=fullfile(study_path, subject_id);
 
@@ -37,7 +37,7 @@ for iRoi = 1:nrois
         half2_fn=fullfile(data_path,'glm_T_stats_even.nii');
 
         %mask name for given subject and roi
-        mask_fn=fullfile(data_path,[rois{iRoi},'_mask.nii']);
+        mask_fn=fullfile(data_path,[rois{i_roi},'_mask.nii']);
 
         % load two halves as CoSMoMVPA dataset structs.
         half1_ds=cosmo_fmri_dataset(half1_fn,'mask',mask_fn);
@@ -56,10 +56,17 @@ for iRoi = 1:nrois
         rho=cosmo_corr(half1_samples',half2_samples');
         % <@@<
 
-        % for the advanced exercise: sum up all individual
-        % correlation matrices
+        % for the advanced exercise ('compute the average of all individual
+        % correlation matrices'): if the first subject and roi,
+        % allocate space for a 'rho_sum' array with three dimensions;
+        % the first two dimensions for the two classes, the third
+        % one for different subjects.
+        % Then add 'rho' to 'rho_sum'
+        %
+        % (If you don't want to do the advanced
+        % exercise, yo don't have to do anything here.)
         % >@@>
-        if j == 1 && iRoi == 1
+        if i_subj == 1 && i_roi == 1
             % first correlation was just computed, and we now know
             % the number of conditions through the size of rho.
             %
@@ -67,7 +74,7 @@ for iRoi = 1:nrois
             nclasses=size(rho,1);
             rho_sum=zeros([nclasses,nclasses,nrois]);
         end
-        rho_sum(:, :, iRoi)=rho_sum(:, :, iRoi)+rho;
+        rho_sum(:, :, i_roi)=rho_sum(:, :, i_roi)+rho;
 
         % <@@<
 
@@ -78,11 +85,11 @@ for iRoi = 1:nrois
         % <@@<
 
         % visualize the matrix 'z'
-        subplot(3,3,j);
+        subplot(3,3,i_subj);
         % >@@>
         imagesc(z);
         colorbar()
-        title([subject_id ' ' rois{iRoi}]);
+        title([subject_id ' ' rois{i_roi}]);
         % <@@<
 
         % define in a variable 'contrast_matrix' how correlations values
@@ -102,9 +109,11 @@ for iRoi = 1:nrois
             error('illegal contrast matrix');
         end
 
-        % Weigh the values in the matrix 'z' by those in the contrast_matrix
-        % and then average them (hint: use the '.*' operator for element-wise
-        % multiplication). Store the results in a variable 'mean_weighted_z'.
+        % Weigh the values in the matrix 'z' by those in the
+        % contrast_matrix and then average them (hint: use the '.*'
+        % operator for element-wise multiplication). Store the results in
+        % a variable 'mean_weighted_z'. Then sum all values in this matrix
+        % and store in a variab
         % >@@>
         weighted_z=z.*contrast_matrix;
 
@@ -114,7 +123,7 @@ for iRoi = 1:nrois
         % store the result for this subject in sum_weighted_zs, so that
         % group statistics can be computed
         % >@@>
-        sum_weighted_zs(j)=sum_weighted_z;
+        sum_weighted_zs_all(i_subj)=sum_weighted_z;
         % <@@<
     end
 
@@ -123,22 +132,26 @@ for iRoi = 1:nrois
 
     % Using matlab's stat toolbox (if present)
     if cosmo_check_external('@stats',false)
-        [h,p,ci,stats]=ttest(sum_weighted_zs);
+        [h,p,ci,stats]=ttest(sum_weighted_zs_all);
         fprintf(['correlation difference in %s at group level: '...
             '%.3f +/- %.3f, t_%d=%.3f, p=%.5f (using matlab stats '...
             'toolbox)\n'],...
-            rois{iRoi},mean(sum_weighted_zs),std(sum_weighted_zs),...
+            rois{i_roi},mean(sum_weighted_zs_all),...
+                        std(sum_weighted_zs_all),...
             stats.df,stats.tstat,p);
     else
         fprintf('Matlab stats toolbox not available\n');
     end
 
-    % Using cosmo_stats - convert to dataset struct.
+    % Apart from using the 'ttest' function (if available), one can
+    % also use 'cosmo_stat' for univaraite statistics.
+    % For this approach, data must be represented in a dataset struct.
+    %
     % The targets are chunks are set to indicate that all samples are from
     % the same class (condition), and each observation is independent from
     % the others
     sum_weighted_zs_ds=struct();
-    sum_weighted_zs_ds.samples=sum_weighted_zs;
+    sum_weighted_zs_ds.samples=sum_weighted_zs_all;
     sum_weighted_zs_ds.sa.targets=ones(nsubjects,1);
     sum_weighted_zs_ds.sa.chunks=(1:nsubjects)';
 
@@ -147,7 +160,7 @@ for iRoi = 1:nrois
 
     fprintf(['correlation difference in %s at group level: '...
         '%.3f +/- %.3f, %s=%.3f, p=%.5f (using cosmo_stat)\n'],...
-        rois{iRoi},mean(sum_weighted_zs),std(sum_weighted_zs),...
+        rois{i_roi},mean(sum_weighted_zs_all),std(sum_weighted_zs_all),...
         ds_t.sa.stats{1},ds_t.samples,ds_p.samples);
 
 end
@@ -162,27 +175,33 @@ end
 ax_handles=zeros(nrois,1);
 col_limits=zeros(nrois,2);
 
-for iRoi = 1:nrois
+for i_roi = 1:nrois
     figure
 
     % store axis handle for current figure
-    ax_handles(iRoi) = gca;
+    ax_handles(i_roi) = gca;
 
-    % visualuize matrix
+    % compute teh average correlation matrix using 'rho_sum', and store the
+    % result in a variable 'rho_mean'. Note that the number of subjects is
+    % stored in a variable 'nsubjects'
     % >@@>
+    rho_mean=rho_sum(:, :, i_roi)/nsubjects;
+    imagesc(rho_mean);
+    % <@@<
 
-    imagesc(rho_sum(:, :, iRoi)/nsubjects)
+    % set labels, colorbar and title
     set(gca, 'xtick', 1:numel(labels), 'xticklabel', labels)
     set(gca, 'ytick', 1:numel(labels), 'yticklabel', labels)
 
     colorbar
     desc=sprintf(['Average splithalf correlation across subjects '...
-                    'in mask ''%s'''], rois{iRoi});
+                    'in mask ''%s'''], rois{i_roi});
     title(desc)
-    % <@@<
 
-    col_limits(iRoi,:) = get(gca, 'clim');
+
+    col_limits(i_roi,:) = get(gca, 'clim');
 end
-%give all figures the same color limits such that correlations can be
-%compared visually
+
+% give all figures the same color limits such that correlations can be
+% compared visually
 set(ax_handles, 'clim', [min(col_limits(:)), max(col_limits(:))])
