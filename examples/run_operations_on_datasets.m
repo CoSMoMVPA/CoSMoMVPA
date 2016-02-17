@@ -77,7 +77,7 @@ assert(isequal(ds_targets13,ds_targets13_alt2));
 
 
 % Get the sample indices that correspond to primates and bugs,
-% and assign the result to varibales 'primate_idx' and 'bug_idx'
+% and assign the result to variables 'primate_idx' and 'bug_idx'
 
 % >@@>
 primate_idx = ds.sa.targets <= 2;
@@ -107,7 +107,7 @@ primates_minus_bugs = primates_mean - bugs_mean;
 %% Store and visualize the results
 % Finally save the result as a dataset with the original header.
 % Just replace ds.samples with the result and remove the sample attributes.
-% Then convert back to nifti and save it using cosmo_map2fmri function.
+% Then convert back to nifti and save it using the cosmo_map2fmri function.
 
 % >@@>
 ds_primates_minus_bugs=ds; % make a copy
