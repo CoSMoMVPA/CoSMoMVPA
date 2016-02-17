@@ -58,11 +58,11 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 
     + The stimulus labels for each run of the fMRI study were monkey, lemur, mallard, warbler, ladybug, and lunamoth -- in that order. This dataset contains summary statistics (T statistics from the general linear model analysis, GLM) for each stimulus for each of ten runs. The runs are vertically stacked by run. For example, the first row contains the summary voxel-wise responses for monkey in run 1, the second row contains that for lemur in run 1, and the seventh row contains monkey from run 2, etc.
 
-    + Add samples atributes (dataset.sa) that contain:
+    + Add samples atributes (dataset.sa) as follows.
 
-        # numeric labels for the targets,aka stimulus labels, in the samples attribute field dataset.sa.targets
-        # add another sample attribute for the chunks, aka run labels, in the field dataset.sa.chunks.
-        # optional: add a third sample attribute with labels (string representation) showing human-readable labels of the conditions.
+        * numeric labels for the targets,aka stimulus labels, in the samples attribute field dataset.sa.targets
+        * add another sample attribute for the chunks, aka run labels, in the field dataset.sa.chunks.
+        * optional: add a third sample attribute with labels (string representation) showing human-readable labels of the conditions.
 
 - Load the VT mask, find where there are non-zero values in the mask, and apply it to the dataset using :ref:`cosmo_slice`.
 
