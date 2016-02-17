@@ -16,6 +16,8 @@ For the impatient
 
 .. include:: quick_download.txt
 
+.. include:: verify_exercise_setup.txt
+
 For the patient
 +++++++++++++++
 
@@ -125,19 +127,9 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
       You can choose in which directory you would like to store the output for from running the examples and demonstrations; just make sture that the ``output_data_path`` directory exists. You can create a new directory for the output if you want.
 
-
 .. _`test_local_setup`:
 
-* To verify that everything works, run the following in Matlab / Octave:
-
-    .. code-block:: matlab
-
-        config=cosmo_config();
-        data_path=fullfile(config.tutorial_data_path,'ak6','s01');
-        ds=cosmo_fmri_dataset(fullfile(data_path,'vt_mask.nii'),'mask',true);
-        cosmo_map2fmri(ds,fullfile(config.output_data_path,'test.nii'));
-
-    If no errors are raised and a file ``test.nii`` is created in the output_data_path, then you are good to go.
+.. include:: verify_exercise_setup.txt
 
 .. _`keep_code_up_to_date`:
 

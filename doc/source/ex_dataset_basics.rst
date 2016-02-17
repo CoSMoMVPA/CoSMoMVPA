@@ -87,14 +87,13 @@ Now that you are familiar with the dataset, let's play around a little.
 
 - Slice samples in various ways (using :ref:`cosmo_slice`):
 
-    + Get data in chunks 1 and 2
-    + Get data in conditions 1 and 3 (monkeys and mallards)
-    + Get data one that has all the primates results (monkey and lemur) and one that
-has only the bugs data (ladybug and lunamoth).
+    + Get dataset with data in chunks 1 and 2
+    + Get dataset with data in conditions 1 and 3 (monkeys and mallards)
+    + Get one dataset with data that has all the primate data (monkey and lemur) and another dataset has only the bugs data (ladybug and lunamoth).
     + Calculate the average pattern for primates and the average pattern for bugs.
     + Subtract bugs from primates.
 
--  Save the result as a dataset.
+- Save the result as a dataset.
 - Convert the dataset into a nifti format using the function :ref:`cosmo_map2fmri`.
 - Visualize the results using ``imagesc`` or :ref:`cosmo_plot_slices`, or save the
 nifti as a file and use some other software like AFNI's or FSL's viewer.

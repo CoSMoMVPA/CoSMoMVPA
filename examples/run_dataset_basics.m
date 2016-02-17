@@ -74,7 +74,8 @@ ds_mask=cosmo_fmri_dataset(fn_mask);
 assert(isequal(ds_mask.fa,ds.fa));
 
 % Now slice the dataset using cosmo_slice, where the third argument must be
-% 2 to indicate the slicing of features (not samples)
+% 2 to indicate the slicing of features (not samples).
+% Assign the result to a variable 'ds_masked'.
 % >@@>
 mask_indices=find(ds_mask.samples);
 ds_masked=cosmo_slice(ds, mask_indices, 2);

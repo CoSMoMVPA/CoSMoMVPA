@@ -7,6 +7,8 @@
 
     + also available as `zip archive`_.
 
+        * In that case, use :ref:`cosmo_set_path` to set the path.
+
 - CoSMOMVPA tutorial data in `zip format <http://cosmomvpa.org/datadb.zip>`_.
 
         * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <http://cosmomvpa.org/datadb-ak6.zip>`_
