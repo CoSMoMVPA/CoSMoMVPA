@@ -21,12 +21,9 @@ ds=cosmo_remove_useless_data(ds);
 % both near the edges of the brain and in the center of the brain.
 nvoxels_per_searchlight=100;
 
-% Define a spherical neighborhood using cosmo_spherical_neighborhood,
-% and assign the result to a variable named 'nrhood'
-% Hint: when using a negative value as the second argument, this sets
-%       the number of voxels in each searchlight rather than
-%       the maximum distance (in voxels) from each center
-% Note: this is not perfect, just an approximation
+% Define a spherical neighborhood with approximately
+% 100 voxels around each voxel using cosmo_spherical_neighborhood,
+% and assign the result to a variable named 'nbrhood'
 % >@@>
 nbrhood=cosmo_spherical_neighborhood(ds,'count',nvoxels_per_searchlight);
 % <@@<
