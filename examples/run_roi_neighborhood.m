@@ -90,7 +90,6 @@ cosmo_disp(nbrhood);
 %   the stacked dataset to get a full dataset with
 %   .samples, .fa, .sa., and .a
 %
-% - combining
 
 % Define a measure and arguments for n-fold
 % cross-validation with LDA classifier
