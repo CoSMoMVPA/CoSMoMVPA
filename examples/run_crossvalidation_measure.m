@@ -119,17 +119,19 @@ args.output='predictions';
 for k=1:nclassifiers
     % Set the classifier function here:
     % assign args.classifier to the k-th classifier in the cell
-    % 'classifiers'
+    % 'classifiers'.
     % >@@>
     args.classifier=classifiers{k};
     % <@@<
 
-    % compute predictions using the measure
+    % compute predictions using the measure, and assign the result to a
+    % variable 'predicted_ds'.
     % >@@>
     predicted_ds=measure(ds,args);
     % <@@<
 
-    % compute confusion matrix
+    % compute confusion matrix using cosmo_confusion_matrix, and assign the
+    % result to a variable 'confusion_matrix'.
     % >@@>
     confusion_matrix=cosmo_confusion_matrix(predicted_ds);
     % <@@<
@@ -140,6 +142,9 @@ for k=1:nclassifiers
     sum_diag=sum(diag(confusion_matrix));
     sum_total=sum(confusion_matrix(:));
     accuracy=sum_diag/sum_total;
+
+    % alternative:
+    accuracy_alt=mean(predicted_ds.samples==predicted_ds.sa.targets);
     % <@@<
 
     % visualize confusion matrix and show classification accuracy in the
