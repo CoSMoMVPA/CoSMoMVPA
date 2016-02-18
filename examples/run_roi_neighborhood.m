@@ -130,7 +130,7 @@ for k=1:nrois
     assert(size(ds_roi.samples,2)==numel(feature_idxs));
 
     % apply the measure and store the result in the k-th element of
-    % 'measure_outputs'
+    % 'each_measure_output'
     % >@@>
     each_measure_output{k}=measure(ds_roi,measure_args);
     % <@@<
