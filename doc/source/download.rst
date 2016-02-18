@@ -116,6 +116,12 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
               edit .cosmomvpa.cfg
 
+      Alternatively, go to CoSMoMVPA's ``mvpa/`` directory and store the ``.cosmomvpa.cfg`` file there.
+
+      Note for Windows users: when creating a new file, Windows may add (but hide) a ``.txt`` extension. It may be better to edit the file from Matlab.
+
+      Note for Unix (OSX, Linux) users: the file will not be shown in the terminal when using ``ls``, because the leading dot in the filename makes it hidden. To show hidden files, use ``ls -a``.
+
       Then add the lines for ``tutorial_data_path`` and ``output_data_path``, and save the file.
 
       For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named ``karen``), and contain the following:
