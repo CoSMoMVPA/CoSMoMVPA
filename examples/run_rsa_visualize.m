@@ -29,7 +29,7 @@ vt_ds=cosmo_remove_useless_data(vt_ds);
 ev_ds=cosmo_remove_useless_data(ev_ds);
 
 % Use pdist (or cosmo_pdist) with 'correlation' distance to get DSMs
-% in vector form
+% in vector form. Assign the result to 'ev_dsm' and 'vt_dsm'
 % >@@>
 ev_dsm = pdist(ev_ds.samples, 'correlation');
 vt_dsm = pdist(vt_ds.samples, 'correlation');
@@ -41,7 +41,7 @@ behav_dsm=squareform(behav);
 
 
 % Using matlab's subplot function place the heat maps for EV, VT
-% and behaviour DSMs side by side in the top three positions of a 3 x 3 
+% and behaviour DSMs side by side in the top three positions of a 3 x 3
 % subplot figure.
 % (Hint: to convert DSMs in vector form to matrix form (and vice versa),
 % using cosmo_squareform or squareform).
@@ -64,7 +64,7 @@ title('behav');
 
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 
-%% Add the dendrograms for EV, LV and behav in the middle row of the 
+%% Add the dendrograms for EV, LV and behav in the middle row of the
 % subplot figure (this requires matlab's stats toolbox)
 if cosmo_check_external('@stats',false)
     % First, compute the linkage using Matlab's linkage for
@@ -75,7 +75,7 @@ if cosmo_check_external('@stats',false)
     ev_hclus = linkage(ev_dsm);
     vt_hclus = linkage(vt_dsm);
     behav_hclus = linkage(behav_dsm);
-    
+
     % <@@<
 
     subplot(3,3,4);
@@ -91,7 +91,7 @@ if cosmo_check_external('@stats',false)
     % >@@>
     dendrogram(vt_hclus,'labels',labels,'orientation','left');
     % <@@<
-    
+
     % Using the same approach, show a dendogram of 'vt_hclus'
     subplot(3,3,6);
     % >@@>
@@ -122,7 +122,7 @@ ylim([-mx mx]);
 
 % Show VT similarity
 
-% using cmdscale, store two-dimensional projection of 'vt_dsm' and 
+% using cmdscale, store two-dimensional projection of 'vt_dsm' and
 % 'behav_dsm'
 % >@@>
 xy_vt = cmdscale(squareform(vt_dsm));
