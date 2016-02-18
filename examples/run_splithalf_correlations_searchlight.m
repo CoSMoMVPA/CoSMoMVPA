@@ -42,9 +42,10 @@ hist(roi_sizes,100)
 
 %% Run a searchlight with the cosmo_correlation_measure
 
-% Use cosmo_searchlight using cosmo_correlation_measure as the measure,
-% and the spherical neighborhood just defined, run a searchlight
-% and assign the result to a variable named 'ds_corr'
+% Use cosmo_searchlight with 'ds' as the dataset input,
+% a function handle of cosmo_correlation_measure as the measure,
+% and the spherical neighborhood just defined to run a searchlight.
+% Assign the result to a variable 'ds_corr'.
 % >@@>
 ds_corr=cosmo_searchlight(ds,nbrhood,@cosmo_correlation_measure);
 % <@@<
@@ -64,3 +65,4 @@ output_fn=fullfile(output_data_path,...
 % Write output to a NIFTI file using cosmo_map2fmri
 % @>>@
 cosmo_map2fmri(ds_corr, output_fn);
+% <@@<
