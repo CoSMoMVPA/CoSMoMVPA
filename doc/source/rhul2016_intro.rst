@@ -111,7 +111,7 @@ Th 10:00-13:00 Practical exercises: Correlation analysis, basic classification a
 -------------- ------------------------------------------------------------------------------------------
 Th 13:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
-Th 14:00-17:00 Pratical exercises: Crossvalidation, neighborhoods, searchlights
+Th 14:00-17:00 Pratical exercises: Classification with cross-validation, neighborhoods, searchlights
 -------------- ------------------------------------------------------------------------------------------
 Fr 10:00-13:00 Practical exercises: RSA, group statistics
 -------------- ------------------------------------------------------------------------------------------
