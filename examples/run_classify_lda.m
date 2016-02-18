@@ -102,7 +102,6 @@ test_targets=ds_odd_birds.sa.targets;
 accuracy = mean(test_pred_nb==test_targets);
 % <@@<
 fprintf('\nNaive Bayes birds even-odd: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be 0.6
 
 
 %% Part 2: all categories; train/test on even/odd runs and vice versa
@@ -123,7 +122,6 @@ test_targets=ds_odd.sa.targets;
 accuracy = mean(test_pred==test_targets);
 % <@@<
 fprintf('\nLDA all categories even-odd: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be 0.767
 
 % Now train on odd, test on even
 % >@@>
