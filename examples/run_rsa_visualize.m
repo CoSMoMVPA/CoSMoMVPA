@@ -123,7 +123,7 @@ ylim([-mx mx]);
 % Show VT similarity
 
 % using cmdscale, store two-dimensional projection of 'vt_dsm' and
-% 'behav_dsm'
+% 'behav_dsm' in 'xy_vt' and 'xy_behav'
 % >@@>
 xy_vt = cmdscale(squareform(vt_dsm));
 xy_behav = cmdscale(squareform(behav_dsm));
