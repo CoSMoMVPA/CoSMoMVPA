@@ -90,7 +90,6 @@ disp([test_targets test_pred])
 accuracy = mean(test_pred==test_targets);
 % <@@<
 fprintf('\nLDA birds even-odd: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be .9
 
 % compare with naive bayes classification
 % (hint: do classification as above, but use cosmo_classify_naive_bayes)
@@ -135,7 +134,6 @@ test_targets=ds_even.sa.targets;
 accuracy = mean(test_pred==test_targets);
 % <@@<
 fprintf('\nLDA all categories odd-even: accuracy %.3f\n', accuracy);
-% Answer: accuracy should be 0.733
 
 
 %% Part 3: build confusion matrix
