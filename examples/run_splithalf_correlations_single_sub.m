@@ -134,7 +134,7 @@ title('Contrast Matrix')
 % Weigh the values in the matrix 'z' by those in the contrast_matrix
 % and then average them (hint: use the '.*' operator for element-wise
 % multiplication).
-% Store the result in a variable 'mean_weighted_z'.
+% Store the result in a variable 'weighted_z'.
 % >@@>
 weighted_z=z .* contrast_matrix;
 % <@@<
