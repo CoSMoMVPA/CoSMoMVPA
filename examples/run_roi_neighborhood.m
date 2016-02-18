@@ -28,6 +28,12 @@ nbrhood.fa.roi_names=roi_names;
 % For illustrative purposes as a single dataset attribute
 nbrhood.a.some_attribute='useless';
 
+% Set the origin field - this is not required, but is useful to avoid
+% mistakes where neighborhoods are used with a different dataset than
+% intended
+nbrhood.origin.fa=ds.fa;
+nbrhood.origin.a=ds.a;
+
 % Add a field '.neighbors' to the nbrhood, which is initialized to a cell
 % with two elements (one for each ROI).
 % In the for-loop below, the cell is filled with feature indices
@@ -241,18 +247,20 @@ mx_confusion=cosmo_confusion_matrix(ds_confusion);
 % <@@<
 
 % visualize the confusion matrices
-% >@@>
+
 classes= {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
 nmatrices=size(mx_confusion,3);
 for k=1:nmatrices
+    % >@@>
     figure()
     imagesc(mx_confusion(:,:,k),[0 10]);
     title(ds_confusion.fa.roi_names{k});
     set(gca, 'xtick', 1:numel(classes), 'xticklabel', classes)
     set(gca, 'ytick', 1:numel(classes), 'yticklabel', classes)
     colorbar();
+    % <@@<
 end
-% <@@<
+
 
 
 

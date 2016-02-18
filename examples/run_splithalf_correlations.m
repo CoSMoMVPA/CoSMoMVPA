@@ -60,7 +60,7 @@ for i_roi = 1:nrois
         % correlation matrices'): if the first subject and roi,
         % allocate space for a 'rho_sum' array with three dimensions;
         % the first two dimensions for the two halves, the third
-        % one for different subjects.
+        % one for different rois.
         % Then add 'rho' to 'rho_sum'
         %
         % (If you don't want to do the advanced
