@@ -49,6 +49,10 @@ A single classification step can be visualized as follows (more advanced cross-v
 Single subject, single fold split-half classification
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+Before starting this exercise, please make sure you have read about:
+
+- :ref:`cosmomvpa_classifier`
+
 For this exercise, load a dataset using subject ``s01``'s T-statistics for every run
 ('glm_T_stats_perrun.nii') and the VT mask.
 
