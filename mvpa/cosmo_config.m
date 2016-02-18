@@ -34,6 +34,9 @@ function config=cosmo_config(fn, config)
 %  - the format for a configuration file is of the form <key>=<value>,
 %    where <key> cannot contain the '=' character and <value> cannot start
 %    or end with a white-space character.
+
+%  - if the .cosmomvpa.cfg file is in the same directory as this file
+%   (presently, 'mvpa/'), it will be found there as well.
 %
 %  - an example configuration file (of three lines):
 %
@@ -162,6 +165,14 @@ function path_fn=find_config_file(fn, raise_)
         if exist_(fn)
             path_fn=fn;
             break
+        end
+
+        % is it in the mvpa directory?
+        parent_dir=fileparts(mfilename('fullpath'));
+        m_fn=fullfile(parent_dir,fn);
+        if exist_(m_fn)
+            path_fn=m_fn;
+            break;
         end
 
         % is it in the matlab path?
