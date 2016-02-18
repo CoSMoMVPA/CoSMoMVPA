@@ -181,11 +181,15 @@ for i_roi = 1:nrois
     % store axis handle for current figure
     ax_handles(i_roi) = gca;
 
-    % compute teh average correlation matrix using 'rho_sum', and store the
+    % compute the average correlation matrix using 'rho_sum', and store the
     % result in a variable 'rho_mean'. Note that the number of subjects is
     % stored in a variable 'nsubjects'
     % >@@>
     rho_mean=rho_sum(:, :, i_roi)/nsubjects;
+    % <@@<
+
+    % visualize the rho_mean matrix using imagesc
+    % >@@>
     imagesc(rho_mean);
     % <@@<
 
