@@ -111,11 +111,11 @@ Th 10:00-13:00 Practical exercises: Correlation analysis, basic classification a
 -------------- ------------------------------------------------------------------------------------------
 Th 13:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
-Th 14:00-17:00 Pratical exercises: Classification with cross-validation, neighborhoods, searchlights
+Th 14:00-17:00 Pratical exercises: Classification with cross-validation, measures, neighborhoods
 -------------- ------------------------------------------------------------------------------------------
 Th 18:00-??:00 Social dinner at Hugo's bar and grill, 72 High Street, Egham
 -------------- ------------------------------------------------------------------------------------------
-Fr 10:00-13:00 Practical exercises: RSA, group statistics
+Fr 10:00-13:00 Practical exercises: Searchlight, RSA, group statistics
 -------------- ------------------------------------------------------------------------------------------
 Fr 13:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
