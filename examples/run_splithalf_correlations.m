@@ -120,7 +120,8 @@ for i_roi = 1:nrois
         sum_weighted_z=sum(weighted_z(:));
         % <@@<
 
-        % store the result for this subject in sum_weighted_zs, so that
+        % store the result for this subject in sum_weighted_zs
+        % (at the i_subj-th position), so that
         % group statistics can be computed
         % >@@>
         sum_weighted_zs_all(i_subj)=sum_weighted_z;
@@ -132,6 +133,8 @@ for i_roi = 1:nrois
 
     % Using matlab's stat toolbox (if present)
     if cosmo_check_external('@stats',false)
+
+        % >@@>
         [h,p,ci,stats]=ttest(sum_weighted_zs_all);
         fprintf(['correlation difference in %s at group level: '...
             '%.3f +/- %.3f, t_%d=%.3f, p=%.5f (using matlab stats '...
@@ -139,6 +142,7 @@ for i_roi = 1:nrois
             rois{i_roi},mean(sum_weighted_zs_all),...
                         std(sum_weighted_zs_all),...
             stats.df,stats.tstat,p);
+        % <@@<
     else
         fprintf('Matlab stats toolbox not available\n');
     end
