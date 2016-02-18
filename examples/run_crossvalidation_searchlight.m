@@ -27,9 +27,9 @@ nvoxels_per_searchlight=100;
 %       the number of voxels in each searchlight rather than
 %       the maximum distance (in voxels) from each center
 % Note: this is not perfect, just an approximation
-% @>>@
+% >@@>
 nbrhood=cosmo_spherical_neighborhood(ds,'count',nvoxels_per_searchlight);
-% @<<@
+% <@@<
 
 %% Define the measure as
 % define the measure as cosmo_crossvalidation_measure
@@ -42,9 +42,15 @@ measure=@cosmo_crossvalidation_measure;
 % want to do this for a publication-quality), but this takes quite long.
 % Instead, we take a short-cut here and use an
 % odd-even partitioning scheme that has only one fold (test on odd chunks,
-% test on even)
+% test on even) using cosmo_oddeven_partitioner.
+
 measure_args=struct();
+
+% As the 'partitions' argument, use an odd-even partitioner
+% >@@>
 measure_args.partitions=cosmo_oddeven_partitioner(ds,'half');
+% <@@<
+
 
 % Use cosmo_classify_lda as classifier argument for the measure
 % >@@>
@@ -64,7 +70,6 @@ ds_cfy=cosmo_searchlight(ds,nbrhood,measure,measure_args);
 %% Visualize and store the results in a NIFTI file
 
 % Visualize the results using cosmo_plot_slices
-% Hint: this function takes datasets with one sample directly as input
 cosmo_plot_slices(ds_cfy);
 
 % Set output filename
@@ -72,7 +77,8 @@ output_fn=fullfile(output_data_path,...
             sprintf('lda_odd-even_accuracy_d%.0fvx.nii',nvoxels_per_searchlight));
 
 % Write output to a NIFTI file using cosmo_map2fmri
-% @>>@
+% >@@>
 cosmo_map2fmri(ds_cfy, output_fn);
+% <@@<
 
 

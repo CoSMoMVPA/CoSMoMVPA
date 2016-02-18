@@ -63,6 +63,6 @@ output_fn=fullfile(output_data_path,...
             sprintf('splithalf_correlation_searchlight_r%.0f.nii',radius));
 
 % Write output to a NIFTI file using cosmo_map2fmri
-% @>>@
+% >@@>
 cosmo_map2fmri(ds_corr, output_fn);
 % <@@<
