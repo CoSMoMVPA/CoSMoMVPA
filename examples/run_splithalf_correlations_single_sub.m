@@ -102,6 +102,20 @@ title(subject_id)
 % named 'contrast_matrix'
 % >@@>
 contrast_matrix=(eye(nClasses)-1/nClasses)/(nClasses-1);
+
+% alternative solution
+contrast_matrix_alt=zeros(nClasses,nClasses);
+for k=1:nClasses
+    for j=1:nClasses
+        if k==j
+            value=1/nClasses;
+        else
+            value=-1/(nClasses*(nClasses-1));
+        end
+        contrast_matrix_alt(k,j)=value;
+    end
+end
+
 % <@@<
 
 % sanity check: ensure the matrix has a sum of zero
