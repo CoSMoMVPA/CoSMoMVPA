@@ -134,7 +134,8 @@ for k=1:nrois
     % 'measure_outputs'
     % >@@>
     each_measure_output{k}=measure(ds_roi,measure_args);
-    % @<<@
+    % <@@<
+
 end
 
 % Stack the datasets in 'each_measure_output' using cosmo_stack along
