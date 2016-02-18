@@ -17,6 +17,7 @@ Contents:
     ex_nfold_partitioner
     ex_crossvalidate
     ex_crossvalidation_measure
+    ex_rsa_visualization
     ex_rsa_tutorial
     ex_sphere_offsets
     ex_searchlight

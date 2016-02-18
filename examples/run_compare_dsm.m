@@ -14,7 +14,6 @@ study_path=fullfile(config.tutorial_data_path,'ak6');
 %       load each dataset
 %       demean it, get DSM, save it in dsms
 
-% >@@>
 
 n_subjects=numel(subjects);
 n_masks=numel(masks);
@@ -41,21 +40,30 @@ for m = 1:n_masks
         % remove constant features
         ds=cosmo_remove_useless_data(ds);
 
+
         % demean
         % Comment this out to see the effects of demeaning vs. not
         ds.samples = bsxfun(@minus, ds.samples, mean(ds.samples, 1));
 
-        % add to stack
+        % compute the one-minus-correlation value for each pair of
+        % targets.
+        % (Hint: use cosmo_pdist with the 'correlation' argument)
+        % @>>@
         dsm=cosmo_pdist(ds.samples, 'correlation');
+        % @<<@
 
         if counter==0
-            % first dsm
+            % first dsm, allocate space
             n_pairs=numel(dsm);
             neural_dsms=zeros(n_subjects*n_masks,n_pairs);
         end
+
+        % increase counter and store the dsm as the counter-th column in
+        % 'neural_dsms'
+        % @>>@
         counter=counter+1;
         neural_dsms(counter,:)=dsm;
-
+        % @<<@
     end
 end
 % <@@<
@@ -89,6 +97,12 @@ imagesc(cc);
 % Now use the values in the last to rows of the cross correlation matrix to
 % visualize the distributions in correlations between the neural similarities
 % and the v1 model/behavioral ratings.
+%
+% Rows  1 to  8: EV neural similarities
+% Rows  9 to 16: VT neural similarities
+% Row        17: EV model
+% Row        18: behavioural similarities
+
 
 % >@@>
 cc_models = [cc(1:8,17) cc(9:16,17) cc(1:8,18) cc(9:16,18)];

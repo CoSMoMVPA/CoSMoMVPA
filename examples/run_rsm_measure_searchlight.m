@@ -24,14 +24,18 @@ load(fullfile(models_path,'behav_sim.mat'));
 load(fullfile(models_path,'v1_model.mat'));
 
 %% Set measure
-% Use the @cosmo_target_dsm_corr_measure measure and set its parameters
-% so that the target_dsm is based on v1_model.mat
+% Set the 'measure' and 'measure_args' to use the
+% @cosmo_target_dsm_corr_measure measure and set its parameters
+% to so that the target_dsm is based on behav.mat
+
 % >@@>
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
 measure_args.target_dsm = behav;
-measure_args.center_data=true;
 % <@@<
+
+% Enable centering the data
+measure_args.center_data=true;
 
 %% Run searchlight
 % use spherical neighborhood of 100 voxels
@@ -61,15 +65,20 @@ cosmo_plot_slices(results);
 %% Advanced exercise: regresion-based RSA
 
 % Using @cosmo_target_dsm_corr_measure, investigate the relative
-% contributions of the v1-model and behavioural similarity matrix
-% This requires the .glm_dsm option
-
+% contributions of the v1-model and behavioural similarity matrix.
+%
+% Thus, set the 'measure' and 'measure_args' to use the
+% @cosmo_target_dsm_corr_measure measure and set its parameters
+% so that the 'glm_dsm' option uses the 'behav' and 'v1_model' targets
 % >@@>
 measure = @cosmo_target_dsm_corr_measure;
 measure_args = struct();
 measure_args.glm_dsm = {behav, v1_model};
-measure_args.center_data=true;
+
 % <@@<
+% Enable centering the data
+measure_args.center_data=true;
+
 
 %% Run searchlight
 % use spherical neighborhood of 100 voxels
