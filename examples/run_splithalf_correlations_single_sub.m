@@ -149,4 +149,5 @@ sum_weighted_z=sum(weighted_z(:)); %Expected value under H0 is 0
 figure
 imagesc(weighted_z)
 colorbar
+% For the advanced exercise
 title(sprintf('Weighted Contrast Matrix m = %5.3f', sum_weighted_z))
