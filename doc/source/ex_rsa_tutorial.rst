@@ -3,6 +3,24 @@
 Representational similarity analysis
 ====================================
 
+Visualizing dissimilarity matrices
+++++++++++++++++++++++++++++++++++
+
+Dissimilarities, based on neural data, behavioural data, and/or model data, can be visualised in various ways.
+
+Compute the similarities in the ``ev`` and ``vt`` regions for participant ``s01`` across the six categories, and load the model similarities for the behavioural ratings. Then visualize the similarities in three ways:
+
+- with dissimilarity matrices
+- with dendograms
+- with multi-dimensional scaling
+
+
+Hint: :ref:`run_rsa_visualize_skl`.
+
+Solution: :ref:`run_rsa_visualize` / :pb:`rsa_visualize`.
+
+
+
 Comparing dissimilarity matrices
 ++++++++++++++++++++++++++++++++
 
@@ -19,7 +37,7 @@ correlations between neural simiilarities and model/behavioral DSMs.
 
 Hint: :ref:`run_compare_dsm_skl`.
 
-Solution: :ref:`run_compare_dsm`.
+Solution: :ref:`run_compare_dsm` / :pb:`compare_dsm`.
 
 Target dissimilarity matrix searchlight
 +++++++++++++++++++++++++++++++++++++++

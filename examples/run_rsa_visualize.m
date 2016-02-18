@@ -29,75 +29,115 @@ vt_ds=cosmo_remove_useless_data(vt_ds);
 ev_ds=cosmo_remove_useless_data(ev_ds);
 
 % Use pdist (or cosmo_pdist) with 'correlation' distance to get DSMs
+% in vector form
 % >@@>
 ev_dsm = pdist(ev_ds.samples, 'correlation');
 vt_dsm = pdist(vt_ds.samples, 'correlation');
 % <@@<
 
-% Using matlab's subplot function place the heat maps for EV and VT DSMs side by
-% side in the top two positions of a 3 x 2 subplot figure
+model_path=fullfile(config.tutorial_data_path,'ak6','models');
+load(fullfile(model_path,'behav_sim.mat'));
+behav_dsm=squareform(behav);
+
+
+% Using matlab's subplot function place the heat maps for EV, VT
+% and behaviour DSMs side by side in the top three positions of a 3 x 3 
+% subplot figure.
+% (Hint: to convert DSMs in vector form to matrix form (and vice versa),
+% using cosmo_squareform or squareform).
 
 % >@@>
 figure();
 
-subplot(3,2,1);
+subplot(3,3,1);
 imagesc(squareform(ev_dsm));
 title('EV');
 
-subplot(3,2,2);
+subplot(3,3,2);
 imagesc(squareform(vt_dsm));
 title('VT');
+
+subplot(3,3,3);
+imagesc(squareform(behav_dsm));
+title('behav');
 % <@@<
 
-
-
-% Now add the dendrograms for EV and LV in the middle row of the subplot figure
-% (this requires matlab's stats toolbox)
 labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
-%
-% First, compute the linkage using Matlab's linkage. Assign the result
-% to 'ev_hclus' and 'vt_hclus'
 
-ev_hclus = linkage(ev_dsm);
-vt_hclus = linkage(vt_dsm);
-% <@@<
-
-% skip if stats toolbox is not present
+%% Add the dendrograms for EV, LV and behav in the middle row of the 
+% subplot figure (this requires matlab's stats toolbox)
 if cosmo_check_external('@stats',false)
-    subplot(3,2,3);
+    % First, compute the linkage using Matlab's linkage for
+    % 'ev_dsm', 'vt_dsm' and 'behav_dsm'. Assign the result
+    % to 'ev_hclus', 'vt_hclus', and 'behav_clus'
+
+    % >@@>
+    ev_hclus = linkage(ev_dsm);
+    vt_hclus = linkage(vt_dsm);
+    behav_hclus = linkage(behav_dsm);
+    
+    % <@@<
+
+    subplot(3,3,4);
     % show dendogram of 'ev_hclus'
-    % Asa additional argument to the dendogram function, use:
+    % As additional arguments to the dendogram function, use:
     %      'labels',labels,'orientation','left'
     % >@@>
     dendrogram(ev_hclus,'labels',labels,'orientation','left');
     % <@@<
 
-    % Along the same way, show a dendogram of 'vt_hclus'
-    subplot(3,2,4);
+    % Using the same approach, show a dendogram of 'vt_hclus'
+    subplot(3,3,5);
     % >@@>
     dendrogram(vt_hclus,'labels',labels,'orientation','left');
+    % <@@<
+    
+    % Using the same approach, show a dendogram of 'vt_hclus'
+    subplot(3,3,6);
+    % >@@>
+    dendrogram(behav_hclus,'labels',labels,'orientation','left');
     % <@@<
 else
     fprintf('stats toolbox not present; cannot show dendrograms\n');
 end
 
-% Show the the MDS plots in the bottom row
+%% Show the MDS (multi-dimensional scaling) plots in the bottom row
 
 % Show early visual cortex model similarity
-F_ev = cmdscale(squareform(ev_dsm));
-subplot(3,2,5);
-text(F_ev(:,1), F_ev(:,2), labels);
-mx = max(abs(F_ev(:)));
+subplot(3,3,7);
+
+% get two-dimensional projection of 'ev_dsm' dissimilarity using cmdscale;
+% assign the result to a variable 'xy_ev'
+% >@@>
+xy_ev = cmdscale(squareform(ev_dsm));
+% <@@<
+
+% plot the labels using the xy_ev labels
+text(xy_ev(:,1), xy_ev(:,2), labels);
+
+% adjust range of x and y axes
+mx = max(abs(xy_ev(:)));
 xlim([-mx mx]);
 ylim([-mx mx]);
 
 % Show VT similarity
+
+% using cmdscale, store two-dimensional projection of 'vt_dsm' and 
+% 'behav_dsm'
 % >@@>
-F_vt = cmdscale(squareform(vt_dsm));
-subplot(3,2,6);
-text(F_vt(:,1), F_vt(:,2), labels);
-mx = max(abs(F_vt(:)));
-xlim([-mx mx]);
-ylim([-mx mx]);
+xy_vt = cmdscale(squareform(vt_dsm));
+xy_behav = cmdscale(squareform(behav_dsm));
 % <@@<
 
+subplot(3,3,8);
+text(xy_vt(:,1), xy_vt(:,2), labels);
+mx = max(abs(xy_vt(:)));
+xlim([-mx mx]);
+ylim([-mx mx]);
+
+
+subplot(3,3,9);
+text(xy_behav(:,1), xy_behav(:,2), labels);
+mx = max(abs(xy_behav(:)));
+xlim([-mx mx]);
+ylim([-mx mx]);
