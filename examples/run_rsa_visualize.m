@@ -69,7 +69,7 @@ labels = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'}';
 if cosmo_check_external('@stats',false)
     % First, compute the linkage using Matlab's linkage for
     % 'ev_dsm', 'vt_dsm' and 'behav_dsm'. Assign the result
-    % to 'ev_hclus', 'vt_hclus', and 'behav_clus'
+    % to 'ev_hclus', 'vt_hclus', and 'behav_hclus'
 
     % >@@>
     ev_hclus = linkage(ev_dsm);
@@ -79,20 +79,20 @@ if cosmo_check_external('@stats',false)
     % <@@<
 
     subplot(3,3,4);
-    % show dendogram of 'ev_hclus'
-    % As additional arguments to the dendogram function, use:
+    % show dendrogram of 'ev_hclus'
+    % As additional arguments to the dendrogram function, use:
     %      'labels',labels,'orientation','left'
     % >@@>
     dendrogram(ev_hclus,'labels',labels,'orientation','left');
     % <@@<
 
-    % Using the same approach, show a dendogram of 'vt_hclus'
+    % Using the same approach, show a dendrogram of 'vt_hclus'
     subplot(3,3,5);
     % >@@>
     dendrogram(vt_hclus,'labels',labels,'orientation','left');
     % <@@<
 
-    % Using the same approach, show a dendogram of 'vt_hclus'
+    % Using the same approach, show a dendrogram of 'behav_hclus'
     subplot(3,3,6);
     % >@@>
     dendrogram(behav_hclus,'labels',labels,'orientation','left');
