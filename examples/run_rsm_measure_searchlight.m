@@ -26,7 +26,7 @@ load(fullfile(models_path,'v1_model.mat'));
 %% Set measure
 % Set the 'measure' and 'measure_args' to use the
 % @cosmo_target_dsm_corr_measure measure and set its parameters
-% to so that the target_dsm is based on behav.mat
+% to so that the target_dsm is based on behav_sim.mat
 
 % >@@>
 measure = @cosmo_target_dsm_corr_measure;
