@@ -23,11 +23,16 @@ ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
 % the average value across all six targets. Each sample is considered to be
 % the same condition, namely the effect of the stimulus-versus-baseline
 % effect; thus all target values must be set to 1.
+%
 % Use either:
 %   - cosmo_split and cosmo_stack
 %   - cosmo_average_samples
 %   - (for advanced users) cosmo_fx
+%
+% Assign the result to a variable 'ds_stim'
 
+ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
+%%
 % >@@>
 ds_stim=ds;
 ds_stim.sa.targets(:)=1;
@@ -71,7 +76,7 @@ plot(sort(n_neighbors_per_feature))
 opt=struct();
 opt.h0_mean=0;
 
-% set the number of iterations.
+% set the number of iterations ('niter' option).
 % At least 10000 is adviced for publication-quality analyses; because that
 % takes quite a while to compute, here we use 200
 
