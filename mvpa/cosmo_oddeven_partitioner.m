@@ -9,10 +9,16 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %    type            One of:
 %                    - 'full': two partitions are returned, training on odd
 %                       unique chunks and testing on even unique chunks,
-%                       and vice versa (default)
+%                       and vice versa (default). A typical use case is
+%                       classification analysis (using
+%                       cosmo_crossvalidation_measure)
 %                    - 'half': a single partition is returned, training on
 %                       odd unique chunks and testing on even unique chunks
-%                       only.
+%                       only. A typical use case is split-half
+%                       correlation analysis (using
+%                       cosmo_correlation_measure) because correlations are
+%                       symmetric (i.e. corr(a,b)==corr(b,a) for column
+%                       vectors a and b)
 %
 % Output:
 %    partitions      A struct with fields .train_indices and .test_indices.
