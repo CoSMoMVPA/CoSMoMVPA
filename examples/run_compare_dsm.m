@@ -48,9 +48,10 @@ for m = 1:n_masks
         % compute the one-minus-correlation value for each pair of
         % targets.
         % (Hint: use cosmo_pdist with the 'correlation' argument)
-        % @>>@
+        % >@@>
         dsm=cosmo_pdist(ds.samples, 'correlation');
-        % @<<@
+        % <@@<
+
 
         if counter==0
             % first dsm, allocate space
@@ -60,13 +61,12 @@ for m = 1:n_masks
 
         % increase counter and store the dsm as the counter-th column in
         % 'neural_dsms'
-        % @>>@
+        % >@@>
         counter=counter+1;
         neural_dsms(counter,:)=dsm;
-        % @<<@
+        % <@@<
     end
 end
-% <@@<
 
 %%
 % Then add the v1 model and behavioral DSMs
