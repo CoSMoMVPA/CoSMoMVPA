@@ -6,7 +6,7 @@
 
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
-% >@@>
+
 data_fn=[data_path '/glm_T_stats_perrun.nii'];
 targets=repmat(1:6,1,10)';
 ev_ds = cosmo_fmri_dataset(data_fn, ...
@@ -16,7 +16,6 @@ ev_ds = cosmo_fmri_dataset(data_fn, ...
 vt_ds = cosmo_fmri_dataset(data_fn, ...
                             'mask',[data_path '/vt_mask.nii'],...
                             'targets',targets);
-% <@@<
 
 % compute average for each unique target, so that the datasets have 6
 % samples each - one for each target
