@@ -115,11 +115,11 @@ Th 14:00-17:00 Pratical exercises: Classification with cross-validation, measure
 -------------- ------------------------------------------------------------------------------------------
 Th 18:00-??:00 Social dinner at Hugo's bar and grill, 72 High Street, Egham
 -------------- ------------------------------------------------------------------------------------------
-Fr 10:00-13:00 Practical exercises: Searchlight, RSA, group statistics
+Fr 10:00-13:00 Practical exercises: Searchlight, RSA visualization and ROI analysis
 -------------- ------------------------------------------------------------------------------------------
 Fr 13:00-14:00 Lunch break
 -------------- ------------------------------------------------------------------------------------------
-Fr 14:00-17:00 Analysis decisions, general discussion, concluding remarks
+Fr 14:00-17:00 RSA searchlight, multiple comparison correction, nalysis decisions, concluding remarks
 ============== ==========================================================================================
 
 :ref:`Back to index <rhul2016>`
