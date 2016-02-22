@@ -13,7 +13,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       for testing scenarios, this value should usually be
 %                       at least 1000, but 10,000 or more is recommended
 %                       for publication-quality analyses.
-%   'h0_mean'           mean under the null hypothesis
+%   'h0_mean'           Mean under the null hypothesis
 %                       Required if and only if a one-sample t-test is
 %                       performed, i.e. all values in ds.sa.targets are the
 %                       same and all values in ds.sa.chunks are different
@@ -23,6 +23,28 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                         h0_mean=1/C, with C the number of classes
 %                         (conditions), is a typical value (assuming that
 %                         the partitioning scheme is balanced)
+%   'feature_stat',f    (optional) statistic for features, one of 'auto' or
+%                       'none':
+%                       - 'auto': Compute cluster-based statistics (one- or
+%                                 two-sample t-test, one-way ANOVA, or
+%                                 repeated measures ANOVA; see Notes
+%                                 section below how to set the .sa.targets
+%                                 and .sa.chunks attributes.
+%                       - 'none': Do not compute statistics, but instead
+%                                 use the input data from ds directory. In
+%                                 this case:
+%                                 * no statistic is computed;
+%                                 * ds.samples must be a row vector.
+%                                 * h0_mean is required.
+%                                 * the 'null' option is required
+%                                 * 'niter' must not be provided.
+%                                 * when using the 'tfce' cluster_stat
+%                                   option (the default), 'dh' must be
+%                                   provided explicitly.
+%                                 This option is intended for use when
+%                                 null data and feature-wise statistics
+%                                 have already been computed.
+%                       Default: 'auto'.
 %   'cluster_stat',s    (optional) statistic for clusters, one of 'tfce'
 %                       'max', 'maxsum', 'maxsize'. Default: 'tfce'
 %                       (Threshold-Free Cluster Enhancement; see
@@ -30,6 +52,13 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %   'dh',dh             (optional) Threshold step (only if cluster_stat is
 %                       'tfce'). The default value of dh=0.1 should be fine
 %                       in most (if not all) cases.
+%                       Exception: when using 'feature_stat','none',
+%                       the 'dh' option is required when using 'tfce'.
+%                       For typical use cases, a value so that 100*dh is
+%                       in the same order of magnitude as the range
+%                       (maximum minus minimum) of the input (in .samples)
+%                       may be a reasonable compromise between speed and
+%                       accuracy
 %   'p_uncorrected'     (optional) Uncorrected (feature-wise) p-value (only
 %                       if cluster_stat is not 'tfce')
 %   'null', null_data   (optional) 1xP cell with null datasets, for example
@@ -46,10 +75,14 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       sampled from null_data. According to Stelzer et al
 %                       (see References), about 100 null datasets per
 %                       participant are sufficient for good estimates of
-%                       data under the null hypothesis
+%                       data under the null hypothesis.
 %                       If this option is not provided, null data is based
 %                       on the contents of ds, which is less precise (more
-%                       conservative, in other words has less power)
+%                       conservative, in other words has less power).
+%                       Exception: when using 'feature_stat','none', then
+%                       the recommendation for the number of null_data
+%                       elements is the same as the recommendation of
+%                       'niter' if the 'feature_stat' option is not 'none'.
 %   'progress',p        Show progress every p steps (default: 10). Use
 %                       p=false to not show progress.
 %   'seed',s            Use seed s for pseudo-random number generation. If
@@ -193,7 +226,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 
 
     defaults=struct();
-    defaults.dh=.1;
+    defaults.feature_stat='auto';
     defaults.cluster_stat='tfce';
     defaults.progress=10;
 
@@ -201,6 +234,9 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 
     % ensure dataset and neighborhood are kosher
     check_inputs(ds,nbrhood);
+
+    % check input options
+    check_opt(ds,opt);
 
 
 
@@ -222,10 +258,10 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     permutation_preproc_func=get_permuter_preproc_func(ds,preproc_func,...
                                                                 opt);
 
-    % 3) ds_zscore=stat_func(ds) takes a dataset ds, performs
+    % 3) ds_zscore=stat_func(ds,opt) takes a dataset ds, performs
     %    a univariate test (for each feature separately), and returns
     %    a dataset with z-scores of the statistic (F or t value)
-    stat_func=get_stat_func(ds);
+    stat_func=get_stat_func(ds,opt);
 
     % 4) cluster_vals=cluster_func(zscores) measures a cluster
     %    based on zscores. For example, if cluster_stat=='tfce', then
@@ -238,7 +274,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     orig_cluster_vals=zeros(2,nfeatures);
     less_than_orig_count=zeros(2,nfeatures);
 
-    niter=opt.niter;
+    niter=get_niter(opt);
 
     prev_progress_msg='';
     clock_start=clock();
@@ -314,9 +350,24 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     ds_z.fa=ds.fa;
 
 
-function stat_func=get_stat_func(ds)
+function stat_func=get_stat_func(ds,opt)
+    if has_feature_stat_auto(opt)
+        stat_func=get_stat_func_auto(ds);
+    else
+        stat_func=get_stat_func_none(ds);
+    end
+
+function stat_func=get_stat_func_none(ds)
+    % returns a function f so that f(ds_perm) returns
+    % just ds_perm
+
+    stat_func=@(x)x;
+
+
+function stat_func=get_stat_func_auto(ds)
     % returns a function f so that f(ds_perm) returns the
     % z-scored univariate f or t statistic for data in ds_perm
+
     nsamples=size(ds.samples,1);
 
     unq_targets=unique(ds.sa.targets);
@@ -349,18 +400,26 @@ function preproc_func=get_preproc_func(ds,opt)
     nsamples=size(ds.samples,1);
     is_one_independent_sample=numel(unique(ds.sa.targets))==1 && ...
                              numel(unique(ds.sa.chunks))==nsamples;
+    is_single_sample=size(ds.samples,1)==1;
+
     has_h0_mean=isfield(opt,'h0_mean');
-    if is_one_independent_sample
+    if is_one_independent_sample || is_single_sample
         % one-sample t-test, enable subtracting h0_mean
         if has_h0_mean
             h0_mean=opt.h0_mean;
 
             preproc_func=@(perm_ds)subtract_from_samples(perm_ds,h0_mean);
         else
+            if is_single_sample
+                infix='the .samples field has a single row';
+            else
+                infix=['the targets and chunks '...
+                        'specify an indepenent design with one '...
+                        'unique target.'];
+            end
+
             error(['The option ''h0_mean'' is required for this '...
-                'dataset, because the targets and chunks '...
-                'specify an indepenent design with one '...
-                'unique target.\n'...
+                'dataset, because %s.\n'...
                 'Use h0_mean=M to test against the null hypothesis '...
                 'of a mean of M.\n'...
                 '- when testing correlation differences, in\n'...
@@ -368,7 +427,7 @@ function preproc_func=get_preproc_func(ds,opt)
                 '- when testing classification accuracies (with \n'...
                 '  balanced partitions), in most cases M=1/C,\n'...
                 '  with C the number of classes (conditions)\n,'...
-                '  is approriate'],'');
+                '  is approriate'],infix);
         end
     else
         % anything but one-sample t-test, permute targets to get
@@ -389,7 +448,39 @@ function ds=subtract_from_samples(ds,m)
     ds.samples=ds.samples-m;
 
 
+function niter=get_niter(opt)
+    if has_feature_stat_auto(opt)
+        niter=opt.niter;
+    else
+        niter=numel(opt.null);
+    end
+
+function tf=has_feature_stat_auto(opt)
+    tf=isequal(opt.feature_stat,'auto');
+
 function permuter_func=get_permuter_preproc_func(ds,preproc_func,opt)
+    if has_feature_stat_auto(opt)
+        permuter_func=get_permuter_preproc_stat_func(ds,preproc_func,opt);
+    else
+        permuter_func=get_permuter_preproc_none_func(ds,preproc_func,opt);
+    end
+
+function permuter_func=get_permuter_preproc_none_func(ds,preproc_func,opt)
+    % if no stats func, that means also no selection of random samples;
+    % instead, the number of iterations is defined by the 'null' input
+    if isfield(opt,'niter')
+        error(['The option ''niter'' is not allowed '...
+                        'with ''none'' statfunc']);
+    end
+
+    if ~isfield(opt,'null')
+        error(['The option ''null'' is required '...
+                        'with ''none'' statfunc']);
+    end
+    permuter_func=@(iter)opt.null{iter};
+
+function permuter_func=get_permuter_preproc_stat_func(ds,preproc_func,opt)
+
     % return a general data permutation function
     if ~isfield(opt,'niter')
         error('The option ''niter'' is required');
@@ -557,6 +648,8 @@ function ds_preproc=signflip_samples(ds,preproc_func,seed)
 
 
 function clustering_func=get_clusterizer_func(nbrhood,opt)
+    tfce_default_dh=.1;
+
     cluster_stat=opt.cluster_stat;
     opt=rmfield(opt,'cluster_stat');
 
@@ -596,6 +689,11 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
                             'for method %s'],cluster_stat);
             end
 
+            if ~isfield(opt,'dh')
+                % use default
+                opt.dh=tfce_default_dh;
+            end
+
         otherwise
             if ~has_p_uncorrected
                 error('missing field ''p_uncorrected'' for method %s',...
@@ -610,7 +708,9 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
             end
 
             opt=rmfield(opt,'p_uncorrected');
-            opt=rmfield(opt,'dh'); % from TFCE defaults
+            if isfield(opt,'dh')
+                opt=rmfield(opt,'dh'); % from TFCE defaults
+            end
             opt.threshold=-norminv(p_unc); % right tail
     end
 
@@ -625,4 +725,45 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
 function check_inputs(ds, nbrhood)
     cosmo_check_dataset(ds);
     cosmo_check_neighborhood(nbrhood,ds);
+
+function check_opt(ds,opt)
+    feature_stat=opt.feature_stat;
+    if ~ischar(feature_stat)
+        error('''feature_stat'' option must be a string');
+    end
+
+    switch feature_stat
+        case 'auto'
+            assert(has_feature_stat_auto(opt));
+            % ok
+
+        case 'none'
+            assert(~has_feature_stat_auto(opt));
+            if size(ds.samples,1)~=1
+                error(['When using ''none'' feature_stat option,'...
+                            '.samples input must be a row vector']);
+            end
+
+            if strcmp(opt.cluster_stat,'tfce')
+                if ~isfield(opt,'dh')
+                    error(['Option ''dh'' must be set explicitly when '...
+                            'using feature_stat=''none'' with TFCE. '...
+                            'Which value for dh may be most suitable '...
+                            'depends on the range of the input '...
+                            '.samples field and the desired'...
+                            'precision; For typical use cases, a value '...
+                            'so that 100*dh is in the same order of '...
+                            'magnitude as the range (maximum minus '...
+                            'minimum) of the input (in .samples) may '...
+                            'be a reasonable compromise between speed '...
+                            'and accuracy']);
+                end
+            end
+
+
+
+        otherwise
+            error('illegal feature_stat ''%s''',feature_stat);
+    end
+
 

@@ -254,4 +254,79 @@ function test_null_data_montecarlo_cluster_stat
 
 
 
+function test_feature_stat_montecarlo_cluster_stat
+    % when using 'feature_stat','none':
+    % - size(ds.samples,1) must be 1
+    % - the option 'null' must be provided
+    % - the option 'niter' must be 0
+    % - h0_mean is required (but can be zero)
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_montecarlo_cluster_stat(varargin{:}),'');
+
+    opt=cosmo_structjoin({'niter',10,...
+                                    'h0_mean',0,...
+                                    'progress',false,...
+                                    'seed',1,...
+                                    'cluster_stat','tfce',...
+                                    'dh',.1});
+    ds6=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    nh=cosmo_cluster_neighborhood(ds6,'progress',false);
+
+    % using default for 'feature_stat' option gives same output as 'auto'
+    res1=cosmo_montecarlo_cluster_stat(ds6,nh,opt,...
+                            'feature_stat','auto');
+    res2=cosmo_montecarlo_cluster_stat(ds6,nh,opt);
+    assertEqual(res1,res2);
+
+    % get dataset with single sample
+    ds1=cosmo_slice(ds6,1);
+
+    % crash with illegal inputs
+    aet(ds1,nh,opt,'feature_stat','foo');
+    aet(ds1,nh,opt,'feature_stat',1);
+    aet(ds1,nh,opt,'feature_stat',false);
+
+
+
+    % cannot have 'niter' option, even with 'null' option
+    n_null=10;
+    null_cell=arrayfun(@(x)cosmo_synthetic_dataset('ntargets',1,...
+                                                 'nchunks',1',...
+                                                 'seed',x),...
+                     1:n_null,...
+                     'UniformOutput',false);
+
+
+
+    opt.feature_stat='none';
+    aet(ds1,nh,opt,'null',null_cell);
+    opt=rmfield(opt,'niter');
+
+    % cannot be without 'null' option
+    aet(ds1,opt);
+
+    opt.null=null_cell;
+
+    % error when using more than one sample
+    aet(ds6,nh,opt);
+
+    % when using default TFCE, dh must be provided
+    opt_no_dh=rmfield(opt,'dh');
+    aet(ds1,nh,opt_no_dh);
+
+
+    res=cosmo_montecarlo_cluster_stat(ds1,nh,opt);
+
+    % simple regression test
+    expected_samples=[0.2533 -0.5244 0 -0.6745 0.8416 -0.6745];
+    assertElementsAlmostEqual(res.samples,expected_samples,...
+                                'absolute',1e-4)
+    assertEqual(res.fa,ds1.fa);
+    assertEqual(res.a,ds1.a);
+
+    % simple regression test
+
+
+
 
