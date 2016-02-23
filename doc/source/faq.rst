@@ -167,6 +167,7 @@ Find the correspondence between voxel indices in AFNI and feature indices in CoS
         - ds.fa.i, ds.fa.j, and ds.fa.k are base-1 whereas AFNI uses base-0. So, to convert AFNI's ijk-indices to CoSMoMVPA's, add 1 to AFNI's coordinates.
         - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
 
+.. _faq_get_ecog_data_in_cosmomvpa_struct:
 
 Get ECoG data in a CoSMoMVPA struct
 -----------------------------------
@@ -210,6 +211,73 @@ Get ECoG data in a CoSMoMVPA struct
             ds_time_in_sample_dim=cosmo_dim_transpose(ds,{'time'},1);
 
     When the data is in this form, one can analyse how well information :ref:`generalizes over time <demo_meeg_timeseries_generalization>` .
+
+Get temporal data in a CoSMoMVPA struct
+---------------------------------------
+
+        'Using MEEG dataset, using custom written software I have precomputed RSA correlations across channels for a group of subjects for each timepoints; the result is ``data`` matrix of size ``17x300``, corresponding to ``subjects x time``. How can I get this in a CoSMoMVPA dataset struct, and use :ref:`cosmo_montecarlo_cluster_stat` for multiple comparison correction?'
+
+    We will generate some (random) data with these characteristics:
+
+    .. code-block:: matlab
+
+        % generate pseudo-random data
+        data=cosmo_rand(17,300);
+
+        % set the time (in seconds) for each column
+        % Here, the first time point is 200ms pre-stimulus
+        % and each time step is 2ms. The last time point
+        % is at 398 ms
+        time_axis=-.2:.002:.398;
+
+
+    To get the data in a dataset structure, a similar approach is followed as in another FAQ entry (:ref:`faq_get_ecog_data_in_cosmomvpa_struct`) - but note that there is only a time axis here to use as a feature dimension:
+
+    .. code-block:: matlab
+
+        ds=cosmo_flatten(data,{'time'},{time_axis},2)
+
+    Clustering with  :ref:`cosmo_montecarlo_cluster_stat` requires (as usual) a clustering neighborhood computed by :ref:`cosmo_cluster_neighborhood`:
+
+    .. code-block:: matlab
+
+        % cluster neighborhood over time points
+        cl_nh=cosmo_cluster_neighborhood(ds);
+
+    To use :ref:`cosmo_montecarlo_cluster_stat`, it is required to set targets and chunks. In this case there is a single sample per subject, which is reflected in ``.sa.targets`` and ``.sa.chunks``.
+
+    .. code-block:: matlab
+
+        n_subjects=size(data,1);
+        ds.sa.targets=ones(n_subjects,1);
+        ds.sa.chunks=(1:n_subjects)';
+
+    To run  :ref:`cosmo_montecarlo_cluster_stat` it is required to set the number of iterations and (for a one-sample t-test) the expected mean under the null hypothesis.
+
+    .. code-block:: matlab
+
+        opt=struct();
+
+        % use at least 10000 iterations for publication-quality analyses
+        opt.niter=10000;
+
+        % expected mean under null hypothesis.
+        % For this example (pre-computed RSA correlation values)
+        % the expected mean is zero.
+        opt.h0_mean=0;
+
+        % compute z-scores after TFCE correction
+        tfce_z_ds=cosmo_montecarlo_cluster_stat(ds,cl_nh,opt);
+
+    Note that clusters are computed across the time dimension, so if a cluster survives between (say) 100 and 150 ms, one *cannot* infer that at 100 ms there is significant information present that explains the non-zero correlations. Instead, the inferences can only be made at the cluster level, i.e. there is evidence for significant information at a cluster of time points. To be able to make inferences at the individual time point level, use a cluster neighborhood that does not connect clusters across the time dimension:
+
+    .. code-block:: matlab
+
+        % cluster neighborhood not connecting time points
+        cl_nh_not_over_time=cosmo_cluster_neighborhood(ds,'time',false);
+
+    in which case a significant feature at (say) 100 ms can directly be interpreted as evidence for information being present at 100 ms. However, such a test is less sensitive than a neighborhood that connects features across time.
+
 
 .. _faq_run_group_analysis:
 
