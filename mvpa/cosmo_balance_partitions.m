@@ -149,7 +149,7 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 
             [te_fold_classes,te_fold_class_pos]=get_classes(te_targets);
             if ~isequal(te_fold_classes,classes)
-                missing=setdiff(classes,tr_fold_classes);
+                missing=setdiff(classes,te_fold_classes);
                 error('missing test class %d in fold %d', missing(1), j);
             end
             test_indices_out{j}=sample_indices(te_idx,te_fold_class_pos,...
