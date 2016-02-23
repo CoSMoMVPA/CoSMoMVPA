@@ -315,18 +315,52 @@ function test_feature_stat_montecarlo_cluster_stat
     opt_no_dh=rmfield(opt,'dh');
     aet(ds1,nh,opt_no_dh);
 
-
+    % simple regression test
     res=cosmo_montecarlo_cluster_stat(ds1,nh,opt);
 
-    % simple regression test
     expected_samples=[0.2533 -0.5244 0 -0.6745 0.8416 -0.6745];
     assertElementsAlmostEqual(res.samples,expected_samples,...
                                 'absolute',1e-4)
     assertEqual(res.fa,ds1.fa);
     assertEqual(res.a,ds1.a);
 
-    % simple regression test
+
+function test_montecarlo_cluster_stat_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_montecarlo_cluster_stat(varargin{:}),'');
+    % dh not allowed with non-tfce cluster stat
+    ds=cosmo_synthetic_dataset();
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+
+    opt=struct();
+    opt.progress=false;
+    opt.niter=10;
+
+    % cannot have dh with non-tfce cluster stat
+    aet(ds,nh,opt,'cluster_stat','maxsize','p_uncorrected',.01,'dh',.1);
+
+    % cannot have p_uncorreced with tfce cluster stat
+    aet(ds,nh,opt,'p_uncorrected',.01);
+    aet(ds,nh,opt,'p_uncorrected',.01,'cluster_stat','tfce');
+
+    % when using feature_stat none, the null option is required
+    ds1=cosmo_slice(ds,1);
+    aet(ds1,nh,'feature_stat','none','dh',.01,'h0_mean',0)
 
 
 
+function test_montecarlo_cluster_stat_default_dh
+    ds=cosmo_synthetic_dataset();
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+
+    opt=struct();
+    opt.progress=false;
+    opt.niter=ceil(rand()*10+10);
+    opt.seed=ceil(rand()*100+1);
+    res_no_dh=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    res_dh_naught_one=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.1);
+    assertEqual(res_no_dh,res_dh_naught_one);
+
+    res_dh_naught_two=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.2);
+    assertFalse(isequal(res_no_dh.samples,res_dh_naught_two.samples));
 
