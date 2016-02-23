@@ -361,6 +361,6 @@ function test_montecarlo_cluster_stat_default_dh
     res_dh_naught_one=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.1);
     assertEqual(res_no_dh,res_dh_naught_one);
 
-    res_dh_naught_two=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.2);
-    assertFalse(isequal(res_no_dh.samples,res_dh_naught_two.samples));
+    res_dh_naught_five=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.5);
+    assertFalse(isequal(res_no_dh.samples,res_dh_naught_five.samples));
 
