@@ -175,13 +175,6 @@ function path_fn=find_config_file(fn, raise_)
             break;
         end
 
-        % is it in the matlab path?
-        w_fn=which(fn);
-        if ~isempty(w_fn)
-            path_fn=w_fn;
-            break;
-        end
-
         % is it in the user path?
         % (not supported on octave)
         if cosmo_wtf('is_matlab')
