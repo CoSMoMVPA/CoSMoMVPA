@@ -1,7 +1,7 @@
-function wizard_set_cosmo_config()
+function cosmo_wizard_set_config()
 % GUI-based 'wizard' to set CoSMoMVPA configuration file
 %
-% wizard_set_cosmo_config()
+% cosmo_wizard_set_config()
 %
 % This 'wizard' can be used to set the CoSMoMVPA configuration paths
 % for exercises and demonstration outputs (in CoSMoMVPA's 'examples/'
@@ -14,7 +14,7 @@ function wizard_set_cosmo_config()
 % It will store a '.cosmomvpa.cfg' file in either the user's home directory
 % (on Linux / OSX), or in any available userpath() directory.
 %
-% Selecting cancel at any time will close this wizard
+% Selecting cancel at any time will close this wizard.
 
 % simulate go-to
 while true

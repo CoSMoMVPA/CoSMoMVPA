@@ -110,7 +110,7 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Set the location of the tutorial data in a text file named ``.cosmomvpa.cfg`` (in a directory that is in the matlab path), as described in the *Notes* section of :ref:`cosmo_config_hdr`.
 
-    + Use ``wizard_set_cosmo_config`` in CoSMoMVPA's ``examples/`` directory, if you prefer a simple-to-use graphical user interface.
+    + Use ``cosmo_wizard_set_config`` in CoSMoMVPA's ``examples/`` directory, if you prefer a simple-to-use graphical user interface.
 
     + To do so manually:
 

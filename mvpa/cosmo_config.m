@@ -12,7 +12,7 @@ function [config,fn]=cosmo_config(fn, config)
 %   >> cosmo_config(fn, to_store)
 %
 % - related function (in CoSMoMVPA's 'examples/' directory):
-%   >> wizard_set_cosmo_config
+%   >> cosmo_wizard_set_config
 %
 % Inputs:
 %   fn          optional filename of a configuration file.
@@ -74,7 +74,7 @@ function [config,fn]=cosmo_config(fn, config)
 %    >> loaded_config=cosmo_config();
 %    >> assert(isequal(loaded_config,config));
 %
-%  - The configuration can be set using wizard_set_cosmo_config in
+%  - The configuration can be set using cosmo_wizard_set_config in
 %    CoSMoMVPA's 'examples/' directory
 %
 % NNO Jan 2014
@@ -107,7 +107,7 @@ function [config,fn]=cosmo_config(fn, config)
                     'it more complicated to run CoSMoMVPA''s '...
                     'exercises and examples.\n'...
                     'To set the configuration, consider running\n\n'...
-                    '    wizard_set_cosmo_config\n\n'...
+                    '    cosmo_wizard_set_config\n\n'...
                     'in the CoSMoMVPA ''examples/'' directory'],...
                     mfilename(),missing_fields_str);
     end
