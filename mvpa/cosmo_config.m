@@ -1,4 +1,4 @@
-function config=cosmo_config(fn, config)
+function [config,fn]=cosmo_config(fn, config)
 % return a struc with configuration settings, or store such settings
 %
 % Usages:
@@ -10,6 +10,9 @@ function config=cosmo_config(fn, config)
 %
 % - store configuration in a file
 %   >> cosmo_config(fn, to_store)
+%
+% - related function (in CoSMoMVPA's 'examples/' directory):
+%   >> cosmo_wizard_set_config
 %
 % Inputs:
 %   fn          optional filename of a configuration file.
@@ -70,6 +73,9 @@ function config=cosmo_config(fn, config)
 %    >> loaded_config=cosmo_config();
 %    >> assert(isequal(loaded_config,config));
 %
+%  - The configuration can be set using cosmo_wizard_set_config in
+%    CoSMoMVPA's 'examples/' directory
+%
 % NNO Jan 2014
 
     default_config_fn='.cosmomvpa.cfg';
@@ -91,25 +97,18 @@ function config=cosmo_config(fn, config)
         error('Illegal input');
     end
 
-    cosmo_mvpa_dir=fileparts(which('cosmo_corr'));
+    expected_fields={'tutorial_data_path','output_data_path'};
+    missing_fields=setdiff(expected_fields,fieldnames(config));
 
-    % set defaults
-    defaults=struct();
-    defaults.tutorial_data_path=fullfile(cosmo_mvpa_dir,...
-                                        '..','datadb','tutorial_data');
-    defaults.output_data_path=defaults.tutorial_data_path;
-
-    % overwrite defaults by configuration options
-    fns=fieldnames(defaults);
-    for k=1:numel(fns)
-        fn=fns{k};
-        if ~isfield(config, fn)
-            config.(fn)=defaults.(fn);
-            warning(['Configuration field %s not set, using default:',...
-                    '"%s"\n(To set the configuration, run: help %s)'], ...
-                        fn,defaults.(fn),mfilename());
-
-        end
+    if numel(missing_fields)>0
+        missing_fields_str=cosmo_strjoin(missing_fields,''', ''');
+        cosmo_warning(['Using %s, fields ''%s'' are missing. This makes '...
+                    'it more complicated to run CoSMoMVPA''s '...
+                    'exercises and examples.\n'...
+                    'To set the configuration, consider running\n\n'...
+                    '    cosmo_wizard_set_config\n\n'...
+                    'in the CoSMoMVPA ''examples/'' directory'],...
+                    mfilename(),missing_fields_str);
     end
 
     validate_config(config);
@@ -140,7 +139,7 @@ function validate_config(config)
 
                 if ~test_func(value)
                     msg_func=check.msg;
-                    error('%s\n%s',msg_func(fn, value),add_msg);
+                    warning('%s\n%s',msg_func(fn, value),add_msg);
                 end
             end
         end
