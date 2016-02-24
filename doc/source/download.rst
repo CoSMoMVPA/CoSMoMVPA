@@ -22,7 +22,7 @@ For the patient
 +++++++++++++++
 
 
-The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <cimec2014>` and the :ref:`demos <contents_demo.rst>`.
+The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <rhul2016>` and the :ref:`demos <contents_demo.rst>`.
 
 * Installation of CoSMoMVPA:
 
@@ -110,26 +110,32 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Set the location of the tutorial data in a text file named ``.cosmomvpa.cfg`` (in a directory that is in the matlab path), as described in the *Notes* section of :ref:`cosmo_config_hdr`.
 
-    + If you do not know where to store the file, just close and start Matlab afresh (so that it starts in a location that is in the Matlab path), and run
+    + Use ``cosmo_wizard_set_config`` in CoSMoMVPA's ``examples/`` directory, if you prefer a simple-to-use graphical user interface.
 
-          .. code-block:: matlab
+    + To do so manually:
 
-              edit .cosmomvpa.cfg
+         * If you do not know where to store the file, just close and start Matlab afresh (so that it starts in a location that is in the Matlab path), and run
 
-      Alternatively, go to CoSMoMVPA's ``mvpa/`` directory and store the ``.cosmomvpa.cfg`` file there.
+                .. code-block:: matlab
 
-      Note for Windows users: when creating a new file, Windows may add (but hide) a ``.txt`` extension. It may be better to edit the file from Matlab.
+                    edit .cosmomvpa.cfg
 
-      Note for Unix (OSX, Linux) users: the file will not be shown in the terminal when using ``ls``, because the leading dot in the filename makes it hidden. To show hidden files, use ``ls -a``.
+            Alternatively, go to CoSMoMVPA's ``mvpa/`` directory and store the ``.cosmomvpa.cfg`` file there (the disadvantage of this location is that the file may be lost if code is updated by downloading an updated ``.zip``-file).
 
-      Then add the lines for ``tutorial_data_path`` and ``output_data_path``, and save the file.
+          * Note for Windows users: when creating a new file, Windows may add (but hide) a ``.txt`` extension. It may be better to edit the file from Matlab.
 
-      For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named ``karen``), and contain the following:
+          * Note for Unix (OSX, Linux) users: the file can be stored in the users' ``$HOME`` directory.
 
-          .. code-block:: none
+          * Note for Unix (OSX, Linux) users: the file will not be shown in the terminal when using ``ls``, because the leading dot in the filename makes it hidden. To show hidden files, use ``ls -a``.
 
-              tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
-              output_data_path=/Users/karen/tmp/CoSMoMVPA_output
+          * Add the lines for ``tutorial_data_path`` and ``output_data_path``, and save the file.
+
+          * For example, on Apple OSX ``.cosmomvpa.cfg`` could be stored in the ``/Users/karen`` home directory (for a user named ``karen``), and contain the following:
+
+              .. code-block:: none
+
+                  tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
+                  output_data_path=/Users/karen/tmp/CoSMoMVPA_output
 
       You can choose in which directory you would like to store the output for from running the examples and demonstrations; just make sture that the ``output_data_path`` directory exists. You can create a new directory for the output if you want.
 
