@@ -46,8 +46,46 @@ function tmp_fn=helper_write_config(c, suffix)
     fprintf(fid,'%s',suffix);
 
 
+function test_error_when_quote_in_paths()
+    orig_warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('off');
 
-function helper_write_read_config(include_path_settings)
+    c=struct();
+
+    for with_path_suffix=[true false]
+        key=randstr();
+        if with_path_suffix
+            key=[key '_path'];
+        end
+
+        around_chars={'','''','"'};
+        for k=1:numel(around_chars)
+            c=around_chars{k};
+
+            value=randstr();
+            config=struct();
+            config.(key)=[c value c];
+
+
+            fn=helper_write_config(config,'');
+            cleaner=onCleanup(@()delete(fn));
+
+            f_handle=@()cosmo_config(fn);
+            if numel(c)>0
+                assertExceptionThrown(f_handle,'');
+            else
+                f_handle();
+            end
+
+            clear cleaner
+        end
+    end
+
+
+
+
+function helper_write_read_config(include_path_settings, config)
     orig_warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
     empty_warning_state=orig_warning_state;
@@ -65,14 +103,17 @@ function helper_write_read_config(include_path_settings)
     end
 
     % generate and write config
-    s=helper_generate_config(n_keys,include_keys);
-    tmp_fn=helper_write_config(s, '# this is a comment');
+    if nargin<=2
+        config=helper_generate_config(n_keys,include_keys);
+    end
+
+    tmp_fn=helper_write_config(config, '# this is a comment');
     file_deleter=onCleanup(@()delete(tmp_fn));
 
 
     % read configuration
     [c,read_tmp_fn]=cosmo_config(tmp_fn);
-    assertEqual(c,s);
+    assertEqual(c,config);
     assertEqual(read_tmp_fn,tmp_fn);
 
     w=cosmo_warning();

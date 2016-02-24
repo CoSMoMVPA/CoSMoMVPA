@@ -220,6 +220,7 @@ function config=read_config(fn)
         error('Unable to open file %s',fn);
     end
 
+    line_number=0;
     while true
         % read each line
         line=fgetl(fid);
@@ -227,6 +228,8 @@ function config=read_config(fn)
             % end of file
             break;
         end
+
+        line_number=line_number+1;
 
         % ignore empty lines or lines starting with '#'
         if isempty(line) || line(1)=='#'
@@ -242,8 +245,12 @@ function config=read_config(fn)
             continue;
         end
 
-        % get value
+
+        % get key and value
+        key=m.key;
         value=m.value;
+
+        verify_no_illegal_char(fn,line_number,[key value])
 
         % see if it can be converted to numeric
         value_num=str2double(value);
@@ -251,10 +258,20 @@ function config=read_config(fn)
             value=value_num;
         end
 
-        config.(m.key)=value;
+        config.(key)=value;
     end
 
     fclose(fid);
+
+function verify_no_illegal_char(fn,line_number,s)
+    illegal_chars=sprintf('"''');
+    matching=bsxfun(@eq,s,illegal_chars(:));
+    if any(matching(:));
+        error(['File %s, line %d: found illegal character. '...
+            'note that quote characters are not allowed '...
+            'for keys or values'],fn,line_number)
+    end
+
 
 
 function write_config(fn, config)
