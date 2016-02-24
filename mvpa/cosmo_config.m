@@ -11,6 +11,9 @@ function [config,fn]=cosmo_config(fn, config)
 % - store configuration in a file
 %   >> cosmo_config(fn, to_store)
 %
+% - related function (in CoSMoMVPA's 'examples/' directory):
+%   >> wizard_set_cosmo_config
+%
 % Inputs:
 %   fn          optional filename of a configuration file.
 %               This can either be a path to a file, a filename to a file
@@ -70,6 +73,9 @@ function [config,fn]=cosmo_config(fn, config)
 %    >> % now check they are the same
 %    >> loaded_config=cosmo_config();
 %    >> assert(isequal(loaded_config,config));
+%
+%  - The configuration can be set using wizard_set_cosmo_config in
+%    CoSMoMVPA's 'examples/' directory
 %
 % NNO Jan 2014
 

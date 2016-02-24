@@ -26,7 +26,7 @@ CoSMoMVPA
    get_started
    download
    documentation
-   cimec2014
+   rhul2016
    tips
    faq
    contact
