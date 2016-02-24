@@ -13,8 +13,7 @@ function config=cosmo_config(fn, config)
 %
 % Inputs:
 %   fn          optional filename of a configuration file.
-%               This can either be a path to a file, a filename to a file
-%               in the matlab path, the user path, or (on Unix platforms)
+%               This can either be a path of a file, or (on Unix platforms)
 %               a filename in the user's home directory.
 %               If fn is omitted, then it defaults to '.cosmomvpa.cfg'
 %               and will read the configuration from that file if it
