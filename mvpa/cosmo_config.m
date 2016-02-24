@@ -1,4 +1,4 @@
-function config=cosmo_config(fn, config)
+function [config,fn]=cosmo_config(fn, config)
 % return a struc with configuration settings, or store such settings
 %
 % Usages:
@@ -92,25 +92,18 @@ function config=cosmo_config(fn, config)
         error('Illegal input');
     end
 
-    cosmo_mvpa_dir=fileparts(which('cosmo_corr'));
+    expected_fields={'tutorial_data_path','output_data_path'};
+    missing_fields=setdiff(expected_fields,fieldnames(config));
 
-    % set defaults
-    defaults=struct();
-    defaults.tutorial_data_path=fullfile(cosmo_mvpa_dir,...
-                                        '..','datadb','tutorial_data');
-    defaults.output_data_path=defaults.tutorial_data_path;
-
-    % overwrite defaults by configuration options
-    fns=fieldnames(defaults);
-    for k=1:numel(fns)
-        fn=fns{k};
-        if ~isfield(config, fn)
-            config.(fn)=defaults.(fn);
-            warning(['Configuration field %s not set, using default:',...
-                    '"%s"\n(To set the configuration, run: help %s)'], ...
-                        fn,defaults.(fn),mfilename());
-
-        end
+    n_missing=numel(missing_fields);
+    for k=1:n_missing
+        cosmo_warning(['Using %s, field ''%s'' is missing which makes '...
+                    'it more complicated to run CoSMoMVPA''s '...
+                    'exercises and examples.\n'...
+                    'To set the configuration, consider running\n\n'...
+                    '    wizard_set_cosmo_config\n\n'...
+                    'in the CoSMoMVPA ''examples/'' directory'],...
+                    mfilename(),missing_fields{k});
     end
 
     validate_config(config);
@@ -141,7 +134,7 @@ function validate_config(config)
 
                 if ~test_func(value)
                     msg_func=check.msg;
-                    error('%s\n%s',msg_func(fn, value),add_msg);
+                    warning('%s\n%s',msg_func(fn, value),add_msg);
                 end
             end
         end
