@@ -6,13 +6,6 @@ function test_suite=test_config
 function s=randstr()
     s=char(ceil(rand(1,20)*20+64));
 
-function test_config_reading_empty()
-    % should raise an exception
-    helper_write_read_config(false);
-
-function test_config_reading_with_paths()
-    helper_write_read_config(true);
-
 function test_config_unable_to_find_file()
     fn=tempname();
     assertExceptionThrown(@()cosmo_config(fn),'');
@@ -21,13 +14,40 @@ function test_config_unable_to_open_file()
     dirname=fileparts(mfilename('fullpath'));
     assertExceptionThrown(@()cosmo_config(dirname),'');
 
+function test_config_reading_empty()
+    helper_write_read_config(false);
 
-function helper_write_read_config(include_path_settings)
+function test_config_reading_with_paths()
+    helper_write_read_config(true);
+
+function s=helper_generate_config(n_keys,include_keys)
+    s=struct();
+    for k=1:n_keys
+        if k<=numel(include_keys)
+            key=include_keys{k};
+            value=pwd();
+        else
+            key=randstr();
+            value=randstr();
+        end
+        s.(key)=value;
+    end
+
+
+function tmp_fn=helper_write_config(c, suffix)
     tmp_fn=tempname();
-    file_deleter=onCleanup(@()delete(tmp_fn));
     fid=fopen(tmp_fn,'w');
     file_closer=onCleanup(@()fclose(fid));
 
+    key_value_pairs_cell=cellfun(@(key)sprintf('%s=%s\n',key,c.(key)),...
+                                fieldnames(c),...
+                                'UniformOutput',false);
+    fprintf(fid,'%s',key_value_pairs_cell{:});
+    fprintf(fid,'%s',suffix);
+
+
+
+function helper_write_read_config(include_path_settings)
     orig_warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
     empty_warning_state=orig_warning_state;
@@ -44,21 +64,11 @@ function helper_write_read_config(include_path_settings)
         include_keys={};
     end
 
-    s=struct();
-    for k=1:n_keys
-        if k<=numel(include_keys)
-            key=include_keys{k};
-            value=pwd();
-        else
-            key=randstr();
-            value=randstr();
-        end
-        fprintf(fid,'%s=%s\n',key,value);
-        s.(key)=value;
-    end
-    fprintf(fid,'\n\n# this is not used\n');
+    % generate and write config
+    s=helper_generate_config(n_keys,include_keys);
+    tmp_fn=helper_write_config(s, '# this is a comment');
+    file_deleter=onCleanup(@()delete(tmp_fn));
 
-    clear file_closer;
 
     % read configuration
     [c,read_tmp_fn]=cosmo_config(tmp_fn);
