@@ -51,7 +51,8 @@ function ds_plumb=cosmo_fmri_deoblique(ds)
 %   - When using this function, it is recommended to inspect the result
 %     visually.
 %
-% NNO Dec 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 % get canonical orthogonal matrix
 [unused,rot_ortho]=cosmo_fmri_orientation(ds);

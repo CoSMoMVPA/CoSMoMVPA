@@ -1,4 +1,8 @@
 %% Dataset basics
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
 % Set data path, load dataset, set targets and chunks, and add labels as
 % sample attributes
 

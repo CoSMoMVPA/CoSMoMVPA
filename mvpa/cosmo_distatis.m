@@ -125,7 +125,8 @@ function res=cosmo_distatis(ds, varargin)
 %   - Output can be reshape to matrix or array form using
 %     cosmo_unflatten(res,1)
 %
-% NNO Sep 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     cosmo_check_external('distatis');
 

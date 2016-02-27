@@ -23,7 +23,8 @@
 %
 % Note: running this code requires FieldTrip.
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 %% get timelock data in CoSMoMVPA format

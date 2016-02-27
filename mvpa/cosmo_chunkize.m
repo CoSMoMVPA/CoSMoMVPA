@@ -72,7 +72,8 @@ function chunks=cosmo_chunkize(ds,nchunks_out)
 %    what you are doing. Rather, for fMRI datasets usually the chunks are
 %    assigned manually so that each run has a different chunk value.
 %
-% NNO Oct 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input(ds);
 

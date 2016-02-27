@@ -86,7 +86,8 @@ function ds=cosmo_dim_prune(ds, varargin)
 %
 % See also: cosmo_dim_match
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 opt=process_opt(varargin{:});
 

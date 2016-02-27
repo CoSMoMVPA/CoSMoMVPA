@@ -55,24 +55,24 @@ function ds=cosmo_dim_rename(ds, old_name, new_name, raise)
 % Notes:
 %  - a use case is renaming dimensions to time and freq
 %
-% NNO Sep 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
+    cosmo_check_dataset(ds);
 
-cosmo_check_dataset(ds);
+    if nargin<4
+        raise=true;
+    end
 
-if nargin<4
-    raise=true;
-end
+    [dim, index, attr_name, dim_name]=cosmo_dim_find(ds, old_name, raise);
 
-[dim, index, attr_name, dim_name]=cosmo_dim_find(ds, old_name, raise);
+    if ~isempty(dim)
+        values=ds.(attr_name).(old_name);
+        ds.(attr_name)=rmfield(ds.(attr_name),old_name);
+        ds.(attr_name).(new_name)=values;
 
-if ~isempty(dim)
-    values=ds.(attr_name).(old_name);
-    ds.(attr_name)=rmfield(ds.(attr_name),old_name);
-    ds.(attr_name).(new_name)=values;
-
-    ds.a.(dim_name).labels{index}=new_name;
-end
+        ds.a.(dim_name).labels{index}=new_name;
+    end
 
 
 

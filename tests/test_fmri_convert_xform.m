@@ -1,5 +1,8 @@
 function test_suite = test_fmri_convert_xform()
 % tests for cosmo_fmri_convert_xform
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite
 

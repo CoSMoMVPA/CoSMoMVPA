@@ -33,7 +33,8 @@ function [orient,cano_rot]=cosmo_fmri_orientation(ds)
 %       * the second dimension goes from posterior to anterior
 %       * the third dimension goes from inferior to superior
 %
-% NNO Dec 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     mx=get_affine_matrix(ds);
 

@@ -76,7 +76,8 @@ function [config,fn]=cosmo_config(fn, config)
 %  - The configuration can be set using cosmo_wizard_set_config in
 %    CoSMoMVPA's 'examples/' directory
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     default_config_fn='.cosmomvpa.cfg';
 

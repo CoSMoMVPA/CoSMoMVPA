@@ -59,7 +59,8 @@ function f_ds=cosmo_fx(ds, f, split_by, dim, check)
 %
 % See also: cosmo_split, cosmo_stack
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<3, split_by=[]; end
     if nargin<4, dim=1; end

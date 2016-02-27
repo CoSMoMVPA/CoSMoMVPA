@@ -69,7 +69,8 @@ function nbrhood=cosmo_interval_neighborhood(ds, label, varargin)
 %
 % See also: cosmo_neighborhood, cosmo_searchlight
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     radius=get_radius(varargin{:});
 

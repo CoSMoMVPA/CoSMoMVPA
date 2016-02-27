@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. ex_searchlight
 
 Write a searchlight function that computes a generic dataset measure

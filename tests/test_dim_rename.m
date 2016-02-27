@@ -1,5 +1,8 @@
 function test_suite = test_dim_rename()
 % tests for cosmo_dim_rename
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite
 

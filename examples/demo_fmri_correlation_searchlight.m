@@ -13,7 +13,8 @@
 %    response were estimated for each category in each run, resulting
 %    in 6*10=60 t-values.
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 

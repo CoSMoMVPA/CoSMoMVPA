@@ -36,7 +36,9 @@ function predicted=cosmo_classify_meta_feature_selection(samples_train, targets_
 %     cosmo_disp(res.samples)
 %     > [ 0.28      0.52 ]
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     [ntrain,nfeatures]=size(samples_train);
     [ntrain__,one__]=size(targets_train);
     nfeatures__=size(samples_test,2);

@@ -41,8 +41,8 @@ function joined=cosmo_strjoin(strings, delim)
 %
 % See also: cosmo_strsplit
 %
-% NNO Sep 2013
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2
         delim=' ';

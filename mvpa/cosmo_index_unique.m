@@ -65,7 +65,8 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
 %     >     'bb'       4
 %     >     'ccc' }    4 ] }
 %
-% NNO Sep 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     return_unique_values=nargout>=2;
 

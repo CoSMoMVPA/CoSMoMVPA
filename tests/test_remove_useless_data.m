@@ -1,5 +1,8 @@
 function test_suite = test_remove_useless_data
 % tests for cosmo_remove_useless_data
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

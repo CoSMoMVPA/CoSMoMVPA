@@ -71,7 +71,8 @@ function is_ok=cosmo_check_external(external, raise_)
 %   % list the publications associated with the externals
 %   cosmo_check_external('-cite');
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent cached_present_names;
 

@@ -60,7 +60,8 @@ function conv_nbrhood=cosmo_convert_neighborhood(nbrhood, output_type)
 %      efficient, but also slower to access than matrix representations.
 %      This function provides conversion between different representations.
 %
-% NNO Oct 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2, output_type=''; end
 

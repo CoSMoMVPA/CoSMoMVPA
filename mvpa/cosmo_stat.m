@@ -152,7 +152,8 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %
 % See also: anova1, ttest, ttest2, cosmo_montecarlo_cluster_stat
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<3
         output_stat_name='';

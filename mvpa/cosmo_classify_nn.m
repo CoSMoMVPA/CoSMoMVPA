@@ -28,7 +28,8 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [ntrain, nfeatures]=size(samples_train);
     [ntest, nfeatures_]=size(samples_test);

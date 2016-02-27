@@ -105,7 +105,8 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %
 % See also: cosmo_convert_neighborhood, cosmo_montecarlo_cluster_stat
 %
-% NNO Oct 2013, updated Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent cached_varargin;
     persistent cached_opt;

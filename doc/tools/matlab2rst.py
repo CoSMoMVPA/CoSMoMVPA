@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#   For CoSMoMVPA's license terms and conditions, see   #
+#   the COPYING file distributed with CoSMoMVPA         #
+#
 # converts matlab to rst files
 #
 # This code reads all matlab .m files and then generates multiple versions:

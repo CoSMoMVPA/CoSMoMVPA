@@ -1,4 +1,9 @@
 %% Dataset Basics (setting sample attributes)
+%
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
 % Set the targets and the chunks
 %
 % There are 10 runs with 6 volumes per run. The runs are vertically stacked one

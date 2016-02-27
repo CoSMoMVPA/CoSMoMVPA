@@ -20,7 +20,8 @@ classdef CosmoDocTestCase < TestCase
 %
 % See also: CosmoDocTestSuite, cosmo_run_tests
 %
-% NNO Jul 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     properties (SetAccess = protected, GetAccess = protected, Hidden = true)
         %

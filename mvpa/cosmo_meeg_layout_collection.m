@@ -49,7 +49,8 @@ function db=cosmo_meeg_layout_collection()
 %   - this function caches previously read layouts, for optimization
 %     reasons. run "clear functions" to reset the cache.
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % cache the layouts, so that after the first call layouts don't have to
     % be read from disc

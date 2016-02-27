@@ -16,7 +16,8 @@
 % The example shows a searchlight analysis matching local neural similarity
 % patterns to three different target similarity matrices
 %
-% NNO May 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 %% Set data paths

@@ -172,7 +172,8 @@ function ds=cosmo_synthetic_dataset(varargin)
 %     >   { { 'A148_dH'  'A147_dH'  'A146_dH' }
 %     >     [ -0.2     -0.15 ]                  }
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     default=struct();
     default.ntargets=2;

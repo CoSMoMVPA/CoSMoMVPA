@@ -25,7 +25,8 @@ function stat_repr=cosmo_statcode(ds, output_format)
 % Notes:
 %   - this function is intended for fmri datasets
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2, output_format=''; end
 

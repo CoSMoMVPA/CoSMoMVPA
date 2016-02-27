@@ -1,5 +1,8 @@
 function test_suite = test_dim_insert()
 % tests for cosmo_dim_insert
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

@@ -100,7 +100,8 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     common to all samples; but note that this option is disabled by
 %     default
 %
-% ACC August 2013, NNO Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % process input arguments
     params=cosmo_structjoin('type','Pearson',... % set default

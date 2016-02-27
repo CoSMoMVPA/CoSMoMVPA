@@ -6,6 +6,9 @@
 % Note: this example shows multiple-comparison for a single subject, but
 % the same logic can be applied to a group of subjects to do a group
 % analysis.
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define data
 config=cosmo_config();

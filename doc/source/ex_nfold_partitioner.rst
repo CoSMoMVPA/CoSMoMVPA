@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. ex_nfold_partitioner
 
 Cross-validation part 1: N-Fold Partitioner

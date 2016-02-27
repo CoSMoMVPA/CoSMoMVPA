@@ -34,7 +34,8 @@ function filename=cosmo_make_temp_filename(prefix,suffix)
 %   % two strings
 %   fns=cosmo_make_temp_filename('foo',{'.bar','.bar'});
 %
-% NNO Apr 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2, suffix=''; end
     if nargin<1, prefix=''; end

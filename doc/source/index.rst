@@ -1,7 +1,9 @@
 .. Cosmo documentation master file, created by
    sphinx-quickstart on Sun Aug 11 10:24:13 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 
 .. figure:: _static/cosmomvpa_banner.png
 

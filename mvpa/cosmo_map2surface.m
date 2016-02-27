@@ -78,7 +78,9 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %
 % See also: cosmo_surface_dataset
 %
-% NNO May 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     if ~ischar(fn)
         error('second argument must be a string');
     end

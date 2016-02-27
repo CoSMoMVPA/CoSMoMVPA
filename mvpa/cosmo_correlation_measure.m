@@ -200,7 +200,8 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     representations of faces and objects in ventral temporal cortex.
 %     Science 293, 2425?2430
 %
-% NNO May 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 persistent cached_partitions;
 persistent cached_chunks;

@@ -74,7 +74,8 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %
 % See also: cosmo_nchoosek_partitioner
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     chunks=get_chunks(ds);
 

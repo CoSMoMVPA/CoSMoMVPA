@@ -1,5 +1,8 @@
 function test_suite=test_find_local_extrema
 % tests for cosmo_find_local_extrema
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite
 

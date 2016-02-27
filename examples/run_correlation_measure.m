@@ -1,5 +1,8 @@
 %% Exercise with cosmo_correlation_measure
 % Split-half correlation analysis using cosmo_correlation_measure
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 %% Single subject analysis over all categories in VT

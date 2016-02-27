@@ -49,7 +49,8 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 % See also: cosmo_spherical_neighborhood, surfing_interval_neighborhood
 %           cosmo_surficial_neighborhood, cosmo_meeg_chan_neighborhood
 %
-% NNO Dec 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [raise, ds, show_warning]=process_input(varargin{:});
 

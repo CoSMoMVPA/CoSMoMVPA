@@ -1,5 +1,8 @@
 function test_suite = test_confusion_matrix
 % tests for cosmo_confusion_matrix
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

@@ -40,7 +40,8 @@ function skip_test=cosmo_skip_test_if_no_external(external)
 %
 % See also: cosmo_check_external, cosmo_notify_test_skipped
 %
-% NNO Apr 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     skip_test=~cosmo_check_external(external,false);
 

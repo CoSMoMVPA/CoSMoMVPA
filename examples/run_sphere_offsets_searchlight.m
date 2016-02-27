@@ -8,7 +8,8 @@
 % Note: for running searchlights it is recommended to use
 %       cosmo_searchlight and cosmo_spherical_neighborhood
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define input files and searchlight radius
 radius=3; % in voxel units

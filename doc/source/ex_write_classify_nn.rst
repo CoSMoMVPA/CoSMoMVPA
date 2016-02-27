@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. ex_write_classify_nn
 
 Write your own Nearest-neighbor classifier

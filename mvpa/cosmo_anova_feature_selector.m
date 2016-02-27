@@ -21,8 +21,8 @@ function selected_indices=cosmo_anova_feature_selector(dataset, how_many)
 %     cosmo_anova_feature_selector(ds,4) % find best 4 features
 %     > [ 2 4 5 3 ]
 %
-%
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     fstat=cosmo_stat(dataset,'F');
     fvalues=fstat.samples;

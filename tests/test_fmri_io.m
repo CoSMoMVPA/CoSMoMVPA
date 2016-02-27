@@ -1,6 +1,9 @@
 function test_suite=test_fmri_io
 % tests for fmri input/output
 %
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
     initTestSuite;
 
 function test_fmri_io_nii_gz()

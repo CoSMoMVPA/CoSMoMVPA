@@ -1,5 +1,8 @@
 function test_suite = test_vol_coordinates
 % tests for cosmo_vol_coordinates
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

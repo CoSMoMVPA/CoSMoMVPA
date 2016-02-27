@@ -1,5 +1,8 @@
 function test_suite=test_meeg_io()
 % tests for MEEG input/output
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

@@ -52,7 +52,8 @@ function msk=cosmo_match(haystack, needle, varargin)
 %
 % See also: cosmo_slice, cosmo_stack, cosmo_dim_match
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2
         error('Need at least two input arguments');

@@ -48,7 +48,8 @@ function predicted=cosmo_classify_knn(samples_train, targets_train, samples_test
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     cosmo_isfield(opt,'knn',true);
     knn=opt.knn;

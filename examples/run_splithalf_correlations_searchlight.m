@@ -1,4 +1,7 @@
 %% Volumetric fMRI Searchlight
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Load data
 config=cosmo_config();

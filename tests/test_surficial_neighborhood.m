@@ -1,5 +1,8 @@
 function test_suite = test_surficial_neighborhood
 % tests for cosmo_surficial_neighborhood
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

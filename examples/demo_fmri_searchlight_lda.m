@@ -9,8 +9,8 @@
 %    4 blocks with presses of each finger and analyzed with the GLM,
 %    resulting in 2*4*4=32 t-values
 %
-% NNO Jan 2014
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 %% Set data paths

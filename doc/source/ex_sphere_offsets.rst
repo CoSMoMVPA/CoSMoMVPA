@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. ex_sphere_offsets
 
 Define voxel selection for a searchlight

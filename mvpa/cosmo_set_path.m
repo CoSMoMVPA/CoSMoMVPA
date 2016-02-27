@@ -15,8 +15,8 @@ function cosmo_set_path()
 %   cosmo_set_path();
 %   savepath();
 %
-%
-% NNO June 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % directories to be added and removed from the path
     remove_subdirs={'doc','examples','tests'};

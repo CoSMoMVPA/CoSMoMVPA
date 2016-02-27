@@ -65,7 +65,8 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 %
 % See also: cosmo_balance_partitions, cosmo_nfold_partitioner
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % process input arguments
     defaults=struct();

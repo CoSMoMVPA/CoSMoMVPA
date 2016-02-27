@@ -1,6 +1,5 @@
-.. Table of contents
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
 
 CoSMo 2013 Multivariate Pattern Analysis Workshop
 =================================================

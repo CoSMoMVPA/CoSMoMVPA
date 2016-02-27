@@ -54,7 +54,8 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %
 % See also: cosmo_classify_matlabsvm, cosmo_crossvalidate
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [nsamples,nfeatures]=size(pred);
     pred_msk=~isnan(pred);

@@ -22,7 +22,8 @@ function predicted=cosmo_meta_feature_selection_classifier(samples_train, target
 %   - this function is deprecated. Use
 %     cosmo_classify_meta_feature_selection instead.
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 cosmo_warning(['%s is deprecated and will be removed in the future; '...
                 'use cosmo_classify_meta_feature_selection instead'],...

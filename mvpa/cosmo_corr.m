@@ -37,7 +37,9 @@ function c=cosmo_corr(x,y,corr_type)
 %
 % See also: corr
 %
-% NNO Sep 2013 (from NNO's phoebe_corr, July 2010)
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     y_as_x=false;
 
     if nargin<2

@@ -1,5 +1,8 @@
 function test_suite = test_strsplit
 % tests for cosmo_strsplit
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

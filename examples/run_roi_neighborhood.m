@@ -2,6 +2,9 @@
 %
 % This example shows how to define and use neighborhoods, and shows
 % how they can be used with the cosmo_searchlight function
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Load data (without mask)
 config=cosmo_config();

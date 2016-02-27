@@ -1,5 +1,8 @@
 function test_suite=test_meeg_source()
 % tests for MEEG datasets in source space
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

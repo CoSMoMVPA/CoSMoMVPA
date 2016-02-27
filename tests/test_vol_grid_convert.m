@@ -1,5 +1,8 @@
 function test_suite = test_vol_grid_convert
 % tests for cosmo_vol_grid_convert
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

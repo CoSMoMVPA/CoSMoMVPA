@@ -204,7 +204,8 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 % See also: cosmo_meeg_chantype, ft_prepare_neighbours,
 %           cosmo_meeg_chan_neighborhood
 %
-% NNO Dec 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     default.label='layout';
     opt=cosmo_structjoin(default,varargin);

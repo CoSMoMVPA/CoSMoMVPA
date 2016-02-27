@@ -3,6 +3,9 @@
 % cosmo_crossvalidation_measure function, using a classifier with n-fold
 % crossvalidation.
 % It shows the confusion matrices using multiple classifiers
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define data
 config=cosmo_config();

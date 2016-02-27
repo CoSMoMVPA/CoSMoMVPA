@@ -1,5 +1,7 @@
 %% RSA Visualize
 %
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Load data in EV and VT mask
 % load datasets cosmo_fmri_dataset

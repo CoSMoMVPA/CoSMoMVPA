@@ -105,7 +105,9 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %
 % See also: cosmo_flatten, cosmo_map2fmri, cosmo_map2meeg
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     if nargin<2 || isempty(dim), dim=2; end
 
     if ~(isnumeric(dim) && isscalar(dim))

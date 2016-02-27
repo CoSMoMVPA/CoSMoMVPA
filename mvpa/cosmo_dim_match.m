@@ -110,7 +110,9 @@ function msk=cosmo_dim_match(ds, varargin)
 %
 % See also: cosmo_match, cosmo_dim_prune
 %
-% NNO Oct 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     [dim_labels, dim_values, expected_dim]=process_input(ds, varargin{:});
 
     ndim=numel(dim_labels);

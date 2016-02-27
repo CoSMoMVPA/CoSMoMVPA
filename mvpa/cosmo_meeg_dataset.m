@@ -79,7 +79,8 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %
 % See also: cosmo_map2meeg
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % Input parsing stuff
 

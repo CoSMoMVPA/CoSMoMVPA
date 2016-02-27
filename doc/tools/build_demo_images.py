@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #
-
+#   For CoSMoMVPA's license terms and conditions, see   #
+#   the COPYING file distributed with CoSMoMVPA         #
+#
 # builds gallery with demonstrations
 
 import os

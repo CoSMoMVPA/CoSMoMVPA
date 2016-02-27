@@ -1,6 +1,8 @@
 %% Dataset Basics
 % Run operations on datasets
 %
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Load data and set targets
 % Load data as before setting targets and chunks appropriately

@@ -21,7 +21,8 @@ function varargout=cosmo_warning(message, varargin)
 %   - this function works more or less like matlab's warning function,
 %     except that by default each warning is just shown once.
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent when_show_warning;
     persistent shown_warnings;

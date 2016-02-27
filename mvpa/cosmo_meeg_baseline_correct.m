@@ -54,8 +54,8 @@ function bl_ds=cosmo_meeg_baseline_correct(ds, reference, method)
 %     > [ 0.272    -0.272     -7.72      7.72     -0.22      0.22
 %     >   -5.41      5.41    -0.309     0.309      1.41     -1.41 ]
 %
-% NNO Sep 2014
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 if isstruct(reference)
     f=@baseline_correct_ds;

@@ -106,7 +106,8 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %
 % See also: cosmo_split
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     [dim, merge_method, check]=process_parameters(ds_cell, varargin{:});

@@ -1,3 +1,4 @@
+
 .. _`ex_roi_neighborhood`:
 
 Using CoSMoMVPA *neighborhoods* for regions of interest

@@ -1,6 +1,9 @@
 function test_suite = test_cosmo_dataset_operations
 % tests for slicing and stacking
 %
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
     initTestSuite;
 
 function test_test_dataset

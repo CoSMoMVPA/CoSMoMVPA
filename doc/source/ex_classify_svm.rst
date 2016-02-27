@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. ex_classify_svm
 
 Build wrapper for Matlab's SVM classifier

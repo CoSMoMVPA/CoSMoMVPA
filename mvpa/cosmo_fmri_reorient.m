@@ -79,8 +79,8 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
 %     information in .fa and .a.fdim; contents of .samples remains
 %     unchanged.
 %
-% NNO Dec 2014
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     cosmo_check_dataset(ds,'fmri');
 

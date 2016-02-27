@@ -81,7 +81,8 @@ function s=cosmo_structjoin(varargin)
 %  - this function can be used to parse input arguments (including
 %    varargin in a "'key1',value1,'key2',value2,..." fashion)
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % use a wrapper so that recursive calls can be forwarded to the wrapper
     % without using mfilename

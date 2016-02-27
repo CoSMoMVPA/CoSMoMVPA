@@ -10,7 +10,9 @@
 % during ten runs in an fMRI study. Using the General Linear Model response
 % were estimated for each category in each run, resulting in 6*10=60
 % t-values.
-
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Set data paths
 % The function cosmo_config() returns a struct containing paths to tutorial

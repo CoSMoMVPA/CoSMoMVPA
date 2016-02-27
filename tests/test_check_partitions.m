@@ -1,5 +1,8 @@
 function test_suite=test_check_partitions()
 % tests for cosmo_check_partitions
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

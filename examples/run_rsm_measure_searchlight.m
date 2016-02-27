@@ -2,6 +2,9 @@
 %
 % Using cosmo_searchlight, run cross-validation with nearest neighbor
 % classifier
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define data
 config=cosmo_config();

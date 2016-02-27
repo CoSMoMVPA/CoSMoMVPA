@@ -188,8 +188,8 @@ function ds=cosmo_slice(ds, to_select, dim, type_or_check)
 %     as when used in searchlights
 %   - this function does not support arrays with more than two dimensions.
 %
-%
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % deal with 2, 3, or 4 input arguments
     if nargin<3 || isempty(dim), dim=1; end

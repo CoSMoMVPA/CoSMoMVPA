@@ -7,12 +7,13 @@ function s=cosmo_type(fn)
 %
 % See also: type
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
-fid=fopen(fn);
-s=fread(fid,inf,'char=>char')';
-fclose(fid);
+    fid=fopen(fn);
+    s=fread(fid,inf,'char=>char')';
+    fclose(fid);
 
-if nargout==0
-    fprintf(s);
-end
+    if nargout==0
+        fprintf(s);
+    end

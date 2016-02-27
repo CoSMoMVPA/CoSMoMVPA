@@ -40,7 +40,8 @@ function d=cosmo_pdist(x, distance)
 %
 % See also: cosmo_dissimilarity_matrix_measure, cosmo_squareform
 %
-% NNO Jul 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2 || isempty(distance), distance='euclidean'; end
 

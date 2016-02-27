@@ -35,7 +35,8 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
 % See also svmtrain, svmclassify, cosmo_classify_svm,
 %          cosmo_classify_matlabsvm
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<4
         opt=struct();

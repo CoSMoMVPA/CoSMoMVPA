@@ -2,6 +2,9 @@
 %
 % A simple example of running a permutation test to determine the
 % signifance of classification accuracies
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Set the number of permutations
 niter=1000;

@@ -46,7 +46,8 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
 %     > dim_name = sdim
 %     > values = -0.2000 -0.1500 -0.1000 -0.0500 0
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     if nargin<3, raise=true; end

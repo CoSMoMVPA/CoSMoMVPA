@@ -160,7 +160,8 @@ function cosmo_disp(x,varargin)
 %     struct, then the contents of that struct is shown as well
 %   - A use case is displaying dataset structs
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults.threshold=5;    % max #items before triggering summary style
     defaults.edgeitems=3;    % #items at edges in summary style

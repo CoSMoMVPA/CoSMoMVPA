@@ -26,8 +26,11 @@ function did_pass=cosmo_run_tests(varargin)
 %     S. Eddings (2009), http://www.mathworks.it/matlabcentral/
 %                         fileexchange/22846-matlab-xunit-test-framework
 %   - Doctest functionality was inspired by T. Smith.
+%   - Unit tests can be run using MOxUnit by N.N. Oosterhof (2015),
+%           https://github.com/MOxUnit/MOxUnit
 %
-% NNO Jul 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     orig_pwd=pwd();
     pwd_resetter=onCleanup(@()cd(orig_pwd));

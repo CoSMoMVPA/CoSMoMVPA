@@ -31,7 +31,8 @@ function varargout=cosmo_notify_test_skipped(reason)
 %
 % See also: moxunit_throw_test_skipped_exception, cosmo_run_tests
 %
-% NNO Apr 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent skipped_tests
 

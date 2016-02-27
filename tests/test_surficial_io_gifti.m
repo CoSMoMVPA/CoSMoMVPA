@@ -1,5 +1,8 @@
 function test_suite = test_surficial_io_gifti
 % tests for GIFTI input/output
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

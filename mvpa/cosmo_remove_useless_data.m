@@ -78,7 +78,8 @@ function [ds_useful,msk]=cosmo_remove_useless_data(ds, dim, type)
 %    because they are not helpful in discriminating between conditions of
 %    interest
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<3 || isempty(type), type='all'; end
     if nargin<2 || isempty(dim), dim=1; end;

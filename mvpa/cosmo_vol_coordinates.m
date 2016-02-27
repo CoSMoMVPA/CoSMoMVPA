@@ -21,7 +21,8 @@ function [transformed, outside]=cosmo_vol_coordinates(ds, coords)
 %                     coordinates; an entry is 0 for coordinates not
 %                     matching a feature.
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % if no coords, return coordinates of all features
     if nargin<2, coords=zeros(1,0); end

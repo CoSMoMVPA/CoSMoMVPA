@@ -1,5 +1,8 @@
 function test_suite=test_anova_feature_selector
 % tests for cosmo_anova_feature_selector
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
     initTestSuite;
 
 function test_anova_feature_selector_basics

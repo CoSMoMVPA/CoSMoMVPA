@@ -112,7 +112,9 @@ function ds=cosmo_flatten(arr, dim_labels, dim_values, dim, varargin)
 %
 % See also: cosmo_unflatten, cosmo_fmri_dataset, cosmo_meeg_dataset
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     defaults.matrix_labels=cell(0);
     opt=cosmo_structjoin(defaults,varargin{:});
 

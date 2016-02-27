@@ -1,5 +1,8 @@
 function test_suite = test_measure_clusters()
 % tests for cosmo_measure_clusters
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite
 

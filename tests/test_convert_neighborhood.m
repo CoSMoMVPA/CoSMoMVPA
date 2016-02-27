@@ -1,5 +1,8 @@
 function test_suite = test_convert_neighborhood()
 % tests for cosmo_convert_neighborhood
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite
 

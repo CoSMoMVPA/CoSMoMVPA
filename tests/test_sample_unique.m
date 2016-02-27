@@ -1,5 +1,8 @@
 function test_suite = test_sample_unique
 % tests for cosmo_sample_unique
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

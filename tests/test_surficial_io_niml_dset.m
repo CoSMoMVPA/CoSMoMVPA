@@ -1,5 +1,8 @@
 function test_suite = test_surficial_io_niml_dset
 % tests for AFNI NIML input/output
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

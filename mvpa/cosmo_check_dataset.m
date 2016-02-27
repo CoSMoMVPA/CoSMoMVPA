@@ -91,7 +91,8 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %  - it is good practice to use this function when a new dataset is created
 %    to ensure consistency of the data
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % deal with input arguments
     if nargin<3

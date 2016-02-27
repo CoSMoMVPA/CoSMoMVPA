@@ -110,7 +110,8 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %
 % See also: cosmo_nchoosek_partitioner, cosmo_nfold_partitioner
 %
-% NNO Dec 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.seed=1;

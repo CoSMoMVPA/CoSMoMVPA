@@ -1,5 +1,8 @@
 function test_suite=test_synthetic_dataset
 % tests for cosmo_synthetic_dataset
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

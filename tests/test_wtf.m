@@ -1,5 +1,8 @@
 function test_suite=test_wtf
 % tests for cosmo_wtf
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

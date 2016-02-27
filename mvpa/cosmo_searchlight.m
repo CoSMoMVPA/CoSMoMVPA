@@ -129,7 +129,8 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 %           cosmo_meeg_chan_neigborhood, cosmo_interval_neighborhood
 %           cosmo_cross_neighborhood
 %
-% ACC Aug 2013, modified from run_spherical_neighborhood_searchlight by NNO
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     sl_defaults=struct();
     sl_defaults.center_ids=[];

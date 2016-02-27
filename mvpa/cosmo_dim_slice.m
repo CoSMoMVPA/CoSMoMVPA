@@ -26,6 +26,9 @@ function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 %           result=cosmo_dim_prune(ds_sliced);
 %
 % See also: cosmo_slice, cosmo_dim_prune
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     cosmo_warning(['%s is deprecated and will be removed in the future;'...
                     '     instead of:\n\n'...

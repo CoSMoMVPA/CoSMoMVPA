@@ -76,7 +76,8 @@ function ds_conv=cosmo_vol_grid_convert(ds,varargin)
 %   - when ds is an meeg source dataset, it is required that the positions
 %     can be placed in a regular grid
 %
-% NNO Mar 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input(ds);
     direction=get_direction(ds,varargin{:});

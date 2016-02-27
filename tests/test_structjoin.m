@@ -1,5 +1,8 @@
 function test_suite=test_structjoin
 % tests for cosmo_structjoin
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

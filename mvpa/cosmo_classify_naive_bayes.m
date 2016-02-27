@@ -29,7 +29,8 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent cached_targets_train;
     persistent cached_samples_train;

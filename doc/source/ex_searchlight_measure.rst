@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. _`ex_searchlight_measure`:
 
 Use the searchlight with a neighborhood and a measure

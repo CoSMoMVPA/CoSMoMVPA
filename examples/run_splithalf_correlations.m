@@ -3,6 +3,9 @@
 % Load t-stat data from all subjects, apply 'vt' mask, compute difference
 % of (fisher-transformed) between on- and off diagonal split-half
 % correlation values, and perform a random effects analysis.
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Set analysis parameters
 subject_ids={'s01','s02','s03','s04','s05','s06','s07','s08'};

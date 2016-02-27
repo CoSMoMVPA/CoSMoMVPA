@@ -23,7 +23,9 @@ function hdr=cosmo_map2fmri(dataset, fn, varargin)
 %
 % See also: cosmo_fmri_deoblique
 %
-% NNO Aug 2013, updated Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     defaults=struct();
     defaults.deoblique=false;
     defaults.bv_force_fit=[];

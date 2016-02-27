@@ -16,7 +16,8 @@ function [map_x2y, map_y2x]=cosmo_align(x,y)
 %   map_y2x           a vector with N elements, so that for all values I in
 %                     1:K it holds that map_y2x(y{I}) is equal to x{I}.
 %
-% NNO Feb 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [x_cell,x_label]=as_cell(x,1);
     [y_cell,y_label]=as_cell(y,2);

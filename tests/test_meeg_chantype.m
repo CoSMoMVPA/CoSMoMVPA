@@ -1,5 +1,8 @@
 function test_suite=test_meeg_chantype
 % tests for cosmo_meeg_chantype
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

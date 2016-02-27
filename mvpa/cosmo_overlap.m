@@ -48,8 +48,8 @@ function [y_in_x,x_in_y]=cosmo_overlap(xs,ys)
 %     >     0.3333    1.0000
 %     >        NaN       NaN
 %
-% NNO Nov 2014
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [xs_vec,nx,nxs,xi]=get_counts(xs);
     [ys_vec,ny,nys,yi]=get_counts(ys);

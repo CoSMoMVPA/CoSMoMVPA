@@ -143,8 +143,8 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %
 % See also: cosmo_searchlight, cosmo_average_samples
 %
-% ACC. Modified to conform to signature of generic datset 'measure'
-% NNO Aug 2013 made this a wrapper function
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 % deal with input arguments
 params=cosmo_structjoin('output','accuracy',... % default output

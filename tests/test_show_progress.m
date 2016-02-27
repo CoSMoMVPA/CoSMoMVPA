@@ -1,5 +1,8 @@
 function test_suite=test_show_progress
 % tests for cosmo_show_progress
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

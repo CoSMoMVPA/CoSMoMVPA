@@ -1,5 +1,8 @@
 function test_suite=test_tail
 % tests for cosmo_tail
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

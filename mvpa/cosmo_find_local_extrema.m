@@ -68,7 +68,8 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %     reproducible and objective manner.
 %   - to ignore particular features, set their value to NaN
 %
-% NNO Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.count=Inf;

@@ -44,7 +44,8 @@ function [randomized_targets,permutation]=cosmo_randomize_targets(ds,varargin)
 %     rand_targets_deterministic'
 %     > [ 2 1 1 2 2 1 2 1 2 1 2 1 1 2 2 1 1 2 2 1 1 2 2 1 2 1 2 1 2 1 ]
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     opt=cosmo_structjoin(varargin);
 

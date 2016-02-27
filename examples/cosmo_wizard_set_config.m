@@ -15,6 +15,9 @@ function cosmo_wizard_set_config()
 % (on Linux / OSX), or in any available userpath() directory.
 %
 % Selecting cancel at any time will close this wizard.
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 % simulate go-to
 while true

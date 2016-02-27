@@ -1,8 +1,12 @@
-% roi-based MVPA for single subject (run_split_half_correlations_single_sub)
+%% Roi-based MVPA for single subject (run_split_half_correlations_single_sub)
 %
 % Load t-stat data from one subject, apply 'vt' mask, compute difference
 % of (fisher-transformed) between on- and off diagonal split-half
 % correlation values.
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
 
 %% Set analysis parameters
 subject_id='s01';

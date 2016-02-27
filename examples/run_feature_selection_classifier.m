@@ -1,4 +1,8 @@
 %% An example of using feature selection with a classifier
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
 % This example plots classification accuracy as a function of the number of
 % features selected using an ANOVA on training set data
 config=cosmo_config();

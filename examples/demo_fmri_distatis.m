@@ -19,6 +19,9 @@
 %     Proceedings of the IEEE Computer Society: International conference
 %     on computer vision and pattern recognition, San Diego, CA, USA
 %     (pp. 42?47).
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Set data paths
 % The function cosmo_config() returns a struct containing paths to tutorial

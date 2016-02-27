@@ -69,9 +69,8 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 %   cosmo_strsplit(' CoSMoMVPA makes live...  easy!',' ')
 %   >     ''    'CoSMoMVPA'    'makes'    'live...'    ''    'easy!'
 %
-%
-%
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 if ~ischar(string)
     error('first argument must be a string');

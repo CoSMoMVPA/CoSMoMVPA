@@ -1,6 +1,9 @@
 %% Anatomical dataset basics
 % In this example, load a brain as a CoSMoMVPA datset and visualize it
 % in matlab
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 % Set the path.
 config=cosmo_config();

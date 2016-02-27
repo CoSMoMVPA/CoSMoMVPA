@@ -32,7 +32,8 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
 % Notes:
 %   - this is a utility function; it does not work on dataset structures.
 %
-% NNO Jul 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<3 || isempty(count)
         count=1;

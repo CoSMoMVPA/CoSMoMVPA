@@ -1,5 +1,8 @@
 function test_suite = test_cartprod
 % tests for cosmo_cartprod
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

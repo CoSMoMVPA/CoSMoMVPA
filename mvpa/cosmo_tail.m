@@ -60,7 +60,8 @@ function [tail_values, idxs]=cosmo_tail(values, to_select)
 %     [v,i]=cosmo_tail(10:15,[2,3])
 %     > error('Second argument must be scalar');
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input(values, to_select);
 

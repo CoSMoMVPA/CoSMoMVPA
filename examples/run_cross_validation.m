@@ -1,6 +1,9 @@
 %% Cross validation example with multiple classifiers
 % This example runs cross validation and shows confusion matrix using
 % multiple classifiers
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define data
 config=cosmo_config();

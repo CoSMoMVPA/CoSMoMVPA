@@ -45,7 +45,8 @@
 % A comparison of volume-based and surface-based information mapping.
 % Neuroimage. DOI:10.1016/j.neuroimage.2010.04.270
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Check externals
 cosmo_check_external('surfing');

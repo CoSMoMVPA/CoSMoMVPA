@@ -60,7 +60,8 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
 %
 % See also: cosmo_cluster_neighborhood, cosmo_convert_neighborhood
 %
-% NNO Sep 2010, updated Jan 2011, Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input_sizes(sample,nbrhood_mat);
 

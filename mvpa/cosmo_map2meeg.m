@@ -25,7 +25,8 @@ function hdr=cosmo_map2meeg(ds, fn)
 %     % store a timeseries dataset in an EEGlab text file
 %     cosmo_map2meeg(ds,'eeglab_data.txt');
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     cosmo_check_dataset(ds,'meeg');
 

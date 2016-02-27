@@ -1,5 +1,8 @@
 function test_suite=test_warning
 % tests for cosmo_warning
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

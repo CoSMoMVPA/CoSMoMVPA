@@ -49,7 +49,8 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %           cosmo_classify_libsvm, cosmo_crossvalidate,
 %           cosmo_crossvalidation_measure
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 persistent cached_classifier_func;
 persistent cached_classifier_name;

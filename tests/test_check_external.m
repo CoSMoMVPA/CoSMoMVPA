@@ -1,5 +1,8 @@
 function test_suite=test_check_external()
 % tests for cosmo_check_external
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

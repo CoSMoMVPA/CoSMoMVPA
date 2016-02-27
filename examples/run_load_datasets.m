@@ -9,6 +9,9 @@
 %
 % Hint: the number of voxels is given by the number of columns in
 % dataset.samples
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Set the datapath
 %

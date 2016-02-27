@@ -1,5 +1,8 @@
 function test_suite=test_dim_generalization_measure()
 % tests for cosmo_dim_generalization_measure
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

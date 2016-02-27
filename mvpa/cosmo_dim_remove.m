@@ -52,7 +52,8 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 %
 % See also: cosmo_dim_transpose
 %
-% NNO Mar 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     has_char_label=ischar(dim_labels);
     if has_char_label

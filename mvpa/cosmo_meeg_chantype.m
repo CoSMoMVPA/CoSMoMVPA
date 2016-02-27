@@ -44,7 +44,8 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %     cosmo_disp(ds_planar.fa.chan);
 %     > [ 1         2         3  ...  202       203       204 ]@1x1428
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     persistent cached_opt;
     persistent cached_ds_labels;

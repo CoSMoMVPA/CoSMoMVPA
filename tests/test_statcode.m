@@ -1,5 +1,8 @@
 function test_suite = test_statcode()
 % tests for cosmo_statcode
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

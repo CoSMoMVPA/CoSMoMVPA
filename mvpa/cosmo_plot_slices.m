@@ -46,7 +46,8 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 %    example dim=1 may give a saggital view if the dataset comes from one
 %    program and an axial view if it comes from another program.
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2 || isempty(dim), dim=3; end
     if nargin<3 || isempty(slice_step), slice_step=-20; end

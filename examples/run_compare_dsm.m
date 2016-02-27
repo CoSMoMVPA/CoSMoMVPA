@@ -1,5 +1,8 @@
-% RSA Tutorial
+%% RSA Tutorial
 % Compare DSMs
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 subjects = {'s01','s02','s03','s04','s05','s06','s07','s08'};

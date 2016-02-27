@@ -41,7 +41,8 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
 %   % output:
 %   > +00:00:03 [####################] -00:00:00  done 100.0%
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<4 || isempty(prev_progress_line)
         delete_count=0; % nothing to delete

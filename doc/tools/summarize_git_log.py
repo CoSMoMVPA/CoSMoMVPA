@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #
-
+#   For CoSMoMVPA's license terms and conditions, see   #
+#   the COPYING file distributed with CoSMoMVPA         #
+#
 # builds git summaries using tags used in CoSMoMVPA commits
 import datetime
 import subprocess

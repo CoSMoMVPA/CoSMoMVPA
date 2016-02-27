@@ -91,7 +91,8 @@ function senstypes=cosmo_meeg_senstype_collection()
 %   - this function caches previously read layouts, for optimization
 %     reasons. run "clear functions" to reset the cahce.
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     senstypes=get_senstypes();
 

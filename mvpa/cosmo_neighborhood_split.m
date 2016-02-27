@@ -136,7 +136,8 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %
 % See also: cosmo_searchlight, cosmo_fmri_dataset
 %
-% NNO May 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.divisions=4;

@@ -43,7 +43,8 @@ function ds=cosmo_dim_insert(ds,dim,index,labels,values,attr,varargin)
 %     functions
 %   - this function does not check for duplicate dimensions
 %
-% NNO Mar 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     defaults.matrix_labels=cell(0);

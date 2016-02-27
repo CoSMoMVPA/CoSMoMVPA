@@ -1,5 +1,8 @@
 function test_suite=test_normalize
 % tests for cosmo_normalize
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

@@ -1,5 +1,8 @@
 function test_suite=test_surface_io()
 % tests for surface input/output
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

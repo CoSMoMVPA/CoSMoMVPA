@@ -122,7 +122,8 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
 %
 % See also: cosmo_fmri_dataset, cosmo_meeg_dataset, cosmo_searchlight
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input(varargin{:});
 

@@ -1,4 +1,10 @@
+%% Crossvalidation searchlight
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
 %% Define data
+%
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 

@@ -1,4 +1,7 @@
-
+% Show sphere offsets for used in spherical neighborhood
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 radii=2:.5:6;
 nradii=numel(radii);

@@ -102,7 +102,8 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 %
 % See also: cosmo_searchlight
 %
-% NNO Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % check input
     cosmo_check_dataset(ds);

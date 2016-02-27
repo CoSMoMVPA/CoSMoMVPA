@@ -1,5 +1,8 @@
 function test_suite = test_meeg_baseline_correct
 % tests for cosmo_meeg_baseline_correct
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

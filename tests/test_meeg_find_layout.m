@@ -1,5 +1,8 @@
 function test_suite=test_meeg_find_layout()
 % tests for cosmo_meeg_find_layout
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

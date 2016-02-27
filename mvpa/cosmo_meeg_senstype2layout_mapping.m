@@ -99,7 +99,8 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %
 % See also: cosmo_meeg_layout_collection, cosmo_meeg_senstype_collection
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % 'secret' options with thresholds to find best matching layout
     defaults=struct();

@@ -189,7 +189,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %
 % See also: cosmo_cluster_neighborhood
 %
-% NNO Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     defaults=struct();

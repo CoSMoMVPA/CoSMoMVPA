@@ -172,6 +172,8 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %
 % See also: surfing, surfing_nodeidxs2coords, cosmo_searchlight
 %
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 cosmo_check_external('surfing');
 

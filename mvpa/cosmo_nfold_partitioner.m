@@ -74,7 +74,8 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %
 % See also: cosmo_balance_partitions, cosmo_nchoosek_partitioner
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if isstruct(chunks)
         if cosmo_isfield(chunks,'sa.chunks',true)

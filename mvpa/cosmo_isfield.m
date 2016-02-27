@@ -57,7 +57,8 @@ function tf=cosmo_isfield(s, name, raise)
 %
 % See also: isfield
 %
-% NNO Aug 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<3
         raise=false;

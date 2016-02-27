@@ -118,7 +118,8 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     >   [ -0.333    -0.333    -0.333
 %     >       1.67      1.67      1.67 ]
 %
-% NNO Oc 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 if isempty(params) || (ischar(params) && strcmp(params,'none'))
     return;

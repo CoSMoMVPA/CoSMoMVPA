@@ -86,7 +86,8 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %
 % See also: cosmo_map2surface
 %
-% NNO May 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.targets=[];

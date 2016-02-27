@@ -1,5 +1,8 @@
 function test_suite = test_crossvalidation_measure
 % tests for cosmo_crossvalidation_measure
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

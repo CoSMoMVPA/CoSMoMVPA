@@ -30,7 +30,8 @@ function s=cosmo_wtf(param)
 %  - this function is intended to get system information in user support
 %    situations.
 %
-% NNO Apr 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 has_param=nargin>=1 && ~isempty(param);
 if has_param

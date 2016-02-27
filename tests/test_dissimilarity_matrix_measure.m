@@ -1,5 +1,8 @@
 function test_suite=test_dissimilarity_matrix_measure()
 % tests for cosmo_dissimilarity_matrix_measure
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

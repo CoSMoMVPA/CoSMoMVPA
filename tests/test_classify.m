@@ -1,5 +1,8 @@
 function test_suite = test_classify
 % tests for cosmo_classify_* functions
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

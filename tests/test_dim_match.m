@@ -1,5 +1,8 @@
 function test_suite=test_dim_match
 % tests for cosmo_dim_match
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

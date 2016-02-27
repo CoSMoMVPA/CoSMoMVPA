@@ -57,7 +57,8 @@ function files=cosmo_dir(varargin)
 %
 % See also: dir
 %
-% NNO Apr 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [root_dir,file_pat]=process_arguments(varargin{:});
 

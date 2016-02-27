@@ -23,7 +23,8 @@ function s=cosmo_squareform(x, varargin)
 %  - this function provides the same functionality as the built-in function
 %    ''squareform'' in the matlab stats toolbox.
 %
-% NNO Jul 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     check_input(x);
 

@@ -200,8 +200,8 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %
 % See also: cosmo_meeg_chan_neighbors
 %
-% NNO Dec 2014
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [dim,unused,attr_name,dim_name,ds_label]=cosmo_dim_find(ds,...
                                                         'chan',true);

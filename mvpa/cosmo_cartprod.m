@@ -76,8 +76,8 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     > #9:Rv1
 %     > #9:Rloc
 %
-%
-% NNO Oct 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<2, convert_to_numeric=true; end
 

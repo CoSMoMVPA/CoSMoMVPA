@@ -122,7 +122,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %
 % See also: cosmo_balance_partitions
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % deal with input parameters
 

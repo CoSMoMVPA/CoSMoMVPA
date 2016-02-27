@@ -1,5 +1,8 @@
 function test_suite = test_run_tests
 % tests for cosmo_run_tests
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

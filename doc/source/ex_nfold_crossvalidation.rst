@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. _`ex_nfold_crossvalidation`:
 
 Classification analysis with cross-validation

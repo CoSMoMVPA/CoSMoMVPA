@@ -134,11 +134,12 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     m=@cosmo_correlation_measure, this amounts to split-half
 %     correlations.
 %
-% See also: @cosmo_correlation_measure, @cosmo_crossvalidation_measure
-%           @cosmo_target_dsm_corr_measure, cosmo_searchlight,
-%           @cosmo_dim_transpose
+% See also: cosmo_correlation_measure, cosmo_crossvalidation_measure
+%           cosmo_target_dsm_corr_measure, cosmo_searchlight,
+%           cosmo_dim_transpose
 %
-% NNO Feb 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.radius=0;

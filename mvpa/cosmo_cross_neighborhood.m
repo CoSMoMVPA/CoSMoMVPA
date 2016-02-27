@@ -50,7 +50,9 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
 % See also: cosmo_spherical_neighborhood, cosmo_meeg_chan_neighborhood,
 %           cosmo_interval_neighborhood
 %
-% NNO Feb 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     cosmo_check_dataset(ds);
     check_nbrhoods(nbrhoods,ds);
 

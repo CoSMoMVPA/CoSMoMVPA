@@ -1,5 +1,7 @@
 %% Example of de-meaning
 %
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Generate random dataset
 ds=cosmo_synthetic_dataset('nchunks',4,'ntargets',3);

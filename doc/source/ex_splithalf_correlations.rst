@@ -1,3 +1,6 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
 .. _`ex_splithalf_correlations`:
 
 Split-half correlation-based MVPA with group analysis

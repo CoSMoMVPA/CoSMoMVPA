@@ -1,5 +1,8 @@
 function test_suite = test_distatis
 % tests for cosmo_distatis
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

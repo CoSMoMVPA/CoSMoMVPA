@@ -1,5 +1,8 @@
 function test_suite = test_fmri_orientation
 % tests for cosmo_fmri_orientation
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

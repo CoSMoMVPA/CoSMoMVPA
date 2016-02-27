@@ -27,7 +27,8 @@ function is_ok=cosmo_publish_run_scripts(varargin)
 %    * a working installation of git
 %    * CoSMoMVPA code present in a git repository
 %
-% NNO Sep 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % ensure 'publish' function is available
     cosmo_check_external('!publish',true);

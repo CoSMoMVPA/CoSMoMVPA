@@ -90,9 +90,8 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %   - This function is aimed at MEEG datasets (and for fMRI datasets with a
 %     time dimension), so that time can be made a sample dimension
 %
-% NNO Feb 2015
-
-
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if ischar(dim_labels)
         dim_labels={dim_labels};

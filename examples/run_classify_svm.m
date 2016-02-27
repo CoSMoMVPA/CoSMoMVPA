@@ -1,5 +1,7 @@
 %% Classification using svm
 %
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 if ~cosmo_check_external('svm',false)
     fprintf('No SVM implementation is available, skipping\n');

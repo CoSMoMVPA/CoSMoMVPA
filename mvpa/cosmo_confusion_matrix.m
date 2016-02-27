@@ -72,7 +72,8 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %   - this function counts the number of times each sample was classified
 %     as any target
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [targets,predicted]=get_data(ds,varargin{:});
 

@@ -45,7 +45,8 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
 %
 % See also sub2ind, ind2sub, cosmo_spherical_neighborhood
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % how big a box should be to contain all voxels with the given radius
     side=ceil(radius)*2+1;

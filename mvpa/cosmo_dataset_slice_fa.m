@@ -21,7 +21,8 @@ function ds=cosmo_dataset_slice_fa(ds, to_select)
 %     it is strongly recommended to use:
 %           comso_slice(dataset, to_select, 2).
 %
-% See also: cosmo_slice
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     cosmo_warning(['%s is deprecated and will be removed in the future;'...

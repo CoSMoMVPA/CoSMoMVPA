@@ -1,5 +1,8 @@
 function test_suite=test_correlation_measure
 % tests for cosmo_correlation_measure
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

@@ -105,7 +105,8 @@ function ds_splits=cosmo_split(ds, split_by, dim, check)
 %
 % See also: cosmo_stack, cosmo_slice
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % set default dim & check input
     if nargin<4

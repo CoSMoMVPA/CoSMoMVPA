@@ -1,5 +1,8 @@
 function test_suite=test_oddeven_partitioner
 % tests for cosmo_oddeven_partitioner
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

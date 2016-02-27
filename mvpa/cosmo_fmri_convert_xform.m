@@ -108,8 +108,8 @@ function tr_xform=cosmo_fmri_convert_xform(fmt, xform)
 %     cosmo_fmri_convert_xform('unknown',1)
 %     > error('unsupported format ''unknown''')
 %
-%
-% NNO Dec 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 

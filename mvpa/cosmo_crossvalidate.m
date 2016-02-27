@@ -121,7 +121,9 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %
 % See also: cosmo_crossvalidation_measure, cosmo_average_samples
 %
-% NNO Aug 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     if nargin<4,opt=struct(); end
     if ~isfield(opt, 'normalization'),
         opt.normalization=[];

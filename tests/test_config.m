@@ -1,5 +1,8 @@
 function test_suite=test_config
 % tests for cosmo_config
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

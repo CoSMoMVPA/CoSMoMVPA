@@ -166,7 +166,8 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 % part of the NIfTI code is based on code by Robert W Cox, 2003,
 % dedicated to the public domain.
 %
-% ACC, NNO Aug, Sep 2013, 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % set defaults
     defaults.mask=[];

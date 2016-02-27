@@ -42,7 +42,8 @@ function result=cosmo_rand(varargin)
 %   - this function uses the Mersenne twister algorithm by default, even
 %     when 'seed' is used (unlike Matlab and Octave).
 %
-% NNO Jan 2015
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     [sizes,seed]=process_input(varargin{:});
 

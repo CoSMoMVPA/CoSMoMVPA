@@ -1,5 +1,8 @@
 function test_suite = test_fx
 % tests for cosmo_fx
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     initTestSuite;
 

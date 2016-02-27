@@ -345,7 +345,8 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %
 % See also: cosmo_nfold_partitioner, cosmo_balance_partitions
 %
-% NNO Sep 2013
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % if the first input is a dataset, get the chunks from it
     is_ds=isstruct(chunks_or_ds);

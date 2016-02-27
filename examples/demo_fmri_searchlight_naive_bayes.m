@@ -13,7 +13,8 @@
 % a fast alternative to using the regular searchlight with a
 % crossvalidation measure and a classifier
 %
-% NNO Jan 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
 

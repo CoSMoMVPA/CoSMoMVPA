@@ -102,7 +102,8 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
 % See also: ft_prepare_neighbors, cosmo_meeg_chan_neighbors,
 %           cosmo_meeg_chan_neighborhood
 %
-% NNO Nov 2014
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     defaults.chantype=[];

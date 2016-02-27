@@ -16,7 +16,9 @@
 % cluster enhancement: Addressing problems of smoothing, threshold
 % dependence and localisation in cluster inference, NeuroImage, Volume 44,
 % Issue 1, 1 January 2009, Pages 83-98.
-
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Check externals
 cosmo_check_external({'surfing','afni'});

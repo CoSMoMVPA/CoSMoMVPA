@@ -41,7 +41,9 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 % - a safety limit of opt.max_feature_count is implemented because a large
 %   number of features can crash Matlab / Octave, and/or make it very slow.
 %
-% Joern Diedrichsen, Tobias Wiestler, NNO Nov 2008; NNO updated Aug 2013
+% (Contributions by Joern Diedrichsen, Tobias Wiestler, Nikolaas Oosterhof)
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if nargin<4 || isempty(opt)
         opt=struct();

@@ -192,8 +192,8 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 % See also: cosmo_pdist, pdist
 %
-% ACC August 2013
-% NNO updated Sep 2013 to return a struct
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % check input
     cosmo_isfield(ds,{'sa.targets','samples'},true);
