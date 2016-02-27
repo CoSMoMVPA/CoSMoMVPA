@@ -6,6 +6,6 @@
 Copyright information
 ---------------------
 
-.. literalinclude:: ../../COPYING
+.. include:: ../../COPYING
 
 
