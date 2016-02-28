@@ -241,7 +241,10 @@ function test_mask_fmri_dataset()
     assertEqual(x5,x);
 
 
-
+function test_pymvpa_fmri_dataset()
+    pymvpa_ds=get_pymvpa_dataset();
+    ds=cosmo_fmri_dataset(pymvpa_ds);
+    assert_dataset_equal(ds, get_expected_dataset(), 'translation');
 
 
 function test_meeg_source_fmri_dataset()
@@ -288,6 +291,26 @@ function ds=get_uint8_dataset()
     mx=max(ds.samples);
     ds.samples=uint8((ds.samples-mn)/(mx-mn)*255);
 
+function ds=get_pymvpa_dataset()
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',1);
+
+    % set .a
+    ds.a.imgaffine=ds.a.vol.mat;
+    ds.a.voxel_eldim=single([3 3]);
+    ds.a.voxel_dim=int64(ds.a.vol.dim(:));
+    ds.a=rmfield(ds.a,'vol');
+    ds.a=rmfield(ds.a,'fdim');
+
+    % set .fa
+    voxel_indices=int64([ds.fa.i; ds.fa.j; ds.fa.k]-1);
+    ds.fa=struct();
+    ds.fa.voxel_indices=voxel_indices;
+
+    % set .samples
+    ds.samples=single(ds.samples);
+
+
+
 function assertAlmostEqualWithTol(x,y)
     assertElementsAlmostEqual(double(x),double(y),'relative',1e-3);
 
@@ -308,7 +331,7 @@ function assert_dataset_equal(x,y,opt)
             assertAlmostEqualWithTol(x.a.vol.mat(1:3,1:3),...
                             y.a.vol.mat(1:3,1:3));
         case 'translation'
-            % BV VMP cannot store xform, just check the matrix
+            % BV VMP or PyMVPA cannot store xform, just check the matrix
             assertEqual(x.a.fdim, y.a.fdim);
             assertAlmostEqualWithTol(x.a.vol.dim,y.a.vol.dim);
             assertAlmostEqualWithTol(x.a.vol.mat,y.a.vol.mat);
