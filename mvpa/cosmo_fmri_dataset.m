@@ -860,8 +860,20 @@ function img_formats=get_img_formats()
     img_formats.ft_source.data_converter=@convert_ft_source_data;
     img_formats.ft_source.convert_volume=false; % already dataset
 
+
+    % fMRI volumetric datasets exported with PyMVPA's cosmo module
+    img_formats.pymvpa_fmri_ds.exts=cell(0);
+    img_formats.pymvpa_fmri_ds.matcher=@isa_pymvpa_fmri;
+    img_formats.pymvpa_fmri_ds.externals=cell(0);
+    img_formats.pymvpa_fmri_ds.header_reader=@read_pymvpa_ds_header;
+    img_formats.pymvpa_fmri_ds.header_converter=@convert_pymvpa_ds_header;
+    img_formats.pymvpa_fmri_ds.data_converter=@convert_pymvpa_ds_data;
+    img_formats.pymvpa_fmri_ds.convert_volume=false; % already dataset
+
+
     img_formats.cosmo_fmri_ds.exts=cell(0);
-    img_formats.cosmo_fmri_ds.matcher=@isa_cosmo_fmri;
+    img_formats.cosmo_fmri_ds.matcher=@(x)isa_cosmo_fmri(x) && ...
+                                            ~isa_pymvpa_fmri(x);
     img_formats.cosmo_fmri_ds.externals=cell(0);
     img_formats.cosmo_fmri_ds.header_reader=@read_cosmo_ds_header;
     img_formats.cosmo_fmri_ds.header_converter=@convert_cosmo_ds_header;
@@ -1738,6 +1750,71 @@ function [ds,nsamples]=convert_ft_source_header(hdr, params)
 function ds=convert_ft_source_data(ds_meeg, volumes)
     ds=convert_ft_source_header(ds_meeg, struct());
     ds=slice_dataset_volumes(ds, volumes);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% PyMVPA fMRI  datasset
+
+function tf=isa_pymvpa_fmri(ds)
+    tf=cosmo_check_dataset(ds) && ...
+            all(cosmo_isfield(ds,{'a.imgaffine',...
+                                    'a.voxel_dim',...
+                                    'a.voxel_eldim',...
+                                    'fa.voxel_indices'}));
+
+function ds=read_pymvpa_ds_header(ds)
+    ds=get_and_check_data(ds, [], @isa_pymvpa_fmri);
+
+function [ds, nsamples]=convert_pymvpa_ds_header(pymvpa_ds, params)
+
+    % set volume information
+    vol=struct();
+    vol.mat=pymvpa_ds.a.imgaffine;
+
+    dim=pymvpa_ds.a.voxel_dim;
+    vol.dim=double(dim(:)');
+
+    vol.xform='unknown';
+
+    % set feature dimensions
+    dim_labels={'i';'j';'k'};
+    n_dim_labels=numel(dim_labels);
+    fdim=struct();
+    fdim.labels=dim_labels;
+    fdim.values=arrayfun(@(x)1:x,vol.dim(:),'UniformOutput',false);
+
+    % copy over data from PyMPVA struct
+    ds=pymvpa_ds;
+
+    % ensure samples are double
+    if ~isa(ds.samples,'double')
+        ds.samples=double(ds.samples);
+    end
+
+    % remove PyMVPA volume-specific fields
+    ds.a=rmfield(ds.a,{'imgaffine','voxel_dim','voxel_eldim'});
+    if isfield(ds.a,'mapper')
+        ds.a=rmfield(ds.a,'mapper');
+    end
+
+    % set vol and fdim
+    ds.a.vol=vol;
+    ds.a.fdim=fdim;
+
+    % set voxel indices
+    ijk_base0=double(ds.fa.voxel_indices);
+    ijk_base1=ijk_base0+1;
+    for k=1:n_dim_labels
+        ds.fa.(dim_labels{k})=ijk_base1(k,:);
+    end
+    ds.fa=rmfield(ds.fa,'voxel_indices');
+
+    % set number of samples
+    nsamples=size(ds.samples,1);
+
+function ds=convert_pymvpa_ds_data(ds, volumes)
+    ds=convert_pymvpa_ds_header(ds, struct());
+    ds=slice_dataset_volumes(ds,volumes);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
