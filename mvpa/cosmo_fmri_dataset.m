@@ -1769,7 +1769,12 @@ function [ds, nsamples]=convert_pymvpa_ds_header(pymvpa_ds, params)
 
     % set volume information
     vol=struct();
-    vol.mat=pymvpa_ds.a.imgaffine;
+    mat_base0=pymvpa_ds.a.imgaffine;
+    offset=mat_base0(1:3,1:3)*ones(3,1);
+    mat_base1=mat_base0;
+    mat_base1(1:3,4)=mat_base1(1:3,4)-offset;
+
+    vol.mat=mat_base1;
 
     dim=pymvpa_ds.a.voxel_dim;
     vol.dim=double(dim(:)');

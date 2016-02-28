@@ -296,6 +296,8 @@ function ds=get_pymvpa_dataset()
 
     % set .a
     ds.a.imgaffine=ds.a.vol.mat;
+    ds.a.imgaffine(1:3,4)=ds.a.imgaffine(1:3,4)+...
+                        ds.a.imgaffine(1:3,1:3)*ones(3,1);
     ds.a.voxel_eldim=single([3 3]);
     ds.a.voxel_dim=int64(ds.a.vol.dim(:));
     ds.a=rmfield(ds.a,'vol');
