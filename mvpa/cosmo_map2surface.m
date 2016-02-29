@@ -160,6 +160,11 @@ function formats=get_formats()
     formats.gii.writer=@write_gifti;
     formats.gii.externals={'gifti'};
 
+    formats.pymvpa.exts={};
+    formats.pymvpa.builder=@build_pymvpa;
+    formats.pymvpa.writer=@write_pymvpa_struct;
+    formats.pymvpa.externals={};
+
 
 function [data, node_indices]=get_surface_data_and_node_indices(ds)
     [data, dim_labels, dim_values]=cosmo_unflatten(ds);
@@ -170,6 +175,22 @@ function [data, node_indices]=get_surface_data_and_node_indices(ds)
     node_indices=dim_values{1}(:)';
 
 
+function p=build_pymvpa(ds)
+    p=ds;
+
+    % remove samples field
+    p=rmfield(p,'samples');
+
+    [data, node_indices]=get_surface_data_and_node_indices(ds);
+    p.samples=data;
+
+    node_indices_base0=int64(node_indices-1);
+    p.fa.node_indices=node_indices_base0;
+    p.a=rmfield(p.a,'fdim');
+
+
+function write_pymvpa_struct(fn,m,opt)
+    save(fn,'-struct','m');
 
 
 function g=build_gifti(ds)

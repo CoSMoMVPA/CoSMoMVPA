@@ -95,31 +95,7 @@ function ds=cosmo_surface_dataset(fn, varargin)
 
     params = cosmo_structjoin(defaults, varargin);
 
-    if cosmo_check_dataset(fn,'surface',false)
-        ds=fn;
-    else
-        [data,node_indices,sa]=read(fn);
-        nfeatures=size(data,2);
-        if nfeatures~=numel(node_indices)
-            error(['The number of features (%d) does not match the number '...
-                    'of node indices (%d)'],nfeatures,numel(node_indices));
-        end
-
-        ds=struct();
-        ds.samples=data;
-
-        % set sample attributes
-        ds.sa=sa;
-
-        % set feature attributes
-        ds.fa.node_indices=1:nfeatures;
-
-        % set dataset attributes
-        fdim=struct();
-        fdim.labels={'node_indices'};
-        fdim.values={node_indices(:)'};
-        ds.a.fdim=fdim;
-    end
+    ds=get_dataset(fn);
 
      % set targets and chunks
     ds=set_vec_sa(ds,'targets',params.targets);
@@ -131,6 +107,53 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function ds=get_dataset(fn)
+    has_read_dataset=false;
+
+    ds=fn;
+    while true
+        if cosmo_check_dataset(ds,'surface',false)
+            return;
+        end
+
+        if ischar(ds) && isempty(cosmo_strsplit(ds,'.mat',-1))
+            ds=importdata(ds);
+            continue;
+        end
+
+        if has_read_dataset
+            raise_error=true;
+            cosmo_check_dataset(ds,'surface',raise_error);
+        end
+
+        ds=read_surface_dataset(ds);
+        has_read_dataset=true;
+    end
+
+function ds=read_surface_dataset(fn)
+    [data,node_indices,sa]=read(fn);
+    nfeatures=size(data,2);
+    if nfeatures~=numel(node_indices)
+        error(['The number of features (%d) does not match the number '...
+                'of node indices (%d)'],nfeatures,numel(node_indices));
+    end
+
+    ds=struct();
+    ds.samples=data;
+
+    % set sample attributes
+    ds.sa=sa;
+
+    % set feature attributes
+    ds.fa.node_indices=1:nfeatures;
+
+    % set dataset attributes
+    fdim=struct();
+    fdim.labels={'node_indices'};
+    fdim.values={node_indices(:)'};
+    ds.a.fdim=fdim;
+
+
 function ds=set_vec_sa(ds, label, values)
     if isempty(values)
         return;
@@ -186,7 +209,7 @@ function [data,node_indices,sa]=read(fn)
     if ischar(fn)
         error('Unsupported extension in filename %s', fn);
     else
-        error('Unsupported input');
+        error('Unsupported input of type %s', class(fn));
     end
 
 
@@ -217,6 +240,68 @@ function img_formats=get_img_formats()
     img_formats.gii.builder=@build_gii;
     img_formats.gii.externals={'gifti'};
 
+    img_formats.pymvpa.exts={};
+    img_formats.pymvpa.matcher=@isa_pymvpa;
+    img_formats.pymvpa.reader=@read_pymvpa;
+    img_formats.pymvpa.builder=@build_pymvpa;
+    img_formats.pymvpa.externals={};
+
+
+function b=isa_pymvpa(x)
+    b=isstruct(x) && ...
+            isfield(x,'samples') && ...
+            isfield(x,'fa') && ...
+            any(cosmo_isfield(x.fa, pymvpa_get_node_indices_fields()));
+
+function b=read_pymvpa(fn)
+    assert(false,'this function should not have been called');
+
+function [data,node_indices,sa]=build_pymvpa(s)
+    data=s.samples;
+    index_fields=pymvpa_get_node_indices_fields();
+    common_fields=intersect(index_fields,fieldnames(s.fa));
+
+    assert(~isempty(common_fields));
+    first_field=common_fields{1};
+    node_indice_base0=s.fa.(first_field);
+    node_indices=double(node_indice_base0)+1;
+
+    sa=struct();
+    if isfield(s,'sa')
+        sa=convert_struct_with_3d_string_array_to_cellstr(s.sa,1);
+    end
+
+
+function c=convert_3d_string_array_to_cellstr(arr,dim)
+    sz=size(arr);
+    assert(numel(sz)==3);
+    if dim==1
+        new_sz_idxs=[1 3];
+    else
+        new_sz_idxs=[2 3];
+    end
+
+    arr_2d=reshape(arr,sz(new_sz_idxs));
+    c=cellstr(arr_2d);
+
+    if dim==2
+        c=c';
+    end
+
+function s=convert_struct_with_3d_string_array_to_cellstr(s,dim)
+    % deal with scipy's character arrays that represent 2d cell strings
+    fns=fieldnames(s);
+    for k=1:numel(fns)
+        fn=fns{k};
+        value=s.(fn);
+        if ischar(value) && numel(size(value))==3
+            s.(fn)=convert_3d_string_array_to_cellstr(value,dim);
+        end
+    end
+
+
+function fields=pymvpa_get_node_indices_fields()
+    fields={'node_indices','center_ids'};
 
 function b=isa_gii(x)
     b=isa(x,'gifti') && isfield(x,'cdata');
