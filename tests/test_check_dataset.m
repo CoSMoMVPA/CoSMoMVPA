@@ -145,7 +145,11 @@ function test_check_dataset_exceptions()
     ds_c=rmfield(ds_c,'fa');
     aet(ds_c);
 
-
+    % missing .fdim for fmri dataset
+    ds_c=ds;
+    ds_c.a=rmfield(ds_c.a,'fdim');
+    aeq(false,ds_c,'fmri',false);
+    aet(ds_c,'fmri');
 
 
 

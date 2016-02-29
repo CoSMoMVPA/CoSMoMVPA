@@ -173,8 +173,11 @@ function msg=check_with_type(ds, ds_type)
             error('Unsupported ds_type=%s', ds_type);
     end
 
-    % check present of field
-    cosmo_isfield(ds, 'a.fdim', true);
+    % check present of .a.fdim field
+    if ~cosmo_isfield(ds, 'a.fdim', false);
+        msg='missing field .a.fdim';
+        return;
+    end
 
     m=cosmo_match(required_dim_labels,ds.a.fdim.labels);
     if any(~m)
