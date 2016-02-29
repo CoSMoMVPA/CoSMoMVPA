@@ -31,16 +31,19 @@ function props=format2props(format)
     f2p.gii.writer=@(fn,x)save(x,fn);
     f2p.gii.reader=@(fn)gifti(fn);
     f2p.gii.cleaner=@do_nothing;
+    f2p.gii.isa=@(x)isa(x,'gifti');
 
     f2p.bv_smp.ext='.smp';
     f2p.bv_smp.writer=@(fn,x)x.SaveAs(fn);
     f2p.bv_smp.reader=@read_bv_and_bless;
     f2p.bv_smp.cleaner=@(x)x.ClearObject();
+    f2p.bv_smp.isa=@(x)isa(x,'xff');
 
     f2p.niml_dset.ext='.niml.dset';
     f2p.niml_dset.writer=@(fn,x)afni_niml_writesimple(x,fn);
     f2p.niml_dset.reader=@(fn)afni_niml_readsimple(fn);
     f2p.niml_dset.cleaner=@do_nothing;
+    f2p.niml_dset.isa=@(x)isstruct(x) && isfield(x,'node_indices');
 
     props=f2p.(format);
 
@@ -50,7 +53,6 @@ function x=read_bv_and_bless(fn)
 
 function x=do_nothing(x)
     % do nothing
-
 
 function save_and_load(format)
     ds=cosmo_synthetic_dataset('type','surface','nchunks',1);
@@ -94,6 +96,7 @@ function save_and_load(format)
 
     assert_dataset_equal(ds,ds3,format);
 
+    % extra format-specific tests
     switch format
         case 'gii'
             o3=gifti(struct('cdata',o2.cdata));
@@ -107,6 +110,14 @@ function save_and_load(format)
             assert_dataset_equal(ds3,ds4,format);
     end
 
+    % use format explicitly
+    o4=cosmo_map2surface(ds,'','format',format);
+    assert_isa_func=props.isa;
+    assert_isa_func(o4);
+    ds4=cosmo_surface_dataset(o4);
+    assert_dataset_equal(ds,ds4,format);
+
+    % test with dataset attributes
     targets=[3 4];
     chunks=5;
     ds4=cosmo_surface_dataset(ds,'targets',targets,'chunks',chunks);
@@ -179,6 +190,7 @@ function assert_dataset_equal(x,y,format)
     if ~strcmp(format,'gii')
         assertEqual(x.sa,z.sa);
     end
+
 
 
 

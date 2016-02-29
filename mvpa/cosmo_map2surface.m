@@ -28,6 +28,9 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %                                'GZipBase64Binary'
 %                       The encoding argument is ignored for BrainVoyager
 %                       output.
+%  'format', f          Optional format to be used for output, if the
+%                       output argument empty; one of 'niml_dset', 'bv_smp'
+%                       or 'gii'.
 %
 % Output:
 %   s                   Structure containing the surface based data based
@@ -95,7 +98,9 @@ function s=cosmo_map2surface(ds, fn, varargin)
     sp=cosmo_strsplit(fn,'-');
     save_to_file=~isempty(sp{1});
 
-    if save_to_file
+    if isfield(opt,'format')
+        fmt=opt.format;
+    elseif save_to_file
         fmt=get_format(formats, fn);
     else
         if numel(sp)~=2
