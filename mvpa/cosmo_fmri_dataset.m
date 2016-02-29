@@ -1756,7 +1756,7 @@ function ds=convert_ft_source_data(ds_meeg, volumes)
 % PyMVPA fMRI  datasset
 
 function tf=isa_pymvpa_fmri(ds)
-    tf=cosmo_check_dataset(ds) && ...
+    tf=isstruct(ds) && isfield(ds,'samples') && ...
             all(cosmo_isfield(ds,{'a.imgaffine',...
                                     'a.voxel_dim',...
                                     'a.voxel_eldim',...
@@ -1764,6 +1764,7 @@ function tf=isa_pymvpa_fmri(ds)
 
 function ds=read_pymvpa_ds_header(ds)
     ds=get_and_check_data(ds, [], @isa_pymvpa_fmri);
+
 
 function [ds, nsamples]=convert_pymvpa_ds_header(pymvpa_ds, params)
 
@@ -1814,6 +1815,12 @@ function [ds, nsamples]=convert_pymvpa_ds_header(pymvpa_ds, params)
     end
     ds.fa=rmfield(ds.fa,'voxel_indices');
 
+    % deal with scipy's 3d character arrays
+    ds.fa=convert_struct_with_3d_string_array_to_cellstr(ds.fa,2);
+    if isfield(ds,'sa')
+        ds.sa=convert_struct_with_3d_string_array_to_cellstr(ds.sa,1);
+    end
+
     % set number of samples
     nsamples=size(ds.samples,1);
 
@@ -1821,6 +1828,33 @@ function ds=convert_pymvpa_ds_data(ds, volumes)
     ds=convert_pymvpa_ds_header(ds, struct());
     ds=slice_dataset_volumes(ds,volumes);
 
+
+function c=convert_3d_string_array_to_cellstr(arr,dim)
+    sz=size(arr);
+    assert(numel(sz)==3);
+    if dim==1
+        new_sz_idxs=[1 3];
+    else
+        new_sz_idxs=[2 3];
+    end
+
+    arr_2d=reshape(arr,sz(new_sz_idxs));
+    c=cellstr(arr_2d);
+
+    if dim==2
+        c=c';
+    end
+
+function s=convert_struct_with_3d_string_array_to_cellstr(s,dim)
+    % deal with scipy's character arrays that represent 2d cell strings
+    fns=fieldnames(s);
+    for k=1:numel(fns)
+        fn=fns{k};
+        value=s.(fn);
+        if ischar(value) && numel(size(value))==3
+            s.(fn)=convert_3d_string_array_to_cellstr(value,dim);
+        end
+    end
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % CoSMoMVPA datasset

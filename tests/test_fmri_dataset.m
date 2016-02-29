@@ -247,6 +247,22 @@ function test_pymvpa_fmri_dataset()
     assert_dataset_equal(ds, get_expected_dataset(), 'translation');
 
 
+function test_pymvpa_3d_string_array()
+    py_ds=get_pymvpa_dataset();
+
+    sa_labels={'foo';'bar'};
+    sa_labels_3d=reshape(strvcat(sa_labels),[2 1 3]);
+    py_ds.sa.labels=sa_labels_3d;
+
+    fa_labels={'foox','barx','foobazx','1','2','3'};
+    fa_labels_3d=reshape(strvcat(fa_labels),[1 6 7]);
+    py_ds.fa.labels=fa_labels_3d;
+
+    ds=cosmo_fmri_dataset(py_ds);
+    assertEqual(ds.sa.labels,sa_labels);
+    assertEqual(ds.fa.labels,fa_labels);
+
+
 function test_meeg_source_fmri_dataset()
     ds=cosmo_synthetic_dataset('type','source');
     res=cosmo_fmri_dataset(ds);
