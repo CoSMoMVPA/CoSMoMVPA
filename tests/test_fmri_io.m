@@ -57,6 +57,24 @@ function test_fmri_io_bv_msk()
 function test_fmri_io_mat()
     save_and_load_dataset_with_extension('.mat');
 
+function test_fmri_io_mat_struct()
+    ds=cosmo_synthetic_dataset('type','fmri');
+
+    fn=cosmo_make_temp_filename('fn1','.mat');
+    cleaner=onCleanup(@()delete_files({fn}));
+
+    % save as struct
+    save(fn,'-struct','ds');
+    x=cosmo_fmri_dataset(fn);
+    assertEqual(x,ds);
+
+    % save as variable
+    save(fn,'ds');
+    x=cosmo_fmri_dataset(fn);
+    assertEqual(x,ds);
+
+
+
 
 function test_fmri_io_bv_vmp_oblique()
     if cosmo_skip_test_if_no_external('neuroelf')

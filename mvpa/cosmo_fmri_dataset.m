@@ -574,11 +574,15 @@ function volumes_cell=partition_volumes(n_volumes_total, n_voxels, ...
 function result=fast_import_data(fn)
     x=load(fn);
     keys=fieldnames(x);
-    if numel(keys)~=1
+    if isfield(x,'samples') && isnumeric(x.samples)
+        result=x;
+    elseif numel(keys)==1
+        result=x.(keys{1});
+    else
         error('Cannot load .mat file %s with multiple variables: %s',...
                 fn, cosmo_strjoin(keys,', '));
     end
-    result=x.(keys{1});
+
 
 
 function ds=set_sa_vec(ds,p,fieldname)
