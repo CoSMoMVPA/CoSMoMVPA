@@ -17,12 +17,15 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 %                   .mat:con                        SPM contrast
 %                   .mat:spm                        SPM stats
 %                   .mat                            Matlab file with
-%                                                   CoSMoMVPA dataset
+%                                                   CoSMoMVPA or PyMVPA
+%                                                   dataset.
 %                * xff structure (from neuroelf's xff)
 %                * nifti structure (from load_untouch_nii)
 %                * FieldTrip source MEEG structure
 %                * SPM structure
 %                * CoSMoMVPA fMRI or MEEG source dataset structure
+%                * PyMVPA fMRI dataset structure (exported using PyMVPA's
+%                  cosmo.map2cosmo function)
 %   'mask', m    Any input as for filename (in which case the output must
 %                contain a single volume), or one of:
 %                   '-all'     exclude features where all values are
@@ -160,6 +163,14 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 %
 %     % load contrast statistic values from SPM GLM file SPM.mat
 %     ds=cosmo_fmri_dataset('path/to/SPM.mat:spm');
+%
+%     % load PyMVPA dataset 'pymvpa_ds' that was exported using
+%     % PyMVPA's cosmo.map2cosmo function in Python with:
+%     %
+%     %    >>> from mvpa2.datasets import cosmo
+%     %    >>> cosmo.map2cosmo(pymvpa_ds,'data.mat')
+%     %
+%     cosmo_ds=cosmo_fmri_dataset('data.mat')
 %
 % See also: cosmo_map2fmri
 %
