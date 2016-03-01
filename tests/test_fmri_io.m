@@ -66,12 +66,12 @@ function test_fmri_io_mat_struct()
     % save as struct
     save(fn,'-struct','ds');
     x=cosmo_fmri_dataset(fn);
-    assertEqual(x,ds);
+    assert_dataset_equal(x,ds,'.mat');
 
     % save as variable
     save(fn,'ds');
     x=cosmo_fmri_dataset(fn);
-    assertEqual(x,ds);
+    assert_dataset_equal(x,ds,'.mat');
 
 
 
