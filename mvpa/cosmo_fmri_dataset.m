@@ -120,32 +120,32 @@ function ds=cosmo_fmri_dataset(filename, varargin)
 %
 % Examples:
 %     % load nifti file
-%     ds=fmri_dataset('mydata.nii');
+%     ds=cosmo_fmri_dataset('mydata.nii');
 %
 %     % load gzipped nifti file
-%     ds=fmri_dataset('mydata.nii.gz');
+%     ds=cosmo_fmri_dataset('mydata.nii.gz');
 %
 %     % load ANALYZE file and apply brain mask
-%     ds=fmri_dataset('mydata.hdr','mask','brain_mask.hdr');
+%     ds=cosmo_fmri_dataset('mydata.hdr','mask','brain_mask.hdr');
 %
 %     % load AFNI file with 6 'bricks' (values per voxel, e.g. beta
 %     % values); set chunks (e.g. runs) and targets (experimental
 %     % conditions); use a mask
-%     ds=fmri_dataset('mydata+tlrc', 'chunks', [1 1 1 2 2 2]', ...
+%     ds=cosmo_fmri_dataset('mydata+tlrc', 'chunks', [1 1 1 2 2 2]', ...
 %                                     'targets', [1 2 3 1 2 3]', ...
 %                                     'mask', 'masks/brain_mask+tlrc);
 %
 %     % load BrainVoyager VMR file in directory 'mydata', and apply an
 %     % automask that removes all features (voxels) that are zero or
 %     % non-finite for all samples
-%     ds=fmri_dataset('mydata/mydata.vmr', 'mask', true);
+%     ds=cosmo_fmri_dataset('mydata/mydata.vmr', 'mask', true);
 %
 %     % load two datasets, one for odd runs, the other for even runs, and
 %     % combine them into one dataset. Note that the chunks are set here,
 %     % but the targets are not - for subsequent analyses this may have to
 %     % be done manually
-%     ds_even=fmri_dataset('data_even_runs.glm','chunks',1);
-%     ds_odd=fmri_dataset('data_odd_runs.glm','chunks',2);
+%     ds_even=cosmo_fmri_dataset('data_even_runs.glm','chunks',1);
+%     ds_odd=cosmo_fmri_dataset('data_odd_runs.glm','chunks',2);
 %     ds=cosmo_stack({ds_even,ds_odd});
 %
 %     % load beta values from SPM GLM analysis stored
