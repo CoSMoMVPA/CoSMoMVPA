@@ -24,6 +24,9 @@ function test_surface_dataset_bv_smp()
     end
     save_and_load('bv_smp');
 
+function test_surface_dataset_pymvpa()
+    save_and_load('pymvpa');
+
 
 function props=format2props(format)
     f2p=struct();
@@ -45,6 +48,16 @@ function props=format2props(format)
     f2p.niml_dset.cleaner=@do_nothing;
     f2p.niml_dset.isa=@(x)isstruct(x) && isfield(x,'node_indices');
 
+    f2p.pymvpa.ext='.mat';
+    f2p.pymvpa.writer=@write_mat_struct;
+    f2p.pymvpa.reader=@import_struct_data_with_error_if_illegal;
+    f2p.pymvpa.cleaner=@do_nothing;
+    f2p.pymvpa.map2surface=@(x,fn)write_mat_struct(fn,...
+                                cosmo_map2surface(x,'','format','pymvpa'));
+    f2p.pymvpa.isa=@(x)isstruct(x) && ...
+                    cosmo_isfield(x,{'samples'}) && ...
+                    ~cosmo_isfield(x,'a.fdim');
+
     props=f2p.(format);
 
 function x=read_bv_and_bless(fn)
@@ -53,6 +66,16 @@ function x=read_bv_and_bless(fn)
 
 function x=do_nothing(x)
     % do nothing
+
+function write_mat_struct(fn,s)
+    save(fn,'-struct','s');
+
+function s=import_struct_data_with_error_if_illegal(fn)
+    try
+        s=load(fn);
+    catch
+        error('Unable to read %s',fn);
+    end
 
 function save_and_load(format)
     ds=cosmo_synthetic_dataset('type','surface','nchunks',1);
@@ -75,7 +98,12 @@ function save_and_load(format)
 
     cleaner=onCleanup(@()delete(tmp_fn2));
 
-    cosmo_map2surface(ds,tmp_fn2);
+    if isfield(props,'map2surface')
+        mapper=props.map2surface;
+    else
+        mapper=@cosmo_map2surface;
+    end
+    mapper(ds,tmp_fn2);
     ds2=cosmo_surface_dataset(tmp_fn2);
 
     assert_dataset_equal(ds,ds2,format);
@@ -136,6 +164,7 @@ function save_and_load(format)
         case 'bv_smp'
             exception_io_failed='xff:XFFioFailed';
             exception_bad_content='xff:BadFileContent';
+
         otherwise
             exception_io_failed='';
             exception_bad_content='';
@@ -165,6 +194,20 @@ function test_surface_io_exceptions()
     aet_out(ds,'-foo');
     aet_out(ds,struct());
     aet_out(ds,{});
+
+
+function test_pymvpa_3d_string_array()
+    py_ds=struct();
+    py_ds.samples=rand(3,4);
+    py_ds.fa.node_indices=[0,3,4,6];
+
+    sa_labels={'foo';'bar';'foobaz'};
+    sa_labels_3d=reshape(strvcat(sa_labels),[3 1 6]);
+    py_ds.sa.labels=sa_labels_3d;
+
+    ds=cosmo_surface_dataset(py_ds);
+    assertEqual(ds.sa.labels,sa_labels);
+
 
 
 function rp=nonid_randperm(n)
