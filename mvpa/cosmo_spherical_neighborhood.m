@@ -150,10 +150,11 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
     [sphere_offsets, distances]=get_sphere_offsets(radius);
 
     % get mapping from linear ids to feature ids
-    lin2feature_ids=get_lin2feature_ids(grid_dim,pos,feature_mask);
+    [lin2feature_ids,lin2feature_mask]=get_lin2feature_ids(grid_dim,pos...
+                                        ,feature_mask);
 
     % number of features associated with each linear id
-    feature_id_count=cellfun(@numel,lin2feature_ids);
+    feature_id_count=sum(lin2feature_mask,2);
 
     show_progress=opt.progress>0;
 
@@ -213,9 +214,11 @@ function nbrhood=cosmo_spherical_neighborhood(ds, varargin)
                                             around_pos(:,3));
 
                 % convert linear to feature ids
-
-
-                feature_ids=[lin2feature_ids{around_lin}];
+                % (transpose is necessary so that when applying the
+                %  mask, the indices remain sorted by distance)
+                around_ids_mat=lin2feature_ids(around_lin,:)';
+                around_ids_mask=lin2feature_mask(around_lin,:)';
+                feature_ids=around_ids_mat(around_ids_mask);
 
                 if use_fixed_radius
                     break; % we're done selecting voxels
@@ -352,8 +355,8 @@ function feature_distances=get_distances(center_distances,feature_id_count)
     feature_distances=ds(~isnan(ds));
 
 
-function lin2feature_ids=get_lin2feature_ids(grid_dim, ...
-                                            all_pos,center_mask)
+function [lin2feature_ids,lin2feature_mask]=get_lin2feature_ids(...
+                                            grid_dim,all_pos,center_mask)
     % returns a function that maps linear ids to feature ids
     % the function takes as input linear ids and the distance for each
     % linear id, and returns the feature ids and their corresponding
@@ -369,12 +372,30 @@ function lin2feature_ids=get_lin2feature_ids(grid_dim, ...
     mask2full=find(center_mask);
     % lin2feature_ids{k}={i1,...,iN} means that the linear voxel index k
     % corresponds to features i1,...iN
-    lin2feature_ids=cell(orig_nvoxels,1);
+    lin2feature_ids_cell=cell(orig_nvoxels,1);
     for k=1:numel(unq_lin_ids)
         lin_id=unq_lin_ids(k);
         idx=idxs{k}(:)';
-        lin2feature_ids{lin_id}=mask2full(idx);
+        lin2feature_ids_cell{lin_id}=mask2full(idx);
     end
+
+    n_max=max(cellfun(@numel,lin2feature_ids_cell));
+
+    lin2feature_ids=zeros(orig_nvoxels, n_max);
+    lin2feature_mask=false(orig_nvoxels,n_max);
+
+    for k=1:numel(unq_lin_ids)
+        lin_id=unq_lin_ids(k);
+        indices=lin2feature_ids_cell{lin_id};
+
+        cols=1:numel(indices);
+        lin2feature_ids(lin_id,cols)=indices;
+        lin2feature_mask(lin_id,cols)=true;
+    end
+
+
+
+
 
 
 function feature_mask=get_features_mask(ds)
