@@ -19,6 +19,22 @@ Before loading any data, please make sure that you:
      - have set paths properly in ``.cosmomvpa.cfg`` (described :ref:`here <set_cosmovmpa_cfg>`)
      - have :ref:`tested <test_local_setup>` that you can load and save data from and to the paths in ``.cosmomvpa.cfg``.
 
+
+Very first exercise
+-------------------
+We will start with a more complicated analysis first without explaining too much of the rationale now; that is left for later.
+
+In this first exercise, you only have to add one line of code. To do this exercise, open the file linked to by Hint - this is a code *skeleton* because it has code left out. Make a new file in the Matlab / GNU Octave editor, paste the file contents, and the fill in the missing code.
+Run the code and a nifti file will be generated. You can visualize this using mricron_ or other fMRI data viewers.
+
+Hint: :ref:`run_fmri_correlation_searchlight_trivial_skl`
+
+Solution: :ref:`run_fmri_correlation_searchlight_trivial_skl` / :pb:`run_fmri_correlation_searchlight_trivial_skl`
+
+
+
+
+
 Load and view anatomical dataset
 --------------------------------
 Before starting this exercise, please make sure you have read about:
