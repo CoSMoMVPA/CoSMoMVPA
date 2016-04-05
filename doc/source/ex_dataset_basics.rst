@@ -39,7 +39,7 @@ Advanced exercise: set all voxels around a center voxel at ``i=150,j=100,k=50`` 
 
 Hint: :ref:`run_anatomical_dataset_basics_skl`
 
-Solution: :ref:`run_anatomical_dataset_basics` / :pb:`run_anatomical_dataset_basics_`
+Solution: :ref:`run_anatomical_dataset_basics` / :pb:`run_anatomical_dataset_basics`
 
 
 Loading datasets with a mask

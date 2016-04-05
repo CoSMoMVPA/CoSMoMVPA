@@ -102,9 +102,9 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Get the tutorial data:
 
-    Download the `tutorial data <http://cosmomvpa.org/datadb.zip>`_ zip archive, and unzip it.
+    Download the `tutorial data datadb.zip>`_ zip archive, and unzip it.
 
-    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <http://cosmomvpa.org/datadb-ak6.zip>`_
+    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6.zip>`_
 
     You can move the directory to another location on your file system, if desired.
 

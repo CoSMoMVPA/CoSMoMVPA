@@ -9,11 +9,11 @@
 
         * In that case, use :ref:`cosmo_set_path` to set the path.
 
-- CoSMOMVPA tutorial data in `zip format <http://cosmomvpa.org/datadb.zip>`_.
+- CoSMOMVPA tutorial data in `zip format <datadb.zip>`_.
 
-        * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <http://cosmomvpa.org/datadb-ak6.zip>`_
+        * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <datadb-ak6.zip>`_
 
-- CoSMOMVPA documentation in HTML format (for off-line viewing) is available in `zip <http://cosmomvpa.org/_static/CoSMoMVPA_documentation_html.zip>`_ and `gzipped tar archive <http://cosmomvpa.org/_static/CoSMoMVPA_documentation_html.tar.gz>`_.
+- CoSMOMVPA documentation in HTML format (for off-line viewing) is available in `zip <_static/CoSMoMVPA_documentation_html.zip>`_ and `gzipped tar archive <_static/CoSMoMVPA_documentation_html.tar.gz>`_.
 
 
 
