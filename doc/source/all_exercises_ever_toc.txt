@@ -1,0 +1,10 @@
+History of exercises:
+
+- 2016  :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.
+- 2016  :ref:`Royal Holloway University of London CoSMoMVPA workshop <rhul2016>`.
+- 2014  :ref:`CIMeC 2014 Advanced Neural Decoding <cimec2014>`.
+- 2013  :ref:`2013 Summer School in Computational Sensory-Motor Neuroscience <cosmo2013>`.
+
+
+
+

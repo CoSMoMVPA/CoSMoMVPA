@@ -16,7 +16,7 @@ Overview
    contents_demo
    get_started
    download
-   cimec2014
+   cimec2016
    faq
    contact
    contribute
@@ -33,7 +33,7 @@ Detailed
    contents_demo
    get_started
    download
-   cimec2014
+   cimec2016
    faq
    contact
    contribute
@@ -49,6 +49,8 @@ Full documentation
    download
    cosmo2013
    cimec2014
+   rhul2016
+   cimec2016
    faq
    contact
    contribute

@@ -6,14 +6,11 @@
 Royal Holloway University of London CoSMoMVPA workshop
 ======================================================
 
-*to be presented by Nick Oosterhof, supported by Raffaele Tucciarelli and Giacomo Ariani*.
+*presented by Nick Oosterhof, supported by Raffaele Tucciarelli and Giacomo Ariani*, Feburary 2016.
 
 hosted by Angelika Lingnau
 
-Earlier presentations:
-
-- 2014  :ref:`CIMeC 2014 Advanced Neural Decoding <cimec2014>`.
-- 2013  (`CoSMo 2013 workshop`_), :ref:`earlier versions of some exercises <cosmo2013>` were presented at the *2013 Summer School in Computational Sensory-Motor Neuroscience*
+.. include:: all_exercises_ever_toc.txt
 
 Contents
 --------
