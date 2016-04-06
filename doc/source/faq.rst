@@ -18,7 +18,7 @@ How should I cite CoSMoMVPA?
 ----------------------------
 We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:
 
-    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, doi:10.1101/047118.
+    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, :doi:`10.1101/047118`.
 
 BiBTeX record::
 

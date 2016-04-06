@@ -286,7 +286,8 @@ texinfo_documents = [
 extlinks = { 'pb': ('_static/publish/run_%s.html', 'Matlab output: run_'),
               'run_up': ('../_static/publish/%s.html', 'Matlab output: '),
                'demo_up': ('../_static/publish/%s.html', 'Matlab output: '),
-             'demo': ('_static/publish/%s.html', 'Matlab output: ')}
+             'demo': ('_static/publish/%s.html', 'Matlab output: '),
+             'doi': ('http://dx.doi.org/%s','doi:')}
 
 # make links available everywhere
 rst_epilog='\n\n.. include: links.txt\n\n'
