@@ -92,18 +92,16 @@ This dataset is used for assignments which will count towards the student's grad
 
 Links
 -----
-Official website: http://cosmomvpa.org
+Official website: http://cosmomvpa.org. This is the up-to-date authoritative source.
 
-Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/
-
+Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/. This website may be out of date, but should be used for downloading example data.
 
 Assignments
 +++++++++++
 
-In the first four weeks we plan one assignment per week. Each assignment will involve MVPA using CoSMoMVPA.
-More details about assignments will be added here soon.
+In the first four weeks we plan one assignment per week. In addition, one assignment after classes have ended *may* be added. Each assignment will involve MVPA using CoSMoMVPA. More details about assignments will be added here soon.
 
-Note: you can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be on your own. PyMVPA is not part of the course.
+Note: you can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
 Using PyMVPA for the MEEG exercises is currently not possible.
 
 Tentative schedule
