@@ -14,6 +14,22 @@ Frequently Asked/Anticipated Questions
 General
 =======
 
+How should I cite CoSMoMVPA?
+----------------------------
+We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:
+
+    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, doi:10.1101/047118.
+
+BiBTeX record::
+
+    @article{OCH16,
+    author = {Oosterhof, Nikolaas N and Connolly, Andrew C and Haxby, James V},
+    title = {{CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave}},
+    journal = {biorxiv.org},
+    doi = {10.1101/047118},
+    year = {2016}
+    }
+
 
 What is the history of CoSMoMVPA?
 ---------------------------------
@@ -92,14 +108,6 @@ Does it run on GNU Octave?
         - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
 
 
-
-How should I cite CoSMoMVPA?
-----------------------------
-We're in the process of preparing a manuscript. In the meantime, please use:
-
-    Oosterhof, N.N., Connolly, A.C, & Haxby, J.V. (in preparation). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Toolbox available from http://cosmomvpa.org.
-
-(We hope to publish a paper soon, and will announce this on the mailinglist when that happens).
 
 How fast does it run?
 -----------------------
