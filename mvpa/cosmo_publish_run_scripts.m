@@ -240,9 +240,11 @@ function [srcfn_cell,opt]=process_input(varargin)
     srcfn_cell=get_srcfn_cell(srcpat);
 
 function srcfn_cell=get_srcfn_cell(srcpat)
+    default_pattern={'run_*','demo_*'};
+
     if isdir(srcpat)
         p=srcpat;
-        nms={'run_*','demo_*'};
+        nms=default_pattern;
         e='.m';
     else
         [p,nm,e]=fileparts(srcpat);
@@ -251,14 +253,14 @@ function srcfn_cell=get_srcfn_cell(srcpat)
         end
 
         if isempty(nm)
-            nm='*';
+            nms=default_pattern;
+        else
+            nms={nm};
         end
 
         if isempty(e)
             e='.m';
         end
-
-        nms={nm};
     end
 
     ds=cellfun(@(nm)dir(fullfile(p,[nm e])),nms,'UniformOutput',false);
