@@ -6,6 +6,13 @@
 Dataset basics
 ==============
 
+Reading material
+----------------
+
+- :cite:`OCH16` - CoSMoMVPA manuscript
+- :cite:`HHS+09a` - PyMVPA manuscript, which inspired CoSMoMVPA data structures
+- :cite:`NPD+06` - an early MVPA review paper
+
 
 fMRI dataset basics
 +++++++++++++++++++
