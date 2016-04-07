@@ -1,6 +1,10 @@
 %% Demo: fMRI searchlights with split-half correlation
-% 
+%
 % This is a trivial exercise as it only requires adding one line of code
+%
+% The output is a searchlight map showing where in the brain
+% the neural patterns show category discrimination across
+% six categories.
 %
 % The data used here is available from http://cosmomvpa.org/datadb.zip
 %
@@ -71,7 +75,7 @@ cosmo_disp(ds_odd_even);
 % non-matching conditions (a la Haxby 2001).
 measure=@cosmo_correlation_measure;
 
-% define spherical neighborhood with radius of 3 voxels. To do so, 
+% define spherical neighborhood with radius of 3 voxels. To do so,
 % assign the value 3 to a variable named 'radius'
 %
 % This part is the only exercise. Because it is the first exercise, it is
