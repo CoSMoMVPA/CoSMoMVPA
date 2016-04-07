@@ -5,6 +5,3 @@ History of exercises:
 - 2014  :ref:`CIMeC 2014 Advanced Neural Decoding <cimec2014>`.
 - 2013  :ref:`2013 Summer School in Computational Sensory-Motor Neuroscience <cosmo2013>`.
 
-
-
-
