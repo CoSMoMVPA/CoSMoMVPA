@@ -14,6 +14,8 @@ Frequently Asked/Anticipated Questions
 General
 =======
 
+.. how_to_cite::
+
 How should I cite CoSMoMVPA?
 ----------------------------
 We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:

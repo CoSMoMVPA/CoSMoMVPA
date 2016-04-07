@@ -118,7 +118,7 @@ We  6 Apr 09:00-10:45 General intro: Get your computer ready to run CoSMoMVPA an
 --------- ----------- ---------------------------------------------------------------------------------------------------
 Th  7 Apr 14:00-15:45 Practical exercises: Basic dataset operations
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr  8 Apr 14:00-15:45 Practical exercises: Correlation analysis
+Fr  8 Apr 14:00-15:45 Practical exercises: Basic dataset operations, correlation analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 13 Apr 09:00-10:45 Practical exercises: Basic classification analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------

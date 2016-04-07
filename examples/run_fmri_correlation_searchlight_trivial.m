@@ -88,7 +88,7 @@ measure=@cosmo_correlation_measure;
 % >@@>
 radius=3; % voxels
 % <@@<
-nbrhood=cosmo_spherical_neighborhood(ds_odd_even,'radius',3);
+nbrhood=cosmo_spherical_neighborhood(ds_odd_even,'radius',radius);
 
 % Run the searchlight with a 3 voxel radius
 corr_results=cosmo_searchlight(ds_odd_even,nbrhood,measure);
