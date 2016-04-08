@@ -151,7 +151,7 @@ You should write your own code and comments. It is acceptable to use code from t
 
 Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof, and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
 
-Exercise 1 - deadline 23:59, 17 April 2016
+Exercise 1 - deadline 23:59, 19 April 2016
 ------------------------------------------
 Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
