@@ -14,7 +14,7 @@ Frequently Asked/Anticipated Questions
 General
 =======
 
-.. how_to_cite::
+.. _how_to_cite:
 
 How should I cite CoSMoMVPA?
 ----------------------------

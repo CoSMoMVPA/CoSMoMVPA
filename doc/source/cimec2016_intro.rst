@@ -46,6 +46,8 @@ AK6 dataset
 -----------
 This dataset is used for exercises shown on the website (with answers), and you can use it to learn MVPA. It contains preprocessed data for 8 subjects from :cite:`CGG+12`. In this experiment, participants were presented with categories of six animals: 2 primates: monkeys and lemurs; 2 birds: mallard ducks and yellow-throated warblers; and 2 bugs: ladybugs and luna moths.
 
+Download link: `tutorial data with AK6 data only <datadb-ak6.zip>`_
+
 .. image:: _static/fmri_design.png
     :width: 400px
 
@@ -88,7 +90,12 @@ This data is stored in the ``models`` directory::
 
 Haxby2001 dataset
 -----------------
-This dataset is used for assignments which will count towards the student's grade for the course. More information will be added soon.
+This dataset is used for assignments which will count towards the student's grade for the course.
+
+It contains data from five participants in the original study by Haxby et al [; for details see the README file.
+
+Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.1.zip>`_
+
 
 Links
 -----
@@ -101,8 +108,60 @@ Assignments
 
 In the first four weeks we plan one assignment per week. In addition, one assignment after classes have ended *may* be added. Each assignment will involve MVPA using CoSMoMVPA. More details about assignments will be added here soon.
 
-Note: you can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
-Using PyMVPA for the MEEG exercises is currently not possible.
+Notes:
+- You can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
+- Using PyMVPA for the MEEG exercises is currently rather challening, as there is little support for MEEG in PyMVPA.
+
+Preparation
+-----------
+- Download the Haxby2001 GLM dataset and store it at a location of your preference
+- Update your ``.cosmomvpa.cfg`` file, so that it contains a new line with a ``haxby2001_data_path`` key; for example the contents could be as follows:
+
+        .. code-block:: none
+
+            tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
+            output_data_path=/Users/karen/tmp/CoSMoMVPA_output
+            haxby2001_data_path=/Users/karen/datasets/CoSMoMVPA/haxby2001-glm-v0.1
+
+
+Format
+------
+
+Please write a matlab ``.m`` file that can be executed. Use the following as a template for the beginning of the file:
+
+    .. code-block:: matlab
+
+        % CIMEC 2016 hands-on method class
+        % Assignment 1
+        %
+        % Name:           karen
+        % Student number: 654321
+        % Email address:  karen@studenti.unitn.it
+        % Date:           08 Apr 2016
+
+        config=cosmo_config();
+        data_path=config.haxby2001_data_path;
+
+
+so that your solution can be run on other computers where the data is stored in a different directory.
+
+Your solution will be rated not only on correctness and completeness of the implementation, but also on readibility and understandibility. Please indent your code, add comments where necessary, and use reasonable variable names. For details, see `code_development`_.
+
+You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but please indicate (through comments in the code) if and where you have used code from elsewhere. It is also acceptable to discuss the problem with your fellow students. It is not acceptable to copy code from your fellow students.
+
+Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof, and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
+
+Exercise 1 - deadline 23:59, 17 April 2016
+------------------------------------------
+Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+
+- single subject pattern similarity visualization. Load GLM data from subject ``s01`` from two thirds of the data, ``glm_t1_8cond-tstat.nii`` and ``glm_t2_8cond-tstat.nii``. Use the ``vt`` mask and load the data for eight conditions from these two halves. Now compute all ``8 * 8 = 64`` pair-wise correlations of the patterns across the first and second half. Quantify the presence of reliable patterns through a *split-half information score* that discriminates between conditiosn by computing the average on-diagonal values minus the average of the off-diagonal values in the correlation matrix. Visualize the correlations using ``imagesc``. (Note: since the single subject results are not very strong, do not worry if the matrix does not show clearly higher values on the diagonal than off the diagonal)
+
+- single subject significance testing. Using the data loaded for subject ``s01`` as described above, estimate how significant the *split-half correlation score* is different from zero. Generate a null dataset by reshuffling the labels in one half of the data, and then compute the *split-half correlation score* for this null dataset. Repeat this process 1000 times to get 1000 split-half null data correlation scores. Finally, compute the significance of the original split-half correlation score by dividing the number of times the original split-half correlation score is less than the null-data correlation scores. Show a histogram with the 1000 null data correlation scores, and a vertical line showing the correlation score in the original data.
+
+- group analysis. Load the same data as in the single subject analysis, but now for each of the five participants. Do a group analysis in areas ``vt`` and ``ev`` using a one-sample t-test to estimate how reliable the split-half correlation score is different from zero across the five participants.
+
+
 
 Tentative schedule
 ++++++++++++++++++
@@ -118,7 +177,7 @@ We  6 Apr 09:00-10:45 General intro: Get your computer ready to run CoSMoMVPA an
 --------- ----------- ---------------------------------------------------------------------------------------------------
 Th  7 Apr 14:00-15:45 Practical exercises: Basic dataset operations
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr  8 Apr 14:00-15:45 Practical exercises: Basic dataset operations, correlation analysis
+Fr  8 Apr 14:00-15:45 Practical exercises: Basic dataset operations, split-half correlation analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 13 Apr 09:00-10:45 Practical exercises: Basic classification analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
