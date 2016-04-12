@@ -6,6 +6,13 @@
 Split-half correlation-based MVPA with group analysis
 =====================================================
 
+Reading material
+----------------
+
+- :cite:`HGF+01`: first MVPA correlation paper showing evidence for distributed object category representations in ventral temporal cortex.
+- :cite:`PWD06`: illustration of correlation approach to dissociate spatially overlappig but distinct neural populations.
+
+
 Background
 ++++++++++
 This exercise the most simple and most popular type of MVPA, that was first reported in :cite:`HGF+01`.

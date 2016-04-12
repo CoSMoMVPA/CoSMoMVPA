@@ -6,10 +6,16 @@
 Classification analysis
 =======================
 
+Reading material
+++++++++++++++++
+
+- :cite:`CoS03`: First use of a classifier on fMRI data.
+- :cite:`MBK09`: Classification introduction and overview.
+
 Background
 ++++++++++
 
-This exercise shows a more advanced MVPA topic, the use of a classifier (first reported in :cite:`CS03`). Using a classifier involves two steps:
+This exercise shows a more advanced MVPA topic, the use of a classifier (first reported in :cite:`CoS03`). Using a classifier involves two steps:
 
 - training: a set of ``samples`` (the patterns) with associated ``.sa.targets`` (conditions) together are called the *training set*. The training set is used so that the classifiers *learns* which patterns are associated with each condition.
 
@@ -27,7 +33,7 @@ Classification performance can be assessed by considering how many predictions f
 
         - The training and test set must be independent. In CoSMoMVPA, independence can be indicated by the ``.sa.chunks`` attribute. In fMRI data, usually one takes one chunk value for each data acquisition run. If the data were not independent, then the classifier could overtrain on the training data but unable to generalize to new, independent data.
 
-    + Multiple samples in each class required (almost always).
+    + Multiple samples in each class are required (almost always).
 
         Unlike the :ref:`cosmo_correlation_measure`, a classifier usually requires that the training set has multiple samples of each class. It can use this information to assess, for example, variability of responses in each feature. This makes a classifier potentially more sensitive than a standard split-half analysis (:ref:`ex_splithalf_correlations`).
 
@@ -75,7 +81,7 @@ Part 1:
 
 Part 2:
 
-    - Use the data from all six categories to train on even runs and test on odd runs, and compute the classification accuracu
+    - Use the data from all six categories to train on even runs and test on odd runs, and compute the classification accuracy.
     - As the previous step, but now test on odd runs and test on even runs.
 
 Part 3:
