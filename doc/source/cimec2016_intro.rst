@@ -157,11 +157,25 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 - single subject pattern similarity visualization. Load GLM data from subject ``s01`` from two thirds of the data, ``glm_t1_8cond-tstat.nii`` and ``glm_t2_8cond-tstat.nii``. Use the ``vt`` mask and load the data for eight conditions from these two halves. Now compute all ``8 * 8 = 64`` pair-wise correlations of the patterns across the first and second half. Quantify the presence of reliable patterns through a *split-half information score* that discriminates between conditiosn by computing the average on-diagonal values minus the average of the off-diagonal values in the correlation matrix. Visualize the correlations using ``imagesc``. (Note: since the single subject results are not very strong, do not worry if the matrix does not show clearly higher values on the diagonal than off the diagonal)
 
-- single subject significance testing. Using the data loaded for subject ``s01`` as described above, estimate how significant the *split-half correlation score* is different from zero. Generate a null dataset by reshuffling the labels in one half of the data, and then compute the *split-half correlation score* for this null dataset. Repeat this process 1000 times to get 1000 split-half null data correlation scores. Finally, compute the significance of the original split-half correlation score by dividing the number of times the original split-half correlation score is less than the null-data correlation scores. Show a histogram with the 1000 null data correlation scores, and a vertical line showing the correlation score in the original data.
+  Suggested functions:
+
+    - :ref:`cosmo_fmri_dataset`
+    - ``corr`` / :ref:`cosmo_corr` (or :ref:`cosmo_correlation_measure`)
+    - ``mean``
+    - ``imagesc``
+
+- single subject significance testing. Using the data loaded for subject ``s01`` as described above, estimate how significant the *split-half correlation score* is different from zero. Generate a null dataset by reshuffling the labels in one half of the data, and then compute the *split-half correlation score* for this null dataset. Using a ``for``-loop, repeat this process 1000 times to get 1000 split-half null data correlation scores. Finally, compute the significance of the original split-half correlation score by dividing the number of times the original split-half correlation score is less than the null-data correlation scores. Show a histogram with the 1000 null data correlation scores, and a vertical line showing the correlation score in the original data.
+
+    Suggested functions:
+
+    - ``randperm`` (or :ref:`cosmo_randomize_targets`)
+    - ``hist``
 
 - group analysis. Load the same data as in the single subject analysis, but now for each of the five participants. Do a group analysis in areas ``vt`` and ``ev`` using a one-sample t-test to estimate how reliable the split-half correlation score is different from zero across the five participants.
 
+    Suggested functions:
 
+    - ``ttest`` (or :ref:`cosmo_stat`)
 
 Tentative schedule
 ++++++++++++++++++
