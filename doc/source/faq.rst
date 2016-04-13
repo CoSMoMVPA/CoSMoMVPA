@@ -175,10 +175,14 @@ Find the correspondence between voxel indices in AFNI and feature indices in CoS
 --------------------------------------------------------------------------------------
 
 
-    In the AFNI GUI, you can view voxel indices by right-clicking on the coordinate field in the very right-top corner. Note that:
+    In the AFNI GUI, you can view voxel indices by right-clicking on the coordinate field in the very left-top corner. Note that:
 
-        - ds.fa.i, ds.fa.j, and ds.fa.k are base-1 whereas AFNI uses base-0. So, to convert AFNI's ijk-indices to CoSMoMVPA's, add 1 to AFNI's coordinates.
-        - CoSMoMVPA's coordinates are valid for LPI-orientations, but not for others. To convert a dataset to LPI, do: 3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
+        - ``ds.fa.i``, ``ds.fa.j``, and ``ds.fa.k`` are base-``1`` whereas AFNI uses base-``0``. So, to convert AFNI's ``ijk``-indices to CoSMoMVPA's, add ``1`` to AFNI's coordinates.
+        - CoSMoMVPA's coordinates are valid for LPI-orientations, meaning that the first dimension is from left (lower values) to right (higher values), the second dimension is from posterior (lower values) to anterior (higher values), and the third dimension from inferior (lower values) to superior (higher values). To convert a dataset to LPI-orientation using AFNI, do:
+
+        .. code-block:: shell
+
+            3dresample -orient LPI -inset my_data+orig -prefix my_data_lpi+orig.
 
 .. _faq_get_ecog_data_in_cosmomvpa_struct:
 
@@ -762,7 +766,7 @@ one might expect a vector of only zeros because of the identities `a==(a+b)-b` a
 
                  0    0.1110         0         0         0
 
-See also: :ref:`cosmo_meeg_dim_match`, :ref:`cosmo_slice`, :ref:`cosmo_dim_prune`.
+See also: :ref:`cosmo_dim_match`, :ref:`cosmo_slice`, :ref:`cosmo_dim_prune`.
 
 
 Select a particular channel type in an MEEG dataset
