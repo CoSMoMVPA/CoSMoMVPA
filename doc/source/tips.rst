@@ -126,7 +126,7 @@ computes a split-half correlation searchlight map; changing only the top line (a
         measure=@cosmo_crossvalidation_measure;
         ds_corr=cosmo_searchlight(ds,nh,measure,opt);
 
-computes a classification accuracy searchlight map - just by changing the function handle (and the associated measure options in ``opt``).
+computes a classification accuracy searchlight map - just by changing the function handle (and the associated measure options in ``opt``). Importantly, the same neighborhood structure and the same searchlight code is used in both cases.
 
 For more information about function handles, run in Matlab: ``help function_handle``
 
