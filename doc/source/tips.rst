@@ -58,7 +58,7 @@ Logical arrays can be constructed with the comparison operators ``<``, ``<=``, `
 
 returns logical masks of the same size as ``my_data`` with values ``true`` where ``my_data`` is at least ``12`` (``[false, false, true, true, true, true, true, true, true, true, false]``)  and equal to ``13`` (``[false, false, true, false, false, false, true, false, false, false]``), respectively.
 
-Finally, the logical operators ``~`` (negation), ``&`` (element-wise logical-and) ``|`` can be used as operators on two logical masks. Thus, in
+Finally, the logical operators ``~`` (negation), ``&`` (element-wise logical-and), and ``|`` (element-wise logical-or) can be used as operators on two logical masks. Thus, in
 
     .. code-block:: matlab
 
@@ -109,17 +109,26 @@ allows using different measures (i.e. functions) by just changing one line of co
 
     .. code-block:: matlab
 
-        measure=@my_funky_new_measuer_no_one_knows;
+        measure=@my_awesome_measure;
 
-which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measure>` but also for :ref:`searchlight analyses <searchlight>`.
+which allows reusing code for future analyses and analysis methods. This concept is key not only for :ref:`measures <cosmomvpa_measure>` but also for :ref:`searchlight analyses <searchlight>`. For example, given a suitable neighborhood ``nbrhood`` and measure options ``opt``,
+
+
+    .. code-block:: matlab
+
+        measure=@cosmo_correlation_measure;
+        ds_corr=cosmo_searchlight(ds,nh,measure,opt);
+
+computes a split-half correlation searchlight map; changing only the top line (and with suitable measure options in ``opt``),
+
+    .. code-block:: matlab
+
+        measure=@cosmo_crossvalidation_measure;
+        ds_corr=cosmo_searchlight(ds,nh,measure,opt);
+
+computes a classification accuracy searchlight map - just by changing the function handle (and the associated measure options in ``opt``).
 
 For more information about function handles, run in Matlab: ``help function_handle``
-
-
-
-
-
-
 
 
 General tips and tricks
