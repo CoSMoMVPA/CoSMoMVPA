@@ -205,17 +205,17 @@ Th  7 Apr 14:00-15:45 Practical exercises: Basic dataset operations
 --------- ----------- ---------------------------------------------------------------------------------------------------
 Fr  8 Apr 14:00-15:45 Practical exercises: Basic dataset operations, split-half correlation analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
-We 13 Apr 09:00-10:45 Practical exercises: Basic classification analysis
+We 13 Apr 09:00-10:45 Practical exercises: Split-half correlation analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Th 14 Apr 14:00-15:45 Practical exercises: Classification with cross-validation
+Th 14 Apr 14:00-15:45 Practical exercises: Split-half correlation analysis, single-fold classification
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr 15 Apr 14:00-15:45 Practical exercises: Measures, neighborhoods, searchlight
+Fr 15 Apr 14:00-15:45 Practical exercises: Classification with cross-validation
 --------- ----------- ---------------------------------------------------------------------------------------------------
-We 20 Apr 09:00-10:45 Practical exercises: Basic RSA
+We 20 Apr 09:00-10:45 Practical exercises: Measures, neighborhoods, searchlight
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Th 21 Apr 14:00-15:45 Practical exercises: RSA consistency and visualization
+Th 21 Apr 14:00-15:45 Practical exercises: Basic RSA
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr 22 Apr 14:00-15:45 Practical exercises: RSA consistency
+Fr 22 Apr 14:00-15:45 Practical exercises: RSA consistency and visualization
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 27 Apr 09:00-10:45 Practical exercises: MEEG classification, searchlights
 --------- ----------- ---------------------------------------------------------------------------------------------------
