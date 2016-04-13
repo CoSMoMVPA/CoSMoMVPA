@@ -164,7 +164,7 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
     - ``mean``
     - ``imagesc``
 
-- single subject significance testing. Using the data loaded for subject ``s01`` as described above, estimate how significant the *split-half correlation score* is different from zero. Generate a null dataset by reshuffling the labels in one half of the data, and then compute the *split-half correlation score* for this null dataset. Using a ``for``-loop, repeat this process 1000 times to get 1000 split-half null data correlation scores. Finally, compute the significance of the original split-half correlation score by dividing the number of times the original split-half correlation score is less than the null-data correlation scores. Show a histogram with the 1000 null data correlation scores, and a vertical line showing the correlation score in the original data.
+- single subject significance testing. Using the data loaded for subject ``s01`` as described above, estimate how significant the *split-half correlation score* is different from zero. Generate a null dataset by reshuffling the labels in one half of the data, and then compute the *split-half correlation score* for this null dataset. Using a ``for``-loop, repeat this process 1000 times (i.e., use 1000 iterations) to get 1000 split-half null data correlation scores. Finally, compute the significance of the original split-half correlation score by dividing the number of times the original split-half correlation score is less than the null-data correlation scores by the number of iterations (1000). Show a histogram with the 1000 null data correlation scores, and a vertical line showing the correlation score in the original data.
 
     Suggested functions:
 
@@ -176,6 +176,18 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
     Suggested functions:
 
     - ``ttest`` (or :ref:`cosmo_stat`)
+
+
+FAQ
++++
+
+- For the assignments, can I use / adapt existing CoSMoMVPA code from the exercises or demonstrations?
+
+    * yes, as long as you indicate that you took the code from elsewhere, and indicate where you took it from.
+
+- Are there slides available?
+
+    * currently not; we try to provide all information on the website.
 
 Tentative schedule
 ++++++++++++++++++
