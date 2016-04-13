@@ -113,17 +113,16 @@ for i_roi = 1:nrois
         end
 
         % Weigh the values in the matrix 'z' by those in the
-        % contrast_matrix and then average them (hint: use the '.*'
+        % contrast_matrix and then sum them (hint: use the '.*'
         % operator for element-wise multiplication). Store the results in
-        % a variable 'mean_weighted_z'. Then sum all values in this matrix
-        % and store in a variab
+        % a variable 'sum_weighted_z'.
         % >@@>
         weighted_z=z.*contrast_matrix;
 
         sum_weighted_z=sum(weighted_z(:));
         % <@@<
 
-        % store the result for this subject in sum_weighted_zs
+        % store the result for this subject in sum_weighted_zs_all
         % (at the i_subj-th position), so that
         % group statistics can be computed
         % >@@>
