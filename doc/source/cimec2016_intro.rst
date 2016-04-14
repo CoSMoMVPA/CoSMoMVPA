@@ -92,7 +92,7 @@ Haxby2001 dataset
 -----------------
 This dataset is used for assignments which will count towards the student's grade for the course.
 
-It contains data from five participants in the original study by Haxby et al [; for details see the README file.
+It contains data from five participants in the original study by Haxby et al (:cite:`HGF+01`); for details see the README file.
 
 Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.1.zip>`_
 
@@ -109,6 +109,7 @@ Assignments
 In the first four weeks we plan one assignment per week. In addition, one assignment after classes have ended *may* be added. Each assignment will involve MVPA using CoSMoMVPA. More details about assignments will be added here soon.
 
 Notes:
+
 - You can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
 - Using PyMVPA for the MEEG exercises is currently rather challening, as there is little support for MEEG in PyMVPA.
 
@@ -157,7 +158,7 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 - single subject pattern similarity visualization. Load GLM data from subject ``s01`` from two thirds of the data, ``glm_t1_8cond-tstat.nii`` and ``glm_t2_8cond-tstat.nii``. Use the ``vt`` mask and load the data for eight conditions from these two halves. Now compute all ``8 * 8 = 64`` pair-wise correlations of the patterns across the first and second half. Quantify the presence of reliable patterns through a *split-half information score* that discriminates between conditiosn by computing the average on-diagonal values minus the average of the off-diagonal values in the correlation matrix. Visualize the correlations using ``imagesc``. (Note: since the single subject results are not very strong, do not worry if the matrix does not show clearly higher values on the diagonal than off the diagonal)
 
-  Suggested functions:
+    Suggested functions:
 
     - :ref:`cosmo_fmri_dataset`
     - ``corr`` / :ref:`cosmo_corr` (or :ref:`cosmo_correlation_measure`)
@@ -176,6 +177,77 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
     Suggested functions:
 
     - ``ttest`` (or :ref:`cosmo_stat`)
+
+
+Exercise 2 - deadline 23:59, 26 April 2016
+------------------------------------------
+Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+
+- *Single subject pattern classification*. Load data from each run for each of the eight conditions ``glm_t12-perrun_8cond-tstat.nii``. Using take-one-run-out cross-validation, use both the LDA and NN classifier to compute classificationa accuracies in the ``vt`` region. Do the same for the ``ev`` region. Compute classification accuracies and show classification confusion matrices for each of the two ROIs and each of the classifiers.
+
+    Suggested functions:
+
+    - :ref:`cosmo_classify_lda`, :ref:`cosmo_classify_nn`
+    - (Optional) :ref:`cosmo_confusion_matrix`.
+    - (Optional) :ref:`cosmo_crossvalidation_measure`.
+    - (Optional) :ref:`cosmo_nfold_partitioner`.
+    - ``imagesc``.
+
+
+- *Custom classifier*. Implement a maximum correlation classifier (c.f. :cite:`HGF+01`). Given a test pattern, the maximum correlation classifier should return the class corresponding to the train patterns that has the highest (Pearson) correlation with the test pattern. Then use it to classify patterns of the eight categories using the ``glm_t12-perrun_8cond-tstat.nii`` data in the ``vt`` region. Your solution should start as follows:
+
+    .. code-block:: matlab
+
+        function pred=my_corr_classify(samples_train,targets_train,samples_test,opt)
+        % maximum correlation classifier
+        %
+        %   predicted=my_max_corr_classify(samples_train, targets_train, samples_test[,opt])
+        %
+        %   Inputs:
+        %     samples_train       PxR training data for P samples and R features
+        %     targets_train       Px1 training data classes
+        %     samples_test        QxR test data
+        %     opt                 Optional struct, unused.
+        %
+        %   Output:
+        %     predicted           Qx1 predicted data classes for samples_test. For
+        %                         all values of k in the range (1:Q):
+        %                           if r is the row for which tr_samples(r,:) shows
+        %                           the highest with samples_train(k,:), then
+        %                           pred(k)==targets_train(r)
+        %
+
+
+            [nsamples_train, nfeatures]=size(samples_train);
+            [ntargets, one_check]=size(targets_train);
+            [nsamples_test, nfeatures_check]=size(te_samples);
+
+            if nsamples_train~=ntargets
+                error('Samples (%d) and targets (%d) size mismatch',...
+                            nsamples_train, ntargets);
+            end
+
+            if one_check~=1
+                error('targets must be a column vector');
+            end
+
+            if nfeatures~=nfeatures_check
+                error('feature count mismatch in train (%d) and test (%d) set',...
+                        nfeatures, nfeatures_check);
+            end
+
+            %%%% Your code comes here %%%%
+
+    Suggested functions:
+
+    - ``corr`` (or :ref:`cosmo_corr`)
+
+- *Group analysis*. Load the same data as in the single subject analysis, but now for each of the five participants. Using the LDA classifier, do a group analysis in areas ``vt`` and ``ev`` using a one-sample t-test to estimate how reliable classification accuracies are different from chance level (``1/8``) across the five participants.
+
+  Suggested functions:
+
+    - ``ttest`` (or :ref:`cosmo_stat`)
+
 
 
 FAQ
