@@ -208,7 +208,7 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     cosmo_isfield(ds,{'sa.targets','samples'},true);
 
     args=cosmo_structjoin('metric','correlation',...
-                            'center_data',false,...,
+                            'center_data',false,...
                             varargin);
 
     % ensure that targets occur exactly once.
