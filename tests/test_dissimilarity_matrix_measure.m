@@ -40,6 +40,38 @@ function test_dissimilarity_matrix_measure_basics()
     end
 
 
+function test_dissimilarity_matrix_measure_centered_data()
+    nsamples=ceil(rand()*10+5);
+    for center_data=[false,true]
+        ds=struct();
+        ds.samples=randn(nsamples,5);
+        ds.sa.targets=(1:size(ds.samples,1))';
+
+        samples=ds.samples;
+
+        opt=struct();
+        if center_data
+            opt.center_data=true;
+            samples=bsxfun(@minus,samples,mean(samples,1));
+        end
+
+        res=cosmo_dissimilarity_matrix_measure(ds,opt);
+
+        pd=cosmo_pdist(samples,'correlation');
+        counter=0;
+        for k=1:(nsamples-1)
+            for j=(k+1):nsamples
+                row=res.sa.targets2==k & res.sa.targets1==j;
+                assert(sum(row)==1);
+                counter=counter+1;
+                assertElementsAlmostEqual(res.samples(row,:),pd(counter));
+            end
+        end
+        assert(counter==numel(pd));
+    end
+
+
+
 function test_dissimilarity_matrix_measure_exceptions()
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_dissimilarity_matrix_measure(varargin{:}),'');

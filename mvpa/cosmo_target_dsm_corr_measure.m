@@ -95,10 +95,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %   - for group analysis, correlations can be fisher-transformed
 %     through:
 %       dcm_ds.samples=atanh(dcm_ds.samples)
-%   - it may be a good idea to set the 'center_data' to true when using
+%   - it is recommended to set the 'center_data' to true when using
 %     the default 'correlation' metric, as this removes a main effect
 %     common to all samples; but note that this option is disabled by
-%     default
+%     default due to historical reasons.
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

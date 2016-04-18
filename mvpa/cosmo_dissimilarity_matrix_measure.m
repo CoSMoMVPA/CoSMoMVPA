@@ -8,8 +8,12 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %                     .sa.targets (Px1) for P samples and Q features.
 %                     each target should occur exactly once
 %  args               optional struct:
-%      args.metric:   a string with the name of the distance
+%      .metric        a string with the name of the distance
 %                     metric to be used by pdist (default: 'correlation')
+%      .center_data   If true, then data is centered before the pair-wise
+%                     distances are computed. The default is false; when
+%                     used with the 'correlation' metric, it is recommended
+%                     to use center_data, 'true'.
 %
 %   Returns
 %
@@ -38,17 +42,17 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     ds.samples=[1 2 3; 1 2 3; 1 0 1; 1 1 2; 1 1 2];
 %     ds.sa.targets=(11:15)';
 %     %
-%     % compute dissimilarity
-%     dsm_ds=cosmo_dissimilarity_matrix_measure(ds);
+%     % compute dissimilarity with centered data
+%     dsm_ds=cosmo_dissimilarity_matrix_measure(ds,'center_data',true);
 %     cosmo_disp(dsm_ds);
 %     > .samples
-%     >   [     0
-%     >         1
-%     >     0.134
-%     >       :
-%     >       0.5
-%     >       0.5
-%     >         0 ]@10x1
+%     >   [         0
+%     >             2
+%     >             2
+%     >         :
+%     >      1.11e-16
+%     >      1.11e-16
+%     >     -2.22e-16 ]@10x1
 %     > .sa
 %     >   .targets1
 %     >     [ 2
@@ -81,11 +85,11 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     [samples, labels, values]=cosmo_unflatten(dsm_ds,1,...
 %                                           'set_missing_to',NaN);
 %     cosmo_disp(samples)
-%     > [   NaN       NaN       NaN       NaN       NaN
-%     >       0       NaN       NaN       NaN       NaN
-%     >       1         1       NaN       NaN       NaN
-%     >   0.134     0.134       0.5       NaN       NaN
-%     >   0.134     0.134       0.5         0       NaN ]
+%     > [ NaN       NaN       NaN       NaN       NaN
+%     >     0       NaN       NaN       NaN       NaN
+%     >     2         2       NaN       NaN       NaN
+%     >     2         2  1.11e-16       NaN       NaN
+%     >     2         2  1.11e-16 -2.22e-16       NaN ]
 %     %
 %     cosmo_disp(labels)
 %     > { 'targets1'  'targets2' }
@@ -189,6 +193,11 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     >          sa: [1x1 struct]
 %     >           a: [1x1 struct]
 %
+% Notes:
+%   - it is recommended to set the 'center_data' to true when using
+%     the default 'correlation' metric, as this removes a main effect
+%     common to all samples; but note that this option is disabled by
+%     default due to historical reasons.
 %
 % See also: cosmo_pdist, pdist
 %
@@ -198,7 +207,9 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     % check input
     cosmo_isfield(ds,{'sa.targets','samples'},true);
 
-    args=cosmo_structjoin('metric','correlation',varargin);
+    args=cosmo_structjoin('metric','correlation',...
+                            'center_data',false,...,
+                            varargin);
 
     % ensure that targets occur exactly once.
     targets=ds.sa.targets;
@@ -219,10 +230,16 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     % make new dataset
     ds_dsm=struct();
 
+    % if center_data, then subtract the mean first
+    samples=ds.samples;
+    if args.center_data
+        samples=bsxfun(@minus,samples,mean(samples,1));
+    end
+
     % compute pair-wise distances between all samples using cosmo_pdist,
     % then store them as samples in ds_dsm
     % >@@>
-    dsm = cosmo_pdist(ds.samples, args.metric)';
+    dsm = cosmo_pdist(samples, args.metric)';
 
     % store dsm
     ds_dsm.samples=dsm;
