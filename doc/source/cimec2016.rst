@@ -4,7 +4,7 @@
 .. _cimec2016:
 
 CIMeC hands-on methods course, part 1 (6 April-2 May 2016)
-=======================================================
+==========================================================
 
 *presented by Nick Oosterhof and James V. Haxby, April and May 2016*
 
