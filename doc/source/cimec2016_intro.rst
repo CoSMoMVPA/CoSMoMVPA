@@ -3,8 +3,7 @@
 
 .. intro
 
-*Note: This page describes the first part of the course, between 6 and 29 April 2016. The second part of the course, between 4 May and 11 May 2016, is taught by Christoph Braun and will cover analysis of MEEG data. Information about the second part is not presented here.*
-
+*Note: This page describes the first part of the course, between 6 April and 2 May 2016. The second part of the course, between 4 May and 11 May 2016, is taught by Christoph Braun and will cover analysis of MEEG data. Information about the second part is not presented here.*
 
 Introduction
 ============
