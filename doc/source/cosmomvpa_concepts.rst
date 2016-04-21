@@ -268,9 +268,9 @@ For example, the following code defines a 'measure' that returns classification 
     .. code-block:: matlab
 
         nbrhood = cosmo_spherical_neighborhood(ds,'radius',3);
-        cv = @cosmo_cross_validation_accuracy_measure;
+        cv = @cosmo_crossvalidation_measure;
         cv_args = struct();
-        cv_args.classifier = @cosmo_classify_svm;
+        cv_args.classifier = @cosmo_classify_lda;
         cv_args.partitions = cosmo_nfold_partitioner(ds);
         sl_dset = cosmo_searchlight(ds,nbrhood,cv,cv_args);
 
