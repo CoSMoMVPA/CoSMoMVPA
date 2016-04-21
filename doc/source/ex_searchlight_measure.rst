@@ -41,7 +41,7 @@ Load the dataset with subject ``s01``'s t-statistic for every run (``glm_T_stats
 
 Using :ref:`cosmo_spherical_neighborhood`, define a spherical neighborhood with at least 100 voxels for each feature (voxel) in ``ds``.
 
-Use :ref:`cosmo_oddeven_partitioner` to define a cross-validation scheme, and use :ref:`cosmo_crossvalidation_measure` and the :ref:`cosmo_searchlight` function to compute a whole-brain information map with classification accuracies, visualize the result using :ref:`cosmo_slice`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`.
+Use :ref:`cosmo_oddeven_partitioner` to define a cross-validation scheme, and use :ref:`cosmo_crossvalidation_measure` and the :ref:`cosmo_searchlight` function to compute a whole-brain information map with classification accuracies, visualize the result using :ref:`cosmo_plot_slices`, and store the result as a NIFTI file using :ref:`cosmo_map2fmri`.
 
 Hint: :ref:`run_crossvalidation_searchlight_skl`
 
