@@ -62,7 +62,7 @@ for m = 1:n_masks
             neural_dsms=zeros(n_subjects*n_masks,n_pairs);
         end
 
-        % increase counter and store the dsm as the counter-th column in
+        % increase counter and store the dsm as the counter-th row in
         % 'neural_dsms'
         % >@@>
         counter=counter+1;
@@ -99,7 +99,9 @@ imagesc(cc);
 %%
 % Now use the values in the last to rows of the cross correlation matrix to
 % visualize the distributions in correlations between the neural similarities
-% and the v1 model/behavioral ratings.
+% and the v1 model/behavioral ratings. Store the result in a matrix
+% 'cc_models', which should have 8 rows (corresponding to the participants)
+% and 4 columns (corresponding to EV and VT correlated with both models)
 %
 % Rows  1 to  8: EV neural similarities
 % Rows  9 to 16: VT neural similarities
@@ -109,11 +111,12 @@ imagesc(cc);
 
 % >@@>
 cc_models = [cc(1:8,17) cc(9:16,17) cc(1:8,18) cc(9:16,18)];
+% <@@<
 labels = {'v1 model~EV','v1 model~VT','behav~EV','behav~VT'};
 figure();
 boxplot(cc_models);
 set(gca,'XTick',[1:4],'XTickLabel',labels);
-% <@@<
+
 
 
 
