@@ -31,8 +31,8 @@ It is easy to compare dissimilarity matrices by computing the
 Pearson correlation between two flattened upper triangle DSMs using the
 :ref:`cosmo_corr` function. For the next exercise, stack flattened DSMs vertically
 into a single matrix starting with all of the EV DSMs from every subject then
-all of the VT DSM. You should have a 10x15 matrix. Then add the v1 model and the
-behavioral DSMs to make it a 12x15 matrix. Now compute the cross-correlation
+all of the VT DSM. You should have an 16x15 matrix. Then add the v1 model and the
+behavioral DSMs to make it a 18x15 matrix. Now compute the cross-correlation
 matrix using :ref:`cosmo_corr`. Visualize the cross-correlation matrix with
 **imagesc**. Try this with demeaning and without demeaning to compare the
 results. Finally, use matlabs **boxplot** function to view the distributions of

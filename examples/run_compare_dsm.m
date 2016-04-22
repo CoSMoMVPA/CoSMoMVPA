@@ -97,7 +97,7 @@ imagesc(cc);
 % <@@<
 
 %%
-% Now use the values in the last to rows of the cross correlation matrix to
+% Now use the values in the last two rows of the cross correlation matrix to
 % visualize the distributions in correlations between the neural similarities
 % and the v1 model/behavioral ratings. Store the result in a matrix
 % 'cc_models', which should have 8 rows (corresponding to the participants)
