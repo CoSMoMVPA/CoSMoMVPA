@@ -190,7 +190,7 @@ ylabel('classification accuracy');
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Part III: channel-time searchlight
+%% Part III: channel-time searchlight
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select limited time period
 msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4);
