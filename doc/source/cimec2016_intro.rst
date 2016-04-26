@@ -294,9 +294,9 @@ Th 21 Apr 14:00-15:45 Practical exercises: Basic RSA
 --------- ----------- ---------------------------------------------------------------------------------------------------
 Fr 22 Apr 14:00-15:45 Practical exercises: Basic RSA, searchlight RSA
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Tu 26 Apr 14:00-15:45 Practical exercises: MEEG classification, searchlights
+Tu 26 Apr 14:00-15:45 Practical exercises: searchlight RSA, MEEG basics, classification
 --------- ----------- ---------------------------------------------------------------------------------------------------
-We 27 Apr 09:00-10:45 Practical exercises: MEEG time generalization
+We 27 Apr 09:00-10:45 Practical exercises: MEEG searchlight, MEEG time generalization
 --------- ----------- ---------------------------------------------------------------------------------------------------
 Mo 02 May 14:00-15:45 Concluding remarks
 --------- ----------- ---------------------------------------------------------------------------------------------------
