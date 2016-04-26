@@ -24,6 +24,7 @@ Contents:
     ex_searchlight_measure
     ex_rsa_tutorial
     ex_meeg_searchlight
+    ex_meeg_time_generalization
     ex_multiple_comparisons
 
 
