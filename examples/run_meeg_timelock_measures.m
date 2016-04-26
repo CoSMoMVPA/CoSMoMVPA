@@ -73,17 +73,20 @@ ds.sa.labels=cellfun(@(x)index2label(x),num2cell(ds.sa.targets));
 % just to check everything is ok
 cosmo_check_dataset(ds);
 
-% get rid of features with at least one NaN value across samples
-fa_nan_mask=sum(isnan(ds.samples),1)>0;
-fprintf('%d / %d features have NaN\n', ...
-            sum(fa_nan_mask), numel(fa_nan_mask));
-ds=cosmo_slice(ds, ~fa_nan_mask, 2);
 
-
+%% Count number of channels, time points and trials
+% >@@>
+fprintf('There are %d channels, %d time points and %d trials\n',...
+        numel(unique(ds.fa.chan)),numel(unique(ds.fa.time)),...
+        size(ds.samples,1));
+% <@@<
 %%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Part I: compute difference between faces and scenes
-% for each time point and sensor; then visualize the results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% For each time point and sensor; then visualize the results
 % for the magnetometer (meg_axial) sensors.
 
 % slice 'ds' twice to get 'ds_face' and 'ds_scene', each with only trials
@@ -119,8 +122,11 @@ cfg.layout=layout;
 
 % show figure with plots for each sensor
 ft_multiplotER(cfg, ft_faceVSscene);
+%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Part 2: run searchlight over time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % set MVPA parameters
 fprintf('The input has feature dimensions %s\n', ...
@@ -182,8 +188,10 @@ xlabel('time');
 ylabel('classification accuracy');
 
 
-%% Part III: channel-time searchlight
-
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Part III: channel-time searchlight
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select limited time period
 msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4);
 
@@ -244,7 +252,7 @@ measure_args.partitions=cosmo_balance_partitions(...
 % to a varibale 'ds_sl'
 
 % >@@>
-ds_sl=cosmo_searchlight(ds_sel,nbrhood,measure,measure_args)
+ds_sl=cosmo_searchlight(ds_sel,nbrhood,measure,measure_args);
 % <@@<
 
 %% visualize timeseries results

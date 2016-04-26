@@ -23,6 +23,7 @@ Contents:
     ex_neighborhood
     ex_searchlight_measure
     ex_rsa_tutorial
+    ex_meeg_searchlight
     ex_multiple_comparisons
 
 
