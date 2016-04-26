@@ -106,6 +106,8 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
     For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6.zip>`_
 
+    Additinal MEEG data, used for the exercises, is here: `datadb-meg_obj6.zip`_.
+
     You can move the directory to another location on your file system, if desired.
 
 

@@ -13,6 +13,8 @@
 
         * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <datadb-ak6.zip>`_
 
+        * MEEG data (only obj-6 data for exercises): `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_
+
 - CoSMOMVPA documentation in HTML format (for off-line viewing) is available in `zip <_static/CoSMoMVPA_documentation_html.zip>`_ and `gzipped tar archive <_static/CoSMoMVPA_documentation_html.tar.gz>`_.
 
 

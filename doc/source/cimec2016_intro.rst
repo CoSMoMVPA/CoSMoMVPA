@@ -260,6 +260,12 @@ FAQ
 
     * currently not; we try to provide all information on the website.
 
+- For assignment 2, I have a sort of “conceptual” doubt with part 2: is the custom classifier supposed to work on a 8x8 correlation matrix?
+
+    * No, the classifier is supposed to correlate every pattern in the training set with every pattern in the test set. Your function should support both training sets and test with multiple samples (rows in ``samples_train`` and ``samples_test``).
+
+
+
 Tentative schedule
 ++++++++++++++++++
 
