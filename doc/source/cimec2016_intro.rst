@@ -249,14 +249,30 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 Exercise 3 - deadline 23:59, 03 May 2016
 ----------------------------------------
-Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+Use the Haxby 2001 GLM dataset (see above) for the following analyses
 
-- *RSA reliabillity*. Using data from participant `s01`,
+- *Classification searchlight*. Use an LDA classifier with take-one-out crossvalidation to classify the 8 conditions for participant ``s01``. Use the common brain mask in ``common/mask_brain.nii`` and the data from ``s01/glm_t12-perrun_8cond-tstat.nii``; for the searchlight, use a spherical neighborhoood with approximately 100 voxels in each searchlight. Show a map with classification accuracies using :ref:`cosmo_plot_slices`.
 
+ Suggested functions:
 
+    - :ref:`cosmo_searchlight`
+    - :ref:`cosmo_classify_lda`
+    - :ref:`cosmo_crossvalidation_measure`
+    - :ref:`cosmo_plot_slices`
 
+- *RSA target similarity searchlight measure*. Use the behavioural similarity ratings from ``models/haxby2001_behav.mat`` and the data in ``glm_t12-average_8cond-tstat.nii`` from participant ``s01``. Then run a searchlight to localize regions in the brain where the neural similarity is similar to the behavioural similarity ratings. Show a map with representational similarities using :ref:`cosmo_plot_slices`.
 
+Suggested functions:
 
+    - :ref:`cosmo_searchlight`
+    - :ref:`cosmo_target_dsm_corr_measure`
+    - :ref:`cosmo_plot_slices`
+
+- *RSA between-participant reliabillity searchlight*. Using data from participants `s01` and `s02`, load the ``glm_t12-average_8cond-tstat.nii`` data from each of the two participants. Then run two searchlights (one for each participant) with about 100 voxels per searchlight: use the :ref:`cosmo_dissimilarity_matrix_measure` to store the vector form (a vector with the elements of the lower diagonal) of dissimilarity matrices at each voxel location. . Then use a ``for`` loop over the features (voxels) to compute, for each voxel (i.e. feature, searchlight location), the correlation between the vector form between the two participants. Show a map using :ref:`cosmo_plot_slices`. (Note: it is not uncommon for this exercise to take 10 minutes, or even longer, to run on a standard PC)
+
+    - :ref:`cosmo_searchlight`
+    - :ref:`cosmo_dissimilarity_matrix_measure`
+    - :ref:`cosmo_plot_slices`
 
 
 FAQ
@@ -264,11 +280,11 @@ FAQ
 
 - For the assignments, can I use / adapt existing CoSMoMVPA code from the exercises or demonstrations?
 
-    * yes, as long as you indicate that you took the code from elsewhere, and indicate where you took it from.
+    * yes, as long as you indicate that you copied the code from elsewhere, and indicate *where* you copied it from.
 
 - Are there slides available?
 
-    * currently not; we try to provide all information on the website.
+    * currently not; we try to provide all necessary information on the website.
 
 - For assignment 2, I have a sort of “conceptual” doubt with part 2: is the custom classifier supposed to work on a 8x8 correlation matrix?
 
