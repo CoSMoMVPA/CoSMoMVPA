@@ -247,6 +247,16 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
     - ``ttest`` (or :ref:`cosmo_stat`)
 
+Exercise 3 - deadline 23:59, 03 May 2016
+----------------------------------------
+Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+
+- *RSA reliabillity*. Using data from participant `s01`,
+
+
+
+
+
 
 
 FAQ
