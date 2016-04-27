@@ -276,8 +276,8 @@ cfg.layout       = layout;
 ft_multiplotER(cfg, sl_ft);
 
 %% visualize topology results
-% show figure with topology for 0 to 600ms after stimulus onset in bins of
-% 100 ms
+% show figure with topology for 100 before to 400ms after stimulus onset
+% in bins of 50 ms
 figure();
 cfg.xlim=-0.1:0.05:0.4;
 ft_topoplotER(cfg, sl_ft);

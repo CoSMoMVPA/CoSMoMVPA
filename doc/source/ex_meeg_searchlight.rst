@@ -9,6 +9,11 @@ MEEG Searchlights
 This exercise requires a separate dataset named `meg-obj6`; see :ref:`download <download>` section.
 It also requires a working installation of FieldTrip_.
 
+Before starting this exercise, please make sure you have read about:
+
+- :ref:`matlab_octave_function_handles`
+- :ref:`cosmomvpa_measure`
+- :ref:`cosmomvpa_neighborhood`
 
 Part 1: MEEG univariate contrast
 ++++++++++++++++++++++++++++++++

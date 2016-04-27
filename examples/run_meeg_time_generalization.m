@@ -77,7 +77,7 @@ sensor_posterior_planar={'MEG1632', 'MEG1642', 'MEG1732', 'MEG1842', ...
 
 msk=cosmo_dim_match(ds,'chan',sensor_posterior_planar,...
                         'time',@(t)t>=0 & t<=.3);
-                    
+
 ds_sel=cosmo_slice(ds,msk,2);
 ds_sel=cosmo_dim_prune(ds_sel);
 
@@ -96,7 +96,8 @@ ds_tr=cosmo_dim_transpose(ds_sel,'time',1);
 
 
 
-% Set the measure to be 
+% Set the measure to be a function handle to
+% cosmo_dim_generalization_measure
 measure=@cosmo_dim_generalization_measure;
 
 % Set measure arguments
@@ -118,7 +119,7 @@ result=measure(ds_tr,measure_args);
 
 % Unflatten the dataset using cosmo_unflatten, and assign the result
 % to three variables: data, labels and values
-% Hint: the second argument to cosmo_unflatten must be 1  
+% Hint: the second argument to cosmo_unflatten must be 1
 
 % >@@>
 [data,labels,values]=cosmo_unflatten(result,1);
