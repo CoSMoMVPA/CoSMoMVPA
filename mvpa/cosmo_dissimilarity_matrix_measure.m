@@ -31,10 +31,6 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %                     the dissimlarity between the i-th and j-th sample
 %                     target.
 %
-% Notes:
-%  - [cosmo_]pdist defaults to 'euclidean' distance, but correlation
-%    distance is preferable for neural dissimilarity matrices, hence it
-%    is used as the default here
 %
 % Example:
 %     % ds is a dataset struct with ds.sa.targets=(11:16)';
@@ -198,6 +194,13 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     the default 'correlation' metric, as this removes a main effect
 %     common to all samples; but note that this option is disabled by
 %     default due to historical reasons.
+%  -  [cosmo_]pdist defaults to 'euclidean' distance, but correlation
+%     distance is preferable for neural dissimilarity matrices, hence it
+%     is used as the default here
+%  -  Results from this function, when used with the default 'correlation'
+%     metric, should *not* be Fisher transformed (using atanh) because
+%     the output ranges from 0 to 2 (=one minus Pearson correlation)
+%     and the Fisher transform of a value >1 is complex (non-real).
 %
 % See also: cosmo_pdist, pdist
 %
