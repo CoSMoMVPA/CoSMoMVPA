@@ -93,7 +93,7 @@ This dataset is used for assignments which will count towards the student's grad
 
 It contains data from five participants in the original study by Haxby et al (:cite:`HGF+01`); for details see the README file.
 
-Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.1.zip>`_
+Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.2.zip>`_
 
 
 Links
@@ -249,7 +249,9 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 Exercise 3 - deadline 23:59, 03 May 2016
 ----------------------------------------
-Use the Haxby 2001 GLM dataset (see above) for the following analyses
+Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+
+*update 30 April 2016: in version 0.1 of the dataset, ``common/brain_mask.nii`` had the value 1 for all voxels. The dataset has been updated to version 0.2. The mask is also available as a seperate `nifti mask file <haxby2001-mask_brain.nii>`_
 
 - *Classification searchlight*. Use an LDA classifier with take-one-out crossvalidation to classify the 8 conditions for participant ``s01``. Use the common brain mask in ``common/mask_brain.nii`` and the data from ``s01/glm_t12-perrun_8cond-tstat.nii``; for the searchlight, use a spherical neighborhoood with approximately 100 voxels in each searchlight. Show a map with classification accuracies using :ref:`cosmo_plot_slices`.
 
@@ -292,6 +294,9 @@ FAQ
 
     * No, the classifier is supposed to correlate every pattern in the training set with every pattern in the test set. Your function should support both training sets and test with multiple samples (rows in ``samples_train`` and ``samples_test``).
 
+- For assignment 3, all values in the mask are 1. Is my file corrupt?
+
+    * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (April 30), this has been corrected. As indicated above, the new mask can also be downloaded seperately.
 
 
 Tentative schedule

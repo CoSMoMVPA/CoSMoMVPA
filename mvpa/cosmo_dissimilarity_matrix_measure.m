@@ -200,7 +200,8 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %  -  Results from this function, when used with the default 'correlation'
 %     metric, should *not* be Fisher transformed (using atanh) because
 %     the output ranges from 0 to 2 (=one minus Pearson correlation)
-%     and the Fisher transform of a value >1 is complex (non-real).
+%     and the Fisher transform of a value >1 is complex (non-real). This is
+%     generally a Bad Thing.
 %
 % See also: cosmo_pdist, pdist
 %
