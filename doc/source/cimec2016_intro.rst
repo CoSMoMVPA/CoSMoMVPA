@@ -93,8 +93,16 @@ This dataset is used for assignments which will count towards the student's grad
 
 It contains data from five participants in the original study by Haxby et al (:cite:`HGF+01`); for details see the README file.
 
-Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.2.zip>`_
+Download link: `Haxby 2001 et al data GLM data <haxby2001-glm-v0.2.zip>`_.
 
+
+MEG obj6 dataset
+----------------
+This dataset is used for both the tutorial and for the assignments.
+
+It contains MEG data from a single participant viewing images of six categories; for details see the README file.
+
+Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_.
 
 Links
 -----
@@ -279,6 +287,55 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
     - :ref:`cosmo_plot_slices`
 
 
+Exercise 4 - deadline 23:59, 10 May 2016
+----------------------------------------
+- Use the MEG object 6 dataset (see Downloads_) to show an animation of the classification confusion matrices over time. Load the ``meg_obj6_s00.mat`` file, then select data from all trials from the following sensors:
+
+    .. code-block:: matlab
+
+        sensors={'MEG1632', 'MEG1642', 'MEG1732', 'MEG1842', ...
+                 'MEG1912', 'MEG1922', 'MEG1942', 'MEG2232', ...
+                 'MEG2312', 'MEG2322', 'MEG2342', 'MEG2432', ...
+                 'MEG2442', 'MEG2512', 'MEG2532',...
+                 'MEG1633', 'MEG1643', 'MEG1733', 'MEG1843', ...
+                 'MEG1913', 'MEG1923', 'MEG1943', 'MEG2233', ...
+                 'MEG2313', 'MEG2323', 'MEG2343', 'MEG2433', ...
+                 'MEG2443', 'MEG2513', 'MEG2533'};
+
+  Re-assign chunks into two values, with approximately an equal amount of trials in each chunk. Define a time neighborhood for each time point with a radius of two time points. Use an odd-even partitioning scheme. Then, for each element (time point) in the neighborhood, use the LDA classifier to compute predictions for each test sample in the balanced partitioning scheme (you can use either a ``for``-loop, or the :ref:`cosmo_searchlight` function for this). Show the confusion matrix for each time point over time (use ``drawnow`` to draw a new frame) to see an animation consisting of all confusion matrices.
+
+  Suggested functions:
+
+    - :ref:`cosmo_slice`
+    - :ref:`cosmo_dim_prune`
+    - :ref:`cosmo_cosmo_crossvalidation_measure`
+    - :ref:`cosmo_nfold_partitioner`
+    - :ref:`cosmo_balance_partitions`
+    - :ref:`cosmo_confusion_matrix`
+    - ``imagesc``
+    - ``drawnow``
+
+
+
+
+
+
+
+
+- Use the Haxby 2001 GLM dataset (see above) to run a Naive Bayes classifier with a searchlight analysis with 100 voxels per searchlight, on all 5 subjects using their ``glm_t12-average_8cond-tstat.nii`` files. Use the common mask found in the ``common`` directory, and for faster execution, use the fast Naive Bayes searchlight and odd-even partitioning scheme. Assign targets and chunks for a second level analysis, then compute two maps. The first is an t-test map against the null hypothesis of chance classification (``1/8``), using :ref:`cosmo_stat` (subtract chance level from ``samples`` first). The second is a Threshold-Free Cluster Enhancement z-score map, corrected for multiple comparisons, using `cosmo_montecarlo_cluster_stat` (make sure to set the ``h0_mean`` option appropriately). Visualize both maps. Briefly explain how you would interpret the two maps.
+
+  Suggested functions:
+
+    - :ref:`cosmo_naive_bayes_classifier_searchlight`
+    - :ref:`cosmo_stat`
+    - :ref:`cosmo_stack`
+    - :ref:`cosmo_cluster_neighborhood`
+    - :ref:`cosmo_montecarlo_cluster_stat`
+    - :ref:`cosmo_plot_slices`
+
+
+
+
 FAQ
 +++
 
@@ -331,7 +388,7 @@ Tu 26 Apr 14:00-15:45 Practical exercises: searchlight RSA, MEEG basics, classif
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 27 Apr 09:00-10:45 Practical exercises: MEEG searchlight, MEEG time generalization
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Mo 02 May 14:00-15:45 Concluding remarks
+Mo 02 May 14:00-15:45 Practical exercises: MEEG searchlight, multiple comparison correction; Concluding remarks
 --------- ----------- ---------------------------------------------------------------------------------------------------
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We  4 May 09:00-10:45 NA; taught by Christoph Braun
