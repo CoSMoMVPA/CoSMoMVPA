@@ -289,7 +289,7 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 Exercise 4 - deadline 23:59, 10 May 2016
 ----------------------------------------
-- Use the MEG object 6 dataset (see Downloads_) to show an animation of the classification confusion matrices over time. Load the ``meg_obj6_s00.mat`` file, then select data from all trials from the following sensors:
+- Use the MEG object 6 dataset (see :ref:`download`) to show an animation of the classification confusion matrices over time. Load the ``meg_obj6_s00.mat`` file, then select data from all trials from the following sensors:
 
     .. code-block:: matlab
 
@@ -302,13 +302,13 @@ Exercise 4 - deadline 23:59, 10 May 2016
                  'MEG2313', 'MEG2323', 'MEG2343', 'MEG2433', ...
                  'MEG2443', 'MEG2513', 'MEG2533'};
 
-  Re-assign chunks into two values, with approximately an equal amount of trials in each chunk. Define a time neighborhood for each time point with a radius of two time points. Use an odd-even partitioning scheme. Then, for each element (time point) in the neighborhood, use the LDA classifier to compute predictions for each test sample in the balanced partitioning scheme (you can use either a ``for``-loop, or the :ref:`cosmo_searchlight` function for this). Show the confusion matrix for each time point over time (use ``drawnow`` to draw a new frame) to see an animation consisting of all confusion matrices.
+  Re-assign chunks into two values, with approximately an equal amount of trials in each chunk. Define a time neighborhood for each time point with a radius of two time points. Use an odd-even partitioning scheme. Then, for each element (time point) in the neighborhood, use the LDA classifier to compute predictions for each test sample in the balanced partitioning scheme (you can use either a ``for``-loop, or the :ref:`cosmo_searchlight` function for this). Using a ``for`` loop, show the confusion matrices (use ``drawnow`` to draw a new frame) to see an animation of classification confusion matrices over time.
 
   Suggested functions:
 
     - :ref:`cosmo_slice`
     - :ref:`cosmo_dim_prune`
-    - :ref:`cosmo_cosmo_crossvalidation_measure`
+    - :ref:`cosmo_crossvalidation_measure`
     - :ref:`cosmo_nfold_partitioner`
     - :ref:`cosmo_balance_partitions`
     - :ref:`cosmo_confusion_matrix`
