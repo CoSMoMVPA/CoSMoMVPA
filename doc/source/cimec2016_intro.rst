@@ -381,7 +381,7 @@ Tu 26 Apr 14:00-15:45 Practical exercises: searchlight RSA, MEEG basics, classif
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 27 Apr 09:00-10:45 Practical exercises: MEEG searchlight, MEEG time generalization
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Mo 02 May 14:00-15:45 Practical exercises: MEEG searchlight, multiple comparison correction; Concluding remarks
+Mo 02 May 14:00-15:45 Practical exercises: MEEG time generalization, multiple comparison correction; Concluding remarks
 --------- ----------- ---------------------------------------------------------------------------------------------------
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We  4 May 09:00-10:45 NA; taught by Christoph Braun
