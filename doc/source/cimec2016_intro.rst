@@ -348,6 +348,10 @@ FAQ
 
     * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (30 April 2016), this has been corrected. As indicated above, the new mask can also be downloaded seperately.
 
+- From the Haxby2001 glm dataset, when computing the average for each category in the ``glm_t12-perrun_8cond-tstat.nii`` file, I get different numbers than the values in ``glm_t12-average_8cond-tstat.nii``. How is this possible?
+
+    * The ``glm_t12-perrun_8cond-tstat.nii`` and ``glm_t12-average_8cond-tstat.nii`` both contain t-test statistics. The t-test statistics are however based on different residuals. In the ``perrun`` file, residuals are based on each run seperately; in the ``average`` file, residuals are based on all eight runs combined.
+
 
 Schedule
 ++++++++
