@@ -344,17 +344,15 @@ FAQ
 
     * No, the classifier is supposed to correlate every pattern in the training set with every pattern in the test set. Your function should support both training sets and test with multiple samples (rows in ``samples_train`` and ``samples_test``).
 
-- For assignment 3, all values in the mask are 1. Is my file corrupt?
+- For assignment 3, all values in the common mask are 1. Is my file corrupt?
 
-    * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (April 30), this has been corrected. As indicated above, the new mask can also be downloaded seperately.
+    * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (30 April 2016), this has been corrected. As indicated above, the new mask can also be downloaded seperately.
 
 
-Tentative schedule
-++++++++++++++++++
+Schedule
+++++++++
 
 Location: Pallazina Fedrigotti, computer room at the ground floor.
-
-The following schedule is tentative and can change any moment depending on student and/or presenter needs.
 
 ========= =========== ===================================================================================================
 Date      Time        Description
@@ -381,7 +379,7 @@ Tu 26 Apr 14:00-15:45 Practical exercises: searchlight RSA, MEEG basics, classif
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We 27 Apr 09:00-10:45 Practical exercises: MEEG searchlight, MEEG time generalization
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Mo 02 May 14:00-15:45 Practical exercises: MEEG time generalization, multiple comparison correction; Concluding remarks
+Mo  2 May 14:00-15:45 Practical exercises: MEEG time generalization, multiple comparison correction; Concluding remarks
 --------- ----------- ---------------------------------------------------------------------------------------------------
 --------- ----------- ---------------------------------------------------------------------------------------------------
 We  4 May 09:00-10:45 NA; taught by Christoph Braun
