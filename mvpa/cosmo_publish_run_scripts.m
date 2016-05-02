@@ -42,6 +42,12 @@ function is_ok=cosmo_publish_run_scripts(varargin)
     orig_path=path();
     path_resetter=onCleanup(@()path(orig_path));
 
+    % go to mvpa dir
+    orig_pwd=pwd();
+    pwd_resetter=onCleanup(@()cd(orig_pwd));
+    mvpa_dir=fileparts(mfilename('fullpath'));
+    cd(mvpa_dir);
+
     if ~isdir(trgdir) && ~opt.dryrun;
         mkdir_recursively(trgdir);
     end
