@@ -33,36 +33,38 @@ ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
 %   - (for advanced users) cosmo_fx
 %
 % Assign the result to a variable 'ds_stim'
-
-ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
-%%
 % >@@>
-ds_stim=ds;
-ds_stim.sa.targets(:)=1;
-ds_split=cosmo_split(ds_stim,{'chunks'});
+ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
 
-for k=1:numel(ds_split)
-    ds_avg_k=cosmo_slice(ds_split{k},1);
-    ds_avg_k.samples=mean(ds_split{k}.samples,1);
-    ds_split{k}=ds_avg_k;
-end
-
-ds_stim=cosmo_stack(ds_split);
-% alternative:
-%     ds_avg=cosmo_fx(ds,@(x)mean(x,1),{'chunks'})
+% % alternative:
+%     ds_stim=ds;
+%     ds_stim.sa.targets(:)=1;
+%     ds_split=cosmo_split(ds_stim,{'chunks'});
+%
+%     for k=1:numel(ds_split)
+%         ds_avg_k=cosmo_slice(ds_split{k},1);
+%         ds_avg_k.samples=mean(ds_split{k}.samples,1);
+%         ds_split{k}=ds_avg_k;
+%     end
+%
+%     ds_stim=cosmo_stack(ds_split);
+%
 % <@@<
 
 %% Define a cluster neighborhood for this dataset and assign the result to
 % a variable 'cl_nh'.
 % hint: use cosmo_cluster_neighborhood
-
+% >@@>
 cl_nh=cosmo_cluster_neighborhood(ds_stim);
+% <@@<
 
 % Show a plot with the sorted number of neighbors
 % for each voxel
+
+% >@@>
 n_neighbors_per_feature=cellfun(@numel,cl_nh.neighbors);
 plot(sort(n_neighbors_per_feature))
-
+% <@@<
 
 %% Run cosmo_montecarlo_cluster_stat
 
@@ -91,7 +93,7 @@ opt.niter=200;
 
 % using cosmo_montecarlo_cluster_stat, compute a map with z-scores
 % against the null hypothesis of a mean of zero, corrected for multiple
-% comparisons
+% comparisons. Store the result in a variable named 'tfce_z_ds_stim'
 
 % >@@>
 tfce_z_ds_stim=cosmo_montecarlo_cluster_stat(ds_stim,cl_nh,opt);
