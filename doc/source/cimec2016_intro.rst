@@ -353,6 +353,53 @@ FAQ
     * The ``glm_t12-perrun_8cond-tstat.nii`` and ``glm_t12-average_8cond-tstat.nii`` both contain t-test statistics. The t-test statistics are however based on different residuals. In the ``perrun`` file, residuals are based on each run seperately; in the ``average`` file, residuals are based on all eight runs combined.
 
 
+- In assignment 3, last part (between-subject reliability), I have an array with two elements, each a dataset corresponding to a subject:
+
+        .. code-block:: shell
+
+            all_dsm =
+
+                [1x1 struct]    [1x1 struct]
+
+
+        Then, I compute my correlation for each voxel across these 2 subjects and store the result in a 1 x num_of_voxels array (‘corr’).
+        To plot these results, I copy one of the two ds I worked on, and I substitute the .samples with my ‘corr’ array:
+
+        .. code-block:: matlab
+
+            ds_corr = ds_dsm;
+            ds_corr.samples = corr;
+
+            cosmo_plot_slices(ds_corr);
+
+
+        If i do just this, the error is the following:
+
+        .. code-block:: shell
+
+            Error using cosmo_plot_slices (line 72)
+            expected 3D image - did you select a single volume?
+
+        But if I transpose the targets in my ds_corr, everything works…or at least the image appears and to my ‘naive’ eye seems correct.
+
+        I’m sure I just miss something in the logics of cosmo_plot_slices: could it be that having a 1 x n samples array, if I don’t transpose the targets into an horizontal vector the dimensions simply mismatch, then the code doesn’t work?
+
+  * The issue is how you substitud the .samples in the 'corr' array. ``ds_dsm`` has 28 (=8*(8-1)/2) rows (samples), and the samples attributes each must have the same number of rows. One way to deal with this is to do:
+
+    .. code-block:: matlab
+
+        ds_corr = cosmo_slice(ds_dsm,1);
+        ds_corr.samples = corr;
+
+    to select, in both ``.samples`` and each field in ``.sa``, only the first row.
+    The reason why transposing ``.sa.targets`` works is that it then becomes a ``1 x 28`` row vector, and the number of rows (=1) matches the number of rows in the correlation row vector.
+
+    Also note that your use of ``corr`` as a variable is not recommended, as it is a builtin function in the matlab statistics toolbox. Using the same name for builtin functions and for variables may lead to confusion.
+
+
+
+
+
 Schedule
 ++++++++
 
