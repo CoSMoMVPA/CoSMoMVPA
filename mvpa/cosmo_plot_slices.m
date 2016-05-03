@@ -4,11 +4,14 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
 % cosmo_plot_slices(data[, dim][, slice_step][, slice_start][, slice_stop])
 %
 % Inputs:
-%  data         a dataset (from cosmo_fmri_dataset), nifti image (from
-%               load_nii), or a 3D array with data. data should contain
-%               data from a single volume (sample) only.
+%  data         an fmri dataset (e.g., from cosmo_fmri_dataset), or a 3D
+%               array with data. data should contain samples from a single
+%               volume (sample) only.
 %  dim          dimension according to which slices are plotted
-%               (default: 3).
+%               (default: 3). Values between 1 and 3 allows using a
+%               saggital, axial or coronal view; but the mapping between
+%               the 3 numbers and 3 views depends on the particular
+%               orientation of the data.
 %  slice_step   step between slices (default: 1). If negative then
 %               -slice_step indicates the number of slices
 %  slice_start  the index of the first slice to plot (default: 1).
@@ -54,31 +57,15 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     if nargin<4 || isempty(slice_start), slice_start=1; end
     if nargin<5 || isempty(slice_stop), slice_stop=[]; end % set later
 
-    if cosmo_check_dataset(data,false)
-        data4D=cosmo_unflatten(data);
-        sz=size(data4D);
-        if sz(1)>1
-            error(['expected single volume data, but found %d '...
-                    'volumes. To select a single volume, use '...
-                    'cosmo_slice. For example, to show the %d-th '...
-                    'volume from a dataset struct ds, use:\n\n   '...
-                    'cosmo_plot_slices(cosmo_slice(ds,%d))\n'],...
-                    sz(1),sz(1),sz(1));
-        end
-        data=reshape(data4D, sz(2:4));
-    end
-
-    if numel(size(data))~=3
-        error('expected 3D image - did you select a single volume?');
-    end
+    data3D=get_data3D(data);
 
     % get min and max values across the entire volume
-    data_lin=data(:);
+    data_lin=data3D(:);
     mn=min(data_lin);
     mx=max(data_lin);
 
     % shift it so that we can walk over the first dimension
-    data_sh=shiftdim(data, dim-1);
+    data_sh=shiftdim(data3D, dim-1);
 
     if isempty(slice_stop)
         slice_stop=size(data_sh,1);
@@ -123,4 +110,34 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
         subplot(nrows, ncols, k);
         imagesc(slice, [mn, mx]);
         title(sprintf('%s = %d', header_labels{dim}, slice_idx));
+    end
+
+
+function data3D=get_data3D(data)
+    if isstruct(data)
+        cosmo_check_dataset(data,'fmri');
+        data4D=cosmo_unflatten(data);
+        sz=size(data4D);
+        if sz(1)>1
+            error(['expected single volume data, but found %d '...
+                    'volumes. To select a single volume, use '...
+                    'cosmo_slice. For example, to show the %d-th '...
+                    'volume from a dataset struct ds, use:\n\n   '...
+                    'cosmo_plot_slices(cosmo_slice(ds,%d))\n'],...
+                    sz(1),sz(1),sz(1));
+        end
+
+        if numel(sz)>4
+            error('data must be 4D');
+        end
+
+        data3D=reshape(data4D, sz(2:end));
+    elseif isnumeric(data) || islogical(data)
+        ndim=numel(size(data));
+        if ndim>3
+            error('expected 3D image - did you select a single volume?');
+        end
+        data3D=data;
+    else
+        error('illegal input: expected dataset or 3D array');
     end
