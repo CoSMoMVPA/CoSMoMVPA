@@ -818,7 +818,7 @@ Assuming you would like to do second-level (group) anaysis:
 
 - :ref:`cosmo_correlation_measure`: the correlations are already Fisher transformed (the transformation can be changed and/or disabled using the ``post_corr_func`` option)
 - :ref:`cosmo_target_dsm_corr_measure`: correlation values are not Fisher transformed. You could consider applying ``atanh`` to the ``.samples`` output
-- ref:`cosmo_dissimilarity_matrix_measure`: the ``.samples`` field contains, by default, one minus the correlation, and thus its range is the interval ``[0, 2]``. Fisher-transformation should not be used, as values greater than 1 are transformed to complex (non-real) numbers.
+- :ref:`cosmo_dissimilarity_matrix_measure`: the ``.samples`` field contains, by default, one minus the correlation, and thus its range is the interval ``[0, 2]``. Fisher-transformation should not be used, as values greater than 1 are transformed to complex (non-real) numbers.
 
 
 .. include:: links.txt
