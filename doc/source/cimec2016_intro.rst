@@ -287,7 +287,7 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
     - :ref:`cosmo_plot_slices`
 
 
-Exercise 4 - deadline 23:59, 10 May 2016
+Exercise 4 - deadline 23:59, 17 May 2016
 ----------------------------------------
 - Use the MEG object 6 dataset (see :ref:`download`) to show an animation of the classification confusion matrices over time. Load the ``meg_obj6_s00.mat`` file, then select data from all trials from the following sensors:
 
@@ -315,7 +315,7 @@ Exercise 4 - deadline 23:59, 10 May 2016
     - ``imagesc``
     - ``drawnow``
 
-- Use the Haxby 2001 GLM dataset (see above) to run a Naive Bayes classifier with a searchlight analysis with 100 voxels per searchlight, on all 5 subjects using their ``glm_t12-average_8cond-tstat.nii`` files. Use the common mask found in the ``common`` directory, and for faster execution, use the fast Naive Bayes searchlight and odd-even partitioning scheme. Assign targets and chunks for a second level analysis, then compute two maps. The first is an t-test map against the null hypothesis of chance classification (``1/8``), using :ref:`cosmo_stat` (subtract chance level from ``samples`` first). The second is a Threshold-Free Cluster Enhancement z-score map, corrected for multiple comparisons, using :ref:`cosmo_montecarlo_cluster_stat` (make sure to set the ``h0_mean`` option appropriately, and use ``500`` iterations). Visualize both maps. Briefly explain how you would interpret the two maps.
+- Use the Haxby 2001 GLM dataset (see above) to run a Naive Bayes classifier with a searchlight analysis with 100 voxels per searchlight, on all 5 subjects using their ``glm_t12-perrun_8cond-tstat.nii`` files. Use the common mask found in the ``common`` directory, and for faster execution, use the fast Naive Bayes searchlight and odd-even partitioning scheme. Assign targets and chunks for a second level analysis, then compute two maps. The first is an t-test map against the null hypothesis of chance classification (``1/8``), using :ref:`cosmo_stat` (subtract chance level from ``samples`` first). The second is a Threshold-Free Cluster Enhancement z-score map, corrected for multiple comparisons, using :ref:`cosmo_montecarlo_cluster_stat` (make sure to set the ``h0_mean`` option appropriately, and use ``500`` iterations). Visualize both maps. Briefly explain how you would interpret the two maps.
 
   Suggested functions:
 
@@ -396,7 +396,9 @@ FAQ
 
     Also note that your use of ``corr`` as a variable is not recommended, as it is a builtin function in the matlab statistics toolbox. Using the same name for builtin functions and for variables may lead to confusion.
 
+- In assignment 4 (description 9 May 2016), last part (classification with Naive Bayes) I am confused about using  ``glm_t12-average_8cond-tstat.nii`` (averaged data). How can I used cross-validation using this data?
 
+  * Indeed the dataset instructed to use was not compatible with using a cross-validation experiment, which made it difficult if not impossible to do the assignment (sorry for that). Please use  ``glm_t12-perrun_8cond-tstat.nii``  (for each participant separately) instead; then run a searchlight with cross-validation for each subject separately. To support students with the confusing instructions, the deadline for this assignment has been extended for a week.
 
 
 
