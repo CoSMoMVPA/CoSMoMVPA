@@ -112,7 +112,7 @@ Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_.
 .. _cimec2016_intro_links:
 
 Links
------
++++++
 Official website: http://cosmomvpa.org. This is the up-to-date authoritative source.
 
 Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/. This website may be out of date, but should be used for downloading example data.
