@@ -1,12 +1,17 @@
 .. #   For CoSMoMVPA's license terms and conditions, see   #
    #   the COPYING file distributed with CoSMoMVPA         #
 
-.. intro
+.. _exercises_intro:
 
-*Note: This page describes the first part of the course, between 6 April and 2 May 2016. The second part of the course, between 4 May and 11 May 2016, is taught by Christoph Braun and will cover analysis of MEEG data. Information about the second part is not presented here.*
 
 Introduction
 ============
+
+Parts
++++++
+Part 1, 6 April -- 2 May 2016: MVPA for fMRI and MEEG data using CoSMoMVPA, taught by Nikolaas Oosterhof and James Haxby.
+Part 2, between 4 May and 11 May 2016: analysis of MEG data using FieldTrip, taught by Christoph Braun.
+
 
 Prerequisites
 +++++++++++++
@@ -104,21 +109,32 @@ It contains MEG data from a single participant viewing images of six categories;
 
 Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_.
 
+.. _cimec2016_intro_links:
+
 Links
 -----
 Official website: http://cosmomvpa.org. This is the up-to-date authoritative source.
 
 Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/. This website may be out of date, but should be used for downloading example data.
 
+Part 2, MEG slides:
+
+    + `Hands on MEG 01 <_static/external_contrib/HandsOnMEG-01.pdf>`_
+    + `Hands on MEG 02 <_static/external_contrib/HandsOnMEG-02.pdf>`_
+    + `Hands on MEG 03 <_static/external_contrib/HandsOnMEG-03.pdf>`_
+    + `Hands on MEG 04 <_static/external_contrib/HandsOnMEG-04.pdf>`_
+
+
 Assignments
 +++++++++++
 
-In the first four weeks we plan one assignment per week. In addition, one assignment after classes have ended *may* be added. Each assignment will involve MVPA using CoSMoMVPA. More details about assignments will be added here soon.
+In the first part (MVPA for fMRI and MEEG using CoSMoMVPA; before May 3), we plan one assignment per week; each assignment will involve MVPA using CoSMoMVPA.
+In the second part (MEEG analysis using FieldTrip; after May 3) we plan three assignments, of which only two have to be completed. More details about the second part will be added here soon.
 
 Notes:
 
-- You can use PyMVPA for all fMRI exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
-- Using PyMVPA for the MEEG exercises is currently rather challening, as there is little support for MEEG in PyMVPA.
+- You can use PyMVPA for all fMRI MVPA exercises (instead of CoSMoMVPA), but you will be more or less on your own; PyMVPA is not part of the course.
+- Using PyMVPA for the MEEG exercises is currently rather challenging, as there is little support for MEEG in PyMVPA.
 
 Preparation
 -----------
@@ -338,7 +354,8 @@ FAQ
 
 - Are there slides available?
 
-    * currently not; we try to provide all necessary information on the website.
+    * For part 1 (MVPA) we try to provide all necessary information on the website.
+    * For part 2 (MEG), see the `links <cimec2016_intro_links>`_ section.
 
 - For assignment 2, I have a sort of “conceptual” doubt with part 2: is the custom classifier supposed to work on a 8x8 correlation matrix?
 
@@ -407,6 +424,9 @@ Schedule
 
 Location: Pallazina Fedrigotti, computer room at the ground floor.
 
+6 Apr - 2 May: taught by Nikolaas Oosterhof, James Haxby
+4 Apr - 13 May: taught by Christoph Braun
+
 ========= =========== ===================================================================================================
 Date      Time        Description
 ========= =========== ===================================================================================================
@@ -435,22 +455,22 @@ We 27 Apr 09:00-10:45 Practical exercises: MEEG searchlight, MEEG time generaliz
 Mo  2 May 14:00-15:45 Practical exercises: MEEG time generalization, multiple comparison correction; Concluding remarks
 --------- ----------- ---------------------------------------------------------------------------------------------------
 --------- ----------- ---------------------------------------------------------------------------------------------------
-We  4 May 09:00-10:45 NA; taught by Christoph Braun
+We  4 May 09:00-10:45 Trigger, Segmentation, Filtering
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Th  5 May 14:00-15:45 NA; taught by Christoph Braun
+Th  5 May 14:00-15:45 Artifact rejection, Time locked analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr  6 May 14:00-15:45 NA; taught by Christoph Braun
+Fr  6 May 14:00-15:45 Time frequency analysis
 --------- ----------- ---------------------------------------------------------------------------------------------------
-We 11 May 09:00-10:45 NA; taught by Christoph Braun
+We 11 May 09:00-10:45 Functional connectivity
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Th 12 May 14:00-15:45 NA; taught by Christoph Braun
+Th 12 May 14:00-15:45 Preparation of source localization
 --------- ----------- ---------------------------------------------------------------------------------------------------
-Fr 13 May 14:00-15:45 NA; taught by Christoph Braun
+Fr 13 May 14:00-15:45 Source localization, review
 ========= =========== ===================================================================================================
 
 Contact
 +++++++
-Please send an email to a@c or b@c, a=nikolaas.oosterhof, b=james.haxby, and c=unitn.it.
+Please send an email to a@d, b@d, or c@e, a=nikolaas.oosterhof, b=james.haxby, c=christoph.braun, d=unitn.it, e=uni-tuebingen.de.
 
 
 :ref:`Back to index <cimec2016>`

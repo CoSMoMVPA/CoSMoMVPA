@@ -27,3 +27,4 @@ modindex*.rst
 contents_*
 matlab
 publish
+source/_static/external_contrib
