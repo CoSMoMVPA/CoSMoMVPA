@@ -209,27 +209,8 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % check input
-    cosmo_isfield(ds,{'sa.targets','samples'},true);
-
-    args=cosmo_structjoin('metric','correlation',...
-                            'center_data',false,...
-                            varargin);
-
-    % ensure that targets occur exactly once.
-    targets=ds.sa.targets;
-    ntargets=numel(targets);
-
-    % unique targets
-    classes=unique(targets);
-    nclasses=numel(classes);
-
-    % each should occur exactly once
-    if nclasses~=ntargets
-        error(['.sa.targets should be permutation of unique targets; '...
-                'to average samples with the same targets, consider '...
-                'ds_mean=cosmo_fx(ds,@(x)mean(x,1),''targets'')'],...
-                    nclasses);
-    end
+    check_input(ds);
+    args=get_args(varargin);
 
     % make new dataset
     ds_dsm=struct();
@@ -246,18 +227,70 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
     dsm = cosmo_pdist(samples, args.metric)';
 
     % store dsm
+    ds_dsm=get_sample_attributes(ds.sa.targets);
     ds_dsm.samples=dsm;
     % <@@<
 
-    % store single sample attribute: the pairs of sample attribute indices
-    % used to compute the dsm.
-    [i,j]=find(triu(repmat(1:nclasses,nclasses,1),1)');
-    ds_dsm.sa.targets1=i;
-    ds_dsm.sa.targets2=j;
 
-    % set sample dimensions
-    add_labels={'targets1','targets2'};
-    add_values={targets, targets};
-    ds_dsm.a.sdim.labels=add_labels;
-    ds_dsm.a.sdim.values=add_values;
 
+function check_input(ds)
+    if ~(isstruct(ds) && ...
+                isfield(ds,'samples') && ...
+                isfield(ds,'sa') && ...
+                isfield(ds.sa,'targets'))
+        error(['require dataset structure with fields '...
+                    '.samples and .sa.targets']);
+    end
+
+function args=get_args(varargin)
+    persistent cached_varargin;
+    persistent cached_args;
+
+    if ~isequal(varargin, cached_varargin)
+        cached_args=cosmo_structjoin('metric','correlation',...
+                            'center_data',false,...
+                            varargin);
+        cached_varargin=varargin;
+    end
+
+    args=cached_args;
+
+
+function ds_skeleton=get_sample_attributes(targets)
+    persistent cached_targets;
+    persistent cached_ds_skeleton;
+
+    if ~isequal(targets, cached_targets)
+        ntargets=numel(targets);
+
+        % unique targets
+        classes=unique(targets);
+        nclasses=numel(classes);
+
+        % each should occur exactly once
+        if nclasses~=ntargets
+            error(['.sa.targets should be permutation of unique targets; '...
+                    'to average samples with the same targets, consider '...
+                    'ds_mean=cosmo_fx(ds,@(x)mean(x,1),''targets'')'],...
+                        nclasses);
+        end
+
+        % store single sample attribute: the pairs of sample attribute indices
+        % used to compute the dsm.
+        [i,j]=find(triu(repmat(1:nclasses,nclasses,1),1)');
+        cached_ds_skeleton.sa=struct();
+        cached_ds_skeleton.sa.targets1=i;
+        cached_ds_skeleton.sa.targets2=j;
+
+        % set sample dimensions
+        add_labels={'targets1','targets2'};
+        add_values={targets, targets};
+
+        cached_ds_skeleton.a.sdim=struct();
+        cached_ds_skeleton.a.sdim.labels=add_labels;
+        cached_ds_skeleton.a.sdim.values=add_values;
+
+        cached_targets=targets;
+    end
+
+    ds_skeleton=cached_ds_skeleton;
