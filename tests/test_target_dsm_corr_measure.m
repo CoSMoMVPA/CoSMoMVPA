@@ -44,9 +44,13 @@ function test_target_dsm_corr_measure_partial_matlab_correspondence
     if cosmo_skip_test_if_no_external('@stats')
         return;
     end
-    ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
-    vec1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
-    vec2=vec1(end:-1:1);
+    ntargets=ceil(rand()*6+6);
+    ds=cosmo_synthetic_dataset('ntargets',ntargets,'nchunks',1);
+    ds.samples(:,:)=randn(size(ds.samples));
+
+    ncombi=ntargets*(ntargets-1)/2;
+    vec1=randn(1,ncombi);
+    vec2=randn(1,ncombi);
 
     dcm1=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
                                                 'regress_dsm',vec2);
