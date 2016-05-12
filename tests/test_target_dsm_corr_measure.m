@@ -40,8 +40,8 @@ function test_target_dsm_corr_measure_partial
     assertElementsAlmostEqual(dcm1.samples,0.3082,'absolute',1e-4);
 
 
-function test_target_dsm_corr_measure_partial_matlab_correspondence
-    if cosmo_skip_test_if_no_external('@stats')
+function test_target_dsm_corr_measure_partial_vector_partialcorr
+    if cosmo_skip_test_if_no_external('!partialcorr')
         return;
     end
     ntargets=ceil(rand()*6+6);
@@ -64,6 +64,46 @@ function test_target_dsm_corr_measure_partial_matlab_correspondence
 
     dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'regress_dsm',mat2);
+    assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
+
+
+function test_target_dsm_corr_measure_partial_cell_partialcorr
+    if cosmo_skip_test_if_no_external('!partialcorr')
+        return;
+    end
+    ntargets=ceil(rand()*6+6);
+    ds=cosmo_synthetic_dataset('ntargets',ntargets,'nchunks',1);
+    ds.samples(:,:)=randn(size(ds.samples));
+
+    ncombi=ntargets*(ntargets-1)/2;
+    vec1=randn(1,ncombi);
+
+    % set up regression elements
+    n_regress=ceil(rand()*5+3);
+    regress_vec_cell=cell(1,n_regress);
+    regress_mx=zeros(ncombi,n_regress);
+    for k=1:n_regress
+        v=randn(1,ncombi);
+        regress_vec_cell{k}=v;
+        regress_mx(:,k)=v;
+    end
+
+    dcm1=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
+                                           'regress_dsm',regress_vec_cell);
+    distance=cosmo_pdist(ds.samples,'correlation');
+    pcorr=partialcorr(distance',vec1',regress_mx);
+
+    assertElementsAlmostEqual(dcm1.samples,pcorr);
+
+    mat1=cosmo_squareform(vec1);
+
+    regress_mx_cell=cell(size(regress_vec_cell));
+    for k=1:n_regress
+        regress_mx_cell{k}=squareform(regress_vec_cell{k});
+    end
+
+    dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
+                                            'regress_dsm',regress_mx_cell);
     assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
 
 function test_target_dsm_corr_measure_partial_regression

@@ -12,8 +12,8 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                    have zeros on the diagonal and be symmetric.
 %                  - target dissimilarity vector of size Nx1, with
 %                    N=P*(P-1)/2 the number of pairs of samples in ds.
-%                  This option is required if the 'glm_dsm' option is not
-%                  provided, and is incompatible with the 'glm_dsm' option.
+%                  This option is mutually exclusive with the 'glm_dsm'
+%                  option.
 %     .metric      (optional) distance metric used in pdist to compute
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
@@ -21,15 +21,18 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  ds, one of 'Pearson' (default), 'Spearman', or
 %                  'Kendall'.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
-%                  .target_dsm) that should be regressed out. If this
-%                  option is provided then the output is the partial
-%                  correlation between the pairwise distances between
-%                  samples in ds and target_dsm, after controlling for the
-%                  effect in regress_dsm.
+%                  .target_dsm), or a cell with matrices or vectors, that
+%                  should be regressed out. If this option is provided then
+%                  the output is the partial correlation between the
+%                  pairwise distances between samples in ds and target_dsm,
+%                  after controlling for the effect of the matrix
+%                  (or matrices) in regress_dsm. (Using this option yields
+%                  similar behaviour as the Matlab function
+%                  'partial_corr')
 %     .glm_dsm     (optional) cell with model dissimilarity matrices or
 %                  vectors (as .target_dsm) for using a general linear
 %                  model to get regression coefficients for each element in
-%                  .model_dsms. Both the input data and the dissimilarity
+%                  .glm_dsm. Both the input data and the dissimilarity
 %                  matrices are z-scored before estimating the regression
 %                  coefficients.
 %                  This option is required when 'target_dsm' is not
@@ -170,13 +173,14 @@ function ds_sa=correlation_dsm(ds_pdist,params)
 
     has_regress_dsm=isfield(params,'regress_dsm');
     if has_regress_dsm
-        regress_dsm_vec=get_dsm_vec_from_struct(params,'regress_dsm',...
-                                                        npairs_dataset);
+        regress_dsm_mat=get_dsm_mat_from_vector_or_cell(...
+                                                    params.regress_dsm,...
+                                                    npairs_dataset);
 
         % overwrite
         [ds_pdist(:),target_dsm_vec(:)]=regress_out(ds_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_vec);
+                                                regress_dsm_mat);
     end
 
 
@@ -196,7 +200,8 @@ function ds_sa=correlation_dsm(ds_pdist,params)
 function ds_sa=linear_regression_dsm(ds_pdist, params)
     npairs_dataset=numel(ds_pdist);
 
-    dsm_mat=get_dsm_mat_from_vector_or_cell(params.glm_dsm, npairs_dataset);
+    dsm_mat=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...
+                                                npairs_dataset);
 
     % normalize matrices
     dsm_mat_zscore=cosmo_normalize(dsm_mat,'zscore');
@@ -221,10 +226,10 @@ function ds_sa=linear_regression_dsm(ds_pdist, params)
 
 function [ds_resid,target_resid]=regress_out(ds_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_vec)
+                                                regress_dsm_mat)
     % set up design matrix
     nsamples=size(ds_pdist,1);
-    regr=[regress_dsm_vec ones(nsamples,1)];
+    regr=[regress_dsm_mat ones(nsamples,1)];
 
     % put ds_pdist and target_dsm_vec together
     both=[ds_pdist target_dsm_vec];
