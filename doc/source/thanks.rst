@@ -29,6 +29,7 @@ We would like to thank the following people for specific contributions:
 The following people have provided valuable suggestions, advice, support, or code to CoSMoMVPA:
 
 + Talia Brandman
++ Christoph Braun
 + James Brissenden
 + Robert W. Cox
 + Karen Cuculiza

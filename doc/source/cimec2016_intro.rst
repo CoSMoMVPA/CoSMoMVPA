@@ -111,11 +111,27 @@ Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_.
 
 .. _cimec2016_intro_links:
 
+MEG TAC dataset with anatomical scan
+------------------------------------
+This dataset contains the files `<sub24_block02_TAC.fif>`_ and `<02_MPRAGE_GRAPPA3_900.zip>`_. For convenience, a NIFTI anatomical file of the latter is provided in `<02_MPRAGE_GRAPPA3_900.nii>`_.
+
+It was created in an experiment in which sham (event 1), near-threshold (event 3), and supra-threshold tactile stimuli (event 5) were presented. Depending on whether stimuli were detected or not detected or whether there was no response the following response events were created. The trigger information is coded in channel ``STI101``.
+
+==================   =====   ============      ========  ===========
+Stimulus condition   Event                Response Events
+------------------   -----   ---------------------------------------
+|                    |       Not detected      Detected  No response
+==================   =====   ============      ========  ===========
+Sham                    1             12            14           16
+Near Threshold          3             32            34           36
+Supra Threshold         5             52            54           56
+==================   =====   ============      ========  ===========
+
 Links
 +++++
 Official website: http://cosmomvpa.org. This is the up-to-date authoritative source.
 
-Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/. This website may be out of date, but should be used for downloading example data.
+Internal backup mirror (CIMeC-only): http://mat-storage-weisz.unitn.it/cosmomvpa/. This website may be out of date, but can be used for downloading example data.
 
 Part 2, MEG slides:
 
@@ -124,12 +140,13 @@ Part 2, MEG slides:
     + `Hands on MEG 03 <_static/external_contrib/HandsOnMEG-03.pdf>`_
     + `Hands on MEG 04 <_static/external_contrib/HandsOnMEG-04.pdf>`_
 
+More information about MEG analysis: `FieldTrip tutorial <http://www.fieldtriptoolbox.org/tutorial>`_.
 
 Assignments
 +++++++++++
 
 In the first part (MVPA for fMRI and MEEG using CoSMoMVPA; before May 3), we plan one assignment per week; each assignment will involve MVPA using CoSMoMVPA.
-In the second part (MEEG analysis using FieldTrip; after May 3) we plan three assignments, of which only two have to be completed. More details about the second part will be added here soon.
+In the second part (MEEG analysis using FieldTrip; after May 3) there will be three assignments. At least two assignments have to be completed  to pass the second part, but to get a higher (maximal) grade all three assignments must be completed.
 
 Notes:
 
@@ -138,7 +155,8 @@ Notes:
 
 Preparation
 -----------
-- Download the Haxby2001 GLM dataset and store it at a location of your preference
+- Download the Haxby2001 GLM dataset and store it at a location of your preference.
+- Download the MEG obj6 dataset and add it to the location of the tutorial data.
 - Update your ``.cosmomvpa.cfg`` file, so that it contains a new line with a ``haxby2001_data_path`` key; for example the contents could be as follows:
 
         .. code-block:: none
@@ -173,7 +191,9 @@ Your solution will be rated not only on correctness and completeness of the impl
 
 You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but please indicate (through comments in the code) if and where you have used code from elsewhere. It is also acceptable to discuss the problem with your fellow students. It is not acceptable to copy code from your fellow students.
 
-Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof, and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
+You can include images or screenshots if that is asked in the exercise.
+
+Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof (MVPA part), and Christoph Braun (MEG part) and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
 
 Exercise 1 - deadline 23:59, 19 April 2016
 ------------------------------------------
@@ -273,9 +293,9 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 Exercise 3 - deadline 23:59, 03 May 2016
 ----------------------------------------
-Use the Haxby 2001 GLM dataset (see above) for the following analyses:
+*update 30 April 2016: in version 0.1 of the dataset, ``common/brain_mask.nii`` had the value 1 for all voxels. The dataset has been updated to version 0.2. The mask is also available as a seperate `nifti mask file <haxby2001-mask_brain.nii>`_*
 
-*update 30 April 2016: in version 0.1 of the dataset, ``common/brain_mask.nii`` had the value 1 for all voxels. The dataset has been updated to version 0.2. The mask is also available as a seperate `nifti mask file <haxby2001-mask_brain.nii>`_
+Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 - *Classification searchlight*. Use an LDA classifier with take-one-out crossvalidation to classify the 8 conditions for participant ``s01``. Use the common brain mask in ``common/mask_brain.nii`` and the data from ``s01/glm_t12-perrun_8cond-tstat.nii``; for the searchlight, use a spherical neighborhoood with approximately 100 voxels in each searchlight. Show a map with classification accuracies using :ref:`cosmo_plot_slices`.
 
@@ -343,6 +363,54 @@ Exercise 4 - deadline 23:59, 17 May 2016
     - :ref:`cosmo_plot_slices`
 
 
+MEG Exercises - deadline 23:59, 5 June 2016
+---------------------------------------------
+
+    - *Please send your solutions to Christoph Braun*
+    - *You are asked to complete at least two of the three assignments below to pass the class; for a higher (and maximal) grade you will have to complete all three exercises*.
+    - *Hand in your commented code and the results of your analysis. Comment on and interprete your results. Present figures in your report and  mention possible difficulties in your report.*
+
+
+#) Time-lock analysis
+
+    Use the dataset in ``sub24_block02_TAC.fif`` for the following analysis:
+
+        #) Define trials with a prestimulus interval and a poststimulus interval of 2 s each.
+        #) Lowpass filter the raw data with a cut-off frequency of 40 Hz.
+        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels. Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
+        #) Do the time-locked analysis with respect to stimulus presentation for all the different conditions. Plot the evoked responses summarized across all channels for the different conditions. In particular, plot the different stimulation conditions in different subplots. In each subplot, the evoked responses for detected and not-detected stimuli.
+        # ) Plot the topography at different peak latencies. For the different stimuli
+
+
+#) Time-frequency analysis
+
+    Use the dataset in ``sub24_block02_TAC.fif`` for the following analysis:
+
+        #) Define trials with a prestimulus interval and a poststimulus interval of 2 s each.
+        #) Lowpass filter the raw data with a cutoff frequency at 40 Hz.
+        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels.
+        Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
+        #) Perform two different analyses:  first a time-frequency analysis and then a spectral analysis. Focus on the baseline period.
+        Compare detected stimuli versus not-detected stimuli. Since the number of trials is critical for the power make sure that you analyze the same number of trials for both conditions.
+
+
+#) Source analysis
+
+    The zip file ``02_MPRAGE_GRAPPA3_900.zip`` contains an anatomical MRI of a subject. Use this together with the dataset in ``sub24_block02_TAC.fif`` for the following analysis:
+
+        #)	Load the MRI file and coregister the anatomy to the functional data (either to the timelock-analysis or the timefrequency analysis).
+        #)	Create a headmodel and a sourcemodel (rectangular equally spaced grid)
+        #)	Localize either a condition of the timefrequency analysis or the timelock analysis.
+        #)	Display results overlaid on to the subject's head.
+
+    Extra task in case you want to do a more challanging task
+
+        #)	Load the MRI file and coregister the anatomy to the functional data (either to the timelock-analysis or the timefrequency analysis).
+        #)	Create a head model for the subject's MRI
+        #)	Create a equidistant, rectangular sourcemodel in the MNI-template brain (provided by fieldtrip)
+        #)	Warp the template sourcemodel grid to the individual subject's head.
+        #)	Do the sourcelocalization either oft he timefrequency analysis or the timelock analysis.
+        #)	Display results on the template brain.
 
 
 FAQ
@@ -379,8 +447,8 @@ FAQ
                 [1x1 struct]    [1x1 struct]
 
 
-        Then, I compute my correlation for each voxel across these 2 subjects and store the result in a 1 x num_of_voxels array (‘corr’).
-        To plot these results, I copy one of the two ds I worked on, and I substitute the .samples with my ‘corr’ array:
+        Then, I compute my correlation for each voxel across these 2 subjects and store the result in a 1 x num_of_voxels array ('corr').
+        To plot these results, I copy one of the two ds I worked on, and I substitute the .samples with my 'corr' array:
 
         .. code-block:: matlab
 
@@ -397,9 +465,9 @@ FAQ
             Error using cosmo_plot_slices (line 72)
             expected 3D image - did you select a single volume?
 
-        But if I transpose the targets in my ds_corr, everything works…or at least the image appears and to my ‘naive’ eye seems correct.
+        But if I transpose the targets in my ds_corr, everything works... or at least the image appears and to my 'naive' eye seems correct.
 
-        I’m sure I just miss something in the logics of cosmo_plot_slices: could it be that having a 1 x n samples array, if I don’t transpose the targets into an horizontal vector the dimensions simply mismatch, then the code doesn’t work?
+        I'm sure I just miss something in the logics of cosmo_plot_slices: could it be that having a 1 x n samples array, if I don't transpose the targets into an horizontal vector the dimensions simply mismatch, then the code doesn't work?
 
   * The issue is how you substitud the .samples in the 'corr' array. ``ds_dsm`` has 28 (=8*(8-1)/2) rows (samples), and the samples attributes each must have the same number of rows. One way to deal with this is to do:
 
