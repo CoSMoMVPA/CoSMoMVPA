@@ -47,8 +47,8 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Stefania Mattioni
 + Mike Miller
 + Sam Nastase
-+ Nicholas Peatfield
 + Liuba Papeo
++ Nicholas Peatfield
 + Alexis Perez
 + Jia Hou Poh
 + Daria Proklova
