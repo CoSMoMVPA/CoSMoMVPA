@@ -57,6 +57,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Gaetan Sanchez
 + Jens Schwarzbach
 + Mohamed Tawfik
++ Raffaele Tucciarelli
 + Luca Turella
 + Moritz Wurm
 
