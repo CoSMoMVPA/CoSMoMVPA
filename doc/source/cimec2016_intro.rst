@@ -113,7 +113,7 @@ Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_.
 
 MEG TAC dataset with anatomical scan
 ------------------------------------
-This dataset contains the files ``sub24_block02_TAC.fif>`` and ``02_MPRAGE_GRAPPA3_900.zip>``. Contact Christoph Braun (see below for contact information) to obtain this data.
+This dataset contains the files ``sub24_block02_TAC.fif`` and ``02_MPRAGE_GRAPPA3_900.zip``. Contact Christoph Braun (see below for contact information) to obtain this data.
 
 It was created in an experiment in which sham (event 1), near-threshold (event 3), and supra-threshold tactile stimuli (event 5) were presented. Depending on whether stimuli were detected or not detected or whether there was no response the following response events were created. The trigger information is coded in channel ``STI101``.
 
