@@ -336,8 +336,6 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     end
 
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
-    % deal with offset at (.5, .5, .5) [CHECKME]
-    mat(1:3,4)=mat(1:3,4)-mat(1:3,1:3)*.5*[1 1 1]';
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
     bv_coords=neuroelf_bvcoordconv_wrapper(tal_coords(1:3,:), ...
                                         'tal2bvs',hdr.BoundingBox);

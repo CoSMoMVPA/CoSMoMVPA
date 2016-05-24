@@ -385,12 +385,12 @@ function xff_bv_glm=get_expected_xff_bv_glm()
                                 'Name2',{'1','2'},...
                                 'RGB',{[255 0 0] [0 255 0]});
     xff_bv_glm.Resolution=2;
-    xff_bv_glm.XStart = 126;
-    xff_bv_glm.XEnd = 130;
-    xff_bv_glm.YStart = 128;
-    xff_bv_glm.YEnd = 130;
-    xff_bv_glm.ZStart = 124;
-    xff_bv_glm.ZEnd = 130;
+    xff_bv_glm.XStart = 127;
+    xff_bv_glm.XEnd = 131;
+    xff_bv_glm.YStart = 129;
+    xff_bv_glm.YEnd = 131;
+    xff_bv_glm.ZStart = 125;
+    xff_bv_glm.ZEnd = 131;
 
     data=zeros(2,1,3,2);
     data_size=size(data);
@@ -406,12 +406,12 @@ function xff_bv_vtc=get_expected_xff_bv_vtc()
     xff_bv_vtc.NrOfVolumes=2;
 
     xff_bv_vtc.Resolution=2;
-    xff_bv_vtc.XStart = 126;
-    xff_bv_vtc.XEnd = 130;
-    xff_bv_vtc.YStart = 128;
-    xff_bv_vtc.YEnd = 130;
-    xff_bv_vtc.ZStart = 124;
-    xff_bv_vtc.ZEnd = 130;
+    xff_bv_vtc.XStart = 127;
+    xff_bv_vtc.XEnd = 131;
+    xff_bv_vtc.YStart = 129;
+    xff_bv_vtc.YEnd = 131;
+    xff_bv_vtc.ZStart = 125;
+    xff_bv_vtc.ZEnd = 131;
 
     data_orig=zeros(2,1,3,2);
     data_size=size(data_orig);
@@ -430,12 +430,12 @@ function xff_bv_vtc=get_expected_xff_bv_vtc()
 function bv_msk=get_expected_bv_msk()
     bv_msk=struct();
     bv_msk.Resolution= 2 ;
-    bv_msk.XStart = 126;
-    bv_msk.XEnd = 130;
-    bv_msk.YStart = 128;
-    bv_msk.YEnd = 130;
-    bv_msk.ZStart = 124;
-    bv_msk.ZEnd = 130;
+    bv_msk.XStart = 127;
+    bv_msk.XEnd = 131;
+    bv_msk.YStart = 129;
+    bv_msk.YEnd = 131;
+    bv_msk.ZStart = 125;
+    bv_msk.ZEnd = 131;
 
     data=zeros(2,1,3,'uint8');
     data(:,:,1) = [ 155 118 ];
@@ -455,12 +455,12 @@ function bv_vmp=get_expected_bv_vmp()
     bv_vmp.FingerprintParamsRangeFrom = 0;
     bv_vmp.FingerprintParamsRangeTo = 0;
     bv_vmp.Resolution = 2;
-    bv_vmp.XStart = 126;
-    bv_vmp.XEnd = 130;
-    bv_vmp.YStart = 128;
-    bv_vmp.YEnd = 130;
-    bv_vmp.ZStart = 124;
-    bv_vmp.ZEnd = 130;
+    bv_vmp.XStart = 127;
+    bv_vmp.XEnd = 131;
+    bv_vmp.YStart = 129;
+    bv_vmp.YEnd = 131;
+    bv_vmp.ZStart = 125;
+    bv_vmp.ZEnd = 131;
 
     map1.VMPData=reshape([-0.2040   -1.0504   -0.2617   ...
                             -3.6849    1.3494    2.0317],[2 1 3]);

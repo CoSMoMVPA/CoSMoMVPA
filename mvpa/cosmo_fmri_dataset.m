@@ -1362,9 +1362,6 @@ function vol=get_vol_bv(hdr)
     mat=neuroelf_bvcoordconv_wrapper([],'bvx2tal',bbox);
     dim=bbox.DimXYZ;
 
-    % deal with offset at (.5, .5, .5) [CHECKME]
-    mat(1:3,4)=mat(1:3,4)+mat(1:3,1:3)*.5*[1 1 1]';
-
     vol=struct();
     vol.mat=mat;
     vol.dim=dim;
