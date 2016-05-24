@@ -30,8 +30,13 @@ function [indices_cell, ds_intersect_cell]=cosmo_mask_dim_intersect(ds_cell,dim,
 %     ds1=cosmo_slice(ds_full,[2 5 3 1],2);
 %     ds2=cosmo_slice(ds_full,[5 1 4 6 2],2);
 %     %
+%     % trying to stack these along the sample dimension gives an error,
+%     % because the feature attributes do not match
+%     result=cosmo_stack({ds1,ds2},1);
+%     > error('size mismatch along dimension 2 ...')
+%     %
 %     % find indices for common mask
-%     [idx_cell,ds_int]=cosmo_mask_dim_intersect({ds1,ds2});
+%     [idx_cell,ds_int_cell]=cosmo_mask_dim_intersect({ds1,ds2});
 %     %
 %     % show slice-arg indices required for each of the two datasets
 %     % to select features (voxels) common across the two datasets;
@@ -42,6 +47,7 @@ function [indices_cell, ds_intersect_cell]=cosmo_mask_dim_intersect(ds_cell,dim,
 %     %
 %     % when slicing using the indices, the dimension feature attributes
 %     % (here: voxel coordinates) are identical
+%     % note: ds_int_cell is equivalent to ds1_sel and ds2_cell
 %     ds1_sel=cosmo_slice(ds1,idx_cell{1},2);
 %     ds2_sel=cosmo_slice(ds2,idx_cell{2},2);
 %     % show voxel coordinates for the two datasets
@@ -52,6 +58,14 @@ function [indices_cell, ds_intersect_cell]=cosmo_mask_dim_intersect(ds_cell,dim,
 %     >     [ 1 1 2 ]        [ 1 1 2 ]
 %     >   .k               .k
 %     >     [ 1 1 1 ]        [ 1 1 1 ] }
+%     %
+%     % because the feature attribtues match, they can now be stacked
+%     result=cosmo_stack(ds_int_cell,1);
+%     disp(result)
+%     >     samples: [12x3 double]
+%     >          sa: [1x1 struct]
+%     >          fa: [1x1 struct]
+%     >           a: [1x1 struct]
 %
 %
 % Notes:
