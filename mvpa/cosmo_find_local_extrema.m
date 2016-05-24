@@ -29,7 +29,7 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %
 %
 % Example:
-%     % generate tiny dataset with 6 voxels
+%     % Generate tiny dataset with 6 voxels
 %     ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',1);
 %     cosmo_disp(ds.samples)
 %     > [ 2.03     0.584     -1.44    -0.518      1.19     -1.33 ]
@@ -62,6 +62,45 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %     > feature_ids =   1         6
 %     > scores      =   2.0317   -1.3265
 %
+%
+%     % A more sophisticated example showing how a table of local maxima
+%     % can be produced:
+%     %
+%     % Generate synthetic dataset with 700 voxels
+%     ds=cosmo_synthetic_dataset('size','big',...
+%                                        'ntargets',1,'nchunks',1);
+%     %
+%     % ensure LPI orientation
+%     ds=cosmo_fmri_reorient(ds,'LPI');
+%     %
+%     % set minimum distance (in voxels) between local extrama (peaks)
+%     min_voxels_between_extrema=5;
+%     nh=cosmo_spherical_neighborhood(ds,...
+%                         'radius',min_voxels_between_extrema,...
+%                         'progress',false);
+%     %
+%     % find local maxima
+%     % (note: local minima are not found; this would require a
+%     %       'fitness' argument different from the default)
+%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh);
+%     %
+%     % define and apply threshold
+%     thr=1.96;
+%     msk=scores>thr;
+%     feature_ids=feature_ids(msk);
+%     scores=scores(msk);
+%     %
+%     % get coordinates of local extrama
+%     xyz=cosmo_vol_coordinates(ds,feature_ids);
+%     %
+%     % show table with coordinates and value at local extrema
+%     fprintf('x=% 3d y=% 3d z=% 3d   score=%.3f\n',[xyz; scores]);
+%     > x= 11 y=  7 z=  3   score=3.679
+%     > x= -1 y=  3 z= -1   score=3.458
+%     > x= 27 y=  7 z=  7   score=3.361
+%     > x= 35 y= -1 z=  3   score=3.288
+%     > x= 23 y=  1 z= -1   score=2.899
+%     > x= 35 y= 11 z= -1   score=2.268
 %
 % Notes:
 %   - this function can be used to define regions of interest in a
