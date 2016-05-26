@@ -9,7 +9,7 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %   'divisions', d      Number of divisions along each feature dimension.
 %                       For example, if d=4 for an fMRI dataset (with
 %                       three feature dimensions corresponding to the three
-%                       spatial dimension, then the output will have
+%                       spatial dimensions), then the output will have
 %                       at most 4^3=64 neighborhood structs and masks.
 %
 % Output:
