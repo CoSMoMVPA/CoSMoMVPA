@@ -1,7 +1,7 @@
 function ds_avg=cosmo_average_samples(ds, varargin)
-% average subsets of samples by unique combinations of chunks and targets
+% average subsets of samples by unique combinations of sample attributes
 %
-% ds_avg=cosmo_averaging_measure(ds, 'ratio', ratio, ['nrep',nrep])
+% ds_avg=cosmo_average_samples(ds, ...)
 %
 % Inputs:
 %   ds              dataset struct with field:
@@ -16,20 +16,25 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %   'repeats', r    Number of times an average is computed for each unique
 %                   combination of targets and chunks. Not compatible with
 %                   'resamplings'
-%   'seed', d       Use seed d for pseudo-random sampling (optional). If
-%                   this option is omitted, then different calls to this
+%   'seed', d       Use seed d for pseudo-random sampling (optional); d
+%                   can be any integer between 1 and 2^32-1.
+%                   If this option is omitted, then different calls to this
 %                   function may (usually: will) return different results.
+%   'split_by',fs   A cell with fieldnames by which the dataset is split
+%                   prior to averaging each bin.
+%                   Default: {'targets','chunks'}.
 %
 %
 % Returns
 %   ds_avg          dataset struct with field:
-%      .samples     ('nrep'*ntargets*nchunks) x NF, where
-%                   ntargets and nchunks are the number of unique targets
-%                   and chunks, respectively. Each sample is an average
-%                   from samples that share the same values for
-%                   .sa.{chunks,targets}. The number of times each sample
-%                   is used to compute average values differs by one at
-%                   most.
+%      .samples     ('repeats'*unq) x NF, where
+%                   unq is the number of unique combinations of values in
+%                   sample attribute as indicated by 'split_by' (by
+%                   default, data is split by 'targets' and 'chunks').
+%                   Each sample is an average from samples that share the
+%                   same values for these attributes. The number of times
+%                   each sample is used to compute average values differs
+%                   by one at most.
 %      .sa          Based on averaged samples.
 %      .fa,.a       Same as in ds (if present).
 %
@@ -46,7 +51,7 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     >   2         2
 %     >   1         3
 %     >   2         3 ]@18x2
-%     % average each unique combiniation of chunks and targets
+%     % average each unique combination of chunks and targets
 %     ds_avg=cosmo_average_samples(ds);
 %     cosmo_disp([ds_avg.sa.targets ds_avg.sa.chunks]);
 %     > [ 1         1
@@ -118,7 +123,8 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %    of samples, how many samples are averaged for each output sample.
 %    'resamplings' and 'repeats' determine how many averages are taken,
 %    based on how many samples are averaged for each output sample.
-%
+% -  To compute averages based on other sample attributes than 'targets'
+%    and 'chunks', use the 'split_by' option
 %
 % See also: cosmo_balance_partitions
 %
@@ -127,10 +133,12 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 
     % deal with input parameters
 
+    defaults=struct();
     defaults.seed=[];
+    defaults.split_by={'targets','chunks'};
 
     opt=cosmo_structjoin(defaults, varargin);
-    split_idxs=get_split_indices(ds);
+    split_idxs=get_split_indices(ds, opt);
 
     nsplits=numel(split_idxs);
     bin_counts=cellfun(@numel,split_idxs);
@@ -160,18 +168,46 @@ function ds_avg=cosmo_average_samples(ds, varargin)
     ds_avg.samples=mu;
 
 
-function split_idxs=get_split_indices(ds)
+function split_idxs=get_split_indices(ds, opt)
+    persistent cached_sa;
+    persistent cached_opt;
+    persistent cached_split_idxs;
+
     if ~(isstruct(ds) && ...
-                isfield(ds,'samples') && ...
-                isfield(ds,'sa') && ...
-                isfield(ds.sa,'targets') && ...
-                isfield(ds.sa,'chunks'))
-        error(['First input must be dataset struct with fields '...
-                '.samples, .sa.targets and .sa.chunks']);
+            isfield(ds,'samples') && ...
+            isfield(ds,'sa'))
+        error(['First argument must be a dataset struct field fields '...
+                    'samples and sa']);
     end
 
-    split_idxs=cosmo_index_unique({ds.sa.targets,ds.sa.chunks});
+    if ~(isequal(cached_opt,opt) && ...
+                    isequal(cached_sa,ds.sa))
+        split_by=opt.split_by;
+        if ~iscellstr(split_by)
+            error('''split_by''  must be a cell with strings');
+        end
 
+        n_dim=numel(split_by);
+        if n_dim==0
+            cached_split_idxs={(1:size(ds.samples,1))'};
+        else
+            values=cell(n_dim,1);
+            for k=1:numel(split_by)
+                key=split_by{k};
+                if ~isfield(ds.sa,key)
+                    error('Missing field ''%s'' in .sa', key);
+                end
+                values{k}=ds.sa.(key);
+            end
+            cached_split_idxs=cosmo_index_unique(values);
+        end
+
+
+        cached_sa=ds.sa;
+        cached_opt=opt;
+    end
+
+    split_idxs=cached_split_idxs;
 
 
 function [idx, value]=get_mutually_exclusive_param(opt, names, ...
