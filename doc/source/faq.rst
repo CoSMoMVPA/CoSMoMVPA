@@ -820,5 +820,17 @@ Assuming you would like to do second-level (group) anaysis:
 - :ref:`cosmo_target_dsm_corr_measure`: correlation values are not Fisher transformed. You could consider applying ``atanh`` to the ``.samples`` output
 - :ref:`cosmo_dissimilarity_matrix_measure`: the ``.samples`` field contains, by default, one minus the correlation, and thus its range is the interval ``[0, 2]``. Fisher-transformation should not be used, as values greater than 1 are transformed to complex (non-real) numbers.
 
+Average samples in a deterministic manner?
+------------------------------------------
+'When using :ref:`cosmo_average_samples` multiple times on the same dataset, I get different avaraged datasets. How can I get the same result every time?'
+
+:ref:`cosmo_average_samples`  has a ``seed`` option; you can use any integer for a seed. For example, if ``ds`` is a dataset, then
+
+  .. code-block:: matlab
+
+        ds_avg=cosmo_average_samples(ds,'seed',1);
+
+will pseudo-deterministically select the same samples upon repeated evaluations of the expression, and thus return the same result
+
 
 .. include:: links.txt
