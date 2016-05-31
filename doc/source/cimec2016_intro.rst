@@ -181,8 +181,8 @@ Please write a matlab ``.m`` file that can be executed. Use the following as a t
         % Email address:  karen@studenti.unitn.it
         % Date:           08 Apr 2016
         %
-        % I, karen, declare that the work included is my own work;
-        % that I did not copy from others (unless I indicated otherwise); that I did not
+        % I, karen, declare that the work included is my own work; that I did not
+        % copy from others (unless I indicated otherwise); that I did not
         % let others copy my work; and that the source of any code obtained
         % from elsewhere is properly attributed / cited.
 
