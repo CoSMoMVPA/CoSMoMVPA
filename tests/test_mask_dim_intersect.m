@@ -99,7 +99,11 @@ function helper_test_mask_dim_intersect(dim)
         idx=ds_indices_cell{k}.samples(indices{k});
 
         % indices must be unique
-        assertEqual(sort(idx),sort(ds_keep_indices));
+        if isempty(idx)
+            assert(isempty(ds_keep_indices));
+        else
+            assertEqual(sort(idx),sort(ds_keep_indices));
+        end
 
         % must return indices in the same order
         ds_sel=cosmo_slice(ds_indices_cell{k},indices{k},dim);
