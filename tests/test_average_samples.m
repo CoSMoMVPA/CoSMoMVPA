@@ -51,6 +51,88 @@ function test_average_samples_
     assertElementsAlmostEqual(delta*3000,round(delta*3000));
 
 
+function test_average_samples_split_by
+    plural_singular={'targets','targets';...
+                     'chunks','chunks';...
+                     'subjects','subject';...
+                     'modalities','modality';...
+                    };
+    n_dim=size(plural_singular,1);
+
+    combis=cosmo_cartprod(repmat({{true,false}},n_dim,1)');
+    for k=1:size(combis,1);
+        combi=cell2mat(combis(k,:));
+        opt=struct();
+        opt.seed=0; % truly random data
+        for j=1:n_dim
+            count=ceil(rand()*2+1);
+            opt.(['n' plural_singular{j,1}])=count;
+        end
+
+        ds=cosmo_synthetic_dataset(opt);
+
+        values=cell(n_dim,1);
+        for j=1:n_dim
+            if combi(j)
+                values{j}=ds.sa.(plural_singular{j,2});
+            end
+        end
+        values=values(combi);
+        if any(combi)
+            [idx,unq_cell]=cosmo_index_unique(values);
+        else
+            idx={1:(size(ds.samples,1))};
+        end
+        n_avg=numel(idx);
+        n_features=size(ds.samples,2);
+        expected_samples=zeros(n_avg,n_features);
+        for m=1:n_avg
+            expected_samples(m,:)=mean(ds.samples(idx{m},:),1);
+        end
+
+        result=cosmo_average_samples(ds,...
+                            'split_by',plural_singular(combi,2));
+
+
+        assertEqual(size(result.samples),size(expected_samples));
+        delta=bsxfun(@minus,result.samples(:,1),expected_samples(:,1)');
+        mapping=zeros(1,n_avg);
+        for m=1:n_avg
+            [mn,mn_idx]=min(abs(delta(m,:)));
+            assert(mn<1e-5); % deal with rounding
+            mapping(mn_idx)=m;
+        end
+        assertEqual(sort(mapping),1:n_avg);
+
+        result_perm=cosmo_slice(result,mapping);
+        assertElementsAlmostEqual(result_perm.samples,expected_samples);
+
+        pos=0;
+        for j=1:n_dim
+            if combi(j)
+                pos=pos+1;
+                fn=plural_singular{j,2};
+                assertEqual(unq_cell{pos},result_perm.sa.(fn));
+            end
+        end
+
+
+        % check default result
+        if isequal(plural_singular(combi),{'targets','chunks'});
+            default_result=cosmo_average_samples(ds);
+            assertEqual(result,default_result);
+        end
+
+    end
+
+
+function test_average_samples_split_by_empty()
+    ds=cosmo_synthetic_dataset('ntargets',ceil(rand()*5+2),...
+                                'nchunks',ceil(rand()*5+2));
+    result=cosmo_average_samples(ds,'split_by',{});
+    assertElementsAlmostEqual(result.samples,mean(ds.samples,1));
+
+
 function test_average_samples_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_average_samples(varargin{:}),'');
@@ -81,6 +163,18 @@ function test_average_samples_exceptions
     aet(ds,'resamplings',[2 2]);
     aet(ds,'resamplings',-1);
     aet(ds,'resamplings',1,'repeats',1);
+
+    % not existing field
+    ds_bad=ds;
+    ds_bad.sa=rmfield(ds_bad.sa,'targets');
+    aet(ds_bad);
+
+    % illegal split-by arguments
+    aet(ds,'split_by',[]);
+    aet(ds,'split_by',struct());
+    aet(ds,'split_by','foo');
+    aet(ds,'split_by',{1,2});
+
 
 
 function test_average_samples_with_repeats
