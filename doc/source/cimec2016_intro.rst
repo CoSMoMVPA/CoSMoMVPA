@@ -180,18 +180,24 @@ Please write a matlab ``.m`` file that can be executed. Use the following as a t
         % Student number: 654321
         % Email address:  karen@studenti.unitn.it
         % Date:           08 Apr 2016
+        %
+        % I, karen, declare that the work included is my own work;
+        % that I did not copy from others (unless I indicated otherwise); that I did not
+        % let others copy my work; and that the source of any code obtained
+        % from elsewhere is properly attributed / cited.
 
         config=cosmo_config();
         data_path=config.haxby2001_data_path;
 
+with the name (``karen``) and other information replaced by your details. Please make sure that your solution can be run on other computers where the data is stored in a different directory. Note that you must only include the declaration (the paragraph starting with "I [...] declare that the work assignment are my own work;") if this statement is true.
 
-so that your solution can be run on other computers where the data is stored in a different directory.
+Assignments must be your own work
+---------------------------------
+Your solution will be rated not only on correctness and completeness of the implementation, but also on readibility and understandibility. Please indent your code, add comments where necessary, and use reasonable variable names. For details, see :ref:`matlab code guidelines`. You can include images or screenshots if that is asked in the exercise.
 
-Your solution will be rated not only on correctness and completeness of the implementation, but also on readibility and understandibility. Please indent your code, add comments where necessary, and use reasonable variable names. For details, see :ref:`matlab code guidelines`.
+We attempt to assign interesting programs that will help you learn the topics discussed in the course, and grade the assignments quickly and fairly. If you need more clarification or help, please let us know - we will try to help. If you are unable to meet a deadline and need more time, please contact us and, most likely, an extension can probably be arranged if the cause for the delay seems reasonable.
 
-You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but please indicate (through comments in the code) if and where you have used code from elsewhere. It is also acceptable to discuss the problem with your fellow students. It is not acceptable to copy code from your fellow students.
-
-You can include images or screenshots if that is asked in the exercise.
+You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but if you do so, indicate (through comments in the code) where you have used (segments of) code from elsewhere. It is also acceptable to discuss the problem and algorithm with others; if you do so, indicate for which parts this is the case (through comments in the code). You can help debug other people's code, as long as this does not involve copying code from yourself or third parties. It is not acceptable to collaborate on writing code together, to copy parts of the implementation (code) from others, or make available your code to other participants in the course. Neither plagiarism nor the faclitation of plagariarism (by letting others copy your work) is acceptable. If non-acceptable behaviour is detected, this may result in serious consequences including but not limited to a reduced grade, failing the class, notification of the program director, and/or expulsion from your program. If you have any questions, please let us know.
 
 Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof (MVPA part), and Christoph Braun (MEG part) and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
 
