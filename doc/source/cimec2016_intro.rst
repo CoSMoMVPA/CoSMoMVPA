@@ -197,7 +197,7 @@ Your solution will be rated not only on correctness and completeness of the impl
 
 We attempt to assign interesting programs that will help you learn the topics discussed in the course, and grade the assignments quickly and fairly. If you need more clarification or help, please let us know - we will try to help. If you are unable to meet a deadline and need more time, please contact us and, most likely, an extension can probably be arranged if the cause for the delay seems reasonable.
 
-You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but if you do so, indicate (through comments in the code) where you have used (segments of) code from elsewhere. It is also acceptable to discuss the problem and algorithm with others; if you do so, indicate for which parts this is the case (through comments in the code). You can help debug other people's code, as long as this does not involve copying code from yourself or third parties. It is not acceptable to collaborate on writing code together, to copy parts of the implementation (code) from others, or make available your code to other participants in the course. Neither plagiarism nor the faclitation of plagariarism (by letting others copy your work) is acceptable. If non-acceptable behaviour is detected, this may result in serious consequences including but not limited to a reduced grade, failing the class, notification of the program director, and/or expulsion from your program. If you have any questions, please let us know.
+You should write your own code and comments. It is acceptable to use code from the CoSMoMVPA website, the CoSMoMVPA code-base, or from other internet sources, but if you do so, indicate (through comments in the code) where you have used (segments of) code from elsewhere. It is also acceptable to discuss the problem and algorithm with others; if you do so, indicate for which parts this is the case (through comments in the code). You can help debug other people's code, or compare the output (the result of running the code), as long as this does not involve copying code from yourself or third parties. It is not acceptable to collaborate on writing code together, to copy parts of the implementation (code) from others, or make available your code to other participants in the course. Neither plagiarism nor the faclitation of plagariarism (by letting others copy your work) is acceptable. If non-acceptable behaviour is detected, this may result in serious consequences including but not limited to a reduced grade, failing the class, notification of the program director, and/or expulsion from your program. If you have any questions, please let us know.
 
 Please send your solution before the deadline to James Haxby and Nikolaas Oosterhof (MVPA part), and Christoph Braun (MEG part) and use the subject line ``CIMEC hands-on - exercise X``, with ``X`` the appropriate value.
 
@@ -369,7 +369,7 @@ Exercise 4 - deadline 23:59, 17 May 2016
     - :ref:`cosmo_plot_slices`
 
 
-MEG Exercises - deadline 23:59, 5 June 2016
+MEG Exercises - deadline 23:59, 15 June 2016
 ---------------------------------------------
 
     - *Please send your solutions to Christoph Braun*
