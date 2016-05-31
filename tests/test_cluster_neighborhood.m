@@ -377,6 +377,61 @@ function test_cluster_neighborhood_source_mom
     end
 
 
+function test_cluster_neighborhood_fmri_time
+    for fa_n_rep=[1,4]
+        n_time=ceil(rand()*3+4);
+        TR=2;
+        time_values=TR*(1:n_time);
+
+        ds_cell=cell(n_time,fa_n_rep);
+        for fa_t=1:n_time
+            ds=cosmo_synthetic_dataset('size','normal','seed',0);
+            n_features=size(ds.samples,2);
+            time_idx=ones(1,n_features)*fa_t;
+            ds=cosmo_dim_insert(ds,2,4,{'time'},{time_values},{time_idx});
+            ds_cell(fa_t,:)=repmat({ds},1,fa_n_rep);
+        end
+
+        % select subset
+        ds_full=cosmo_stack(ds_cell,2);
+        n_features=size(ds_full.samples,2);
+        rp=randperm(n_features);
+        n_keep=ceil(n_features/2);
+        keep_idxs=rp(1:n_keep);
+
+        ds=cosmo_slice(ds_full,keep_idxs,2);
+
+        fa_ijk=[ds.fa.i; ds.fa.j; ds.fa.k];
+        fa_t=ds.fa.time;
+
+        for join_time=-1:1
+            if join_time==-1
+                args={};
+            else
+                args={'time',join_time==1};
+            end
+            nh=cosmo_cluster_neighborhood(ds,args,'progress',false);
+
+            assertEqual(nh.origin.fa,ds.fa);
+            assertEqual(nh.origin.a,ds.a);
+
+            assertEqual(nh.fa.sizes,ones(1,n_keep));
+            assertEqual(nh.a,ds.a);
+
+            time_radius=abs(join_time);
+            for k=1:numel(nh.neighbors)
+                idx=nh.neighbors{k};
+
+                delta_xyz=sqrt(sum(bsxfun(@minus,fa_ijk(:,k),fa_ijk).^2,1));
+                delta_t=abs(fa_t(k)-fa_t);
+
+                msk=delta_xyz<=1.9 & delta_t<=time_radius;
+                assertEqual(sort(idx),find(msk))
+            end
+
+        end
+    end
+
 function test_cluster_neighborhood_exceptions
     ds=cosmo_synthetic_dataset();
     aet=@(varargin)assertExceptionThrown(...
