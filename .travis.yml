@@ -15,6 +15,7 @@ env:
 matrix:
   allow_failures:
     - env: WITH_EXTERNALS=true  WITH_COVERAGE=true
+  fast_finish: true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -54,11 +55,9 @@ install:
     - PTH=`pwd`
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
-    - echo "MVPA path ${OCTAVEPTH}"
-    - ls "${OCTAVEPTH}"
     - CHECKEXTCMD=""
     - OCTAVE=octave
-    - if [[ "${WITH_COVERAGE}" = "true" ]]; then
+    - if [[ "$WITH_COVERAGE" == "true" ]]; then
           EXTERNALS="
                      afni
                      surfing
