@@ -359,7 +359,7 @@ function b=isa_bv_smp(x)
 
 function s=read_bv_smp(fn)
     s=xff(fn);
-    s=bless(s);
+    neuroelf_bless_wrapper(s);
 
 function [data,node_indices,sa]=build_bv_smp(s)
     nsamples=s.NrOfMaps;
@@ -379,8 +379,10 @@ function [data,node_indices,sa]=build_bv_smp(s)
     sa.labels=labels;
     sa.stats=cosmo_statcode(s);
 
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
 
-
-
-
+    result=bless(arg);
 

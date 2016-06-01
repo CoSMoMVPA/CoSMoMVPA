@@ -313,6 +313,13 @@ function mat=neuroelf_bvcoordconv_wrapper(varargin)
 
     mat=f(varargin{:});
 
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
+
+    result=bless(arg);
+
     %% Brainvoyager VMP
 function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     % ensure dataset is plump
@@ -406,7 +413,7 @@ function hdr=new_bv_vmp(ds)
     hdr.Map=cat(2,maps{:});
     hdr.NrOfMaps=nsamples;
 
-    bless(hdr);
+    neuroelf_bless_wrapper(hdr);
 
 function write_bv(fn, hdr)
     % general storage function

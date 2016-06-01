@@ -62,10 +62,17 @@ function props=format2props(format)
 
 function x=read_bv_and_bless(fn)
     x=xff(fn);
-    bless(x);
+    neuroelf_bless_wrapper(x);
 
 function x=do_nothing(x)
     % do nothing
+
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
+
+    result=bless(arg);
 
 function write_mat_struct(fn,s)
     save(fn,'-struct','s');

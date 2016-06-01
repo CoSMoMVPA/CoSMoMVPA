@@ -291,22 +291,17 @@ function s=build_bv_smp(ds)
     s.NrOfMaps=nsamples;
     s.NrOfVertices=nfeatures;
 
-    bless(s);
+    neuroelf_bless_wrapper(s);
 
 function write_bv_smp(fn,s,opt)
     s.SaveAs(fn);
     s.ClearObject();
 
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
 
-
-
-
-
-
-
-
-
-
-
+    result=bless(arg);
 
 

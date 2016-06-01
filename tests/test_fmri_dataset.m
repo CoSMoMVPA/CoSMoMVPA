@@ -128,7 +128,7 @@ function test_bv_vmr_fmri_dataset()
     bv_vmr=cosmo_map2fmri(uint_ds,'-bv_vmr');
 
     cleaner=onCleanup(@()bv_vmr.ClearObject());
-    bless(bv_vmr);
+    neuroelf_bless_wrapper(bv_vmr);
 
     assert_bv_equal(bv_vmr, get_expected_bv_vmr());
     ds_bv_vmr=cosmo_fmri_dataset(bv_vmr,'mask',false);
@@ -145,7 +145,7 @@ function test_bv_vmp_fmri_dataset()
     bv_vmp=cosmo_map2fmri(ds,'-bv_vmp');
 
     cleaner=onCleanup(@()bv_vmp.ClearObject());
-    bless(bv_vmp);
+    neuroelf_bless_wrapper(bv_vmp);
 
     assert_bv_equal(bv_vmp, get_expected_bv_vmp());
     ds_bv_vmp=cosmo_fmri_dataset(bv_vmp);
@@ -162,7 +162,7 @@ function test_bv_msk_fmri_dataset()
     bv_msk=cosmo_map2fmri(uint_ds,'-bv_msk');
 
     cleaner=onCleanup(@()bv_msk.ClearObject());
-    bless(bv_msk);
+    neuroelf_bless_wrapper(bv_msk);
 
     assert_bv_equal(bv_msk, get_expected_bv_msk());
 
@@ -182,7 +182,7 @@ function test_bv_vtc_fmri_dataset()
 
     xff_bv_vtc=get_expected_xff_bv_vtc();
     cleaner=onCleanup(@()xff_bv_vtc.ClearObject());
-    bless(xff_bv_vtc);
+    neuroelf_bless_wrapper(xff_bv_vtc);
 
     ds_bv_vtc=cosmo_fmri_dataset(xff_bv_vtc);
     ds_bv_glm_lpi=cosmo_fmri_reorient(ds_bv_vtc,'LPI');
@@ -200,7 +200,7 @@ function test_bv_glm_subject_fmri_dataset()
 
     xff_bv_glm=get_expected_xff_bv_glm();
     cleaner=onCleanup(@()xff_bv_glm.ClearObject());
-    bless(xff_bv_glm);
+    neuroelf_bless_wrapper(xff_bv_glm);
 
     ds_bv_glm=cosmo_fmri_dataset(xff_bv_glm);
     ds_bv_glm_lpi=cosmo_fmri_reorient(ds_bv_glm,'LPI');
@@ -651,4 +651,11 @@ function s=clear_fields(s,keys)
         v(:)=0;
         s.(key)=v;
     end
+
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
+
+    result=bless(arg);
 
