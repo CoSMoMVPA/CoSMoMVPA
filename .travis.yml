@@ -9,12 +9,16 @@ language: java
 cache:
   - apt
 env:
-  - WITH_EXTERNALS=false WITH_COVERAGE=false
-  - WITH_EXTERNALS=true  WITH_COVERAGE=false
-  - WITH_EXTERNALS=true  WITH_COVERAGE=true
+  - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false
+  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false
+  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
 matrix:
+  # allow failures with coverage, because execution speed
+  # is significantly lower when coverage is enabled which may
+  # result in a time-out (error) when execution time
+  # exceeds 50 minutes.
   allow_failures:
-    - env: WITH_EXTERNALS=true  WITH_COVERAGE=true
+    - env: TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
   fast_finish: true
 before_install:
     # to prevent IPv6 being used for APT
@@ -45,7 +49,7 @@ before_install:
     - make -C MOxUnit install
 
     # optionally retrieve MOcov
-    - if [[ "$WITH_COVERAGE" == "true" ]]; then
+    - if [[ "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
           rm -rf MOcov;
           git clone git://github.com/MOcov/MOcov.git;
           make -C MOcov install;
@@ -57,7 +61,7 @@ install:
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
     - CHECKEXTCMD=""
     - OCTAVE=octave
-    - if [[ "$WITH_COVERAGE" == "true" ]]; then
+    - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
                      afni
                      surfing
@@ -173,7 +177,7 @@ before_script:
 script:
     - cd CoSMoMVPA
     - ls
-    - if [[  "$WITH_COVERAGE" == "true" ]]; then
+    - if [[  "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
           TEST_ARGS=WITH_COVERAGE=true;
           COVER_ARGS=COVER=`pwd`/mvpa;
 
