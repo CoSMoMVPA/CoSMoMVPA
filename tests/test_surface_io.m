@@ -170,17 +170,26 @@ function save_and_load(format)
     switch format
         case 'bv_smp'
             exception_io_failed='xff:XFFioFailed';
-            exception_bad_content='xff:BadFileContent';
+
+            % neuroelf v<1.1 did not have the 'neuroelf:' prefix
+            exception_bad_content={'xff:BadFileContent',...
+                                    'neuroelf:xff:badFileContent'};
 
         otherwise
             exception_io_failed='';
             exception_bad_content='';
     end
 
-    assertExceptionThrown(@()reader(tmp_fn2),exception_io_failed);
+    % file should not be readable
+    assertExceptionThrown(@()reader(tmp_fn2),...
+                                        exception_io_failed);
 
+    % file should not exist
     tmp_fn2=cosmo_make_temp_filename();
-    assertExceptionThrown(@()reader(tmp_fn2),exception_bad_content);
+    assert_helper_any_exception_thrown(@()reader(tmp_fn2),...
+                                        exception_bad_content);
+
+
 
 function test_surface_io_exceptions()
     aet_in=@(varargin)assertExceptionThrown(@()...
@@ -240,6 +249,26 @@ function assert_dataset_equal(x,y,format)
     if ~strcmp(format,'gii')
         assertEqual(x.sa,z.sa);
     end
+
+function assert_helper_any_exception_thrown(f, exception)
+    if ischar(exception)
+        assertExceptionThrown(f,exception);
+        return
+    end
+
+    assert(iscell(exception))
+    try
+        f();
+        error('no exception thrown');
+    catch
+        e=lasterror();
+        i=strmatch(e.identifier,exception,'exact');
+        if isempty(i)
+            error('None of the following exceptions was thrown: %s',...
+                    cosmo_strjoin(exception,', '));
+        end
+    end
+
 
 
 
