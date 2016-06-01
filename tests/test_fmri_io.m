@@ -617,7 +617,11 @@ function sib_exts=get_sibling_exts(ext)
             sib_exts={'+tlrc.BRIK'};
         case '+tlrc.BRIK'
             sib_exts={'+tlrc.HEAD'};
-        case {'.msk','.mat','.vmr','.vmp','.nii','.nii.gz'};
+        case '.vmp'
+            % recent Neuroelf (>=v1.1) seems to save run time variables
+            % in an .rtv file
+            sib_exts={'.rtv'};
+        case {'.msk','.mat','.vmr','.nii','.nii.gz'};
             % do nothing
         otherwise
             error('unsupported extension ''%s''',ext);
