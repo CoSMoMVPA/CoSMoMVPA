@@ -310,72 +310,6 @@ Run group analysis
 
         Also, :ref:`cosmo_cluster_neighborhood` works on other types of datasets, including surface-based fMRI, timelocked MEEG, and time-frequency MEEG.)
 
-    First of all, it is important that subjects are in the same common space, such as MNI or Talairach.
-    If you run the searchlight for each subject along the following lines:
-
-        .. code-block:: matlab
-
-            result_cell=cell(nsubj,1);
-            for subj=1:nsubj
-                % searchlight code for this subject
-                % (your code here)
-                result=searchlight(...);
-
-                % here we assume a single output (sample) for each
-                % searchlight. For statistical analysis later, where
-                % we want to do a one-sample t-test, we set
-                % .sa.targets to 1 (any constant value will do) and
-                % .sa.chunks to the subject number.
-                % nsamples=size(result.samples,1);
-                %
-                % Notes:
-                % - these values can also be set after the analysis is run,
-                %   although that may be more error-prone
-                % - for other statistical tests, such as one-way ANOVA,
-                %   repeated-measures ANOVA, paired-sample t-test and
-                %   two-sample t-tests, chunks and targets have to be
-                %   set differently. See the documentation of
-                %   cosmo_montecarlo_cluster_stat for details.
-
-                result.sa.targets=1;
-                result.sa.chunks=subj;
-                result_cell{subj}=result;
-            end
-
-    then data can be joined using
-
-        .. code-block:: matlab
-
-            result=cosmo_stack(result_cell);
-
-    (If this gives an error because feature attributes do not match: this can be due to using different brain masks across participants. To use a common mask, either use :ref:`cosmo_fmri_dataset` with a common mask to load the data before running the searchlight, or apply a common mask afterwards, as in
-
-        .. code-block:: matlab
-
-            % If data from different subjects was based on different masks,
-            % they can be masked afterwards using a common mask.
-            %
-            % It is strongly recommended to use a the common mask that
-            % is an intersection mask, with non-zero values only for features
-            % (voxels) that have data for all participants. Otherwise
-            % this could lead to either loss of power, or (in the case
-            % of the 'h0_mean' parameter set to a non-zero value in
-            % cosmo_montecarlo_cluster_stat), incorrect results with
-            % artifacts
-
-
-            % for the common mask use either a filename, or a dataset with
-            % a single sample
-            common_mask='my_common_mask.nii';
-
-            for k=1:nsubj
-                % apply common mask for each subject
-                result_cell{k}=cosmo_fmri_dataset(result_cell{k},...
-                                        'mask',common_mask);
-            end
-
-            result=cosmo_stack(result_cell);
-
     Assuming that ``result`` was constructed as above, a group analysis using Threshold-Free Cluster Enhancement and using 1000 permutations can now by done quite easily. For a one-sample t-test (one sample per participant, it is however required to specify the mean under the null hypothesis. When the :ref:`cosmo_correlation_measure` or :ref:`cosmo_target_dsm_corr_measure` is used, this is typically zero, whereas for :ref:`cosmo_crossvalidation_measure`, this is typically 1 divided by the number of classes (e.g. ``0.25`` for 4-class discrimination).
 
         .. code-block:: matlab
@@ -396,6 +330,54 @@ Run group analysis
                                                     'niter', niter,...
                                                     'h0_mean', h0_mean);
 
+
+
+Make an intersection mask across participants
+---------------------------------------------
+    'I ran my analysis for multiple participants, each with their own mask. Now I want to do group analysis, but combining the data using :ref:`cosmo_stack` gives an error because feature attributes do not match. How can I combine data across participants?
+
+If ``ds_cell`` is a cell so that ``ds_cell{k}`` contains the dataset from the ``k``-th participant, an intersection (based on features common across participants) can be computed though:
+
+    .. code-block:: matlab
+
+        [idxs,ds_intersect_cell]=cosmo_mask_dim_intersect(ds_cell);
+
+For (second level) group analysis, in general, it is a good idea to assign ``chunks`` (if not done already) and ``targets``. The general approach to setting chunks is by indicating that data from different participants is assumed to be independent; for setting targets, see the help of :ref:`cosmo_stat`:
+
+    .. code-block:: matlab
+
+        n_subjects=numel(ds_intersect_cell);
+        for subject_i=1:n_subjects
+            % get dataset
+            ds=ds_intersect_cell{subject_i];
+
+            % assign chunks
+            n_samples=size(ds.samples,1);
+            ds.sa.chunks=ones(nsamples,1)*subject_i;
+
+            % assign targets
+            % Your code comes here; see cosmo_stat on how to assign
+            % targets depending on subsequent analysis
+            % (one-sample or two-sample t-test, or one-way or
+            % repeated-measures ANOVA).
+
+
+            % store results
+            ds_intersect_cell{subject_i}=ds;
+        end
+
+
+The the resulting datasets can be combined through:
+
+    .. code-block:: matlab
+
+        ds_all=cosmo_stack(ds_intersect_cell,2);
+
+Note: The above line may give an error ``non-unique elements in fa.X``, with ``X`` some feature attribute such as ``center_ids`` or ``radius``. This is to be expected if the datasets are the result from another analysis, such as :ref:`cosmo_searchlight`. In that case, the data can be combined using:
+
+    .. code-block:: matlab
+
+        ds_all=cosmo_stack(ds_intersect_cell,2,'drop_nonunique');
 
 
 Run group analysis on time-by-time generalization measures

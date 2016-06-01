@@ -57,13 +57,7 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %     ds=cosmo_synthetic_dataset('type','surface');
 %     % convert to bv smp xff struct
 %     % (to store a file to disc, use a filename as the second argument)
-%     bv_smp=cosmo_map2surface(ds,'-bv_smp')
-%     >           FileVersion: 5
-%     >          NrOfVertices: 6
-%     >              NrOfMaps: 6
-%     >     NameOfOriginalSRF: 'untitled.srf'
-%     >                   Map: [1x6 struct]
-%     >           RunTimeVars: [1x1 struct]
+%     bv_smp=cosmo_map2surface(ds,'-bv_smp');
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
@@ -291,22 +285,17 @@ function s=build_bv_smp(ds)
     s.NrOfMaps=nsamples;
     s.NrOfVertices=nfeatures;
 
-    bless(s);
+    neuroelf_bless_wrapper(s);
 
 function write_bv_smp(fn,s,opt)
     s.SaveAs(fn);
     s.ClearObject();
 
+function result=neuroelf_bless_wrapper(arg)
+    % deals with recent neuroelf (>v1.1), where bless is deprecated
+    s=warning('off','neuroelf:xff:deprecated');
+    resetter=onCleanup(@()warning(s));
 
-
-
-
-
-
-
-
-
-
-
+    result=bless(arg);
 
 
