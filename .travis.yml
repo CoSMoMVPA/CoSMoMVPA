@@ -9,14 +9,12 @@ language: java
 cache:
   - apt
 env:
-  global:
-    - OCTAVE=octave
-    - COSMOPATH=`pwd`
-    - MVPAPATH=${COSMOPATH}/mvpa
-  matrix:
-    - EXTERNALS=""
-    - EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_pkg_miscellaneous octave_savannah_evalc"
-    - WITH_COVERAGE=true EXTERNALS="afni surfing fieldtrip libsvm gifti octave_pkg_parallel octave_pkg_statistics octave_pkg_miscellaneous octave_savannah_evalc"
+  - WITH_EXTERNALS=false WITH_COVERAGE=false
+  - WITH_EXTERNALS=true  WITH_COVERAGE=false
+  - WITH_EXTERNALS=true  WITH_COVERAGE=true
+matrix:
+  allow_failures:
+    - env: WITH_EXTERNALS=true  WITH_COVERAGE=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -55,8 +53,24 @@ before_install:
 install:
     - PTH=`pwd`
     - OCTAVERC=~/.octaverc
-    - OCTAVEPTH="${MVPAPATH}"
+    - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
+    - echo "MVPA path ${OCTAVEPTH}"
+    - ls "${OCTAVEPTH}"
     - CHECKEXTCMD=""
+    - OCTAVE=octave
+    - if [[ "${WITH_COVERAGE}" = "true" ]]; then
+          EXTERNALS="
+                     afni
+                     surfing
+                     fieldtrip
+                     libsvm
+                     gifti
+                     octave_pkg_parallel
+                     octave_pkg_statistics
+                     octave_pkg_miscellaneous
+                     octave_savannah_evalc
+                    ";
+      fi
 
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
