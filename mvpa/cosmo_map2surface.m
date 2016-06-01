@@ -57,13 +57,7 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %     ds=cosmo_synthetic_dataset('type','surface');
 %     % convert to bv smp xff struct
 %     % (to store a file to disc, use a filename as the second argument)
-%     bv_smp=cosmo_map2surface(ds,'-bv_smp')
-%     >           FileVersion: 5
-%     >          NrOfVertices: 6
-%     >              NrOfMaps: 6
-%     >     NameOfOriginalSRF: 'untitled.srf'
-%     >                   Map: [1x6 struct]
-%     >           RunTimeVars: [1x1 struct]
+%     bv_smp=cosmo_map2surface(ds,'-bv_smp');
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
