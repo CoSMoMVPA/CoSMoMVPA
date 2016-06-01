@@ -41,14 +41,6 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     % compute dissimilarity with centered data
 %     dsm_ds=cosmo_dissimilarity_matrix_measure(ds,'center_data',true);
 %     cosmo_disp(dsm_ds);
-%     > .samples
-%     >   [         0
-%     >             2
-%     >             2
-%     >         :
-%     >      1.11e-16
-%     >      1.11e-16
-%     >     -2.22e-16 ]@10x1
 %     > .sa
 %     >   .targets1
 %     >     [ 2
@@ -76,6 +68,14 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     >           13      13
 %     >           14      14
 %     >           15 ]    15 ] }
+%     > .samples
+%     >   [         0
+%     >             2
+%     >             2
+%     >         :
+%     >      1.11e-16
+%     >      1.11e-16
+%     >     -2.22e-16 ]@10x1
 %     %
 %     % map results to matrix. values of 0 mean perfect correlation
 %     [samples, labels, values]=cosmo_unflatten(dsm_ds,1,...
@@ -185,9 +185,9 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',3);
 %     ds_avg=cosmo_fx(ds,@(x)mean(x,1),'targets');
 %     cosmo_dissimilarity_matrix_measure(ds_avg)
-%     >     samples: [3x1 double]
 %     >          sa: [1x1 struct]
 %     >           a: [1x1 struct]
+%     >     samples: [3x1 double]
 %
 % Notes:
 %   - it is recommended to set the 'center_data' to true when using
