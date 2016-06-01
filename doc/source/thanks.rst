@@ -58,6 +58,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Jens Schwarzbach
 + Yuan Tao
 + Mohamed Tawfik
++ Lara Todorova
 + Raffaele Tucciarelli
 + Luca Turella
 + Moritz Wurm
