@@ -339,7 +339,7 @@ function result=neuroelf_bless_wrapper(arg)
     result=bless(arg);
 
     %% Brainvoyager VMP
-function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
+function [hdr,ds]=new_bv_mat_hdr(ds,bv_type)
     % ensure dataset is plump
     check_plump_orientation(ds);
 
@@ -364,6 +364,8 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
         % forced earlier
         error('Unsupported orientation: need ARS');
     end
+
+    hdr=xff(['new:' bv_type]);
 
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
@@ -399,12 +401,9 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     end
 
 function hdr=new_bv_vmp(ds)
-    hdr=xff('new:vmp');
+    [hdr,ds]=new_bv_mat_hdr(ds,'vmp');
 
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmp');
-
-    % Store the data
-
+    % Get data
     nsamples=size(ds.samples,1);
     maps=cell(1,nsamples);
 
@@ -450,8 +449,7 @@ function hdr=new_bv_vmr(ds)
         error('Unsupported: more than 1 sample');
     end
 
-    hdr=xff('new:vmr');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
+    [hdr,ds]=new_bv_mat_hdr(ds,'vmr');
 
     % scale to 0..255
     vol_data=unflatten(ds);
@@ -464,8 +462,7 @@ function hdr=new_bv_msk(ds)
         error('Unsupported: more than 1 sample');
     end
 
-    hdr=xff('new:msk');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
+    [hdr,ds]=new_bv_mat_hdr(ds,'msk');
 
     vol_data=unflatten(ds);
     hdr.Mask=scale_uint8(vol_data);
