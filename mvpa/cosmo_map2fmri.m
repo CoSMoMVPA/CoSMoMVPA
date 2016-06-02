@@ -442,13 +442,13 @@ function clean_bv(hdr)
 
     %% Brainvoyager VMR
 function hdr=new_bv_vmr(ds)
-    hdr=xff('new:vmr');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
-
     nsamples=size(ds.samples,1);
     if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
+
+    hdr=xff('new:vmr');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
 
     % scale to 0..255
     vol_data=unflatten(ds);
@@ -456,13 +456,13 @@ function hdr=new_bv_vmr(ds)
 
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
-    hdr=xff('new:msk');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
-
     nsamples=size(ds.samples,1);
     if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
+
+    hdr=xff('new:msk');
+    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
 
     vol_data=unflatten(ds);
     hdr.Mask=scale_uint8(vol_data);
