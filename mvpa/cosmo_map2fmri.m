@@ -343,6 +343,11 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     % ensure dataset is plump
     check_plump_orientation(ds);
 
+    if ~strcmp(bv_type,'vmr')
+        % require voxels to be isotropic
+        check_isotropic_voxels(ds);
+    end
+
     % automatically set orientation to ARS
     if ~strcmp(cosmo_fmri_orientation(ds),'ASR')
         ds=cosmo_fmri_reorient(ds,'ASR');
@@ -367,8 +372,6 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
 
     switch bv_type
         case {'vmp','msk'}
-            % require voxels to be isotropic
-            check_isotropic_voxels(ds);
             dg=diag(rot_asr);
             resolution=prod(dg)^(1/3);
 
