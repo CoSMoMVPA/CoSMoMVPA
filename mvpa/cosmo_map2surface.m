@@ -111,13 +111,28 @@ function s=cosmo_map2surface(ds, fn, varargin)
     externals=format.externals;
     cosmo_check_external(externals);
 
+
     builder=format.builder;
     s=builder(ds);
+
+    if nargout==0
+        cleaner=onCleanup(get_cleaner(format,s));
+    end
 
     if save_to_file
         writer=format.writer;
         writer(fn, s, opt);
     end
+
+function f=get_cleaner(format,obj)
+    if isfield(format,'cleaner')
+        f=@()format.cleaner(obj);
+    else
+        f=@do_nothing;
+    end
+
+function do_nothing()
+    % do nothing
 
 function format=get_format(formats,fn)
     endswith=@(s,e) isempty(cosmo_strsplit(s,e,-1));
@@ -147,6 +162,7 @@ function formats=get_formats()
     formats.bv_smp.exts={'.smp'};
     formats.bv_smp.builder=@build_bv_smp;
     formats.bv_smp.writer=@write_bv_smp;
+    formats.bv_smp.cleaner=@(x)x.ClearObject();
     formats.bv_smp.externals={'neuroelf'};
 
     formats.gii.exts={'.gii'};
@@ -236,8 +252,6 @@ function write_niml_dset(fn,s,opt)
 
 
 function s=build_bv_smp(ds)
-    s=xff('new:smp');
-
     [nsamples,nfeatures]=size(ds.samples);
     [data, node_indices]=get_surface_data_and_node_indices(ds);
     if ~isequal(node_indices,1:nfeatures)
@@ -252,6 +266,7 @@ function s=build_bv_smp(ds)
     for k=1:nsamples
         t=xff('new:smp');
         map=t.Map;
+        t.ClearObject();
         map.SMPData=data(k,:);
 
         if k==1
@@ -281,6 +296,7 @@ function s=build_bv_smp(ds)
         maps{k}=map;
     end
 
+    s=xff('new:smp');
     s.Map=cat(2,maps{:});
     s.NrOfMaps=nsamples;
     s.NrOfVertices=nfeatures;
@@ -289,7 +305,7 @@ function s=build_bv_smp(ds)
 
 function write_bv_smp(fn,s,opt)
     s.SaveAs(fn);
-    s.ClearObject();
+
 
 function result=neuroelf_bless_wrapper(arg)
     % deals with recent neuroelf (>v1.1), where bless is deprecated
