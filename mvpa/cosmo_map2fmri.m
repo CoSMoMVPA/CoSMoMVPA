@@ -366,6 +366,7 @@ function [hdr,ds]=new_bv_mat_hdr(ds,bv_type)
     end
 
     hdr=xff(['new:' bv_type]);
+    hdr=neuroelf_bless_wrapper(hdr);
 
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
