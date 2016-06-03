@@ -44,30 +44,6 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     >     .values
 %     >       { [ 2 21 202 ] }
 %
-%     % construct BrainVoyager surface map
-%     cosmo_check_external('neuroelf');
-%     smp=xff('new:smp');
-%     %
-%     % make surface dataset
-%     % (a filename of a .smp file is supported as well)
-%     ds=cosmo_surface_dataset(smp);
-%     cosmo_disp(ds)
-%     > .samples
-%     >   [ 0         0         0  ...  0         0         0 ]@1x40962
-%     > .sa
-%     >   .labels
-%     >     { 'New Map' }
-%     >   .stats
-%     >     { 'Ttest(249)' }
-%     > .fa
-%     >   .node_indices
-%     >     [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'node_indices' }
-%     >     .values
-%     >       { [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962 }
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
@@ -108,27 +84,130 @@ function ds=cosmo_surface_dataset(fn, varargin)
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function ds=get_dataset(fn)
-    has_read_dataset=false;
-
-    ds=fn;
-    while true
-        if cosmo_check_dataset(ds,'surface',false)
-            return;
-        end
-
-        if ischar(ds) && isempty(cosmo_strsplit(ds,'.mat',-1))
-            ds=importdata(ds);
-            continue;
-        end
-
-        if has_read_dataset
-            raise_error=true;
-            cosmo_check_dataset(ds,'surface',raise_error);
-        end
-
-        ds=read_surface_dataset(ds);
-        has_read_dataset=true;
+    obj_to_clean=[];
+    % try to load from .mat file
+    obj_from_mat=try_dataset_from_mat(fn);
+    if isempty(obj_from_mat)
+        obj=fn;
+    else
+        obj=obj_from_mat;
+        obj_to_clean=obj;
     end
+
+    % try to load from file
+    if ischar(obj)
+        obj=try_obj_from_file(obj);
+        obj_to_clean=obj;
+    end
+
+    [ds,fmt]=try_dataset_from_obj(obj);
+
+    if ~isempty(obj_to_clean)
+        apply_cleaner(obj_to_clean,fmt);
+    end
+
+function obj=try_dataset_from_mat(fn)
+    obj=[];
+    if ischar(fn) && isempty(cosmo_strsplit(fn,'.mat',-1))
+        obj=importdata(fn);
+    end
+
+function [obj,fmt]=try_obj_from_file(fn)
+    assert(ischar(fn));
+    [exts_cell,fmts]=get_format_attribute('exts');
+
+    endswith=@(s,e) isempty(cosmo_strsplit(s,e,-1));
+    endswith_any=@(s,ce) any(cellfun(@(x)endswith(s,x),ce));
+
+    match=cellfun(@(x)endswith_any(fn,x), exts_cell);
+
+    i=find_single_or_error(match, ...
+                            @()sprintf('unknown extension for file %s',...
+                                                fn));
+    fmt=fmts{i};
+    reader=fmt.reader;
+    obj=reader(fn);
+
+
+function [ds,fmt]=try_dataset_from_obj(obj)
+    if cosmo_check_dataset(obj,'surface',false)
+        % it is already a valid dataset
+        ds=obj;
+        fmt='';
+        return;
+    end
+
+    [matcher_cell,fmts]=get_format_attribute('matcher');
+
+    match=cellfun(@(f) f(obj),matcher_cell);
+    i=find_single_or_error(match, ...
+                            @()sprintf('unknown object of type %s',...
+                                                class(obj)));
+
+    fmt=fmts{i};
+    ds=build_dataset(obj,fmt);
+
+
+function ds=build_dataset(obj,fmt)
+    builder=fmt.builder;
+    [data,node_indices,sa]=builder(obj);
+    nfeatures=size(data,2);
+    if nfeatures~=numel(node_indices)
+        error(['The number of features (%d) does not match the number '...
+                'of node indices (%d)'],nfeatures,numel(node_indices));
+    end
+
+    ds=struct();
+    ds.samples=data;
+
+    % set sample attributes
+    ds.sa=sa;
+
+    % set feature attributes
+    ds.fa.node_indices=1:nfeatures;
+
+    % set dataset attributes
+    fdim=struct();
+    fdim.labels={'node_indices'};
+    fdim.values={node_indices(:)'};
+    ds.a.fdim=fdim;
+
+function apply_cleaner(obj,fmt)
+    if ~isempty(fmt) && isfield(fmt,'cleaner')
+        cleaner=fmt.cleaner;
+        cleaner(obj);
+    end
+
+function i=find_single_or_error(m, error_text_func)
+    i=find(m);
+    switch numel(i)
+        case 0
+            error(error_text_func());
+
+        case 1
+            % ok
+
+        otherwise
+            assert(false,'this should not happen');
+    end
+
+function [elems,fmts]=get_format_attribute(fmt_key)
+    img_formats=get_img_formats();
+    keys=fieldnames(img_formats);
+    n_fmts=numel(keys);
+
+    elems=cell(n_fmts,1);
+    fmts=cell(n_fmts,1);
+
+    for k=1:n_fmts
+        key=keys{k};
+
+        fmt=img_formats.(key);
+        elems{k}=fmt.(fmt_key);
+        fmts{k}=fmt;
+    end
+
+
 
 function ds=read_surface_dataset(fn)
     [data,node_indices,sa]=read(fn);
@@ -232,6 +311,7 @@ function img_formats=get_img_formats()
     img_formats.bv_smp.matcher=@isa_bv_smp;
     img_formats.bv_smp.reader=@read_bv_smp;
     img_formats.bv_smp.builder=@build_bv_smp;
+    img_formats.bv_smp.cleaner=@(x)x.ClearObject();
     img_formats.bv_smp.externals={'neuroelf'};
 
     img_formats.gii.exts={'.gii'};
@@ -378,6 +458,7 @@ function [data,node_indices,sa]=build_bv_smp(s)
     sa=struct();
     sa.labels=labels;
     sa.stats=cosmo_statcode(s);
+
 
 function result=neuroelf_bless_wrapper(arg)
     % deals with recent neuroelf (>v1.1), where bless is deprecated

@@ -62,14 +62,30 @@ function hdr=cosmo_map2fmri(dataset, fn, varargin)
     % build header structure
     hdr=creator(dataset);
 
+    if nargout==0
+        cleaner=onCleanup(get_cleaner(methods,hdr));
+    end
+
     if save_to_file
         writer=methods.writer;
         writer(fn, hdr);
     end
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % general helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function f=get_cleaner(methods,hdr)
+    if isfield(methods,'cleaner')
+        f=@()methods.cleaner(hdr);
+    else
+        f=@do_nothing;
+    end
+
+function do_nothing
+    % do nothing
+
 function ds=preprocess(ds,opt)
     if opt.deoblique
         ds=cosmo_fmri_deoblique(ds);
@@ -164,7 +180,6 @@ function unfl_ds_timelast=unflatten(ds)
 
 
 
-
 function b=ends_with(end_str, str)
     if iscell(end_str)
         b=any(cellfun(@(x) ends_with(x,str),end_str));
@@ -196,22 +211,25 @@ function img_formats=get_img_formats()
 
     img_formats.bv_vmp.creator=@new_bv_vmp;
     img_formats.bv_vmp.writer=@write_bv;
+    img_formats.bv_vmp.cleaner=@clean_bv;
     img_formats.bv_vmp.externals={'neuroelf'};
     img_formats.bv_vmp.exts={'.vmp'};
 
     img_formats.bv_vmr.creator=@new_bv_vmr;
     img_formats.bv_vmr.writer=@write_bv;
+    img_formats.bv_vmr.cleaner=@clean_bv;
     img_formats.bv_vmr.externals={'neuroelf'};
     img_formats.bv_vmr.exts={'.vmr'};
 
     img_formats.bv_msk.creator=@new_bv_msk;
     img_formats.bv_msk.writer=@write_bv;
+    img_formats.bv_msk.cleaner=@clean_bv;
     img_formats.bv_msk.externals={'neuroelf'};
     img_formats.bv_msk.exts={'.msk'};
 
+    img_formats.afni.creator=@new_afni;
     img_formats.afni.writer=@write_afni;
     img_formats.afni.externals={'afni'};
-    img_formats.afni.creator=@new_afni;
     img_formats.afni.exts={'+orig','+orig.HEAD','+orig.BRIK',...
                            '+orig.BRIK.gz','+tlrc','+tlrc.HEAD',...
                            '+tlrc.BRIK','+tlrc.BRIK.gz'};
@@ -321,9 +339,14 @@ function result=neuroelf_bless_wrapper(arg)
     result=bless(arg);
 
     %% Brainvoyager VMP
-function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
+function [hdr,ds]=new_bv_mat_hdr(ds,bv_type)
     % ensure dataset is plump
     check_plump_orientation(ds);
+
+    if ~strcmp(bv_type,'vmr')
+        % require voxels to be isotropic
+        check_isotropic_voxels(ds);
+    end
 
     % automatically set orientation to ARS
     if ~strcmp(cosmo_fmri_orientation(ds),'ASR')
@@ -342,6 +365,9 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
         error('Unsupported orientation: need ARS');
     end
 
+    hdr=xff(['new:' bv_type]);
+    hdr=neuroelf_bless_wrapper(hdr);
+
     % Set {X,Y,Z}{Start,End} values based on the transformation matrix
     tal_coords=mat*[1 1 1 1; ds.a.vol.dim+1, 1]';
     bv_coords=neuroelf_bvcoordconv_wrapper(tal_coords(1:3,:), ...
@@ -349,8 +375,6 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
 
     switch bv_type
         case {'vmp','msk'}
-            % require voxels to be isotropic
-            check_isotropic_voxels(ds);
             dg=diag(rot_asr);
             resolution=prod(dg)^(1/3);
 
@@ -378,12 +402,9 @@ function [hdr,ds]=add_bv_mat_hdr(hdr,ds,bv_type)
     end
 
 function hdr=new_bv_vmp(ds)
-    hdr=xff('new:vmp');
+    [hdr,ds]=new_bv_mat_hdr(ds,'vmp');
 
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmp');
-
-    % Store the data
-
+    % Get data
     nsamples=size(ds.samples,1);
     maps=cell(1,nsamples);
 
@@ -418,18 +439,18 @@ function hdr=new_bv_vmp(ds)
 function write_bv(fn, hdr)
     % general storage function
     hdr.SaveAs(fn);
-    hdr.ClearObject();
 
+function clean_bv(hdr)
+    hdr.ClearObject();
 
     %% Brainvoyager VMR
 function hdr=new_bv_vmr(ds)
-    hdr=xff('new:vmr');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'vmr');
-
     nsamples=size(ds.samples,1);
     if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
+
+    [hdr,ds]=new_bv_mat_hdr(ds,'vmr');
 
     % scale to 0..255
     vol_data=unflatten(ds);
@@ -437,13 +458,12 @@ function hdr=new_bv_vmr(ds)
 
     %% Brainvoyager mask
 function hdr=new_bv_msk(ds)
-    hdr=xff('new:msk');
-    [hdr,ds]=add_bv_mat_hdr(hdr,ds,'msk');
-
     nsamples=size(ds.samples,1);
     if nsamples~=1,
         error('Unsupported: more than 1 sample');
     end
+
+    [hdr,ds]=new_bv_mat_hdr(ds,'msk');
 
     vol_data=unflatten(ds);
     hdr.Mask=scale_uint8(vol_data);

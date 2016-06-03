@@ -1349,12 +1349,13 @@ function z=xff_struct(x)
     % helper function: applies xff and returns a struct
     % this avoids clearing of the object (which xff seems like doing)
     y=xff(x);
-
     z=getcont(y);
-
 
     % BoundingBox is a method; copy its output to the struct
     z.BoundingBox=y.BoundingBox;
+
+    % Clear object
+    y.ClearObject();
 
 function vol=get_vol_bv(hdr)
     % bv vol info
@@ -1477,6 +1478,7 @@ function data=convert_bv_vmp_data(hdr, volumes)
     end
 
     data=cat(4,data_cell{:});
+
 
 
 % BV mask input

@@ -27,6 +27,39 @@ function test_surface_dataset_bv_smp()
 function test_surface_dataset_pymvpa()
     save_and_load('pymvpa');
 
+function test_surface_io_exceptions()
+    aet_in=@(varargin)assertExceptionThrown(@()...
+                    cosmo_surface_dataset(varargin{:}),'');
+    aet_out=@(varargin)assertExceptionThrown(@()...
+                    cosmo_map2surface(varargin{:}),'');
+    tmp_fn=cosmo_make_temp_filename();
+
+    aet_in(tmp_fn);
+    aet_in(struct());
+    aet_in({});
+
+    ds=cosmo_synthetic_dataset('type','surface');
+    aet_out(struct,'-bv_smp');
+    aet_out(struct,'-gii');
+    aet_out(struct,'-niml_dset');
+    aet_out(ds,tmp_fn);
+    aet_out(ds,'-foo');
+    aet_out(ds,struct());
+    aet_out(ds,{});
+
+
+function test_pymvpa_3d_string_array()
+    py_ds=struct();
+    py_ds.samples=rand(3,4);
+    py_ds.fa.node_indices=[0,3,4,6];
+
+    sa_labels={'foo';'bar';'foobaz'};
+    sa_labels_3d=reshape(strvcat(sa_labels),[3 1 6]);
+    py_ds.sa.labels=sa_labels_3d;
+
+    ds=cosmo_surface_dataset(py_ds);
+    assertEqual(ds.sa.labels,sa_labels);
+
 
 function props=format2props(format)
     f2p=struct();
@@ -89,7 +122,11 @@ function save_and_load(format)
     nfeatures=size(ds.samples,2);
     ds.fa.node_indices=ds.fa.node_indices(nonid_randperm(nfeatures));
 
-    if ~strcmp(format,'bv_smp')
+    if strcmp(format,'bv_smp')
+        xff_count_orig=helper_count_xff_objects();
+        % ensure count of objects does not increase
+    else
+        xff_count_orig=NaN;
         % also permute node indices
         ds.a.fdim.values{1}=ds.a.fdim.values{1}(nonid_randperm(nfeatures));
     end
@@ -103,15 +140,20 @@ function save_and_load(format)
     ext=props.ext;
     tmp_fn2=cosmo_make_temp_filename('_tmp',ext);
 
-    cleaner=onCleanup(@()delete(tmp_fn2));
+    tmp_file_cleaner=onCleanup(@()delete(tmp_fn2));
 
     if isfield(props,'map2surface')
         mapper=props.map2surface;
     else
         mapper=@cosmo_map2surface;
     end
+
+    helper_assert_memory_use_equal(format,xff_count_orig);
     mapper(ds,tmp_fn2);
+    helper_assert_memory_use_equal(format,xff_count_orig);
+
     ds2=cosmo_surface_dataset(tmp_fn2);
+    helper_assert_memory_use_equal(format,xff_count_orig);
 
     assert_dataset_equal(ds,ds2,format);
 
@@ -119,13 +161,19 @@ function save_and_load(format)
         ds2.a.fdim.values{1}=ds.a.fdim.values{1}(...
                                     nonid_randperm(nfeatures));
         assertExceptionThrown(@()cosmo_map2surface(ds2,tmp_fn2),'');
+        helper_assert_memory_use_equal(format,xff_count_orig);
     end
+
 
     o=cosmo_map2surface(ds,['-' format]);
     writer=props.writer;
     reader=props.reader;
+    cleaner=props.cleaner;
 
     writer(tmp_fn2,o);
+    cleaner(o);
+    helper_assert_memory_use_equal(format,xff_count_orig);
+
     o2=reader(tmp_fn2);
     ds3=cosmo_surface_dataset(o2);
 
@@ -145,12 +193,19 @@ function save_and_load(format)
             assert_dataset_equal(ds3,ds4,format);
     end
 
+    % clean up intermediate objects
+    cleaner(o2);
+
+    helper_assert_memory_use_equal(format,xff_count_orig);
+
     % use format explicitly
     o4=cosmo_map2surface(ds,'','format',format);
     assert_isa_func=props.isa;
     assert_isa_func(o4);
     ds4=cosmo_surface_dataset(o4);
     assert_dataset_equal(ds,ds4,format);
+    cleaner(o4);
+
 
     % test with dataset attributes
     targets=[3 4];
@@ -189,41 +244,15 @@ function save_and_load(format)
     assert_helper_any_exception_thrown(@()reader(tmp_fn2),...
                                         exception_bad_content);
 
+    helper_assert_memory_use_equal(format,xff_count_orig);
 
 
-function test_surface_io_exceptions()
-    aet_in=@(varargin)assertExceptionThrown(@()...
-                    cosmo_surface_dataset(varargin{:}),'');
-    aet_out=@(varargin)assertExceptionThrown(@()...
-                    cosmo_map2surface(varargin{:}),'');
-    tmp_fn=cosmo_make_temp_filename();
-
-    aet_in(tmp_fn);
-    aet_in(struct());
-    aet_in({});
-
-    ds=cosmo_synthetic_dataset('type','surface');
-    aet_out(struct,'-bv_smp');
-    aet_out(struct,'-gii');
-    aet_out(struct,'-niml_dset');
-    aet_out(ds,tmp_fn);
-    aet_out(ds,'-foo');
-    aet_out(ds,struct());
-    aet_out(ds,{});
-
-
-function test_pymvpa_3d_string_array()
-    py_ds=struct();
-    py_ds.samples=rand(3,4);
-    py_ds.fa.node_indices=[0,3,4,6];
-
-    sa_labels={'foo';'bar';'foobaz'};
-    sa_labels_3d=reshape(strvcat(sa_labels),[3 1 6]);
-    py_ds.sa.labels=sa_labels_3d;
-
-    ds=cosmo_surface_dataset(py_ds);
-    assertEqual(ds.sa.labels,sa_labels);
-
+function helper_assert_memory_use_equal(format,xff_count_orig)
+    if strcmp(format,'bv_smp')
+        xff_count_final=helper_count_xff_objects();
+        delta=xff_count_final-xff_count_orig;
+        assert(delta==0,sprintf('count increased by %d',delta));
+    end
 
 
 function rp=nonid_randperm(n)
@@ -270,7 +299,35 @@ function assert_helper_any_exception_thrown(f, exception)
     end
 
 
+function count=helper_count_xff_objects
+    if cosmo_skip_test_if_no_external('!evalc')
+        return;
+    end
 
+    xff_str=evalc('xff()');
+    lines=cosmo_strsplit(xff_str,'\n');
 
+    pre_idx=strmatch('   # | Type  | ',lines);
+    line_idxs=strmatch('------------------',lines);
 
+    if isempty(pre_idx)
+        % Neuroelf < v1.1, no objects
+        assert(isempty(line_idxs));
+        count=0;
+        return;
+    end
+
+    post_idx=line_idxs(line_idxs>(pre_idx+2));
+
+    assert(numel(pre_idx)==1);
+
+    if numel(post_idx)==0
+        count=0;
+        return;
+    end
+
+    assert(numel(post_idx)==1);
+
+    offset=2;
+    count=post_idx-pre_idx-offset;
 

@@ -93,6 +93,9 @@ function test_fmri_io_bv_vmp_oblique()
 
     ds_deob=cosmo_fmri_deoblique(ds);
     bv_vmp=cosmo_map2fmri(ds,'-bv_vmp','deoblique',true);
+
+    cleaner=onCleanup(@()bv_vmp.ClearObject());
+
     ds2=cosmo_fmri_dataset(bv_vmp);
     ds3=cosmo_fmri_reorient(ds2,cosmo_fmri_orientation(ds_deob));
 
@@ -117,6 +120,8 @@ function test_fmri_io_bv_vmp_noniso()
     aet(ds,'-bv_vmp','deoblique',true,'bv_force_fit',false);
 
     bv_vmp=cosmo_map2fmri(ds,'-bv_vmp','bv_force_fit',true);
+    cleaner=onCleanup(@()bv_vmp.ClearObject());
+
     ds2=cosmo_fmri_dataset(bv_vmp);
     ds3=cosmo_fmri_reorient(ds2,cosmo_fmri_orientation(ds));
 
