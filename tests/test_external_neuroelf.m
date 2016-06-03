@@ -76,6 +76,13 @@ function count=helper_count_xff_objects
     pre_idx=strmatch('   # | Type  | ',lines);
     line_idxs=strmatch('------------------',lines);
 
+    if isempty(pre_idx)
+        % Neuroelf < v1.1, no objects
+        assert(isempty(line_idxs));
+        count=0;
+        return;
+    end
+
     post_idx=line_idxs(line_idxs>(pre_idx+2));
 
     assert(numel(pre_idx)==1);
