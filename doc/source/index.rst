@@ -28,7 +28,7 @@ CoSMoMVPA
    get_started
    download
    documentation
-   cimec2016
+   prni2016
    tips
    faq
    contact
@@ -48,7 +48,7 @@ CoSMoMVPA
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
-   :target: cimec2016.html
+   :target: prni2016.html
 .. image:: _static/icon_tips.png
    :target: tips.html
 .. image:: _static/icon_faq.png
