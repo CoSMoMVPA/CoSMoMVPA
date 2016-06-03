@@ -320,6 +320,12 @@ function count=helper_count_xff_objects
     post_idx=line_idxs(line_idxs>(pre_idx+2));
 
     assert(numel(pre_idx)==1);
+
+    if numel(post_idx)==0
+        count=0;
+        return;
+    end
+
     assert(numel(post_idx)==1);
 
     offset=2;
