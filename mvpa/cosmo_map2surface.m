@@ -54,11 +54,6 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %     >       1.16      3.49     -1.37     0.479    -0.955      3.41
 %     >      -1.29    -0.199      1.73    0.0832     0.501     -0.48 ]
 %
-%     ds=cosmo_synthetic_dataset('type','surface');
-%     % convert to bv smp xff struct
-%     % (to store a file to disc, use a filename as the second argument)
-%     bv_smp=cosmo_map2surface(ds,'-bv_smp');
-%
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
 %     one or more values associated with each surface node. It does not

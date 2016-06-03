@@ -44,30 +44,6 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     >     .values
 %     >       { [ 2 21 202 ] }
 %
-%     % construct BrainVoyager surface map
-%     cosmo_check_external('neuroelf');
-%     smp=xff('new:smp');
-%     %
-%     % make surface dataset
-%     % (a filename of a .smp file is supported as well)
-%     ds=cosmo_surface_dataset(smp);
-%     cosmo_disp(ds)
-%     > .samples
-%     >   [ 0         0         0  ...  0         0         0 ]@1x40962
-%     > .sa
-%     >   .labels
-%     >     { 'New Map' }
-%     >   .stats
-%     >     { 'Ttest(249)' }
-%     > .fa
-%     >   .node_indices
-%     >     [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'node_indices' }
-%     >     .values
-%     >       { [ 1 2 3  ...  4.1e+04   4.1e+04   4.1e+04 ]@1x40962 }
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with
