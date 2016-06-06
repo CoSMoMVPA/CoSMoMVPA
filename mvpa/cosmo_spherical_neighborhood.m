@@ -524,7 +524,8 @@ function fdim=get_spherical_fdim(ds, target_labels)
     if numel(dim_labels)<index+(nlabels-1) || ...
             ~isequal(dim_labels(idx_labels),target_labels)
         error('expected labels %s in .a.fdim.labels(%d:%d)',...
-                  cosmo_strjoin(target_labels,', '),idx_labels([1 end]));
+                  cosmo_strjoin(target_labels,', '),...
+                idx_labels(1), idx_labels(end));
     end
 
     fdim=struct();
