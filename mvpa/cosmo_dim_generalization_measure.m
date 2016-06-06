@@ -294,10 +294,11 @@ function [values,splits]=split_half_by_dimension(ds,opt)
     ds_tr=remove_fa_field(ds_tr,dimension);
 
     values=nbrhood.a.fdim.values{1}(keep_nbrs);
-    if ~isvector(values)
-        error('dimension %s must be a row vector', dimension);
-    elseif ~iscolumn(values)
+    sz=size(values);
+    if sz(1)==1
         values=values';
+    elseif sz(2)~=1
+        error('dimension %s must be a row vector', dimension);
     end
 
     n=numel(keep_nbrs);
