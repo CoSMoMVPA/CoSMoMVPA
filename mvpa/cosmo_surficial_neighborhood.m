@@ -441,7 +441,8 @@ function check_surf_arguments(ds_is_surface,v1,v2,f,vo,fo)
 
     if ~(one_surface || ds_is_surface || isequal(size(v1),size(v2)))
         error('Size mismatch between surfaces: %dx%d != %dx%d',...
-                    size(v1), size(v2));
+                    size(v1,1), size(v1,2),...
+                    size(v2,1), size(v2,2));
     end
 
     surfing_check_surface(v1,f);
