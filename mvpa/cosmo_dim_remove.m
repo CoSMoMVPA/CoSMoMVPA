@@ -94,9 +94,12 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 
     % set values to return
     values=xdim_values(remove_idxs);
-    assert(isvector(values));
 
-    if xor(dim==1,isrow(values))
+    sz=size(values);
+    assert(any(sz==1));
+
+    needs_transpose=sz(dim)~=1;
+    if needs_transpose
         values=values';
     end
 
@@ -105,16 +108,4 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
         assert(numel(values)==1);
         values=values{1};
     end
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -151,7 +151,7 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
 
 
 function check_input_sizes(sample,nbrhood_mat)
-    if ~isrow(sample)
+    if size(sample,1)~=1
         error('sample input must be a row vector');
     end
 

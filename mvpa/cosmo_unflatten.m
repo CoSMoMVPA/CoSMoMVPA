@@ -192,9 +192,10 @@ function [arr, dim_labels, dim_values]=unflatten_features(samples, ...
     if numel(lin_indices)~=numel(unq_lin_indices)
         h=histc(lin_indices,unq_lin_indices);
         duplicate=unq_lin_indices(find(h>1,1));
-        duplicate_pos=find(lin_indices==duplicate,2);
+        two_duplicate_pos=find(lin_indices==duplicate,2);
 
-        error('Duplicate features at #%d and #%d', duplicate_pos);
+        error('Duplicate features at #%d and #%d', ...
+                    two_duplicate_pos(1), two_duplicate_pos(2));
     end
 
     % allocate space in 'ndim'-space for each sample,

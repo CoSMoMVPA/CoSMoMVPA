@@ -50,8 +50,15 @@ function test_corr_exceptions
         id_minrhs='Octave:undefined-function';
         id_innerdim='Octave:nonconformant-args';
     else
+        v=cosmo_wtf('version');
+        is_prior_to_2012b=str2num(v(1))<=7;
 
-        id_minrhs='MATLAB:minrhs';
+        if is_prior_to_2012b
+            id_minrhs='MATLAB:inputArgUndefined';
+        else
+            id_minrhs='MATLAB:minrhs';
+        end
+
         id_innerdim='MATLAB:innerdim';
     end
 

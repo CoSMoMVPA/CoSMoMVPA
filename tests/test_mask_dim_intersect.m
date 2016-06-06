@@ -102,7 +102,7 @@ function helper_test_mask_dim_intersect(dim)
         if isempty(idx)
             assert(isempty(ds_keep_indices));
         else
-            assertEqual(sort(idx),sort(ds_keep_indices));
+            assertEqual(sort(idx(:)),sort(ds_keep_indices(:)));
         end
 
         % must return indices in the same order

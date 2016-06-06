@@ -126,7 +126,7 @@ function msg=check_basis(nbrhood, ds, show_warning)
 
 function tf=is_positive_int_row_vector(x)
     tf=isempty(x) || ...
-            (isrow(x) && min(x)>=1 && all(round(x)==x));
+            (size(x,1)==1 && min(x)>=1 && all(round(x)==x));
 
 
 function msg=check_neighbors(nbrhood, ds, show_warning)
@@ -225,7 +225,7 @@ function msg=check_origin_matches(nbrhood, ds, show_warning)
                 ds_a=rmfield(ds_a,dim_name);
             end
 
-            if ~isequaln(origin_a, ds_a)
+            if ~isequalwithequalnans(origin_a, ds_a)
                 error('.a mismatch between dataset and neighborhood');
             end
         end

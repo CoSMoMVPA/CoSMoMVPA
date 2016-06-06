@@ -406,7 +406,7 @@ function feature_mask=get_features_mask(ds)
     if cosmo_isfield(ds,'fa.inside')
         inside=ds.fa.inside;
 
-        if ~isrow(inside)
+        if size(inside,1)~=1
             error('field .fa.inside must be a row vector');
         end
 
@@ -524,7 +524,8 @@ function fdim=get_spherical_fdim(ds, target_labels)
     if numel(dim_labels)<index+(nlabels-1) || ...
             ~isequal(dim_labels(idx_labels),target_labels)
         error('expected labels %s in .a.fdim.labels(%d:%d)',...
-                  cosmo_strjoin(target_labels,', '),idx_labels([1 end]));
+                  cosmo_strjoin(target_labels,', '),...
+                idx_labels(1), idx_labels(end));
     end
 
     fdim=struct();
