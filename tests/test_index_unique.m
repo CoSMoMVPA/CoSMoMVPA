@@ -108,7 +108,14 @@ function test_index_unique_()
     aet({[1,2],'a'});
 
     if cosmo_wtf('is_matlab')
-        id_different_classes='MATLAB:UNIQUE:InputClass';
+        v=cosmo_wtf('version');
+        is_prior_to_2012b=str2num(v(1))<=7;
+
+        if is_prior_to_2012b
+            id_different_classes='MATLAB:CELL:UNIQUE:InputClass';
+        else
+            id_different_classes='MATLAB:UNIQUE:InputClass';
+        end
     else
         id_different_classes='';
     end

@@ -405,7 +405,7 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
 function nbrhood=ensure_neighbors_row_vectors(nbrhood)
     % compatibility wrapper for the surfing toolbox
     for k=1:numel(nbrhood.neighbors)
-        if ~isrow(nbrhood.neighbors{k})
+        if size(nbrhood.neighbors{k},1)~=1
             nbrhood.neighbors{k}=nbrhood.neighbors{k}';
         end
     end

@@ -406,7 +406,7 @@ function feature_mask=get_features_mask(ds)
     if cosmo_isfield(ds,'fa.inside')
         inside=ds.fa.inside;
 
-        if ~isrow(inside)
+        if size(inside,1)~=1
             error('field .fa.inside must be a row vector');
         end
 
