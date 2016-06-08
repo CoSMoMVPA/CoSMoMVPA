@@ -814,5 +814,27 @@ Average samples in a deterministic manner?
 
 will pseudo-deterministically select the same samples upon repeated evaluations of the expression, and thus return the same result
 
+Select only a subset of features in a neighborhood?
+---------------------------------------------------
+'When using :ref:`cosmo_spherical_neighborhood` with the ``radius`` option, some elements in ``.neighborhood`` have only a few elements. How can I exclude them from subsequent searchlight analyses?
+
+Although :ref:`cosmo_slice` does not support neighborhood structures (yet), consider the following example using tiny example datasets and neighborhoods:
+
+  .. code-block:: matlab
+
+        min_count=4; % in most use cases this is more than 4
+
+        ds=cosmo_synthetic_dataset();
+        nh=cosmo_spherical_neighborhood(ds,'radius',1);
+
+        keep_msk=nh.fa.nvoxels>=min_count;
+
+        nh.fa=cosmo_slice(nh.fa,keep_msk,2,'struct');
+        nh.neighbors=cosmo_slice(nh.neighbors,keep_msk);
+
+        cosmo_check_neighborhood(nh,ds); % sanity check
+
+Alternatively, :ref:`cosmo_spherical_neighborhood` (and :ref:`cosmo_surficial_neighborhood`) can be used with a 'count' argument - it keeps the number of elements across neighborhoods more constant.
+
 
 .. include:: links.txt
