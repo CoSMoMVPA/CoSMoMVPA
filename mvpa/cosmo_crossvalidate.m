@@ -16,6 +16,14 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                       first or second dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%     .pca              optional, (default: 0) Set to a value larger than 0
+%                       to transform the data using PCA prior to
+%                       classification. If set to 1, all pca components are
+%                       used for classification. If set to a value smaller
+%                       than 1, only the components that explain that
+%                       amount of variance (in percent) are retained. If
+%                       set to a value larger than 1, it determines the
+%                       number of components that are retained.
 %    .check_partitions  optional (default: true). If set to false then
 %                       partitions are not checked for being set properly.
 %    .average_train_X   average the samples in the train set using
@@ -128,6 +136,9 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     if ~isfield(opt, 'normalization'),
         opt.normalization=[];
     end
+    if ~isfield(opt, 'pca'),
+        opt.pca=0;
+    end
     if ~isfield(opt, 'check_partitions'),
         opt.check_partitions=true;
     end
@@ -137,6 +148,12 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         opt.autoscale=false; % disable for {matlab,lib}svm classifiers
     else
         normalization=[];
+    end
+    
+    if ~isempty(opt.pca);
+        pca=opt.pca;
+    else
+        pca=0;
     end
 
     if opt.check_partitions
@@ -193,13 +210,17 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 
         test_data = ds.samples(test_idxs,:);
 
+        % apply pca
+        if pca>0
+            [train_data,params]=cosmo_pca(train_data,pca);
+            test_data=cosmo_pca(test_data,params);
+        end
+        
         % apply normalization
         if ~isempty(normalization)
             [train_data,params]=cosmo_normalize(train_data,normalization);
             test_data=cosmo_normalize(test_data,params);
         end
-
-
 
         % >@@>
         % then get predictions for the training samples using

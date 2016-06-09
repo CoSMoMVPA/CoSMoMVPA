@@ -24,6 +24,14 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       first or second dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%   args.pca            optional, (default: 0) Set to a value larger than 0
+%                       to transform the data using PCA prior to
+%                       classification. If set to 1, all pca components are
+%                       used for classification. If set to a value smaller
+%                       than 1, only the components that explain that
+%                       amount of variance (in percent) are retained. If
+%                       set to a value larger than 1, it determines the
+%                       number of components that are retained.
 %   args.average_train_X  average the samples in the train set using
 %                       cosmo_average_samples. For X, use any parameter
 %                       supported by cosmo_average_samples, i.e. either
