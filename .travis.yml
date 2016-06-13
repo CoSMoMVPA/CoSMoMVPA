@@ -100,7 +100,7 @@ install:
 
                     git clone git://github.com/fieldtrip/fieldtrip.git --depth 100;
           cd fieldtrip;
-          git checkout 943d2bd6ba88b401987c76d312c0ce7b74db9afe;
+          git checkout 5746bca0ee25f165dd458d126b0fffd256a66378;
           cd ..;
 
 
