@@ -68,7 +68,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       one-sample t-test across participants is used to
 %                       test classification  accuracies against chance
 %                       level (with the 'h0_mean' option), then each
-%                       dataset null{i} should contain classification
+%                       dataset null_data{i} should contain classification
 %                       accuracies for each participant that were computed
 %                       using randomized values for .sa.targets.
 %                       If this option is provided, then null data is
