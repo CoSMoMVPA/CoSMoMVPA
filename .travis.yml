@@ -90,20 +90,9 @@ install:
       fi
 
     # optionally install FieldTrip
-    # NOTE: temporalily use fixed (not latest) version of FieldTrip
-    #       due to bug #3143 in FieldTrip:
-    #       http://bugzilla.fieldtriptoolbox.org/show_bug.cgi?id=3143
-
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
-          git clone git://github.com/fieldtrip/fieldtrip.git --depth 100;
-
-                    git clone git://github.com/fieldtrip/fieldtrip.git --depth 100;
-          cd fieldtrip;
-          git checkout 5746bca0ee25f165dd458d126b0fffd256a66378;
-          cd ..;
-
-
+          git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
                             savepath();";
