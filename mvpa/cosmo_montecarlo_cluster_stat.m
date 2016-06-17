@@ -31,7 +31,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                                 section below how to set the .sa.targets
 %                                 and .sa.chunks attributes.
 %                       - 'none': Do not compute statistics, but instead
-%                                 use the input data from ds directory. In
+%                                 use the input data from ds directly. In
 %                                 this case:
 %                                 * no statistic is computed;
 %                                 * ds.samples must be a row vector.
