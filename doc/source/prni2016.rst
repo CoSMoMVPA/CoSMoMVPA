@@ -1,0 +1,58 @@
+.. #   For CoSMoMVPA's license terms and conditions, see   #
+   #   the COPYING file distributed with CoSMoMVPA         #
+
+.. _prni2016:
+
+PRNI 2016 workshop
+==================
+CoSMoMVPA workshop at PRNI 2016, the 6th International Workshop on Pattern Recognition in Neuroimaging
+
+*presented by Nick Oosterhof*
+
+**Note: this page is under construction. Information is subject to change**
+
+(Students in the CIMeC 2016 hands-on method course, see :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.)
+
+.. include:: all_exercises_ever_toc.txt
+
+Contents
+--------
+
+.. toctree::
+    :maxdepth: 2
+
+    prni2016_intro
+    prni2016_ex_toc
+
+.. toctree::
+    :maxdepth: 1
+
+    modindex
+    modindex_hdr
+    modindex_skl
+
+    modindex_run
+    modindex_skl_run
+
+Matlab outputs: matlab_pb_toc_
+
+Miscellaneous
+-------------
+
+.. toctree::
+    :maxdepth: 1
+
+    modindex_test
+    modindex_demo
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. _matlab_pb_toc: _static/publish/index.html
+
+.. include:: links.txt
+
