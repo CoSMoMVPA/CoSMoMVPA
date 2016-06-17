@@ -3,6 +3,7 @@
 
 News
 ----
+
+- `PRNI 2016`_, the 6th International Workshop on Pattern Recognition in Neuroimaging, is held in Trento - Italy, June 22nd - 24th, 2016. A CoSMoMVPA tutorial session is provided on June 20 and 21; see :ref:`prni2016`.
 - our CoSMoMVPA manuscript is online as a preprint on bioRxiv, :doi:`10.1101/047118` (citation :cite:`OCH16`)
-- The 2016 Summer School in Computational Sensory-Motor Neuroscience ( `CoSMo 2016 workshop`_ ) has been announced. Application deadline: April 11, 2016. (Note that CoSMoMVPA_ will not be presented).
 
