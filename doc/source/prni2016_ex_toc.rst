@@ -18,15 +18,15 @@ Contents:
     ex_dataset_basics
     ex_splithalf_correlations
     ex_classify_lda
-    ex_nfold_crossvalidation
     ex_measures
     ex_neighborhood
     ex_searchlight_measure
-    ex_rsa_tutorial
     ex_meeg_searchlight
     ex_meeg_time_generalization
+    ex_rsa_tutorial
     ex_multiple_comparisons
 
 
-:ref:`Back to index <cimec2016>`
+
+:ref:`Back to index <prni2016>`
 

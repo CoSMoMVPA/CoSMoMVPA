@@ -44,6 +44,8 @@ Part 2
 Using the neighborhood structure defined in Part 1, use the :ref:`cosmo_searchlight` function to perform the same analysis as in Part 1.
 
 
+*Exercises part 3 and 4 are optional. They are used to illustrate that different measures can be used with the same searchlight and neighborhood functionality.*
+
 Part 3
 ######
 

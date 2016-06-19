@@ -216,3 +216,6 @@ website: html html-zip-archive html-targz-archive
 	@rsync -vcru $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
 				 $(WEBSITESTATIC)/
 
+
+prni: website
+	$(MAKE) website WEBSITEROOT=pr:/var/www/html

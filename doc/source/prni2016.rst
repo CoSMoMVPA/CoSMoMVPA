@@ -5,13 +5,11 @@
 
 PRNI 2016 workshop
 ==================
-CoSMoMVPA workshop at PRNI 2016, the 6th International Workshop on Pattern Recognition in Neuroimaging
+CoSMoMVPA workshop at `PRNI 2016`_, the 6th International Workshop on Pattern Recognition in Neuroimaging
 
 *presented by Nick Oosterhof*
 
-**Note: this page is under construction. Information is subject to change**
-
-(Students in the CIMeC 2016 hands-on method course, see :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.)
+(University of Trento students in the CIMeC 2016 hands-on method course, see :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.)
 
 .. include:: all_exercises_ever_toc.txt
 

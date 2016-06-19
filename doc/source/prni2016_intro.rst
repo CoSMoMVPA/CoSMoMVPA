@@ -3,8 +3,6 @@
 
 .. _intro:
 
-**Note: this page is under construction. Information is subject to change**
-
 Introduction
 ============
 
@@ -31,6 +29,7 @@ Prerequisites
     * fMRI and/or MEEG :ref:`advanced beginner level <cogneuro_experience>` analysis experience.
     * Working Matlab_ or Octave_ installation.
     * Working FieldTrip_ installation (required for MEEG analysis)
+    * MRI data viewer, such as MRIcron_ (strongly recommended)
     * :ref:`CoSMoMVPA source code and tutorial data <get_code_and_example_data>`.
     * It is recommended, prior to the course, to:
 
@@ -44,7 +43,7 @@ Goals of this course
 ++++++++++++++++++++
 
     * Learn typical MVPA approaches (correlation analysis, classification analysis, representational similarity analysis).
-    * Learn how these approaches can be applied to both fMRI and MEEG data,
+    * Learn how these approaches can be applied to both fMRI and MEEG data.
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
@@ -134,29 +133,29 @@ Mo  9:00-10:20 General introduction presentation
 -------------- ---------------------------------------------------------------------------------------------------
 Mo 10:20-10:40 Coffee break
 -------------- ---------------------------------------------------------------------------------------------------
-Mo 10:40-12:00 Get your computer ready to run CoSMoMVPA; practical exercises: fMRI basic dataset operations
+Mo 10:40-12:00 :doc:`get_started`, :doc:`ex_dataset_basics`
 -------------- ---------------------------------------------------------------------------------------------------
 Mo 12:00-13:30 Lunch break
 -------------- ---------------------------------------------------------------------------------------------------
-Mo 13:30-14:50 correlation analysis
+Mo 13:30-14:50 :doc:`ex_splithalf_correlations`
 -------------- ---------------------------------------------------------------------------------------------------
 Mo 14:50-15:10 Coffee break
 -------------- ---------------------------------------------------------------------------------------------------
-Mo 15:10-16:30 classification analysis, measures
+Mo 15:10-16:30 :doc:`ex_classify_lda`, :doc:`ex_measures`
 -------------- ---------------------------------------------------------------------------------------------------
-Tu  9:00-10:20 neighborhoods, searchlight
+Tu  9:00-10:20 :doc:`ex_neighborhood`, :doc:`ex_searchlight_measure`
 -------------- ---------------------------------------------------------------------------------------------------
 Tu 10:20-10:40 Coffee break
 -------------- ---------------------------------------------------------------------------------------------------
-Tu 10:40-12:00 MEEG basics, classification, searchlight
+Tu 10:40-12:00 :doc:`ex_meeg_searchlight`, :doc:`ex_meeg_time_generalization`
 -------------- ---------------------------------------------------------------------------------------------------
 Tu 12:00-13:30 Lunch break
 -------------- ---------------------------------------------------------------------------------------------------
-Tu 13:30-14:50 MEEG time generalization; fMRI RSA
+Tu 13:30-14:50 :doc:`ex_meeg_time_generalization`, :doc:`ex_rsa_tutorial`
 -------------- ---------------------------------------------------------------------------------------------------
 Tu 14:50-15:10 Coffee break
 -------------- ---------------------------------------------------------------------------------------------------
-Tu 15:10-16:30 multiple comparison correction; concluding remarks
+Tu 15:10-16:30  :doc:`ex_multiple_comparisons`; concluding remarks
 ============== ===================================================================================================
 
 
