@@ -289,7 +289,7 @@ function [has_unique_elem, unique_elem]=get_single_unique_element(vs)
         end
 
         if has_elem
-            if ~isequaln(v, unique_elem)
+            if ~isequalwithequalnans(v, unique_elem)
                 has_unique_elem=false;
                 return;
             end
