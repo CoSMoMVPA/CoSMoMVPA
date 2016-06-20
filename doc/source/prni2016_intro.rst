@@ -124,7 +124,7 @@ Tentative schedule
 
 Dates: Monday 20 June and Tuesday 21 June, 2016.
 
-Location: FBK - POVO, Via Sommarive, 18, 38123 Trento. Room *Sala consiglio*.
+Location: FBK - POVO, Via Sommarive, 18, 38123 Trento. Room *Sala consiglio* (*Tutorial 3*).
 
 The following schedule is tentative and can change any moment depending on user, organizer and/or presenter needs.
 

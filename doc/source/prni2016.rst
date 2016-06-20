@@ -9,7 +9,7 @@ CoSMoMVPA workshop at `PRNI 2016`_, the 6th International Workshop on Pattern Re
 
 *presented by Nick Oosterhof*
 
-Location: FBK - POVO, Via Sommarive, 18, 38123 Trento. Room *Sala consiglio*.
+Location: FBK - POVO, Via Sommarive, 18, 38123 Trento. Room *Sala consiglio* (*Tutorial 3*).
 
 (University of Trento students in the CIMeC 2016 hands-on method course, see :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.)
 
