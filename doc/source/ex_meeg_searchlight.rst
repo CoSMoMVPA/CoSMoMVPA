@@ -31,7 +31,7 @@ Using the same data as above, define `chan` (channel) and `time` neighborhoods; 
 
 Hint: :ref:`run_meeg_timelock_measures_skl`
 
-Solution: :ref:`run_meeg_timelock_measures_skl` / :pb:`meeg_timelock_measures`
+Solution: :ref:`run_meeg_timelock_measures` / :pb:`meeg_timelock_measures`
 
 .. include:: links.txt
 
