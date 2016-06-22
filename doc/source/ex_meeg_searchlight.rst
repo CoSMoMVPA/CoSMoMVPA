@@ -23,7 +23,7 @@ Use :ref:`cosmo_meeg_dataset` to convert the dataset to a CoSMoMVPA dataset stru
 Part 2: MEEG time-course searchlight with classifier and cross-validation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Using the same data as above, define a `time` neighborhood for magnetometer sensors in the posterior part of the brain.
-Then, for each time point, compute use a classifier with cross-validation discriminating the six categories using data for the selected sensors, and plot a classification accuracy time course.
+Then, for each time point, use a classifier with cross-validation discriminating the six categories using data for the selected sensors, and plot a classification accuracy time course.
 
 Part 3: MEEG time-course searchlight with split-half correlation measure
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
