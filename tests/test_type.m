@@ -16,8 +16,7 @@ function test_type_basics()
     assertEqual(s,data);
 
 function test_dim_type_fprintf()
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('''evalc'' is not available in Octave');
+    if cosmo_skip_test_if_no_external('!evalc')
         return;
     end
 
