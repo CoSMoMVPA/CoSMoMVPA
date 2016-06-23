@@ -68,6 +68,7 @@ install:
                      fieldtrip
                      libsvm
                      gifti
+                     octave_pkg_struct
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
@@ -139,13 +140,22 @@ before_script:
           RETRY=travis_retry;
       fi
 
+    # ensure Octave rc file exists
+    - echo "" >> $OCTAVERC;
+
     # load Octave io package
     - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+
+
+    # optionally enable Octave struct package
+    - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
+      fi
+
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
-          echo "" >> $OCTAVERC;
       fi
 
     # optionally enable Octave statistics package
