@@ -52,6 +52,36 @@ function test_meeg_senstype_collection_
         end
     end
 
+function test_meeg_senstype_collection_ft_regr_2016june
+    % since the following commit, ft_senstype supports
+    %     ft_senslabel('neuromag306_combined')
+    % but its output is different than was expected in
+    % cosmo_meeg_senstype_collection. In particular the recent commit
+    % includes the magnetometers, whereas the meeg_senstype
+    % does not include those. This test is added as check for
+    % such regressions
+
+    % FieldTrip (https://github.com/fieldtrip/fieldtrip.git)
+    % commit 882dba3426db583f7f4f9ac0cdf4eb3c26aaefc1
+    % Author: Robert Oostenveld <r.oostenveld@gmail.com>
+    % Date:   Wed Jun 22 12:47:47 2016 +0200
+    %
+    %     ENH - improve combined planar MEG sensor handling, see
+    %     http://bugzilla.fieldtriptoolbox.org/show_bug.cgi?id=3144
+
+    stc=cosmo_meeg_senstype_collection();
+    label=stc.neuromag306_planar_combined.label;
+    assertEqual(size(label),[102 1]);
+
+    present_labels={'MEG 2642+2643','MEG 0112+0113'};
+    absent_labels={'MEG0111'',MEG0112','MEG0113',...
+                    'MEG2641'',MEG2642','MEG2643'};
+    assert(all(cosmo_match(present_labels,label(:))));
+    assert(~any(cosmo_match(absent_labels,label(:))));
+
+
+
+
 
 function props=get_senstype_properties()
 
