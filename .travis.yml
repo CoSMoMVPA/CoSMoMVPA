@@ -60,6 +60,16 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
     - CHECKEXTCMD=""
+    - OCTAVE_DISABLE_WARNINGS=" Octave:array-to-scalar
+                                Octave:imag-to-real
+                                Octave:language-extension
+                                Octave:missing-semicolon
+                                Octave:resize-on-range-error
+                                Octave:separator-insert
+                                Octave:single-quote-string
+                                Octave:str-to-num
+                                Octave:mixed-string-concat
+                                Octave:variable-switch-label"
     - OCTAVE=octave
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
@@ -123,6 +133,11 @@ install:
 
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
+
+    # disable warnings
+    - for label in $OCTAVE_DISABLE_WARNINGS; do
+          echo "warning('off','${label}');" >> $OCTAVERC;
+      done
 
     # prevent shippable from re-using old test results
     - if [[  "$SHIPPABLE" == "true"  ]]; then
