@@ -25,8 +25,13 @@ function test_dim_type_fprintf()
 
     data=write_data(fn);
 
-    s=evalc('cosmo_type(fn);');
-    assertEqual(s,data);
+    expr=sprintf('cosmo_type(''%s'')',fn);
+
+    s=evalc(expr);
+    s_fixed=regexprep(s,'ans\s*=\s*','');
+    s_fixed=regexprep(s_fixed,'\s*$','');
+
+    assertEqual(s_fixed,data);
 
 
 function data=write_data(fn)
