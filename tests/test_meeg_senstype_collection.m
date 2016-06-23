@@ -53,6 +53,10 @@ function test_meeg_senstype_collection_
     end
 
 function test_meeg_senstype_collection_ft_regr_2016june
+    if cosmo_skip_test_if_no_external('fieldtrip')
+            return;
+    end
+
     % since the following commit, ft_senstype supports
     %     ft_senslabel('neuromag306_combined')
     % but its output is different than was expected in
