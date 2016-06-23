@@ -51,8 +51,10 @@ params2func.version=version_;
 params2func.java=java_;
 params2func.cosmo_externals=@cosmo_externals;
 params2func.toolboxes=@toolboxes;
+params2func.warnings=@warning_helper;
 params2func.cosmo_config=@cosmo_config_helper;
 params2func.cosmo_files=@cosmo_files;
+
 
 
 has_param=nargin>=1 && ~isempty(param);
@@ -139,6 +141,15 @@ function s=cosmo_config_helper()
         caught_error=lasterror();
         s=caught_error.message;
     end
+
+function s=warning_helper()
+    s=warning();
+    n=numel(s);
+
+    s_parts=arrayfun(@(i)sprintf('%s: %s', s(i).identifier, s(i).state),...
+                    1:n,'UniformOutput',false);
+    s=cosmo_strjoin(s_parts, ', ');
+
 
 
 function s=dir2str(d, formatter)

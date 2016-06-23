@@ -34,14 +34,42 @@ function test_wtf_basics()
 
     assertExceptionThrown(@()cosmo_wtf('illegal'),'');
 
-function assert_contains(haystack, needle)
-    re=regexptranslate('escape',needle);
-    assertFalse(isempty(regexp(haystack,re,'once')));
+function test_wtf_warnings()
+    rand_str_func=@()char(ceil(rand(20,1)*26+64));
+    warning_id=sprintf('%s:%s',rand_str_func(),rand_str_func());
 
-function tf=environment_is_octave()
-    tf=logical(exist('OCTAVE_VERSION', 'builtin'));
+    warning_state=warning();
+    warning_state_resetter=onCleanup(@()warning(warning_state));
+
+    on_off_labels={'on','off'};
+    for k=1:numel(on_off_labels);
+        label=on_off_labels{k};
+        anti_label=on_off_labels{3-k};
+
+        warning(anti_label,'all');
+        warning(label,warning_id);
+
+        w=cosmo_wtf('warnings');
+        assert_contains(w,sprintf('%s: %s',warning_id,label));
+        assert_not_contains(w,sprintf('%s: %s',warning_id,anti_label));
+    end
 
 function test_wtf_is_matlab
     is_octave=environment_is_octave;
     assertEqual(cosmo_wtf('is_matlab'),~is_octave);
     assertEqual(cosmo_wtf('is_octave'),is_octave);
+
+
+function assert_contains(haystack, needle)
+    assert_contains_helper(haystack, needle, true);
+
+function assert_not_contains(haystack, needle)
+    assert_contains_helper(haystack, needle, false);
+
+function assert_contains_helper(haystack, needle, expected_tf)
+    re=regexptranslate('escape',needle);
+    assertEqual(~isempty(regexp(haystack,re,'once')),expected_tf);
+
+function tf=environment_is_octave()
+    tf=logical(exist('OCTAVE_VERSION', 'builtin'));
+
