@@ -181,6 +181,10 @@ before_script:
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
 
+    # show warnings in Octave
+    - $OCTAVE --eval "w=warning();disp(w);"
+
+
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
