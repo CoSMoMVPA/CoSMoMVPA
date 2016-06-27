@@ -181,9 +181,6 @@ before_script:
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
 
-    # show warnings in Octave
-    - $OCTAVE --eval "w=warning();disp(w);"
-
 
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
@@ -211,6 +208,9 @@ script:
       elif [[  "$SHIPPABLE" == "true"  ]]; then
           RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
       fi
+    # show warnings in Octave
+    - $OCTAVE --eval "disp('Warning state:');w=warning();for k=1:numel(w), disp(w(k)); end"
+
     - echo Test arguments $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
     - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
     - $AFTER_SCRIPT
