@@ -178,6 +178,13 @@ function test_average_samples_exceptions
 
 
 function test_average_samples_with_repeats
+    disp('warning state');
+    w=warning();
+    for k=1:numel(w)
+        disp(w(k));
+    end
+
+
     nchunks=ceil(rand()*4+3);
     ntargets=ceil(rand()*4+3);
     ncombi_max=ceil(rand()*3+4);
