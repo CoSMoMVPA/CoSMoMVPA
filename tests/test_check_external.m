@@ -17,10 +17,8 @@ function test_check_external_nifti()
 
     warning_state=cosmo_warning();
     orig_path=path();
-    run_sequentially=@(varargin)cellfun(@(f)f(),varargin);
-    cleaner=onCleanup(@()run_sequentially(...
-                            @()path(orig_path),...
-                            @()cosmo_warning(warning_state)));
+    warning_state_resetter=onCleanup(@()warning(warning_state));
+    path_resetter=onCleanup(@()path(orig_path));
 
     % ensure path is set; disable warnings by cosmo_set_path
     cosmo_warning('off');
@@ -56,6 +54,8 @@ function test_check_external_nifti()
     % throws exception when second argument is true or absent
     assertExceptionThrown(@()cosmo_check_external('nifti',true),'');
     assertExceptionThrown(@()cosmo_check_external('nifti'),'');
+
+
 
 
 function test_check_external_mocov()
