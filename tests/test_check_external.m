@@ -57,6 +57,12 @@ function test_check_external_mocov()
     has_mocov=~isempty(which('mocov'));
     assertEqual(has_mocov,cosmo_check_external('mocov',false));
 
+    disp('warning state');
+    w=warning();
+    for k=1:numel(w)
+        disp(w(k));
+    end
+
 function test_check_external_command()
     commands={'foo','basdfds','disp'};
     n=numel(commands);
