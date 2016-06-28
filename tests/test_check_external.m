@@ -17,11 +17,12 @@ function test_check_external_nifti()
 
     warning_state=cosmo_warning();
     orig_path=path();
-    warning_state_resetter=onCleanup(@()warning(warning_state));
+
+    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
     path_resetter=onCleanup(@()path(orig_path));
 
     % ensure path is set; disable warnings by cosmo_set_path
-    warning('off','all');
+    cosmo_warning('off');
     cosmo_set_path();
 
     assertTrue(cosmo_check_external('nifti'))
