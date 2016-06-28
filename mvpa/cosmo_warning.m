@@ -24,107 +24,62 @@ function varargout=cosmo_warning(message, varargin)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-    persistent when_show_warning;
-    persistent shown_warnings;
 
-    if isempty(when_show_warning)
-        when_show_warning='once';
-        shown_warnings=[];
+    if isempty(get_from_state('when'))
+        set_default_state();
     end
 
     if nargin==0
-        switch nargout
-            case 0
-                warning();
-            case 1
-                state=struct();
-                state.warning=warning();
-                state.when_show_warning=when_show_warning;
-                state.shown_warnings=shown_warnings;
-                varargout{1}=state;
-            otherwise
-                assert(false);
-        end
+        varargout={get_state()};
         return
     end
 
     if isstruct(message)
-        % input was warning state
-        state=message;
-        warning(state.warning);
-        when_show_warning=state.when_show_warning;
-        shown_warnings=state.shown_warnings;
-        return;
-    end
-
-    if isnumeric(when_show_warning)
-        when_show_warning='once';
+        set_state(message);
+        return
     end
 
     lmessage=lower(message);
     show_warning=true;
 
-    if cosmo_match({lmessage},{'on','off','once','reset'})
-        if strcmp(lmessage,'reset')
-            shown_warnings=[];
-        end
+    switch lmessage
+        case {'on','off','once'}
+            update_state('when',lmessage);
+            return;
 
-        show_warning=false;
-        if strcmp(lmessage,'reset')
-            shown_warnings=[];
-        else
-            when_show_warning=lmessage;
-        end
+        case 'reset'
+            set_default_state();
+            return;
+
+        otherwise
+            show_warning_helper(message,varargin{:});
     end
 
-    if cosmo_match({message},{'on','off'})
-        if nargout>0
-            varargout{1}=warning(message,varargin{:});
-        else
-            warning(message,varargin{:});
-        end
-        show_warning=false;
-    end
+function show_warning_helper(message,varargin)
+    [identifier,full_message]=get_identifier_and_message(...
+                                    message,varargin{:});
 
-    if ~show_warning
-        return
-    end
-
-    args=varargin;
-    has_identifier=numel(args)>0 && has_warning_identifier(message);
-    if has_identifier
-        identifier=message;
-        message=args{1};
-        args=args(2:end);
-    end
-
-    if numel(args)>0
-        full_message=sprintf(message, args{:});
-    else
-        full_message=message;
-    end
-
-    has_warning=iscellstr(full_message) && ...
-                    ~cosmo_match({full_message},shown_warnings);
+    shown_warnings=get_from_state('shown_warnings');
+    has_warning=cosmo_match({full_message},shown_warnings);
     if ~has_warning
-        if isnumeric(shown_warnings)
-            shown_warnings=cell(0);
-        end
         shown_warnings{end+1}=full_message;
+        update_state('shown_warnings',shown_warnings);
     end
 
-    switch when_show_warning
+    when=get_from_state('when');
+    switch when
         case 'once'
-            if ~has_warning
-                me=mfilename();
-                postfix=sprintf(['\n\nThis warning is shown only once, '...
-                               'but the underlying issue may occur '...
-                               'multiple times. To show each warning:\n'...
-                               ' - every time:   %s(''on'')\n'...
-                               ' - once:         %s(''once'')\n'...
-                               ' - never:        %s(''off'')\n'],me,me,me);
-                full_message=[full_message postfix];
-            end
+            show_warning=~has_warning;
+
+            me=mfilename();
+            postfix=sprintf(['\n\nThis warning is shown only once, '...
+                           'but the underlying issue may occur '...
+                           'multiple times. To show each warning:\n'...
+                           ' - every time:   %s(''on'')\n'...
+                           ' - once:         %s(''once'')\n'...
+                           ' - never:        %s(''off'')\n'],me,me,me);
+            full_message=[full_message postfix];
+
         case 'off'
             show_warning=false;
         case 'on'
@@ -137,17 +92,91 @@ function varargout=cosmo_warning(message, varargin)
         state=warning(); % store state
         state_resetter=onCleanup(@()warning(state));
 
-        warning('on');
+        warning('on','all');
         % avoid extra entry on the stack
+        has_identifier=~isempty(identifier);
+
         if has_identifier
             warning(identifier,'%s',full_message);
         else
             warning('%s',full_message);
         end
-
     end
+
+function [identifier,full_message]=get_identifier_and_message(...
+                                            message,varargin)
+    args=varargin;
+    has_identifier=numel(args)>0 && has_warning_identifier(message);
+    if has_identifier
+        identifier=message;
+        message=args{1};
+        args=args(2:end);
+    else
+        identifier='';
+    end
+
+    if numel(args)>0
+        full_message=sprintf(message, args{:});
+    else
+        full_message=message;
+    end
+
+
 
 function tf=has_warning_identifier(s)
     alpha_num='([a-z_A-Z0-9]+)';
     pat=sprintf('^%s(:%s)?:%s$',alpha_num,alpha_num,alpha_num);
     tf=~isempty(regexp(s,pat,'once'));
+
+
+function s=get_state()
+    s=get_or_set_state();
+
+function set_state(s)
+    get_or_set_state(s);
+
+function set_default_state()
+    s=struct();
+    s.when='once';
+    s.shown_warnings=cell(0);
+    set_state(s);
+
+function value=get_from_state(key)
+    s=get_state();
+    value=s.(key);
+
+function update_state(key, value)
+    s=get_state();
+    s.(key)=value;
+    set_state(s);
+
+function varargout=get_or_set_state(s)
+    persistent state;
+    switch nargin
+        case 0
+            % get state
+            if isempty(state)
+                set_default_state();
+            end
+
+            varargout={state};
+
+        case 1
+            % set state
+            state=s;
+            varargout={};
+
+        otherwise
+            assert(false);
+    end
+
+
+
+
+
+
+
+
+
+
+
