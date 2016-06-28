@@ -90,7 +90,7 @@ function helper_test_surfing_voxel_selection(metric)
     end
     warning_state=warning();
     warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off');
+    warning('off','all');
 
     nx=round(rand()*5)+5;
     ny=round(rand()*5)+5;

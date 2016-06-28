@@ -60,6 +60,16 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
     - CHECKEXTCMD=""
+    - OCTAVE_DISABLE_WARNINGS=" Octave:array-to-scalar
+                                Octave:imag-to-real
+                                Octave:language-extension
+                                Octave:missing-semicolon
+                                Octave:resize-on-range-error
+                                Octave:separator-insert
+                                Octave:single-quote-string
+                                Octave:str-to-num
+                                Octave:mixed-string-concat
+                                Octave:variable-switch-label"
     - OCTAVE=octave
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
@@ -124,6 +134,11 @@ install:
     # disable "more"
     - echo "more('off');" >> $OCTAVERC
 
+    # disable warnings
+    - for label in $OCTAVE_DISABLE_WARNINGS; do
+          echo "warning('off','${label}');" >> $OCTAVERC;
+      done
+
     # prevent shippable from re-using old test results
     - if [[  "$SHIPPABLE" == "true"  ]]; then
           rm -f shippable/testresults/*.xml;
@@ -166,6 +181,7 @@ before_script:
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
 
+
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
@@ -173,6 +189,8 @@ before_script:
           $RETRY $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
+    # show Octave-rc
+    - echo "Octave-rc:"; cat $OCTAVERC
 
 script:
     - cd CoSMoMVPA
@@ -190,6 +208,9 @@ script:
       elif [[  "$SHIPPABLE" == "true"  ]]; then
           RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
       fi
+    # show warnings in Octave
+    - $OCTAVE --eval "disp('Warning state:');w=warning();for k=1:numel(w), disp(w(k)); end"
+
     - echo Test arguments $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
     - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
     - $AFTER_SCRIPT
