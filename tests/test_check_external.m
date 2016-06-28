@@ -21,7 +21,7 @@ function test_check_external_nifti()
     path_resetter=onCleanup(@()path(orig_path));
 
     % ensure path is set; disable warnings by cosmo_set_path
-    cosmo_warning('off');
+    warning('off','all');
     cosmo_set_path();
 
     assertTrue(cosmo_check_external('nifti'))
