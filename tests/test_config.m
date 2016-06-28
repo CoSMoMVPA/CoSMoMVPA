@@ -89,6 +89,7 @@ function helper_write_read_config(include_path_settings, config)
     orig_warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
 
+    cosmo_warning('reset');
     cosmo_warning('off');
 
     n_keys=ceil(rand()*5+5);
