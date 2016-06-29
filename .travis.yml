@@ -60,6 +60,16 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
     - CHECKEXTCMD=""
+    - OCTAVE_DISABLE_WARNINGS=" Octave:array-to-scalar
+                                Octave:imag-to-real
+                                Octave:language-extension
+                                Octave:missing-semicolon
+                                Octave:resize-on-range-error
+                                Octave:separator-insert
+                                Octave:single-quote-string
+                                Octave:str-to-num
+                                Octave:mixed-string-concat
+                                Octave:variable-switch-label"
     - OCTAVE=octave
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
@@ -144,6 +154,7 @@ before_script:
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
           echo "" >> $OCTAVERC;
       fi
@@ -163,9 +174,6 @@ before_script:
       fi
 
 
-    # show which packages are installed
-    - $OCTAVE --eval "pkg('list')"
-
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
@@ -173,6 +181,15 @@ before_script:
           $RETRY $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
+    # show Octave-rc
+    - echo "Octave-rc:"; cat $OCTAVERC
+
+
+    # show which packages are installed
+    - $OCTAVE --eval "pkg('list')"
+
+     # show WTF
+    - $OCTAVE --eval "addpath('${PTH}/CoSMoMVPA/mvpa');cosmo_wtf()"
 
 script:
     - cd CoSMoMVPA
@@ -190,7 +207,7 @@ script:
       elif [[  "$SHIPPABLE" == "true"  ]]; then
           RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
       fi
-    - echo Test arguments $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
+
     - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
     - $AFTER_SCRIPT
 
