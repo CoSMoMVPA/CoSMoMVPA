@@ -478,7 +478,8 @@ function permuter_func=get_permuter_preproc_none_func(ds,preproc_func,opt)
         error(['The option ''null'' is required '...
                         'with ''none'' statfunc']);
     end
-    permuter_func=@(iter)opt.null{iter};
+
+    permuter_func=@(iter) preproc_func(opt.null{iter});
 
 function permuter_func=get_permuter_preproc_stat_func(ds,preproc_func,opt)
 

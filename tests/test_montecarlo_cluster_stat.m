@@ -327,6 +327,28 @@ function test_feature_stat_montecarlo_cluster_stat
     assertEqual(res.fa,ds1.fa);
     assertEqual(res.a,ds1.a);
 
+    % h0_mean shoudl work
+    c=8+rand();
+    null_cell_const=null_cell;
+    for k=1:numel(null_cell_const)
+        null_cell_const{k}.samples=null_cell_const{k}.samples+c;
+    end
+
+    ds1_const=ds1;
+    ds1_const.samples=ds1_const.samples+c;
+
+
+    opt.h0_mean=c;
+    opt.null=null_cell_const;
+
+    res_const=cosmo_montecarlo_cluster_stat(ds1_const,nh,opt);
+    assertElementsAlmostEqual(res_const.samples,res.samples,...
+                                'absolute',1e-4);
+    assertEqual(res.fa,res_const.fa);
+    assertEqual(res.a,res_const.a);
+
+
+
 
 function test_montecarlo_cluster_stat_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
