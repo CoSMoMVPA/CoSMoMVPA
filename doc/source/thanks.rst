@@ -35,6 +35,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Karen Cuculiza
 + Sarah Belinda Aimee Degosciu
 + Hanna Gertz
++ Tijl Grootswagers
 + Yaroslav Halchenko
 + Thomas Hartmann
 + James Haxby
