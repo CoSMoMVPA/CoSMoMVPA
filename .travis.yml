@@ -26,7 +26,7 @@ before_install:
     # ensure up-to-date prior to software-properties-common
     - travis_retry sudo apt-get -y -qq update
     # get Octave 4.0
-    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties libtool
+    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties libtool autoconf automake m4
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
     - travis_retry sudo apt-get -y install octave
@@ -54,6 +54,10 @@ before_install:
           git clone git://github.com/MOcov/MOcov.git;
           make -C MOcov install;
       fi
+    # Show package info
+    - autoconf --version
+    - automake --version
+    - m4 --version
 
 install:
     - PTH=`pwd`
