@@ -155,7 +155,8 @@ before_script:
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+          $RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
+          make -C octave-parallel install;
       fi
 
     # optionally enable Octave statistics package
