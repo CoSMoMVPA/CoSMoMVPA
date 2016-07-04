@@ -160,6 +160,7 @@ before_script:
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
           $RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
+          sed -i '' 's/AC_CONFIG_MACRO_DIRS/AC_CONFIG_MACRO_DIR/g' octave-parallel/src/configure.ac;
           make -C octave-parallel install;
       fi
 
