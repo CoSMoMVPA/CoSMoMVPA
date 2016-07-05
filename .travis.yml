@@ -9,17 +9,15 @@ language: java
 cache:
   - apt
 env:
-  - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false
-  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false
-  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
-matrix:
-  # allow failures with coverage, because execution speed
-  # is significantly lower when coverage is enabled which may
-  # result in a time-out (error) when execution time
-  # exceeds 50 minutes.
-  allow_failures:
-    - env: TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
-  fast_finish: true
+  global:
+    - COVERALLS_PARALLEL=true
+  matrix:
+    - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=4
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=4
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=4
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=4
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -203,12 +201,18 @@ script:
           elif [[  "$TRAVIS" == "true"  ]]; then
               OUTPUT_ARGS=COVER_JSON_FILE=`pwd`/coveralls.json;
               AFTER_SCRIPT="curl --verbose -F json_file=@`pwd`/coveralls.json https://coveralls.io/api/v1/jobs";
+              if [ ! -z "$PARTITION_INDEX" ]; then
+                  PARTITION_ARGS="TEST_PARTITION_INDEX=${PARTITION_INDEX} TEST_PARTITION_COUNT=${PARTITION_COUNT}";
+              fi
           fi;
       elif [[  "$SHIPPABLE" == "true"  ]]; then
           RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
       fi
 
-    - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
+    - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS $PARTITION_ARGS
     - $AFTER_SCRIPT
+
+notifications:
+  webhooks: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
 
 
