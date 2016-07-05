@@ -376,11 +376,12 @@ function test_montecarlo_cluster_stat_exceptions
 
 function test_montecarlo_cluster_stat_default_dh
     ds=cosmo_synthetic_dataset();
+    ds.samples=randn(size(ds.samples));
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     opt=struct();
     opt.progress=false;
-    opt.niter=ceil(rand()*10+10);
+    opt.niter=ceil(rand()*100+10);
     opt.seed=ceil(rand()*100+1);
     res_no_dh=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     res_dh_naught_one=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.1);
