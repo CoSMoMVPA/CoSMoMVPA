@@ -40,7 +40,6 @@ function varargout=cosmo_warning(message, varargin)
     end
 
     lmessage=lower(message);
-    show_warning=true;
 
     switch lmessage
         case {'on','off','once'}
@@ -52,10 +51,10 @@ function varargout=cosmo_warning(message, varargin)
             return;
 
         otherwise
-            show_warning_helper(message,varargin{:});
+            show_warning(message,varargin{:});
     end
 
-function show_warning_helper(message,varargin)
+function show_warning(message,varargin)
     [identifier,full_message]=get_identifier_and_message(...
                                     message,varargin{:});
 
@@ -69,7 +68,7 @@ function show_warning_helper(message,varargin)
     when=get_from_state('when');
     switch when
         case 'once'
-            show_warning=~has_warning;
+            do_show_warning=~has_warning;
 
             me=mfilename();
             postfix=sprintf(['\n\nThis warning is shown only once, '...
@@ -81,14 +80,14 @@ function show_warning_helper(message,varargin)
             full_message=[full_message postfix];
 
         case 'off'
-            show_warning=false;
+            do_show_warning=false;
         case 'on'
-            show_warning=true;
+            do_show_warning=true;
         otherwise
             assert(false);
     end
 
-    if show_warning
+    if do_show_warning
         state=warning(); % store state
         state_resetter=onCleanup(@()warning(state));
 
