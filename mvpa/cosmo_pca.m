@@ -1,22 +1,25 @@
-function [ds, params]=cosmo_pca(ds, params)
+function [ds, pca_params]=cosmo_pca(ds, varargin)
 % normalize dataset either by estimating or applying estimated parameters
 %
-% [ds, est_params]=cosmo_pca(ds, params)
+% [ds, pca_params]=cosmo_pca(ds[, pca_params, pca_explained_count, 
+%                            pca_explained_ratio])
 %
 % Inputs
 %   ds            a dataset struct with field .samples of size PxQ, or a
 %                 numeric array of that size
-%   params        either the number of components to retain:
-%                   - 0>params>1   (retain number of components that 
-%                                   explain 'params' % of the variance)
-%                   - 1<=params    (retain 'params' components)
-%                 -or-
-%                 previously estimated pca parameters using the 'params'
-%                 output result from a previous call to this function.
+%   pca_params    previously estimated pca parameters using the 
+%                 'pca_params' output result from a previous call to this 
+%                 function
+%   pca_explained_count    retain only the first 'pca_explained_count' 
+%                          components
+%   pca_explained_ratio    retain the first components that explain 
+%                 'pca_explained_ratio' percent of the variance (value
+%                 between 0 and 1, where 1 retains all components)
 %
 % Output
 %   ds            a dataset struct similar to ds, but with .samples data
 %                 transformed using pca. Chan now refers to components
+%                 instead of channels
 %   params        estimated parameters for pca. These can be re-used for a 
 %                 second pca step of an independent dataset. For example, 
 %                 parameters can be estimated from a training dataset and 
@@ -25,11 +28,17 @@ function [ds, params]=cosmo_pca(ds, params)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-if isempty(params)
-    return;
-end
+opt=cosmo_structjoin(varargin);
 
-apply_params=isstruct(params);
+apply_params = isfield(opt,'pca_params');
+pca_explained_count = isfield(opt,'pca_explained_count');
+pca_explained_ratio = isfield(opt,'pca_explained_ratio');
+    
+%they are mutually exclusive
+if sum([apply_params,pca_explained_count,pca_explained_ratio])>1
+    error(['apply_params, pca_explained_count, pca_explained_ratio '...
+      'are mutually exclusive.']);
+end
 
 is_ds=isstruct(ds) && isfield(ds,'samples');
 
@@ -40,23 +49,46 @@ else
 end
 
 if apply_params
-    coeff=params.coeff;
-    mu=params.mu;
-    retain=params.retain;
+    pca_params=opt.pca_params;
+    coeff=pca_params.coeff;
+    mu=pca_params.mu;
+    retain=pca_params.retain;
+    %de-mean and multiply with previously computed coefficients
+    samples=bsxfun(@minus,samples,mu)*coeff;
 else
-    [coeff,~,~,~,explained,mu]=pca(samples);
-    if params<1
-        retain=cumsum(explained)<=params*100;
+    [coeff,samples,unused1,unused2,explained,mu]=pca(samples); %#ok<ASGLU>
+    pca_params=struct();
+    pca_params.mu=mu;
+    pca_params.coeff=coeff;
+    if pca_explained_count
+        pca_explained_count=opt.pca_explained_count;
+        %check for valid values
+        if pca_explained_count==0
+            error('pca_explained_count should be greater than 0');
+        elseif pca_explained_count>length(explained)
+            error(['pca_explained_count should be smaller than the '...
+                'number of features']);
+        end
+        %retain the first n components, sorted by their explained variance
+        pca_params.pca_explained_count=pca_explained_count;
+        retain=(1:length(explained))<=pca_explained_count;
+    elseif pca_explained_ratio
+        pca_explained_ratio=opt.pca_explained_ratio;
+        %check for valid values
+        if pca_explained_ratio<=0
+            error('pca_explained_ratio should be greater than 0');
+        elseif pca_explained_count>1
+            error('pca_explained_ratio should be smaller than 1');
+        end
+        %retain the first components that explain the amount of variance 
+        pca_params.pca_explained_ratio=pca_explained_ratio;
+        retain=cumsum(explained)<=pca_explained_ratio*100;
     else
-        retain=(1:length(explained))<=params;
+        %retain everything
+        retain = true(1,length(explained));
     end
-    params=struct();
-    params.mu=mu;
-    params.coeff=coeff;
-    params.retain=retain;
+    pca_params.retain=retain;
 end
-%de-mean and multiply with coefficients
-samples=bsxfun(@minus,samples,mu)*coeff;
 
 %apply retain mask
 if is_ds
