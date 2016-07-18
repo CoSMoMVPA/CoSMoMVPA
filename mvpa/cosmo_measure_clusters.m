@@ -247,7 +247,7 @@ function feature_sizes=get_feature_sizes(sample,opt)
         % if given as option, use those
         feature_sizes=opt.feature_sizes;
         % ensure it is a row vector
-        if ~isrow(feature_sizes) || size(feature_sizes,2) ~= nfeatures
+        if ~isequal(size(feature_sizes),[1,nfeatures])
             error('feature sizes must be of size 1x%d', nfeatures);
         end
     else
@@ -318,7 +318,7 @@ function check_positive_scalar(value, name)
     end
 
 function check_input_sizes(sample,nbrhood_mx)
-    if ~isrow(sample)
+    if size(sample,1)~=1
         error('sample input must be a row vector');
     end
 

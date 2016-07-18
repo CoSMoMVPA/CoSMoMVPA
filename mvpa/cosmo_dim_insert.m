@@ -138,12 +138,16 @@ function dim_values=get_dim_values(labels,values,dim,opt)
         value=values{j};
 
         if ~cosmo_match({label},matrix_labels)
-            if ~isvector(value)
+            sz=size(value);
+            if ~any(sz==1)
                 error(['dim value for %s must be a vector, because it '...
                             'is not set in the matrix_labels option'],...
                             label);
             end
-            if xor(isrow(value),dim==2)
+
+            needs_transpose=sz(dim)==1;
+
+            if needs_transpose
                 value=value';
             end
         end

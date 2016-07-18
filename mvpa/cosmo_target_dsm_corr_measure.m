@@ -271,9 +271,11 @@ function dsm_vec=get_dsm_vec(dsm,npairs_dataset,name)
         error('dsm inputs must be numeric, found %s', class(dsm));
     end
 
-    if isrow(dsm)
+    sz=size(dsm);
+
+    if sz(1)==1
         dsm_vec=dsm';
-    elseif iscolumn(dsm)
+    elseif sz(2)==1
         dsm_vec=dsm;
     else
         % convert square matrix to vector

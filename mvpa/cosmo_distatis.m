@@ -282,6 +282,7 @@ function [ew,v]=eigen_weights(x, feature_id)
     negative_c=c<0;
 
     if any(negative_c(:))
+
         [i,j]=find(negative_c);
         error(['feature %d has negative correlation between '...
                 'sample %d and %d, which is not supported by '...
@@ -290,7 +291,7 @@ function [ew,v]=eigen_weights(x, feature_id)
                 'correlate positively. Because that is not the '...
                 'case, you cannot use DISTATIS analysis on this '...
                 'data. '],...
-                feature_id,i,j);
+                feature_id,i(1),j(1));
     end
 
     [v,e]=fast_eig1(c);
