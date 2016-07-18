@@ -137,7 +137,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         opt.normalization=[];
     end
     if ~isfield(opt, 'pca'),
-        opt.pca=false;
+        opt.pca=[];
     end
     if ~isfield(opt, 'check_partitions'),
         opt.check_partitions=true;
@@ -152,12 +152,12 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     
     if ~isempty(opt.pca);
         pca=opt.pca;
-        if ~isempty(opt.pca_explained_count);
+        if isfield(opt, 'pca_explained_count');
             pca_explained_count=opt.pca_explained_count;
         else
             pca_explained_count=false;
         end
-        if ~isempty(opt.pca_explained_ratio);
+        if isfield(opt, 'pca_explained_ratio');
             pca_explained_ratio=opt.pca_explained_ratio;
         else
             pca_explained_ratio=false;

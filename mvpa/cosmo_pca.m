@@ -18,8 +18,7 @@ function [ds, pca_params]=cosmo_pca(ds, varargin)
 %
 % Output
 %   ds            a dataset struct similar to ds, but with .samples data
-%                 transformed using pca. Chan now refers to components
-%                 instead of channels
+%                 transformed using pca.
 %   params        estimated parameters for pca. These can be re-used for a 
 %                 second pca step of an independent dataset. For example, 
 %                 parameters can be estimated from a training dataset and 
@@ -77,7 +76,7 @@ else
         %check for valid values
         if pca_explained_ratio<=0
             error('pca_explained_ratio should be greater than 0');
-        elseif pca_explained_count>1
+        elseif pca_explained_ratio>1
             error('pca_explained_ratio should be smaller than 1');
         end
         %retain the first components that explain the amount of variance 
@@ -93,6 +92,10 @@ end
 %apply retain mask
 if is_ds
     ds.samples=samples;
+    ds.fa = {};
+    ds.fa.comp=1:size(samples,2);
+    ds.a.fdim.labels={'comp'};
+    ds.a.fdim.values={1:size(samples,2)};
     ds=cosmo_slice(ds,retain,2);
 else
     ds=samples(:,retain);
