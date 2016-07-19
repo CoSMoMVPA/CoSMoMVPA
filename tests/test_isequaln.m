@@ -61,7 +61,7 @@ function helper_test_comparison(func)
     if cosmo_skip_test_if_no_external(ext_name)
         return
     end
-    
+
     warning_state=warning();
     warning_resetter=onCleanup(@()warning(warning_state));
     warning('off','Octave:deprecated-keyword');
