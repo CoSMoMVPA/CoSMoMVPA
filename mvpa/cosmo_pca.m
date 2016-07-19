@@ -92,7 +92,7 @@ end
 %apply retain mask
 if is_ds
     ds.samples=samples;
-    ds.fa = {};
+    ds.fa = struct();
     ds.fa.comp=1:size(samples,2);
     ds.a.fdim.labels={'comp'};
     ds.a.fdim.values={1:size(samples,2)};
