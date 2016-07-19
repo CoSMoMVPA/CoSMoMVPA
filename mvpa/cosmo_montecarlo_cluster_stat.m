@@ -31,7 +31,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                                 section below how to set the .sa.targets
 %                                 and .sa.chunks attributes.
 %                       - 'none': Do not compute statistics, but instead
-%                                 use the input data from ds directory. In
+%                                 use the input data from ds directly. In
 %                                 this case:
 %                                 * no statistic is computed;
 %                                 * ds.samples must be a row vector.
@@ -68,7 +68,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %                       one-sample t-test across participants is used to
 %                       test classification  accuracies against chance
 %                       level (with the 'h0_mean' option), then each
-%                       dataset null{i} should contain classification
+%                       dataset null_data{i} should contain classification
 %                       accuracies for each participant that were computed
 %                       using randomized values for .sa.targets.
 %                       If this option is provided, then null data is
@@ -478,7 +478,8 @@ function permuter_func=get_permuter_preproc_none_func(ds,preproc_func,opt)
         error(['The option ''null'' is required '...
                         'with ''none'' statfunc']);
     end
-    permuter_func=@(iter)opt.null{iter};
+
+    permuter_func=@(iter) preproc_func(opt.null{iter});
 
 function permuter_func=get_permuter_preproc_stat_func(ds,preproc_func,opt)
 

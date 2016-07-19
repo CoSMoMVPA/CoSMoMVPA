@@ -67,6 +67,7 @@ function test_align_basics
 
     aet({'b','c','d','d'},{'d','b','c','d'});
 
+
 function test_align_multiple_nans
     n_rows_half=20+ceil(rand()*20);
     x=ceil(rand(n_rows_half*2,2)*sqrt(n_rows_half));

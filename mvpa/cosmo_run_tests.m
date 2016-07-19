@@ -53,6 +53,24 @@ function did_pass=cosmo_run_tests(varargin)
 
     did_pass=all(cellfun(@(runner) runner(opt,args),runners));
 
+    if ~did_pass
+        write_wtf(opt.logfile);
+    end
+
+
+function write_wtf(logfile)
+    has_logfile=~isempty(logfile);
+    if has_logfile
+        fid=fopen(logfile,'a');
+        file_closer=onCleanup(@()fclose(fid));
+    else
+        fid=1;
+    end
+
+    wtf=cosmo_wtf();
+    fprintf(fid,'%s',wtf);
+
+
 
 function did_pass=run_doctest_helper(opt,unused)
     did_pass=true;
@@ -129,7 +147,9 @@ function s=get_all_test_runners_struct()
                               '-cover_json_file',...
                               '-with_coverage',...
                               '-junit_xml_file',...
-                              '-cover_method'};
+                              '-cover_method',...
+                              '-partition_index',...
+                              '-partition_count'};
 
     s.xunit.runner=@runtests;
     s.xunit.arg_with_value={};

@@ -25,7 +25,7 @@ For the patient
 +++++++++++++++
 
 
-The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the example data (in ``examples``) is required to run the :ref:`exercises <rhul2016>` and the :ref:`demos <contents_demo.rst>`.
+The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; the tutorial data is required to run the :ref:`exercises <prni2016>` and the :ref:`demos <contents_demo.rst>`, which are included in the ``examples/`` directory.
 
 * Installation of CoSMoMVPA:
 
@@ -44,7 +44,7 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
                 cosmo_set_path
 
-            (alternatively, add the ``mvpa`` and ``external`` directories, and their subdirectories to the path).
+            (alternatively, add the ``mvpa`` and ``external`` directories, and their subdirectories to the path, using ``addpath``).
 
             Then run
 
@@ -106,7 +106,9 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
     For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6.zip>`_
 
-    Additinal MEEG data, used for the exercises, is here: `datadb-meg_obj6.zip`_.
+    Additional MEEG ``obj-6`` data, used for the exercises, is here: `datadb-meg_obj6.zip`_.
+
+    For `PRNI 2016`_, we use fMRI ``AK6`` and MEEG ``obj-6``: `<datadb-ak6-meg_obj6-v0.3.zip>`_.
 
     You can move the directory to another location on your file system, if desired.
 
