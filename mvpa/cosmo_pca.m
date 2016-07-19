@@ -82,7 +82,7 @@ else
         if pca_explained_ratio<=0
             error('pca_explained_ratio should be greater than 0');
         elseif pca_explained_ratio>1
-            error('pca_explained_ratio should be smaller than 1');
+            error('pca_explained_ratio should not be greater than 1');
         end
         %retain the first components that explain the amount of variance 
         pca_params.pca_explained_ratio=pca_explained_ratio;
