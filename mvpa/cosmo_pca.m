@@ -51,6 +51,11 @@ if apply_params
     pca_params=opt.pca_params;
     coeff=pca_params.coeff;
     mu=pca_params.mu;
+    if size(coeff,1)~=size(samples,2)
+        error(['Expecting ',num2str(size(coeff,1)),' features for the ',...
+            'PCA transformation, but ',num2str(size(samples,2)),...
+            ' features were provided.'])
+    end
     retain=pca_params.retain;
     %de-mean and multiply with previously computed coefficients
     samples=bsxfun(@minus,samples,mu)*coeff;
