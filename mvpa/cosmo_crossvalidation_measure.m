@@ -13,8 +13,8 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       @classify_naive_baysian
 %   args.partitions     Partition scheme, for example the output from
 %                       cosmo_nfold_partition
-%   args.output         'accuracy' (default), 'predictions', or
-%                       'accuracy_by_chunk'
+%   args.output         'accuracy' (default), 'balanced_accuracy', 
+%                       'predictions', or 'accuracy_by_chunk'
 %   args.check_partitions  optional (default: true). If set to false then
 %                          partitions are not checked for being set
 %                          properly.
@@ -24,6 +24,13 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       first or second dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%     .pca_explained_count   optional, transform the data with PCA prior to
+%                            classification, and retain this number of
+%                            components
+%     .pca_explained_ratio   optional, transform the data with PCA prior to
+%                            classification, and retain the components that
+%                            explain this percentage of the variance
+%                            (value between 0-1)
 %   args.average_train_X  average the samples in the train set using
 %                       cosmo_average_samples. For X, use any parameter
 %                       supported by cosmo_average_samples, i.e. either
@@ -167,6 +174,16 @@ switch params.output
     case 'accuracy'
         ds_sa.samples=accuracy;
         ds_sa.sa.labels={'accuracy'};
+        
+    case 'balanced_accuracy'
+        classes = unique(ds.sa.targets);
+        ba = zeros(1,length(classes));
+        for c=1:length(classes)
+            idx = ds.sa.targets==classes(c);
+            ba(c) = mean(ds.sa.targets(idx)==pred(idx));
+        end
+        ds_sa.samples=mean(ba);
+        ds_sa.sa.labels={'balanced_accuracy'};
 
     case {'predictions','raw'}
         ds_sa.sa=ds.sa;
