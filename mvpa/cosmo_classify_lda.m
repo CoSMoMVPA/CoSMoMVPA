@@ -1,4 +1,4 @@
-function predicted = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
+function [predicted,decisionvalues] = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
 % linear discriminant analysis classifier - without prior
 %
 % predicted=cosmo_classify_lda(samples_train, targets_train, samples_test[,opt])
@@ -76,7 +76,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
     end
 
     % test classifier
-    predicted=test(model, samples_test);
+    [predicted,decisionvalues]=test(model, samples_test);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % helper functions
@@ -166,7 +166,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
         model.class_weight=class_weight;
         model.classes=classes;
 
-function predicted=test(model, samples_test)
+function [predicted,decisionvalues]=test(model, samples_test)
     % test LDA classifier
 
     class_offset=model.class_offset;
@@ -180,7 +180,7 @@ function predicted=test(model, samples_test)
 
     class_proj=bsxfun(@plus,-.5*class_offset,class_weight*samples_test');
 
-    [unused,class_idxs]=max(class_proj);
+    [decisionvalues,class_idxs]=max(class_proj);
     predicted=classes(class_idxs);
 
 function unq_xs=fast_vector_unique(xs)
