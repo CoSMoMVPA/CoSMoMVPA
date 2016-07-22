@@ -18,7 +18,7 @@ CoSMoMVPA
 - Searchlights in the volume, on the surface, over sensors, time bins, and frequency bands.
 - Multiple-comparison correction using Threshold-Free Cluster Enhancement Monte Carlo simulations.
 - Extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
-- Is Free/Open Source Software (MIT License).
+- Is Free/Open Source Software (MIT License), see http://github.com/CoSMoMVPA/CoSMoMVPA.
 
 .. toctree::
    :hidden:
