@@ -135,11 +135,11 @@ function bytes=get_niml_dset_data(format)
     switch lower(format)
         case 'ascii'
             data_pat=[repmat(['%.6f' col_sep],1,nrows) row_sep];
-            bucket_data=sprintf(data_pat,data);
+            bucket_data=uint8(sprintf(data_pat,data));
 
             node_pat=['%d' row_sep];
             node_data=uint8(sprintf(node_pat,nodes_base0));
-            ni_form=uint8([]);
+            ni_form='';
 
         case {'binary','binary.lsbfirst','binary.msbfirst'};
             data_single=single(data(:)');

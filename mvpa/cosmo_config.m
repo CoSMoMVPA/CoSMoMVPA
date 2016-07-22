@@ -140,7 +140,7 @@ function validate_config(config)
 
                 if ~test_func(value)
                     msg_func=check.msg;
-                    warning('%s\n%s',msg_func(fn, value),add_msg);
+                    cosmo_warning('%s\n%s',msg_func(fn, value),add_msg);
                 end
             end
         end
@@ -242,7 +242,7 @@ function config=read_config(fn)
         m=regexp(line,'(?<key>[^=]+)\s*=\s*(?<value>.*)\s*','names');
 
         if isempty(m)
-            warning('Skipping non-recognized line "%s"', line);
+            cosmo_warning('Skipping non-recognized line "%s"', line);
             continue;
         end
 
@@ -292,7 +292,8 @@ function write_config(fn, config)
         elseif ischar(v)
             % no converstion
         else
-            warning('Skipping unsupported data type for key "%s"', fn);
+            cosmo_warning('Skipping unsupported data type for key "%s"',...
+                                                fn);
         end
         fprintf(fid,'%s=%s\n',fn,v);
     end

@@ -20,17 +20,29 @@ function test_run_tests_failing
     assert(~isempty(findstr('FAILED',output)));
 
 function test_run_tests_no_file_found_absolute_path()
+    if skip_test_if_octave_package_io_2_4_2()
+        return;
+    end
+
     cosmo_test_dir=fileparts(mfilename('fullpath'));
     fn=cosmo_make_temp_filename(fullfile(cosmo_test_dir,'test_'),'.m');
     assertExceptionThrown(@()helper_run_tests({fn}),'');
 
 
 function test_run_tests_no_file_found_relative_path()
+    if skip_test_if_octave_package_io_2_4_2()
+        return;
+    end
+
     fn=cosmo_make_temp_filename('test_','.m');
     assertExceptionThrown(@()helper_run_tests({fn}),'');
 
 
 function test_run_tests_missing_logfile_argument()
+    if skip_test_if_octave_package_io_2_4_2()
+        return;
+    end
+
     assertExceptionThrown(@()helper_run_tests({'-logfile'}),'');
 
 
@@ -84,3 +96,40 @@ function delete_if_exists(fn)
     if exist(fn,'file')
         delete(fn);
     end
+
+
+function skip_test_if_octave_package_io_2_4_2()
+% July 2016:
+% Octave package 'io' version 2.4.2 gave the following error with
+% three tests:
+% - test_run_tests_no_file_found_absolute_path
+% - test_run_tests_no_file_found_relative_path
+% - test_run_tests_missing_logfile_argument
+%
+%         failure: '__octave_config_info__' undefined near line 1 column 1
+%   __init_io__:30 (/Users/nick/octave/io-2.4.2/__init_io__.m)
+%   /Users/nick/octave/io-2.4.2/PKG_ADD:2 (/Users/nick/octave/io-2.4.2/PKG_ADD)
+%
+% These tests are disabled for now when using Octave and io 2.4.2.
+% (Version 2.4.0 seems to work fine)
+
+    if ~cosmo_wtf('is_octave')
+        return;
+    end
+
+    pkgs=pkg('list','io');
+    if numel(pkgs)~=1
+        return;
+    end
+
+    version=pkgs{1}.version;
+    if isequal(version,'2.4.2')
+        reason=['Octave io package 2.4.2 gives unexpected error '...
+                '"''__octave_config_info__'' undefined" in '...
+                '__init_io__.m:30; therefore '...
+                'the tests causing this error are temporarily disabled'];
+        cosmo_notify_test_skipped(reason);
+    end
+
+
+
