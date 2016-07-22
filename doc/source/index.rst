@@ -12,7 +12,7 @@ A multi-modal, multi-variate pattern analysis (MVPA) toolbox in Matlab / GNU Oct
 CoSMoMVPA
 ---------
 - State-of-the art, yet simple to use MVPA implementations.
-- Runs on the Matlab and GNU Octave platform.
+- Runs on the Matlab and GNU Octave platform, on MS Windows, OSX, and GNU/Linux.
 - Handles fMRI volumetric, fMRI surface-based, and MEEG data through a uniform data structure.
 - Support for a wide range of data formats.
 - Searchlights in the volume, on the surface, over sensors, time bins, and frequency bands.
