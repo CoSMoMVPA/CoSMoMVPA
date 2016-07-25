@@ -13,7 +13,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       @classify_naive_baysian
 %   args.partitions     Partition scheme, for example the output from
 %                       cosmo_nfold_partition
-%   args.output         'accuracy' (default), 'balanced_accuracy', 
+%   args.output         'accuracy' (default), 'balanced_accuracy',
 %                       'predictions', or 'accuracy_by_chunk'
 %   args.check_partitions  optional (default: true). If set to false then
 %                          partitions are not checked for being set
@@ -167,16 +167,22 @@ switch params.output
     case 'accuracy'
         ds_sa.samples=accuracy;
         ds_sa.sa.labels={'accuracy'};
-        
+
     case 'balanced_accuracy'
         classes = unique(ds.sa.targets);
         ba = zeros(1,length(classes));
+        has_predictions = ~isnan(pred);
         for c=1:length(classes)
-            idx = ds.sa.targets==classes(c);
+            % some samples may be without predictions (and are set to NaN
+            % by cosmo_crossvalidate). Consider only the samples with
+            % predicitons, and compute for each class the classification
+            % accuracy
+            idx = ds.sa.targets==classes(c) & has_predictions;
             ba(c) = mean(ds.sa.targets(idx)==pred(idx));
         end
         ds_sa.samples=mean(ba);
         ds_sa.sa.labels={'balanced_accuracy'};
+
 
     case {'predictions','raw'}
         ds_sa.sa=ds.sa;
