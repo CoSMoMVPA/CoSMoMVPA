@@ -375,18 +375,30 @@ function test_montecarlo_cluster_stat_exceptions
 
 
 function test_montecarlo_cluster_stat_default_dh
-    ds=cosmo_synthetic_dataset();
-    ds.samples=randn(size(ds.samples));
+    ds=cosmo_synthetic_dataset('size','normal',...
+                                'ntargets',1,'nchunks',15);
+    ds.samples=randn(size(ds.samples))+.5;
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     opt=struct();
     opt.progress=false;
-    opt.niter=ceil(rand()*100+10);
+    opt.h0_mean=0;
+
+    % make output detereministic over multiple runs
+    opt.niter=ceil(rand()*5+15);
     opt.seed=ceil(rand()*100+1);
+
+
+    % default value of dh should give identical result
     res_no_dh=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     res_dh_naught_one=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.1);
     assertEqual(res_no_dh,res_dh_naught_one);
 
+    % different dh value should (almost always) give different result
     res_dh_naught_five=cosmo_montecarlo_cluster_stat(ds,nh,opt,'dh',.5);
     assertFalse(isequal(res_no_dh.samples,res_dh_naught_five.samples));
+
+    min_corr=.7;
+    assertTrue(corr(res_dh_naught_one.samples(:),...
+                        res_dh_naught_five.samples(:))>min_corr);
 
