@@ -14,10 +14,12 @@ env:
   matrix:
     - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=4
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=4
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=4
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=4
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=6
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=6
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=6
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=6
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=6
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=6 TRAVIS_AFTER_ALL_ARGS='--is_master'
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -210,7 +212,29 @@ script:
       fi
 
     - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS $PARTITION_ARGS
-    - $AFTER_SCRIPT
+
+after_success:
+  - echo "Success"
+  - ./travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
+  - cat .to_export_back
+  - export $(cat .to_export_back)
+  - if [ "$BUILD_LEADER" = "YES" ]; then
+      if [ "$BUILD_AGGREGATE_STATUS" = "others_succeeded" ]; then
+          echo "All jobs succeeded! PUBLISHING through '${AFTER_SCRIPT}'...";
+          $AFTER_SCRIPT
+        else
+          echo "Some or all jobs failed, not publishing";
+       fi
+    fi
+
+after_failure:
+  - echo "Failure"
+  - python travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
+  - cat .to_export_back
+  - export $(cat .to_export_back)
+  - if [ "$BUILD_LEADER" = "YES" ]; then
+       echo "Some or all jobs failed, not publishing";
+    fi
 
 notifications:
   webhooks: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
