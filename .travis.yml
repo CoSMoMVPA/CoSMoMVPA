@@ -237,6 +237,6 @@ after_failure:
     fi
 
 notifications:
-  webhooks: https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN
+  webhooks: https://coveralls.io/webhook?repo_token=$COVERALLS_REPO_TOKEN
 
 
