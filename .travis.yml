@@ -215,7 +215,7 @@ script:
 
 after_success:
   - echo "Success"
-  - ./travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
+  - tools/travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
   - cat .to_export_back
   - export $(cat .to_export_back)
   - if [ "$BUILD_LEADER" = "YES" ]; then
@@ -229,7 +229,7 @@ after_success:
 
 after_failure:
   - echo "Failure"
-  - python travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
+  - tools/travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
   - cat .to_export_back
   - export $(cat .to_export_back)
   - if [ "$BUILD_LEADER" = "YES" ]; then
