@@ -205,7 +205,7 @@ def get_argument_parser():
     parser.add_argument('--is_master', action="store_true")
     parser.add_argument('--master_number', type=int, default=0)
     parser.add_argument('--poll', type=int, default=5,
-                        description='polling interval in seconds')
+                        help='polling interval in seconds')
     parser.add_argument('--export_file',
                         default='.to_export_back')
     return parser
@@ -259,8 +259,8 @@ if __name__ == '__main__':
     gh_token = os.getenv(GITHUB_TOKEN)
     job_number = os.getenv(TRAVIS_JOB_NUMBER, '')
 
-    is_master = args.is_master or \
-                job_number.endswith('.%s' % parser.master_number)
+    is_master = (args.is_master or
+                 job_number.endswith('.%s' % parser.master_number))
 
     travis_entry = args.travis_entry
 
