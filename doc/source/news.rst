@@ -3,6 +3,7 @@
 
 News
 ----
-- our CoSMoMVPA manuscript is online as a preprint on bioRxiv, :doi:`10.1101/047118` (citation :cite:`OCH16`)
-- The 2016 Summer School in Computational Sensory-Motor Neuroscience ( `CoSMo 2016 workshop`_ ) has been announced. Application deadline: April 11, 2016. (Note that CoSMoMVPA_ will not be presented).
+
+- our CoSMoMVPA manuscript has been published (:cite:`OCH16`): Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Frontiers in Neuroinformatics, :doi:`10.3389/fninf.2016.00027`.
+
 

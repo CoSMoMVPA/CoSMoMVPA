@@ -18,17 +18,17 @@ General
 
 How should I cite CoSMoMVPA?
 ----------------------------
-We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:
+Please cite :cite:`OCH16`:
 
-    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, :doi:`10.1101/047118`.
+    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Frontiers in Neuroinformatics, :doi:`10.3389/fninf.2016.00027`.
 
 BiBTeX record::
 
     @article{OCH16,
     author = {Oosterhof, Nikolaas N and Connolly, Andrew C and Haxby, James V},
     title = {{CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave}},
-    journal = {biorxiv.org},
-    doi = {10.1101/047118},
+    journal = {Frontiers in Neuroinformatics},
+    doi = {10.3389/fninf.2016.00027},
     year = {2016}
     }
 
@@ -162,6 +162,19 @@ How can I contact the developers directly?
 Is there a mailinglist?
 -----------------------
     There is the `CoSMoMVPA Google group`_.
+
+
+Why do you encourage balanced partitions?
+-----------------------------------------
+        'I noticed that CoSMoMVPA heavily 'encourages' balanced class distributions (with equal number of samples in each class), and recommends to remove data to balance; why?'
+
+TL;DR: it's much simpler and you don't lose much by enforcing balanced partitions.
+
+Longer version:the main reason for encouraging (almost enforcing) balanced partitions is a combination of simplicity and avoiding mistakes with 'above chance' classification.
+It is considerably simple when chance is 1/c, with c the number of classes; in particular, this simplifies second level (group) analysis and allows for a relatively quick Monte Carlo based multiple-comparison correction through sign-swapping (as implemented in :ref:`cosmo_montecarlo_cluster_stat`).
+In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can re-use the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
+
+
 
 ============
 How do I ...

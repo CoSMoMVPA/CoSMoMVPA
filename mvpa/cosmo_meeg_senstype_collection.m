@@ -109,6 +109,7 @@ function senstypes=get_senstypes()
         % also rename 'planar_combined' to 'combined'
         processors={@fix_alt_name_senstypes,...
                     @fix_neuromag306_planar_combinations,...
+                    @fix_neuromag306_combined_with_mag,...
                     @fix_ctf275_planar_old_fieldtrip,...
                     @fix_eeg10XX_channels_old_fieldtrip,...
                     @fix_yokogawa440_planar_old_fieldtrip,...
@@ -368,6 +369,57 @@ function senstypes=fix_neuromag306_planar_combinations(senstypes)
         end
     end
 
+function senstypes=fix_neuromag306_combined_with_mag(senstypes)
+    % since the following commit, ft_senstype supports
+    %     ft_senslabel('neuromag306_combined')
+    % but its output is different than was expected in
+    % cosmo_meeg_senstype_collection. In particular the recent commit
+    % includes the magnetometers, whereas the meeg_senstype
+    % does not include those. This test is added as check for
+    % such regressions
+
+    % FieldTrip (https://github.com/fieldtrip/fieldtrip.git)
+    % commit 882dba3426db583f7f4f9ac0cdf4eb3c26aaefc1
+    % Author: Robert Oostenveld <r.oostenveld@gmail.com>
+    % Date:   Wed Jun 22 12:47:47 2016 +0200
+    %
+    %     ENH - improve combined planar MEG sensor handling, see
+    %     http://bugzilla.fieldtriptoolbox.org/show_bug.cgi?id=3144
+
+    prefix='neuromag306';
+    suffix='_planar_combined';
+
+    keys=fieldnames(senstypes);
+    n=numel(keys);
+    for k=1:n
+        key=keys{k};
+
+        if isempty(regexp(key,['^' prefix '.*' suffix '$'],'once'))
+            continue;
+        end
+
+
+        label=senstypes.(key).label;
+
+        if size(label,2)==2
+            is_non_combined_channel_mask=cellfun(@isempty,...
+                                                regexp(label,'\+'));
+            keep_mask=[false,true];
+
+            illegal_label_mask=bsxfun(@xor,~keep_mask,...
+                                      is_non_combined_channel_mask);
+            if any(illegal_label_mask(:))
+                error(['unexpected channel order, cannot fix. Please '...
+                        'contact the CoSMoMVPA developers']);
+            end
+
+            senstypes.(key).label=label(:,keep_mask);
+        end
+    end
+
+
+
+
 function senstypes=fix_ctf275_planar_old_fieldtrip(senstypes)
     % fixes missing channel in old fieldtrip versions
     key='ctf275_planar';
@@ -473,7 +525,7 @@ function senstypes=check_siblings(senstypes)
         first_size=size(senstypes.(first_key).label);
         for j=1:numel(idx)
             key=keys{idx(j)};
-            size_=size(senstypes.(key).label);
+            label_size=size(senstypes.(key).label);
 
             % planar systems have two columns for channel labels,
             % all others have one
@@ -483,16 +535,18 @@ function senstypes=check_siblings(senstypes)
                 ncol=1;
             end
 
-            if size_(2)~=ncol
-                error('%s must have %d columns in .label',key,ncol);
+            if label_size(2)~=ncol
+                disp(senstypes.(key));
+                error('%s must have %d columns in .label, found %d',...
+                            key,ncol,label_size(2));
             end
 
             % veryify that number of channel positions matches across
             % all siblings
-            if ~isequal(first_size(1),size_(1))
+            if ~isequal(first_size(1),label_size(1))
                 error(['size mismatch between %s and %s: number of '...
                         'channel positions mismatches (%d ~= %d)'],...
-                        first_key,key,first_size(1),size_(1));
+                        first_key,key,first_size(1),label_size(1));
             end
 
         end

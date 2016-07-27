@@ -15,5 +15,6 @@ function s=cosmo_type(fn)
     fclose(fid);
 
     if nargout==0
-        fprintf(s);
+        fprintf('%s',s);
+        clear s;
     end

@@ -16,8 +16,7 @@ function test_type_basics()
     assertEqual(s,data);
 
 function test_dim_type_fprintf()
-    if cosmo_wtf('is_octave')
-        cosmo_notify_test_skipped('''evalc'' is not available in Octave');
+    if cosmo_skip_test_if_no_external('!evalc')
         return;
     end
 
@@ -26,8 +25,13 @@ function test_dim_type_fprintf()
 
     data=write_data(fn);
 
-    s=evalc('cosmo_type(fn);');
-    assertEqual(s,data);
+    expr=sprintf('cosmo_type(''%s'')',fn);
+
+    s=evalc(expr);
+    s_fixed=regexprep(s,'ans\s*=\s*','');
+    s_fixed=regexprep(s_fixed,'\s*$','');
+
+    assertEqual(s_fixed,data);
 
 
 function data=write_data(fn)

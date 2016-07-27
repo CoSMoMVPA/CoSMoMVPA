@@ -26,6 +26,16 @@ ifdef JUNIT_XML
 	RUNTESTS_ARGS +=,'-junit_xml','$(JUNIT_XML)'
 endif
 
+ifdef TEST_PARTITION_INDEX
+	ifdef TEST_PARTITION_COUNT
+		RUNTESTS_ARGS+=,'-partition_index',$(TEST_PARTITION_INDEX)
+		RUNTESTS_ARGS+=,'-partition_count',$(TEST_PARTITION_COUNT)
+		export TEST_PARTITION_INDEX
+		export TEST_PARTITION_COUNT
+	endif
+endif
+
+
 ifdef WITH_COVERAGE
 	ifndef COVER
 		#$(error COVER variable must be set when using WITH_COVERAGE)
@@ -216,3 +226,6 @@ website: html html-zip-archive html-targz-archive
 	@rsync -vcru $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
 				 $(WEBSITESTATIC)/
 
+
+prni: website
+	$(MAKE) website WEBSITEROOT=pr:/var/www/html

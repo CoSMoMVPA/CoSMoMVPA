@@ -225,7 +225,7 @@ function msg=check_origin_matches(nbrhood, ds, show_warning)
                 ds_a=rmfield(ds_a,dim_name);
             end
 
-            if ~isequalwithequalnans(origin_a, ds_a)
+            if ~isequaln(origin_a, ds_a)
                 error('.a mismatch between dataset and neighborhood');
             end
         end
