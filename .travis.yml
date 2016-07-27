@@ -221,7 +221,7 @@ after_script:
   - if [[  "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
         if [[  "$TRAVIS" == "true"  ]]; then
             echo "Sending json";
-            cat @`pwd`/coveralls.json;
+            cat `pwd`/coveralls.json;
         fi;
     fi
   - $AFTER_SCRIPT
