@@ -62,9 +62,11 @@ function helper_test_comparison(func)
         return
     end
 
-    warning_state=warning();
-    warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off','Octave:deprecated-keyword');
+    if cosmo_wtf('is_octave')
+        warning_state=warning();
+        warning_resetter=onCleanup(@()warning(warning_state));
+        warning('off','Octave:deprecated-keyword');
+    end
 
     is_eq_diff_cell=get_eq_diff_cells();
     all_eq_diff=cat(1,is_eq_diff_cell{:});
