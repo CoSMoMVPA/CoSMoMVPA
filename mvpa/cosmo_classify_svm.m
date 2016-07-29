@@ -105,7 +105,7 @@ end
 % occurs. After sucessful classifcation the classifier_func is restored.
 cached_classifier_func=[];
 
-switch svm_name
+switch cached_classifier_name
     case 'libsvm'
         [predicted,decisionvalues]=classifier_func(samples_train, ...
             targets_train, samples_test, opt);
