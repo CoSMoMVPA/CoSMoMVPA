@@ -1,4 +1,4 @@
-function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
+function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
 % libsvm-based SVM classifier
 %
 % predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
@@ -69,7 +69,7 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     % train; if it fails, see if this caused by non-functioning libsvm
     try
         model=svmtrain(targets_train, samples_train, opt_str);
-        predicted=svmpredict(NaN(ntest,1), samples_test, model, '-q');
+        [predicted,unused,decisionvalues]=svmpredict(NaN(ntest,1), samples_test, model, '-q');
     catch
         cosmo_check_external('libsvm');
         rethrow(lasterror());

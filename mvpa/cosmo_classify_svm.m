@@ -1,4 +1,4 @@
-function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
+function [predicted,decisionvalues]=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
 % classifier wrapper that uses either matlab's or libsvm's SVM.
 %
 % predicted=cosmo_classify_svm(samples_train, targets_train, samples_test, opt)
@@ -89,6 +89,9 @@ else
         case 'libsvm'
             classifier_func=@cosmo_classify_libsvm;
         case 'matlabsvm';
+            if nargout==2
+                error('decision values are only supported for libsvm');
+            end
             classifier_func=@cosmo_classify_matlabsvm;
         otherwise
             error(['unsupported svm ''%s'': must be one of: '...
@@ -102,7 +105,14 @@ end
 % occurs. After sucessful classifcation the classifier_func is restored.
 cached_classifier_func=[];
 
-predicted=classifier_func(samples_train, targets_train, samples_test, opt);
+switch svm_name
+    case 'libsvm'
+        [predicted,decisionvalues]=classifier_func(samples_train, ...
+            targets_train, samples_test, opt);
+    case 'matlabsvm';
+        [predicted]=classifier_func(samples_train, ...
+            targets_train, samples_test, opt);
+end
 
 cached_classifier_func=classifier_func;
 
