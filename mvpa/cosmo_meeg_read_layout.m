@@ -51,8 +51,9 @@ function lay_string=read_lay_string_from_file(fn)
 
     % read FT layout (.lay) file
     fid=fopen(fn);
+    file_closer=onCleanup(@()fclose(fid));
     lay_string=fread(fid,inf,'char=>char')';
-    fclose(fid);
+
 
 function check_layout_input(fn)
     if ~ischar(fn)
