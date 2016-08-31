@@ -28,6 +28,10 @@ function layout=cosmo_meeg_read_layout(fn)
 %   - whitespace is trimmed from the labels
 %   - the sensor number is not used; the order of the sensors in layout is
 %     the same as in the layout file
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
+
     check_layout_input(fn)
 
     if string_contains_newline(fn)
