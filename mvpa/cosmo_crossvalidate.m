@@ -145,7 +145,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     else
         normalization=[];
     end
-    
+
     if all(isfield(opt, {'pca_explained_count','pca_explained_ratio'}))
             error(['pca_explained_count and pca_explained_ratio are ' ...
                 'mutually exclusive'])
@@ -219,7 +219,7 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
                     arg_pca,arg_pca_value);
             test_data=cosmo_pca(test_data,'pca_params',pca_params);
         end
-        
+
         % apply normalization
         if ~isempty(normalization)
             [train_data,params]=cosmo_normalize(train_data,normalization);
