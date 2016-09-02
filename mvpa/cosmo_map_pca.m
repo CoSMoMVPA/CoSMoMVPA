@@ -49,21 +49,21 @@ end
 
 if apply_params
     pca_params=opt.pca_params;
-    coeff=pca_params.coeff;
+    coef=pca_params.coef;
     mu=pca_params.mu;
-    if size(coeff,1)~=size(samples,2)
-        error(['Expecting ',num2str(size(coeff,1)),' features for the ',...
+    if size(coef,1)~=size(samples,2)
+        error(['Expecting ',num2str(size(coef,1)),' features for the ',...
             'PCA transformation, but ',num2str(size(samples,2)),...
             ' features were provided.'])
     end
     retain=pca_params.retain;
     %de-mean and multiply with previously computed coefficients
-    samples=bsxfun(@minus,samples,mu)*coeff;
+    samples=bsxfun(@minus,samples,mu)*coef;
 else
-    [coeff,samples,unused1,unused2,explained,mu]=pca(samples); %#ok<ASGLU>
+    [coef,samples,unused1,unused2,explained,mu]=pca(samples); %#ok<ASGLU>
     pca_params=struct();
     pca_params.mu=mu;
-    pca_params.coeff=coeff;
+    pca_params.coef=coef;
     if pca_explained_count
         pca_explained_count=opt.pca_explained_count;
         %check for valid values
