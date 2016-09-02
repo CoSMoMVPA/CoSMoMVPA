@@ -74,7 +74,6 @@ else
                 'number of features']);
         end
         %retain the first n components, sorted by their explained variance
-        pca_params.pca_explained_count=pca_explained_count;
         retain=(1:length(explained))<=pca_explained_count;
     elseif pca_explained_ratio
         pca_explained_ratio=opt.pca_explained_ratio;
@@ -85,7 +84,6 @@ else
             error('pca_explained_ratio should not be greater than 1');
         end
         %retain the first components that explain the amount of variance
-        pca_params.pca_explained_ratio=pca_explained_ratio;
         retain=cumsum(explained)<=pca_explained_ratio*100;
     else
         %retain everything
