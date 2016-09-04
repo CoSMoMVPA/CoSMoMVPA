@@ -102,9 +102,9 @@ function [pca_samples,params]=cosmo_pca(samples,retain)
     nexpl=min([nrow-1,ncol]);
     if nrow==1 || ncol==0
         % special case for empty vecto with explained variance
-        params.explained=zeros(0,1);
+        params.explained=zeros(1,0);
     else
-        explained_ratio=eigvals.^2;
+        explained_ratio=eigvals'.^2;
         params.explained=100*explained_ratio(1:nexpl)/sum(explained_ratio);
     end
 
@@ -152,72 +152,3 @@ function verify_parameters(samples,retain)
                      isequal(round(retain),retain)))
         error('retain argument must be integer');
     end
-
-
-
-% function [pca_samples,params]=cosmo_temp_pca(samples,retain)
-%
-%
-%     mu = mean(samples,1);
-%     samples_demu = bsxfun(@minus, samples, mu);
-%     [u,s,w]=svd(samples_demu);
-%
-%     if size(samples,2)==1 || size(samples,1)==1
-%         ev=s(1);
-%     else
-%         ev=diag(s);
-%     end
-%
-%     [nrow,ncol]=size(s);
-%     ncomp=min(nrow,ncol);
-%     pca_samples=bsxfun(@times,u(:,1:ncomp),ev');
-%
-%     %uu=max_abs_positive(uu);
-%     [coef,sgn]=max_abs_positive_columnwise(w);
-%     pca_samples=bsxfun(@times,pca_samples,sgn(1:ncomp));
-%
-%
-%     max_retain=size(samples,2);
-%     if nargin<2
-%         retain=max_retain;
-%     elseif ~(isscalar(retain) && ...
-%                     retain>0 && ...
-%                     retain<=max_retain && ...
-%                     isequal(round(retain),retain))
-%         error('illegal value for retain, data has %d dimensions',...
-%                                 max_retain);
-%     end
-%
-%     retain=min([nrow-1,ncol,retain]);
-%
-%     pca_samples=pca_samples(:,1:retain);
-%     coef=coef(:,1:retain);
-%
-%
-%     params=struct();
-%     params.coef=coef;
-%     params.mu=mu;
-%     ev=ev.^2;
-%
-%
-%     %nexpl=max(min([nrow-1,ncol]),1);
-%     nexpl=min([nrow-1,ncol]);
-%     if nexpl==0
-%         params.explained=zeros(0,1);
-%     else
-%         params.explained=100*ev(1:nexpl)/sum(ev);
-%     end
-%
-%
-%
-%
-% function [coef_pos,sgn]=max_abs_positive_columnwise(coef)
-%
-%     [nrow,ncol]=size(coef);
-%     [unused,i]=max(abs(coef),[],1);
-%
-%     mx_idx=sub2ind(size(coef),i,1:size(coef,2));
-%     mx=coef(mx_idx);
-%
-%     sgn=(mx>0)*2-1;
-%     coef_pos=bsxfun(@times,coef,sgn);

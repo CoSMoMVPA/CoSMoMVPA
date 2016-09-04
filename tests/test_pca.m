@@ -32,6 +32,8 @@ function [pca_samples,coef,mu,expl]=helper_matlab_pca_wrapper(samples,...
     end
 
     [coef,pca_samples,unused,unused,expl,mu]=pca(samples,args{:});
+    expl=expl';
+
 
 
 function test_pca_more_samples_than_features
@@ -106,7 +108,7 @@ function test_pca_regression
 
     mu=[0.0864    0.9248   -0.2001    1.2522    1.0349    0.0568];
 
-    explained=[64.7794   26.0994    6.0071    3.1059    0.0082]';
+    explained=[64.7794   26.0994    6.0071    3.1059    0.0082];
 
     for nkeep=[NaN,1:7]
         if isnan(nkeep)
@@ -150,7 +152,7 @@ function test_pca_basic_properties
 
     % explained variance is on diagonal
     d=y'*y;
-    assertElementsAlmostEqual(100*diag(d)/trace(d),param.explained);
+    assertElementsAlmostEqual(100*diag(d)/trace(d),param.explained');
 
     % components are orthogonal
     d_zero_diag=d-diag(diag(d));
@@ -203,62 +205,8 @@ function helper_test_pca_correspondence_nkeep(nsamples,nfeatures,nkeep)
     assertElementsAlmostEqual(e1,e2,tolerance_arg{:});
 
 
-
-
-
-
-
-
-
-
-
-
-%
-% function [pca_samples,coef,mu,expl]=helper_pca_wrapper(samples,keep_count)
-%     mu = mean(samples,1);
-%     Xm = bsxfun(@minus, samples, mu);
-%     C = cov(Xm);
-%     [coef_rev,eig_vals_rev_diag] = eig(C);
-%
-%     % reverse
-%     coef=coef_rev(:,end:-1:1);
-%     eig_vals_rev=diag(eig_vals_rev_diag);
-%     eig_vals=eig_vals_rev(end:-1:1);
-%
-%     expl=100*eig_vals/sum(eig_vals);
-%
-%     % apply to samples
-%     if nargin<2
-%         keep_count=numel(mu);
-%     end
-%
-%     pca_samples_full=bsxfun(@plus,Xm*coef,0);
-%     pca_samples=pca_samples_full(:,1:keep_count);
-%
-%
-% function test_helper_pca_wrapper()
-%     nfeatures=ceil(rand()*10+5);
-%     nsamples=3*nfeatures;
-%     samples=randn(nsamples,nfeatures);
-%
-%     [pca_samples,coef,mu,expl]=helper_pca_wrapper(samples);
-%     [coef2,pca_samples2,unused,unused,expl2,mu2]=pca(samples);
-%
-%
-%     % sign swap can happen
-%     for col=1:nfeatures
-%         if pca_samples(1,col)*pca_samples2(1,col)<0
-%             pca_samples(:,col)=-pca_samples(:,col);
-%             coef(:,col)=-coef(:,col);
-%         end
-%     end
-%
-%     assertElementsAlmostEqual(pca_samples,pca_samples2);
-%     assertElementsAlmostEqual(coef,coef2);
-%     assertElementsAlmostEqual(mu,mu2);
-%     assertElementsAlmostEqual(expl,expl2);
-%
-%
-%     keep_count=ceil(nfeatures/2);
-%
-%
+function test_pca_retain_is_row_vector()
+    nsamples=ceil(10+rand()*10);
+    x=randn(nsamples);
+    [y,params]=cosmo_pca(x);
+    assertEqual(size(params.explained),[1 nsamples-1]);
