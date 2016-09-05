@@ -150,5 +150,5 @@ function verify_parameters(samples,retain)
                     (isscalar(retain) && ...
                      retain>0 && ...
                      isequal(round(retain),retain)))
-        error('retain argument must be integer');
+        error('retain argument must be positive integer');
     end
