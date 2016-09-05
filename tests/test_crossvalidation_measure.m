@@ -218,7 +218,7 @@ function test_pca()
     ds=struct();
     ds.samples=randn(nsamples,nfeatures);
     ds.sa.targets=mod(idxs,ntargets)+1;
-    ds.sa.chunks=mod(ceil(idxs/(ntargets*nchunks)),nchunks)+1;
+    ds.sa.chunks=mod(floor(idxs/(ntargets*nchunks)),nchunks)+1;
 
     test_msk=ds.sa.chunks==nchunks;
     partitions=struct();
