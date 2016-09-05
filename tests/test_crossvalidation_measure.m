@@ -290,6 +290,7 @@ function test_crossvalidation_measure_pca_exceptions
     opt.classifier=@cosmo_classify_lda;
     opt.partitions=cosmo_nfold_partitioner(ds);
 
+    % mutually exclusive parameters
     bad_opt=opt;
     bad_opt.pca_explained_count=2;
     bad_opt.pca_explained_ratio=.5;
