@@ -22,7 +22,7 @@ function test_layout_exceptions()
 
     % illegal character
     for illegal_char='~!@#$%^&*()[]{};:'
-        aet(sprintf('1 1 1 1 1 foo%s\2 2 2 2 2 baz)', illegal_char));
+        aet(sprintf('1 1 1 1 1 foo%s\n2 2 2 2 2 baz)', illegal_char));
     end
 
 
