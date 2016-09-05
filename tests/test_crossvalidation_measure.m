@@ -204,3 +204,95 @@ function test_balanced_accuracy()
     assertEqual(pred_result.samples,all_pred);
     assertEqual(pred_result.sa.targets,ds.sa.targets);
 
+
+
+function test_pca()
+    ntargets=2;
+    nchunks=5;
+
+    nfeatures=ceil(rand()*10+10);
+    nsamples=ntargets*nchunks*4*nfeatures;
+
+    idxs=(1:nsamples)'-1;
+
+    ds=struct();
+    ds.samples=randn(nsamples,nfeatures);
+    ds.sa.targets=mod(idxs,ntargets)+1;
+    ds.sa.chunks=mod(ceil(idxs/(ntargets*nchunks)),nchunks)+1;
+
+    test_msk=ds.sa.chunks==nchunks;
+    partitions=struct();
+    partitions.train_indices={find(~test_msk)};
+    partitions.test_indices={find(test_msk)};
+
+    opt=struct();
+    opt.partitions=partitions;
+    opt.classifier=@cosmo_classify_lda;
+    opt.output='predictions';
+
+    for count=[1 ceil(nfeatures/2) nfeatures ceil(rand()*nfeatures)]
+        opt_count=opt;
+        opt_count.pca_explained_count=count;
+        helper_test_pca_count(ds,opt_count,count)
+    end
+
+    for ratio=[.1 .5 .9 1 rand()]
+        opt_ratio=opt;
+        opt_ratio.pca_explained_ratio=ratio;
+        helper_test_pca_ratio(ds,opt_ratio,ratio)
+    end
+
+function helper_test_pca_count(ds,opt,count)
+    pred_full=cosmo_crossvalidation_measure(ds,opt);
+
+    % compute results manually
+    [expected_pred,test_indices]=helper_pca_crossval_single_fold(ds,...
+                                                        opt,count);
+    % compare results
+    assertEqual(expected_pred,...
+                    pred_full.samples(test_indices));
+
+function [pred,test_indices]=helper_pca_crossval_single_fold(ds,opt,count)
+    partitions=opt.partitions;
+    assert(numel(partitions.train_indices)==1);
+    assert(numel(partitions.test_indices)==1);
+    ds_train=cosmo_slice(ds,partitions.train_indices{1});
+    [tr_pca,params]=cosmo_pca(ds_train.samples,count);
+
+    test_indices=partitions.test_indices{1};
+    ds_test=cosmo_slice(ds,test_indices);
+    te_pca=bsxfun(@minus,ds_test.samples,params.mu)*params.coef;
+
+    pred=opt.classifier(tr_pca,ds_train.sa.targets,te_pca);
+
+
+function helper_test_pca_ratio(ds,opt,ratio)
+    partitions=opt.partitions;
+    assert(numel(partitions.train_indices)==1);
+    ds_train=cosmo_slice(ds,partitions.train_indices{1});
+    [unused,params]=cosmo_pca(ds_train.samples);
+
+    count=find(cumsum(params.explained)>=ratio*100,1);
+    if isempty(count)
+        count=numel(params.explained);
+    end
+
+    % delegate to count helepr
+    helper_test_pca_count(ds,opt,count)
+
+
+function test_crossvalidation_measure_pca_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                cosmo_crossvalidation_measure(varargin{:}),'');
+    ds=cosmo_synthetic_dataset();
+
+    opt=struct();
+    opt.classifier=@cosmo_classify_lda;
+    opt.partitions=cosmo_nfold_partitioner(ds);
+
+    bad_opt=opt;
+    bad_opt.pca_explained_count=2;
+    bad_opt.pca_explained_ratio=.5;
+
+    aet(ds,bad_opt);
+

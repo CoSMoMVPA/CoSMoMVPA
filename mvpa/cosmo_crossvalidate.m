@@ -215,9 +215,9 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 
         % apply pca
         if ~isempty(arg_pca)
-            [train_data,pca_params]=cosmo_pca(train_data,...
+            [train_data,pca_params]=cosmo_map_pca(train_data,...
                     arg_pca,arg_pca_value);
-            test_data=cosmo_pca(test_data,'pca_params',pca_params);
+            test_data=cosmo_map_pca(test_data,'pca_params',pca_params);
         end
 
         % apply normalization
