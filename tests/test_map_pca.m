@@ -74,9 +74,11 @@ function helper_test_map_pca_with_ratio(train_samples,...
 
     % check that ratio and count give the same output
     [unused,param]=cosmo_pca(train_samples);
-    to_keep=cumsum(param.explained)<=ratio*100;
+    count=find(cumsum(param.explained)>=ratio*100,1);
+    if isempty(count)
+        count=numel(param.explained);
+    end
 
-    count=sum(to_keep);
     count_opt=struct();
     count_opt.pca_explained_count=count;
 
@@ -87,6 +89,7 @@ function helper_test_map_pca_with_ratio(train_samples,...
     end
 
     if did_throw
+        cosmo_map_pca(train_samples,count_opt)
         assertExceptionThrown(@()...
                 cosmo_map_pca(train_samples,count_opt));
         assertExceptionThrown(@()...
@@ -100,7 +103,8 @@ function helper_test_map_pca_with_ratio(train_samples,...
         assert_almost_equal(samples_ratio,samples_count);
         assert_almost_equal(params_ratio,params_count);
 
-        % verify that raw samples and dataset structures give the same result
+        % verify that raw samples and dataset structures give the same
+        % result
         helper_test_dataset_samples_correspondence(train_samples,...
                                                     ratio_opt);
         helper_test_dataset_samples_correspondence(test_samples,...
@@ -118,6 +122,7 @@ function helper_test_map_pca_with_ratio(train_samples,...
 
 
 function helper_test_map_pca_with_count(train_samples,test_samples,count)
+    assert(numel(count)==1);
     opt=struct();
     opt.pca_explained_count=count;
 
@@ -125,6 +130,7 @@ function helper_test_map_pca_with_count(train_samples,test_samples,count)
     % compare its result to cosmo_map_pca
     [ys,params]=cosmo_map_pca(train_samples,opt);
     [pca_samples,pca_params]=cosmo_pca(train_samples,count);
+
     assert_almost_equal(ys,pca_samples);
 
     % verify when using samples

@@ -10,7 +10,7 @@ function [pca_samples,params]=cosmo_pca(samples,retain)
 %
 % Output:
 %   pca_samples             M x retain samples in Principal Component
-%                           space, after samples had been centered
+%                           space, after samples have been centered
 %   params                  struct with fields:
 %     .coef                 M x retain Principal Component coefficients
 %     .mu                   M x 1 column-wise average of samples
@@ -52,8 +52,6 @@ function [pca_samples,params]=cosmo_pca(samples,retain)
 %     >   [    66
 %     >      33.3
 %     >     0.676 ]
-%
-% here
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

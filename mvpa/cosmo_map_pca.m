@@ -115,6 +115,8 @@ function [full_samples,pca_params]=pca_estimate(samples,opt)
     has_pca_explained_count = isfield(opt,'pca_explained_count');
     has_pca_explained_ratio = isfield(opt,'pca_explained_ratio');
 
+    ndim=size(samples,2);
+
     if has_pca_explained_count
         pca_explained_count=opt.pca_explained_count;
         %check for valid values
@@ -127,8 +129,10 @@ function [full_samples,pca_params]=pca_estimate(samples,opt)
                     'or equal to than the '...
                     'number of features']);
         end
-        %retain the first n components, sorted by their explained variance
-        retain=(1:length(pca_params.explained))<=pca_explained_count;
+
+        %retain the first ndim components
+        nretain=pca_explained_count;
+
     elseif has_pca_explained_ratio
         pca_explained_ratio=opt.pca_explained_ratio;
         %check for valid values
@@ -138,17 +142,21 @@ function [full_samples,pca_params]=pca_estimate(samples,opt)
             error('pca_explained_ratio should not be greater than 1');
         end
         %retain the first components that explain the amount of variance
-        retain=cumsum(explained)<=pca_explained_ratio*100;
-        if sum(retain)<1
-            error(['pca_explained_ratio=%d leads to not a single '...
-                        'component being selected, this is '...
-                        'not supported'],...
-                        pca_explained_ratio);
+        cum_explained=cumsum(explained);
+        nretain=find(cum_explained>pca_explained_ratio*100,1,'first');
+
+        if isempty(nretain)
+            % deal wtih rounding error
+            assert(100-cum_explained(ndim)<1e-4);
+            nretain=ndim;
         end
+
     else
         %retain everything
-        retain = true(1,length(explained));
+        nretain = ndim;
     end
+
+    retain=[true(1,nretain), false(1,ndim-nretain)];
 
     pca_params.retain=retain;
     pca_params.coef=pca_params.coef(:,retain);
