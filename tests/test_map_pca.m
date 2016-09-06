@@ -54,7 +54,7 @@ function test_map_pca_basics
     train_samples=randn(nsamples_train,nfeatures);
     test_samples=randn(nsamples_test,nfeatures);
 
-    for count=[1 ceil(nfeatures/2) nfeatures round(rand()*nfeatures)]
+    for count=[1 ceil(nfeatures/2) nfeatures ceil(rand()*nfeatures)]
         helper_test_map_pca_with_count(train_samples,...
                                                 test_samples,count);
     end
