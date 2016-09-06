@@ -115,7 +115,7 @@ function [full_samples,pca_params]=pca_estimate(samples,opt)
     has_pca_explained_count = isfield(opt,'pca_explained_count');
     has_pca_explained_ratio = isfield(opt,'pca_explained_ratio');
 
-    ndim=size(samples,2);
+    ndim=size(full_samples,2);
 
     if has_pca_explained_count
         pca_explained_count=opt.pca_explained_count;
@@ -147,7 +147,7 @@ function [full_samples,pca_params]=pca_estimate(samples,opt)
 
         if isempty(nretain)
             % deal wtih rounding error
-            assert(100-cum_explained(ndim)<1e-4);
+            assert(100-cum_explained(end)<1e-4);
             nretain=ndim;
         end
 

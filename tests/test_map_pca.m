@@ -236,3 +236,15 @@ function assert_almost_equal(x,y,msg,tol)
     end
 
 
+function test_pca_map_ratio_unity()
+    sizes=[4,10;...
+           10,4;...
+           4,4];
+
+    for k=size(sizes,1);
+        sz=sizes(k,:);
+        samples=randn(sz);
+        [xs,params]=cosmo_map_pca(samples,'pca_explained_ratio',1);
+
+        assertEqual(params.retain,true(1,sz(end)-1));
+    end
