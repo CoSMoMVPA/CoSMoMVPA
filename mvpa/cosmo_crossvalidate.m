@@ -10,10 +10,10 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                       @classify_naive_baysian
 %   partitions          For example the output from nfold_partition
 %   opt                 optional struct with options for classifier
-%     .normalization    optional, one of '{zscore,demean,scale_unit}{1,2}'
+%     .normalization    optional, one of 'zscore','demean','scale_unit'
 %                       to normalize the data prior to classification using
 %                       zscoring, demeaning or scaling to [-1,1] along the
-%                       first or second dimension of ds. Normalization
+%                       first dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
 %    .check_partitions  optional (default: true). If set to false then
