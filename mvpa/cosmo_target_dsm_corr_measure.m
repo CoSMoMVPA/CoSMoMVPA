@@ -159,8 +159,8 @@ function check_output(input_ds,output_ds_sa)
     end
 
 
-function ds_sa=correlation_dsm(ds_pdist,params)
-    npairs_dataset=numel(ds_pdist);
+function ds_sa=correlation_dsm(samples_pdist,params)
+    npairs_dataset=numel(samples_pdist);
 
     % get target dsm in vector form
     target_dsm_vec=get_dsm_vec_from_struct(params,'target_dsm',...
@@ -175,7 +175,7 @@ function ds_sa=correlation_dsm(ds_pdist,params)
                                                     npairs_dataset);
 
         % overwrite
-        [ds_pdist(:),target_dsm_vec(:)]=regress_out(ds_pdist,...
+        [samples_pdist(:),target_dsm_vec(:)]=regress_out(samples_pdist,...
                                                 target_dsm_vec,...
                                                 regress_dsm_mat);
     end
@@ -183,7 +183,7 @@ function ds_sa=correlation_dsm(ds_pdist,params)
 
     % >@@>
     % compute correlations between 'pd' and 'target_dsm_vec', store in 'rho'
-    rho=cosmo_corr(ds_pdist,target_dsm_vec, params.type);
+    rho=cosmo_corr(samples_pdist,target_dsm_vec, params.type);
     % <@@<
 
     % store results
