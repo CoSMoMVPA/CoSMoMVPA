@@ -225,33 +225,52 @@ function test_target_dsm_random_data_with_cosmo_functions
     ds.sa.chunks=ceil(rand()*10+3);
 
     % assume working pdist (tested elsewhere)
-    target_dsm=cosmo_pdist(randn(ntargets,2*nfeatures));
+    make_rand_dsm=@()cosmo_pdist(randn(ntargets,2*nfeatures));
+    target_dsm=make_rand_dsm();
+    glm_dsm={make_rand_dsm(),make_rand_dsm()};
 
-    for center_data=[-1,0,1]
+    for num_glms=[0,1,2]
+        for center_data=[-1,0,1]
+            ds.samples=randn(ntargets,nfeatures);
+            samples=ds.samples;
 
-        ds.samples=randn(ntargets,nfeatures);
-        samples=ds.samples;
+            opt=struct();
 
-        opt=struct();
-        opt.target_dsm=target_dsm;
-        if center_data>0
-            opt.center_data=logical(center_data);
+            % optionally, center data
+            if center_data>0
+                opt.center_data=logical(center_data);
 
-            if opt.center_data
-                samples=bsxfun(@minus,samples,mean(samples,1));
+                if opt.center_data
+                    samples=bsxfun(@minus,samples,mean(samples,1));
+                end
             end
+
+            % compute pdist for samples
+            c=cosmo_squareform(1-cosmo_corr(samples'));
+
+            if num_glms==0
+                opt.target_dsm=target_dsm;
+                expected_samples=cosmo_corr(c',target_dsm');
+            else
+                opt.glm_dsm=glm_dsm(1:num_glms);
+
+                glm_mat=cat(1,opt.glm_dsm{:})';
+                glm_z=helper_quick_zscore(glm_mat);
+                assertElementsAlmostEqual(glm_z,zscore(glm_z,[],1));
+                c_z=helper_quick_zscore(c');
+                expected_samples=glm_z \ c_z;
+            end
+
+            result=cosmo_target_dsm_corr_measure(ds,opt);
+            assertElementsAlmostEqual(result.samples,expected_samples)
         end
-
-        result=cosmo_target_dsm_corr_measure(ds,opt);
-
-        c=1-cosmo_corr(samples');
-        expected_samples=cosmo_corr(cosmo_squareform(c)',target_dsm');
-        assertElementsAlmostEqual(result.samples,expected_samples)
     end
 
 
 
-
+function mat_z=helper_quick_zscore(mat)
+    mat_c=bsxfun(@minus,mat,mean(mat,1));
+    mat_z=bsxfun(@rdivide,mat_c,std(mat_c,[],1));
 
 
 % test exceptions
