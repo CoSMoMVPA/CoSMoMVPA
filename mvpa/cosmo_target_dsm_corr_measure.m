@@ -13,7 +13,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  - target dissimilarity vector of size Nx1, with
 %                    N=P*(P-1)/2 the number of pairs of samples in ds.
 %                  This option is mutually exclusive with the 'glm_dsm'
-%                  option.
+%                  option
 %     .metric      (optional) distance metric used in pdist to compute
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
@@ -93,6 +93,39 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     >     { 'correlation' }
 %     >   .type
 %     >     { 'Pearson' }
+%     %
+%     % do not consider classses 3 and 5
+%     target_dsm([3,5],:)=NaN;
+%     target_dsm(:,[3,5])=NaN;
+%     target_dsm(3,3)=0;
+%     target_dsm(5,5)=0;
+%     %
+%     % show the updatedtarget dissimilarity matrix
+%     cosmo_disp(target_dsm);
+%     > [   0         0       NaN         1       NaN         1
+%     >     0         0       NaN         1       NaN         1
+%     >   NaN       NaN         0       NaN       NaN       NaN
+%     >     1         1       NaN         0       NaN         1
+%     >   NaN       NaN       NaN       NaN         0       NaN
+%     >     1         1       NaN         1       NaN         0 ]
+%     %
+%     % compute similarity between pairw-wise similarity of the
+%     % patterns in the dataset and the target dissimilarity matrix
+%     dcm_ds=cosmo_target_dsm_corr_measure(ds,'target_dsm',target_dsm);
+%     %
+%     % Correlation is different because classes 3 and 5 were left out
+%     cosmo_disp(dcm_ds)
+%     > .samples
+%     >   [ 0.705 ]
+%     > .sa
+%     >   .labels
+%     >     { 'rho' }
+%     >   .metric
+%     >     { 'correlation' }
+%     >   .type
+%     >     { 'Pearson' }
+%
+%
 %
 % Notes:
 %   - for group analysis, correlations can be fisher-transformed
@@ -102,6 +135,11 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     the default 'correlation' metric, as this removes a main effect
 %     common to all samples; but note that this option is disabled by
 %     default due to historical reasons.
+%   - elements in the *_dsm dissimilarity matrices can have NaNs, in which
+%     case their value, as well as the corresponding location in the
+%     dataset's samples, are ignored. Masking is done prior to z-score
+%     normalization.
+%
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -163,19 +201,29 @@ function ds_sa=correlation_dsm(samples_pdist,params)
     npairs_dataset=numel(samples_pdist);
 
     % get target dsm in vector form
-    target_dsm_vec=get_dsm_vec_from_struct(params,'target_dsm',...
+    [target_dsm_vec,target_msk]=get_dsm_vec_from_struct(params,...
+                                                'target_dsm',...
                                                 npairs_dataset);
 
-    % ensure the size of the dataset matches the matrix
+    if ~isempty(target_msk)
+        samples_pdist=samples_pdist(target_msk);
+    end
 
+
+    % ensure the size of the dataset matches the matrix
     has_regress_dsm=isfield(params,'regress_dsm');
     if has_regress_dsm
-        regress_dsm_mat=get_dsm_mat_from_vector_or_cell(...
+        [regress_dsm_mat,regress_msk]=get_dsm_mat_from_vector_or_cell(...
                                                     params.regress_dsm,...
                                                     npairs_dataset);
 
-        % overwrite
-        [samples_pdist(:),target_dsm_vec(:)]=regress_out(samples_pdist,...
+        if ~isequal(target_msk,regress_msk)
+            error(['NaN mask non-match between ''target_dsm'' '...
+                    'and ''regress_dsm''']);
+        end
+
+        [samples_pdist(:),target_dsm_vec(:)]=regress_out(...
+                                                samples_pdist,...
                                                 target_dsm_vec,...
                                                 regress_dsm_mat);
     end
@@ -197,15 +245,21 @@ function ds_sa=correlation_dsm(samples_pdist,params)
 function ds_sa=linear_regression_dsm(samples_pdist, params)
     npairs_dataset=numel(samples_pdist);
 
-    dsm_mat=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...
+    [dsm_mat,msk]=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...
                                                 npairs_dataset);
 
     % normalize matrices
     dsm_mat_zscore=cosmo_normalize(dsm_mat,'zscore');
 
+
+    if ~isempty(msk)
+        samples_pdist=samples_pdist(msk);
+    end
+
     % normalize data
     samples_pdist_zscore=cosmo_normalize(samples_pdist(:),'zscore');
 
+    % estimate betas based on masked samples
     betas=dsm_mat_zscore \ samples_pdist_zscore;
 
     % construct labels
@@ -237,7 +291,8 @@ function [ds_resid,target_resid]=regress_out(ds_pdist,...
     ds_resid=both_resid(:,1);
     target_resid=both_resid(:,2);
 
-function dsm_mat=get_dsm_mat_from_vector_or_cell(dsm_cell, npairs_dataset)
+function [dsm_mat,common_msk]=get_dsm_mat_from_vector_or_cell(dsm_cell, ...
+                                                        npairs_dataset)
     if isnumeric(dsm_cell)
         dsm_cell={dsm_cell};
     elseif ~iscell(dsm_cell)
@@ -245,25 +300,38 @@ function dsm_mat=get_dsm_mat_from_vector_or_cell(dsm_cell, npairs_dataset)
     end
 
     n=numel(dsm_cell);
-    dsm_mat=zeros(npairs_dataset,n);
-
     for k=1:n
         name=sprintf('.model_dsms{%d}',k);
-        dsm_mat(:,k)=get_dsm_vec(dsm_cell{k},npairs_dataset,name);
+        [vec,msk_k]=get_dsm_vec(dsm_cell{k},npairs_dataset,name);
+
+        if k==1
+            nrows=numel(vec);
+            dsm_mat=zeros(nrows,n);
+
+            common_msk=msk_k;
+        end
+
+
+        if ~isempty(msk_k) && k~=1 && ~isequal(common_msk,msk_k)
+            error('DSMs NaN mask mismatch for matrices %d and %d',...
+                        1, k);
+        end
+
+        dsm_mat(:,k)=vec;
     end
 
-function dsm_vec=get_dsm_vec_from_struct(params,name,npairs_dataset)
+function [dsm_vec,msk]=get_dsm_vec_from_struct(params,name,npairs_dataset)
     % helper funciton to get dsm in vector form
     if ~isfield(params,name)
         error('Missing parameter ''%s''',name);
     end
 
     dsm=params.(name);
-    dsm_vec=get_dsm_vec(dsm, npairs_dataset, ['''' name '''']);
+    [dsm_vec,msk]=get_dsm_vec(dsm, npairs_dataset, ['''' name '''']);
 
 
-function dsm_vec=get_dsm_vec(dsm,npairs_dataset,name)
-    % helper function to get dsm in vector form
+function [dsm_vec,msk]=get_dsm_vec(dsm,npairs_dataset,name)
+    % helper function to get dsm in column vector form
     if ~isnumeric(dsm)
         error('dsm inputs must be numeric, found %s', class(dsm));
     end
@@ -285,6 +353,14 @@ function dsm_vec=get_dsm_vec(dsm,npairs_dataset,name)
                         npairs_dataset,name,numel(dsm_vec));
     end
 
+    msk=[];
+
+    nan_msk=isnan(dsm_vec);
+    if any(nan_msk)
+        % apply mask
+        msk=~nan_msk;
+        dsm_vec=dsm_vec(msk);
+    end
 
 
 function check_input(ds)
