@@ -256,7 +256,6 @@ function test_target_dsm_random_data_with_cosmo_functions
 
                 glm_mat=cat(1,opt.glm_dsm{:})';
                 glm_z=helper_quick_zscore(glm_mat);
-                assertElementsAlmostEqual(glm_z,zscore(glm_z,[],1));
                 c_z=helper_quick_zscore(c');
                 expected_samples=glm_z \ c_z;
             end
