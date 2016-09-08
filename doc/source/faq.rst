@@ -18,17 +18,17 @@ General
 
 How should I cite CoSMoMVPA?
 ----------------------------
-We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:
+Please cite :cite:`OCH16`:
 
-    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, :doi:`10.1101/047118`.
+    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Frontiers in Neuroinformatics, :doi:`10.3389/fninf.2016.00027`.
 
 BiBTeX record::
 
     @article{OCH16,
     author = {Oosterhof, Nikolaas N and Connolly, Andrew C and Haxby, James V},
     title = {{CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave}},
-    journal = {biorxiv.org},
-    doi = {10.1101/047118},
+    journal = {Frontiers in Neuroinformatics},
+    doi = {10.3389/fninf.2016.00027},
     year = {2016}
     }
 
@@ -848,6 +848,80 @@ Although :ref:`cosmo_slice` does not support neighborhood structures (yet), cons
         cosmo_check_neighborhood(nh,ds); % sanity check
 
 Alternatively, :ref:`cosmo_spherical_neighborhood` (and :ref:`cosmo_surficial_neighborhood`) can be used with a 'count' argument - it keeps the number of elements across neighborhoods more constant.
+
+Use multiple-comparison correction for a time course?
+-----------------------------------------------------
+'I have a matrix of beta values (Nsubjects x Ntimepoints) for each predictor and I want to test for each timepoint (i.e. each column) if the mean beta is significantly different from zero. I ran a t-test but I wonder if I should test for multiple comparisons as well.
+What would be the best way to test for significance here?'
+
+You could use multiple comparison correction using Threshold-Free Cluster Enhancement with a temporal neighborhood. Suppose your data is in the following data matrix:
+
+  .. code-block:: matlab
+
+        % generate gaussian example data with no signal;
+        n_subjects=15;
+        time_axis=-.1:.01:.5;
+
+        n_time=numel(time_axis);
+        data=randn(n_subjects,n_time);
+
+then the first step is to put this data in a dataset structure:
+
+    .. code-block:: matlab
+
+        % make a dataset
+        ds=struct();
+        ds.samples=data;
+
+        % insert time dimension
+        ds=cosmo_dim_insert(ds,2,0,{'time'},{time_axis},{1:numel(time_axis)});
+
+You would have to decide how to form clusters, i.e. whether you want to make inferences at the individual time point level, or at the cluster-of-timepoints level. Then use :ref:`cosmo_montecarlo_cluster_stat` to estimate significance.
+
+    .. code-block:: matlab
+
+        % Make a temporal neighborhood for clustering
+        %
+        % In the following, if
+        %
+        %   allow_clustering_over_time=true
+        % then clusters can form over multiple time points. This makes the analysis
+        % more sensitive if there is a true effect in the data over multiple
+        % consecutive time points. However, when allow_clustering_over_time=true
+        % then one cannot make inferences about a specific time point (i.e.
+        % "the effect was significant at t=100ms"), only about a cluster (i.e
+        % "the effect was significant in a cluster stretching between t=50 and
+        % t=150 ms"). If, on the ohter hand,
+        %
+        %   allow_clustering_over_time=false
+        %
+        % then inferences can be made at the individual time point level, at the
+        % expensive of sensitivity of detecting any significant effect if there is
+        % a true effect that spans multiple consecutive time points
+        allow_clustering_over_time=false; % true or false
+
+        % define the neighborhood
+        nh_cl=cosmo_cluster_neighborhood(ds,'time',allow_clustering_over_time);
+
+        % set subject information
+        n_samples=size(ds.samples,1);
+        ds.sa.chunks=(1:n_samples)';     % all subjects are independent
+        ds.sa.targets=ones(n_samples,1); % one-sample t-test
+
+        % set clustering
+        opt=struct();
+        opt.h0_mean=0; % expected mean against which t-test is run
+        opt.niter=10000; % 10,000 is recommdended for publication-quality analyses
+
+        % run TFCE Monte Carlo multiple comparison correction
+        % in the output map, z-scores above 1.65 (for one-tailed) or 1.96 (for
+        % two-tailed) tests are significant
+        ds_tfce=cosmo_montecarlo_cluster_stat(ds,nh_cl,opt);
+
+
+
+
+
 
 
 .. include:: links.txt

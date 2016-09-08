@@ -83,7 +83,7 @@ function layouts=read_all_layouts()
     for k=1:nlay
         lay_name=layout_names{k};
         lay_fn=fullfile(lay_dir,lay_name);
-        lay=read_single_layout(lay_fn);
+        lay=cosmo_meeg_read_layout(lay_fn);
         lay.name=lay_name;
         layouts{k}=lay;
     end
@@ -125,35 +125,6 @@ function i=find_layout(db,name)
     names=cellfun(@(x)x.name,db,'UniformOutput',false);
     i=find(cosmo_match(names,name));
     assert(numel(i)==1);
-
-
-function layout=read_single_layout(fn)
-    % read FT layout (.lay) file
-
-    fid=fopen(fn);
-    lay_string=fread(fid,inf,'char=>char')';
-    fclose(fid);
-
-    % pattern to match is 5 numeric values followed by a string that can
-    % contain whitespaces and plus characters, followed by newline
-    pat=['(\d+)\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+)\s+'...
-            '([\w\s\+]+\w)\s*' sprintf('\n')];
-
-    matches=regexp(sprintf('%s\n',lay_string),pat,'tokens');
-
-    % convert to (nchannel x 6) matrix
-    layout_matrix=cat(1,matches{:});
-
-    % convert values in first five columns to numeric
-    num_values_cell=layout_matrix(:,1:5)';
-    str_values=sprintf('%s %s %s %s %s; ', num_values_cell{:});
-    num_values=str2num(str_values);
-
-    % store layout information (omit channel number in first column)
-    layout.pos    = num_values(:,2:3);
-    layout.width  = num_values(:,4);
-    layout.height = num_values(:,5);
-    layout.label  = layout_matrix(:,6);
 
 
 function layouts=fix_make_ft_compatible(layouts)

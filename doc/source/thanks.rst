@@ -56,6 +56,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Reshanne Reader
 + Anne Roefs
 + Gaetan Sanchez
++ Joscha Schmiedt
 + Jens Schwarzbach
 + Yuan Tao
 + Mohamed Tawfik

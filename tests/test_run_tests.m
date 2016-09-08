@@ -98,7 +98,7 @@ function delete_if_exists(fn)
     end
 
 
-function skip_test_if_octave_package_io_2_4_2()
+function tf=skip_test_if_octave_package_io_2_4_2()
 % July 2016:
 % Octave package 'io' version 2.4.2 gave the following error with
 % three tests:
@@ -113,6 +113,8 @@ function skip_test_if_octave_package_io_2_4_2()
 % These tests are disabled for now when using Octave and io 2.4.2.
 % (Version 2.4.0 seems to work fine)
 
+    tf=false;
+
     if ~cosmo_wtf('is_octave')
         return;
     end
@@ -123,13 +125,18 @@ function skip_test_if_octave_package_io_2_4_2()
     end
 
     version=pkgs{1}.version;
-    if isequal(version,'2.4.2')
-        reason=['Octave io package 2.4.2 gives unexpected error '...
-                '"''__octave_config_info__'' undefined" in '...
-                '__init_io__.m:30; therefore '...
-                'the tests causing this error are temporarily disabled'];
-        cosmo_notify_test_skipped(reason);
+    if ~isequal(version,'2.4.2')
+        return;
     end
+
+    tf=true;
+    reason=['Octave io package 2.4.2 gives unexpected error '...
+            '"''__octave_config_info__'' undefined" in '...
+            '__init_io__.m:30; therefore '...
+            'the tests causing this error are temporarily disabled'];
+    cosmo_notify_test_skipped(reason);
+
+
 
 
 
