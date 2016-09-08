@@ -123,17 +123,14 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
         samples=bsxfun(@minus,samples,mean(samples,1));
     end
 
-    ds_pdist = cosmo_pdist(samples, params.metric)';
-
-    % number of pairwise distances; should match that of target_dsm_vec
-    % below
+    samples_pdist = cosmo_pdist(samples, params.metric)';
 
     has_model_dsms=isfield(params,'glm_dsm');
 
     if has_model_dsms
-        ds_sa=linear_regression_dsm(ds_pdist, params);
+        ds_sa=linear_regression_dsm(samples_pdist, params);
     else
-        ds_sa=correlation_dsm(ds_pdist,params);
+        ds_sa=correlation_dsm(samples_pdist,params);
     end
 
     check_output(ds,ds_sa);
@@ -197,8 +194,8 @@ function ds_sa=correlation_dsm(ds_pdist,params)
     ds_sa.sa.type={params.type};
 
 
-function ds_sa=linear_regression_dsm(ds_pdist, params)
-    npairs_dataset=numel(ds_pdist);
+function ds_sa=linear_regression_dsm(samples_pdist, params)
+    npairs_dataset=numel(samples_pdist);
 
     dsm_mat=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...
                                                 npairs_dataset);
@@ -207,9 +204,9 @@ function ds_sa=linear_regression_dsm(ds_pdist, params)
     dsm_mat_zscore=cosmo_normalize(dsm_mat,'zscore');
 
     % normalize data
-    ds_pdist_zscore=cosmo_normalize(ds_pdist(:),'zscore');
+    samples_pdist_zscore=cosmo_normalize(samples_pdist(:),'zscore');
 
-    betas=dsm_mat_zscore \ ds_pdist_zscore;
+    betas=dsm_mat_zscore \ samples_pdist_zscore;
 
     % construct labels
     nvec=size(dsm_mat_zscore,2);
