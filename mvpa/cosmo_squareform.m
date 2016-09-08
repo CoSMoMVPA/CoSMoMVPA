@@ -66,7 +66,7 @@ function s=to_vector(x)
         error('square matrix must be all zero on diagonal');
     end
 
-    if ~isequal(x,x');
+    if ~cosmo_isequaln(x,x');
         error('square matrix must be symmetric');
     end
 
