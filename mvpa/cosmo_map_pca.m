@@ -1,28 +1,33 @@
 function [pca_ds, pca_params]=cosmo_map_pca(ds, varargin)
 % normalize dataset either by estimating or applying estimated parameters
 %
-% [ds, pca_params]=cosmo_map_pca(ds[, pca_params, pca_explained_count,
-%                                     pca_explained_ratio])
+% [pca_ds, pca_params]=cosmo_map_pca(ds[, ...])
 %
 % Inputs
-%   ds            a dataset struct with field .samples of size PxQ, or a
-%                 numeric array of that size
-%   pca_params    previously estimated pca parameters using the
-%                 'pca_params' output result from a previous call to this
-%                 function
-%   pca_explained_count    retain only the first 'pca_explained_count'
-%                          components
-%   pca_explained_ratio    retain the first components that explain
-%                 'pca_explained_ratio' percent of the variance (value
-%                 between 0 and 1, where 1 retains all components)
+%   ds                          a dataset struct with field .samples of
+%                               numeric array of size PxQ, or a
+%                               numeric array of that size
+%   'pca_params',p              previously estimated pca parameters using
+%                               the 'pca_params' output result from a
+%                               previous call to this function
+%   'pca_explained_count',c     retain only the first 'pca_explained_count'
+%                               components
+%   pca_explained_ratio         retain the first components that explain
+%                               'pca_explained_ratio' * 100% of the
+%                               variance (value between 0 and 1, where 1
+%                               retains all components)
 %
 % Output
-%   ds            a dataset struct similar to ds, but with .samples data
-%                 transformed using pca.
-%   params        estimated parameters for pca. These can be re-used for a
-%                 second pca step of an independent dataset. For example,
-%                 parameters can be estimated from a training dataset and
-%                 then applied to a testing dataset
+%   pca_ds                      a dataset struct similar to ds, but
+%                               with .samples data transformed using pca.
+%                               If the input was a numeric array, then
+%                               pca_ds is numeric as well
+%   params                      estimated parameters for pca. These can be
+%                               re-used for a second pca step of an
+%                               independent dataset. For example,
+%                               parameters can be estimated from a
+%                               training dataset and then applied to a
+%                               testing dataset
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
