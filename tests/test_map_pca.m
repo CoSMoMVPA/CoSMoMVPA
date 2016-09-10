@@ -46,6 +46,50 @@ function test_map_pca_exceptions
     aet(ds,'pca_explained_ratio',-.001);
     aet(ds,'pca_explained_ratio',1.001);
 
+function test_map_pca_max_feature_count_exceptions()
+    default_max_feature_count=1000;
+
+    nsamples=20;
+    for max_feature_count=[NaN, ...
+                            round(rand()*10+10), ...
+                            default_max_feature_count]
+        for delta=(-1:1)
+            opt=struct();
+
+            if isnan(max_feature_count)
+                nfeatures=default_max_feature_count+delta;
+            else
+                nfeatures=max_feature_count+delta;
+                opt.max_feature_count=max_feature_count;
+            end
+
+            data=randn(nsamples,nfeatures);
+
+            expect_exception=delta>0;
+
+            for use_struct=[false,true]
+                if use_struct
+                    ds=struct();
+                    ds.samples=data;
+                else
+                    ds=data;
+                end
+
+                func_handle=@()cosmo_map_pca(ds,opt);
+
+                if expect_exception
+                    assertExceptionThrown(func_handle);
+                else
+                    % should not raise an exception
+                    func_handle();
+                end
+            end
+        end
+    end
+
+
+
+
 function test_map_pca_basics
     nfeatures=ceil(rand()*10+10);
     nsamples_train=ceil(rand()*10+10)+nfeatures;

@@ -10,12 +10,15 @@ function [pca_ds, pca_params]=cosmo_map_pca(ds, varargin)
 %   'pca_params',p              previously estimated pca parameters using
 %                               the 'pca_params' output result from a
 %                               previous call to this function
-%   'pca_explained_count',c     retain only the first 'pca_explained_count'
-%                               components
-%   pca_explained_ratio         retain the first components that explain
-%                               'pca_explained_ratio' * 100% of the
+%   'pca_explained_count',c     retain only the first components
+%   'pca_explained_ratio',r     retain the first components that explain
+%                               (r * 100)% of the
 %                               variance (value between 0 and 1, where 1
 %                               retains all components)
+%   'max_feature_count',mx      Raise an error if Q>mx (default: mx=1000).
+%                               This protects against possible comutations
+%                               that require much memory and/or time when
+%                               computing singular value decompositions
 %
 % Output
 %   pca_ds                      a dataset struct similar to ds, but
@@ -32,7 +35,10 @@ function [pca_ds, pca_params]=cosmo_map_pca(ds, varargin)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-    opt=cosmo_structjoin(varargin);
+    defaults=struct();
+    defaults.max_feature_count=1000;
+
+    opt=cosmo_structjoin(defaults,varargin);
 
     apply_params = isfield(opt,'pca_params');
     pca_explained_count = isfield(opt,'pca_explained_count');
@@ -50,6 +56,20 @@ function [pca_ds, pca_params]=cosmo_map_pca(ds, varargin)
         samples=ds.samples;
     else
         samples=ds;
+    end
+
+    if size(samples,2)>opt.max_feature_count
+        error(['A large number of features (%d) was found, '...
+                    'exceeding the safety limit max_feature_count=%d '...
+                    'for the %s function.\n'...
+                    'This limit is imposed because computing the '...
+                    'singular value decomposition may require lots '...
+                    'of time and/or memory'...
+                    'The safety limit can be changed by setting '...
+                    'the ''max_feature_count'' option to another '...
+                    'value, but large values ***may freeze or crash '...
+                    'the machine***.'],...
+                    size(samples,2),opt.max_feature_count);
     end
 
     % estimate or apply parameters
