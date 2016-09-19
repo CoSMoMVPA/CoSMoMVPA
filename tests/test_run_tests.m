@@ -76,7 +76,7 @@ function [result,output]=helper_run_tests(args)
     orig_pwd=pwd();
     log_fn=tempname();
 
-    run_sequentially=@(varargin)cellfun(@(f)f(),varargin);
+
     cleaner=onCleanup(@()run_sequentially(...
                             @()path(orig_path),...
                             @()cosmo_warning(warning_state),...
@@ -95,6 +95,12 @@ function [result,output]=helper_run_tests(args)
 function delete_if_exists(fn)
     if exist(fn,'file')
         delete(fn);
+    end
+
+function run_sequentially(funcs)
+    for k=1:numel(funcs)
+        f=funcs{k};
+        f();
     end
 
 
