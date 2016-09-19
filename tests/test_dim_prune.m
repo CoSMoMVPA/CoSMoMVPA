@@ -67,7 +67,6 @@ function test_dim_prune_label()
 
     labels={'i','j','k'};
 
-    ds_pruned=cosmo_dim_prune(ds);
     for k=1:numel(labels)
         label=labels{k};
         ds_pruned=cosmo_dim_prune(ds,'labels',labels(k));
