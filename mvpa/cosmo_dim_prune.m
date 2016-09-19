@@ -89,16 +89,17 @@ function ds=cosmo_dim_prune(ds, varargin)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-opt=process_opt(varargin{:});
+    opt=process_opt(varargin{:});
 
-cosmo_check_dataset(ds);
+    cosmo_check_dataset(ds);
 
-dim=opt.dim;
-ndim=numel(dim);
-opt=rmfield(opt,'dim');
-for k=1:ndim
-    ds=prune_single_dim(ds, dim(k), opt);
-end
+    dim=opt.dim;
+    ndim=numel(dim);
+    opt=rmfield(opt,'dim');
+    for k=1:ndim
+        ds=prune_single_dim(ds, dim(k), opt);
+    end
+
 
 function ds=prune_single_dim(ds, dim, opt)
     labels=opt.labels;
