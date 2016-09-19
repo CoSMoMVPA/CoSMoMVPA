@@ -145,11 +145,6 @@ function ds=prune_single_dim(ds, dim, opt)
             attr=ds.(attr_name).(label);
             [unq_idxs,unused,map_idxs]=unique(attr);
 
-            if isequal(unq_idxs(:),(1:numel(values))')
-                % already pruned, no update necessary
-                continue;
-            end
-
             values=get_unique(label, dim, values, unq_idxs, opt);
             ds.a.(dim_name).values{index}=values;
 

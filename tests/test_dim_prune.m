@@ -78,6 +78,7 @@ function test_dim_prune_label()
     end
 
 
+
 function helper_test_dim_prune(varargin)
     ds=cosmo_synthetic_dataset(varargin{:});
 
