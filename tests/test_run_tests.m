@@ -20,7 +20,7 @@ function test_run_tests_failing
     assert(~isempty(findstr('FAILED',output)));
 
 function test_run_tests_no_file_found_absolute_path()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -30,7 +30,7 @@ function test_run_tests_no_file_found_absolute_path()
 
 
 function test_run_tests_no_file_found_relative_path()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -39,7 +39,7 @@ function test_run_tests_no_file_found_relative_path()
 
 
 function test_run_tests_missing_logfile_argument()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -104,7 +104,7 @@ function run_sequentially(funcs)
     end
 
 
-function tf=skip_test_if_octave_package_io_2_4_2()
+function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
 % July 2016:
 % Octave package 'io' version 2.4.2 gave the following error with
 % three tests:
@@ -118,8 +118,11 @@ function tf=skip_test_if_octave_package_io_2_4_2()
 %
 % These tests are disabled for now when using Octave and io 2.4.2.
 % (Version 2.4.0 seems to work fine)
+%
+% Update Sept 2016: same issue with io 2.4.3. Updated code to take any
+% version from 2.4.2 or later
 
-    tf=false;
+    is_before_2_4_2=false;
 
     if ~cosmo_wtf('is_octave')
         return;
@@ -131,11 +134,17 @@ function tf=skip_test_if_octave_package_io_2_4_2()
     end
 
     version=pkgs{1}.version;
-    if ~isequal(version,'2.4.2')
+    elem_str=regexp(version,'(\d+)\.(\d+)\.(\d+)','tokens','once');
+    elem=cellfun(@str2num,elem_str);
+
+    is_before_2_4_2=elem(1)<2 || ...
+                        (elem(1)==2 && elem(2)<4) || ...
+                        (elem(1)==2 && elem(2)==4 && elem(3)<2;
+
+    if is_before_2_4_2
         return;
     end
 
-    tf=true;
     reason=['Octave io package 2.4.2 gives unexpected error '...
             '"''__octave_config_info__'' undefined" in '...
             '__init_io__.m:30; therefore '...
