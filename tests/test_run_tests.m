@@ -139,7 +139,7 @@ function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
 
     is_before_2_4_2=elem(1)<2 || ...
                         (elem(1)==2 && elem(2)<4) || ...
-                        (elem(1)==2 && elem(2)==4 && elem(3)<2;
+                        (elem(1)==2 && elem(2)==4 && elem(3)<2);
 
     if is_before_2_4_2
         return;
