@@ -66,6 +66,7 @@ function helper_test_comparison(func)
         warning_state=warning();
         warning_resetter=onCleanup(@()warning(warning_state));
         warning('off','Octave:deprecated-keyword');
+        warning('off','Octave:deprecated-function');
     end
 
     is_eq_diff_cell=get_eq_diff_cells();
