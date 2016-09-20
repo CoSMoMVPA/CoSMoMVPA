@@ -432,6 +432,40 @@ function test_cluster_neighborhood_fmri_time
         end
     end
 
+function test_meeg_cluster_neighborhood_unknown_eeg_channels
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
+    ds_orig=cosmo_synthetic_dataset('type','meeg',...
+                                    'sens','eeg1005',...
+                                    'size','normal');
+
+    for with_unknown_channel=[false,true]
+        ds=ds_orig;
+        if with_unknown_channel
+            nchan=max(ds.fa.chan);
+            idx=ceil(rand()*nchan);
+            ds.a.fdim.values{1}{idx}='foo';
+        end
+
+        nh=cosmo_cluster_neighborhood(ds,'progress',false);
+
+        if with_unknown_channel
+            empty_msk=ds.fa.chan==idx;
+            assert(any(empty_msk));
+        else
+            empty_msk=false(size(ds.fa.chan));
+        end
+
+        count=cellfun(@numel,nh.neighbors);
+        assert(all(count(empty_msk)==0));
+        assert(all(count(~empty_msk)>0));
+    end
+
+
+
+
 function test_cluster_neighborhood_exceptions
     ds=cosmo_synthetic_dataset();
     aet=@(varargin)assertExceptionThrown(...
