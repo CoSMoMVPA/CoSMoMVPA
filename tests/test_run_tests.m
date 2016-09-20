@@ -104,7 +104,7 @@ function run_sequentially(funcs)
     end
 
 
-function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
+function is_2_4_2_or_later=skip_test_if_octave_package_io_2_4_2_or_later()
 % July 2016:
 % Octave package 'io' version 2.4.2 gave the following error with
 % three tests:
@@ -122,7 +122,7 @@ function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
 % Update Sept 2016: same issue with io 2.4.3. Updated code to take any
 % version from 2.4.2 or later
 
-    is_before_2_4_2=false;
+    is_2_4_2_or_later=false;
 
     if ~cosmo_wtf('is_octave')
         return;
@@ -137,11 +137,11 @@ function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
     elem_str=regexp(version,'(\d+)\.(\d+)\.(\d+)','tokens','once');
     elem=cellfun(@str2num,elem_str);
 
-    is_before_2_4_2=elem(1)<2 || ...
-                        (elem(1)==2 && elem(2)<4) || ...
-                        (elem(1)==2 && elem(2)==4 && elem(3)<2);
+    is_2_4_2_or_later=elem(1)>=2 || ...
+                        (elem(1)==2 && elem(2)>=4) || ...
+                        (elem(1)==2 && elem(2)==4 && elem(3)>=2);
 
-    if is_before_2_4_2
+    if ~is_2_4_2_or_later
         return;
     end
 
@@ -150,8 +150,3 @@ function is_before_2_4_2=skip_test_if_octave_package_io_2_4_2_or_later()
             '__init_io__.m:30; therefore '...
             'the tests causing this error are temporarily disabled'];
     cosmo_notify_test_skipped(reason);
-
-
-
-
-
