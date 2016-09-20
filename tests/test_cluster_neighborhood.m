@@ -433,6 +433,10 @@ function test_cluster_neighborhood_fmri_time
     end
 
 function test_meeg_cluster_neighborhood_unknown_eeg_channels
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
     ds_orig=cosmo_synthetic_dataset('type','meeg',...
                                     'sens','eeg1005',...
                                     'size','normal');
@@ -459,7 +463,6 @@ function test_meeg_cluster_neighborhood_unknown_eeg_channels
         assert(all(count(~empty_msk)>0));
     end
 
-    x=cosmo_meeg_chantype(ds)
 
 
 
