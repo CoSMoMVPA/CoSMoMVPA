@@ -27,31 +27,65 @@ function hdr=cosmo_map2meeg(ds, fn)
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
+    if nargin<2
+        fn='-mat';
+    end
 
     cosmo_check_dataset(ds,'meeg');
 
     % for now only support ft-like output
-    builder=@build_ft;
+    [img_format,needs_writer]=find_img_format(fn);
+
+    builder=img_format.builder;
     hdr=builder(ds);
 
     % if filename was provided, store to file
-    if nargin>1
+    if needs_writer
+        writer=img_format.writer;
+        % write the file
+        writer(fn, hdr);
+    end
+
+function [img_format,needs_writer]=find_img_format(fn)
+    if ~ischar(fn) || isempty(fn)
+        error('filename must be non-empty string');
+    end
+
+    needs_writer=fn(1)~='-';
+    if needs_writer
         fn_parts=cosmo_strsplit(fn,'.');
         if numel(fn_parts)<2
             error('Filename needs extension');
         end
         ext=fn_parts{end};
-
-        ext2writer=struct();
-        ext2writer.txt=@write_eeglab_txt;
-        ext2writer.mat=@write_ft;
-        if ~isfield(ext2writer,ext);
-            error('Unsupported extension %s', ext);
-        end
-        writer=ext2writer.(ext);
-        % write the file
-        writer(fn, hdr);
+    else
+        ext=fn(2:end);
     end
+
+    all_formats=get_all_supported_img_formats();
+    keys=fieldnames(all_formats);
+
+    idx=find(cellfun(@(x)cosmo_match({ext},all_formats.(x).exts),keys));
+    n_match=numel(idx);
+    assert(n_match<=1); % cannot have multiple matches
+
+    if n_match==0
+        error('Image format not found for extension ''%s''',ext)
+    end
+
+    img_format=all_formats.(keys{idx});
+
+
+
+function all_formats=get_all_supported_img_formats()
+    all_formats=struct();
+    all_formats.eeglab_txt.exts={'txt'};
+    all_formats.eeglab_txt.builder=@build_ft;
+    all_formats.eeglab_txt.writer=@write_eeglab_txt;
+
+    all_formats.ft.exts={'mat'};
+    all_formats.ft.builder=@build_ft;
+    all_formats.ft.writer=@write_ft;
 
 
 function write_eeglab_txt(fn, hdr)
