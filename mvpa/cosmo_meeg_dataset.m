@@ -4,12 +4,18 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 % ds=cosmo_meeg_dataset(filename, varargin)
 %
 % Inputs:
-%   filename          filename of MEEG data to be loaded. Currently this
-%                     can be a .mat file (for FieldTrip) with timelocked or
-%                     time-frequency data at either the sensor or source
-%                     level, or .txt (exported EEGLab) with timelocked
-%                     data. Alternatively it can be a FieldTrip struct with
-%                     timelocked or time-frequency data.
+%   filename          filename of MEEG data to be loaded. Currently
+%                     supported are files with extensions:
+%                       .mat :        FieldTrip time-locked or
+%                                     time-frequency  data at  either the
+%                                     sensor or source level.
+%                       .txt :        exported EEGLab with timelocked data.
+%                       .daterp       time-locked      }
+%                       .icaerp       ICA time-locked  } EEGLab
+%                       .dattimef     time-freq        }
+%                       .icatimef     ICA time-freq    }
+%                     Alternatively it can be a FieldTrip or EEGLab struct
+%                     with time-locked or time-frequency data
 %   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
@@ -153,16 +159,33 @@ function img_formats=get_supported_image_formats()
 
     % helper function to see if a filename ends with a certain string.
     % uses currying - who doesn't like curry?
-    endswith=@(ext) @(fn) ischar(fn) && isempty(cosmo_strsplit(fn,ext,-1));
+    ends_with=@(ext) @(fn) ischar(fn) && ...
+                        isempty(cosmo_strsplit(fn,ext,-1));
+    ends_with_any=@(exts) @(fn) ischar(fn) && any(...
+                            cellfun(@(x)isempty(...
+                                        cosmo_strsplit(fn,x,-1)),exts));
 
     % eeglab txt files
-    img_formats.eeglab_txt.file_matcher=endswith('.txt');
+    img_formats.eeglab_txt.file_matcher=ends_with('.txt');
     img_formats.eeglab_txt.reader=@read_eeglab_txt;
     img_formats.eeglab_txt.externals={};
 
+    img_formats.eeglab.file_matcher=ends_with_any({'.daterp',...
+                                                   '.icaerp',...
+                                                   '.dattimef',...
+                                                   '.icatimef'});
+    img_formats.eeglab.reader=@read_eeglab;
+    img_formats.eeglab.externals={};
+
+    img_formats.eeglab_struct.file_matcher=@is_eeglab_struct;
+    img_formats.eeglab_struct.reader=@convert_eeglab_struct;
+    img_formats.eeglab_struct.externals={};
+
+
+
     % fieldtrip
     % XXX any .mat file is currently assumed to be a fieldtrip struct
-    img_formats.ft.file_matcher=endswith('.mat');
+    img_formats.ft.file_matcher=ends_with('.mat');
     img_formats.ft.reader=@read_ft;
     img_formats.ft.externals={};
 
@@ -533,9 +556,120 @@ function tf=is_ft_sensor_struct(ft)
 function tf=is_ft_struct(ft)
     tf=is_ft_source_struct(ft) || is_ft_sensor_struct(ft);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% eeglab struct helper function
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function tf=is_eeglab_struct(s)
+    tf=isstruct(s) && ...
+            isfield(s,'times') && ...
+            isfield(s,'datatype');
+
+
+function ds=read_eeglab(fn,opt)
+    s=load(fn,'-mat');
+    ds=convert_eeglab_struct(s,opt);
+
+function ds=convert_eeglab_struct(s, opt)
+    samples_type=eeglab_get_samples_type(s);
+    has_freq=strcmp(samples_type,'timefreq');
+    if has_freq
+        freq_label={'freq'};
+        freq_values={s.freqs};
+    else
+        freq_label={};
+        freq_values={};
+    end
+    freq_size=cellfun(@numel,freq_values);
+
+    chan_prefix=eeglab_get_chan_prefix(s);
+    chan_values=eeglab_get_chan_labels(s);
+    n_chan=numel(chan_values);
+
+    time_values=s.times;
+    n_time=numel(time_values);
+
+    data_cell=cell(n_chan,1);
+    for k=1:n_chan
+        key=chan_values{k};
+        value=s.(key);
+
+        n_samples=size(value,1);
+        value_rs=reshape(value,[n_samples,1,[freq_size],n_time]);
+        data_cell{k}=value_rs;
+    end
+
+
+    data=cat(2,data_cell{:});
+    ds=cosmo_flatten(data,[{chan_prefix},freq_label,{'time'}],...
+                          [{chan_values},freq_values,{time_values}]);
+
+    ds.sa=struct();
+    if isfield(s,'datafiles')
+        ds.sa.datafiles=eeglab_get_datafiles_sa(s);
+    end
+
+    ds.a.meeg.samples_field='trial';
+    ds.a.meeg.samples_type=samples_type;
+    ds.a.meeg.samples_label='rpt';
+
+    ds.a.meeg.parameters=s.parameters;
+
+
+function datafiles=eeglab_get_datafiles_sa(s)
+    trials=s.datatrials;
+    counts=cellfun(@numel,trials);
+    ntotal=sum(counts);
+
+    datafiles=cell(ntotal,1);
+    for k=1:numel(counts);
+        idxs=trials{k};
+        datafiles(idxs)=repmat(s.datafiles(k),counts(k),1);
+    end
+
+
+function chan_prefix=eeglab_get_chan_prefix(s)
+    has_ica=isfield(s,'comp1');
+    if has_ica
+        chan_prefix='comp';
+    else
+        chan_prefix='chan';
+    end
+
+function chan_labels=eeglab_get_chan_labels(s)
+    chan_prefix=eeglab_get_chan_prefix(s);
+
+    make_label=@(idx)sprintf('%s%d',chan_prefix,idx);
+
+    count=0;
+    while true
+        label=make_label(count+1);
+        if ~isfield(s,label)
+            break
+        end
+        count=count+1;
+    end
+
+    chan_labels=arrayfun(make_label,1:count,'UniformOutput',false);
+
+
+
+
+
+function samples_type=eeglab_get_samples_type(s)
+    mapping={'erp','timelock';...
+            'timef','timefreq'};
+    for k=1:size(mapping,1)
+        row=mapping(k,:);
+        if strcmp(lower(s.datatype),row{1})
+            samples_type=row{2};
+            return;
+        end
+    end
+
+    error('unsupported datatype mapping ''%s''',s.datatype);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% eeglab helper function
+% eeglab txt helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ds=read_eeglab_txt(fn, unused)
