@@ -78,11 +78,12 @@ distatis=cosmo_distatis(all_ds);
 [compromise_matrix,dim_labels,values]=cosmo_unflatten(distatis,1);
 
 labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
+n_labels=numel(labels);
 figure();
 imagesc(compromise_matrix)
 title('DSM');
-set(gca,'YTickLabel',labels);
-set(gca,'XTickLabel',labels);
+set(gca,'YTick',1:n_labels,'YTickLabel',labels);
+set(gca,'XTick',1:n_labels,'XTickLabel',labels);
 ylabel(dim_labels{1});
 xlabel(dim_labels{2});
 colorbar

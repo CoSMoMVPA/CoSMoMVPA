@@ -129,7 +129,7 @@ fprintf('\nLDA all categories n-fold: accuracy %.3f\n', accuracy);
 % the cosmo_confusion_matrix convenience function is used to compute the
 % confusion matrix
 [confusion_matrix,classes]=cosmo_confusion_matrix(ds.sa.targets,all_pred);
-
+nclasses=numel(classes);
 % print confusion matrix to terminal window
 fprintf('\nLDA n-fold cross-validation confusion matrix:\n')
 disp(confusion_matrix);
@@ -138,8 +138,8 @@ disp(confusion_matrix);
 figure
 imagesc(confusion_matrix,[0 10])
 title('confusion matrix');
-set(gca,'XTickLabel',classes);
-set(gca,'YTickLabel',classes);
+set(gca,'XTick',1:nclasses,'XTickLabel',classes);
+set(gca,'YTick',1:nclasses,'YTickLabel',classes);
 ylabel('target');
 xlabel('predicted');
 colorbar
