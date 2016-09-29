@@ -7,11 +7,11 @@ function test_suite=test_meeg_io()
     initTestSuite;
 
 
-function test_meeg_dataset()
+function test_meeg_ft_dataset()
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_meeg_dataset(varargin{:}),'');
 
-    dimords=get_dimords();
+    dimords=get_ft_dimords();
     n=numel(dimords);
     for k=1:n
         dimord=dimords{k};
@@ -81,7 +81,7 @@ function test_synthetic_meeg_dataset()
     assertExceptionThrown(@()cosmo_meeg_dataset(ds,'targets',[1 2]),'');
 
 
-function test_meeg_eeglab_io()
+function test_meeg_eeglab_txt_io()
     ds=cosmo_synthetic_dataset('type','meeg');
 
     tmp_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
@@ -171,10 +171,7 @@ function test_meeg_ft_io_exceptions()
     aeto(ds,'eeglab_timelock.txt');
 
 
-
-
-
-function dimords=get_dimords()
+function dimords=get_ft_dimords()
     dimords={   'chan_time',...
                 'rpt_chan_time'...
                 'chan_freq',...
@@ -246,5 +243,185 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     if strcmp(data_label,'trial')
         ft.avg=mean(ft.(data_label),1);
     end
+
+
+function test_eeglab_io()
+    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,:);
+        [s,ds,ext]=build_eeglab_dataset_struct(arg{:});
+
+        ds_from_struct=cosmo_meeg_dataset(s);
+        assertEqual(ds,ds_from_struct);
+
+        % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn);
+        assertEqual(ds,ds_loaded);
+        clear cleaner;
+
+        s_converted=cosmo_map2meeg(ds,['-' ext]);
+        assertEqual(s,s_converted)
+
+        % store using cosmo_map2meeg, then read
+        cosmo_map2meeg(ds,fn);
+        cleaner=onCleanup(@()delete(fn));
+
+        s_loaded=load(fn,'-mat');
+        assertEqual(s_loaded,s);
+        assertEqual(s,s_loaded);
+        clear cleaner;
+    end
+
+function test_eeglab_io_exceptions()
+    aet_md=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+    aet_m2m=@(varargin)assertExceptionThrown(@()...
+                            cosmo_map2meeg(varargin{:}),'');
+
+    s=build_eeglab_dataset_struct(true,true,true);
+
+    % bad datatype
+    s.datatype='foo';
+    aet_md(s)
+
+    % output is not a filename
+    ds=cosmo_synthetic_dataset('type','timefreq');
+    aet_m2m(ds,struct);
+
+    % bad  fdim
+    good_labels={'chan','freq','time'};
+    all_bad_labels={'chan','freq','time','foo'};
+
+    for dim=1:numel(good_labels)
+        for j=1:numel(all_bad_labels)
+            ds_bad_chan_fdim=ds;
+            bad=all_bad_labels{j};
+            if ~strcmp(bad, good_labels{dim})
+                ds_bad_chan_fdim.a.fdim.labels{dim}=bad;
+                aet_m2m(ds_bad_chan_fdim,'-dattimef');
+            end
+        end
+    end
+
+
+
+
+function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
+    % trial dimension
+    if has_trial
+        trial_dim=randint();
+    else
+        trial_dim=1;
+    end
+
+
+    % channel / component dimension
+    chan_dim=randint();
+    if has_ica
+        chan_prefix='comp';
+        ext_prefix='ica';
+    else
+        chan_prefix='chan';
+        ext_prefix='dat';
+    end
+    chan_label={chan_prefix};
+    chan_value={arrayfun(@(x)sprintf('%s%d',chan_label{1},x),1:chan_dim,...
+                            'UniformOutput',false)};
+
+    % frequency dimension
+    if has_freq
+        freq_dim=randint();
+        freq_label={'freq'};
+        freq_value={(1:freq_dim)*2};
+        samples_type='timefreq';
+        ext_suffix='timef';
+    else
+        freq_dim=[];
+        freq_label={};
+        freq_value={};
+        samples_type='timelock';
+        ext_suffix='erp';
+    end
+
+    % time dimensions
+    time_dim=randint();
+    time_label={'time'};
+    time_value={(1:time_dim())*.2-.1};
+
+    % data
+    dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
+    dim_sizes_without_chan=dim_sizes([1, 3:end]);
+    data_arr=randn(dim_sizes);
+
+    % params
+    parameters={randstr(), randstr()};
+
+    % datafiles
+    % (use sorted order for datafiles so that testing for presence of
+    % correct datafiles is easier)
+    datafile_count=ceil(trial_dim/3);
+    datafiles=sort(arrayfun(@(x)randstr(),ones(1,datafile_count),...
+                            'UniformOutput',false));
+    datafile_idxs=ceil(rand(1,trial_dim)*datafile_count);
+
+    % ensure none empty
+    datafile_idxs(1:datafile_count)=randperm(datafile_count);
+
+    sa_datafiles=cell(trial_dim,1);
+    datatrials=cell(1,datafile_count);
+    for k=1:datafile_count
+        msk=datafile_idxs==k;
+        datatrials{k}=find(msk);
+        sa_datafiles(msk)=repmat(datafiles(k),sum(msk),1);
+    end
+
+    ds=cosmo_flatten(data_arr,...
+                        [chan_label,freq_label,time_label],...
+                        [chan_value,freq_value,time_value]);
+
+    ds.a.meeg.samples_field='trial';
+    ds.a.meeg.samples_type=samples_type;
+    ds.a.meeg.samples_label='rpt';
+    ds.a.meeg.parameters=parameters;
+    ds.sa.datafiles=sa_datafiles;
+
+
+    s=struct();
+    chanlabels=cell(1,chan_dim);
+    for k=1:chan_dim
+        key=sprintf('%s%d',chan_prefix,k);
+        value=data_arr(:,k,:);
+        value_reshaped=reshape(value,dim_sizes_without_chan);
+        s.(key)=value_reshaped;
+        chanlabels{k}=key;
+    end
+
+    if ~has_ica
+        s.chanlabels=chanlabels;
+    end
+
+    if has_freq
+        s.freqs=freq_value{1};
+    end
+    s.times=time_value{1};
+    s.datatype=upper(ext_suffix);
+    s.datafiles=datafiles;
+    s.datatrials=datatrials;
+    s.parameters=parameters;
+
+    ext=[ext_prefix, ext_suffix];
+
+
+function x=randint()
+    x=ceil(rand()*10+5);
+
+function x=randstr()
+    x=char(rand(1,10)*24+65);
+
 
 
