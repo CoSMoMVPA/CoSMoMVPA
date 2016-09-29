@@ -176,8 +176,8 @@ end
 figure
 imagesc(confusion_matrix,[0 5])
 title('confusion matrix');
-set(gca,'XTickLabel',classes);
-set(gca,'YTickLabel',classes);
+set(gca,'XTick',1:nclasses,'XTickLabel',classes);
+set(gca,'YTick',1:nclasses,'YTickLabel',classes);
 ylabel('target');
 xlabel('predicted');
 colorbar

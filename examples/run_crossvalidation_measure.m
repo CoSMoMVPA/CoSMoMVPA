@@ -160,8 +160,9 @@ for k=1:nclassifiers
 
 
     classes = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
-    set(gca,'XTickLabel',classes);
-    set(gca,'YTickLabel',classes);
+    nclasses=numel(classes);
+    set(gca,'XTick',1:nclasses,'XTickLabel',classes);
+    set(gca,'YTick',1:nclasses,'YTickLabel',classes);
     ylabel('target');
     xlabel('predicted');
     colorbar
