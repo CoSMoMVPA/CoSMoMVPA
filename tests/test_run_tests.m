@@ -69,19 +69,16 @@ function [result,output]=helper_test_make_and_run(test_content)
 
 
 
-
 function [result,output]=helper_run_tests(args)
     warning_state=cosmo_warning();
     orig_path=path();
     orig_pwd=pwd();
     log_fn=tempname();
 
-
-    cleaner=onCleanup(@()run_sequentially({...
-                            @()path(orig_path),...
-                            @()cosmo_warning(warning_state),...
-                            @()cd(orig_pwd),...
-                            @()delete_if_exists(log_fn)}));
+    path_cleaner=onCleanup(@()path(orig_path));
+    warning_cleaner=onCleanup(@()cosmo_warning(warning_state));
+    pwd_cleaner=onCleanup(@()cd(orig_pwd));
+    log_fn_cleaner=onCleanup(@()delete_if_exists(log_fn));
 
     % ensure path is set; disable warnings by cosmo_set_path
     cosmo_warning('off');
@@ -89,18 +86,14 @@ function [result,output]=helper_run_tests(args)
     more_args={'-verbose','-logfile',log_fn,'-no_doctest'};
     result=cosmo_run_tests(more_args{:},args{:});
     fid=fopen(log_fn);
+    file_closer=onCleanup(@()fclose(fid));
+
     output=fread(fid,Inf,'char=>char')';
 
 
 function delete_if_exists(fn)
     if exist(fn,'file')
         delete(fn);
-    end
-
-function run_sequentially(funcs)
-    for k=1:numel(funcs)
-        f=funcs{k};
-        f();
     end
 
 
