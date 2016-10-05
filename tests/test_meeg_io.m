@@ -253,6 +253,7 @@ function test_eeglab_io()
         [s,ds,ext]=build_eeglab_dataset_struct(arg{:});
 
         ds_from_struct=cosmo_meeg_dataset(s);
+        assertEqual(ds.samples,ds_from_struct.samples);
         assertEqual(ds,ds_from_struct);
 
         % store, then read using cosmo_meeg_dataset
@@ -325,12 +326,25 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     if has_ica
         chan_prefix='comp';
         ext_prefix='ica';
+
+        make_chan_prefix_func=@()chan_prefix;
     else
         chan_prefix='chan';
         ext_prefix='dat';
+
+        make_chan_prefix_func=@randstr;
     end
+
+    if has_freq
+        chan_suffix='_timef';
+    else
+        chan_suffix='';
+    end
+
+    make_chan_label=@(idx) sprintf('%s%d',make_chan_prefix_func(),idx);
+
     chan_label={chan_prefix};
-    chan_value={arrayfun(@(x)sprintf('%s%d',chan_label{1},x),1:chan_dim,...
+    chan_value={arrayfun(make_chan_label,1:chan_dim,...
                             'UniformOutput',false)};
 
     % frequency dimension
@@ -361,48 +375,36 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     % params
     parameters={randstr(), randstr()};
 
-    % datafiles
-    % (use sorted order for datafiles so that testing for presence of
-    % correct datafiles is easier)
-    datafile_count=ceil(trial_dim/3);
-    datafiles=sort(arrayfun(@(x)randstr(),ones(1,datafile_count),...
-                            'UniformOutput',false));
-    datafile_idxs=ceil(rand(1,trial_dim)*datafile_count);
-
-    % ensure none empty
-    datafile_idxs(1:datafile_count)=randperm(datafile_count);
-
-    sa_datafiles=cell(trial_dim,1);
-    datatrials=cell(1,datafile_count);
-    for k=1:datafile_count
-        msk=datafile_idxs==k;
-        datatrials{k}=find(msk);
-        sa_datafiles(msk)=repmat(datafiles(k),sum(msk),1);
-    end
-
+    % make dataset
     ds=cosmo_flatten(data_arr,...
                         [chan_label,freq_label,time_label],...
                         [chan_value,freq_value,time_value]);
-
+    ds.sa=struct();
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type=samples_type;
     ds.a.meeg.samples_label='rpt';
     ds.a.meeg.parameters=parameters;
-    ds.sa.datafiles=sa_datafiles;
 
 
     s=struct();
-    chanlabels=cell(1,chan_dim);
     for k=1:chan_dim
-        key=sprintf('%s%d',chan_prefix,k);
+        key=sprintf('%s%d%s',chan_prefix,k,chan_suffix);
         value=data_arr(:,k,:);
-        value_reshaped=reshape(value,dim_sizes_without_chan);
-        s.(key)=value_reshaped;
-        chanlabels{k}=key;
+        value_rs=reshape(value,dim_sizes_without_chan);
+
+        if has_freq
+            % it seems that for freq data, single trial data is the last
+            % dimension, whereas for erp data, single trial data is the first
+            % dimension.
+            value_rs=shiftdim(value_rs,1);
+        end
+
+        s.(key)=value_rs;
     end
 
     if ~has_ica
-        s.chanlabels=chanlabels;
+        s.chanlabels=chan_value{1};
+        assert(iscellstr(s.chanlabels));
     end
 
     if has_freq
@@ -410,8 +412,6 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     end
     s.times=time_value{1};
     s.datatype=upper(ext_suffix);
-    s.datafiles=datafiles;
-    s.datatrials=datatrials;
     s.parameters=parameters;
 
     ext=[ext_prefix, ext_suffix];

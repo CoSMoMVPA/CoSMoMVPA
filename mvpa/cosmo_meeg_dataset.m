@@ -581,20 +581,40 @@ function ds=convert_eeglab_struct(s, opt)
     end
     freq_size=cellfun(@numel,freq_values);
 
-    chan_prefix=eeglab_get_chan_prefix(s);
-    chan_values=eeglab_get_chan_labels(s);
+    [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s);
+    [eeglab_labels,chan_values]=eeglab_get_chan_labels(...
+                                        s,chan_prefix,chan_suffix);
     n_chan=numel(chan_values);
+
+    if isfield(s,'chanlabels')
+        assert(numel(s.chanlabels)==n_chan);
+    end
 
     time_values=s.times;
     n_time=numel(time_values);
 
     data_cell=cell(n_chan,1);
     for k=1:n_chan
-        key=chan_values{k};
+        key=eeglab_labels{k};
         value=s.(key);
 
+        if has_freq
+            % it seems that for freq data, single trial data is the last
+            % dimension, whereas for erp data, single trial data is the first
+            % dimension. In any case we want to make single trial data the
+            % first dimension
+            has_trial_dim=size(value,3)~=1;
+            if has_trial_dim
+                value=shiftdim(value,2);
+            else
+                value=shiftdim(value,-1); % insert singleton dimension
+            end
+        end
+
         n_samples=size(value,1);
-        value_rs=reshape(value,[n_samples,1,[freq_size],n_time]);
+        size_chan_singleton=[n_samples,1,[freq_size],n_time];
+
+        value_rs=reshape(value,size_chan_singleton);
         data_cell{k}=value_rs;
     end
 
@@ -604,10 +624,6 @@ function ds=convert_eeglab_struct(s, opt)
                           [{chan_values},freq_values,{time_values}]);
 
     ds.sa=struct();
-    if isfield(s,'datafiles')
-        ds.sa.datafiles=eeglab_get_datafiles_sa(s);
-    end
-
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type=samples_type;
     ds.a.meeg.samples_label='rpt';
@@ -615,41 +631,50 @@ function ds=convert_eeglab_struct(s, opt)
     ds.a.meeg.parameters=s.parameters;
 
 
-function datafiles=eeglab_get_datafiles_sa(s)
-    trials=s.datatrials;
-    counts=cellfun(@numel,trials);
-    ntotal=sum(counts);
+function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s)
+    keys=fieldnames(s);
 
-    datafiles=cell(ntotal,1);
-    for k=1:numel(counts);
-        idxs=trials{k};
-        datafiles(idxs)=repmat(s.datafiles(k),counts(k),1);
+    numeric_infix='1';
+    pat=['^(\D+)' numeric_infix '([\D_]*$)'];
+    matches=regexp(keys,pat,'once','tokens');
+
+    match_idx=find(~cellfun(@isempty,matches));
+
+    if numel(match_idx)~=1
+        error('no (unique) channel found ending at ''1''');
     end
 
+    unique_match=matches{match_idx};
+    chan_prefix=unique_match{1};
+    chan_suffix=unique_match{2};
 
-function chan_prefix=eeglab_get_chan_prefix(s)
-    has_ica=isfield(s,'comp1');
-    if has_ica
-        chan_prefix='comp';
-    else
-        chan_prefix='chan';
-    end
 
-function chan_labels=eeglab_get_chan_labels(s)
-    chan_prefix=eeglab_get_chan_prefix(s);
 
-    make_label=@(idx)sprintf('%s%d',chan_prefix,idx);
+function [eeglab_labels,cosmo_labels]=eeglab_get_chan_labels(...
+                                s,chan_prefix,chan_suffix)
 
+    make_eeglab_label=@(idx)sprintf('%s%d%s',chan_prefix,idx,chan_suffix);
+    % see how many labels there are
     count=0;
     while true
-        label=make_label(count+1);
+        label=make_eeglab_label(count+1);
         if ~isfield(s,label)
             break
         end
         count=count+1;
     end
 
-    chan_labels=arrayfun(make_label,1:count,'UniformOutput',false);
+    idxs=1:count;
+
+    eeglab_labels=arrayfun(make_eeglab_label,idxs,'UniformOutput',false);
+    if strcmp(chan_prefix,'comp')
+        assert(~isfield(s,'chanlabels'));
+        make_comp_label=@(idx)sprintf('comp%d',idx);
+        cosmo_labels=arrayfun(make_comp_label,idxs,'UniformOutput',false);
+    else
+        cosmo_labels=s.chanlabels;
+    end
+
 
 
 
