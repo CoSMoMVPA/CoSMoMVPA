@@ -188,9 +188,11 @@ function s=build_eeglab(ds)
         s.freqs=fdim_values{2};
         freq_sz=numel(s.freqs);
         datatype='timef';
+        chan_suffix=sprintf('_%s',datatype);
     else
         freq_sz=[];
         datatype='erp';
+        chan_suffix='';
     end
 
     % set datatype
@@ -210,12 +212,21 @@ function s=build_eeglab(ds)
 
     for k=1:nchan
         chan_arr=reshape(arr(:,k,:),each_chan_sz);
-        key=sprintf('%s%d',chan_prefix,k);
+        key=sprintf('%s%d%s',chan_prefix,k,chan_suffix);
+
+        % it seems that for freq data, single trial data is the last
+        % dimension, whereas for erp data, single trial data is the first
+        % dimension.
+        if has_freq
+            chan_arr=shiftdim(chan_arr,1);
+         % note: no shift for erp data, as time is already the first
+         % dimension
+        end
         s.(key)=chan_arr;
     end
 
     if ~has_ica
-        s.chanlabels=fdim_values{1};
+        s.chanlabels=chan_names;
     end
 
     s.times=fdim_values{end};
