@@ -1,11 +1,11 @@
-function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_progress_line)
+function progress_line=cosmo_show_progress(clock_start, ratio_done, msg, prev_progress_line)
 % Shows a progress bar, and time elapsed and expected to complete.
 %
 % progress_line=cosmo_show_progress(clock_start, progress[, msg[, prev_progress_line]])
 %
 % Inputs:
 %   clock_start         The time the task started (from clock()).
-%   progress            0 <= progress <= 1, where 0 means nothing
+%   ratio_done          0 <= ratio_done <= 1, where 0 means nothing
 %                       completed and 1 means fully completed.
 %   msg                 String with a message to be shown next to the
 %                       progress bar (optional).
@@ -33,10 +33,11 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
 %   % this code takes just over 3 seconds to run, and fills a progress bar.
 %   prev_msg='';
 %   clock_start=clock();
-%   for k=0:100
+%   for k=1:100
 %       pause(.03);
 %       status=sprintf('done %.1f%%', k);
-%       prev_msg=cosmo_show_progress(clock_start,k/100,status,prev_msg);
+%       ratio_done=k/100;
+%       prev_msg=cosmo_show_progress(clock_start,ratio_done,status,prev_msg);
 %   end
 %   % output:
 %   > +00:00:03 [####################] -00:00:00  done 100.0%
@@ -53,17 +54,18 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
     if nargin<3 || isempty(msg)
         msg='';
     end
-    if progress<0 || progress>1
-        error('illegal progress %d: should be between 0 and 1', progress);
+    if ratio_done<0 || ratio_done>1
+        error('illegal progress %d: should be between 0 and 1', ratio_done);
     end
 
-    if progress==0
+    if ratio_done==0
         ratio_to_do=Inf;
     else
-        ratio_to_do=(1-progress)/progress;
+        ratio_to_do=(1-ratio_done)/ratio_done;
     end
 
-    took=etime(clock, clock_start);
+    clock_now=clock();
+    took=etime(clock_now, clock_start);
     eta=ratio_to_do*took; % 'estimated time of arrival'
 
     % set number of backspace characters
@@ -71,7 +73,7 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
 
     % define the bar
     bar_width=20;
-    bar_done=round(progress*bar_width);
+    bar_done=round(ratio_done*bar_width);
     bar_eta=bar_width-bar_done;
     bar_str=[repmat('#',1,bar_done) repmat('-',1,bar_eta)];
 
@@ -82,7 +84,7 @@ function progress_line=cosmo_show_progress(clock_start, progress, msg, prev_prog
                                         secs2str(-eta)),...
                    msg];
 
-    if progress==1
+    if ratio_done==1
         postfix=sprintf('\n');
     else
         postfix='';
