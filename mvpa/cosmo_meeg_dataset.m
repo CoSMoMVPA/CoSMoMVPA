@@ -624,27 +624,12 @@ function ds=convert_eeglab_struct(s, opt)
                           [{chan_values},freq_values,{time_values}]);
 
     ds.sa=struct();
-    if isfield(s,'datafiles')
-        ds.sa.datafiles=eeglab_get_datafiles_sa(s);
-    end
-
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type=samples_type;
     ds.a.meeg.samples_label='rpt';
 
     ds.a.meeg.parameters=s.parameters;
 
-
-function datafiles=eeglab_get_datafiles_sa(s)
-    trials=s.datatrials;
-    counts=cellfun(@numel,trials);
-    ntotal=sum(counts);
-
-    datafiles=cell(ntotal,1);
-    for k=1:numel(counts);
-        idxs=trials{k};
-        datafiles(idxs)=repmat(s.datafiles(k),counts(k),1);
-    end
 
 function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s)
     keys=fieldnames(s);

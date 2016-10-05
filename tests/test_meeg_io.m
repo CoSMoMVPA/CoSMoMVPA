@@ -375,34 +375,15 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     % params
     parameters={randstr(), randstr()};
 
-    % datafiles
-    % (use sorted order for datafiles so that testing for presence of
-    % correct datafiles is easier)
-    datafile_count=ceil(trial_dim/3);
-    datafiles=sort(arrayfun(@(x)randstr(),ones(1,datafile_count),...
-                            'UniformOutput',false));
-    datafile_idxs=ceil(rand(1,trial_dim)*datafile_count);
-
-    % ensure none empty
-    datafile_idxs(1:datafile_count)=randperm(datafile_count);
-
-    sa_datafiles=cell(trial_dim,1);
-    datatrials=cell(1,datafile_count);
-    for k=1:datafile_count
-        msk=datafile_idxs==k;
-        datatrials{k}=find(msk);
-        sa_datafiles(msk)=repmat(datafiles(k),sum(msk),1);
-    end
-
+    % make dataset
     ds=cosmo_flatten(data_arr,...
                         [chan_label,freq_label,time_label],...
                         [chan_value,freq_value,time_value]);
-
+    ds.sa=struct();
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type=samples_type;
     ds.a.meeg.samples_label='rpt';
     ds.a.meeg.parameters=parameters;
-    ds.sa.datafiles=sa_datafiles;
 
 
     s=struct();
@@ -431,8 +412,6 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     end
     s.times=time_value{1};
     s.datatype=upper(ext_suffix);
-    s.datafiles=datafiles;
-    s.datatrials=datatrials;
     s.parameters=parameters;
 
     ext=[ext_prefix, ext_suffix];

@@ -230,16 +230,7 @@ function s=build_eeglab(ds)
     end
 
     s.times=fdim_values{end};
-    s=set_datafiles_if_present(s,ds);
     s=set_parameters_if_present(s,ds);
-
-
-function s=set_datafiles_if_present(s,ds)
-    if cosmo_isfield(ds,'sa.datafiles')
-        [idx,filenames]=cosmo_index_unique({ds.sa.datafiles});
-        s.datafiles=filenames{1}';
-        s.datatrials=cellfun(@transpose,idx','UniformOutput',false);
-    end
 
 
 function s=set_parameters_if_present(s,ds)
