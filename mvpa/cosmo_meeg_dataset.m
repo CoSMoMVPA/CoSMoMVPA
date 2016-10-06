@@ -17,12 +17,16 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %                     Alternatively it can be a FieldTrip or EEGLab struct
 %                     with time-locked or time-frequency data
 %   'targets', t      Px1 targets for P samples; these will be stored in
-%                     the output as ds.sa.targets
+%                     the output as ds.sa.targets (optional)
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
-%                     the output as ds.sa.chunks
+%                     the output as ds.sa.chunks (optional)
 %   'data_field', f   For MEEG source dataset with multiple data fields
 %                     (such as 'pow' and 'mom'), this sets which data field
-%                     is used.
+%                     is used. (only for source data)
+%   'trials', idx     Mx1 array with indices of trials to load (optional).
+%                     If not provided then all trials are loaded. The
+%                     output has a .samples field with the number of rows
+%                     equal to numel(idx).
 %
 % Returns:
 %   ds                dataset struct with the following fields
@@ -82,6 +86,16 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %       ds.sa.targets=ds.sa.trialinfo(:,3)
 %
 %    to set the trial conditions.
+%  - Implementation note: when loading EEGLAB data from a file, using this
+%    option means that different parts of the file are with different
+%    'load' commands. The advantage is that significant less memory is
+%    needed compared to when the full dataset is loaded first and then
+%    sliced. The disadvantage is that loaded may take longer, because the
+%    file is opened and closed multiple times.
+%    Such memory reductions are currently not implemented for FieldTrip
+%    data, as FieldTrip's data structures do not allow for such memory
+%    usage reductions.
+
 %
 % See also: cosmo_map2meeg
 %
@@ -195,7 +209,30 @@ function img_formats=get_supported_image_formats()
     img_formats.ft_struct.externals={};
 
 
+function ds=posthoc_slice_dataset_if_necessary(ds,opt)
+    if ~isfield(opt,'trials')
+        return;
+    end
 
+    trial_idx=opt.trials;
+    verify_trial_params(size(ds.samples,1),trial_idx);
+    ds=cosmo_slice(ds,trial_idx);
+
+function verify_trial_params(nsamples,trial_idx)
+    if ~isnumeric(trial_idx)
+        error('.trials option must be numeric');
+    end
+
+    bad_msk=trial_idx<1 | ...
+                trial_idx>nsamples | ...
+                round(trial_idx)~=trial_idx;
+
+    if any(bad_msk)
+        bad_pos=find(bad_msk,1);
+        error(['.trials option has illegal value at position %d; '...
+                'all values must be in (1:%d)'],...
+                bad_pos,nsamples);
+    end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fieldtrip helper function
@@ -222,6 +259,9 @@ function ds=convert_ft(ft, opt)
     nsamples=size(ds.samples,1);
     ft_fields={'rpt','trialinfo','cumtapcnt'};
     ds.sa=copy_fields_for_matching_sample_size(ft,nsamples,ft_fields);
+
+    ds=posthoc_slice_dataset_if_necessary(ds,opt);
+
 
 function [data,samples_field,fdim]=get_ft_data(ft,opt)
     [data, samples_field]=get_data_ft(ft,opt);
@@ -283,11 +323,6 @@ function [data,fdim]=fix_ft_lcmv_if_necessary(data,fdim)
 
         end
     end
-
-
-
-
-
 
 
 
@@ -556,6 +591,8 @@ function tf=is_ft_sensor_struct(ft)
 function tf=is_ft_struct(ft)
     tf=is_ft_source_struct(ft) || is_ft_sensor_struct(ft);
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % eeglab struct helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -566,12 +603,73 @@ function tf=is_eeglab_struct(s)
 
 
 function ds=read_eeglab(fn,opt)
-    s=load(fn,'-mat');
+    if isfield(opt,'trials')
+        % can have significant reduction in memory requirements
+        % at the expense of loading different parts of the same file
+        % multiple times.
+        s=eeglab_load_with_trials(fn,opt.trials);
+        opt=rmfield(opt,'trials');
+    else
+        s=load(fn,'-mat');
+    end
     ds=convert_eeglab_struct(s,opt);
 
-function ds=convert_eeglab_struct(s, opt)
+function s=eeglab_load_with_trials(fn,trial_idx)
+    % can save memory by loaded each channel seperately
+    s_minimal=load(fn,'-mat','datatype');
+    has_freq=helper_eeglab_get_freq_info(s_minimal);
+
+    w=whos('-file',fn);
+    s_surrogate=struct();
+    for k=1:numel(w)
+        s_surrogate.(w(k).name)=[];
+    end
+
+    [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s_surrogate);
+    [chan_labels]=eeglab_get_chan_labels(s_surrogate,...
+                                    chan_prefix,chan_suffix);
+    other_labels=setdiff({w.name},chan_labels);
+    assert(numel(other_labels)<numel(w));
+
+    s=load(fn,'-mat',other_labels{:});
+    n_chan=numel(chan_labels);
+    for k=1:n_chan
+        label=chan_labels{k};
+        data_struct=load(fn,'-mat',label);
+        data=data_struct.(label);
+
+        sliced_data=helper_eeglab_slice_chan(data,trial_idx,has_freq);
+        s.(label)=sliced_data;
+    end
+
+
+function result=helper_eeglab_slice_chan(data, trial_idx, has_freq)
+    assert(islogical(has_freq));
+
+    if has_freq
+        trial_dim=3;
+    else
+        trial_dim=1;
+    end
+
+    % ensure enough trials
+    n_trials=size(data,trial_dim);
+    verify_trial_params(n_trials,trial_idx);
+
+    if has_freq
+        result=data(:,:,trial_idx);
+    else
+        assert(numel(size(data))<=2);
+        result=data(trial_idx,:);
+    end
+
+function [has_freq,freq_label,freq_values]=helper_eeglab_get_freq_info(s)
     samples_type=eeglab_get_samples_type(s);
     has_freq=strcmp(samples_type,'timefreq');
+    if nargout<=1
+        return;
+    end
+
     if has_freq
         freq_label={'freq'};
         freq_values={s.freqs};
@@ -579,6 +677,12 @@ function ds=convert_eeglab_struct(s, opt)
         freq_label={};
         freq_values={};
     end
+
+
+
+function ds=convert_eeglab_struct(s, opt)
+    samples_type=eeglab_get_samples_type(s);
+    [has_freq,freq_label,freq_values]=helper_eeglab_get_freq_info(s);
     freq_size=cellfun(@numel,freq_values);
 
     [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s);
@@ -629,6 +733,8 @@ function ds=convert_eeglab_struct(s, opt)
     ds.a.meeg.samples_label='rpt';
 
     ds.a.meeg.parameters=s.parameters;
+
+    ds=posthoc_slice_dataset_if_necessary(ds,opt);
 
 
 function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s)
@@ -697,7 +803,7 @@ function samples_type=eeglab_get_samples_type(s)
 % eeglab txt helper function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ds=read_eeglab_txt(fn, unused)
+function ds=read_eeglab_txt(fn, opt)
     % reads eeglab time series data. returns data in fieldtrip-like format
     fid=fopen(fn);
 
@@ -761,4 +867,7 @@ function ds=read_eeglab_txt(fn, unused)
 
     % set sample info
     ds.sa.(ds.a.meeg.samples_label)=(1:ntrial)';
+
+    ds=posthoc_slice_dataset_if_necessary(ds,opt);
+
 

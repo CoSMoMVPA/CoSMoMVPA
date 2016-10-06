@@ -61,6 +61,35 @@ function test_meeg_ft_dataset()
     aet(struct('avg',1));
     aet(struct('avg',1,'dimord','rpt_foo'));
 
+function test_meeg_ft_dataset_trials()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+
+    dimords=get_ft_dimords();
+    n=numel(dimords);
+    for k=1:n
+        dimord=dimords{k};
+        ft=generate_ft_struct(dimord);
+        ds=cosmo_meeg_dataset(ft);
+
+        % check subset of trials option
+        ntrials=size(ds.samples,1);
+        trial_idx=ceil(rand(1,2)*ntrials);
+        ds_single_trial=cosmo_meeg_dataset(ft,...
+                                    'trials',trial_idx);
+        assertEqual(cosmo_slice(ds,trial_idx),ds_single_trial);
+        ds_single_trial=cosmo_meeg_dataset(ft,...
+                                    cosmo_structjoin('trials',trial_idx));
+        assertEqual(cosmo_slice(ds,trial_idx),ds_single_trial);
+
+        illegal_args={ntrials+1,0,struct,cell(1,0),'foo',true,1.5};
+        for j=1:numel(illegal_args)
+            arg=illegal_args{j};
+            aet(ft,'trials',arg);
+        end
+    end
+
+
 
 function test_synthetic_meeg_dataset()
     combis=cosmo_cartprod({{'timelock','timefreq','source'},...
@@ -116,13 +145,32 @@ function test_meeg_eeglab_txt_io()
     assertEqual(ds.a.fdim.labels,ds2.a.fdim.labels);
     assertEqual(ds.fa,ds2.fa);
 
-    % add bogus datamox
+    % test trials option
+    nsamples=size(ds.samples,1);
+    trial_idx=ceil(rand(1,2)*nsamples);
+    ds_trials=cosmo_meeg_dataset(tmp_fn,'trials',trial_idx);
+    ds_expected_trials=cosmo_slice(ds,trial_idx);
+    assertElementsAlmostEqual(ds_trials.samples,...
+                                ds_expected_trials.samples,...
+                                'absolute',1e-4);
+
+    % test illegal options
+    aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+    illegal_args={nsamples+1,0,struct,{},'foo',true,1.5};
+    for j=1:numel(illegal_args)
+        arg=illegal_args{j};
+        aet(tmp_fn,'trials',arg);
+        aet(tmp_fn,cosmo_structjoin('trials',arg));
+    end
+
+    % add bogus data, expect exception
     fid=fopen(tmp_fn,'a');
     fprintf(fid,'.3');
     fclose(fid);
     file_closer=[];
 
-    assertExceptionThrown(@()cosmo_meeg_dataset(tmp_fn),'');
+    aet(tmp_fn);
 
     tmp2_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
     file_remover2=onCleanup(@()delete(tmp2_fn));
@@ -168,7 +216,7 @@ function test_meeg_ft_io_exceptions()
     aeto(ds,'file_without_extension');
     aeto(ds,'file.with_unknown_extension');
 
-    aeto(ds,'eeglab_timelock.txt');
+    aeto(ds,'eeglab_timelock.txt'); % not supported
 
 
 function dimords=get_ft_dimords()
@@ -277,6 +325,48 @@ function test_eeglab_io()
         assertEqual(s,s_loaded);
         clear cleaner;
     end
+
+function test_eeglab_io_trials()
+
+    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,:);
+        [s,ds,ext]=build_eeglab_dataset_struct(arg{:});
+
+        nsamples=size(ds.samples,1);
+        trial_idx=ceil(rand(1,2)*nsamples);
+        ds_expected_trials=cosmo_slice(ds,trial_idx);
+
+        % with struct input
+        ds_trials=cosmo_meeg_dataset(s,'trials',trial_idx);
+        assertElementsAlmostEqual(ds_trials.samples,...
+                                ds_expected_trials.samples,...
+                                'absolute',1e-4);
+
+        % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn,'trials',trial_idx);
+        assertEqual(ds_loaded,ds_expected_trials);
+
+
+        % test illegal options
+        aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+        illegal_args={nsamples+1,0,struct,{},'foo',true,1.5};
+        for j=1:numel(illegal_args)
+            arg=illegal_args{j};
+            aet(s,'trials',arg);
+        end
+
+        clear cleaner;
+
+
+    end
+
 
 function test_eeglab_io_exceptions()
     aet_md=@(varargin)assertExceptionThrown(@()...
@@ -422,6 +512,3 @@ function x=randint()
 
 function x=randstr()
     x=char(rand(1,10)*24+65);
-
-
-
