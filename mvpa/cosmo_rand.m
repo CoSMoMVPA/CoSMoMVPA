@@ -45,7 +45,7 @@ function result=cosmo_rand(varargin)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-    [sizes,seed]=process_input(varargin{:});
+    [sizes,seed,class_func]=process_input(varargin{:});
 
     randomizer=@rand; % default
     if seed~=0
@@ -69,7 +69,7 @@ function result=cosmo_rand(varargin)
         end
     end
 
-    result=randomizer(sizes);
+    result=class_func(randomizer(sizes));
 
 
 function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
@@ -116,15 +116,18 @@ function rng_state=get_mersenne_state_from_seed(seed, is_matlab)
     cached_rng_state=rng_state;
     cached_seed=seed;
 
+function x=identify_func(x)
+    % do nothing
 
-
-function [sizes,seed]=process_input(varargin)
+function [sizes,seed,class_func]=process_input(varargin)
     persistent cached_varargin;
     persistent cached_sizes;
     persistent cached_seed;
+    persistent cached_class_func;
     if isequal(varargin,cached_varargin)
         sizes=cached_sizes;
         seed=cached_seed;
+        class_func=cached_class_func;
         return;
     end
 
@@ -132,6 +135,9 @@ function [sizes,seed]=process_input(varargin)
 
     seed=0;
     sizes_cell=cell(1,n);
+    class_func=[];
+
+    has_processed_sizes=false;
 
     % process each argument
     k=0;
@@ -139,22 +145,41 @@ function [sizes,seed]=process_input(varargin)
         k=k+1;
         arg=varargin{k};
         if isnumeric(arg)
+            if has_processed_sizes
+                error('size argument not allowed after string argument');
+            end
+
             ensure_positive_vector(k,arg);
             sizes_cell{k}=arg(:)';
-        elseif ischar(arg)
-            k=k+1;
-            if k>n
-                error('missing value after key ''%s''', arg);
-            end
-            value=varargin{k};
-            ensure_positive_scalar(k,value);
 
+        elseif ischar(arg)
+            has_processed_sizes=true;
             switch arg
+                case 'single'
+                    if ~isempty(class_func)
+                        error('type can only be set once');
+                    end
+                    class_func=@single;
+
+                case 'double'
+                    if ~isempty(class_func)
+                        error('type can only be set once');
+                    end
+                    class_func=@identify_func;
+
                 case 'seed'
+                    k=k+1;
+                    if k>n
+                        error('missing value after key ''%s''', arg);
+                    end
+                    value=varargin{k};
+                    ensure_positive_scalar(k,value);
                     seed=value;
+
                 otherwise
                     error('unsupported key ''%s''', arg);
             end
+
         else
             error('illegal input at position %d', k);
         end
@@ -167,9 +192,14 @@ function [sizes,seed]=process_input(varargin)
         sizes=1;
     end
 
+    if isempty(class_func)
+        class_func=@identify_func;
+    end
+
     cached_varargin=varargin;
     cached_sizes=sizes;
     cached_seed=seed;
+    cached_class_func=class_func;
 
 function ensure_positive_scalar(k,arg)
     ensure_positive_vector(k,arg);
