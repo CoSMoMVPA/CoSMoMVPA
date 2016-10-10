@@ -34,14 +34,26 @@ function test_classify_naive_bayes
 
 
 function test_classify_meta_feature_selection
+%     % Oct 2016: got strange glibc error when using travis
+%
+%     ** glibc detected *** /usr/bin/octave-cli: double free or corruption (!prev): 0x0000000003570030 ***
+%     ======= Backtrace: =========
+%     /lib/x86_64-linux-gnu/libc.so.6(+0x7da26)[0x2abf370a4a26]
+%     /usr/lib/x86_64-linux-gnu/liboctinterp.so.3(_ZN12symbol_table7cleanupEv+0x7d)[0x2abf3678001d]
+%     /usr/lib/x86_64-linux-gnu/liboctinterp.so.3(+0xb486de)[0x2abf367b26de]
+%     /usr/lib/x86_64-linux-gnu/liboctinterp.so.3(_Z17clean_up_and_exitib+0x17)[0x2abf367b4057]
+%     /usr/lib/x86_64-linux-gnu/liboctinterp.so.3(octave_execute_interpreter+0xd1a)[0x2abf35f341ca]
+%     /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed)[0x2abf370487ed]
+%
+%     https://travis-ci.org/nno/CoSMoMVPA/builds/166411636
     cfy=@cosmo_classify_meta_feature_selection;
     opt=struct();
-    opt.child_classifier=@cosmo_classify_lda;
+    opt.child_classifier=@cosmo_classify_nn;
     opt.feature_selector=@cosmo_anova_feature_selector;
     opt.feature_selection_ratio_to_keep=.6;
     handle=get_predictor(cfy,opt);
-    assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
-                                    9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
+    assert_predictions_equal(handle,[1 1 7 1 6 6 1 1 7 5 1 1 4 ...
+                                      9 6 7 7 1 1 2 1 3 9 6 7 8 7 ]');
     general_test_classifier(cfy,opt)
 
 function test_cosmo_meta_feature_selection_classifier
@@ -52,12 +64,12 @@ function test_cosmo_meta_feature_selection_classifier
 
     cfy=@cosmo_meta_feature_selection_classifier;
     opt=struct();
-    opt.child_classifier=@cosmo_classify_lda;
+    opt.child_classifier=@cosmo_classify_nn;
     opt.feature_selector=@cosmo_anova_feature_selector;
     opt.feature_selection_ratio_to_keep=.6;
     handle=get_predictor(cfy,opt);
-    assert_predictions_equal(handle,[1 3 7 8 6 6 8 3 7 5 7 5 4 ...
-                                    9 2 7 7 3 3 2 1 3 7 6 7 9 7 ]');
+    assert_predictions_equal(handle,[1 1 7 1 6 6 1 1 7 5 1 1 4 ...
+                                      9 6 7 7 1 1 2 1 3 9 6 7 8 7 ]');
     general_test_classifier(cfy,opt)
 
 function test_classify_nn
