@@ -197,23 +197,9 @@ switch params.output
         ds_sa.sa.chunks=chunks;
 
     case 'accuracy_by_chunk'
-        [unused,orig_chunks]=cosmo_index_unique(ds.sa.chunks);
-        norig_chunks=numel(orig_chunks);
-
-        ds_sa.samples=NaN(norig_chunks,1);
-        ds_sa.sa.chunks=NaN(norig_chunks,1);
-
-        [chunk_idxs,unq_chunks]=cosmo_index_unique(chunks);
-        for k=1:numel(unq_chunks)
-            chunk_value=unq_chunks(k);
-            if isnan(chunk_value)
-                continue;
-            end
-            idx=chunk_idxs{k};
-            ds_sa.samples(k)=mean(ds.sa.targets(idx)==pred(idx));
-            ds_sa.sa.chunks(k)=chunk_value;
-        end
-
+        error(['Output ''%s'' is not supported anymore. Consider '...
+                'using ''fold_predictions'' whenever this is '...
+                'implemented'], params.output);
 
     otherwise
         error('Illegal output parameter %s', params.output);
