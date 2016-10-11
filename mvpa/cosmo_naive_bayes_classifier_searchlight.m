@@ -174,14 +174,13 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
             result.samples=mean(is_correct,1);
             result.sa.labels={'accuracy'};
 
-        case 'predictions'
+        case 'winner_predictions'
             result.samples=predictions;
-            result.sa=ds.sa;
-            result.sa.chunks(~has_prediction)=NaN;
+            result.sa=rmfield(ds.sa,'chunks');
 
         otherwise
             error(['illegal output ''%s'', must be '...
-                    '''accuracy'' or ''predictions'''], opt.output);
+                    '''accuracy'' or ''winner_predictions'''], opt.output);
     end
 
     cosmo_check_dataset(result);
