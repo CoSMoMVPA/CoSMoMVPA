@@ -7,7 +7,7 @@ function test_suite = test_crossvalidation_measure
     initTestSuite;
 
 
-function test_crossvalidation_measure_basics
+function test_crossvalidation_measure_regression
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',4);
     ds.sa.targets=ds.sa.targets+10;
     ds.sa.chunks=ds.sa.chunks+20;
@@ -17,35 +17,37 @@ function test_crossvalidation_measure_basics
     opt.classifier=@cosmo_classify_lda;
 
     res=cosmo_crossvalidation_measure(ds,opt);
-    assertEqual(res.samples,0.6250);
+    assertElementsAlmostEqual(res.samples,0.6250);
     assertEqual(res.sa,cosmo_structjoin('labels',{'accuracy'}));
 
     opt.output='accuracy';
     res2=cosmo_crossvalidation_measure(ds,opt);
     assertEqual(res,res2);
 
-    opt.output='predictions';
+    opt.output='winner_predictions';
     res3=cosmo_crossvalidation_measure(ds,opt);
     assertEqual(res3.samples,10+[1 2 3 4 5 5 4 6 2 4 2 6 ...
                                 1 2 3 4 6 6 1 3 3 4 3 1]');
-    assertEqual(res3.sa,ds.sa);
+    assertEqual(res3.sa,rmfield(ds.sa,'chunks'));
 
-    opt.output='accuracy_by_chunk';
+    % use deprecated output options
+    warning_state=cosmo_warning();
+    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+    opt.output='predictions';
+    res3a=cosmo_crossvalidation_measure(ds,opt);
+    assertEqual(res3,res3a);
+
+
+    opt.output='fold_accuracy';
     res4=cosmo_crossvalidation_measure(ds,opt);
     assertElementsAlmostEqual(res4.samples,[5 2 5 3]'/6);
-
-    opt.partitions=cosmo_nchoosek_partitioner(ds,2);
-    opt.partitions.test_indices{1}=find(ds.sa.chunks==21);
-    opt.partitions.test_indices{4}=find(ds.sa.chunks==22);
-    opt.partitions.test_indices{5}=find(ds.sa.chunks==24);
-    res5=cosmo_crossvalidation_measure(ds,opt);
-    assertElementsAlmostEqual(res5.samples,[3 NaN NaN NaN]'/6);
-    assertEqual(res5.sa,cosmo_structjoin('chunks',[22 NaN NaN NaN]'));
+    assertEqual(res4.sa.folds,(1:4)');
 
     % test different classifier
     opt.classifier=@cosmo_classify_nn;
     opt.partitions=cosmo_nfold_partitioner(ds);
-    opt.output='predictions';
+    opt.output='winner_predictions';
 
     res6=cosmo_crossvalidation_measure(ds,opt);
     assertEqual(res6.samples,10+[1 2 3 1 5 6 4 6 5 4 6 6 6 ...
@@ -70,7 +72,7 @@ function test_crossvalidation_measure_basics
                                     2 3 4 5 6 1 2 3 4 5 1]');
 
 
-function test_fold_predictions
+function test_fold_accuracy()
     randint=@()ceil(rand()*5)+5;
 
     ntargets=randint();
@@ -81,9 +83,45 @@ function test_fold_predictions
     ds.sa.targets=ds.sa.targets+10;
     ds.sa.chunks=ds.sa.chunks+20;
 
+    partitions=cosmo_nchoosek_partitioner(ds,3);
 
     opt=struct();
-    opt.partitions=cosmo_nchoosek_partitioner(ds,3);
+    opt.partitions=partitions;
+    opt.classifier=@cosmo_classify_nn;
+    opt.output='fold_accuracy';
+
+    nfolds=numel(opt.partitions.train_indices);
+
+    res=cosmo_crossvalidation_measure(ds,opt);
+    assertEqual(size(res.samples),[nfolds,1]);
+    assertEqual(size(res.sa.folds),[nfolds,1]);
+
+    for fold=1:nfolds
+        f_opt=opt;
+        f_opt.partitions.train_indices=partitions.train_indices(fold);
+        f_opt.partitions.test_indices=partitions.test_indices(fold);
+        f_res=cosmo_crossvalidation_measure(ds,f_opt);
+        assertElementsAlmostEqual(res.samples(fold),f_res.samples);
+    end
+
+
+
+function test_fold_predictions
+    randint=@()ceil(rand()*4)+1;
+
+    ntargets=randint();
+    targets_offset=randint();
+    nchunks=randint()+1;
+    ds=cosmo_synthetic_dataset('ntargets',ntargets,...
+                                'nchunks',nchunks,...
+                                'nreps',randint());
+    ds.samples(:)=randn(size(ds.samples));
+    ds.sa.targets=ds.sa.targets+targets_offset;
+    ds.sa.chunks=ds.sa.chunks+20;
+
+
+    opt=struct();
+    opt.partitions=cosmo_nchoosek_partitioner(ds,ceil(nchunks/2));
     opt.classifier=@cosmo_classify_nn;
     opt.output='fold_predictions';
 
@@ -99,11 +137,14 @@ function test_fold_predictions
     % using crossvalidate function
     [cv_pred,acc]=cosmo_crossvalidate(ds,opt.classifier,opt.partitions);
 
+    visited=false(size(res.samples));
     for k=1:nfolds
         % test crossvalidation_measure
         msk=res.sa.folds==k;
+        visited(msk)=true;
         pred=res.samples(msk,:);
         assertEqual(size(pred),[numel(test_idx{k}),1]);
+        assertEqual(res.sa.targets(msk),ds.sa.targets(test_idx{k}));
 
         % compare with classifier output
         fold_pred=opt.classifier(ds.samples(train_idx{k},:),...
@@ -117,6 +158,11 @@ function test_fold_predictions
         assertEqual(isnan(cv_pred(:,k)),nan_msk);
         assertEqual(cv_pred(~nan_msk,k),fold_pred);
     end
+    assert(all(visited));
+
+    % fields should only be targets and folds
+    assertEqual(sort(fieldnames(res.sa)),...
+                sort({'targets';'folds'}));
 
     % test accuracy
     pred_msk=~isnan(cv_pred);
@@ -129,14 +175,14 @@ function test_fold_predictions
     assertEqual(size(res.samples),[nsamples,1]);
 
     for row=1:nsamples
-        h=histc(cv_pred,1:ntargets);
+        h=histc(cv_pred(row,:),(1:ntargets)+targets_offset);
 
         % predicted sample is a winner
-        row_pred=res.samples(row);
+        row_pred=res.samples(row)-targets_offset;
         assert(all(h<=h(row_pred)));
 
         % correct winner
-        assert(h(row_pred)==max(row_pred));
+        assert(h(row_pred)==max(h));
     end
 
 
@@ -334,7 +380,7 @@ function test_pca()
     opt=struct();
     opt.partitions=partitions;
     opt.classifier=@cosmo_classify_lda;
-    opt.output='predictions';
+    opt.output='winner_predictions';
 
     for count=[1 ceil(nfeatures/2) nfeatures ceil(rand()*nfeatures)]
         opt_count=opt;
