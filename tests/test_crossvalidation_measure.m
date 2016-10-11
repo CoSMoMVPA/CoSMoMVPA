@@ -140,7 +140,33 @@ function test_fold_predictions
     end
 
 
+function test_crossvalidation_measure_deprecations
+    warning_state=cosmo_warning();
+    state_resetter=onCleanup(@()cosmo_warning(warning_state));
 
+    deprecated_outputs={'predictions','raw'};
+
+    ds=cosmo_synthetic_dataset();
+    opt=struct();
+    opt.classifier=@cosmo_classify_nn;
+    opt.partitions=cosmo_nfold_partitioner(ds);
+
+
+    for i_output=1:numel(deprecated_outputs);
+        cosmo_warning('reset');
+        cosmo_warning('off');
+
+        output=deprecated_outputs{i_output};
+        opt.output=output;
+
+        % run the measure
+        cosmo_crossvalidation_measure(ds,opt);
+
+        % must have shown a warning
+        s=cosmo_warning();
+        w=s.shown_warnings;
+        assertTrue(numel(w)>=1, 'no warning was shown');
+    end
 
 
 
