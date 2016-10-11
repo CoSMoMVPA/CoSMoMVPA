@@ -46,6 +46,10 @@ function test_classify_meta_feature_selection
 %     /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed)[0x2abf370487ed]
 %
 %     https://travis-ci.org/nno/CoSMoMVPA/builds/166411636
+%
+%     Fix seemded to use cosmo_classify_nn instead of cosmo_classify_lda
+%     as child_classifier - but that may just be describing a symptom, not
+%     the root cause.
     cfy=@cosmo_classify_meta_feature_selection;
     opt=struct();
     opt.child_classifier=@cosmo_classify_nn;

@@ -1,4 +1,4 @@
-function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, partitions, opt)
+function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 % performs cross-validation using a classifier
 %
 % [pred, accuracy] = cosmo_crossvalidate(dataset, classifier, partitions, opt)
@@ -174,24 +174,16 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     nsamples=size(ds.samples,1);
 
     % space for output (one column per partition)
-    % the k-th column contains predictions for the k-th partition
-    % (with values of zeros if there was no prediction)
-    all_pred=NaN(nsamples,npartitions);
+    % the k-th column contains predictions for the k-th fold
+    % (with values of NaNs if there was no prediction)
+    pred=NaN(nsamples,npartitions);
 
     targets=ds.sa.targets;
-    chunks=ds.sa.chunks;
-
-    % keep track for which samples there has been a prediction
-    test_mask=false(nsamples,1);
-
-    % keep track how often a prediction there was made for each chunk
-    test_chunks=NaN(nsamples,1);
-    test_counts=zeros(nsamples,1);
 
     % process each fold
-    for k=1:npartitions
-        train_idxs=train_indices{k};
-        test_idxs=test_indices{k};
+    for fold=1:npartitions
+        train_idxs=train_indices{fold};
+        test_idxs=test_indices{fold};
         % for each partition get the training and test data, store in
         % train_data and test_data
         train_data = ds.samples(train_idxs,:);
@@ -231,38 +223,14 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         % the classifier, and store these in the k-th column of all_pred.
         p = classifier(train_data, train_targets, test_data, opt);
 
-        all_pred(test_idxs,k) = p;
-        test_mask(test_idxs)=true;
-        % <@@<
-
-        test_counts(test_idxs)=test_counts(test_idxs)+1;
-        test_chunks(test_idxs)=chunks(test_idxs);
+        pred(test_idxs,fold) = p;
     end
 
-    % combine predictions for multiple partitions
-    % - in the case of nfold-crossvalidation there is just one prediction
-    %   for each sample, but with other cross validation schemes such as
-    %   from nchoosek_partitioner(ds, 2) there can be more than one.
-    [pred_indices,classes]=cosmo_winner_indices(all_pred);
-
-    % sanity check: missing predictions should be identical to lack of
-    % winners
-    assert(all(isnan(pred_indices)~=test_mask));
-    assert(all(isnan(pred_indices)==isnan(test_chunks)));
-
-    % only chunks with single prediction are not set to NaN
-    test_chunks(test_counts~=1)=NaN;
-
-    % set predictions
-    pred=NaN(nsamples,1);
-    pred(test_mask)=classes(pred_indices(test_mask));
-
     % compute accuracies
-    correct_mask=ds.sa.targets(test_mask)==pred(test_mask);
-    ncorrect = sum(correct_mask);
-    ntotal = numel(correct_mask);
+    has_prediction_mask=~isnan(pred);
+    correct_mask=bsxfun(@eq,targets,pred) & has_prediction_mask;
 
-    accuracy = ncorrect/ntotal;
+    accuracy=sum(correct_mask)/sum(has_prediction_mask);
 
 function [do_average_train, average_train_opt]=get_average_train_opt(opt)
     persistent cached_opt;

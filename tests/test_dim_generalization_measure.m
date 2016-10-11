@@ -152,7 +152,7 @@ function test_dim_generalization_measure_basics
     ds1=cosmo_slice(ds,ds.sa.chunks==2 & ds.sa.time==1);
     ds2=cosmo_slice(ds,ds.sa.chunks==1 & ds.sa.time==3);
     opt.measure=@cosmo_crossvalidation_measure;
-    opt.output='predictions';
+    opt.output='winner_predictions';
 
     if cosmo_wtf('is_matlab')
         err_id='MATLAB:nonExistentField';
@@ -176,8 +176,8 @@ function test_dim_generalization_measure_basics
     result1=cosmo_slice(result,result.sa.train_time==2 & ...
                                         result.sa.test_time==1);
     result1.sa=rmfield(result1.sa,'transpose_ids');
-    r=set_nan_chunks_unique(r);
-    result1=set_nan_chunks_unique(result1);
+    r=set_nan_samples_unique_sa(r);
+    result1=set_nan_samples_unique_sa(result1);
 
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
@@ -204,8 +204,8 @@ function test_dim_generalization_measure_basics
                                         result.sa.test_time==1);
     result1.sa=rmfield(result1.sa,'transpose_ids');
 
-    r_msk=~isnan(r.sa.chunks);
-    result1_msk=~isnan(result1.sa.chunks);
+    r_msk=~isnan(r.samples);
+    result1_msk=~isnan(result1.samples);
 
     r=cosmo_slice(r,r_msk);
     result1=cosmo_slice(result1,result1_msk);
@@ -213,10 +213,11 @@ function test_dim_generalization_measure_basics
     mp=cosmo_align(r.sa,result1.sa);
     assertEqual(r.samples(mp),result1.samples);
 
-function ds=set_nan_chunks_unique(ds)
-    nan_msk=isnan(ds.sa.chunks);
+function ds=set_nan_samples_unique_sa(ds)
+    nan_msk=isnan(ds.samples);
     nsamples=numel(nan_msk);
-    ds.sa.chunks(nan_msk)=nsamples+(1:sum(nan_msk));
+    ds.sa.attr=NaN(size(ds.samples));
+    ds.sa.attr(nan_msk)=nsamples+(1:sum(nan_msk));
 
 function pred=my_stupid_classifier(x,y,z,unused)
     [foo,i]=sort(x(:));

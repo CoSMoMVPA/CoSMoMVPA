@@ -11,7 +11,7 @@ function test_naive_bayes_classifier_searchlight_basics
     nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
     opt=struct();
     opt.partitions=cosmo_nfold_partitioner(ds);
-    opt.output='predictions';
+    opt.output='winner_predictions';
     opt.progress=false;
 
     x=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
@@ -35,6 +35,9 @@ function assert_same_output_as_classifical_searchlight(ds,nh,opt)
     opt.classifier=@cosmo_classify_naive_bayes;
     y=cosmo_searchlight(ds,nh,@cosmo_crossvalidation_measure,opt);
 
+    assertElementsAlmostEqual(x.samples,y.samples)
+    x=rmfield(x,'samples');
+    y=rmfield(y,'samples');
     assertEqual(x,y);
 
 
@@ -74,21 +77,12 @@ function test_naive_bayes_classifier_searchlight_partial_partitions
     opt=struct();
     opt.progress=false;
     opt.partitions=partitions;
-    opt.output='predictions';
+    opt.output='winner_predictions';
 
     res=cosmo_naive_bayes_classifier_searchlight(ds,nh,opt);
 
-    ds_sa=ds.sa;
-    ds_sa.chunks(prediction_count==0)=NaN;
+    ds_sa=rmfield(ds.sa,'chunks');
     assertEqual(res.sa,ds_sa);
     cosmo_check_dataset(res);
 
     assert_same_output_as_classifical_searchlight(ds,nh,opt);
-
-
-
-
-
-
-
-
