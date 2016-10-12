@@ -34,7 +34,7 @@ function test_crossvalidation_measure_regression
     warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
-    opt.output='predictions';
+    opt.output='winner_predictions';
     res3a=cosmo_crossvalidation_measure(ds,opt);
     assertEqual(res3,res3a);
 
@@ -297,7 +297,7 @@ function test_balanced_accuracy()
     opt.output='balanced_accuracy';
     ba_result=cosmo_crossvalidation_measure(ds,opt);
 
-    opt.output='predictions';
+    opt.output='winner_predictions';
     pred_result=cosmo_crossvalidation_measure(ds,opt);
 
     opt.output='accuracy';
