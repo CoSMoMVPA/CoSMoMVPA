@@ -40,6 +40,64 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %                               In other words, the resulting partitions
 %                               are balanced for both training and test
 %                               set.
+%
+% Examples:
+%     % make simple dataset with 9 samples, 3 features
+%     ds=struct();
+%     ds.samples=randn(9,3);
+%     ds.sa.targets=[1 1 1 1 1 2 2 2 2]';
+%     ds.sa.chunks=(1:9)';
+%     %
+%     % Partition scheme with 5 folds, each in which 1 target in each chunk
+%     % is used for testing
+%     partitions=cosmo_independent_samples_partitioner(ds,...
+%                                             'test_count',1,...
+%                                             'fold_count',5);
+%     cosmo_disp(partitions)
+%     > .test_indices
+%     >   { [ 2    [ 4    [ 2    [ 5    [ 1
+%     >       6 ]    8 ]    7 ]    8 ]    7 ] }
+%     > .train_indices
+%     >   { [ 1    [ 1    [ 1    [ 1    [ 3
+%     >       3      3      3      2      4
+%     >       5      5      5      4      5
+%     >       7      6      6      6      6
+%     >       8      7      8      7      8
+%     >       9 ]    9 ]    9 ]    9 ]    9 ] }
+%     %
+%     % As above, but now with 2 targets in each chunk used for testing
+%     partitions=cosmo_independent_samples_partitioner(ds,...
+%                                             'test_count',2,...
+%                                             'fold_count',5);
+%     cosmo_disp(partitions)
+%     > .test_indices
+%     >   { [ 1    [ 4    [ 2    [ 1    [ 1
+%     >       2      5      3      5      5
+%     >       6      7      6      6      6
+%     >       7 ]    8 ]    7 ]    8 ]    7 ] }
+%     > .train_indices
+%     >   { [ 3    [ 1    [ 1    [ 2    [ 3
+%     >       5      3      5      4      4
+%     >       8      6      8      7      8
+%     >       9 ]    9 ]    9 ]    9 ]    9 ] }
+%     %
+%     % Now use 30% of the targets in each chunk for testing,
+%     % and return 20 chunks.
+%     partitions=cosmo_independent_samples_partitioner(ds,...
+%                                             'test_ratio',0.3,...
+%                                             'fold_count',20);
+%     cosmo_disp(partitions)
+%     > .test_indices
+%     >   { [ 3    [ 4    [ 1   ... [ 5    [ 1    [ 4
+%     >       6 ]    7 ]    8 ]       6 ]    9 ]    7 ]   }@1x20
+%     > .train_indices
+%     >   { [ 1    [ 2    [ 2   ... [ 1    [ 3    [ 1
+%     >       2      3      4         2      4      2
+%     >       4      5      5         3      5      5
+%     >       7      6      6         7      6      6
+%     >       8      8      7         8      7      8
+%     >       9 ]    9 ]    9 ]       9 ]    8 ]    9 ]   }@1x20
+%
 % Notes:
 % - In almost all cases, the number of partitions returned by this function
 %   (=c) is less than the total number of possible partitions. In these
