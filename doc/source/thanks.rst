@@ -40,6 +40,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Thomas Hartmann
 + James Haxby
 + Clayton Hickey
++ Thomas Hinault
 + Daniel Kaiser
 + James Keidel
 + Sukhbinder Kumar
