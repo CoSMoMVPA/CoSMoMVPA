@@ -218,7 +218,6 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
             test_data=cosmo_normalize(test_data,params);
         end
 
-        % >@@>
         % then get predictions for the training samples using
         % the classifier, and store these in the k-th column of all_pred.
         p = classifier(train_data, train_targets, test_data, opt);
