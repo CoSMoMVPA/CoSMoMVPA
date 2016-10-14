@@ -345,6 +345,7 @@ class CoSMoModules(object):
                  'flatten',
                  'unflatten',
                  'check_external',
+                 'wizard_set_config'
                  ],
 
         utils=[  'strsplit',
@@ -360,7 +361,12 @@ class CoSMoModules(object):
                  'tail',
                  'overlap',
                  'align',
-                 'sample_unique'
+                 'sample_unique',
+                 'randperm',
+                 'isequaln',
+                 'mask_dim_intersect',
+                 'pca',
+                 'map_pca',
                  ],
 
 
@@ -429,6 +435,7 @@ class CoSMoModules(object):
                      'nfold_partitioner',
                      'check_partitions',
                      'oddeven_partitioner',
+                     'independent_samples_partitioner',
                      'chunkize',
                      'check_partitions'
                      ],
@@ -440,6 +447,7 @@ class CoSMoModules(object):
                     'meeg_layout_collection',
                     'meeg_chan_neighborhood',
                     'meeg_senstype2layout_mapping',
+                    'meeg_read_layout',
                     ],
 
         fmri=       ['fmri_reorient',
