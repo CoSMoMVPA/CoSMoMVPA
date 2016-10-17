@@ -47,22 +47,23 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     partitions=cosmo_nfold_partitioner(ds);
 %     classifier=@cosmo_classify_naive_bayes;
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                       partitions);
-%     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred chunks])
-%     >      3     3     1
-%     >      4     4     1
-%     >      5     5     1
-%     >      3     3     2
-%     >      4     5     2
-%     >      5     5     2
-%     >      3     3     3
-%     >      4     4     3
-%     >      5     5     3
-%     >      3     3     4
-%     >      4     4     4
-%     >      5     5     4
+%     % show targets, chunks, and predictions labels for each of the
+%     % four folds
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [   3   NaN   NaN   NaN
+%     >     4      1        4   NaN   NaN   NaN
+%     >     5      1        5   NaN   NaN   NaN
+%     >     3      2      NaN     3   NaN   NaN
+%     >     4      2      NaN     5   NaN   NaN
+%     >     5      2      NaN     5   NaN   NaN
+%     >     3      3      NaN   NaN     3   NaN
+%     >     4      3      NaN   NaN     4   NaN
+%     >     5      3      NaN   NaN     5   NaN
+%     >     3      4      NaN   NaN   NaN     3
+%     >     4      4      NaN   NaN   NaN     4
+%     >     5 ]    4 ]    NaN   NaN   NaN     5 ] }
 %     disp(accuracy)
 %     >     0.9167
 %     %
@@ -70,49 +71,49 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     partitions=cosmo_nchoosek_partitioner(ds,2);
 %     classifier=@cosmo_classify_lda;
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                           partitions);
-%     % show targets, predicted labels, and accuracy
-%     % (chunks are set to NaN because there is no unique chunk for
-%     %  each prediction)
-%     disp([ds.sa.targets pred chunks])
-%     >      3     5   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     3   NaN
+%     % show targets, chunks, and predictions labels for each of the
+%     % four folds
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [   5     5     3   NaN   NaN   NaN
+%     >     4      1        4     4     4   NaN   NaN   NaN
+%     >     5      1        5     5     4   NaN   NaN   NaN
+%     >     3      2        3   NaN   NaN     3     3   NaN
+%     >     4      2        4   NaN   NaN     4     4   NaN
+%     >     5      2        5   NaN   NaN     4     5   NaN
+%     >     3      3      NaN     5   NaN     3   NaN     3
+%     >     4      3      NaN     4   NaN     4   NaN     4
+%     >     5      3      NaN     5   NaN     5   NaN     5
+%     >     3      4      NaN   NaN     3   NaN     3     3
+%     >     4      4      NaN   NaN     4   NaN     4     5
+%     >     5 ]    4 ]    NaN   NaN     5   NaN     3     3 ] }
 %     disp(accuracy)
-%     >     0.8333
+%     >     0.7778
 %     %
-%     % as the example above, but use z-scoring on each training set
-%     % and apply the estimated mean and std to the test set.
+%     % as the example above, but (1) use z-scoring on each training set
+%     % and apply the estimated mean and std to the test set, and (2)
+%     % use odd-even partitioner
 %     opt=struct();
 %     opt.normalization='zscore';
 %     partitions=cosmo_oddeven_partitioner(ds);
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                        partitions, opt);
 %     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred chunks])
-%     >      3     5     1
-%     >      4     4     1
-%     >      5     5     1
-%     >      3     3     2
-%     >      4     4     2
-%     >      5     5     2
-%     >      3     5     3
-%     >      4     4     3
-%     >      5     5     3
-%     >      3     3     4
-%     >      4     4     4
-%     >      5     3     4
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [ NaN     5
+%     >     4      1      NaN     4
+%     >     5      1      NaN     5
+%     >     3      2        3   NaN
+%     >     4      2        4   NaN
+%     >     5      2        5   NaN
+%     >     3      3      NaN     5
+%     >     4      3      NaN     4
+%     >     5      3      NaN     5
+%     >     3      4        3   NaN
+%     >     4      4        4   NaN
+%     >     5 ]    4 ]      3   NaN ] }
 %     disp(accuracy)
 %     >     0.7500
 %
