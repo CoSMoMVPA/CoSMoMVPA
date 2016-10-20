@@ -146,7 +146,7 @@ function test_naive_bayes_classifier_searchlight_deprecations
 
     orig_warning_state=cosmo_warning();
     cleaner=onCleanup(@()cosmo_warning(orig_warning_state));
-    cosmo_warning('off');
+    cosmo_warning('reset');
 
     % no warnings
     w=cosmo_warning();
