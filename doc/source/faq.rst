@@ -920,6 +920,89 @@ You would have to decide how to form clusters, i.e. whether you want to make inf
 
 
 
+Classify different groups of participants (such as patients versus controls)?
+-----------------------------------------------------------------------------
+'I have participants in three groups, patients1, patients2, and controls. How can I see where in the brain people these groups can be discriminated above chance level?'
+
+    To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
+
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`montecarlo_cluster_stat` without computing a feature statistic.
+
+    Consider the following example:
+
+    .. code-block:: matlab
+
+        % set number of groups and number of participants in each group
+        ngroups=3;
+        nchunks=10;
+
+        % generate example dataset with some signal that discriminates
+        % the participants
+        ds=cosmo_synthetic_dataset('ntargets',ngroups,'nchunks',nchunks);
+
+        % since all participants are independent, all chunks are set to
+        % unique values
+        ds.sa.chunks(:)=1:(ngroups*nchunks);
+
+        % define partitions
+        fold_count=50;
+        test_count=1;
+        partitions=cosmo_independent_samples_partitioner(ds,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+        % define neighborhood
+        radius_in_voxels=1; % typical is 3 voxels
+        nh=cosmo_spherical_neighborhood(ds,'radius',radius_in_voxels);
+
+        % run searchlight on original data
+        opt=struct();
+        opt.classifier=@cosmo_classify_lda;
+        opt.partitions=partitions;
+
+        result=cosmo_searchlight(ds,nh,...
+                            @cosmo_crossvalidation_measure,opt);
+
+        % generate null dataset
+        niter=100; % at least 1000 is iterations is recommended, 10000 is better
+        ds_null_cell=cell(niter,1);
+
+        for iter=1:niter
+            ds_null=ds;
+
+            ds_null.sa.targets=cosmo_randomize_targets(ds_null);
+
+            % update partitions
+            opt.partitions=cosmo_independent_samples_partitioner(ds_null,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+
+            null_result=cosmo_searchlight(ds_null,nh,...
+                                    @cosmo_crossvalidation_measure,opt);
+
+            ds_null_cell{iter}=null_result;
+        end
+        %%
+
+        % Since partitions are balanced, chance level
+        % is the inverse of the number of groups. For example,
+        % with 4 groups, chance level is 1/4 = 0.25 = 25%.
+        chance_level=1/ngroups;
+        tfce_dh=0.01; % should be sufficient for accuracies
+
+        opt=struct();
+        opt.h0_mean=chance_level;
+        opt.dh=tfce_dh;
+        opt.feature_stat='none';
+        opt.null=ds_null_cell;
+
+        cl_nh=cosmo_cluster_neighborhood(result);
+
+        %% compute TFCE map with z-scores
+        % z-scores above 1.65 are signficant at p=0.05 one-tailed.
+
+        tfce_map=cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
 
 
 
