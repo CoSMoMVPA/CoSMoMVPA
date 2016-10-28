@@ -50,8 +50,11 @@ function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_t
     persistent cached_opt;
     persistent cached_model;
 
+    cache_limit=1e5; % avoid caching huge training sets
+
     if isequal(cached_targets_train, targets_train) && ...
             isequal(cached_opt, opt) && ...
+            numel(samples_train) < cache_limit && ...
             isequal(cached_samples_train, samples_train)
         % use cache
         model=cached_model;
