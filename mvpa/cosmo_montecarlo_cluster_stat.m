@@ -399,8 +399,12 @@ function stat_func=get_stat_func_auto(ds)
 
 function preproc_func=get_preproc_func(ds,opt)
     nsamples=size(ds.samples,1);
-    is_one_independent_sample=numel(unique(ds.sa.targets))==1 && ...
-                             numel(unique(ds.sa.chunks))==nsamples;
+
+    has_targets_chunks=all(cosmo_isfield(ds,{'sa.targets',...
+                                                'sa.chunks'}));
+    is_one_independent_sample=has_targets_chunks && ...
+                              numel(unique(ds.sa.targets))==1 && ...
+                              numel(unique(ds.sa.chunks))==nsamples;
     is_single_sample=size(ds.samples,1)==1;
 
     has_h0_mean=isfield(opt,'h0_mean');
