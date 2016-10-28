@@ -55,15 +55,49 @@ function helper_test_deterministic(with_seed)
     assertEqual(sum(sum(msk==1,1),2),k); % each column has one 1
     assertEqual(sum(sum(msk==1,2),1),k); % each row has one 1
 
-    x2a=f(n,k);
+
     if with_seed
+        % deterministic
+        x2a=f(n,k);
         assertEqual(x2,x2a);
     else
-        assert(~isequal(x2,x2a));
+        found=false;
+        for attempt=1:10
+            x2a=f(n,k);
+            if ~isequal(x2,x2a)
+                found=true;
+                break;
+            end
+        end
+
+        if ~found
+            error('Different calls do not lead to different outputs');
+        end
     end
 
     x3=f(0);
     assertTrue(isempty(x3));
+
+    x4=f(1);
+    assertEqual(x4,1);
+
+    x5=f(1,1);
+    assertEqual(x5,1);
+
+function test_randperm_different_seeds
+    count=10;
+    seed=0;
+    result=cell(count,1);
+    for k=1:count
+        seed=seed+randint();
+
+        result{k}=cosmo_randperm(1000,'seed',seed);
+        for j=1:(k-1)
+            assertFalse(isequal(result{j},result{k}));
+        end
+    end
+
+
 
 
 function test_randperm_exceptions
@@ -113,10 +147,7 @@ function test_randperm_exceptions
     aet(2,'foo');
 
 function x=randint(n)
-    if nargin<1
-        n=50;
-    end
-    x=ceil(rand()*n);
+    x=ceil(10+rand()*50);
 
 
 
