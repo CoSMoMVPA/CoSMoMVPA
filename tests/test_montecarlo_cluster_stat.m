@@ -327,7 +327,18 @@ function test_feature_stat_montecarlo_cluster_stat
     assertEqual(res.fa,ds1.fa);
     assertEqual(res.a,ds1.a);
 
-    % h0_mean shoudl work
+    % should also work when no .sa present, or no .sa.targets
+    ds_no_sa=rmfield(ds1,'sa');
+    res_no_sa=cosmo_montecarlo_cluster_stat(ds_no_sa,nh,opt);
+    assertElementsAlmostEqual(res_no_sa.samples,res.samples);
+
+    ds_no_targets=ds1;
+    ds_no_targets.sa=rmfield(ds_no_targets.sa,'targets');
+    res_no_targets=cosmo_montecarlo_cluster_stat(ds_no_targets,nh,opt);
+    assertElementsAlmostEqual(res_no_targets.samples,res.samples);
+
+
+    % h0_mean should work
     c=8+rand();
     null_cell_const=null_cell;
     for k=1:numel(null_cell_const)
