@@ -1,6 +1,6 @@
 function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 % balances a partition so that each target occurs equally often in each
-% training chunk
+% training and test chunk
 %
 % bpartitions=cosmo_balance_partitions(partitions, ds, ...)
 %
