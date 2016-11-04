@@ -173,6 +173,7 @@ nclassifiers=numel(classifiers);
 nmasks=numel(mask_labels);
 
 labels={'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};
+nlabels=numel(labels);
 
 % little helper function to replace underscores by spaces
 underscore2space=@(x) strrep(x,'_',' ');
@@ -210,8 +211,8 @@ for j=1:nmasks
         title_=sprintf('%s using %s: accuracy=%.3f', ...
                         underscore2space(mask_label), cfy_label, accuracy);
         title(title_)
-        set(gca,'XTickLabel',labels);
-        set(gca,'YTickLabel',labels);
+        set(gca,'XTick',1:nlabels,'XTickLabel',labels);
+        set(gca,'YTick',1:nlabels,'YTickLabel',labels);
         ylabel('target');
         xlabel('predicted');
     end

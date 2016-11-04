@@ -40,6 +40,13 @@ function test_dir_basics()
     assert_dir_equal([],tmp_dir,'');
     assert_dir_equal([],tmp_dir,'aa');
 
+    % support single argument
+    assert_dir_equal(files([2 4 5 6 7]),tmp_dir,'bar/*.m');
+    assert_dir_equal(files([4 5 6 7]),tmp_dir,'bar/foo/*.m');
+    assert_dir_equal(files([4 5]),tmp_dir,'bar/?.m');
+    assert_dir_equal(files([6 7]),tmp_dir,'bar/??.m');
+
+
     % test exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                             run_cosmo_dir(varargin{:}),'');

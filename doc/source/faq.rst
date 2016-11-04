@@ -849,5 +849,162 @@ Although :ref:`cosmo_slice` does not support neighborhood structures (yet), cons
 
 Alternatively, :ref:`cosmo_spherical_neighborhood` (and :ref:`cosmo_surficial_neighborhood`) can be used with a 'count' argument - it keeps the number of elements across neighborhoods more constant.
 
+Use multiple-comparison correction for a time course?
+-----------------------------------------------------
+'I have a matrix of beta values (Nsubjects x Ntimepoints) for each predictor and I want to test for each timepoint (i.e. each column) if the mean beta is significantly different from zero. I ran a t-test but I wonder if I should test for multiple comparisons as well.
+What would be the best way to test for significance here?'
+
+You could use multiple comparison correction using Threshold-Free Cluster Enhancement with a temporal neighborhood. Suppose your data is in the following data matrix:
+
+  .. code-block:: matlab
+
+        % generate gaussian example data with no signal;
+        n_subjects=15;
+        time_axis=-.1:.01:.5;
+
+        n_time=numel(time_axis);
+        data=randn(n_subjects,n_time);
+
+then the first step is to put this data in a dataset structure:
+
+    .. code-block:: matlab
+
+        % make a dataset
+        ds=struct();
+        ds.samples=data;
+
+        % insert time dimension
+        ds=cosmo_dim_insert(ds,2,0,{'time'},{time_axis},{1:numel(time_axis)});
+
+You would have to decide how to form clusters, i.e. whether you want to make inferences at the individual time point level, or at the cluster-of-timepoints level. Then use :ref:`cosmo_montecarlo_cluster_stat` to estimate significance.
+
+    .. code-block:: matlab
+
+        % Make a temporal neighborhood for clustering
+        %
+        % In the following, if
+        %
+        %   allow_clustering_over_time=true
+        % then clusters can form over multiple time points. This makes the analysis
+        % more sensitive if there is a true effect in the data over multiple
+        % consecutive time points. However, when allow_clustering_over_time=true
+        % then one cannot make inferences about a specific time point (i.e.
+        % "the effect was significant at t=100ms"), only about a cluster (i.e
+        % "the effect was significant in a cluster stretching between t=50 and
+        % t=150 ms"). If, on the ohter hand,
+        %
+        %   allow_clustering_over_time=false
+        %
+        % then inferences can be made at the individual time point level, at the
+        % expensive of sensitivity of detecting any significant effect if there is
+        % a true effect that spans multiple consecutive time points
+        allow_clustering_over_time=false; % true or false
+
+        % define the neighborhood
+        nh_cl=cosmo_cluster_neighborhood(ds,'time',allow_clustering_over_time);
+
+        % set subject information
+        n_samples=size(ds.samples,1);
+        ds.sa.chunks=(1:n_samples)';     % all subjects are independent
+        ds.sa.targets=ones(n_samples,1); % one-sample t-test
+
+        % set clustering
+        opt=struct();
+        opt.h0_mean=0; % expected mean against which t-test is run
+        opt.niter=10000; % 10,000 is recommdended for publication-quality analyses
+
+        % run TFCE Monte Carlo multiple comparison correction
+        % in the output map, z-scores above 1.65 (for one-tailed) or 1.96 (for
+        % two-tailed) tests are significant
+        ds_tfce=cosmo_montecarlo_cluster_stat(ds,nh_cl,opt);
+
+
+
+Classify different groups of participants (such as patients versus controls)?
+-----------------------------------------------------------------------------
+'I have participants in three groups, patients1, patients2, and controls. How can I see where in the brain people these groups can be discriminated above chance level?'
+
+    To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
+
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`montecarlo_cluster_stat` without computing a feature statistic.
+
+    Consider the following example:
+
+    .. code-block:: matlab
+
+        % set number of groups and number of participants in each group
+        ngroups=3;
+        nchunks=10;
+
+        % generate example dataset with some signal that discriminates
+        % the participants
+        ds=cosmo_synthetic_dataset('ntargets',ngroups,'nchunks',nchunks);
+
+        % since all participants are independent, all chunks are set to
+        % unique values
+        ds.sa.chunks(:)=1:(ngroups*nchunks);
+
+        % define partitions
+        fold_count=50;
+        test_count=1;
+        partitions=cosmo_independent_samples_partitioner(ds,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+        % define neighborhood
+        radius_in_voxels=1; % typical is 3 voxels
+        nh=cosmo_spherical_neighborhood(ds,'radius',radius_in_voxels);
+
+        % run searchlight on original data
+        opt=struct();
+        opt.classifier=@cosmo_classify_lda;
+        opt.partitions=partitions;
+
+        result=cosmo_searchlight(ds,nh,...
+                            @cosmo_crossvalidation_measure,opt);
+
+        % generate null dataset
+        niter=100; % at least 1000 is iterations is recommended, 10000 is better
+        ds_null_cell=cell(niter,1);
+
+        for iter=1:niter
+            ds_null=ds;
+
+            ds_null.sa.targets=cosmo_randomize_targets(ds_null);
+
+            % update partitions
+            opt.partitions=cosmo_independent_samples_partitioner(ds_null,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+
+            null_result=cosmo_searchlight(ds_null,nh,...
+                                    @cosmo_crossvalidation_measure,opt);
+
+            ds_null_cell{iter}=null_result;
+        end
+        %%
+
+        % Since partitions are balanced, chance level
+        % is the inverse of the number of groups. For example,
+        % with 4 groups, chance level is 1/4 = 0.25 = 25%.
+        chance_level=1/ngroups;
+        tfce_dh=0.01; % should be sufficient for accuracies
+
+        opt=struct();
+        opt.h0_mean=chance_level;
+        opt.dh=tfce_dh;
+        opt.feature_stat='none';
+        opt.null=ds_null_cell;
+
+        cl_nh=cosmo_cluster_neighborhood(result);
+
+        %% compute TFCE map with z-scores
+        % z-scores above 1.65 are signficant at p=0.05 one-tailed.
+
+        tfce_map=cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
+
+
+
 
 .. include:: links.txt

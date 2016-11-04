@@ -1,5 +1,5 @@
 function sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
-% slice and prune a dataset with dimension attributes
+% slice and prune a dataset with dimension attributes [deprecated]
 %
 % sliced_pruned_ds=cosmo_dim_slice(ds, to_select, dim)
 %

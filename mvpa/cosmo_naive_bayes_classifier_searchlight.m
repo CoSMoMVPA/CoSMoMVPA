@@ -123,9 +123,10 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 
     % get partitions for crossvalidation
     [train_idxs,test_idxs]=get_partitions(ds,opt);
-    npartitions=numel(train_idxs);
+    nfolds=numel(train_idxs);
 
-    predictions=NaN(nsamples,ncenters);
+    max_prediction_count=get_max_prediction_count(test_idxs);
+    predictions=NaN(nsamples,ncenters,max_prediction_count);
     prediction_count=zeros(nsamples,1);
 
     if show_progress
@@ -134,7 +135,7 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
     end
 
     % perform classification for each fold
-    for fold=1:npartitions
+    for fold=1:nfolds
         train_idx=train_idxs{fold};
         test_idx=test_idxs{fold};
         samples_train=ds.samples(train_idx,:);
@@ -145,43 +146,81 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 
         % predict classes
         test_samples=ds.samples(test_idx,:);
-        pred=naive_bayes_predict(model, nbrhood_mat, test_samples);
+        fold_pred=naive_bayes_predict(model, nbrhood_mat, test_samples);
 
-        % store predictions
-        predictions(test_idx,:)=pred;
-        prediction_count(test_idx)=prediction_count(test_idx)+1;
+        % store predictions; work backwards to ensure each is stored just
+        % once
+        for col=max_prediction_count:-1:1
+            row_msk=prediction_count(test_idx)==(col-1);
+            row=test_idx(row_msk);
+            predictions(row,:,col)=fold_pred(row_msk,:);
+            prediction_count(row)=prediction_count(row)+1;
+        end
 
         if show_progress && (fold<10 || ~mod(fold,opt.progress) || ...
                                                 fold==ncenters)
             msg='';
             prev_progress_msg=cosmo_show_progress(clock_start, ...
-                            fold/npartitions, msg, prev_progress_msg);
+                            fold/nfolds, msg, prev_progress_msg);
         end
 
     end
-
-    has_prediction=prediction_count>0;
 
     result=struct();
     result.a=nbrhood.a;
     result.fa=nbrhood.fa;
 
     % set output
-    switch opt.output
+    output=opt.output;
+    switch output
         case 'accuracy'
-            is_correct=bsxfun(@eq,predictions(has_prediction,:),...
-                                    ds.sa.targets(has_prediction));
-            result.samples=mean(is_correct,1);
+            is_pred=~isnan(predictions);
+            is_correct=is_pred & bsxfun(@eq,predictions,ds.sa.targets);
+
+            correct_count=sum(sum(is_correct,1),3);
+            pred_count=sum(sum(is_pred,1),3);
+
+            result.samples=correct_count./pred_count;
             result.sa.labels={'accuracy'};
 
-        case 'predictions'
-            result.samples=predictions;
-            result.sa=ds.sa;
-            result.sa.chunks(~has_prediction)=NaN;
+        case {'winner_predictions','predictions'}
+            if cosmo_match({output},{'predictions'})
+                cosmo_warning('CoSMoMVPA:deprecated',...
+                        sprintf(...
+                        ['Output option ''%s'' is deprecated and will '...
+                        'be removed from a future release. Please use '...
+                        'output=''winner_predictions'' instead.'],...
+                            output));
+            end
+
+
+            if max_prediction_count<=1
+                winners=predictions;
+            else
+                winners=zeros(nsamples,ncenters);
+                for k=1:ncenters
+                    pred_mat=reshape(predictions(:,k,:),...
+                                        nsamples,max_prediction_count);
+                    [idx,cl]=cosmo_winner_indices(pred_mat);
+                    winners(:,k)=cl(idx);
+
+                    if show_progress && (k<10 || ...
+                                        ~mod(k,opt.progress) || ...
+                                        k==ncenters)
+                        msg='computing winners';
+                        prev_progress_msg=cosmo_show_progress(...
+                                    clock_start, ...
+                                    k/ncenters, msg, prev_progress_msg);
+                    end
+                end
+            end
+
+            result.samples=winners;
+            result.sa=rmfield(ds.sa,'chunks');
 
         otherwise
             error(['illegal output ''%s'', must be '...
-                    '''accuracy'' or ''predictions'''], opt.output);
+                    '''accuracy'' or ''winner_predictions'''], opt.output);
     end
 
     cosmo_check_dataset(result);
@@ -199,19 +238,18 @@ function [train_idxs,test_idxs]=get_partitions(ds,opt)
     train_idxs=partitions.train_indices;
     test_idxs=partitions.test_indices;
 
-    all_test_idxs=cat(1,test_idxs{:});
-    unq_test_idxs=unique(all_test_idxs);
-    pred_counts=histc(all_test_idxs,unq_test_idxs);
-    more_than_one_prediction=find(pred_counts>1,1);
-    if ~isempty(more_than_one_prediction)
-        error(['this function does not support crossvalidation '...
-                'schemes with more than one prediction per sample, but'...
-                'sample %d has %d predictions. Consider using '...
-                'cosmo_nfold_partitioner or cosmo_oddeven_partitioner '...
-                'to define the partitions'],...
-                unq_test_idxs(more_than_one_prediction(1)), ...
-                pred_counts(more_than_one_prediction(1)));
+
+function max_prediction_count=get_max_prediction_count(test_idxs)
+    max_index=max(cellfun(@max,test_idxs));
+    h=zeros(max_index,1);
+
+    nfolds=numel(test_idxs);
+    for fold=1:nfolds
+        idx=test_idxs{fold};
+        h(idx)=h(idx)+1;
     end
+
+    max_prediction_count=max(h);
 
 
 

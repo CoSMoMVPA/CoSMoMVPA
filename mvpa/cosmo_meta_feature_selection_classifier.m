@@ -1,5 +1,5 @@
 function predicted=cosmo_meta_feature_selection_classifier(samples_train, targets_train, samples_test, opt)
-% meta classifier that uses feature selection on the training data
+% meta classifier that uses feature selection on the training data [deprecated]
 %
 % predicted=cosmo_classify_meta_feature_selection(samples_train, targets_train, samples_test, opt)
 %

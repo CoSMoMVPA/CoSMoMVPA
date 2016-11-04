@@ -20,7 +20,7 @@ function test_run_tests_failing
     assert(~isempty(findstr('FAILED',output)));
 
 function test_run_tests_no_file_found_absolute_path()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -30,7 +30,7 @@ function test_run_tests_no_file_found_absolute_path()
 
 
 function test_run_tests_no_file_found_relative_path()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -39,7 +39,7 @@ function test_run_tests_no_file_found_relative_path()
 
 
 function test_run_tests_missing_logfile_argument()
-    if skip_test_if_octave_package_io_2_4_2()
+    if skip_test_if_octave_package_io_2_4_2_or_later()
         return;
     end
 
@@ -69,19 +69,16 @@ function [result,output]=helper_test_make_and_run(test_content)
 
 
 
-
 function [result,output]=helper_run_tests(args)
     warning_state=cosmo_warning();
     orig_path=path();
     orig_pwd=pwd();
     log_fn=tempname();
 
-    run_sequentially=@(varargin)cellfun(@(f)f(),varargin);
-    cleaner=onCleanup(@()run_sequentially(...
-                            @()path(orig_path),...
-                            @()cosmo_warning(warning_state),...
-                            @()cd(orig_pwd),...
-                            @()delete_if_exists(log_fn)));
+    path_cleaner=onCleanup(@()path(orig_path));
+    warning_cleaner=onCleanup(@()cosmo_warning(warning_state));
+    pwd_cleaner=onCleanup(@()cd(orig_pwd));
+    log_fn_cleaner=onCleanup(@()delete_if_exists(log_fn));
 
     % ensure path is set; disable warnings by cosmo_set_path
     cosmo_warning('off');
@@ -89,6 +86,8 @@ function [result,output]=helper_run_tests(args)
     more_args={'-verbose','-logfile',log_fn,'-no_doctest'};
     result=cosmo_run_tests(more_args{:},args{:});
     fid=fopen(log_fn);
+    file_closer=onCleanup(@()fclose(fid));
+
     output=fread(fid,Inf,'char=>char')';
 
 
@@ -98,7 +97,7 @@ function delete_if_exists(fn)
     end
 
 
-function skip_test_if_octave_package_io_2_4_2()
+function is_2_4_2_or_later=skip_test_if_octave_package_io_2_4_2_or_later()
 % July 2016:
 % Octave package 'io' version 2.4.2 gave the following error with
 % three tests:
@@ -112,6 +111,11 @@ function skip_test_if_octave_package_io_2_4_2()
 %
 % These tests are disabled for now when using Octave and io 2.4.2.
 % (Version 2.4.0 seems to work fine)
+%
+% Update Sept 2016: same issue with io 2.4.3. Updated code to take any
+% version from 2.4.2 or later
+
+    is_2_4_2_or_later=false;
 
     if ~cosmo_wtf('is_octave')
         return;
@@ -123,13 +127,19 @@ function skip_test_if_octave_package_io_2_4_2()
     end
 
     version=pkgs{1}.version;
-    if isequal(version,'2.4.2')
-        reason=['Octave io package 2.4.2 gives unexpected error '...
-                '"''__octave_config_info__'' undefined" in '...
-                '__init_io__.m:30; therefore '...
-                'the tests causing this error are temporarily disabled'];
-        cosmo_notify_test_skipped(reason);
+    elem_str=regexp(version,'(\d+)\.(\d+)\.(\d+)','tokens','once');
+    elem=cellfun(@str2num,elem_str);
+
+    is_2_4_2_or_later=elem(1)>=2 || ...
+                        (elem(1)==2 && elem(2)>=4) || ...
+                        (elem(1)==2 && elem(2)==4 && elem(3)>=2);
+
+    if ~is_2_4_2_or_later
+        return;
     end
 
-
-
+    reason=['Octave io package 2.4.2 gives unexpected error '...
+            '"''__octave_config_info__'' undefined" in '...
+            '__init_io__.m:30; therefore '...
+            'the tests causing this error are temporarily disabled'];
+    cosmo_notify_test_skipped(reason);

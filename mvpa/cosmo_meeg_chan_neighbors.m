@@ -287,10 +287,10 @@ function chan_types=get_chantypes(ds, chantype)
 
     switch chantype
         case 'all'
-            chan_types=unique(cosmo_meeg_chantype(ds));
+            chan_types=get_all_chantypes_from_ds(ds);
         case 'all_combined'
             % replace meg_planar by meg_planar_combined
-            chan_types=unique(cosmo_meeg_chantype(ds));
+            chan_types=get_all_chantypes_from_ds(ds);
             i=find(cosmo_match(chan_types,'meg_planar'));
             if numel(i)~=1
                 error(['dataset has no planar channels, therefore '...
@@ -300,6 +300,10 @@ function chan_types=get_chantypes(ds, chantype)
             chan_types{i}='meg_combined_from_planar';
     end
 
+
+function chan_types=get_all_chantypes_from_ds(ds)
+    chan_types=unique(cosmo_meeg_chantype(ds));
+    chan_types=setdiff(chan_types,{'unknown'});
 
 
 function neighbors=get_neighbors_with_chantype(ds,opt)

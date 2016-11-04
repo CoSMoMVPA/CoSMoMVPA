@@ -31,15 +31,37 @@ function test_rand_basics
     assertEqual(size(cosmo_rand([1,2,3])),[1,2,3])
     assertEqual(size(cosmo_rand([1,2,3])),[1,2,3])
 
+    x7=cosmo_rand('single');
+    assertEqual(class(x7),'single');
+    seed=ceil(rand()*1e5);
+    sz=ceil(3*rand(1,4));
+    x8=cosmo_rand(sz,'single','seed',seed);
+    x8b=cosmo_rand(sz,'single','seed',seed);
+    assertEqual(x8,x8b);
+    assertEqual(class(x8),'single');
+
+    x9=cosmo_rand(sz,'double','seed',seed);
+    x9b=cosmo_rand(sz,'double','seed',seed);
+    assertEqual(x8,x8b);
+    assertEqual(class(x8),'single');
+
+    assertElementsAlmostEqual(x8,single(x9));
+
 
 
 function test_rand_exceptions
     aet=@(varargin) assertExceptionThrown(@()cosmo_rand(varargin{:}),'');
-    aet(2,2,'foo')
-    aet(2,2,'foo',2)
-    aet(2,2,'seed',[1 2])
-    aet(2,2,'seed',-1)
-    aet(2,2,'seed',NaN)
+    aet(2,2,'foo');
+    aet(2,2,'foo',2);
+    aet(2,2,'single',2);
+    aet(2,2,'double',2);
+    aet(2,2,'single','double');
+    aet(2,2,'double','single');
+    aet(2,2,'double','double');
+    aet(2,2,'signle','single');
+    aet(2,2,'seed',[1 2]);
+    aet(2,2,'seed',-1);
+    aet(2,2,'seed',NaN);
     aet(-2,2);
     aet(NaN,2);
 
