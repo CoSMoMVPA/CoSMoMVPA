@@ -167,7 +167,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
-    progress_suffix=cosmo_parallel_get_get_progress_suffix(environment);
+    progress_suffix=cosmo_parallel_get_progress_suffix(environment);
 
     % set options for each worker process
     worker_opt_cell=cell(1,nproc_available);
