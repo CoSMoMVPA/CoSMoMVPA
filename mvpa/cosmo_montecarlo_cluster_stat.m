@@ -253,7 +253,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
-    progress_suffix=cosmo_parallel_get_progress_suffix(environment);
+    progress_suffix=get_progress_suffix(environment);
 
     % the heavy lifting is done by four helper functions:
     % 1) ds_preproc=preproc_func(ds) takes a dataset and preprocesses it.
@@ -293,7 +293,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     %compute the original values first
     ds_perm=preproc_func(ds);
     ds_perm_zscore=stat_func(ds_perm);
-    
+
     for neg_pos=1:2
         % treat negative and positive values separately
         perm_sign=2*neg_pos-3; % -1 or 1
@@ -303,13 +303,13 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
         cluster_vals=cluster_func(signed_perm_zscore);
         orig_cluster_vals(neg_pos,:)=cluster_vals;
     end
-    
+
     % split iterations in multiple parts, so that each thread can do a
     % subset of all the work
     block_size = ceil(niter/nproc_available);
     iter_start=1:block_size:niter;
     iter_end=[block_size:block_size:(niter-1) niter];
-                                                
+
     % set options for each worker process
     worker_opt_cell=cell(1,nproc_available);
     for p=1:nproc_available
@@ -326,9 +326,9 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
         worker_opt.iters=iter_start(p):iter_end(p);
         worker_opt_cell{p}=worker_opt;
     end
-    
+
     use_parallel=nproc_available>1;
-    
+
     if use_parallel
         switch environment
             case 'matlab'
@@ -345,7 +345,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
                                         'UniformOutput',false,...
                                         'VerboseLevel',0);
         end
-        
+
         % join results from each worker
         less_than_orig_count = sum(cat(3,result_cell{:}),3);
     else
@@ -385,10 +385,10 @@ function less_than_orig_count=run_with_worker(worker_opt)
     progress=worker_opt.progress;
     progress_suffix=worker_opt.progress_suffix;
     iters=worker_opt.iters;
-    
+
     less_than_orig_count=zeros(2,nfeatures);
     niter = length(iters);
-    
+
     % see if progress is to be reported
     show_progress=~isempty(progress) && ...
                         progress && ...
@@ -405,7 +405,7 @@ function less_than_orig_count=run_with_worker(worker_opt)
     for iter=1:niter
         ds_perm=permutation_preproc_func(iters(iter));
         ds_perm_zscore=stat_func(ds_perm);
-    
+
         for neg_pos=1:2
             % treat negative and positive values separately
 
@@ -425,7 +425,7 @@ function less_than_orig_count=run_with_worker(worker_opt)
             less_than_orig_count(neg_pos,perm_lt)=...
                         less_than_orig_count(neg_pos,perm_lt)+1;
         end
-        
+
         if show_progress && (iter<10 || ...
                                 ~mod(iter, progress) || ...
                                 iter==niter);
@@ -454,7 +454,7 @@ function less_than_orig_count=run_with_worker(worker_opt)
             end
         end
     end
-    
+
 function stat_func=get_stat_func(ds,opt)
     if has_feature_stat_auto(opt)
         stat_func=get_stat_func_auto(ds);
@@ -878,3 +878,13 @@ function check_opt(ds,opt)
     end
 
 
+function suffix=get_progress_suffix(environment)
+    % Matlab needs newline character at progress message to show it in
+    % parallel mode; Octave should not have newline character
+
+    switch environment
+        case 'matlab'
+            suffix=sprintf('\n');
+        case 'octave'
+            suffix='';
+    end
