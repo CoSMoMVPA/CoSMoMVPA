@@ -248,11 +248,11 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     check_opt(ds,opt);
 
     % get number of processes
-    environment=cosmo_wtf('environment');
-    nproc_available=cosmo_parallel_get_nproc_available(opt,environment);
+    nproc_available=cosmo_parallel_get_nproc_available(opt);
 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
+    environment=cosmo_wtf('environment');
     progress_suffix=get_progress_suffix(environment);
 
     % the heavy lifting is done by four helper functions:

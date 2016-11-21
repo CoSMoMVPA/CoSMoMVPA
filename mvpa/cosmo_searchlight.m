@@ -157,8 +157,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     end
 
     % get number of processes for searchlight
-    environment=cosmo_wtf('environment');
-    nproc_available=cosmo_parallel_get_nproc_available(sl_opt,environment);
+    nproc_available=cosmo_parallel_get_nproc_available(sl_opt);
 
     % split neighborhood in multiple parts, so that each thread can do a
     % subset of all the work
@@ -167,6 +166,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
+    environment=cosmo_wtf('environment');
     progress_suffix=get_progress_suffix(environment);
 
     % set options for each worker process
