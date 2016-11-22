@@ -186,34 +186,15 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         worker_opt_cell{p}=worker_opt;
     end
 
+    % Run process for each work in parallel
+    % Note that when using nproc=1, cosmo_parcellfun does actually not
+    % use any parallellization
+    result_map_cell=cosmo_parcellfun(sl_opt.nproc,...
+                                     @run_searchlight_with_worker,...
+                                    worker_opt_cell,...
+                                    'UniformOutput',false);
 
-    use_parallel=nproc_available>1;
-    if use_parallel
-        switch environment
-            case 'matlab'
-                result_cell=cell(1,nproc_available);
-
-                parfor p=1:nproc_available
-                    result_cell{p}=run_searchlight_with_worker(...
-                                                    worker_opt_cell{p})
-                end
-
-            case 'octave'
-                result_cell=parcellfun(nproc_available,...
-                                        @run_searchlight_with_worker,...
-                                        worker_opt_cell,...
-                                        'UniformOutput',false,...
-                                        'VerboseLevel',0);
-        end
-
-        % join results from each worker
-        results_map=cosmo_stack(result_cell,2);
-    else
-        % single thread
-        assert(numel(worker_opt_cell)==1)
-        results_map=run_searchlight_with_worker(worker_opt_cell{1});
-    end
-
+    results_map=cosmo_stack(result_map_cell,2);
     cosmo_check_dataset(results_map);
 
 function results_map=run_searchlight_with_worker(worker_opt)
