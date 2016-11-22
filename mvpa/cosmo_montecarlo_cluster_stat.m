@@ -346,12 +346,14 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
                                         (niter*2)+.5;
 
     % deal with extreme tails
-    ps_two_tailed(ps_two_tailed>1-1/niter)=1-1/niter;
-    ps_two_tailed(ps_two_tailed<  1/niter)=1/niter;
+    min_p_value=1/niter;
+    ps_two_tailed(ps_two_tailed>1-min_p_value)=1-min_p_value;
+    ps_two_tailed(ps_two_tailed<  min_p_value)=min_p_value;
 
     % convert to z-score
     z_two_tailed=norminv(ps_two_tailed);
 
+    % store result in dataset structure
     ds_z=struct();
     ds_z.samples=z_two_tailed;
     ds_z.sa.stats={'Zscore()'};
