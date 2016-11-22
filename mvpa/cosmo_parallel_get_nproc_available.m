@@ -47,7 +47,7 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 
         nproc_available=min(nproc_available,nproc_wanted);
 
-        if nproc_available==1
+        if nproc_available==1 && isfinite(nproc_wanted);
             cosmo_warning(['Parallel computing not available, using '...
                             'single thread']);
         end
