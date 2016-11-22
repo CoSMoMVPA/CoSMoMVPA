@@ -146,19 +146,19 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     measure_opt=rmfield(sl_opt,fieldnames(sl_defaults));
     measure_opt.progress=false;
 
-    center_ids=sl_opt.center_ids;
-
     % get the neighborhood information. This is a cell where
     % neighbors{k} contains the feature indices in input dataset 'ds'
     % for the 'k'-th center of the output dataset
     neighbors=nbrhood.neighbors;
+
+    % get center ids
+    center_ids=sl_opt.center_ids;
     if isempty(center_ids)
         center_ids=1:numel(neighbors); % all output features
     end
 
     % get number of processes for searchlight
-    environment=cosmo_wtf('environment');
-    nproc_available=get_nproc_available(sl_opt,environment);
+    nproc_available=cosmo_parallel_get_nproc_available(sl_opt);
 
     % split neighborhood in multiple parts, so that each thread can do a
     % subset of all the work
@@ -167,6 +167,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
+    environment=cosmo_wtf('environment');
     progress_suffix=get_progress_suffix(environment);
 
     % set options for each worker process
@@ -180,49 +181,21 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         worker_opt.nworkers=nproc_available;
         worker_opt.progress=sl_opt.progress;
         worker_opt.progress_suffix=progress_suffix;
-
         worker_opt.nbrhood=nbrhood_cell{p};
+
         worker_opt_cell{p}=worker_opt;
     end
 
+    % Run process for each worker in parallel
+    % Note that when using nproc=1, cosmo_parcellfun does actually not
+    % use any parallellization; the result is a cell with a single element.
+    result_map_cell=cosmo_parcellfun(sl_opt.nproc,...
+                                     @run_searchlight_with_worker,...
+                                    worker_opt_cell,...
+                                    'UniformOutput',false);
 
-    use_parallel=nproc_available>1;
-    if use_parallel
-        switch environment
-            case 'matlab'
-                result_cell=cell(1,nproc_available);
-
-                parfor p=1:nproc_available
-                    result_cell{p}=run_searchlight_with_worker(...
-                                                    worker_opt_cell{p})
-                end
-
-            case 'octave'
-                result_cell=parcellfun(nproc_available,...
-                                        @run_searchlight_with_worker,...
-                                        worker_opt_cell,...
-                                        'UniformOutput',false,...
-                                        'VerboseLevel',0);
-        end
-
-        % join results from each worker
-        results_map=cosmo_stack(result_cell,2);
-    else
-        % single thread
-        assert(numel(worker_opt_cell)==1)
-        results_map=run_searchlight_with_worker(worker_opt_cell{1});
-    end
-
+    results_map=cosmo_stack(result_map_cell,2);
     cosmo_check_dataset(results_map);
-
-function suffix=get_progress_suffix(environment)
-    switch environment
-        case 'matlab'
-            suffix=sprintf('\n');
-        case 'octave'
-            suffix='';
-    end
-
 
 function results_map=run_searchlight_with_worker(worker_opt)
 % run searchlight using the options in worker_opt
@@ -406,96 +379,6 @@ function check_input(ds, nbrhood, measure, opt)
     cosmo_check_neighborhood(nbrhood,ds);
 
 
-function nproc=get_nproc_available(sl_opt, environment)
-% get number of processes available from Matlab parallel processing pool.
-% return nproc=1 if no parallel processing pool available
-    nproc_wanted=sl_opt.nproc;
-
-    wants_multithreaded = nproc_wanted>1;
-    if wants_multithreaded
-        switch environment
-            case 'matlab'
-                nproc_available=get_nproc_available_matlab(nproc_wanted);
-
-            case 'octave'
-                nproc_available=get_nproc_available_octave(nproc_wanted);
-
-            otherwise
-                assert(false);
-
-        end
-
-        nproc=nproc_available;
-
-        if nproc_available==1
-            cosmo_warning(['Parallel computing not available, using '...
-                            'single thread']);
-            nproc=1;
-        end
-    else
-        nproc=1;
-    end
-
-function nproc_available=get_nproc_available_matlab(nproc_wanted)
-    matlab_parallel_functions={'gcp','parpool'};
-
-    if usejava('jvm') && platform_has_functions(matlab_parallel_functions)
-        pool = gcp();
-
-        if isempty(pool)
-            cosmo_warning(['Parallel toolbox is available, but '...
-                            'unable to open pool; using nproc=1']);
-            nproc_available=1;
-        else
-            nworkers=pool.NumWorkers();
-
-            if nproc_wanted>nworkers
-                cosmo_warning(['nproc=%d requested but only %d '...
-                            'workers available; recommended '...
-                            'usage is nproc=%d'],...
-                            nproc_wanted,nworkers,nworkers);
-            end
-
-            nproc_available=nproc_wanted;
-        end
-    else
-        nproc_available=1;
-        if nproc_wanted>nproc_available
-            cosmo_warning(['nproc=%d requested but parallel toolbox '...
-                            'or java not available; using nproc=%d'], ...
-                            nproc_wanted, nproc_available);
-        end
-    end
-
-function nproc_available=get_nproc_available_octave(nproc_wanted)
-% return nproc_wanted if the Octave 'parallel' package is available, or 1
-% otherwise
-% (the parallel package does not support returning the number
-% of CPUs available)
-    if cosmo_check_external('octave_pkg_parallel',false)
-        nworkers=nproc('all');
-
-        if nproc_wanted>nworkers
-                cosmo_warning(['nproc=%d requested but only %d '...
-                            'workers available; recommended '...
-                            'usage is nproc=%d'],...
-                            nproc_wanted,nworkers);
-        end
-
-        nproc_available=nproc_wanted;
-    else
-        nproc_available=1;
-        if nproc_wanted>nproc_available
-            cosmo_warning(['nproc=%d requested but parallel toolbox '...
-                            'not available; setting nproc=%d'], ...
-                            nproc_wanted, nproc_available);
-        end
-    end
-
-
-function tf=platform_has_functions(function_names)
-    tf=all(cellfun(@(x)~isempty(which(x)),function_names));
-
 function raise_parameter_exception()
     error(['Illegal syntax, use:\n\n',...
             '  %s(ds,nbrhood,measure,...)\n\n',...
@@ -510,3 +393,15 @@ function raise_parameter_exception()
             'parameter, and measure arguments are passed directly\n'...
             'rather than through an ''args'' arguments'], ...
             mfilename());
+
+
+function suffix=get_progress_suffix(environment)
+    % Matlab needs newline character at progress message to show it in
+    % parallel mode; Octave should not have newline character
+
+    switch environment
+        case 'matlab'
+            suffix=sprintf('\n');
+        case 'octave'
+            suffix='';
+    end
