@@ -146,12 +146,13 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     measure_opt=rmfield(sl_opt,fieldnames(sl_defaults));
     measure_opt.progress=false;
 
-    center_ids=sl_opt.center_ids;
-
     % get the neighborhood information. This is a cell where
     % neighbors{k} contains the feature indices in input dataset 'ds'
     % for the 'k'-th center of the output dataset
     neighbors=nbrhood.neighbors;
+
+    % get center ids
+    center_ids=sl_opt.center_ids;
     if isempty(center_ids)
         center_ids=1:numel(neighbors); % all output features
     end
