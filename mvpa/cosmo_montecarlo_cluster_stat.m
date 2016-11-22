@@ -327,33 +327,18 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
         worker_opt_cell{p}=worker_opt;
     end
 
-    use_parallel=nproc_available>1;
+    % Run process for each worker in parallel
+    % Note that when using nproc=1, cosmo_parcellfun does actually not
+    % use any parallellization; the result is a cell with a single element.
+    result_cell=cosmo_parcellfun(nproc_available,...
+                                    @run_with_worker,...
+                                    worker_opt_cell,...
+                                    'UniformOutput',false);
 
-    if use_parallel
-        switch environment
-            case 'matlab'
-                result_cell=cell(1,nproc_available);
+    % join results from each worker
+    less_than_orig_count = sum(cat(3,result_cell{:}),3);
 
-                parfor p=1:nproc_available
-                    result_cell{p}=run_with_worker(worker_opt_cell{p})
-                end
-
-            case 'octave'
-                result_cell=parcellfun(nproc_available,...
-                                        @run_with_worker,...
-                                        worker_opt_cell,...
-                                        'UniformOutput',false,...
-                                        'VerboseLevel',0);
-        end
-
-        % join results from each worker
-        less_than_orig_count = sum(cat(3,result_cell{:}),3);
-    else
-        % single thread
-        assert(numel(worker_opt_cell)==1)
-        less_than_orig_count=run_with_worker(worker_opt_cell{1});
-    end
-
+    % safety check: each item is either positive or negative
     assert(max(sum(less_than_orig_count>0,1))<=1);
 
     % convert p-values of two tails into one p-value
