@@ -926,7 +926,7 @@ Classify different groups of participants (such as patients versus controls)?
 
     To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
 
-    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`montecarlo_cluster_stat` without computing a feature statistic.
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`cosmo_montecarlo_cluster_stat` without computing a feature statistic.
 
     Consider the following example:
 
