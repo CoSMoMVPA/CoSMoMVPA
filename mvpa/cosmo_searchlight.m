@@ -181,14 +181,14 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
         worker_opt.nworkers=nproc_available;
         worker_opt.progress=sl_opt.progress;
         worker_opt.progress_suffix=progress_suffix;
-
         worker_opt.nbrhood=nbrhood_cell{p};
+
         worker_opt_cell{p}=worker_opt;
     end
 
-    % Run process for each work in parallel
+    % Run process for each worker in parallel
     % Note that when using nproc=1, cosmo_parcellfun does actually not
-    % use any parallellization
+    % use any parallellization; the result is a cell with a single element.
     result_map_cell=cosmo_parcellfun(sl_opt.nproc,...
                                      @run_searchlight_with_worker,...
                                     worker_opt_cell,...
