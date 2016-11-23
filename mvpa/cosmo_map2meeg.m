@@ -315,13 +315,11 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                                             'matrix_labels',{'pos'});
 
     is_single_sample=size(ds.samples,1)==1;
-    if is_single_sample
-        samples_label=cell(0);
-    elseif cosmo_isfield(ds,'a.meeg.samples_label')
+
+    if cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
-    elseif cosmo_isfield(ds,'a.meeg.samples_field') && ...
-                    strcmp(ds.a.meeg.samples_field,'individual')
-        samples_label={'subj'};
+    elseif is_single_sample
+        samples_label=cell(0);
     else
         samples_label={'rpt'};
     end

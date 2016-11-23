@@ -256,11 +256,26 @@ function ds=convert_ft(ft, opt)
         ds.a.meeg.dim=ft.dim;
     end
 
+    ds.a.meeg=set_samples_label_explicitly_if_necessary(ds.a.meeg,ft);
+
     nsamples=size(ds.samples,1);
     ft_fields={'rpt','trialinfo','cumtapcnt'};
     ds.sa=copy_fields_for_matching_sample_size(ft,nsamples,ft_fields);
 
     ds=posthoc_slice_dataset_if_necessary(ds,opt);
+
+
+function a_meeg=set_samples_label_explicitly_if_necessary(a_meeg,ft)
+    % deal with grand average data
+    if ~cosmo_isfield(ft,'dimord')
+        return;
+    end
+
+    first_label=cosmo_strsplit(ft.dimord,'_',1);
+
+    if cosmo_match({first_label},{'subj'})
+        a_meeg.samples_label=first_label;
+    end
 
 
 function [data,samples_field,fdim]=get_ft_data(ft,opt)
