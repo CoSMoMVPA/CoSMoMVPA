@@ -214,6 +214,9 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     most significant; when visualized using an external package, a
 %     threshold can be applied to see which features (e.g. voxels or nodes)
 %     survive a particular cluster-corrected significance threshold.
+%   - Versions of this function from before 23 November 2016 incorrectly
+%     producted z-scores corresponding to one-tailed, rather than
+%     two-tailed, probablity values.
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
@@ -342,8 +345,13 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     assert(max(sum(less_than_orig_count>0,1))<=1);
 
     % convert p-values of two tails into one p-value
-    ps_two_tailed=sum(bsxfun(@times,[-1;1],less_than_orig_count))/...
-                                        (niter*2)+.5;
+    pos_mask=less_than_orig_count(1,:)>0;
+    neg_mask=less_than_orig_count(2,:)>0;
+    nfeatures=numel(pos_mask);
+    ps_two_tailed=zeros(1,nfeatures)+.5;
+
+    ps_two_tailed(pos_mask)=1-less_than_orig_count(1,pos_mask)/niter;
+    ps_two_tailed(neg_mask)=less_than_orig_count(2,neg_mask)/niter;
 
     % deal with extreme tails
     min_p_value=1/niter;
