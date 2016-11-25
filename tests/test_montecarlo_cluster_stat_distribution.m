@@ -14,7 +14,21 @@ function test_mccs_uniformity_slow()
 
     % show progress when running travis - otherwise the test may stall
     % when no output is received for a long time
-    show_progress=strcmp(getenv('CI'),'true');
+    is_running_ci=strcmp(getenv('CI'),'true');
+    if is_running_ci
+        stack=dbstack();
+        names={stack.name};
+
+        is_running_MoCov_coverage=any(cosmo_match({'mocov'},names));
+        if is_running_MoCov_coverage
+            reason=['Running coverage on CI platform for a very slow '...
+                        'function, which may lead to a stalled build. '];
+
+            cosmo_notify_test_skipped(reason);
+            return;
+        end
+    end
+
 
     % test for uniformity of p-values of monte_carlo_cluster_stat
     %
@@ -48,10 +62,7 @@ function test_mccs_uniformity_slow()
 
     niter=10;
     for attempt=1:max_attempts
-        ps_cell{attempt}=helper_mccs_get_pvalues(niter,show_progress);
-        if show_progress
-            fprintf('\n');
-        end
+        ps_cell{attempt}=helper_mccs_get_pvalues(niter);
         ps=sort(cat(1,ps_cell{:}));
 
         % compute correlation with expected p-values
@@ -91,7 +102,7 @@ function test_mccs_uniformity_slow()
     error('Maximum number of attempts reached');
 
 
-function ps=helper_mccs_get_pvalues(niter, show_progress)
+function ps=helper_mccs_get_pvalues(niter)
     % output: correlation between expected uniform distribution of p values
     % and those obtained from monte_carl_cluster_stat
 
@@ -126,10 +137,6 @@ function ps=helper_mccs_get_pvalues(niter, show_progress)
 
         z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
         ps(iter)=normcdf(z.samples);
-
-        if show_progress
-            fprintf(':');
-        end
     end
 
 
