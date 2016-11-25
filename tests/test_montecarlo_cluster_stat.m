@@ -9,7 +9,7 @@ function test_suite=test_montecarlo_cluster_stat
 function test_onesample_ttest_montecarlo_cluster_extremes
     ds=cosmo_synthetic_dataset('ntargets',1,...
                                 'nchunks',10,...
-                                'size','big');
+                                'size','normal');
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     % table generated using
