@@ -14,7 +14,7 @@ function test_mccs_uniformity_slow()
 
     % show progress when running travis - otherwise the test may stall
     % when no output is received for a long time
-    is_running_ci=strcmp(getenv('CI'),'true');
+    is_running_ci=~isempty(getenv('CI'));
     if is_running_ci
         stack=dbstack();
         names={stack.name};
