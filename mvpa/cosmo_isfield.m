@@ -67,7 +67,11 @@ function tf=cosmo_isfield(s, name, raise)
     if ischar(name)
         tf=single_isfield(s, name, raise);
     elseif iscellstr(name)
-        tf=cellfun(@(x)single_isfield(s,x,raise),name);
+        n=numel(name);
+        tf=false(1,n);
+        for k=1:n
+            tf(k)=single_isfield(s,name{k},raise);
+        end
     else
         error('Second argument must be string or cell with strings');
     end
@@ -82,7 +86,7 @@ function has_key=single_isfield(s, name, raise)
     if all(name~='.')
         keys={name};
     else
-        keys=cosmo_strsplit(name,'.');
+        keys=regexp(name,'\.','split');
     end
     nkeys=numel(keys);
 
