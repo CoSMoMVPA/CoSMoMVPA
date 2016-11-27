@@ -345,8 +345,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     assert(max(sum(less_than_orig_count>0,1))<=1);
 
     % convert p-values of two tails into one p-value
-    pos_mask=less_than_orig_count(1,:)>0;
-    neg_mask=less_than_orig_count(2,:)>0;
+    pos_mask=less_than_orig_count(1,:)>0 & less_than_orig_count(1,:)>niter/2;
+    neg_mask=less_than_orig_count(2,:)>0 & less_than_orig_count(2,:)>niter/2;
     nfeatures=numel(pos_mask);
     ps_two_tailed=zeros(1,nfeatures)+.5;
 
