@@ -12,20 +12,7 @@ function test_onesample_ttest_montecarlo_cluster_extremes
                                 'size','normal');
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
-    % table generated using
-    %     niter=1:40; fprintf('%.4f %.4f %.4f %.4f %.4f ...\n',...
-    %                       norminv(1-1./niter))
-    % but without need for presence of norminv
-    z_lookup=[    -Inf 0.0000 0.4307 0.6745 0.8416 ...
-                0.9674 1.0676 1.1503 1.2206 1.2816 ...
-                1.3352 1.3830 1.4261 1.4652 1.5011 ...
-                1.5341 1.5647 1.5932 1.6199 1.6449 ...
-                1.6684 1.6906 1.7117 1.7317 1.7507 ...
-                1.7688 1.7862 1.8027 1.8186 1.8339 ...
-                1.8486 1.8627 1.8764 1.8895 1.9022 ...
-                1.9145 1.9264 1.9379 1.9491 1.9600 ...
-                ];
-
+    z_lookup=get_zscore_lookup_table();
 
     for signal_sign=[-1 1]
         magnitude=10;
@@ -45,6 +32,126 @@ function test_onesample_ttest_montecarlo_cluster_extremes
                             z_expected+zeros(1,nfeatures),...
                             'absolute',1e-4);
     end
+
+function z_lookup=get_zscore_lookup_table()
+    % table generated using
+    %     niter=1:40; fprintf('%.4f %.4f %.4f %.4f %.4f ...\n',...
+    %                       norminv(1-1./niter))
+    % but without need for presence of norminv
+    z_lookup=[    -Inf 0.0000 0.4307 0.6745 0.8416 ...
+                0.9674 1.0676 1.1503 1.2206 1.2816 ...
+                1.3352 1.3830 1.4261 1.4652 1.5011 ...
+                1.5341 1.5647 1.5932 1.6199 1.6449 ...
+                1.6684 1.6906 1.7117 1.7317 1.7507 ...
+                1.7688 1.7862 1.8027 1.8186 1.8339 ...
+                1.8486 1.8627 1.8764 1.8895 1.9022 ...
+                1.9145 1.9264 1.9379 1.9491 1.9600 ...
+                ];
+
+function test_onesample_ttest_montecarlo_cluster_sign_match()
+    nchunks=ceil(rand()*10)+10;
+    ds=cosmo_synthetic_dataset('size','big',...
+                                'nchunks',nchunks,...
+                                'ntargets',1);
+    nfeatures=size(ds.samples,2);
+
+    % generate some effect for some of the features. Here we generate data
+    % where about 1/3rd of the features may show an effect in the left tail
+    % (less than 0), and 1/3rd of the features may show an effect in the
+    % right tail (greater than 0).
+    ratio_effect=1/3;
+    nfeatures_effect=ceil(nfeatures*ratio_effect);
+
+    z_table=get_zscore_lookup_table();
+
+    for left_tail=[false,true]
+        for right_tail=[false,true]
+            [unused,rp]=sort(rand(1,nfeatures));
+            ds.samples=randn(nchunks,nfeatures);
+
+            sigma=3/sqrt(nchunks);
+
+            % add effect below zero
+            if left_tail
+                neg_idx=rp(nfeatures_effect+(1:nfeatures_effect));
+                ds.samples(:,neg_idx)=ds.samples(:,neg_idx)-sigma;
+            end
+
+            % add effect above zero
+            if right_tail
+                pos_idx=rp(1:nfeatures_effect);
+                ds.samples(:,pos_idx)=ds.samples(:,pos_idx)+sigma;
+            end
+
+            % run TFCE
+            nh=cosmo_cluster_neighborhood(ds,'progress',false);
+            opt=struct();
+            opt.niter=ceil(rand()*10+10);
+            opt.h0_mean=0;
+            opt.dh=1; % make it faster
+            opt.progress=false;
+            z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+
+            % check sign of output of each feature
+            t=cosmo_stat(ds,'t');
+
+            for tail_sign=[-1,1]
+                % everywhere where z is positive [negative], the
+                % corresponding t value must also be positive [negative]
+                z_msk=z.samples*tail_sign>0;
+                t_msk=t.samples*tail_sign>0;
+                assertTrue(all(t_msk(z_msk)));
+            end
+
+            % see how many significant effects found
+            tiny=1e-4;
+            for tail_sign=[-1,1]
+                has_effect=(tail_sign==-1 && left_tail) || ...
+                                (tail_sign==1 && right_tail);
+
+                if has_effect
+                    % quite a lof of features should show an effect
+                    minimum_tail_ratio=.1;
+                    maximum_tail_ratio=.5;
+                else
+                    % very few features should show an effect
+                    minimum_tail_ratio=0;
+                    maximum_tail_ratio=.1;
+                end
+
+                expected_extreme_z=tail_sign*z_table(opt.niter);
+                if has_effect
+                    extreme_z=max(z.samples*tail_sign)*tail_sign;
+                    assertElementsAlmostEqual(extreme_z,...
+                                        expected_extreme_z,...
+                                        'absolute',tiny);
+                end
+
+                % deal with rounding
+                extreme_ratio=mean(abs(z.samples-expected_extreme_z)<tiny);
+                assertTrue(extreme_ratio>=minimum_tail_ratio);
+                assertTrue(extreme_ratio<=maximum_tail_ratio);
+            end
+
+            % count number of features without an effect
+            median_zero_ratio=1-2*ratio_effect;
+            if ~left_tail
+                median_zero_ratio=median_zero_ratio+ratio_effect;
+            end
+            if ~right_tail
+                median_zero_ratio=median_zero_ratio+ratio_effect;
+            end
+
+            margin=1/6;
+            minimum_zero_ratio=median_zero_ratio-margin;
+            maximum_zero_ratio=median_zero_ratio+margin;
+
+            zero_ratio=mean(abs(z.samples)<tiny);
+            assertTrue(zero_ratio>=minimum_zero_ratio);
+            assertTrue(zero_ratio<=maximum_zero_ratio);
+        end
+    end
+
 
 
 
