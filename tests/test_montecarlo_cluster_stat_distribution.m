@@ -12,26 +12,21 @@ function test_mccs_uniformity_slow()
         return;
     end
 
-    % show progress when running travis - otherwise the test may stall
-    % when no output is received for a long time
-    is_running_ci=~isempty(getenv('CI'));
-    show_progress=false;
-    if is_running_ci
-        stack=dbstack();
-        names={stack.name};
-
-        is_running_MoCov_coverage=any(cosmo_match({'mocov'},names));
-        if is_running_MoCov_coverage
-            show_progress=true;
-        end
-    end
+    show_progress=true;
 
     if show_progress
-        progress_helper('Running CI, showing progress for slow test - ');
+        cleaner=onCleanup(@()progress_helper('-clear'));
+        progress_helper(sprintf('Slow test in %s, showing progress\n',...
+                                    mfilename()));
     end
 
-
     % test for uniformity of p-values of monte_carlo_cluster_stat
+    %
+    % this test aims to verify that there is not an excessive number of
+    % false positives under the null hypothesis. It does so by running
+    % monte_carlo_cluster_stat several times on random data, storing the p
+    % values for each iteration, and comparing those to a uniform
+    % distribution.
     %
     % because running this test is slow, it can perform the same test
     % multiple times, each time increasing the number of iterations. This
@@ -39,12 +34,12 @@ function test_mccs_uniformity_slow()
     % uniform or not.
 
     max_attempts=8;
-    grow_niter=1.5;
+    grow_niter=1.2;
 
     % values obtained by runnning helper_mccs_get_correlation_with_uniform
     % multiple times with 'correct' monte carlo custer stat function and
     % with 50 iterations. Clearly with more iterations the sd is lower.
-    uniform_c_mu=.99;
+    uniform_c_mu=.98;
     uniform_c_sd=.005;
 
     % the null hypothesis is that p values are uniformly distributed;
@@ -59,12 +54,9 @@ function test_mccs_uniformity_slow()
     count_pass=0;
     count_fail=0;
 
-    cleaner=onCleanup(@()progress_helper('-clear'));
-
-
     ps_cell=cell(1,max_attempts);
 
-    niter=10;
+    niter=20;
     for attempt=1:max_attempts
         ps_cell{attempt}=helper_mccs_get_pvalues(niter,show_progress);
         ps=sort(cat(1,ps_cell{:}));
@@ -89,6 +81,7 @@ function test_mccs_uniformity_slow()
         end
 
         if count_pass>=min_pass_or_fail_count
+            % test passes
             return;
 
         elseif count_fail>=min_pass_or_fail_count
@@ -100,9 +93,10 @@ function test_mccs_uniformity_slow()
         % not enough evidence for either uniform or non-uniform, redo the
         % test with more iterations
         niter=ceil(niter*grow_niter);
+        progress_helper('#');
 
     end
-    error('Maximum number of attempts reached');
+    error('Maximum number of %d attempts reached', attempt);
 
 
 function ps=helper_mccs_get_pvalues(niter,show_progress)
@@ -141,6 +135,7 @@ function ps=helper_mccs_get_pvalues(niter,show_progress)
         ds.samples=randn(nsubj,1);
 
         z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+
         ps(iter)=normcdf(z.samples);
 
         if show_progress
@@ -160,6 +155,7 @@ function progress_helper(what)
 
     if strcmp(what,'-clear')
         to_print=repmat(sprintf('\b'),1,delete_count);
+        delete_count=0;
     else
         to_print=what;
         delete_count=delete_count+numel(what);
