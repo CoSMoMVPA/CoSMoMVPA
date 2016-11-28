@@ -82,12 +82,12 @@ function test_mccs_uniformity_slow()
         end
 
         if count_pass>=min_pass_or_fail_count
-            finalize_test_helepr(show_progress);
+            finalize_test_helper(show_progress);
             return;
 
         elseif count_fail>=min_pass_or_fail_count
             % enough evidence that p values are non-uniform, fail
-            finalize_test_helepr(show_progress);
+            finalize_test_helper(show_progress);
             error(['Found z=%d, indicating that probability values '...
                         'are probably not uniform'],z);
         end
@@ -97,10 +97,10 @@ function test_mccs_uniformity_slow()
         niter=ceil(niter*grow_niter);
 
     end
-    finalize_test_helepr(show_progress);
+    finalize_test_helper(show_progress);
     error('Maximum number of attempts reached');
 
-function finalize_test_helepr(show_progress)
+function finalize_test_helper(show_progress)
     if show_progress
         fprintf('\n');
     end
