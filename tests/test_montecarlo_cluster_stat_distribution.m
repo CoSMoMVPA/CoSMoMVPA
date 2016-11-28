@@ -67,7 +67,7 @@ function test_mccs_uniformity_slow()
         c=cosmo_corr(ps,ps_uniform);
 
         z=sqrt(niter)*(c-uniform_c_mu)/uniform_c_sd;
-        disp([c z attempt n_ps]);
+
         if z>pass_min_z
             count_pass=count_pass+1;
             count_fail=0;
