@@ -16,7 +16,7 @@ function test_mccs_uniformity_slow()
 
     if show_progress
         cleaner=onCleanup(@()progress_helper('-clear'));
-        progress_helper(sprintf('Slow test in %s, showing progress\n',...
+        progress_helper(sprintf('Slow test in %s ',...
                                     mfilename()));
     end
 
