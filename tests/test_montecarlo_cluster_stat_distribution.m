@@ -26,6 +26,10 @@ function test_mccs_uniformity_slow()
         end
     end
 
+    if show_progress
+        progress_helper('Running CI, showing progress for slow test - ');
+    end
+
 
     % test for uniformity of p-values of monte_carlo_cluster_stat
     %
@@ -55,6 +59,9 @@ function test_mccs_uniformity_slow()
     count_pass=0;
     count_fail=0;
 
+    cleaner=onCleanup(@()progress_helper('-clear'));
+
+
     ps_cell=cell(1,max_attempts);
 
     niter=10;
@@ -82,12 +89,10 @@ function test_mccs_uniformity_slow()
         end
 
         if count_pass>=min_pass_or_fail_count
-            finalize_test_helepr(show_progress);
             return;
 
         elseif count_fail>=min_pass_or_fail_count
             % enough evidence that p values are non-uniform, fail
-            finalize_test_helepr(show_progress);
             error(['Found z=%d, indicating that probability values '...
                         'are probably not uniform'],z);
         end
@@ -97,13 +102,8 @@ function test_mccs_uniformity_slow()
         niter=ceil(niter*grow_niter);
 
     end
-    finalize_test_helepr(show_progress);
     error('Maximum number of attempts reached');
 
-function finalize_test_helepr(show_progress)
-    if show_progress
-        fprintf('\n');
-    end
 
 function ps=helper_mccs_get_pvalues(niter,show_progress)
     % output: correlation between expected uniform distribution of p values
@@ -144,8 +144,25 @@ function ps=helper_mccs_get_pvalues(niter,show_progress)
         ps(iter)=normcdf(z.samples);
 
         if show_progress
-            fprintf(':');
+            progress_helper(':');
         end
     end
 
 
+function progress_helper(what)
+    % helper to show progress during the test, which then flushes at the
+    % end
+    persistent delete_count;
+
+    if isempty(delete_count)
+        delete_count=0;
+    end
+
+    if strcmp(what,'-clear')
+        to_print=repmat(sprintf('\b'),1,delete_count);
+    else
+        to_print=what;
+        delete_count=delete_count+numel(what);
+    end
+
+    fprintf(to_print);
