@@ -36,11 +36,11 @@ function test_mccs_uniformity_slow()
     max_attempts=8;
     grow_niter=1.2;
 
-    % values obtained by runnning helper_mccs_get_correlation_with_uniform
-    % multiple times with 'correct' monte carlo custer stat function and
-    % with 50 iterations. Clearly with more iterations the sd is lower.
-    uniform_c_mu=.98;
-    uniform_c_sd=.005;
+    % benchmark values obtained by runnning
+    % helper_mccs_get_correlation_with_uniform multiple times with
+    % 'correct' monte carlo custer stat function.
+    uniform_c_mu=.985;
+    uniform_c_sd=.05;
 
     % the null hypothesis is that p values are uniformly distributed;
     % earlier versions of monte_carlo_cluster_stat would fail this test,
@@ -66,8 +66,8 @@ function test_mccs_uniformity_slow()
         ps_uniform=(.5:n_ps)'/n_ps;
         c=cosmo_corr(ps,ps_uniform);
 
-        z=(c-uniform_c_mu)/uniform_c_sd;
-
+        z=sqrt(niter)*(c-uniform_c_mu)/uniform_c_sd;
+        disp([c z attempt n_ps]);
         if z>pass_min_z
             count_pass=count_pass+1;
             count_fail=0;
