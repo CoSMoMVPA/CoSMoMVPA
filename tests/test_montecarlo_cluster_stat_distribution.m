@@ -100,7 +100,7 @@ function test_mccs_uniformity_slow()
         progress_helper('#');
 
     end
-    
+
     finalize_test_helper(show_progress);
     error('Maximum number of attempts reached');
 
