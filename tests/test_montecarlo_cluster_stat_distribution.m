@@ -81,11 +81,15 @@ function test_mccs_uniformity_slow()
         end
 
         if count_pass>=min_pass_or_fail_count
+            finalize_test_helper(show_progress);
+
             % test passes
             return;
 
         elseif count_fail>=min_pass_or_fail_count
             % enough evidence that p values are non-uniform, fail
+            finalize_test_helper(show_progress);
+
             error(['Found z=%d, indicating that probability values '...
                         'are probably not uniform'],z);
         end
@@ -96,8 +100,14 @@ function test_mccs_uniformity_slow()
         progress_helper('#');
 
     end
-    error('Maximum number of %d attempts reached', attempt);
 
+    finalize_test_helper(show_progress);
+    error('Maximum number of attempts reached');
+
+function finalize_test_helper(show_progress)
+    if show_progress
+        fprintf('\n');
+    end
 
 function ps=helper_mccs_get_pvalues(niter,show_progress)
     % output: correlation between expected uniform distribution of p values
