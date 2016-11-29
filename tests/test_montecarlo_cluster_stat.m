@@ -155,39 +155,67 @@ function test_onesample_ttest_montecarlo_cluster_sign_match()
 
 
 
-function test_onesample_ttest_montecarlo_cluster_stat
-    aet=@(varargin)assertExceptionThrown(@()...
-                        cosmo_montecarlo_cluster_stat(varargin{:}),'');
-
-
+function test_onesample_ttest_montecarlo_cluster_stat_basics
     ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
-    nh1=cosmo_cluster_neighborhood(ds,'progress',false);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     opt=struct();
     opt.niter=10;
     opt.h0_mean=0;
     opt.seed=7;
     opt.progress=false;
-    z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
 
-    assertElementsAlmostEqual(z_ds1.samples,...
+    assertElementsAlmostEqual(z.samples,...
                     [1.2816 0 1.2816 0 1.2816 0],...
                     'absolute',1e-4);
 
+function test_onesample_ttest_montecarlo_cluster_stat_other_mean
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
+
     % different h0_mean
+    opt=struct();
+    opt.niter=10;
+    opt.seed=7;
+    opt.progress=false;
     opt.h0_mean=1.2;
-    nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
-    z_ds2=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
-    assertElementsAlmostEqual(z_ds2.samples,...
+
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    assertElementsAlmostEqual(z.samples,...
                 [0 -1.2816 1.2816 -1.2816 0.5244 -1.2816],...
                 'absolute',1e-4);
 
+function test_onesample_ttest_montecarlo_cluster_stat_other_dh
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
+
+    opt=struct();
+    opt.niter=10;
+    opt.h0_mean=1.2;
+    opt.seed=7;
+    opt.progress=false;
     opt.dh=1.1;
-    z_ds3=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
-    assertElementsAlmostEqual(z_ds3.samples,...
+
+
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    assertElementsAlmostEqual(z.samples,...
                 [0 -1.2816 0 -0.84162 0 -0.84162],...
                 'absolute',1e-4);
 
+function test_onesample_ttest_montecarlo_cluster_stat_exceptions
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    nh2=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
+
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_montecarlo_cluster_stat(varargin{:}),'');
+
+    opt=struct();
+    opt.niter=10;
+    opt.h0_mean=1.2;
+    opt.seed=7;
+    opt.progress=false;
+    opt.dh=1.1;
 
     opt.cluster_stat='maxsize';
     aet(ds,nh2,opt);
@@ -212,17 +240,23 @@ function test_onesample_ttest_montecarlo_cluster_stat
     opt=rmfield(opt,'h0_mean');
     aet(ds,nh2,opt);
 
+
+function test_onesample_ttest_montecarlo_cluster_stat_strong
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
+
     % lots of signal, should work with no seed specified
     opt=struct();
     opt.h0_mean=-15;
     opt.progress=false;
     opt.niter=14;
-    z_ds6=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
-    assertElementsAlmostEqual(z_ds6.samples,...
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    assertElementsAlmostEqual(z.samples,...
                         repmat(1.4652,1,6),...
                         'absolute',1e-4);
 
-function test_twosample_ttest_montecarlo_cluster_stat
+
+function test_twosample_ttest_montecarlo_cluster_stat_basics
     aet=@(varargin)assertExceptionThrown(@()...
                         cosmo_montecarlo_cluster_stat(varargin{:}),'');
 
@@ -236,27 +270,49 @@ function test_twosample_ttest_montecarlo_cluster_stat
     opt.progress=false;
     z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
 
-    assertElementsAlmostEqual(z_ds1.samples,...
-                    [0.5244 -1.2816 0 0.84162 -0.5244 0],...
-                    'absolute',1e-4);
-    opt.cluster_stat='maxsum';
-    opt.p_uncorrected=0.35;
-    z_ds2=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
 
-    assertElementsAlmostEqual(z_ds2.samples,...
-                    [0.5244 -1.2816 0 0.5244 -1.2816 0],...
-                    'absolute',1e-4);
+function test_twosample_ttest_montecarlo_cluster_stat_ws
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',6,'sigma',2);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
-    % test between-subjects
-    ds.sa.chunks=ds.sa.chunks*2+ds.sa.targets;
+    % test within-subjects
     opt=struct();
     opt.niter=10;
     opt.seed=1;
     opt.progress=false;
-    z_ds3=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
-    assertElementsAlmostEqual(z_ds3.samples,...
+    opt.cluster_stat='maxsum';
+    opt.p_uncorrected=0.35;
+
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+
+    assertElementsAlmostEqual(z.samples,...
+                    [0.5244 -1.2816 0 0.5244 -1.2816 0],...
+                    'absolute',1e-4);
+
+
+function test_twosample_ttest_montecarlo_cluster_stat_bs
+
+    % test between-subjects
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',6,'sigma',2);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+    ds.sa.chunks=ds.sa.chunks*2+ds.sa.targets;
+
+    opt=struct();
+    opt.niter=10;
+    opt.seed=1;
+    opt.progress=false;
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    assertElementsAlmostEqual(z.samples,...
                     [0 -1.2816 0 0 -1.2816 0],...
                     'absolute',1e-4);
+
+
+function test_twosample_ttest_montecarlo_cluster_stat_strong
+
+    % test between-subjects
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',6,'sigma',2);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+    ds.sa.chunks=ds.sa.chunks*2+ds.sa.targets;
 
     % lots of signal, should work with no seed specified
     opt=struct();
@@ -264,11 +320,18 @@ function test_twosample_ttest_montecarlo_cluster_stat
     opt.progress=false;
     msk1=ds.sa.targets==1;
     ds.samples(msk1,:)=ds.samples(msk1,:)+10;
-    z_ds3=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
-    assertElementsAlmostEqual(z_ds3.samples,...
+    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+    assertElementsAlmostEqual(z.samples,...
                     repmat(1.5011,1,6),...
                     'absolute',1e-4);
 
+function test_twosample_ttest_montecarlo_cluster_stat_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_montecarlo_cluster_stat(varargin{:}),'');
+
+    % test between-subjects
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',6,'sigma',2);
+    nh1=cosmo_cluster_neighborhood(ds,'progress',false);
     opt.cluster_stat='foo';
     aet(ds,nh1,opt);
 
@@ -276,12 +339,8 @@ function test_twosample_ttest_montecarlo_cluster_stat
     opt.h0_mean=3;
     aet(ds,nh1,opt);
 
-    %%
 
-function test_anova_montecarlo_cluster_stat
-    aet=@(varargin)assertExceptionThrown(@()...
-                        cosmo_montecarlo_cluster_stat(varargin{:}),'');
-
+function test_anova_montecarlo_cluster_stat_ws
     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',6,'sigma',2);
     nh1=cosmo_cluster_neighborhood(ds,'progress',false);
 
@@ -295,18 +354,40 @@ function test_anova_montecarlo_cluster_stat
                     [1.2816 0 0 0 1.2816 0],...
                     'absolute',1e-4);
 
+
+function test_anova_montecarlo_cluster_stat_bs
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',6,'sigma',2);
+    nh1=cosmo_cluster_neighborhood(ds,'progress',false);
+
+    % test within-subjects
+    opt=struct();
+    opt.niter=10;
+    opt.seed=1;
+    opt.progress=false;
+
     % test between-subjects
     ds.sa.chunks=ds.sa.chunks*3+ds.sa.targets;
-    z_ds2=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
-    assertElementsAlmostEqual(z_ds2.samples,...
+    z=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
+    assertElementsAlmostEqual(z.samples,...
                     [1.2816 0.84162 0 0 1.2816 0.5244],...
                     'absolute',1e-4);
 
+
+
+function test_anova_montecarlo_cluster_stat_exceptions
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_montecarlo_cluster_stat(varargin{:}),'');
+
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',6,'sigma',2);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+    opt=struct();
+    opt.niter=10;
+    opt.seed=1;
+    opt.progress=false;
+
     % unbalanced design
     ds.sa.chunks(1)=5;
-    aet(ds,nh1,opt);
-
-
+    aet(ds,nh,opt);
 
 function test_null_data_montecarlo_cluster_stat
     aet=@(varargin)assertExceptionThrown(@()...
