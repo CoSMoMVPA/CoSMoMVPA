@@ -350,6 +350,8 @@ class CoSMoModules(object):
                  'unflatten',
                  'check_external',
                  'wizard_set_config'
+                 'parcellfun',
+                 'parallel_get_nproc_available'
                  ],
 
         utils=[  'strsplit',
