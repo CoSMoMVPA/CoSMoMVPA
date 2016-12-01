@@ -49,7 +49,7 @@ Before starting this exercise, please make sure you have read about:
 - :ref:`cosmomvpa_dataset`
 - :ref:`matlab_octave_logical_masking`
 
-Using some basic :ref:`CoSMoMVPA functions <modindex>` we start loading a single NIFTI image of an anatomical scan.
+Using some basic :ref:`CoSMoMVPA functions <matindex>` we start loading a single NIFTI image of an anatomical scan.
 Use the function :ref:`cosmo_fmri_dataset` to load the nifti file of the brain of subject s01 (``brain.nii``) and assign the result to a struct 'ds'. What is contained in this struct?
 
 Make a histogram of all voxels, and a second histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?

@@ -27,12 +27,12 @@ Contents
 .. toctree::
     :maxdepth: 1
 
-    modindex
-    modindex_hdr
-    modindex_skl
+    matindex
+    matindex_hdr
+    matindex_skl
 
-    modindex_run
-    modindex_skl_run
+    matindex_run
+    matindex_skl_run
 
 Matlab outputs: matlab_pb_toc_
 
@@ -42,14 +42,14 @@ Miscellaneous
 .. toctree::
     :maxdepth: 1
 
-    modindex_test
-    modindex_demo
+    matindex_test
+    matindex_demo
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
+* :ref:`matindex`
 * :ref:`search`
 
 .. _matlab_pb_toc: _static/publish/index.html

@@ -931,7 +931,7 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 

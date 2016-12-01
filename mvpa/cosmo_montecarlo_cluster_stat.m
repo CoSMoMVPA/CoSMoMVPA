@@ -147,7 +147,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     % One feature has abs(z_ds.samples)>1.96, indicating it
 %     % survives correction for multiple comparisons
 %     cosmo_disp(z_ds.samples)
-%     > [ 1.41    -0.553      2.05    0.0753      1.75    0.0502 ]
+%     > [ 0.994         0      2.05         0      1.41         0 ]
 %
 %
 % Notes:

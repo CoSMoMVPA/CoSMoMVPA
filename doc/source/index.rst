@@ -44,7 +44,7 @@ CoSMoMVPA
 .. image:: _static/icon_download.png
    :target: download.html
 .. image:: _static/icon_modules.png
-   :target: modindex.html
+   :target: matindex.html
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
@@ -71,8 +71,8 @@ CoSMoMVPA
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
+* :ref:`documentation`
+* :ref:`matindex`
 * :ref:`search`
 
 .. include:: links.txt
