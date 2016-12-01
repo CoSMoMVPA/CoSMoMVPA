@@ -195,6 +195,10 @@ class RSTType(object):
                     cosmo='CoSMoMVPA functions',
                     test='CoSMoMVPA unit tests')[self.prefix]
 
+    def get_title(self, tp):
+        suffix='' if tp is None else ' - %s' % rst_type.type2name(output)
+        return '%s%s' %  (rst_type.get_name(), suffix)
+
     def get_postfix(self):
         return '' if self.prefix == 'cosmo' else '_'+self.prefix
 
@@ -594,18 +598,30 @@ for output in ('hdr','skl',None):
 
             base_names.append((b,parts[1]))
         if rebuild_toc:
-            toc_base_name='modindex%s%s' % (infix, rst_type.get_postfix())
-            title='%s - %s' % (rst_type.get_name(), rst_type.type2name(output))
-            header='.. _`%s`:\n\n.. toctree::\n    :maxdepth: 2\n    :hidden:\n\n' % (
-                        toc_base_name)
+            toc_base_name='matindex%s%s' % (infix, rst_type.get_postfix())
+            ref_header='.. _`%s`:\n' % toc_base_name
 
+            title_text=rst_type.get_title(output)
+            title_line='='*len(title_text)
+            title='\n'.join([title_line,title_text,title_line])
+
+            toctree_header=('.. toctree::\n'
+                            '    :maxdepth: 2\n'
+                            '    :hidden:\n')
+
+            toctree_body='\n'.join('    %s/%s' % (output_mat_rel,b)
+                                        for b,_ in base_names)
+            header='\n'.join([ref_header,
+                                title,
+                                '',
+                                toctree_header,
+                                toctree_body,
+                                '',
+                                ''])
 
             trg_fn=join(output_root_abs,'%s.rst' % toc_base_name)
             with open(trg_fn,'w') as f:
                 f.write(header)
-                f.write('\n'.join('    %s/%s' % (output_mat_rel,b) for b,_ in base_names))
-                f.write('\n\n%s\n%s\n\n' % (title, '+' * len(title)))
-
                 f.write(modules.as_table(base_names))
 
 
@@ -614,7 +630,7 @@ for output in ('hdr','skl',None):
                 trg_fn=join(output_root_abs,include_base_name)
 
                 title='%s - full listings' % (rst_type.get_name())
-                header=('.. _`%s`:\n\n%s\n%s\n\nContents\n\n.. '
+                header=('.. _`%s`:\n\n%s\n%s\n\n.. '
                         'contents::\n    :local:\n    :depth: 1\n\n') % (
                         include_base_name, title, '='*len(title))
 
