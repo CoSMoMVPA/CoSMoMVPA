@@ -478,7 +478,7 @@ class CoSMoModules(object):
                 ('processing','Dataset processing'),
                 ('meeg','MEEG related functions'),
                 ('fmri','fMRI related functions'),
-                ('visualization','Data visualuzation'),
+                ('visualization','Data visualization'),
                 ('correlations','Correlations'),
                 ('classification','Classification and cross-validation'),
                 ('rsa','Representational similarity analysis'),
