@@ -506,7 +506,7 @@ class CoSMoModules(object):
 
         for cat, catfull in self._name2full:
             table.add(RSTHeader(catfull))
-            for func_name in self._name2funcs[cat]:
+            for func_name in sorted(self._name2funcs[cat]):
                 full_name=self.prefix+func_name
                 if full_name in name2desc:
                     table.add(RSTModRef(full_name,name2desc[full_name]))
