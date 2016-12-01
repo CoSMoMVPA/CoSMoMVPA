@@ -349,7 +349,7 @@ class CoSMoModules(object):
                  'flatten',
                  'unflatten',
                  'check_external',
-                 'wizard_set_config'
+                 'wizard_set_config',
                  'parcellfun',
                  'parallel_get_nproc_available'
                  ],
