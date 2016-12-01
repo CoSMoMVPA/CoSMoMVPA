@@ -202,9 +202,16 @@ for j=1:nmasks
     % show result for each classifier
     for k=1:nclassifiers
         classifier=classifiers{k};
+
+        % get predictions for each fold
         [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
-        confusion_matrix=cosmo_confusion_matrix(ds.sa.targets,pred);
+        % get confusion matrix for each fold
+        confusion_matrix_folds=cosmo_confusion_matrix(ds.sa.targets,pred);
+
+        % sum confusion for each ground-truth target and prediction,
+        % resulting in an nclasses x nclasses matrix
+        confusion_matrix=sum(confusion_matrix_folds,3);
         figure
         imagesc(confusion_matrix,[0 10])
         cfy_label=underscore2space(func2str(classifier));
