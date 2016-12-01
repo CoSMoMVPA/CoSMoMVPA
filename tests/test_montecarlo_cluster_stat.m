@@ -85,7 +85,7 @@ function helper_test_mccs_with_tail(left_tail,right_tail)
     [unused,rp]=sort(rand(1,nfeatures));
     ds.samples=randn(nchunks,nfeatures);
 
-    sigma=3/sqrt(nchunks);
+    sigma=4/sqrt(nchunks);
 
     % add effect below zero
     if left_tail
@@ -158,13 +158,20 @@ function helper_test_mccs_with_tail(left_tail,right_tail)
         median_zero_ratio=median_zero_ratio+ratio_effect;
     end
 
-    margin=1/6;
+    if left_tail && right_tail
+        % allow for more non-results
+        margin=1/4;
+    else
+        margin=1/6;
+    end
+
     minimum_zero_ratio=median_zero_ratio-margin;
     maximum_zero_ratio=median_zero_ratio+margin;
 
     zero_ratio=mean(abs(z.samples)<tiny);
     assertTrue(zero_ratio>=minimum_zero_ratio);
     assertTrue(zero_ratio<=maximum_zero_ratio);
+
 
 
 function test_onesample_ttest_montecarlo_cluster_stat_basics
