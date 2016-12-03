@@ -53,7 +53,11 @@ function helper_test_meeg_baseline_correct_comparison(interval,method,...
     ds=cosmo_synthetic_dataset('type','timefreq','size','big','seed',0);
     ds.samples=randn(size(ds.samples));
 
-    m=ds.fa.chan<=3 & ds.fa.freq<=2;
+    chan_to_select=cosmo_randperm(max(ds.fa.chan),ceil(rand()*3+1));
+    freq_to_select=cosmo_randperm(max(ds.fa.freq),ceil(rand()*3+1));
+
+    m=cosmo_match(ds.fa.chan,chan_to_select) & ...
+            cosmo_match(ds.fa.freq,freq_to_select);
     ds=cosmo_slice(ds,m,2);
     ds=cosmo_dim_prune(ds);
 
@@ -192,6 +196,31 @@ function [ds,ds_ref]=get_test_dataset(interval)
     matcher=@(x) interval(1) <= x & x <= interval(2);
     ds_ref=cosmo_slice(ds,cosmo_dim_match(ds,'time',matcher),2);
     ds_ref=cosmo_dim_prune(ds_ref);
+
+function test_meeg_baseline_correct_nonmatching_sa
+    ds=cosmo_synthetic_dataset('size','big','ntargets',8,...
+                            'nchunks',1,'type','timelock');
+    nsamples=size(ds.samples,1);
+
+    while true
+        rp=cosmo_randperm(nsamples);
+        if ~isequal(rp,1:nsamples)
+            break;
+        end
+    end
+    ds_ref=cosmo_slice(ds,rp);
+    assertExceptionThrown(@()cosmo_meeg_baseline_correct(...
+                            ds,ds_ref,'relative'),'');
+
+
+function test_meeg_baseline_correct_nonmatching_fa
+    ds_big=cosmo_synthetic_dataset('size','big','ntargets',8,...
+                            'nchunks',1,'type','timefreq');
+    ds=cosmo_slice(ds_big,ds_big.fa.chan<=2 & ds_big.fa.freq<=3,2);
+    ds_ref=cosmo_slice(ds_big,ds_big.fa.chan<=3 & ds_big.fa.freq<=2,2);
+
+    assertExceptionThrown(@()cosmo_meeg_baseline_correct(...
+                                        ds,ds_ref,'relative'),'');
 
 
 function test_meeg_baseline_correct_illegal_inputs
