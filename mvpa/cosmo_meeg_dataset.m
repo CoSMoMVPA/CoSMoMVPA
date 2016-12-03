@@ -86,16 +86,17 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %       ds.sa.targets=ds.sa.trialinfo(:,3)
 %
 %    to set the trial conditions.
-%  - Implementation note: when loading EEGLAB data from a file, using this
-%    option means that different parts of the file are with different
-%    'load' commands. The advantage is that significant less memory is
-%    needed compared to when the full dataset is loaded first and then
-%    sliced. The disadvantage is that loaded may take longer, because the
-%    file is opened and closed multiple times.
-%    Such memory reductions are currently not implemented for FieldTrip
-%    data, as FieldTrip's data structures do not allow for such memory
-%    usage reductions.
-
+%  - Implementation note: when loading EEGLAB data from a file, using the
+%    'trials' option means that data from different channels are loaded
+%    through different 'load' commands. When loading a subset of all
+%    trials, the advantage of this implementation is that significant
+%    less memory is needed compared to an alternative implementation in
+%    which the full dataset is loaded and then the trials of interest
+%    are selected through slicing. The disadvantage is that loading may
+%    take longer, because the file is opened and closed multiple times.
+%    Such memory reductions are currently not available for FieldTrip
+%    data, as FieldTrip's data structures do not store data for different
+%    channels in different variables.
 %
 % See also: cosmo_map2meeg
 %
