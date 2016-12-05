@@ -265,14 +265,21 @@ function test_onesample_ttest_montecarlo_cluster_stat_strong
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
     % lots of signal, should work with no seed specified
-    opt=struct();
-    opt.h0_mean=-15;
-    opt.progress=false;
-    opt.niter=14;
-    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
-    assertElementsAlmostEqual(z.samples,...
-                        repmat(1.4652,1,6),...
-                        'absolute',1e-4);
+
+    for effect_sign=[-1,1]
+        niter=ceil(rand()*10+10);
+        z_table=get_zscore_lookup_table();
+        expected_z=z_table(niter);
+
+        opt=struct();
+        opt.h0_mean=(-effect_sign)*15;
+        opt.progress=false;
+        opt.niter=niter;
+        z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+        assertElementsAlmostEqual(z.samples,...
+                            repmat(effect_sign*expected_z,1,6),...
+                            'absolute',1e-4);
+    end
 
 
 function test_twosample_ttest_montecarlo_cluster_stat_basics
@@ -287,7 +294,14 @@ function test_twosample_ttest_montecarlo_cluster_stat_basics
     opt.niter=10;
     opt.seed=1;
     opt.progress=false;
-    z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
+
+    z=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
+
+    assertElementsAlmostEqual(z.samples,...
+                    [0.5244 -1.2816 0 0.8416 -0.5244 0],...
+                     'absolute',1e-4);
+
+
 
 
 function test_twosample_ttest_montecarlo_cluster_stat_ws
