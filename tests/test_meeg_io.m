@@ -370,8 +370,6 @@ function test_eeglab_io_trials()
         end
 
         clear cleaner;
-
-
     end
 
 

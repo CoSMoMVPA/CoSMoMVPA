@@ -740,17 +740,22 @@ function ds=convert_eeglab_struct(s, opt)
         data_cell{k}=value_rs;
     end
 
+    meeg_parameters=s.parameters;
+    clear s;
 
     data=cat(2,data_cell{:});
+    clear data_cell;
+
     ds=cosmo_flatten(data,[{chan_prefix},freq_label,{'time'}],...
                           [{chan_values},freq_values,{time_values}]);
+    clear data;
 
     ds.sa=struct();
     ds.a.meeg.samples_field='trial';
     ds.a.meeg.samples_type=samples_type;
     ds.a.meeg.samples_label='rpt';
 
-    ds.a.meeg.parameters=s.parameters;
+    ds.a.meeg.parameters=meeg_parameters;
 
     ds=posthoc_slice_dataset_if_necessary(ds,opt);
 
