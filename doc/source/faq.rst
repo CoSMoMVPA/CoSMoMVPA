@@ -44,6 +44,8 @@ What is the history of CoSMoMVPA?
 
     The initial components in CoSMoMVPA_ still stand, but quite a few things have changed in the meantime. CoSMoMVPA has added support for various file formats, including surface-based data and MEEG data. It also supports a wider range of analyses. Finally, there is a new set of :ref:`exercises <rhul2016>`, less aimed at writing your own toolbox, but more at understanding and implementing basic MVPA techniques using CoSMoMVPA_.
 
+    For recent changes, see the :ref:`changelog`.
+
 What are the main features?
 ---------------------------
 CoSMoMVPA_ provides:

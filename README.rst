@@ -14,11 +14,12 @@ CoSMoMVPA |build-status| |coverage-status|
    :alt: CoSMoMVPA coveralls.io coverage status
 
 
-A lightweight multi-variate pattern analysis (MVPA) toolbox in Matlab / Octave
+A lightweight multi-modal, multi-variate pattern analysis (MVPA) toolbox for cognitive neuroscience in Matlab / Octave.
 
 Website: http://www.cosmomvpa.org
 
 git repository: http://github.com/CoSMoMVPA
+
 
 
 

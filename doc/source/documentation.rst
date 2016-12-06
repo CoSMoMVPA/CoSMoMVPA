@@ -22,6 +22,7 @@ Overview
    contribute
    thanks
    copyright
+   changelog
    references
 
 Detailed
