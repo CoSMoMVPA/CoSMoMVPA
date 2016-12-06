@@ -221,9 +221,20 @@ function fold_count=get_fold_count(unique_fold_count,opt)
 
 function count=get_unique_fold_count(test_class_counts,test_count)
     % see how often each class occurs
-    class_counts=arrayfun(@(c)nchoosek(c,test_count),...
+    class_counts=arrayfun(@(c)nchoosek_lower_limit(c,test_count),...
                                     test_class_counts);
     count=prod(class_counts);
+
+function c=nchoosek_lower_limit(n,k)
+    % for many combinations return a lower limit of nchoosek. This avoids a
+    % warning by nchoosek if n and k are large, and still properly
+    % deals with cases of small n and k.
+    if n-k>10 && k>10
+        % it holds that nchoosek(n,k)<1e5 if n-k>10 and k>10
+        c=1e5;
+    else
+        c=nchoosek(n,k);
+    end
 
 
 function test_count=get_test_count(class_counts,classes,opt)
