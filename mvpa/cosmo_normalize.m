@@ -165,12 +165,17 @@ switch method
             mu=params.mu;
             sigma=params.sigma;
         else
-            mu=mean(samples,dim);
-            sigma=std(samples,[],dim);
+            n=size(samples,dim);
+            mu=sum(samples,dim)/n;
             params.mu=mu;
+        end
+
+        d=bsxfun(@minus,samples,mu);
+
+        if ~apply_params
+            sigma=sqrt(sum(d.^2,dim)/(n-1));
             params.sigma=sigma;
         end
-        d=bsxfun(@minus,samples,mu);
 
         if isempty(sigma)
             % Octave 3.8.2 on Ubuntu gives it the wrong size
