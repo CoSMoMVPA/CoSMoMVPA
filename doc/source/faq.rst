@@ -1004,8 +1004,41 @@ Classify different groups of participants (such as patients versus controls)?
         %% compute TFCE map with z-scores
         % z-scores above 1.65 are signficant at p=0.05 one-tailed.
 
-        tfce_map=cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
+        tfce_map-cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
 
+When running an MEEG searchlight, have the same channels in the output dataset as in the input dataset?
+-------------------------------------------------------------------------------------------------------
+'When I run an MEEG searchlight over channels, the searchlight dataset map has more channels than the input dataset. Is this normal?'
+
+This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual particpants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
+
+If you want to use only the channels from the input dataset (say ``ds``) you can set the ``label`` option to 'dataset'. See the following example, where ``chan_nh`` has only channels from the input dataset.
+
+    .. code-block:: matlab
+
+        chan_nh=cosmo_meeg_chan_neighborhood(ds,'count',5,'label','dataset')
+
+
+Save MEEG data when I get the error "value for fdim channel label is not supported"?
+------------------------------------------------------------------------------------
+'When I try to export MEEG searchlight maps with channel information as MEEG data using ``cosmo_map2meeg(ds,'-dattimef')``, I get the error "value for fdim channel label is not supported"? Also I am unable to visualize the data in FieldTrip. Any idea how to fix this?'
+
+This is probably caused by a wrong feature dimension order when crossing the neighborhood with :ref:`cosmo_cross_neighborhood`. The FieldTrip convention for the order is ``'chan','time'`` (for time-locked data) or ``'chan','time','freq'`` (for time-frequency data). (As of 16 December 2016, a warning has been added if a non-standard dimension order is detected).
+
+It is possible to change the feature dimension order afterwards. First, the feature dimension order for a dataset struct ``ds`` can be displayed by running:
+
+    .. code-block:: matlab
+
+        disp(ds.a.fdim.labels)
+
+If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimension should be moved from position 3 to position 1 to become ``'chan','freq','time'``. To move the channel dimension, first remove the dimension, than insert it at another position, as follows:
+
+    .. code-block:: matlab
+
+        label_to_move='chan';
+        target_pos=1;
+        [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
+        ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
 
 
 
