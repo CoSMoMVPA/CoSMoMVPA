@@ -251,6 +251,10 @@ function test_cross_neighborhood_progress()
 
 
 function test_warning_weird_dimension_order
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
 
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',0);
