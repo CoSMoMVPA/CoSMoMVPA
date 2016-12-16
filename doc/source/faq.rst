@@ -1018,4 +1018,28 @@ If you want to use only the channels from the input dataset (say ``ds``) you can
 
         chan_nh=cosmo_meeg_chan_neighborhood(ds,'count',5,'label','dataset')
 
+
+Save MEEG data when I get the error "value for fdim channel label is not supported"?
+------------------------------------------------------------------------------------
+'When I try to export MEEG searchlight maps with channel information as MEEG data using ``cosmo_map2meeg(ds,'-dattimef')``, I get the error "value for fdim channel label is not supported"? Also I am unable to visualize the data in FieldTrip. Any idea how to fix this?'
+
+This is probably caused by a wrong feature dimension order when crossing the neighborhood with :ref:`cosmo_cross_neighborhood`. The FieldTrip convention for the order is ``'chan','time'`` (for time-locked data) or ``'chan','time','freq'`` (for time-frequency data). (As of 16 December 2016, a warning has been added if a non-standard dimension order is detected).
+
+It is possible to change the feature dimension order afterwards. First, the feature dimension order for a dataset struct ``ds`` can be displayed by running:
+
+    .. code-block:: matlab
+
+        disp(ds.a.fdim.labels)
+
+If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimension should be moved from position 3 to position 1 to become ``'chan','freq','time'``. To move the channel dimension, first remove the dimension, than insert it at another position, as follows:
+
+    .. code-block:: matlab
+
+        label_to_move='chan';
+        target_pos=1;
+        [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
+        ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
+
+
+
 .. include:: links.txt
