@@ -1004,9 +1004,18 @@ Classify different groups of participants (such as patients versus controls)?
         %% compute TFCE map with z-scores
         % z-scores above 1.65 are signficant at p=0.05 one-tailed.
 
-        tfce_map=cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
+        tfce_map-cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
 
+When running an MEEG searchlight, have the same channels in the output dataset as in the input dataset?
+-------------------------------------------------------------------------------------------------------
+'When I run an MEEG searchlight over channels, the searchlight dataset map has more channels than the input dataset. Is this normal?'
 
+This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual particpants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
 
+If you want to use only the channels from the input dataset (say ``ds``) you can set the ``label`` option to 'dataset'. See the following example, where ``chan_nh`` has only channels from the input dataset.
+
+    .. code-block:: matlab
+
+        chan_nh=cosmo_meeg_chan_neighborhood(ds,'count',5,'label','dataset')
 
 .. include:: links.txt
