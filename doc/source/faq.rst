@@ -44,6 +44,8 @@ What is the history of CoSMoMVPA?
 
     The initial components in CoSMoMVPA_ still stand, but quite a few things have changed in the meantime. CoSMoMVPA has added support for various file formats, including surface-based data and MEEG data. It also supports a wider range of analyses. Finally, there is a new set of :ref:`exercises <rhul2016>`, less aimed at writing your own toolbox, but more at understanding and implementing basic MVPA techniques using CoSMoMVPA_.
 
+    For recent changes, see the :ref:`changelog`.
+
 What are the main features?
 ---------------------------
 CoSMoMVPA_ provides:
@@ -926,7 +928,7 @@ Classify different groups of participants (such as patients versus controls)?
 
     To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
 
-    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`montecarlo_cluster_stat` without computing a feature statistic.
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`cosmo_montecarlo_cluster_stat` without computing a feature statistic.
 
     Consider the following example:
 

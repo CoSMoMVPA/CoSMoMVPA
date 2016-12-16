@@ -323,6 +323,10 @@ function assert_throws_expected_exceptions(cfy_base,cfy)
     assert_deals_with_empty_input(cfy_base,cfy);
 
 function assert_throws_illegal_input_exceptions(cfy)
+    warning_state=cosmo_warning();
+    state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off')
+
     assertExceptionThrown(@()cfy([1 2],[1;2],[1 2]),'')
     assertExceptionThrown(@()cfy([1;2],[1 2],[1 2]),'')
     assertExceptionThrown(@()cfy([1 2],[1 2],[1 2]),'')

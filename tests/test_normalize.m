@@ -110,6 +110,121 @@ function test_normalize_basics()
     assert(all(all(~isnan(dsn.samples(:,2:3)))));
 
 
+function test_normalize_random_data_train
+
+    dim_opt=struct();
+    dim_opt.dim={[],1,2};
+    dim_opt.method={'zscore','demean','scale_unit'};
+
+    combis=cosmo_cartprod(dim_opt);
+    for k=1:numel(combis)
+        opt=combis{k};
+
+        method=opt.method;
+        args={method};
+        if isempty(opt.dim)
+            dim=1;
+        else
+            dim=opt.dim;
+            args{end+1}=dim;
+        end
+
+        nsamples=ceil(rand()*10+10);
+        nfeatures=ceil(rand()*10+10)+nsamples;
+
+        samples=randn(nsamples,nfeatures);
+
+        ds=struct();
+        ds.samples=samples;
+        ds.sa.targets=1+mod(cosmo_randperm(nsamples),3)';
+
+        [res_ds,res_param]=cosmo_normalize(ds,args{:});
+
+        mu=mean(samples,dim);
+        sd=std(samples,[],dim);
+
+        expected_param=struct();
+        expected_param.dim=dim;
+        expected_param.method=method;
+
+        switch method
+            case 'demean'
+                expected_samples=bsxfun(@minus,samples,mu);
+                expected_param.mu=mu;
+
+
+            case 'zscore'
+                expected_samples=bsxfun(@rdivide,...
+                                bsxfun(@minus,samples,mu),sd);
+                expected_param.mu=mu;
+                expected_param.sigma=sd;
+
+            case 'scale_unit'
+                mn=min(samples,[],dim);
+                mx=max(samples,[],dim);
+                delta=mx-mn;
+
+                expected_samples=bsxfun(@rdivide,...
+                                bsxfun(@minus,samples,mn),delta)*2-1;
+
+                expected_param.min=mn;
+                expected_param.max=mx;
+
+            otherwise
+                assert(false);
+
+        end
+
+        assertElementsAlmostEqual(res_ds.samples,expected_samples);
+        assert_struct_almost_equal(res_param,expected_param);
+
+        % new dataset, apply parameters
+        samples=randn(size(samples));
+        ds.samples=samples;
+        ds.sa.targets=1+mod(cosmo_randperm(nsamples),3)';
+
+        [res2_ds,res2_param]=cosmo_normalize(ds,res_param);
+
+        switch method
+            case 'demean'
+                expected_samples=bsxfun(@minus,samples,mu);
+
+            case 'zscore'
+                expected_samples=bsxfun(@rdivide,...
+                                bsxfun(@minus,samples,mu),sd);
+
+            case 'scale_unit'
+                expected_samples=bsxfun(@rdivide,...
+                                bsxfun(@minus,samples,mn),delta)*2-1;
+
+            otherwise
+                assert(false);
+        end
+
+        assertElementsAlmostEqual(res2_ds.samples,expected_samples);
+        assert_struct_almost_equal(res2_param,res_param);
+    end
+
+
+function assert_struct_almost_equal(x,y)
+    keys=fieldnames(x);
+    assertEqual(sort(keys),sort(fieldnames(y)))
+
+    for k=1:numel(keys)
+        key=keys{k};
+        v=x.(key);
+        w=y.(key);
+
+        if isnumeric(v)
+            func=@assertElementsAlmostEqual;
+        else
+            func=@assertEqual;
+        end
+
+        func(v,w);
+    end
+
+
 function test_normalize_exceptions()
     ds=cosmo_synthetic_dataset();
     aet=@(varargin)assertExceptionThrown(@()...
@@ -122,9 +237,16 @@ function test_normalize_exceptions()
     aet('zscore1',1);
     aet('zscore1',2);
 
+    % bad dimension
     [unused,params]=cosmo_normalize(ds,'zscore',1);
     aet(params,2);
 
+    aet(params,2);
+    bad_params=params;
+    bad_params.dim=2;
+    aet(bad_params,1);
+
+    % illegal second input
     aet({'foo'});
 
 

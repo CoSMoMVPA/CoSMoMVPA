@@ -136,10 +136,18 @@ function bl_ds=baseline_correct_ds(ds,reference,baseline_label,method)
                     n,nref);
     end
 
-    parts=cell(n,1);
     for k=1:n
         part_ds=ds_split{k};
         part_reference=reference_split{k};
+
+        fa_ds=cosmo_slice(part_ds.fa,1,2,'struct');
+        fa_reference=cosmo_slice(part_reference.fa,1,2,'struct');
+
+        if ~isequal(rmfield(fa_ds,baseline_label),...
+                        rmfield(fa_reference,baseline_label))
+            error(['Feature mismatch between '...
+                        'input dataset and reference dataset']);
+        end
 
         mu=mean(part_reference.samples,2);
 
@@ -155,22 +163,8 @@ function ds_split=split_by_other(ds, baseline_label)
 
 function [ds1, sa]=first_feature(ds, remove_fields)
     ds1=cosmo_slice(ds,1,2);
-    nsamples=size(ds1.samples,1);
 
-    require_matching_sa=true; % disabled for now
     sa=struct();
-    if require_matching_sa
-        if nargin<2
-            remove_fields={'targets','labels'};
-        end
-
-        if isfield(ds,'sa')
-            sa=ds1.sa;
-            for k=1:numel(remove_fields)
-                remove_field=remove_fields{k};
-                if isfield(sa,remove_field)
-                    sa=rmfield(sa,remove_field);
-                end
-            end
-        end
+    if isfield(ds,'sa')
+        sa=ds.sa;
     end

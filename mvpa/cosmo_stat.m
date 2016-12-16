@@ -289,7 +289,6 @@ function [stat,df,stat_label]=ttest2_wrapper(samples,targets,chunks,...
 
     [stat,df]=quick_ttest2(samples(m1,:),...
                           samples(m2,:));
-    cdf_label='t';
     stat_label='Ttest';
 
 function [stat,df,stat_label]=ftest_wrapper(samples,targets,chunks,...
@@ -459,8 +458,16 @@ function ensure_has_stats_toolbox()
     % - Octave has the required functionality in the octave-forge
     %   statistics toolbox and will raise an error if it is not installed.
     % - Matlab needs checking for the toolbox
-    if cosmo_wtf('is_matlab')
-        cosmo_check_external('@stats');
+    persistent cached_has_toolbox;
+
+    if isequal(cached_has_toolbox,[])
+        if cosmo_wtf('is_matlab')
+            raise_exception_if_absent=true;
+            cached_has_toolbox=cosmo_check_external('@stats', ...
+                                raise_exception_if_absent);
+        else
+            cached_has_toolbox=false;
+        end
     end
 
 function [samples,targets,chunks,type]=get_descriptors(ds)

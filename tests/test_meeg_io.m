@@ -222,10 +222,13 @@ function test_meeg_ft_io_exceptions()
 function dimords=get_ft_dimords()
     dimords={   'chan_time',...
                 'rpt_chan_time'...
+                'subj_chan_time'...
                 'chan_freq',...
                 'rpt_chan_freq',...
+                'subj_chan_freq',...
                 'chan_freq_time',...
                 'rpt_chan_freq_time',...
+                'subj_chan_freq_time',...
                 };
 
 function [ft,fdim,data_label]=generate_ft_struct(dimord)
@@ -256,6 +259,10 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
         switch dims{k}
             case 'rpt'
                 data_label='trial';
+                ntrials=numel(idxs);
+
+            case 'subj'
+                data_label='individual';
                 ntrials=numel(idxs);
 
             case 'chan'
@@ -363,8 +370,6 @@ function test_eeglab_io_trials()
         end
 
         clear cleaner;
-
-
     end
 
 

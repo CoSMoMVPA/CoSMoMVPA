@@ -246,7 +246,9 @@ function s=set_parameters_if_present(s,ds)
 function tf=is_ft_timelock(ft)
     tf=isstruct(ft) && ...
             isfield(ft,'dimord') && ...
-            cosmo_match({ft.dimord}, {'rpt_chan_time','chan_time'});
+            cosmo_match({ft.dimord}, {'rpt_chan_time',...
+                                        'subj_chan_time',...
+                                        'chan_time'});
 
 
 
@@ -254,6 +256,8 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
     nfreq=sum(cosmo_match(ds.a.fdim.labels,{'freq'}));
     ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
     nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
+
+    has_samples_field=cosmo_isfield(ds,'a.meeg.samples_field');
 
     if is_ds_source_struct(ds)
         if is_single_sample
@@ -274,15 +278,23 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
     else
         if nchan>=1 && ntime>=1
             if nfreq>=1
+                % time-freq data
                 samples_field='powspctrm';
-            else
-                if is_single_sample
-                    samples_field='avg';
-                else
-                    samples_field='trial';
-                end
+                return;
             end
-            return
+
+            if is_single_sample
+                % time-locked, single sample
+                samples_field='avg';
+                return;
+            end
+
+
+            if ~has_samples_field
+                % time-locked, multiple trials
+                samples_field='trial';
+                return
+            end
         end
     end
 
@@ -303,10 +315,11 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                                             'matrix_labels',{'pos'});
 
     is_single_sample=size(ds.samples,1)==1;
-    if is_single_sample
-        samples_label=cell(0);
-    elseif cosmo_isfield(ds,'a.meeg.samples_label')
+
+    if cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
+    elseif is_single_sample
+        samples_label=cell(0);
     else
         samples_label={'rpt'};
     end

@@ -229,3 +229,5 @@ website: html html-zip-archive html-targz-archive
 
 prni: website
 	$(MAKE) website WEBSITEROOT=pr:/var/www/html
+
+clean: clean-html
