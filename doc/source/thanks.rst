@@ -35,10 +35,12 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Karen Cuculiza
 + Sarah Belinda Aimee Degosciu
 + Hanna Gertz
++ Tijl Grootswagers
 + Yaroslav Halchenko
 + Thomas Hartmann
 + James Haxby
 + Clayton Hickey
++ Thomas Hinault
 + Daniel Kaiser
 + James Keidel
 + Sukhbinder Kumar
@@ -46,6 +48,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Seth Levine
 + Stefania Mattioni
 + Mike Miller
++ Maria Montchal
 + Sam Nastase
 + Liuba Papeo
 + Nicholas Peatfield
@@ -55,9 +58,11 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Reshanne Reader
 + Anne Roefs
 + Gaetan Sanchez
++ Joscha Schmiedt
 + Jens Schwarzbach
 + Yuan Tao
 + Mohamed Tawfik
++ Ben Timberlake
 + Lara Todorova
 + Raffaele Tucciarelli
 + Luca Turella

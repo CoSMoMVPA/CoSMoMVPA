@@ -24,6 +24,7 @@ run*.html
 run*.png
 index.html
 modindex*.rst
+matindex*.rst
 contents_*
 matlab
 publish

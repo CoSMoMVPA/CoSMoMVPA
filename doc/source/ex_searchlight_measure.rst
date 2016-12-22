@@ -34,6 +34,8 @@ Hint: :ref:`run_splithalf_correlations_searchlight_skl`
 
 Solution: :ref:`run_splithalf_correlations_searchlight` / :pb:`splithalf_correlations_searchlight`
 
+*Part 2 is optional; it is used to illustrate that a whole-brain searchlight can be applied with different measures*.
+
 Part 2
 ++++++
 

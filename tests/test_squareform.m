@@ -64,17 +64,62 @@ function test_squareform_matlab_agreement()
         n=side*(side-1)/2;
         data=rand(n,1);
 
-        assert_squareform_equal(data);
-        assert_squareform_equal(data,'tomatrix');
-        assert_squareform_equal(data','tomatrix');
+        helper_assert_squareform_equal_to_matlab(data);
+        helper_assert_squareform_equal_to_matlab(data,'tomatrix');
+        helper_assert_squareform_equal_to_matlab(data','tomatrix');
 
         mx=squareform(data);
-        assert_squareform_equal(mx);
-        assert_squareform_equal(mx,'tovector');
+        helper_assert_squareform_equal_to_matlab(mx);
+        helper_assert_squareform_equal_to_matlab(mx,'tovector');
     end
 
-function assert_squareform_equal(varargin)
+function helper_assert_squareform_equal_to_matlab(varargin)
     assertEqual(squareform(varargin{:}),cosmo_squareform(varargin{:}));
+
+
+function test_squareform_random_data_without_nans()
+    helper_test_squareform_with_random_data(false);
+
+function test_squareform_random_data_with_nans()
+    helper_test_squareform_with_random_data(true);
+
+function helper_test_squareform_with_random_data(has_nan)
+    for side=1:10
+        data=randn(side);
+        data=data+data';
+        data=data-diag(diag(data));
+
+        if has_nan
+            if side==1
+                continue;
+            end
+
+            data(side,1)=NaN;
+            data(1,side)=NaN;
+        end
+
+        data_sq=cosmo_squareform(data,'tovector');
+        nelem=numel(data_sq);
+        assertEqual(nelem,side*(side-1)/2);
+
+        counter=0;
+        for col=1:(side-1)
+            for row=(col+1):side
+                counter=counter+1;
+                assertEqual(data(row,col),data_sq(counter));
+            end
+        end
+
+        data_back=cosmo_squareform(data_sq,'tomatrix');
+        if side==1
+            assert(isempty(data_back));
+        else
+            assertEqual(data,data_back);
+        end
+    end
+
+
+
 
 
 

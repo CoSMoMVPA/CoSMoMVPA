@@ -7,11 +7,11 @@ function test_suite=test_meeg_io()
     initTestSuite;
 
 
-function test_meeg_dataset()
+function test_meeg_ft_dataset()
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_meeg_dataset(varargin{:}),'');
 
-    dimords=get_dimords();
+    dimords=get_ft_dimords();
     n=numel(dimords);
     for k=1:n
         dimord=dimords{k};
@@ -61,6 +61,35 @@ function test_meeg_dataset()
     aet(struct('avg',1));
     aet(struct('avg',1,'dimord','rpt_foo'));
 
+function test_meeg_ft_dataset_trials()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+
+    dimords=get_ft_dimords();
+    n=numel(dimords);
+    for k=1:n
+        dimord=dimords{k};
+        ft=generate_ft_struct(dimord);
+        ds=cosmo_meeg_dataset(ft);
+
+        % check subset of trials option
+        ntrials=size(ds.samples,1);
+        trial_idx=ceil(rand(1,2)*ntrials);
+        ds_single_trial=cosmo_meeg_dataset(ft,...
+                                    'trials',trial_idx);
+        assertEqual(cosmo_slice(ds,trial_idx),ds_single_trial);
+        ds_single_trial=cosmo_meeg_dataset(ft,...
+                                    cosmo_structjoin('trials',trial_idx));
+        assertEqual(cosmo_slice(ds,trial_idx),ds_single_trial);
+
+        illegal_args={ntrials+1,0,struct,cell(1,0),'foo',true,1.5};
+        for j=1:numel(illegal_args)
+            arg=illegal_args{j};
+            aet(ft,'trials',arg);
+        end
+    end
+
+
 
 function test_synthetic_meeg_dataset()
     combis=cosmo_cartprod({{'timelock','timefreq','source'},...
@@ -81,7 +110,7 @@ function test_synthetic_meeg_dataset()
     assertExceptionThrown(@()cosmo_meeg_dataset(ds,'targets',[1 2]),'');
 
 
-function test_meeg_eeglab_io()
+function test_meeg_eeglab_txt_io()
     ds=cosmo_synthetic_dataset('type','meeg');
 
     tmp_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
@@ -116,13 +145,32 @@ function test_meeg_eeglab_io()
     assertEqual(ds.a.fdim.labels,ds2.a.fdim.labels);
     assertEqual(ds.fa,ds2.fa);
 
-    % add bogus datamox
+    % test trials option
+    nsamples=size(ds.samples,1);
+    trial_idx=ceil(rand(1,2)*nsamples);
+    ds_trials=cosmo_meeg_dataset(tmp_fn,'trials',trial_idx);
+    ds_expected_trials=cosmo_slice(ds,trial_idx);
+    assertElementsAlmostEqual(ds_trials.samples,...
+                                ds_expected_trials.samples,...
+                                'absolute',1e-4);
+
+    % test illegal options
+    aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+    illegal_args={nsamples+1,0,struct,{},'foo',true,1.5};
+    for j=1:numel(illegal_args)
+        arg=illegal_args{j};
+        aet(tmp_fn,'trials',arg);
+        aet(tmp_fn,cosmo_structjoin('trials',arg));
+    end
+
+    % add bogus data, expect exception
     fid=fopen(tmp_fn,'a');
     fprintf(fid,'.3');
     fclose(fid);
     file_closer=[];
 
-    assertExceptionThrown(@()cosmo_meeg_dataset(tmp_fn),'');
+    aet(tmp_fn);
 
     tmp2_fn=sprintf('_tmp_%06.0f.txt',rand()*1e5);
     file_remover2=onCleanup(@()delete(tmp2_fn));
@@ -168,19 +216,19 @@ function test_meeg_ft_io_exceptions()
     aeto(ds,'file_without_extension');
     aeto(ds,'file.with_unknown_extension');
 
-    aeto(ds,'eeglab_timelock.txt');
+    aeto(ds,'eeglab_timelock.txt'); % not supported
 
 
-
-
-
-function dimords=get_dimords()
+function dimords=get_ft_dimords()
     dimords={   'chan_time',...
                 'rpt_chan_time'...
+                'subj_chan_time'...
                 'chan_freq',...
                 'rpt_chan_freq',...
+                'subj_chan_freq',...
                 'chan_freq_time',...
                 'rpt_chan_freq_time',...
+                'subj_chan_freq_time',...
                 };
 
 function [ft,fdim,data_label]=generate_ft_struct(dimord)
@@ -211,6 +259,10 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
         switch dims{k}
             case 'rpt'
                 data_label='trial';
+                ntrials=numel(idxs);
+
+            case 'subj'
+                data_label='individual';
                 ntrials=numel(idxs);
 
             case 'chan'
@@ -248,3 +300,279 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     end
 
 
+function test_eeglab_io()
+    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,:);
+        [s,ds,ext]=build_eeglab_dataset_struct(arg{:});
+
+        ds_from_struct=cosmo_meeg_dataset(s);
+        assertEqual(ds.samples,ds_from_struct.samples);
+        assertEqual(ds,ds_from_struct);
+
+        % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn);
+        assertEqual(ds,ds_loaded);
+        clear cleaner;
+
+        s_converted=cosmo_map2meeg(ds,['-' ext]);
+        assertEqual(s,s_converted)
+
+        % store using cosmo_map2meeg, then read
+        cosmo_map2meeg(ds,fn);
+        cleaner=onCleanup(@()delete(fn));
+
+        s_loaded=load(fn,'-mat');
+        assertEqual(s_loaded,s);
+        assertEqual(s,s_loaded);
+        clear cleaner;
+    end
+
+function test_eeglab_io_trials()
+
+    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,:);
+        [s,ds,ext]=build_eeglab_dataset_struct(arg{:});
+
+        nsamples=size(ds.samples,1);
+        trial_idx=ceil(rand(1,2)*nsamples);
+        ds_expected_trials=cosmo_slice(ds,trial_idx);
+
+        % with struct input
+        ds_trials=cosmo_meeg_dataset(s,'trials',trial_idx);
+        assertElementsAlmostEqual(ds_trials.samples,...
+                                ds_expected_trials.samples,...
+                                'absolute',1e-4);
+
+        % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn,'trials',trial_idx);
+        assertEqual(ds_loaded,ds_expected_trials);
+
+
+        % test illegal options
+        aet=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+        illegal_args={nsamples+1,0,struct,{},'foo',true,1.5};
+        for j=1:numel(illegal_args)
+            arg=illegal_args{j};
+            aet(s,'trials',arg);
+        end
+
+        clear cleaner;
+    end
+
+
+function test_eeglab_io_exceptions()
+    aet_md=@(varargin)assertExceptionThrown(@()...
+                            cosmo_meeg_dataset(varargin{:}),'');
+    aet_m2m=@(varargin)assertExceptionThrown(@()...
+                            cosmo_map2meeg(varargin{:}),'');
+
+    s=build_eeglab_dataset_struct(true,true,true);
+
+    % bad datatype
+    s.datatype='foo';
+    aet_md(s)
+
+    % output is not a filename
+    ds=cosmo_synthetic_dataset('type','timefreq');
+    aet_m2m(ds,struct);
+
+    % bad  fdim
+    good_labels={'chan','freq','time'};
+    all_bad_labels={'chan','freq','time','foo'};
+
+    for dim=1:numel(good_labels)
+        for j=1:numel(all_bad_labels)
+            ds_bad_chan_fdim=ds;
+            bad=all_bad_labels{j};
+            if ~strcmp(bad, good_labels{dim})
+                ds_bad_chan_fdim.a.fdim.labels{dim}=bad;
+                aet_m2m(ds_bad_chan_fdim,'-dattimef');
+            end
+        end
+    end
+
+
+
+
+function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
+    % trial dimension
+    if has_trial
+        trial_dim=randint();
+    else
+        trial_dim=1;
+    end
+
+
+    % channel / component dimension
+    chan_dim=randint();
+    if has_ica
+        chan_prefix='comp';
+        ext_prefix='ica';
+
+        make_chan_prefix_func=@()chan_prefix;
+    else
+        chan_prefix='chan';
+        ext_prefix='dat';
+
+        make_chan_prefix_func=@randstr;
+    end
+
+    if has_freq
+        chan_suffix='_timef';
+    else
+        chan_suffix='';
+    end
+
+    make_chan_label=@(idx) sprintf('%s%d',make_chan_prefix_func(),idx);
+
+    chan_label={chan_prefix};
+    chan_value={arrayfun(make_chan_label,1:chan_dim,...
+                            'UniformOutput',false)};
+
+    % frequency dimension
+    if has_freq
+        freq_dim=randint();
+        freq_label={'freq'};
+        freq_value={(1:freq_dim)*2};
+        samples_type='timefreq';
+        ext_suffix='timef';
+    else
+        freq_dim=[];
+        freq_label={};
+        freq_value={};
+        samples_type='timelock';
+        ext_suffix='erp';
+    end
+
+    % time dimensions
+    time_dim=randint();
+    time_label={'time'};
+    time_value={(1:time_dim())*.2-.1};
+
+    % data
+    dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
+    dim_sizes_without_chan=dim_sizes([1, 3:end]);
+    data_arr=randn(dim_sizes);
+
+    % params
+    parameters={randstr(), randstr()};
+
+    % make dataset
+    ds=cosmo_flatten(data_arr,...
+                        [chan_label,freq_label,time_label],...
+                        [chan_value,freq_value,time_value]);
+    ds.sa=struct();
+    ds.a.meeg.samples_field='trial';
+    ds.a.meeg.samples_type=samples_type;
+    ds.a.meeg.samples_label='rpt';
+    ds.a.meeg.parameters=parameters;
+
+
+    s=struct();
+    for k=1:chan_dim
+        key=sprintf('%s%d%s',chan_prefix,k,chan_suffix);
+        value=data_arr(:,k,:);
+        value_rs=reshape(value,dim_sizes_without_chan);
+
+        if has_freq
+            % it seems that for freq data, single trial data is the last
+            % dimension, whereas for erp data, single trial data is the first
+            % dimension.
+            value_rs=shiftdim(value_rs,1);
+        end
+
+        s.(key)=value_rs;
+    end
+
+    if ~has_ica
+        s.chanlabels=chan_value{1};
+        assert(iscellstr(s.chanlabels));
+    end
+
+    if has_freq
+        s.freqs=freq_value{1};
+    end
+    s.times=time_value{1};
+    s.datatype=upper(ext_suffix);
+    s.parameters=parameters;
+
+    ext=[ext_prefix, ext_suffix];
+
+
+function test_dimord_label()
+    opt=struct();
+    opt.samples_label={'','rpt','trial'};
+    opt.nsamples={1,randint(),10};
+    opt.datatype={'timefreq','timelock'};
+
+    combis=cosmo_cartprod(opt);
+    n_combi=numel(combis);
+
+    for k=1:n_combi
+        c=combis{k};
+
+        ds=cosmo_synthetic_dataset('type',c.datatype,...
+                                        'ntargets',1,...
+                                        'nchunks',c.nsamples,...
+                                    'size','big');
+        assertEqual(size(ds.samples,1),c.nsamples);
+
+        with_samples_label=~isempty(c.samples_label);
+        if with_samples_label
+            ds.a.meeg.samples_label=c.samples_label;
+        else
+            ds.a.meeg=rmfield(ds.a.meeg,'samples_label');
+        end
+
+        data_is_average=c.nsamples==1 && ~with_samples_label;
+
+        switch c.datatype
+            case 'timefreq'
+                samples_field='powspctrm';
+
+            case 'timelock'
+                if data_is_average
+                    samples_field='avg';
+                else
+                    samples_field='trial';
+                end
+
+            otherwise
+                assert(false)
+        end
+
+
+        ft=cosmo_map2meeg(ds);
+
+        labels=cosmo_strsplit(ft.dimord,'_');
+
+        ndim_expected=numel(ds.a.fdim.labels);
+        if ~data_is_average
+            ndim_expected=ndim_expected+1;
+        end
+
+        assertEqual(numel(labels),ndim_expected);
+        assertEqual(numel(size(ft.(samples_field))),ndim_expected);
+
+    end
+
+
+
+function x=randint()
+    x=ceil(rand()*10+5);
+
+function x=randstr()
+    x=char(rand(1,10)*24+65);

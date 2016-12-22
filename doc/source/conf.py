@@ -107,7 +107,16 @@ class CoSMoRefStyle(AlphaStyle):
         summary=e.fields.get('cosmomvpa-summary',None)
         if summary is not None:
             summary_text=Tag('emph',Text('[ %s ]' % summary))
-            text.extend([Symbol('newblock'),summary_text])
+
+            summary_symbol=[Symbol('newblock'),summary_text]
+            if hasattr(text,'extend'):
+                target_to_extend=text
+            elif hasattr(text,'parts'):
+                target_to_extend=text.parts
+            else:
+                raise ValueError('Unsupported type %s', type(text))
+
+            target_to_extend.extend(summary_symbol)
 
         return text
 

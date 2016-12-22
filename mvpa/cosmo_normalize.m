@@ -133,7 +133,7 @@ if apply_params;
         error('Dim specified as %d, but estimates used %d',dim,params.dim);
     end
 elseif ischar(params)
-    params=get_method_and_dim(params,dim);
+    params=get_params_from_string(params,dim);
 else
     error('norm_spec must be struct or string');
 end
@@ -165,12 +165,17 @@ switch method
             mu=params.mu;
             sigma=params.sigma;
         else
-            mu=mean(samples,dim);
-            sigma=std(samples,[],dim);
+            n=size(samples,dim);
+            mu=sum(samples,dim)/n;
             params.mu=mu;
+        end
+
+        d=bsxfun(@minus,samples,mu);
+
+        if ~apply_params
+            sigma=sqrt(sum(d.^2,dim)/(n-1));
             params.sigma=sigma;
         end
-        d=bsxfun(@minus,samples,mu);
 
         if isempty(sigma)
             % Octave 3.8.2 on Ubuntu gives it the wrong size
@@ -214,27 +219,40 @@ else
     ds=samples;
 end
 
-function params=get_method_and_dim(params,dim_arg)
-    assert(ischar(params));
-    assert(numel(params)>0);
+function params=get_params_from_string(norm_method,dim_arg)
+    persistent cached_params;
+    persistent cached_norm_method;
+    persistent cached_dim_arg;
 
-    dim=[];
-    method=params;
 
-    if isempty(dim_arg)
-        if isempty(dim)
-            dim=1;
-        end
-    else
-        if isempty(dim)
-            dim=dim_arg;
+    if ~(isequal(norm_method, cached_norm_method) && ...
+            isequal(dim_arg,cached_dim_arg))
+
+        assert(ischar(norm_method));
+        assert(numel(norm_method)>0);
+
+        dim=[];
+        method=norm_method;
+
+        if isempty(dim_arg)
+            if isempty(dim)
+                dim=1;
+            end
         else
-            error(['Cannot have third argument when second argument '...
-                        'ends with a number']);
+            if isempty(dim)
+                dim=dim_arg;
+            else
+                error(['Cannot have third argument when second argument '...
+                            'ends with a number']);
+            end
         end
+
+        cached_params=struct();
+        cached_params.method=method;
+        cached_params.dim=dim;
+
+        cached_norm_method=norm_method;
+        cached_dim_arg=dim_arg;
     end
 
-
-    params=struct();
-    params.method=method;
-    params.dim=dim;
+    params=cached_params;

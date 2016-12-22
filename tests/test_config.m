@@ -54,8 +54,6 @@ function test_error_when_quote_in_paths()
     warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
     cosmo_warning('off');
 
-    c=struct();
-
     for with_path_suffix=[true false]
         key=randstr();
         if with_path_suffix
@@ -69,7 +67,6 @@ function test_error_when_quote_in_paths()
             value=randstr();
             config=struct();
             config.(key)=[c value c];
-
 
             fn=helper_write_config(config,'');
             cleaner=onCleanup(@()delete(fn));
@@ -91,10 +88,8 @@ function test_error_when_quote_in_paths()
 function helper_write_read_config(include_path_settings, config)
     orig_warning_state=cosmo_warning();
     warning_state_resetter=onCleanup(@()cosmo_warning(orig_warning_state));
-    empty_warning_state=orig_warning_state;
-    empty_warning_state.shown_warnings=[];
-    cosmo_warning(empty_warning_state);
 
+    cosmo_warning('reset');
     cosmo_warning('off');
 
     n_keys=ceil(rand()*5+5);

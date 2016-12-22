@@ -148,6 +148,46 @@ function check_labels(dim_labels,ds_labels)
         error('dimension label unknown in dataset: %s', delta{1});
     end
 
+    show_warning_if_weird_dim_label_order(dim_labels);
+
+
+function show_warning_if_weird_dim_label_order(dim_labels)
+    expected_order={'chan','freq','time'};
+
+    norder=numel(expected_order);
+
+    pos_in_ds=@(needle)find(cosmo_match(dim_labels,{needle}));
+
+    for i=1:(norder-1)
+        for j=(i+1):norder
+            pre_label=expected_order{i};
+            pre=pos_in_ds(pre_label);
+
+            post_label=expected_order{j};
+            post=pos_in_ds(post_label);
+
+            if ~isempty(pre) && ...
+                    ~isempty(post) && ...
+                    pre>post
+                cosmo_warning(['dimension labels ''%s'' and ''%s'' are '...
+                        'in an uncommon order, which may cause '...
+                        'issues when exporting data to FieldTrip '...
+                        'or EEGLAB. It is strongly adviced '...
+                        'to change the order of the input '...
+                        'neighborhoods so that dimension ''%s'''...
+                        'preceeds dimension ''%s'''],...
+                         pre_label,post_label,post_label,pre_label);
+
+            end
+        end
+    end
+
+
+
+
+
+
+
 function [flat_idxs, map_idxs]=conj_indices(dim_idxs, show_progress, use_fast)
     % computes conjunction indices
     %

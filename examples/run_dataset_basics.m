@@ -10,13 +10,15 @@
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
-% Set the filename to the glm_T_stats_perrun NIFTI file
+% Set the filename to the glm_T_stats_perrun NIFTI file; assign
+% the filename to a variable named 'fn'
 % >@@>
 fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 % <@@<
 
+% Load data using cosmo_fmri_dataset, and assign the result to a variable
+% named 'ds'
 % >@@>
-% Load data using cosmo_fmri_dataset
 ds = cosmo_fmri_dataset(fn);
 % <@@<
 

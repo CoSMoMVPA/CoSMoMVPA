@@ -30,6 +30,7 @@
 .. _Octave: https://www.gnu.org/software/octave/
 .. _`Octave-Forge`: http://octave.sourceforge.net
 .. _`Princeton MVPA`: http://code.google.com/p/princeton-mvpa-toolbox/)
+.. _`PRNI 2016`: http://prni2016.wix.com/prni2016
 .. _PRoNTo: http://www.mlnl.cs.ucl.ac.uk/pronto)
 .. _PyMVPA: http://pymvpa.org
 .. _Python: http://python.org

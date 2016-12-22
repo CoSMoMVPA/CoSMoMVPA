@@ -12,13 +12,13 @@ A multi-modal, multi-variate pattern analysis (MVPA) toolbox in Matlab / GNU Oct
 CoSMoMVPA
 ---------
 - State-of-the art, yet simple to use MVPA implementations.
-- Runs on the Matlab and GNU Octave platform.
+- Runs on the Matlab and GNU Octave platform, on MS Windows, OSX, and GNU/Linux.
 - Handles fMRI volumetric, fMRI surface-based, and MEEG data through a uniform data structure.
 - Support for a wide range of data formats.
 - Searchlights in the volume, on the surface, over sensors, time bins, and frequency bands.
 - Multiple-comparison correction using Threshold-Free Cluster Enhancement Monte Carlo simulations.
 - Extensive documentation, including a variety of runnable scripts and implementation exercises (with solutions).
-- Is Free/Open Source Software (MIT License).
+- Is Free/Open Source Software (MIT License), see http://github.com/CoSMoMVPA/CoSMoMVPA.
 
 .. toctree::
    :hidden:
@@ -28,7 +28,7 @@ CoSMoMVPA
    get_started
    download
    documentation
-   cimec2016
+   prni2016
    tips
    faq
    contact
@@ -44,11 +44,11 @@ CoSMoMVPA
 .. image:: _static/icon_download.png
    :target: download.html
 .. image:: _static/icon_modules.png
-   :target: modindex.html
+   :target: matindex.html
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
-   :target: cimec2016.html
+   :target: prni2016.html
 .. image:: _static/icon_tips.png
    :target: tips.html
 .. image:: _static/icon_faq.png
@@ -71,8 +71,8 @@ CoSMoMVPA
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
+* :ref:`documentation`
+* :ref:`matindex`
 * :ref:`search`
 
 .. include:: links.txt

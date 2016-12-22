@@ -42,11 +42,44 @@ function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets
         opt=struct();
     end
 
-    [ntrain, nfeatures]=size(samples_train);
-    [ntest, nfeatures_]=size(samples_test);
-    ntrain_=numel(targets_train);
+    % support repeated testing on different data after training every time
+    % on the same data. This is achieved by caching the training data
+    % and associated model
+    persistent cached_targets_train;
+    persistent cached_samples_train;
+    persistent cached_opt;
+    persistent cached_model;
 
-    if nfeatures~=nfeatures_ || ntrain_~=ntrain
+    cache_limit=1e5; % avoid caching huge training sets
+
+    if isequal(cached_targets_train, targets_train) && ...
+            isequal(cached_opt, opt) && ...
+            numel(samples_train) < cache_limit && ...
+            isequal(cached_samples_train, samples_train)
+        % use cache
+        model=cached_model;
+    else
+        model=train(samples_train,targets_train,opt);
+
+                % store model
+        cached_targets_train=targets_train;
+        cached_samples_train=samples_train;
+        cached_opt=opt;
+        cached_model=model;
+    end
+
+    predicted=test(model, samples_test);
+
+function model=train(samples_train,targets_train,opt)
+    [ntrain, nfeatures]=size(samples_train);
+
+    model=struct();
+    model.nfeatures=nfeatures;
+    model.normalize=[]; % off by default
+
+    % check input size
+    ntrain_=numel(targets_train);
+    if ntrain_~=ntrain
         error('illegal input size');
     end
 
@@ -63,17 +96,48 @@ function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets
     if autoscale
         [samples_train, params]=cosmo_normalize(samples_train, ...
                                                     'zscore', 1);
-        samples_test=cosmo_normalize(samples_test, params);
+        model.normalize=params;
     end
+    train_func=@()svmtrain(targets_train(:), ...
+                            samples_train, ...
+                            opt_str);
 
-    % train; if it fails, see if this caused by non-functioning libsvm
+    model.libsvm_model=eval_with_check_external(train_func);
+
+
+function output=eval_with_check_external(func)
+% Evaluates func() in try-catch block. If it fails, this may be due
+% to missing libsvm and/or libsvm conflicting with Matlab's svm.
+% Therefore first cosmo_check_external is called, which will give an
+% informative error message if that is the case. Otherwise the original
+% message is shown.
+
     try
-        model=svmtrain(targets_train, samples_train, opt_str);
-        [predicted,unused,decisionvalues]=svmpredict(NaN(ntest,1), samples_test, model, '-q');
+        output=func();
     catch
         cosmo_check_external('libsvm');
         rethrow(lasterror());
     end
+
+
+function predicted=test(model, samples_test)
+    [ntest, nfeatures]=size(samples_test);
+    if nfeatures~=model.nfeatures
+        error(['Number of features in train set (%d) and '...
+                    'test set (%d) do not match'],...
+                    model.nfeatures,nfeatures);
+    end
+
+    if ~isempty(model.normalize)
+        samples_test=cosmo_normalize(samples_test, model.normalize);
+    end
+
+    test_opt_str='-q'; % quiet (no output)
+    test_func=@()svmpredict(NaN(ntest,1), samples_test, ...
+                            model.libsvm_model, test_opt_str);
+    [predicted,unused,decisionvalues]=eval_with_check_external(test_func);
+
+
 
 
 function opt_str=libsvm_opt2str(opt)

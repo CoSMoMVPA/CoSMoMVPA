@@ -4,12 +4,24 @@ function hdr=cosmo_map2meeg(ds, fn)
 % hdr=cosmo_map2meeg(ds[, fn])
 %
 % Inputs:
-%    ds         dataset struct with field .samples with MEEG data
-%    fn         optional filename to write output to. Supported extensions
-%               are .txt (EEGlab time course) or .mat (FieldTrip data)
+%    ds               dataset struct with field .samples with MEEG data
+%    fn               output filename or extension. If a filename,
+%                     the following extentions are supported:
+%                       .mat :        FieldTrip time-locked or
+%                                     time-frequency  data at  either the
+%                                     sensor or source level.
+%                       .txt :        exported EEGLab with timelocked data.
+%                       .daterp       time-locked      }
+%                       .icaerp       ICA time-locked  } EEGLab
+%                       .dattimef     time-freq        }
+%                       .icatimef     ICA time-freq    }
+%                     To avoid writing a file, but get output in the hdr
+%                     field, use one of the extensions above but with the
+%                     dot ('.') replaced by a hyphen ('-'), for example
+%                     '-dattimef' for time-freq data.
 %
 % Returns:
-%    hdr        FieldTrip struct with the MEEG data
+%    hdr        FieldTrip or EEGLAB struct with the MEEG data
 %
 % Notes:
 %    - a typical use case is to use this function to map the dataset to a
@@ -25,35 +37,104 @@ function hdr=cosmo_map2meeg(ds, fn)
 %     % store a timeseries dataset in an EEGlab text file
 %     cosmo_map2meeg(ds,'eeglab_data.txt');
 %
+%     % convert a dataset structure to a FieldTrip structure
+%     ft=cosmo_map2meeg(ds,'-mat');
+%
+%     % convert a time-lock dataset to an EEGLAB structure
+%     eeglab_daterp=cosmo_map2meg(ds,'-daterp');
+%
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
+
+    if nargin<2
+        fn='-mat';
+    end
 
     cosmo_check_dataset(ds,'meeg');
 
     % for now only support ft-like output
-    builder=@build_ft;
+    [img_format,write_to_file]=find_img_format(fn);
+
+    builder=img_format.builder;
     hdr=builder(ds);
 
     % if filename was provided, store to file
-    if nargin>1
-        fn_parts=cosmo_strsplit(fn,'.');
-        if numel(fn_parts)<2
-            error('Filename needs extension');
-        end
-        ext=fn_parts{end};
-
-        ext2writer=struct();
-        ext2writer.txt=@write_eeglab_txt;
-        ext2writer.mat=@write_ft;
-        if ~isfield(ext2writer,ext);
-            error('Unsupported extension %s', ext);
-        end
-        writer=ext2writer.(ext);
+    if write_to_file
+        writer=img_format.writer;
         % write the file
         writer(fn, hdr);
     end
 
 
+function [img_format,write_to_file]=find_img_format(fn)
+    if ~ischar(fn) || isempty(fn)
+        error('filename must be non-empty string');
+    end
+
+    write_to_file=fn(1)~='-';
+    if write_to_file
+        ext=get_filename_extension(fn);
+    else
+        ext=fn(2:end);
+    end
+
+    all_formats=get_all_supported_img_formats();
+    keys=fieldnames(all_formats);
+
+    idx=find(cellfun(@(x)cosmo_match({ext},all_formats.(x).exts),keys));
+    n_match=numel(idx);
+    assert(n_match<=1); % cannot have multiple matches
+
+    if n_match==0
+        error('Image format not found for extension ''%s''',ext)
+    end
+
+    img_format=all_formats.(keys{idx});
+
+function ext=get_filename_extension(fn)
+    fn_parts=cosmo_strsplit(fn,'.');
+    if numel(fn_parts)<2
+        error('Filename needs extension');
+    end
+    ext=fn_parts{end};
+
+
+
+function all_formats=get_all_supported_img_formats()
+    all_formats=struct();
+
+    % EEGLAB text
+    all_formats.eeglab_txt.exts={'txt'};
+    all_formats.eeglab_txt.builder=@build_ft;
+    all_formats.eeglab_txt.writer=@write_eeglab_txt;
+
+    % EEGLAB matlab
+    all_formats.eeglab.exts={'daterp','icaerp','dattimef','icatimef'};
+    all_formats.eeglab.builder=@build_eeglab;
+    all_formats.eeglab.writer=@write_struct_as_mat;
+
+    all_formats.ft.exts={'mat'};
+    all_formats.ft.builder=@build_ft;
+    all_formats.ft.writer=@write_struct_as_mat;
+
+
+function write_struct_as_mat(fn,hdr)
+    % use matlab save
+    save(fn,'-mat','-struct','hdr');
+
+function tf=choose_equal_or_exception(value,if_true,if_false,desc)
+    if isequal(value,if_true)
+        tf=true;
+    elseif isequal(value,if_false)
+        tf=false;
+    else
+        error('value for %s is not supported', desc);
+    end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EEGLAB text
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function write_eeglab_txt(fn, hdr)
     if ~is_ft_timelock(hdr)
         error('Only time-lock data is supported for EEGlab data');
@@ -80,26 +161,106 @@ function write_eeglab_txt(fn, hdr)
     fprintf(fid,arr_pat,arr'); % transpose because order is row then column
     fclose(fid);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EEGLAB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function s=build_eeglab(ds)
+    fdim=ds.a.fdim;
+    fdim_labels=fdim.labels(:);
+    fdim_values=fdim.values(:);
 
-function write_ft(fn,hdr)
-    % use matlab save
-    save(fn, '-struct', 'hdr');
+    has_ica=choose_equal_or_exception(fdim_labels{1},'comp','chan',...
+                                        'fdim channel label');
+    has_freq=choose_equal_or_exception(fdim_labels(2:end),...
+                                        {'freq';'time'},{'time'},...
+                                        'fdim dimension labels');
+    if has_ica
+        chan_prefix='comp';
+    else
+        chan_prefix='chan';
+    end
 
+    % preparet output
+    s=struct();
+
+    % set frequency, if present
+    if has_freq
+        s.freqs=fdim_values{2};
+        freq_sz=numel(s.freqs);
+        datatype='timef';
+        chan_suffix=sprintf('_%s',datatype);
+    else
+        freq_sz=[];
+        datatype='erp';
+        chan_suffix='';
+    end
+
+    % set datatype
+    s.datatype=upper(datatype);
+
+    % deal with feature dimensions
+    nsamples=size(ds.samples,1);
+    ntime=numel(fdim_values{end});
+    each_chan_sz=[nsamples,freq_sz,ntime]; % with or without freq
+
+    chan_names=fdim_values{1};
+    nchan=numel(chan_names);
+
+    % unflattten the array
+    arr=cosmo_unflatten(ds,2);
+    assert(nchan==size(arr,2));
+
+    for k=1:nchan
+        chan_arr=reshape(arr(:,k,:),each_chan_sz);
+        key=sprintf('%s%d%s',chan_prefix,k,chan_suffix);
+
+        % it seems that for freq data, single trial data is the last
+        % dimension, whereas for erp data, single trial data is the first
+        % dimension.
+        if has_freq
+            chan_arr=shiftdim(chan_arr,1);
+         % note: no shift for erp data, as time is already the first
+         % dimension
+        end
+        s.(key)=chan_arr;
+    end
+
+    if ~has_ica
+        s.chanlabels=chan_names;
+    end
+
+    s.times=fdim_values{end};
+    s=set_parameters_if_present(s,ds);
+
+
+function s=set_parameters_if_present(s,ds)
+    if cosmo_isfield(ds,'a.meeg.parameters')
+        s.parameters=ds.a.meeg.parameters;
+    end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FieldTrip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function tf=is_ft_timelock(ft)
     tf=isstruct(ft) && ...
             isfield(ft,'dimord') && ...
-            cosmo_match({ft.dimord}, {'rpt_chan_time','chan_time'});
+            cosmo_match({ft.dimord}, {'rpt_chan_time',...
+                                        'subj_chan_time',...
+                                        'chan_time'});
 
 
 
-function samples_field=ft_detect_samples_field(ds, is_single_sample)
+function samples_field=ft_detect_samples_field(ds, is_without_samples_dim)
     nfreq=sum(cosmo_match(ds.a.fdim.labels,{'freq'}));
     ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
     nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
 
+    has_samples_field=cosmo_isfield(ds,'a.meeg.samples_field');
+
     if is_ds_source_struct(ds)
-        if is_single_sample
+        if is_without_samples_dim
             main_field='avg';
         else
             main_field='trial';
@@ -117,15 +278,23 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
     else
         if nchan>=1 && ntime>=1
             if nfreq>=1
+                % time-freq data
                 samples_field='powspctrm';
-            else
-                if is_single_sample
-                    samples_field='avg';
-                else
-                    samples_field='trial';
-                end
+                return;
             end
-            return
+
+            if is_without_samples_dim
+                % time-locked, single sample
+                samples_field='avg';
+                return;
+            end
+
+
+            if ~has_samples_field
+                % time-locked, multiple trials
+                samples_field='trial';
+                return
+            end
         end
     end
 
@@ -145,17 +314,22 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     [arr, dim_labels]=cosmo_unflatten(ds,[],'set_missing_to',NaN,...
                                             'matrix_labels',{'pos'});
 
-    is_single_sample=size(ds.samples,1)==1;
-    if is_single_sample
-        samples_label=cell(0);
-    elseif cosmo_isfield(ds,'a.meeg.samples_label')
+    is_without_samples_dim=size(ds.samples,1);
+
+    if cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
     else
-        samples_label={'rpt'};
+        if size(ds.samples,1)==1
+            samples_label=cell(0);
+        else
+            samples_label={'rpt'};
+        end
     end
 
+    is_without_samples_dim=isempty(samples_label);
+
     % store the data
-    samples_field=ft_detect_samples_field(ds, is_single_sample);
+    samples_field=ft_detect_samples_field(ds, is_without_samples_dim);
 
     samples_field_keys=cosmo_strsplit(samples_field,'.');
     nsubfields=numel(samples_field_keys)-1;
@@ -169,7 +343,7 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     switch nsubfields
         case 0
             % non-source data
-            ft=get_ft_sensor_samples_from_array(ds, arr, ...
+            ft=get_ft_sensor_samples_from_array(arr, samples_label, ...
                                         samples_field_keys{1});
 
         case 1
@@ -183,10 +357,11 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                         'subfield %s'],samples_field);
     end
 
-function ft=get_ft_sensor_samples_from_array(ds, arr, key)
-    if size(ds.samples,1)==1
+function ft=get_ft_sensor_samples_from_array(arr, samples_label, key)
+    if isempty(samples_label)
         arr_size=size(arr);
-        arr_ft=reshape(arr,[arr_size(2:end) 1]);
+        size_at_least_2d=[arr_size(2:end) 1];
+        arr_ft=reshape(arr,size_at_least_2d);
     else
         arr_ft=arr;
     end

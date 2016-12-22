@@ -18,17 +18,17 @@ General
 
 How should I cite CoSMoMVPA?
 ----------------------------
-We have submitted a manuscript for peer review, which is currently available as a preprint on bioRxiv :cite:`OCH16`:
+Please cite :cite:`OCH16`:
 
-    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. biorxiv.org, :doi:`10.1101/047118`.
+    Oosterhof, N. N., Connolly, A. C., and Haxby, J. V. (2016). CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave. Frontiers in Neuroinformatics, :doi:`10.3389/fninf.2016.00027`.
 
 BiBTeX record::
 
     @article{OCH16,
     author = {Oosterhof, Nikolaas N and Connolly, Andrew C and Haxby, James V},
     title = {{CoSMoMVPA: multi-modal multivariate pattern analysis of neuroimaging data in Matlab / GNU Octave}},
-    journal = {biorxiv.org},
-    doi = {10.1101/047118},
+    journal = {Frontiers in Neuroinformatics},
+    doi = {10.3389/fninf.2016.00027},
     year = {2016}
     }
 
@@ -43,6 +43,8 @@ What is the history of CoSMoMVPA?
     Their plan was to let participants write a basic MVPA toolbox in two days (see the :ref:`exercises <cosmo2013>`). This was, with hindsight, a tad ambitious.
 
     The initial components in CoSMoMVPA_ still stand, but quite a few things have changed in the meantime. CoSMoMVPA has added support for various file formats, including surface-based data and MEEG data. It also supports a wider range of analyses. Finally, there is a new set of :ref:`exercises <rhul2016>`, less aimed at writing your own toolbox, but more at understanding and implementing basic MVPA techniques using CoSMoMVPA_.
+
+    For recent changes, see the :ref:`changelog`.
 
 What are the main features?
 ---------------------------
@@ -162,6 +164,19 @@ How can I contact the developers directly?
 Is there a mailinglist?
 -----------------------
     There is the `CoSMoMVPA Google group`_.
+
+
+Why do you encourage balanced partitions?
+-----------------------------------------
+        'I noticed that CoSMoMVPA heavily 'encourages' balanced class distributions (with equal number of samples in each class), and recommends to remove data to balance; why?'
+
+TL;DR: it's much simpler and you don't lose much by enforcing balanced partitions.
+
+Longer version:the main reason for encouraging (almost enforcing) balanced partitions is a combination of simplicity and avoiding mistakes with 'above chance' classification.
+It is considerably simple when chance is 1/c, with c the number of classes; in particular, this simplifies second level (group) analysis and allows for a relatively quick Monte Carlo based multiple-comparison correction through sign-swapping (as implemented in :ref:`cosmo_montecarlo_cluster_stat`).
+In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can re-use the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
+
+
 
 ============
 How do I ...
@@ -835,6 +850,196 @@ Although :ref:`cosmo_slice` does not support neighborhood structures (yet), cons
         cosmo_check_neighborhood(nh,ds); % sanity check
 
 Alternatively, :ref:`cosmo_spherical_neighborhood` (and :ref:`cosmo_surficial_neighborhood`) can be used with a 'count' argument - it keeps the number of elements across neighborhoods more constant.
+
+Use multiple-comparison correction for a time course?
+-----------------------------------------------------
+'I have a matrix of beta values (Nsubjects x Ntimepoints) for each predictor and I want to test for each timepoint (i.e. each column) if the mean beta is significantly different from zero. I ran a t-test but I wonder if I should test for multiple comparisons as well.
+What would be the best way to test for significance here?'
+
+You could use multiple comparison correction using Threshold-Free Cluster Enhancement with a temporal neighborhood. Suppose your data is in the following data matrix:
+
+  .. code-block:: matlab
+
+        % generate gaussian example data with no signal;
+        n_subjects=15;
+        time_axis=-.1:.01:.5;
+
+        n_time=numel(time_axis);
+        data=randn(n_subjects,n_time);
+
+then the first step is to put this data in a dataset structure:
+
+    .. code-block:: matlab
+
+        % make a dataset
+        ds=struct();
+        ds.samples=data;
+
+        % insert time dimension
+        ds=cosmo_dim_insert(ds,2,0,{'time'},{time_axis},{1:numel(time_axis)});
+
+You would have to decide how to form clusters, i.e. whether you want to make inferences at the individual time point level, or at the cluster-of-timepoints level. Then use :ref:`cosmo_montecarlo_cluster_stat` to estimate significance.
+
+    .. code-block:: matlab
+
+        % Make a temporal neighborhood for clustering
+        %
+        % In the following, if
+        %
+        %   allow_clustering_over_time=true
+        % then clusters can form over multiple time points. This makes the analysis
+        % more sensitive if there is a true effect in the data over multiple
+        % consecutive time points. However, when allow_clustering_over_time=true
+        % then one cannot make inferences about a specific time point (i.e.
+        % "the effect was significant at t=100ms"), only about a cluster (i.e
+        % "the effect was significant in a cluster stretching between t=50 and
+        % t=150 ms"). If, on the ohter hand,
+        %
+        %   allow_clustering_over_time=false
+        %
+        % then inferences can be made at the individual time point level, at the
+        % expensive of sensitivity of detecting any significant effect if there is
+        % a true effect that spans multiple consecutive time points
+        allow_clustering_over_time=false; % true or false
+
+        % define the neighborhood
+        nh_cl=cosmo_cluster_neighborhood(ds,'time',allow_clustering_over_time);
+
+        % set subject information
+        n_samples=size(ds.samples,1);
+        ds.sa.chunks=(1:n_samples)';     % all subjects are independent
+        ds.sa.targets=ones(n_samples,1); % one-sample t-test
+
+        % set clustering
+        opt=struct();
+        opt.h0_mean=0; % expected mean against which t-test is run
+        opt.niter=10000; % 10,000 is recommdended for publication-quality analyses
+
+        % run TFCE Monte Carlo multiple comparison correction
+        % in the output map, z-scores above 1.65 (for one-tailed) or 1.96 (for
+        % two-tailed) tests are significant
+        ds_tfce=cosmo_montecarlo_cluster_stat(ds,nh_cl,opt);
+
+
+
+Classify different groups of participants (such as patients versus controls)?
+-----------------------------------------------------------------------------
+'I have participants in three groups, patients1, patients2, and controls. How can I see where in the brain people these groups can be discriminated above chance level?'
+
+    To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
+
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`cosmo_montecarlo_cluster_stat` without computing a feature statistic.
+
+    Consider the following example:
+
+    .. code-block:: matlab
+
+        % set number of groups and number of participants in each group
+        ngroups=3;
+        nchunks=10;
+
+        % generate example dataset with some signal that discriminates
+        % the participants
+        ds=cosmo_synthetic_dataset('ntargets',ngroups,'nchunks',nchunks);
+
+        % since all participants are independent, all chunks are set to
+        % unique values
+        ds.sa.chunks(:)=1:(ngroups*nchunks);
+
+        % define partitions
+        fold_count=50;
+        test_count=1;
+        partitions=cosmo_independent_samples_partitioner(ds,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+        % define neighborhood
+        radius_in_voxels=1; % typical is 3 voxels
+        nh=cosmo_spherical_neighborhood(ds,'radius',radius_in_voxels);
+
+        % run searchlight on original data
+        opt=struct();
+        opt.classifier=@cosmo_classify_lda;
+        opt.partitions=partitions;
+
+        result=cosmo_searchlight(ds,nh,...
+                            @cosmo_crossvalidation_measure,opt);
+
+        % generate null dataset
+        niter=100; % at least 1000 is iterations is recommended, 10000 is better
+        ds_null_cell=cell(niter,1);
+
+        for iter=1:niter
+            ds_null=ds;
+
+            ds_null.sa.targets=cosmo_randomize_targets(ds_null);
+
+            % update partitions
+            opt.partitions=cosmo_independent_samples_partitioner(ds_null,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+
+            null_result=cosmo_searchlight(ds_null,nh,...
+                                    @cosmo_crossvalidation_measure,opt);
+
+            ds_null_cell{iter}=null_result;
+        end
+        %%
+
+        % Since partitions are balanced, chance level
+        % is the inverse of the number of groups. For example,
+        % with 4 groups, chance level is 1/4 = 0.25 = 25%.
+        chance_level=1/ngroups;
+        tfce_dh=0.01; % should be sufficient for accuracies
+
+        opt=struct();
+        opt.h0_mean=chance_level;
+        opt.dh=tfce_dh;
+        opt.feature_stat='none';
+        opt.null=ds_null_cell;
+
+        cl_nh=cosmo_cluster_neighborhood(result);
+
+        %% compute TFCE map with z-scores
+        % z-scores above 1.65 are signficant at p=0.05 one-tailed.
+
+        tfce_map-cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
+
+When running an MEEG searchlight, have the same channels in the output dataset as in the input dataset?
+-------------------------------------------------------------------------------------------------------
+'When I run an MEEG searchlight over channels, the searchlight dataset map has more channels than the input dataset. Is this normal?'
+
+This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual particpants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
+
+If you want to use only the channels from the input dataset (say ``ds``) you can set the ``label`` option to 'dataset'. See the following example, where ``chan_nh`` has only channels from the input dataset.
+
+    .. code-block:: matlab
+
+        chan_nh=cosmo_meeg_chan_neighborhood(ds,'count',5,'label','dataset')
+
+
+Save MEEG data when I get the error "value for fdim channel label is not supported"?
+------------------------------------------------------------------------------------
+'When I try to export MEEG searchlight maps with channel information as MEEG data using ``cosmo_map2meeg(ds,'-dattimef')``, I get the error "value for fdim channel label is not supported"? Also I am unable to visualize the data in FieldTrip. Any idea how to fix this?'
+
+This is probably caused by a wrong feature dimension order when crossing the neighborhood with :ref:`cosmo_cross_neighborhood`. The FieldTrip convention for the order is ``'chan','time'`` (for time-locked data) or ``'chan','time','freq'`` (for time-frequency data). (As of 16 December 2016, a warning has been added if a non-standard dimension order is detected).
+
+It is possible to change the feature dimension order afterwards. First, the feature dimension order for a dataset struct ``ds`` can be displayed by running:
+
+    .. code-block:: matlab
+
+        disp(ds.a.fdim.labels)
+
+If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimension should be moved from position 3 to position 1 to become ``'chan','freq','time'``. To move the channel dimension, first remove the dimension, than insert it at another position, as follows:
+
+    .. code-block:: matlab
+
+        label_to_move='chan';
+        target_pos=1;
+        [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
+        ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
+
 
 
 .. include:: links.txt

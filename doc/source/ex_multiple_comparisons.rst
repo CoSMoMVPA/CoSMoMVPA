@@ -9,7 +9,7 @@ Using CoSMoMVPA multiple-comparison correction
 Rationale
 +++++++++
 
-A :ref:`previous exercise <ex_searchligh>` showed how to generate a whole-brain map. How do we know which features (voxels) show a significant effect?
+A :ref:`previous exercise <ex_searchlight>` showed how to generate a whole-brain map. How do we know which features (voxels) show a significant effect?
 
 A few approaches for whole-brain multiple-comparison methods have been proposed in the literature, but are *not* used in CoSMoMVPA:
 

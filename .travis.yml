@@ -9,17 +9,19 @@ language: java
 cache:
   - apt
 env:
-  - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false
-  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false
-  - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
-matrix:
-  # allow failures with coverage, because execution speed
-  # is significantly lower when coverage is enabled which may
-  # result in a time-out (error) when execution time
-  # exceeds 50 minutes.
-  allow_failures:
-    - env: TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true
-  fast_finish: true
+  global:
+    - COVERALLS_PARALLEL=true
+  matrix:
+    - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -60,6 +62,16 @@ install:
     - OCTAVERC=~/.octaverc
     - OCTAVEPTH=`pwd`/CoSMoMVPA/mvpa
     - CHECKEXTCMD=""
+    - OCTAVE_DISABLE_WARNINGS=" Octave:array-to-scalar
+                                Octave:imag-to-real
+                                Octave:language-extension
+                                Octave:missing-semicolon
+                                Octave:resize-on-range-error
+                                Octave:separator-insert
+                                Octave:single-quote-string
+                                Octave:str-to-num
+                                Octave:mixed-string-concat
+                                Octave:variable-switch-label"
     - OCTAVE=octave
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
@@ -144,6 +156,7 @@ before_script:
 
     # optionally enable Octave parallel package
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
           echo "" >> $OCTAVERC;
       fi
@@ -163,9 +176,6 @@ before_script:
       fi
 
 
-    # show which packages are installed
-    - $OCTAVE --eval "pkg('list')"
-
     # optionally enable experimental evalc implementation
     - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
           mkdir savannah_evalc;
@@ -173,6 +183,15 @@ before_script:
           $RETRY $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
+    # show Octave-rc
+    - echo "Octave-rc:"; cat $OCTAVERC
+
+
+    # show which packages are installed
+    - $OCTAVE --eval "pkg('list')"
+
+     # show WTF
+    - $OCTAVE --eval "addpath('${PTH}/CoSMoMVPA/mvpa');cosmo_wtf()"
 
 script:
     - cd CoSMoMVPA
@@ -186,12 +205,26 @@ script:
           elif [[  "$TRAVIS" == "true"  ]]; then
               OUTPUT_ARGS=COVER_JSON_FILE=`pwd`/coveralls.json;
               AFTER_SCRIPT="curl --verbose -F json_file=@`pwd`/coveralls.json https://coveralls.io/api/v1/jobs";
+              if [ ! -z "$PARTITION_INDEX" ]; then
+                  PARTITION_ARGS="TEST_PARTITION_INDEX=${PARTITION_INDEX} TEST_PARTITION_COUNT=${PARTITION_COUNT}";
+              fi
           fi;
       elif [[  "$SHIPPABLE" == "true"  ]]; then
           RESULT_ARGS=JUNIT_XML_FILE=shippable/testresults/test_results.xml;
       fi
-    - echo Test arguments $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
-    - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS
-    - $AFTER_SCRIPT
 
+    - make test $TEST_ARGS $COVER_ARGS $OUTPUT_ARGS $RESULT_ARGS $PARTITION_ARGS
+
+after_script:
+  - echo "After script"
+  - tools/travis_after_all.py $TRAVIS_AFTER_ALL_ARGS
+  - cat .to_export_back
+  - export $(cat .to_export_back)
+  - if [[  "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
+        if [[  "$TRAVIS" == "true"  ]]; then
+            echo "Sending json";
+            cat `pwd`/coveralls.json;
+        fi;
+    fi
+  - $AFTER_SCRIPT
 

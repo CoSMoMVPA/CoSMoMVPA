@@ -117,7 +117,7 @@ function test_searchlight_partial_classification
     opt.classifier=@cosmo_classify_lda;
     opt.partitions=partitions;
     opt.progress=false;
-    opt.output='predictions';
+    opt.output='winner_predictions';
 
 
     nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);

@@ -1,0 +1,65 @@
+===================
+CoSMoMVPA changelog
+===================
+
+* 1.1.0 (2016-12-06)
+
+    * Fixed
+
+        * **Major** Fix issue in :ref:`cosmo_montecarlo_cluster_stat`, which returned z-scores corresponding than one-tailed instead of two-tailed probabilities, doubling the Type I error rate.
+
+        * When using GNU Octave, let :ref:`cosmo_check_external` deal properly with packages that are installed but not loaded.
+
+    * Changed behaviour
+        
+        * In :ref:`cosmo_crossvalidate`, the first output contains (for each sample) a prediction for each fold, rather than one single prediction computed by :ref:`cosmo_winner_indices`. (Unchanged is that :ref:`cosmo_crossvalidation_measure` returns, by default, a single prediction per sample).
+
+    * Deprecated
+
+        * In :ref:`cosmo_crossvalidation_measure`, the "predictions" and "raw" output options are deprecated; use "winner_predictions" instead.
+        * :ref:`cosmo_dataset_slice_fa` and :ref:`cosmo_dataset_slice_fa` will be removed in the future; use :ref:`cosmo_slice` instead.
+        * :ref:`cosmo_dim_slice` will be removed in the future; use :ref:`cosmo_slice` and :ref:`cosmo_dim_prune` instead.
+        * :ref:`cosmo_meta_feature_selection_classifier`  will be removed in the future; use :ref:`cosmo_classify_meta_feature_selection` instead.
+
+    * Removed
+
+        * in :ref:`cosmo_crossvalidation_measure`, the "accuracy_by_chunk" output option has been removed. Use "fold_predictions" to get predictions for each fold.
+        * in :ref:`cosmo_naive_bayes_classifier_searchlight`, the "predictions" output option has been removed. Use "winner_predictions" instead.
+        
+
+    * New features
+        
+        * :ref:`cosmo_meeg_dataset` and :ref:`cosmo_map2meeg` provide input/output support for EEGLAB datasets with study structure, and for FieldTrip datasets with "subj" as the first dimension in dimord.
+
+        * :ref:`cosmo_montecarlo_cluster_stat` and :ref:`cosmo_searchlight` support parallellization over multiple CPU cores/threads using the "nproc" parameter.
+
+        * New function :ref:`cosmo_independent_samples_partitioner` for MEEG datasets where samples can be assumed to be independent.
+
+        * New function :ref:`cosmo_randperm` with optional seed.
+
+        * New functions for parallel computations on the Matlab and Octave platform, :ref:`cosmo_parallel_get_nproc_available` and :ref:`cosmo_parcellfun`.
+        
+        * New functions :ref:`cosmo_map_pca` and :ref:`cosmo_pca` for Principal Component Analysis (PCA), and support for PCA in :ref:`cosmo_crossvalidate` and :ref:`cosmo_crossvalidation_measure`.
+
+        * Added Changelog
+
+    * Contributors
+        
+        * Tijl Grootswagers
+
+    * Acknowledgements
+
+        * Christoph Braun
+        * Tijl Grootswagers
+        * Thomas Hinault
+        * Maria Montchal
+        * Daria Proklova
+        * Joscha Schmiedt
+        * Jo Taylor
+        * Lara Todorova
+        * Raffaele Tucciarelli
+
+
+* 1.0.0 (2016-07-22)
+
+    * First public release.
