@@ -68,7 +68,7 @@ function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets
         cached_model=model;
     end
 
-    predicted=test(model, samples_test);
+    [predicted,decisionvalues]=test(model, samples_test);
 
 function model=train(samples_train,targets_train,opt)
     [ntrain, nfeatures]=size(samples_train);
@@ -120,7 +120,7 @@ function output=eval_with_check_external(func)
     end
 
 
-function predicted=test(model, samples_test)
+function [predicted,decisionvalues]=test(model, samples_test)
     [ntest, nfeatures]=size(samples_test);
     if nfeatures~=model.nfeatures
         error(['Number of features in train set (%d) and '...
