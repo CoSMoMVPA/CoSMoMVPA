@@ -146,7 +146,7 @@ function test_cross_neighborhood_transpose
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',1);
     nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
 
-    nh=cosmo_cross_neighborhood(ds,{nh_time,nh_freq},opt);
+    nh=cosmo_cross_neighborhood(ds,{nh_freq,nh_time},opt);
 
     cp=cosmo_cartprod(repmat({[false,true]},4,1));
     n=size(cp,1);
@@ -178,7 +178,7 @@ function test_cross_neighborhood_transpose
         nh2_time=cosmo_interval_neighborhood(ds2,'time','radius',1);
         nh2_freq=cosmo_interval_neighborhood(ds2,'freq','radius',0);
 
-        nh2=cosmo_cross_neighborhood(ds2,{nh2_time,nh2_freq},opt);
+        nh2=cosmo_cross_neighborhood(ds2,{nh2_freq,nh2_time},opt);
         assertEqual(nh2.a,nh.a);
         assertEqual(nh2.fa,nh.fa);
         assertEqual(nh2.neighbors,nh.neighbors);
