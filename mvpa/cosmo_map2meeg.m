@@ -252,7 +252,7 @@ function tf=is_ft_timelock(ft)
 
 
 
-function samples_field=ft_detect_samples_field(ds, is_single_sample)
+function samples_field=ft_detect_samples_field(ds, is_without_samples_dim)
     nfreq=sum(cosmo_match(ds.a.fdim.labels,{'freq'}));
     ntime=sum(cosmo_match(ds.a.fdim.labels,{'time'}));
     nchan=sum(cosmo_match(ds.a.fdim.labels,{'chan'}));
@@ -260,7 +260,7 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
     has_samples_field=cosmo_isfield(ds,'a.meeg.samples_field');
 
     if is_ds_source_struct(ds)
-        if is_single_sample
+        if is_without_samples_dim
             main_field='avg';
         else
             main_field='trial';
@@ -283,7 +283,7 @@ function samples_field=ft_detect_samples_field(ds, is_single_sample)
                 return;
             end
 
-            if is_single_sample
+            if is_without_samples_dim
                 % time-locked, single sample
                 samples_field='avg';
                 return;
@@ -314,18 +314,22 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     [arr, dim_labels]=cosmo_unflatten(ds,[],'set_missing_to',NaN,...
                                             'matrix_labels',{'pos'});
 
-    is_single_sample=size(ds.samples,1)==1;
+    is_without_samples_dim=size(ds.samples,1);
 
     if cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
-    elseif is_single_sample
-        samples_label=cell(0);
     else
-        samples_label={'rpt'};
+        if size(ds.samples,1)==1
+            samples_label=cell(0);
+        else
+            samples_label={'rpt'};
+        end
     end
 
+    is_without_samples_dim=isempty(samples_label);
+
     % store the data
-    samples_field=ft_detect_samples_field(ds, is_single_sample);
+    samples_field=ft_detect_samples_field(ds, is_without_samples_dim);
 
     samples_field_keys=cosmo_strsplit(samples_field,'.');
     nsubfields=numel(samples_field_keys)-1;
@@ -339,7 +343,7 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     switch nsubfields
         case 0
             % non-source data
-            ft=get_ft_sensor_samples_from_array(ds, arr, ...
+            ft=get_ft_sensor_samples_from_array(arr, samples_label, ...
                                         samples_field_keys{1});
 
         case 1
@@ -353,10 +357,11 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
                         'subfield %s'],samples_field);
     end
 
-function ft=get_ft_sensor_samples_from_array(ds, arr, key)
-    if size(ds.samples,1)==1
+function ft=get_ft_sensor_samples_from_array(arr, samples_label, key)
+    if isempty(samples_label)
         arr_size=size(arr);
-        arr_ft=reshape(arr,[arr_size(2:end) 1]);
+        size_at_least_2d=[arr_size(2:end) 1];
+        arr_ft=reshape(arr,size_at_least_2d);
     else
         arr_ft=arr;
     end

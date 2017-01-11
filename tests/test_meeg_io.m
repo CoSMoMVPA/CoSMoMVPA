@@ -512,6 +512,65 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     ext=[ext_prefix, ext_suffix];
 
 
+function test_dimord_label()
+    opt=struct();
+    opt.samples_label={'','rpt','trial'};
+    opt.nsamples={1,randint(),10};
+    opt.datatype={'timefreq','timelock'};
+
+    combis=cosmo_cartprod(opt);
+    n_combi=numel(combis);
+
+    for k=1:n_combi
+        c=combis{k};
+
+        ds=cosmo_synthetic_dataset('type',c.datatype,...
+                                        'ntargets',1,...
+                                        'nchunks',c.nsamples,...
+                                    'size','big');
+        assertEqual(size(ds.samples,1),c.nsamples);
+
+        with_samples_label=~isempty(c.samples_label);
+        if with_samples_label
+            ds.a.meeg.samples_label=c.samples_label;
+        else
+            ds.a.meeg=rmfield(ds.a.meeg,'samples_label');
+        end
+
+        data_is_average=c.nsamples==1 && ~with_samples_label;
+
+        switch c.datatype
+            case 'timefreq'
+                samples_field='powspctrm';
+
+            case 'timelock'
+                if data_is_average
+                    samples_field='avg';
+                else
+                    samples_field='trial';
+                end
+
+            otherwise
+                assert(false)
+        end
+
+
+        ft=cosmo_map2meeg(ds);
+
+        labels=cosmo_strsplit(ft.dimord,'_');
+
+        ndim_expected=numel(ds.a.fdim.labels);
+        if ~data_is_average
+            ndim_expected=ndim_expected+1;
+        end
+
+        assertEqual(numel(labels),ndim_expected);
+        assertEqual(numel(size(ft.(samples_field))),ndim_expected);
+
+    end
+
+
+
 function x=randint()
     x=ceil(rand()*10+5);
 
