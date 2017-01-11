@@ -4,9 +4,9 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 % cosmo_check_partitions(partitions, ds, varargin)
 %
 % Inputs:
-%   ds          dataset struct with fields .sa.{targets,chunks}
 %   partitions  struct with partitions, e.g. from
 %               cosmo_{nfold,oddeven,nchoosek}_partitioner
+%   ds          dataset struct with fields .sa.{targets,chunks}
 %   opt         (optional) struct with optional field:
 %     .unbalanced_partitions_ok    if set to true, then unbalanced
 %                                  partitions (with a different number of
