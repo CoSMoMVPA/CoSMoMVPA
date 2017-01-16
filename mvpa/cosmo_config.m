@@ -177,7 +177,8 @@ function path_fn=find_config_file(fn, raise_)
         % is it in the user path?
         % (not supported on octave)
         if cosmo_wtf('is_matlab')
-            upaths=cosmo_strsplit(userpath(),':');
+            upaths=cosmo_strsplit(userpath(),';');
+            %if strncmp(upaths{2}(end),';',1); upaths{2} = upaths{2}(1:end-1); end
             for k=1:numel(upaths)
                 u_fn=fullfile(upaths{k},fn);
                 if exist_(u_fn)
