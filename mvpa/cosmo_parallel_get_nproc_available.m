@@ -32,19 +32,23 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
     [max_nproc_available,msg]=max_nproc_available_query_func();
 
     if ~isfield(opt,'nproc')
+        disp('here');
+        disp(max_nproc_available)
+        disp('dnoe');
         nproc_available=max_nproc_available;
         return;
     end
 
     nproc_wanted=opt.nproc;
+    nproc_available=max_nproc_available;
+
     if nproc_wanted>max_nproc_available
-        nproc_available=max_nproc_available;
         full_msg=sprintf(['''nproc''=%d requested, but %s. '...
                             'Using ''nproc''=%d'],...
                             nproc_wanted,msg,nproc_available);
-        warning(msg);
-        nproc_available=max_nproc_available;
+        warning(full_msg);
     end
+
 
 
 
@@ -101,7 +105,7 @@ function [nproc_available,msg]=octave_get_max_nproc_available
         return;
     end
 
-    nproc_available=nproc_available('overridable');
+    nproc_available=nproc('overridable');
 
 
 function tf=platform_has_functions(function_names)
