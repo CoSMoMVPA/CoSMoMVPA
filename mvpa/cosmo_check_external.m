@@ -545,7 +545,19 @@ function externals=get_externals_helper()
     externals.mocov.url='https://github.com/MOcov/MOcov';
 
 function tf=has_octave_package(label)
-    tf=cosmo_wtf('is_octave') && ~isempty(pkg('list',label));
+    tf=false;
+    if ~cosmo_wtf('is_octave')
+        return;
+    end
+
+    result=pkg('list',label);
+    if isempty(result)
+        return;
+    end
+
+    assert(numel(result)==1);
+
+    tf=result{1}.loaded;
 
 function tf=same_path(args)
     pths=cellfun(@(x)fileparts(which(x)),args,'UniformOutput',false);

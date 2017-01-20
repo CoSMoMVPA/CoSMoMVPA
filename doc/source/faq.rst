@@ -44,6 +44,8 @@ What is the history of CoSMoMVPA?
 
     The initial components in CoSMoMVPA_ still stand, but quite a few things have changed in the meantime. CoSMoMVPA has added support for various file formats, including surface-based data and MEEG data. It also supports a wider range of analyses. Finally, there is a new set of :ref:`exercises <rhul2016>`, less aimed at writing your own toolbox, but more at understanding and implementing basic MVPA techniques using CoSMoMVPA_.
 
+    For recent changes, see the :ref:`changelog`.
+
 What are the main features?
 ---------------------------
 CoSMoMVPA_ provides:
@@ -920,7 +922,123 @@ You would have to decide how to form clusters, i.e. whether you want to make inf
 
 
 
+Classify different groups of participants (such as patients versus controls)?
+-----------------------------------------------------------------------------
+'I have participants in three groups, patients1, patients2, and controls. How can I see where in the brain people these groups can be discriminated above chance level?'
 
+    To do so, consider a standard searchlight using :ref:`cosmo_searchlight` with `cosmo_crossvalidation_measure`. Group membership is set in ``.sa.targets``. Since all participants are assumed to be independent, values in ``.sa.chunks`` are all unique.
+
+    Correcting for multiple comparisons is more difficult. Since it is not possible to do a 'standard' t-test (two groups) or ANOVA F-test (three or more groups), instead generate null datasets manually by randomly permuting the ``.sa.targets`` labels. Then use these null datasets directly as input for :ref:`cosmo_montecarlo_cluster_stat` without computing a feature statistic.
+
+    Consider the following example:
+
+    .. code-block:: matlab
+
+        % set number of groups and number of participants in each group
+        ngroups=3;
+        nchunks=10;
+
+        % generate example dataset with some signal that discriminates
+        % the participants
+        ds=cosmo_synthetic_dataset('ntargets',ngroups,'nchunks',nchunks);
+
+        % since all participants are independent, all chunks are set to
+        % unique values
+        ds.sa.chunks(:)=1:(ngroups*nchunks);
+
+        % define partitions
+        fold_count=50;
+        test_count=1;
+        partitions=cosmo_independent_samples_partitioner(ds,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+        % define neighborhood
+        radius_in_voxels=1; % typical is 3 voxels
+        nh=cosmo_spherical_neighborhood(ds,'radius',radius_in_voxels);
+
+        % run searchlight on original data
+        opt=struct();
+        opt.classifier=@cosmo_classify_lda;
+        opt.partitions=partitions;
+
+        result=cosmo_searchlight(ds,nh,...
+                            @cosmo_crossvalidation_measure,opt);
+
+        % generate null dataset
+        niter=100; % at least 1000 is iterations is recommended, 10000 is better
+        ds_null_cell=cell(niter,1);
+
+        for iter=1:niter
+            ds_null=ds;
+
+            ds_null.sa.targets=cosmo_randomize_targets(ds_null);
+
+            % update partitions
+            opt.partitions=cosmo_independent_samples_partitioner(ds_null,...
+                                'fold_count',fold_count,...
+                                'test_count',test_count);
+
+
+            null_result=cosmo_searchlight(ds_null,nh,...
+                                    @cosmo_crossvalidation_measure,opt);
+
+            ds_null_cell{iter}=null_result;
+        end
+        %%
+
+        % Since partitions are balanced, chance level
+        % is the inverse of the number of groups. For example,
+        % with 4 groups, chance level is 1/4 = 0.25 = 25%.
+        chance_level=1/ngroups;
+        tfce_dh=0.01; % should be sufficient for accuracies
+
+        opt=struct();
+        opt.h0_mean=chance_level;
+        opt.dh=tfce_dh;
+        opt.feature_stat='none';
+        opt.null=ds_null_cell;
+
+        cl_nh=cosmo_cluster_neighborhood(result);
+
+        %% compute TFCE map with z-scores
+        % z-scores above 1.65 are signficant at p=0.05 one-tailed.
+
+        tfce_map-cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
+
+When running an MEEG searchlight, have the same channels in the output dataset as in the input dataset?
+-------------------------------------------------------------------------------------------------------
+'When I run an MEEG searchlight over channels, the searchlight dataset map has more channels than the input dataset. Is this normal?'
+
+This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual particpants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
+
+If you want to use only the channels from the input dataset (say ``ds``) you can set the ``label`` option to 'dataset'. See the following example, where ``chan_nh`` has only channels from the input dataset.
+
+    .. code-block:: matlab
+
+        chan_nh=cosmo_meeg_chan_neighborhood(ds,'count',5,'label','dataset')
+
+
+Save MEEG data when I get the error "value for fdim channel label is not supported"?
+------------------------------------------------------------------------------------
+'When I try to export MEEG searchlight maps with channel information as MEEG data using ``cosmo_map2meeg(ds,'-dattimef')``, I get the error "value for fdim channel label is not supported"? Also I am unable to visualize the data in FieldTrip. Any idea how to fix this?'
+
+This is probably caused by a wrong feature dimension order when crossing the neighborhood with :ref:`cosmo_cross_neighborhood`. The FieldTrip convention for the order is ``'chan','time'`` (for time-locked data) or ``'chan','time','freq'`` (for time-frequency data). (As of 16 December 2016, a warning has been added if a non-standard dimension order is detected).
+
+It is possible to change the feature dimension order afterwards. First, the feature dimension order for a dataset struct ``ds`` can be displayed by running:
+
+    .. code-block:: matlab
+
+        disp(ds.a.fdim.labels)
+
+If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimension should be moved from position 3 to position 1 to become ``'chan','freq','time'``. To move the channel dimension, first remove the dimension, than insert it at another position, as follows:
+
+    .. code-block:: matlab
+
+        label_to_move='chan';
+        target_pos=1;
+        [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
+        ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
 
 
 

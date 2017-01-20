@@ -40,6 +40,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Thomas Hartmann
 + James Haxby
 + Clayton Hickey
++ Thomas Hinault
 + Daniel Kaiser
 + James Keidel
 + Sukhbinder Kumar
@@ -47,6 +48,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Seth Levine
 + Stefania Mattioni
 + Mike Miller
++ Maria Montchal
 + Sam Nastase
 + Liuba Papeo
 + Nicholas Peatfield

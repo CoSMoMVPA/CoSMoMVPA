@@ -173,7 +173,7 @@ function test_test_vol_coordinates_exceptions()
 function remove_dir_helper(tmp_dir)
     if cosmo_wtf('is_octave')
         rmdir_state=confirm_recursive_rmdir();
-        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state);
+        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state));
         confirm_recursive_rmdir(false,'local');
     end
     rmdir(tmp_dir,'s');

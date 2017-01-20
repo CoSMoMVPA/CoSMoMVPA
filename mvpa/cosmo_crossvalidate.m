@@ -1,4 +1,4 @@
-function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, partitions, opt)
+function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 % performs cross-validation using a classifier
 %
 % [pred, accuracy] = cosmo_crossvalidate(dataset, classifier, partitions, opt)
@@ -16,6 +16,13 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %                       first dimension of ds. Normalization
 %                       parameters are estimated using the training data
 %                       and applied to the testing data.
+%     .pca_explained_count   optional, transform the data with PCA prior to
+%                            classification, and retain this number of
+%                            components
+%     .pca_explained_ratio   optional, transform the data with PCA prior to
+%                            classification, and retain the components that
+%                            explain this percentage of the variance
+%                            (value between 0-1)
 %    .check_partitions  optional (default: true). If set to false then
 %                       partitions are not checked for being set properly.
 %    .average_train_X   average the samples in the train set using
@@ -40,22 +47,23 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     partitions=cosmo_nfold_partitioner(ds);
 %     classifier=@cosmo_classify_naive_bayes;
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                       partitions);
-%     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred chunks])
-%     >      3     3     1
-%     >      4     4     1
-%     >      5     5     1
-%     >      3     3     2
-%     >      4     5     2
-%     >      5     5     2
-%     >      3     3     3
-%     >      4     4     3
-%     >      5     5     3
-%     >      3     3     4
-%     >      4     4     4
-%     >      5     5     4
+%     % show targets, chunks, and predictions labels for each of the
+%     % four folds
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [   3   NaN   NaN   NaN
+%     >     4      1        4   NaN   NaN   NaN
+%     >     5      1        5   NaN   NaN   NaN
+%     >     3      2      NaN     3   NaN   NaN
+%     >     4      2      NaN     5   NaN   NaN
+%     >     5      2      NaN     5   NaN   NaN
+%     >     3      3      NaN   NaN     3   NaN
+%     >     4      3      NaN   NaN     4   NaN
+%     >     5      3      NaN   NaN     5   NaN
+%     >     3      4      NaN   NaN   NaN     3
+%     >     4      4      NaN   NaN   NaN     4
+%     >     5 ]    4 ]    NaN   NaN   NaN     5 ] }
 %     disp(accuracy)
 %     >     0.9167
 %     %
@@ -63,49 +71,49 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 %     partitions=cosmo_nchoosek_partitioner(ds,2);
 %     classifier=@cosmo_classify_lda;
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                           partitions);
-%     % show targets, predicted labels, and accuracy
-%     % (chunks are set to NaN because there is no unique chunk for
-%     %  each prediction)
-%     disp([ds.sa.targets pred chunks])
-%     >      3     5   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     5   NaN
-%     >      3     3   NaN
-%     >      4     4   NaN
-%     >      5     3   NaN
+%     % show targets, chunks, and predictions labels for each of the
+%     % four folds
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [   5     5     3   NaN   NaN   NaN
+%     >     4      1        4     4     4   NaN   NaN   NaN
+%     >     5      1        5     5     4   NaN   NaN   NaN
+%     >     3      2        3   NaN   NaN     3     3   NaN
+%     >     4      2        4   NaN   NaN     4     4   NaN
+%     >     5      2        5   NaN   NaN     4     5   NaN
+%     >     3      3      NaN     5   NaN     3   NaN     3
+%     >     4      3      NaN     4   NaN     4   NaN     4
+%     >     5      3      NaN     5   NaN     5   NaN     5
+%     >     3      4      NaN   NaN     3   NaN     3     3
+%     >     4      4      NaN   NaN     4   NaN     4     5
+%     >     5 ]    4 ]    NaN   NaN     5   NaN     3     3 ] }
 %     disp(accuracy)
-%     >     0.8333
+%     >     0.7778
 %     %
-%     % as the example above, but use z-scoring on each training set
-%     % and apply the estimated mean and std to the test set.
+%     % as the example above, but (1) use z-scoring on each training set
+%     % and apply the estimated mean and std to the test set, and (2)
+%     % use odd-even partitioner
 %     opt=struct();
 %     opt.normalization='zscore';
 %     partitions=cosmo_oddeven_partitioner(ds);
 %     % run crossvalidation
-%     [pred,accuracy,chunks]=cosmo_crossvalidate(ds, classifier, ...
+%     [pred,accuracy]=cosmo_crossvalidate(ds, classifier, ...
 %                                                        partitions, opt);
 %     % show targets, predicted labels, and accuracy
-%     disp([ds.sa.targets pred chunks])
-%     >      3     5     1
-%     >      4     4     1
-%     >      5     5     1
-%     >      3     3     2
-%     >      4     4     2
-%     >      5     5     2
-%     >      3     5     3
-%     >      4     4     3
-%     >      5     5     3
-%     >      3     3     4
-%     >      4     4     4
-%     >      5     3     4
+%     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
+%     > { [ 3    [ 1    [ NaN     5
+%     >     4      1      NaN     4
+%     >     5      1      NaN     5
+%     >     3      2        3   NaN
+%     >     4      2        4   NaN
+%     >     5      2        5   NaN
+%     >     3      3      NaN     5
+%     >     4      3      NaN     4
+%     >     5      3      NaN     5
+%     >     3      4        3   NaN
+%     >     4      4        4   NaN
+%     >     5 ]    4 ]      3   NaN ] }
 %     disp(accuracy)
 %     >     0.7500
 %
@@ -139,6 +147,19 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
         normalization=[];
     end
 
+    if all(isfield(opt, {'pca_explained_count','pca_explained_ratio'}))
+            error(['pca_explained_count and pca_explained_ratio are ' ...
+                'mutually exclusive'])
+    elseif isfield(opt, 'pca_explained_count');
+        arg_pca='pca_explained_count';
+        arg_pca_value=opt.pca_explained_count;
+    elseif isfield(opt, 'pca_explained_ratio');
+        arg_pca='pca_explained_ratio';
+        arg_pca_value=opt.pca_explained_ratio;
+    else
+        arg_pca=[];
+    end
+
     if opt.check_partitions
         cosmo_check_partitions(partitions, ds);
     end
@@ -154,24 +175,16 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
     nsamples=size(ds.samples,1);
 
     % space for output (one column per partition)
-    % the k-th column contains predictions for the k-th partition
-    % (with values of zeros if there was no prediction)
-    all_pred=NaN(nsamples,npartitions);
+    % the k-th column contains predictions for the k-th fold
+    % (with values of NaNs if there was no prediction)
+    pred=NaN(nsamples,npartitions);
 
     targets=ds.sa.targets;
-    chunks=ds.sa.chunks;
-
-    % keep track for which samples there has been a prediction
-    test_mask=false(nsamples,1);
-
-    % keep track how often a prediction there was made for each chunk
-    test_chunks=NaN(nsamples,1);
-    test_counts=zeros(nsamples,1);
 
     % process each fold
-    for k=1:npartitions
-        train_idxs=train_indices{k};
-        test_idxs=test_indices{k};
+    for fold=1:npartitions
+        train_idxs=train_indices{fold};
+        test_idxs=test_indices{fold};
         % for each partition get the training and test data, store in
         % train_data and test_data
         train_data = ds.samples(train_idxs,:);
@@ -193,51 +206,31 @@ function [pred, accuracy, test_chunks] = cosmo_crossvalidate(ds, classifier, par
 
         test_data = ds.samples(test_idxs,:);
 
+        % apply pca
+        if ~isempty(arg_pca)
+            [train_data,pca_params]=cosmo_map_pca(train_data,...
+                    arg_pca,arg_pca_value);
+            test_data=cosmo_map_pca(test_data,'pca_params',pca_params);
+        end
+
         % apply normalization
         if ~isempty(normalization)
             [train_data,params]=cosmo_normalize(train_data,normalization);
             test_data=cosmo_normalize(test_data,params);
         end
 
-
-
-        % >@@>
         % then get predictions for the training samples using
         % the classifier, and store these in the k-th column of all_pred.
         p = classifier(train_data, train_targets, test_data, opt);
 
-        all_pred(test_idxs,k) = p;
-        test_mask(test_idxs)=true;
-        % <@@<
-
-        test_counts(test_idxs)=test_counts(test_idxs)+1;
-        test_chunks(test_idxs)=chunks(test_idxs);
+        pred(test_idxs,fold) = p;
     end
 
-    % combine predictions for multiple partitions
-    % - in the case of nfold-crossvalidation there is just one prediction
-    %   for each sample, but with other cross validation schemes such as
-    %   from nchoosek_partitioner(ds, 2) there can be more than one.
-    [pred_indices,classes]=cosmo_winner_indices(all_pred);
-
-    % sanity check: missing predictions should be identical to lack of
-    % winners
-    assert(all(isnan(pred_indices)~=test_mask));
-    assert(all(isnan(pred_indices)==isnan(test_chunks)));
-
-    % only chunks with single prediction are not set to NaN
-    test_chunks(test_counts~=1)=NaN;
-
-    % set predictions
-    pred=NaN(nsamples,1);
-    pred(test_mask)=classes(pred_indices(test_mask));
-
     % compute accuracies
-    correct_mask=ds.sa.targets(test_mask)==pred(test_mask);
-    ncorrect = sum(correct_mask);
-    ntotal = numel(correct_mask);
+    has_prediction_mask=~isnan(pred);
+    correct_mask=bsxfun(@eq,targets,pred) & has_prediction_mask;
 
-    accuracy = ncorrect/ntotal;
+    accuracy=sum(correct_mask)/sum(has_prediction_mask);
 
 function [do_average_train, average_train_opt]=get_average_train_opt(opt)
     persistent cached_opt;

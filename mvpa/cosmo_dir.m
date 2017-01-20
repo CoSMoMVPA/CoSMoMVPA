@@ -9,7 +9,8 @@ function files=cosmo_dir(varargin)
 %   file_pattern   optional pattern to match file names. The wildcards '*'
 %                  (zero or more of any character) and '?' (any single
 %                  character) can be used. If omitted, '*' is used, meaning
-%                  that all files are listed.
+%                  that all files are listed. A file pattern may be
+%                  prefixed by a directory.
 % Output:
 %   files          Px1 struct (if P files were found in the directory or
 %                  recursively in any (sub^X)-directorie) with fields
@@ -45,6 +46,10 @@ function files=cosmo_dir(varargin)
 %  % list recursively all files in the directory 'my_dir' with extension
 %  % '.jpg'
 %  d=cosmo_dir('my_dir', '*.jpg')
+%
+%  % as above but with a single argument; list recursively all files in
+%  % the directory 'my_dir' with extension '.jpg'
+%  d=cosmo_dir('my_dir/*.jpg')
 %
 %  % list recursively all files in my_dir that are two characters long,
 %  % followed by the extension '.jpg'
@@ -93,8 +98,8 @@ function [root_dir,file_pat]=process_arguments(varargin)
             if narg>=2
                 error('Directory not found: ''%s''', arg1);
             end
-            root_dir='';
-            file_pat=arg1;
+            [root_dir,nm,ext]=fileparts(arg1);
+            file_pat=[nm ext];
         end
     end
 

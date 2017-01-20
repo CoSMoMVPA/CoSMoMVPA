@@ -146,7 +146,7 @@ function test_cross_neighborhood_transpose
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',1);
     nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
 
-    nh=cosmo_cross_neighborhood(ds,{nh_time,nh_freq},opt);
+    nh=cosmo_cross_neighborhood(ds,{nh_freq,nh_time},opt);
 
     cp=cosmo_cartprod(repmat({[false,true]},4,1));
     n=size(cp,1);
@@ -178,7 +178,7 @@ function test_cross_neighborhood_transpose
         nh2_time=cosmo_interval_neighborhood(ds2,'time','radius',1);
         nh2_freq=cosmo_interval_neighborhood(ds2,'freq','radius',0);
 
-        nh2=cosmo_cross_neighborhood(ds2,{nh2_time,nh2_freq},opt);
+        nh2=cosmo_cross_neighborhood(ds2,{nh2_freq,nh2_time},opt);
         assertEqual(nh2.a,nh.a);
         assertEqual(nh2.fa,nh.fa);
         assertEqual(nh2.neighbors,nh.neighbors);
@@ -249,3 +249,60 @@ function test_cross_neighborhood_progress()
     assert(~isempty(strfind(res,'[####################]')));
     assert(~isempty(strfind(res,'crossing neighborhoods')));
 
+
+function test_warning_weird_dimension_order
+    if cosmo_skip_test_if_no_external('fieldtrip')
+        return;
+    end
+
+    ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+
+    nh_time=cosmo_interval_neighborhood(ds,'time','radius',0);
+    nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
+    nh_chan=cosmo_meeg_chan_neighborhood(ds,'count',4,...
+                                    'chantype','meg_planar');
+
+    nh_cell={nh_chan,nh_freq,nh_time};
+    for ndim=1:3
+        idxs=nchoosek(1:3,ndim);
+        order=perms(1:ndim);
+
+        for k=1:size(idxs,1)
+            for j=1:size(order,1)
+
+                idx=idxs(k,order(j,:));
+                nh_sel=nh_cell(idx);
+
+                is_weird_order=~issorted(idx);
+
+                func=@()cosmo_cross_neighborhood(ds,nh_sel,...
+                                    'progress',false);
+                assert_warning_being_shown(func,is_weird_order);
+            end
+        end
+    end
+
+
+
+function assert_warning_being_shown(func, flag)
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
+    % initially must be empty
+    s=cosmo_warning();
+    assertEqual(s.shown_warnings,{});
+
+    func();
+
+    s=cosmo_warning();
+    if flag
+        % must have warning added
+        assertTrue(iscellstr(s.shown_warnings));
+        assertTrue(numel(s.shown_warnings)>0);
+    else
+        % still without warning
+        assertEqual(s.shown_warnings,{});
+    end

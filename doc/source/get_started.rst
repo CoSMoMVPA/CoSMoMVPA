@@ -50,9 +50,9 @@ Next steps
 Once you are ready:
 
 - run the :ref:`demos <contents_demo.rst>`.
-- look at the :ref:`runnable examples <modindex_run>` and the associated `Matlab outputs`_.
+- look at the :ref:`runnable examples <matindex_run>` and the associated `Matlab outputs`_.
 - try the :ref:`exercises <ex_toc>`.
-- explore the :ref:`CoSMoMVPA functions <modindex>`.
+- explore the :ref:`CoSMoMVPA functions <matindex>`.
 
 Some examples of analyses that can be run with CoSMoMVPA_:
 

@@ -60,10 +60,10 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %     % larger extent but less extreme value and features in clusters with
 %     % smaller extent but more extreme values have larger values
 %     cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.1)
-%     > 0.7700    2.8550    0.7700    0.7700         0    3.4931    3.4931
+%     > 0.7700  2.8550  0.7700  0.7700       0  3.4931  3.4931
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.05)
-%     > 0.6175    2.8763    0.6175    0.6175         0    3.6310    3.6310
+%     > 0.6175  2.8763  0.6175  0.6175       0  3.6310  3.6310
 %     %
 %     % illustrate other cluster stats. Note that the results varies more
 %     % as a function of the chosen threshold

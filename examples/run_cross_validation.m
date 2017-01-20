@@ -40,11 +40,30 @@ partitions=cosmo_nfold_partitioner(ds);
 % confusion matrix
 for k=1:nclassifiers
     classifier=classifiers{k};
-    % >@@>
-    [pred,accuracy]=cosmo_crossvalidate(ds, classifier, partitions);
 
-    confusion_matrix=cosmo_confusion_matrix(ds.sa.targets, pred);
+    % get predictions for each fold, and store the result in
+    % a variable 'pred'.
+    % This output is in a 60 x 10 matrix, corresponding to predictions
+    % for all 60 samples and 10 folds
+    % >@@>
+    pred=cosmo_crossvalidate(ds, classifier, partitions);
     % <@@<
+
+    % use cosmo_confusion_matrix to compute the confusion matrix for each
+    % fold, and store the results in a variable 'confusion_matrix_folds'.
+    % The output is 6 x 6 x 10, consisting of 10 confusion matrices each
+    % of size 6 x 6
+    % >@@>
+    confusion_matrix_folds=cosmo_confusion_matrix(ds.sa.targets,pred);
+    % <@@<
+
+    % sum the confusion matrix_folds alnog the third dimension to
+    % obtain a single 6 x 6 confusion matirx. Store the result
+    % in a variable named confusion_matrix
+    % >@@>
+    confusion_matrix=sum(confusion_matrix_folds,3);
+    % <@@<
+    % show the confusion matrix
     figure();
     imagesc(confusion_matrix,[0 10])
     title(sprintf('%s: %.3f', strrep(func2str(classifier),'_',' '), accuracy))

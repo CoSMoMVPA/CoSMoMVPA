@@ -850,7 +850,7 @@ Use ``sprintf`` or ``fprint`` when formatting strings
 
 Avoid using ``eval``
 ++++++++++++++++++++
-Statements with ``eval`` can obfuscates the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+Statements with ``eval`` can obfuscate the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles
 
     **very bad:**
 
@@ -909,7 +909,7 @@ Check input arguments
 +++++++++++++++++++++
 Generally it is good to check the input arguments, although there is a subjective component in deciding how much should be checked, or when an error should be thrown. Checking more means less concise code and longer execution times, but can also prevent the user from making mistakes that would otherwise go undetected.
 
-CoSMoMPVA-specific guidelines
+CoSMoMVPA-specific guidelines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Writing exercises
@@ -931,7 +931,7 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <modindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 
