@@ -32,9 +32,6 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
     [max_nproc_available,msg]=max_nproc_available_query_func();
 
     if ~isfield(opt,'nproc')
-        disp('here');
-        disp(max_nproc_available)
-        disp('dnoe');
         nproc_available=max_nproc_available;
         return;
     end
