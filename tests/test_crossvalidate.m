@@ -30,8 +30,9 @@ function test_crossvalidate_basics
     pred=NaN(nsamples,nfolds);
 
     for fold=1:nfolds
-        train_idx=randperm(nsamples,train_size);
-        test_idx=setdiff(1:nsamples,train_idx);
+        all_idx=randperm(nsamples);
+        train_idx=all_idx(1:train_size);
+        test_idx=all_idx((train_size+1):end);
 
         partitions.train_indices{fold}=train_idx;
         partitions.test_indices{fold}=test_idx;
