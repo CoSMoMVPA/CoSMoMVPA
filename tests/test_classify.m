@@ -97,6 +97,10 @@ function test_classify_knn
     general_test_classifier(cfy,opt);
 
 function test_classify_matlabsvm
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     cfy=@cosmo_classify_matlabsvm;
     handle=get_predictor(cfy);
     if ~cosmo_check_external('matlabsvm',false)
@@ -106,15 +110,15 @@ function test_classify_matlabsvm
         return;
     end
 
-    warning_state=cosmo_warning();
-    cleaner=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
-
     assert_predictions_equal(handle,[1 3 9 7 6 6 9 3 7 5 6 6 4 ...
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
     general_test_classifier(cfy);
 
 function test_classify_matlabsvm_2class
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     cfy=@cosmo_classify_matlabsvm_2class;
     handle=get_predictor(cfy);
     if ~cosmo_check_external('matlabsvm',false)
@@ -123,9 +127,6 @@ function test_classify_matlabsvm_2class
         notify_test_skipped('matlabsvm');
         return;
     end
-    warning_state=cosmo_warning();
-    cleaner=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
 
     assertExceptionThrown(handle,''); % cannot deal with nine classes
 
@@ -147,6 +148,10 @@ function test_classify_matlabsvm_2class
 
 
 function test_classify_libsvm_with_autoscale
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     cfy=@cosmo_classify_libsvm;
     opt=struct();
     opt.autoscale=true;
@@ -157,15 +162,15 @@ function test_classify_libsvm_with_autoscale
         return;
     end
 
-    warning_state=cosmo_warning();
-    cleaner=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
-
     assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
                                     1 2 7 7 7 1 2 8 1 9 6 7 1 3 ]');
     general_test_classifier(cfy,opt);
 
 function test_classify_libsvm_no_autoscale
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     cfy=@cosmo_classify_libsvm;
     opt=struct();
     opt.autoscale=false;
@@ -175,10 +180,6 @@ function test_classify_libsvm_no_autoscale
         cosmo_notify_test_skipped('libsvm');
         return;
     end
-
-    warning_state=cosmo_warning();
-    cleaner=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
 
     assert_predictions_equal(handle,[8 3 3 8 6 6 1 3 7 5 7 6 4 ...
                                     1 2 7 7 7 1 2 8 1 9 6 7 1 3]');
