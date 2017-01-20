@@ -43,7 +43,7 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
         full_msg=sprintf(['''nproc''=%d requested, but %s. '...
                             'Using ''nproc''=%d'],...
                             nproc_wanted,msg,nproc_available);
-        warning(full_msg);
+        cosmo_warning(full_msg);
     end
 
 
