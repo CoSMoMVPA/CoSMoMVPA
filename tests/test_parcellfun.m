@@ -14,6 +14,24 @@ function test_parcellfun_single_proc()
     nproc=1;
     helper_test_parcellfun(nproc);
 
+function test_cosmo_parallel_get_nproc_available()
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
+    nproc=cosmo_parallel_get_nproc_available();
+    assert(nproc>=1);
+
+    % should not have shown any warnings
+    w=cosmo_warning();
+    assert(isempty(w.shown_warnings),sprintf('warning shown: %s',...
+                                      w.shown_warnings{:}));
+
+
+
+
+
 function test_parcellfun_multi_proc()
     nproc=cosmo_parallel_get_nproc_available();
     if nproc==1

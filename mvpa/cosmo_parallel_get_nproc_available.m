@@ -5,7 +5,8 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 %
 % Input:
 %   'nproc',nproc_wanted            Number of desired processes
-%                                   default: Inf
+%                                   If not provided, then the number of
+%                                   available cores is returned.
 %
 % Output:
 %   nproc_available                 Number of available parallel processes.
@@ -23,105 +24,85 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-    default=struct();
-    default.nproc=Inf;
-
-    opt=cosmo_structjoin(default,varargin{:});
+    defaults=struct();
+    opt=cosmo_structjoin(defaults,varargin{:});
     check_inputs(opt);
 
+    max_nproc_available_query_func=get_max_nproc_available_func();
+    [max_nproc_available,msg]=max_nproc_available_query_func();
+
+    if ~isfield(opt,'nproc')
+        nproc_available=max_nproc_available;
+        return;
+    end
 
     nproc_wanted=opt.nproc;
-    wants_multithreaded = nproc_wanted>1;
+    if nproc_wanted>max_nproc_available
+        nproc_available=max_nproc_available;
+        full_msg=sprintf(['''nproc''=%d requested, but %s. '...
+                            'Using ''nproc''=%d'],...
+                            nproc_wanted,msg,nproc_available);
+        warning(msg);
+        nproc_available=max_nproc_available;
+    end
 
-    if wants_multithreaded
-        if cosmo_wtf('is_matlab')
-            nproc_available=get_nproc_available_matlab(nproc_wanted);
 
-        elseif cosmo_wtf('is_octave')
-            nproc_available=get_nproc_available_octave(nproc_wanted);
 
-        else
-            assert(false,'this should not happen');
-
-        end
-
-        nproc_available=min(nproc_available,nproc_wanted);
-
-        if nproc_available==1 && isfinite(nproc_wanted);
-            cosmo_warning(['Parallel computing not available, using '...
-                            'single thread']);
-        end
+function func=get_max_nproc_available_func()
+    if cosmo_wtf('is_matlab')
+        func=@matlab_get_max_nproc_available;
+    elseif cosmo_wtf('is_octave')
+        func=@octave_get_max_nproc_available;
     else
-        nproc_available=1;
+        assert(false,'this should not happen');
     end
 
 
 function check_inputs(opt)
-    assert(isfield(opt,'nproc'));
-    nproc=opt.nproc;
-    if ~(isnumeric(nproc) && ...
-            isscalar(nproc) && ...
-            nproc>=1 && ...
-            round(nproc)==nproc)
-        error('nproc must be a positive scalar');
+    if isfield(opt,'nproc')
+        nproc=opt.nproc;
+        if ~(isnumeric(nproc) && ...
+                    isscalar(nproc) && ...
+                    nproc>=1 && ...
+                    round(nproc)==nproc)
+            error('nproc must be a positive scalar');
+        end
     end
 
 
-function nproc_available=get_nproc_available_matlab(nproc_wanted)
+function [nproc_available,msg]=matlab_get_max_nproc_available
+    msg='';
+    nproc_available=1;
+
     matlab_parallel_functions={'gcp','parpool'};
-
-    if usejava('jvm') && platform_has_functions(matlab_parallel_functions)
-        pool = gcp();
-
-        if isempty(pool)
-            cosmo_warning(['Parallel toolbox is available, but '...
-                            'unable to open pool; using nproc=1']);
-            nproc_available=1;
-        else
-            nworkers=pool.NumWorkers();
-
-            if nproc_wanted>nworkers && isfinite(nproc_wanted);
-                cosmo_warning(['nproc=%d requested but only %d '...
-                            'workers available; setting '...
-                            'nproc=%d'],...
-                            nproc_wanted,nworkers,nworkers);
-            end
-
-            nproc_available=nworkers;
-        end
-    else
-        nproc_available=1;
-        if nproc_wanted>nproc_available
-            cosmo_warning(['nproc=%d requested but parallel toolbox '...
-                            'or java not available; using nproc=%d'], ...
-                            nproc_wanted, nproc_available);
-        end
+    if ~(usejava('jvm') && ...
+                platform_has_functions(matlab_parallel_functions))
+        msg='java or parallel functions not available';
+        return;
     end
 
-function nproc_available=get_nproc_available_octave(nproc_wanted)
-% return nproc_wanted if the Octave 'parallel' package is available, or 1
-% otherwise
-% (the parallel package does not support returning the number
-% of CPUs available)
-    if cosmo_check_external('octave_pkg_parallel',false)
-        nworkers=nproc('overridable');
+    pool = gcp();
 
-        if nproc_wanted>nworkers
-                cosmo_warning(['nproc=%d requested but only %d '...
-                            'workers available; setting '...
-                            'nproc=%d'],...
-                            nproc_wanted,nworkers);
-        end
-
-        nproc_available=nworkers;
-    else
-        nproc_available=1;
-        if nproc_wanted>nproc_available && isfinite(nproc_wanted)
-            cosmo_warning(['nproc=%d requested but parallel toolbox '...
-                            'not available; setting nproc=%d'], ...
-                            nproc_wanted, nproc_available);
-        end
+    if isempty(pool)
+        msg=['Parallel toolbox is available, but '...
+                        'unable to open pool'];
+        return;
     end
+
+    nproc_available=pool.NumWorkers();
+
+
+function [nproc_available,msg]=octave_get_max_nproc_available
+    msg='';
+    nproc_available=1;
+
+    if ~cosmo_check_external('octave_pkg_parallel',false)
+        msg='parallel toolbox is not available';
+        return;
+    end
+
+    nproc_available=nproc_available('overridable');
+
 
 function tf=platform_has_functions(function_names)
     tf=all(cellfun(@(x)~isempty(which(x)),function_names));
