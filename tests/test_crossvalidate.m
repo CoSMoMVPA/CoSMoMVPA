@@ -3,7 +3,10 @@ function test_suite = test_crossvalidate
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
@@ -27,8 +30,9 @@ function test_crossvalidate_basics
     pred=NaN(nsamples,nfolds);
 
     for fold=1:nfolds
-        train_idx=randperm(nsamples,train_size);
-        test_idx=setdiff(1:nsamples,train_idx);
+        all_idx=randperm(nsamples);
+        train_idx=all_idx(1:train_size);
+        test_idx=all_idx((train_size+1):end);
 
         partitions.train_indices{fold}=train_idx;
         partitions.test_indices{fold}=test_idx;

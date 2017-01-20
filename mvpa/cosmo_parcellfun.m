@@ -35,7 +35,7 @@ function result=cosmo_parcellfun(nproc,func,arg_cell,varargin)
         nproc_to_use=1;
     else
         nproc_available=cosmo_parallel_get_nproc_available();
-        nproc_to_use=min(narg_cell,nproc_available);
+        nproc_to_use=min([nproc,narg_cell,nproc_available]);
     end
 
     if nproc_to_use<=1
@@ -62,8 +62,8 @@ function args=get_extra_builtin_cellfun_args(opt)
 
 function result=run_single_thread(nproc,func,arg_cell,opt)
 % single thread, Matlab of Octave --- redirect to cellfun
-    cellfun_args=get_extra_builtin_cellfun_args(opt);
-    result=cellfun(func,arg_cell,cellfun_args{:});
+    result_cell=cellfun(func,arg_cell,'UniformOutput',false);
+    result=convert_to_uniform_output_if_necessary(result_cell,opt);
 
 
 function result=run_parallel_matlab(nproc,func,arg_cell,opt)

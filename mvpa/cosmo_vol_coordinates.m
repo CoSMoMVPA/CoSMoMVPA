@@ -108,7 +108,7 @@ function [lin2fa, outside]=xyz2fa_indices(ds, coords)
         h=histc(fa_lin,unq);
         idx=find(h>1,1);
         pos=find(fa_lin==unq(idx),2);
-        error('Duplicate feature index at %d and %d', pos);
+        error('Duplicate feature index at %d and %d', pos(1), pos(2));
     end
 
     % compute mapping from coords indices to fa indices

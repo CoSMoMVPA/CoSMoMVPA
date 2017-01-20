@@ -25,6 +25,10 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
 %    provide an option 'normalization' to perform data scaling
+%  - As of Matlab 2017a (maybe earlier), Matlab gives the warning that
+%      'svmtrain will be removed in a future release. Use fitcsvm instead.'
+%    however fitcsvm gives different results than svmtrain. In this
+%    function the warning message is suppressed.
 %
 % See also svmtrain, svmclassify, cosmo_classify_matlabsvm
 %
@@ -65,19 +69,46 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
         if ~cached_has_matlabsvm()
             cosmo_check_external('matlabsvm');
         end
-        % Use svmtrain and svmclassify to get predictions for the testing set.
-        % (Hint: 'opt_cell{:}' allows you to pass the options as varargin)
-        % >@@>
 
-        s = svmtrain(samples_train, targets_train, opt_cell{:});
-        predicted=svmclassify(s, samples_test);
-        % <@@<
+        % Use svmtrain and svmclassify to get predictions for the testing set.
+
+        % disable warnings shown by Matlab 2017 and later
+        orig_warning_state=warning();
+        cleaner=onCleanup(@()warning(orig_warning_state));
+        warning('off','stats:obsolete:ReplaceThisWith');
+        warning('off',['stats:obsolete:ReplaceThisWith'...
+                            'MethodOfObjectReturnedBy']);
+
+        % store most recent warning
+        [orig_lastmsg, orig_lastid]=lastwarn();
+
+        model = svmtrain(samples_train, targets_train, opt_cell{:});
+        predicted=svmclassify(model, samples_test);
+
+        % deal with possible warning shown (Matlab >= 2016)
+        [warning_msg,warning_id]=lastwarn();
+        if strcmp(warning_msg,['svmtrain will be removed in a future '...
+                                'release. Use fitcsvm instead.'])
+            % only show warning once (by default) if this is a
+            % a stats:obsolete message
+            suffix=['CoSMoMVPA note: fitcsvm gives different results '...
+                        'than svmtrain. Currently there is no support '...
+                        'in CoSMoMVPA for using fitcsvm in a '...
+                        'classifier'];
+            cosmo_warning('%s\n%s',warning_msg,suffix);
+        elseif ~strcmp(warning_id,orig_lastid)
+            % new warning was issued , different from stats:obsolete one;
+            % show warning message
+            warning(warning_id,warning_msg);
+        end
+
+
     catch
         caught_exception=lasterror();
         cosmo_check_external('matlabsvm');
 
         if strcmp(caught_exception.identifier,...
-                            'stats:svmtrain:NoConvergence');
+                            'stats:svmtrain:NoConvergence')
             error(['SVM training did not converge. Your options are:\n'...
                    ' 1) increase ''boxconstraint''\n'...
                    ' 2) increase ''tolkkt''\n'...
@@ -90,6 +121,9 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
             rethrow(caught_exception);
         end
     end
+
+
+
 
     % helper function to convert cell to struct
 function opt_cell=opt2cell(opt)
