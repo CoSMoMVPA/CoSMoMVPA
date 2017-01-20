@@ -122,6 +122,7 @@ function test_illegal_arguments
     % (note: Octave accepts output when using
     %           @(x)[x x]
     %  This may be a bug)
+    aet(1,@(x) repmat(x,1,x),{1;2});
     aet(2,@(x) repmat(x,1,x),{1;2});
 
 
