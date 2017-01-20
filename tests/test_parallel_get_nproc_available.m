@@ -16,7 +16,8 @@ function test_parallel_get_nproc_available_matlab()
         return;
     end
 
-    has_parallel_toolbox=cosmo_check_external('@distcomp',false);
+    has_parallel_toolbox=cosmo_check_external('@distcomp',false) && ...
+                                ~isempty(which('gcp'));
 
     aeq=@(expeced_output,varargin)assertEqual(expeced_output,...
                     cosmo_parallel_get_nproc_available(varargin{:}));
@@ -81,6 +82,10 @@ function test_parallel_get_nproc_available_octave()
 
 
 function test_parallel_get_nproc_available_exceptiont()
+    warning_state=cosmo_warning();
+    state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_parallel_get_nproc_available(varargin{:}),'');
     illegal_args={{'foo'},...
