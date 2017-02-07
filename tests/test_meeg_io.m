@@ -304,7 +304,7 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
 
 
 function test_eeglab_io()
-    datatypes={'timef','erp'};
+    datatypes={'timef','erp','itc'};
 
     args=cosmo_cartprod({{true,false},...
                          {true,false},...
@@ -344,7 +344,7 @@ function test_eeglab_io()
 
 function test_eeglab_io_trials()
 
-    datatypes={'timef','erp'};
+    datatypes={'timef','erp','itc'};
 
     args=cosmo_cartprod({{true,false},...
                          {true,false},...

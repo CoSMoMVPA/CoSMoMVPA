@@ -53,10 +53,10 @@ function hdr=cosmo_map2meeg(ds, fn)
     cosmo_check_dataset(ds,'meeg');
 
     % for now only support ft-like output
-    [img_format,write_to_file]=find_img_format(fn);
+    [ext,img_format,write_to_file]=find_img_format(fn);
 
     builder=img_format.builder;
-    hdr=builder(ds);
+    hdr=builder(ds,ext);
 
     % if filename was provided, store to file
     if write_to_file
@@ -66,7 +66,7 @@ function hdr=cosmo_map2meeg(ds, fn)
     end
 
 
-function [img_format,write_to_file]=find_img_format(fn)
+function [ext,img_format,write_to_file]=find_img_format(fn)
     if ~ischar(fn) || isempty(fn)
         error('filename must be non-empty string');
     end
@@ -109,7 +109,12 @@ function all_formats=get_all_supported_img_formats()
     all_formats.eeglab_txt.writer=@write_eeglab_txt;
 
     % EEGLAB matlab
-    all_formats.eeglab.exts={'daterp','icaerp','dattimef','icatimef'};
+    all_formats.eeglab.exts={  'daterp',...
+                               'icaerp',...
+                               'dattimef',...
+                               'icatimef',...
+                               'datitc',...
+                               'icaitc'};
     all_formats.eeglab.builder=@build_eeglab;
     all_formats.eeglab.writer=@write_struct_as_mat;
 
@@ -164,7 +169,7 @@ function write_eeglab_txt(fn, hdr)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % EEGLAB
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function s=build_eeglab(ds)
+function s=build_eeglab(ds,ext)
     fdim=ds.a.fdim;
     fdim_labels=fdim.labels(:);
     fdim_values=fdim.values(:);
@@ -187,7 +192,14 @@ function s=build_eeglab(ds)
     if has_freq
         s.freqs=fdim_values{2};
         freq_sz=numel(s.freqs);
-        datatype='timef';
+
+        datatype_candidates={'timef','itc'};
+        msk=cellfun(@(x)contains_string(ext,x),datatype_candidates);
+        idx=find(msk);
+
+        assert(numel(idx)==1,'this should not happen') % weird data
+        datatype=datatype_candidates{idx};
+
         chan_suffix=sprintf('_%s',datatype);
     else
         freq_sz=[];
@@ -232,6 +244,9 @@ function s=build_eeglab(ds)
     s.times=fdim_values{end};
     s=set_parameters_if_present(s,ds);
 
+
+function tf=contains_string(haystack,needle)
+    tf=~isempty(strfind(haystack,needle));
 
 function s=set_parameters_if_present(s,ds)
     if cosmo_isfield(ds,'a.meeg.parameters')
@@ -472,7 +487,7 @@ function ft=init_ft_source_fields(ds)
 
 
 
-function ft=build_ft(ds)
+function ft=build_ft(ds,unused)
     % get fieldtrip-specific fields from header
     [ft, samples_label, dim_labels]=get_ft_samples(ds);
 
