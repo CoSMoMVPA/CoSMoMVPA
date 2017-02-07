@@ -304,7 +304,13 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
 
 
 function test_eeglab_io()
-    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    datatypes={'timef','erp'};
+
+    args=cosmo_cartprod({{true,false},...
+                         {true,false},...
+                         datatypes});
+
+
     ncombi=size(args,1);
     for k=1:ncombi
         arg=args(k,:);
@@ -338,7 +344,12 @@ function test_eeglab_io()
 
 function test_eeglab_io_trials()
 
-    args=cosmo_cartprod(repmat({{true;false}},1,3));
+    datatypes={'timef','erp'};
+
+    args=cosmo_cartprod({{true,false},...
+                         {true,false},...
+                         datatypes});
+
     ncombi=size(args,1);
     for k=1:ncombi
         arg=args(k,:);
@@ -382,7 +393,7 @@ function test_eeglab_io_exceptions()
     aet_m2m=@(varargin)assertExceptionThrown(@()...
                             cosmo_map2meeg(varargin{:}),'');
 
-    s=build_eeglab_dataset_struct(true,true,true);
+    s=build_eeglab_dataset_struct(true,true,'timef');
 
     % bad datatype
     s.datatype='foo';
@@ -408,15 +419,32 @@ function test_eeglab_io_exceptions()
     end
 
 
-
-
-function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
+function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
     % trial dimension
     if has_trial
         trial_dim=randint();
     else
         trial_dim=1;
     end
+
+    if strcmp(datatype,'ersp')
+        builder=@build_eeglab_dataset_struct;
+        [s1,ds1,ext]=builder(has_ica,has_trial,'ersp_nobaseline');
+        [s2,ds2]=builder(has_ica,has_trial,'erspbase');
+
+        keys=s2.chanlabels;
+        for k=1:numel(keys)
+            key=keys{k};
+            assert(~isfield(s1,key));
+            s1.(key)=s2.(key);
+        end
+
+        s=s1;
+        ds={ds1,ds2};
+        return;
+    end
+
+
 
 
     % channel / component dimension
@@ -433,10 +461,26 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
         make_chan_prefix_func=@randstr;
     end
 
-    if has_freq
-        chan_suffix='_timef';
-    else
-        chan_suffix='';
+    has_freq=2;
+
+    switch datatype
+        case 'timef'
+            chan_suffix='_timef';
+
+        case 'erp'
+            chan_suffix='';
+
+        case 'ersp_nobaseline'
+            chan_suffix='_ersp';
+
+        case 'erspbase'
+            chan_suffix='_erspbase';
+
+        case 'itc';
+            chan_suffix='_itc';
+
+        otherwise
+            assert(false);
     end
 
     make_chan_label=@(idx) sprintf('%s%d',make_chan_prefix_func(),idx);
@@ -446,24 +490,43 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
                             'UniformOutput',false)};
 
     % frequency dimension
+    switch datatype
+        case {'timef','ersp','itc'}
+            has_freq=true;
+
+
+        case {'erp','erspbase'};
+            has_freq=false;
+
+        otherwise
+            assert(false);
+    end
+
     if has_freq
         freq_dim=randint();
         freq_label={'freq'};
         freq_value={(1:freq_dim)*2};
         samples_type='timefreq';
-        ext_suffix='timef';
     else
         freq_dim=[];
         freq_label={};
         freq_value={};
         samples_type='timelock';
-        ext_suffix='erp';
     end
 
-    % time dimensions
-    time_dim=randint();
-    time_label={'time'};
-    time_value={(1:time_dim())*.2-.1};
+    ext_suffix=datatype;
+
+    if strcmp(datatype,'erspbase')
+        % no time dimension
+        time_dim=[];
+        time_label={};
+        time_value={};
+    else
+        % include time dimension
+        time_dim=randint();
+        time_label={'time'};
+        time_value={(1:time_dim())*.2-.1};
+    end
 
     % data
     dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
