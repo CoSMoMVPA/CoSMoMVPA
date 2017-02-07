@@ -11,10 +11,12 @@ function hdr=cosmo_map2meeg(ds, fn)
 %                                     time-frequency  data at  either the
 %                                     sensor or source level.
 %                       .txt :        exported EEGLab with timelocked data.
-%                       .daterp       time-locked      }
-%                       .icaerp       ICA time-locked  } EEGLab
-%                       .dattimef     time-freq        }
-%                       .icatimef     ICA time-freq    }
+%                       .daterp       time-locked               }
+%                       .icaerp       ICA time-locked           } EEGLab
+%                       .dattimef     time-freq                 }
+%                       .icatimef     ICA time-freq             }
+%                       .datitc       inter-trial coherence     }
+%                       .icaitc       ICA inter-trial coherence }
 %                     To avoid writing a file, but get output in the hdr
 %                     field, use one of the extensions above but with the
 %                     dot ('.') replaced by a hyphen ('-'), for example
@@ -26,6 +28,7 @@ function hdr=cosmo_map2meeg(ds, fn)
 % Notes:
 %    - a typical use case is to use this function to map the dataset to a
 %      FieldTrip struct, then use FieldTrip to visualize the data
+%    - there is currently no support for wirting EEGLAB 'ersp' data.
 %
 % Examples:
 %     % convert a dataset struct to a FieldTrip struct

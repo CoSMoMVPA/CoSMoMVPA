@@ -343,7 +343,7 @@ function test_eeglab_io()
     end
 
 function test_eeglab_io_trials()
-
+% test with loading a subset of trials
     datatypes={'timef','erp','itc'};
 
     args=cosmo_cartprod({{true,false},...
@@ -386,6 +386,60 @@ function test_eeglab_io_trials()
         clear cleaner;
     end
 
+function test_eeglab_io_ersp()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+
+    args=cosmo_cartprod({{true,false},...
+                         {false},...
+                         {'ersp'},...
+                         {false,true}});
+
+     ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,1:3);
+        [s,ds_cell,ext]=build_eeglab_dataset_struct(arg{:});
+
+        % either load baseline data or original data
+        with_baseline=args{k,4};
+        if with_baseline
+            load_args={'data_field','erspbase'};
+            ds=ds_cell{2};
+        else
+            load_args={'data_field','ersp'};
+            ds=ds_cell{1};
+        end
+
+        % illegal without arguments or wrong arguments
+        aet(s);
+        aet(s,'data_field','foo');
+        aet(s,'data_field',false);
+
+        % load data with correct arguments
+        ds_loaded=cosmo_meeg_dataset(s,load_args{:});
+        assertEqual(ds_loaded,ds);
+
+
+         % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn,load_args);
+
+        % writing the file is not supported
+        assertExceptionThrown(@()cosmo_map2meeg(ds,fn),'');
+
+        clear cleaner
+
+        assertEqual(ds_loaded,ds);
+    end
+
+
+
+
+
+
 
 function test_eeglab_io_exceptions()
     aet_md=@(varargin)assertExceptionThrown(@()...
@@ -419,7 +473,21 @@ function test_eeglab_io_exceptions()
     end
 
 
-function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
+function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype,...
+                        chan_dim,freq_dim,time_dim)
+    if nargin<6
+        time_dim=randint();
+    end
+
+    if nargin<5
+        freq_dim=randint();
+    end
+
+    if nargin<4
+        chan_dim=randint();
+    end
+
+
     % trial dimension
     if has_trial
         trial_dim=randint();
@@ -428,27 +496,40 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
     end
 
     if strcmp(datatype,'ersp')
+        % has baseline corrected data together with baseline data
         builder=@build_eeglab_dataset_struct;
-        [s1,ds1,ext]=builder(has_ica,has_trial,'ersp_nobaseline');
-        [s2,ds2]=builder(has_ica,has_trial,'erspbase');
+        args={chan_dim,freq_dim,time_dim};
+        [s1,ds1,ext]=builder(has_ica,has_trial,...
+                                'ersp_baselinecorrected',args{:});
+        [s2,ds2]=builder(has_ica,has_trial,...
+                                'erspbase',args{:});
 
-        keys=s2.chanlabels;
+        keys=fieldnames(s1);
         for k=1:numel(keys)
             key=keys{k};
-            assert(~isfield(s1,key));
-            s1.(key)=s2.(key);
+            s2.(key)=s1.(key);
         end
 
-        s=s1;
+        s=s2;
+        s.datatype=upper(datatype);
+
+        % make sure parameters are the same
+        ds1.a.meeg.parameters=s.parameters;
+        ds2.a.meeg.parameters=s.parameters;
+
+        if isfield(s,'chanlabels')
+            chan_labels=s.chanlabels;
+            ds1.a.fdim.values{1}=chan_labels;
+            ds2.a.fdim.values{1}=chan_labels;
+        end
+
         ds={ds1,ds2};
+        % remove second part from extension
+        ext=regexprep(ext,'_.*','');
         return;
     end
 
-
-
-
     % channel / component dimension
-    chan_dim=randint();
     if has_ica
         chan_prefix='comp';
         ext_prefix='ica';
@@ -470,7 +551,7 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
         case 'erp'
             chan_suffix='';
 
-        case 'ersp_nobaseline'
+        case 'ersp_baselinecorrected'
             chan_suffix='_ersp';
 
         case 'erspbase'
@@ -491,11 +572,11 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
 
     % frequency dimension
     switch datatype
-        case {'timef','ersp','itc'}
+        case {'timef','ersp_baselinecorrected','itc','erspbase'}
             has_freq=true;
 
 
-        case {'erp','erspbase'};
+        case {'erp'};
             has_freq=false;
 
         otherwise
@@ -503,7 +584,6 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
     end
 
     if has_freq
-        freq_dim=randint();
         freq_label={'freq'};
         freq_value={(1:freq_dim)*2};
         samples_type='timefreq';
@@ -516,21 +596,22 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
 
     ext_suffix=datatype;
 
-    if strcmp(datatype,'erspbase')
+    hastime=~strcmp(datatype,'erspbase');
+
+    if hastime
+        % include time dimension
+        time_label={'time'};
+        time_value={(1:time_dim())*.2-.1};
+    else
         % no time dimension
         time_dim=[];
         time_label={};
         time_value={};
-    else
-        % include time dimension
-        time_dim=randint();
-        time_label={'time'};
-        time_value={(1:time_dim())*.2-.1};
     end
 
     % data
     dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
-    dim_sizes_without_chan=dim_sizes([1, 3:end]);
+    dim_sizes_without_chan=[dim_sizes([1, 3:end]), 1];
     data_arr=randn(dim_sizes);
 
     % params
@@ -571,7 +652,11 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype)
     if has_freq
         s.freqs=freq_value{1};
     end
-    s.times=time_value{1};
+
+    if hastime
+        s.times=time_value{1};
+    end
+
     s.datatype=upper(ext_suffix);
     s.parameters=parameters;
 

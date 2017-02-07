@@ -10,19 +10,28 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %                                     time-frequency  data at  either the
 %                                     sensor or source level.
 %                       .txt :        exported EEGLab with timelocked data.
-%                       .daterp       time-locked      }
-%                       .icaerp       ICA time-locked  } EEGLab
-%                       .dattimef     time-freq        }
-%                       .icatimef     ICA time-freq    }
+%                       .daterp       time-locked               }
+%                       .icaerp       ICA time-locked           } EEGLab
+%                       .dattimef     time-freq                 }
+%                       .icatimef     ICA time-freq             }
+%                       .datitc       inter-trial coherence     }
+%                       .icaitc       ICA inter-trial coherence }
+%                       .datersp      ERSP data                 }
+%                       .icaersp      ICA ERSP data             }
 %                     Alternatively it can be a FieldTrip or EEGLab struct
 %                     with time-locked or time-frequency data
 %   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets (optional)
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
 %                     the output as ds.sa.chunks (optional)
-%   'data_field', f   For MEEG source dataset with multiple data fields
-%                     (such as 'pow' and 'mom'), this sets which data field
-%                     is used. (only for source data)
+%   'data_field', f   - For FieldTrip MEEG source dataset with multiple
+%                       data fields (such as 'pow' and 'mom'), this sets
+%                       which data is returned. (only for source data)
+%                     - For EEGLAB 'ersp' data, this sets whether the
+%                       baseline-corrected data is returned (f='ersp') or
+%                       whether the baseline itself is returned
+%                       (f='erspbase'). In both cases the data is expressed
+%                       in decibel (dB), i.e. 10*log10(power).
 %   'trials', idx     Mx1 array with indices of trials to load (optional).
 %                     If not provided then all trials are loaded. The
 %                     output has a .samples field with the number of rows
@@ -34,8 +43,6 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %     .sa.targets     Px1 sample targets (if provided)
 %     .sa.chunks      Px1 sample chunks (if provided)
 %     .a
-%       .hdr_{F}           header information for format F. Currently
-%                          F is always 'ft'.
 %       .meeg
 %         .sample_field   name of sample field. One of 'fourierspctrm',
 %                         'powspctrm', or 'trial'.
@@ -62,7 +69,7 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %
 % Notes:
 %  - The resulting dataset can be mapped back to MEEG format using
-%    cosmo_map2meeg.
+%    cosmo_map2meeg
 %  - if the input contains data from a single sample (such as an average)
 %    the .sample_field is set to .trial, and mapping back to MEEG format
 %    adds a singleton dimension to the .trial data output field.
@@ -93,7 +100,9 @@ function ds=cosmo_meeg_dataset(filename, varargin)
 %    less memory is needed compared to an alternative implementation in
 %    which the full dataset is loaded and then the trials of interest
 %    are selected through slicing. The disadvantage is that loading may
-%    take longer, because the file is opened and closed multiple times.
+%    take longer, because the file is opened and closed multiple times. yet
+%    this approach allows one to load subsets of trials from data files
+%    that are larger than the available RAM.
 %    Such memory reductions are currently not available for FieldTrip
 %    data, as FieldTrip's data structures do not store data for different
 %    channels in different variables.
@@ -190,7 +199,9 @@ function img_formats=get_supported_image_formats()
                                                    '.dattimef',...
                                                    '.icatimef',...
                                                    '.datitc',...
-                                                   '.icaitc'});
+                                                   '.icaitc',...
+                                                   '.datersp',...
+                                                   '.icaersp'});
     img_formats.eeglab.reader=@read_eeglab;
     img_formats.eeglab.externals={};
 
@@ -705,7 +716,21 @@ function ds=convert_eeglab_struct(s, opt)
     [has_freq,freq_label,freq_values]=helper_eeglab_get_freq_info(s);
     freq_size=cellfun(@numel,freq_values);
 
-    [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s);
+    [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s, opt);
+
+    is_baseline=~isempty(regexp(chan_suffix,'base$','once'));
+    if is_baseline
+        % because the baseline is computed over time
+        time_size=[];
+        time_values={};
+        time_label={};
+    else
+        time_values={s.times};
+        time_label={'time'};
+        time_size=numel(time_values{1});
+    end
+
+    % set channels
     [eeglab_labels,chan_values]=eeglab_get_chan_labels(...
                                         s,chan_prefix,chan_suffix);
     n_chan=numel(chan_values);
@@ -714,11 +739,11 @@ function ds=convert_eeglab_struct(s, opt)
         assert(numel(s.chanlabels)==n_chan);
     end
 
-    time_values=s.times;
-    n_time=numel(time_values);
+
 
     data_cell=cell(n_chan,1);
     for k=1:n_chan
+        % load data for each channel
         key=eeglab_labels{k};
         value=s.(key);
 
@@ -736,7 +761,7 @@ function ds=convert_eeglab_struct(s, opt)
         end
 
         n_samples=size(value,1);
-        size_chan_singleton=[n_samples,1,[freq_size],n_time];
+        size_chan_singleton=[n_samples,1,[freq_size],time_size];
 
         value_rs=reshape(value,size_chan_singleton);
         data_cell{k}=value_rs;
@@ -748,8 +773,8 @@ function ds=convert_eeglab_struct(s, opt)
     data=cat(2,data_cell{:});
     clear data_cell;
 
-    ds=cosmo_flatten(data,[{chan_prefix},freq_label,{'time'}],...
-                          [{chan_values},freq_values,{time_values}]);
+    ds=cosmo_flatten(data,[{chan_prefix},freq_label,time_label],...
+                          [{chan_values},freq_values,time_values]);
     clear data;
 
     ds.sa=struct();
@@ -762,7 +787,7 @@ function ds=convert_eeglab_struct(s, opt)
     ds=posthoc_slice_dataset_if_necessary(ds,opt);
 
 
-function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s)
+function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s,opt)
     keys=fieldnames(s);
 
     numeric_infix='1';
@@ -771,13 +796,58 @@ function [chan_prefix,chan_suffix]=eeglab_get_chan_pre_suffix(s)
 
     match_idx=find(~cellfun(@isempty,matches));
 
-    if numel(match_idx)~=1
-        error('no (unique) channel found ending at ''1''');
+    if numel(match_idx)==1
+        unique_match=matches{match_idx};
+    else
+        unique_match=eeglab_select_idx_chan_pref_suffix(matches,opt);
     end
 
-    unique_match=matches{match_idx};
     chan_prefix=unique_match{1};
     chan_suffix=unique_match{2};
+
+
+function match=eeglab_select_idx_chan_pref_suffix(all_matches,opt)
+% typical use case is data with *_erspbase and _ersp data
+    key='data_field';
+
+
+    match_msk=~cellfun(@isempty,all_matches);
+    matches=all_matches(match_msk);
+
+    valid_values=cellfun(@(x)x{2}(2:end),matches,...
+                           'UniformOutput',false);
+    suffix=sprintf('Valid options for the ''%s'' option are ''%s''.',...
+                         key,cosmo_strjoin(valid_values,''', '''));
+
+    % try to be helpful
+    is_ersp=isequal(unique(valid_values),sort({'erspbase';'ersp'}));
+    if is_ersp
+        suffix=sprintf(['%s\nThis data looks like an EEGLAB '...
+                    'ERSP data structure. Note '...
+                    'that the ''ersp'' option returns a '...
+                    'dataset that is already baseline-corrected, ',...
+                    'whereas ''erspbase'' returns the baseline '...
+                    'values themselves (that were used for baseline '...
+                    'correction. It is currently not possible to '...
+                    'generate the original, non-baseline corrected, '...
+                    'data.'],suffix);
+    end
+
+    if ~isfield(opt,key)
+        error('The ''%s'' option is required. %s', key, suffix);
+    end
+
+    value=opt.(key);
+    if ~ischar(value)
+        error('The ''%s'' option must be a string. %s',key, suffix);
+    end
+
+    idx=find(cosmo_match(valid_values,value));
+
+    if isempty(idx)
+        error(suffix);
+    end
+    match=matches{idx};
 
 
 
@@ -814,7 +884,9 @@ function [eeglab_labels,cosmo_labels]=eeglab_get_chan_labels(...
 function samples_type=eeglab_get_samples_type(s)
     mapping={'erp','timelock';...
             'timef','timefreq';...
-            'itc','timefreq';};
+            'itc','timefreq';...
+            'ersp','timefreq';...
+            'erspbase','baseline'};
     for k=1:size(mapping,1)
         row=mapping(k,:);
         if strcmp(lower(s.datatype),row{1})
