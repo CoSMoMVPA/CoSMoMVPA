@@ -807,6 +807,77 @@ To select channels of a particular type, consider the following:
 
 See also: :ref:`cosmo_meeg_chantype`, :ref:`cosmo_slice`, :ref:`cosmo_match`, :ref:`cosmo_dim_prune`.
 
+
+Use only a subset of channels for my analysis?
+----------------------------------------------
+'I have time-frequency MEEG data for all channels in the layout. How can I select data from a region of interest, in other words use only a subset? Also, how can I compute the response averaged over the selected channels?'
+
+First, in order to select a subset of channels of interest, consider the following:
+
+    .. code-block:: matlab
+
+        % generate some example data
+        ds=cosmo_synthetic_dataset('size','huge','type','timefreq',...
+                                'ntargets',1,'nchunks',1);
+
+        % define channels of interest
+        channels_of_interest={'MEG0941','MEG0942',...
+                              'MEG1831','MEG1832',...
+                              };
+
+        % define mask
+        msk=cosmo_dim_match(ds,'chan', channels_of_interest);
+
+        fprintf('Selecting %.1f%% of the channels\n',100*mean(msk));
+
+        % select data
+        ds=cosmo_slice(ds,msk,2);
+
+        % prune dataset
+        ds=cosmo_dim_prune(ds);
+
+Then, to compute the average for each time point and frequency bin:
+
+    .. code-block:: matlab
+
+        % average for each time point and frequency bin seperately
+        other_dims={'time','freq'};
+        feature_averager=@(x)mean(x,2);
+        ds_avg=cosmo_fx(ds,feature_averager,other_dims,2);
+
+        % remove the channel dimension
+        ds_avg=cosmo_dim_remove(ds_avg,'chan');
+
+In this case the data is in time-frequency space. If there is only one sample (i.e. .samples is a row vector), it can be visualized as a time by frequency matrix:
+
+    .. code-block:: matlab
+
+
+        % safety check
+        assert(size(ds_avg.samples,1)==1,'only a single sample is supported');
+
+        % unflatten
+        [data,labels,values]=cosmo_unflatten(ds_avg);
+        assert(isequal(labels,{'freq';'time'})); % safety check
+
+        % make it a matrix
+        freq_time=squeeze(data);
+
+        % visualize data
+        label_step=5;
+        freq_values=values{1};
+        n_freq=numel(freq_values);
+        keep_freq=1:label_step:n_freq;
+
+        time_values=values{2};
+        n_time=numel(time_values);
+        keep_time=1:label_step:n_time;
+
+        imagesc(freq_time,[-3 3]);
+        colorbar();
+        set(gca,'XTickLabel',time_values(keep_time),'XTick',keep_time);
+        set(gca,'YTickLabel',freq_values(keep_freq),'YTick',keep_freq);
+
 Should I Fisher-transform correlation values?
 ---------------------------------------------
 'When using :ref:`cosmo_correlation_measure`, :ref:`cosmo_target_dsm_corr_measure`, or :ref:`cosmo_dissimilarity_matrix_measure`, should I transform the data, for example using Fisher transformation (``atanh``)?'
@@ -1039,6 +1110,7 @@ If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimens
         target_pos=1;
         [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
         ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
+
 
 
 
