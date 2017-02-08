@@ -52,7 +52,7 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 function func=get_max_nproc_available_func()
     if cosmo_wtf('is_matlab')
         v_num=cosmo_wtf('version_number');
-        is_matlab_ge_2013b=v_num(1)>=8 && n_num(2)>=2;
+        is_matlab_ge_2013b=v_num(1)>=8 && v_num(2)>=2;
 
         if is_matlab_ge_2013b
             func=@matlab_get_max_nproc_available_ge2013b;
