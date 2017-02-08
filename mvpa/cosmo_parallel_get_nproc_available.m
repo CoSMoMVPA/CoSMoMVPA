@@ -51,7 +51,14 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 
 function func=get_max_nproc_available_func()
     if cosmo_wtf('is_matlab')
-        func=@matlab_get_max_nproc_available;
+        v_num=cosmo_wtf('version_number');
+        is_matlab_ge_2013b=v_num(1)>=8 && n_num(2)>=2;
+
+        if is_matlab_ge_2013b
+            func=@matlab_get_max_nproc_available_ge2013b;
+        else
+            func=@matlab_get_max_nproc_available_lt2013b;
+        end
     elseif cosmo_wtf('is_octave')
         func=@octave_get_max_nproc_available;
     else
@@ -71,7 +78,30 @@ function check_inputs(opt)
     end
 
 
-function [nproc_available,msg]=matlab_get_max_nproc_available
+function [nproc_available,msg]=matlab_get_max_nproc_available_lt2013b()
+    nproc_available=1;
+    msg=check_java_and_funcs({'matlabpool'});
+
+    if ~isempty(msg)
+        return;
+    end
+
+    pool_func=@matlabpool;
+    queryfunc=@()pool_func('size');
+
+    % get number of processes
+    nproc_available=queryfunc();
+
+    if nproc_available==0
+        % pool was closed; try to open and get size again
+        pool_func();
+
+        nproc_available=queryfunc();
+    end
+
+
+
+function [nproc_available,msg]=matlab_get_max_nproc_available_ge2013b()
     msg='';
     nproc_available=1;
 
@@ -91,6 +121,15 @@ function [nproc_available,msg]=matlab_get_max_nproc_available
     end
 
     nproc_available=pool.NumWorkers();
+
+
+function msg=check_java_and_funcs(function_names)
+    msg='';
+    if ~(usejava('jvm') && ...
+                platform_has_functions(function_names))
+        msg='java or parallel functions not available';
+        return;
+    end
 
 
 function [nproc_available,msg]=octave_get_max_nproc_available

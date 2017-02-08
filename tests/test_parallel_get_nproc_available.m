@@ -10,9 +10,12 @@ function test_suite=test_parallel_get_nproc_available()
     initTestSuite;
 
 
-function test_parallel_get_nproc_available_matlab()
-    if ~cosmo_wtf('is_matlab')
-        cosmo_notify_test_skipped('Only for the Matlab platform');
+function test_parallel_get_nproc_available_matlab_ge2013b()
+    v_num=cosmo_wtf('version_number');
+
+    if ~cosmo_wtf('is_matlab') || ...
+                version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform >=2013b');
         return;
     end
 
@@ -45,6 +48,44 @@ function test_parallel_get_nproc_available_matlab()
             aeq(nproc,'nproc',nproc);
         end
 
+    else
+        aeq(1);
+        aeq(1,'nproc',2);
+    end
+
+function tf=version_lt2013b()
+    v_num=cosmo_wtf('version_number');
+    tf=v_num(1)<8 || v_num(2)<2;
+
+function test_parallel_get_nproc_available_matlab_lt2013b()
+    if ~cosmo_wtf('is_matlab') || ...
+                ~version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform <2013b');
+        return;
+    end
+
+    has_parallel_toolbox=cosmo_check_external('@distcomp',false) && ...
+                                ~isempty(which('matlabpool'));
+
+
+    aeq=@(expeced_output,varargin)assertEqual(expeced_output,...
+                    cosmo_parallel_get_nproc_available(varargin{:}));
+
+    warning_state=cosmo_warning();
+    state_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    if has_parallel_toolbox
+        func=@matlabpool;
+        query_func=@()func('size');
+        nproc_available=query_func();
+
+        if nproc_available==0
+            func();
+            nproc_available=query_func();
+        end
+
+        aeq(nproc_available,'nproc',nproc_available);
     else
         aeq(1);
         aeq(1,'nproc',2);
