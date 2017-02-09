@@ -3,7 +3,10 @@ function test_suite=test_montecarlo_cluster_stat
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 function test_onesample_ttest_montecarlo_cluster_extremes
@@ -676,4 +679,36 @@ function test_montecarlo_cluster_stat_default_dh
     min_corr=.7;
     assertTrue(corr(res_dh_naught_one.samples(:),...
                         res_dh_naught_five.samples(:))>min_corr);
+
+function test_montecarlo_cluster_stat_tiny_niter_singlethread
+    helper_test_tiny_niter_with_nproc(1);
+
+function test_montecarlo_cluster_stat_tiny_niter_multithread
+    if cosmo_parallel_get_nproc_available()<=1
+        cosmo_notify_test_skipped('No parallel toolbox available');
+        return;
+    end
+
+    helper_test_tiny_niter_with_nproc(2);
+
+function helper_test_tiny_niter_with_nproc(nproc)
+
+    ds=cosmo_synthetic_dataset('size','normal',...
+                                'ntargets',1,'nchunks',15);
+    nh=cosmo_cluster_neighborhood(ds,'progress',false);
+    opt=struct();
+    opt.progress=false;
+    opt.h0_mean=0;
+
+    % single iteration
+    opt.niter=1;
+
+    % set nproc
+    opt.nproc=nproc;
+
+    % should not raise an error
+    cosmo_montecarlo_cluster_stat(ds,nh,opt);
+
+
+
 
