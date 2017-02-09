@@ -11,8 +11,6 @@ function test_suite=test_parallel_get_nproc_available()
 
 
 function test_parallel_get_nproc_available_matlab_ge2013b()
-    v_num=cosmo_wtf('version_number');
-
     if ~cosmo_wtf('is_matlab') || ...
                 version_lt2013b()
         cosmo_notify_test_skipped('Only for the Matlab platform >=2013b');
@@ -117,8 +115,44 @@ function test_parallel_get_nproc_available_octave()
         aeq(1,'nproc',2);
     end
 
+function test_parallel_get_nproc_available_override_query_func
+    for navailable=1:3
+        opt=struct();
+        opt.nproc_available_query_func=@()mock_query_func(navailable);
+
+        result=cosmo_parallel_get_nproc_available(opt);
+        assertEqual(navailable,result);
+
+        for nproc=1:6
+            % save warning state
+            warning_state=cosmo_warning();
+            warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+
+            cosmo_warning('reset');
+            cosmo_warning('off');
+
+            % check number of processes
+            opt.nproc=nproc;
+            result=cosmo_parallel_get_nproc_available(opt);
+            expected=min(nproc,navailable);
+
+            assertEqual(expected,result);
+
+            % check whether a warning was shown if expected
+            should_show_warning=nproc>navailable;
+
+            s=cosmo_warning();
+            did_show_warning=~isempty(s.shown_warnings);
+            assertEqual(did_show_warning,should_show_warning);
+
+            clear warning_resetter;
+        end
+    end
 
 
+function [output,msg]=mock_query_func(nproc)
+    msg='';
+    output=nproc;
 
 
 
