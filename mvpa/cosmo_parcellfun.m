@@ -70,6 +70,7 @@ function result=run_parallel_matlab(nproc,func,arg_cell,opt)
 % multi-thread, Matlab
     narg_cell=numel(arg_cell);
     result_cell=cell(size(arg_cell));
+
     parfor (i=1:narg_cell, nproc)
         result_cell{i}=func(arg_cell{i});
     end
