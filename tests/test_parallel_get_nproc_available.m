@@ -123,7 +123,7 @@ function test_parallel_get_nproc_available_override_query_func
         result=cosmo_parallel_get_nproc_available(opt);
         assertEqual(navailable,result);
 
-        for nproc=1:6
+        for nproc=[1:6,inf]
             % save warning state
             warning_state=cosmo_warning();
             warning_resetter=onCleanup(@()cosmo_warning(warning_state));
@@ -139,7 +139,7 @@ function test_parallel_get_nproc_available_override_query_func
             assertEqual(expected,result);
 
             % check whether a warning was shown if expected
-            should_show_warning=nproc>navailable;
+            should_show_warning=nproc>navailable && isfinite(nproc);
 
             s=cosmo_warning();
             did_show_warning=~isempty(s.shown_warnings);

@@ -7,6 +7,8 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 %   'nproc',nproc_wanted            Number of desired processes (optional)
 %                                   If not provided, then the number of
 %                                   available cores is returned.
+%                                   Use 'nproc',inf to get as many
+%                                   cores as there available.
 %   'nproc_available_query_func',f  Function handle to determine how many
 %                                   processes are available. This function
 %                                   is intended for use by developers only;
@@ -22,10 +24,10 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 %                                     toolbox
 %                                   If the required toolbox is not
 %                                   available, then nproc_available=1.
-%                                   If there are nproc_available processes
-%                                   available and
-%                                     nproc_available<nproc_wanted
-%                                   then nproc=nproc_available.
+%                                   If there are nproc_available
+%                                   processes available and
+%                                       nproc_available<nproc_wanted
+%                                   then nproc=nproc_available is returned.
 %
 % Notes:
 %   - If no parallel processing pool has been started, then this function
@@ -39,7 +41,7 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
 %     processes than available), then this function will return M (and not
 %     N if M<N). If you need a fresh pool with
 %
-% See also: parcellfun, matlabpool,
+% See also: parcellfun, matlabpool
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -48,14 +50,22 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
     opt=cosmo_structjoin(defaults,varargin{:});
     check_inputs(opt);
 
+    [has_nproc_wanted,nproc_wanted]=get_nproc_wanted(opt);
+    if has_nproc_wanted && nproc_wanted<=1
+        nproc_available=1;
+        return;
+    end
+
     max_nproc_available_query_func=get_max_nproc_available_func(opt);
     [max_nproc_available,msg]=max_nproc_available_query_func();
 
-    if ~isfield(opt,'nproc')
+    if ~has_nproc_wanted
         nproc_available=max_nproc_available;
         return;
     end
 
+    % getting here it means opt.nproc>1, i.e. the user asked for more than
+    %
     nproc_wanted=opt.nproc;
     nproc_available=max_nproc_available;
 
@@ -63,12 +73,26 @@ function nproc_available=cosmo_parallel_get_nproc_available(varargin)
         full_msg=sprintf(['''nproc''=%d requested, but %s. '...
                             'Using ''nproc''=%d'],...
                             nproc_wanted,msg,nproc_available);
-        cosmo_warning(full_msg);
+
+        if ~isinf(nproc_wanted)
+            % do not show warning if nproc_wanted is infinity
+            cosmo_warning(full_msg);
+        end
     end
 
     if nproc_wanted<nproc_available
         nproc_available=nproc_wanted;
     end
+
+
+function [has_nproc_wanted,nproc_wanted]=get_nproc_wanted(opt)
+    nproc_wanted=NaN;
+
+    has_nproc_wanted=isfield(opt,'nproc');
+    if has_nproc_wanted
+        nproc_wanted=opt.nproc;
+    end
+
 
 
 function func=get_max_nproc_available_func(opt)
