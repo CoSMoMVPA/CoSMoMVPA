@@ -201,15 +201,15 @@ Notes on committing
   - To view the history of previous commits, ``gitk`` is useful.
   - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. If the acknowledgement includes code or documentation (not a bug report or question), use ``CTB`` as well.
-    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
+    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page.
+    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed. If the bug was fixed before the code was merged into the master branch, use ``FT``.
     + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
     + ``BLD``: Changes in the build system.
     + ``BIG``: Major change. Please use together with another tag.
-    + ``CLN``: Code cleanup. ``SML`` can be omitted.
-    + ``CTB``: Code contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). Use together with ``ACK``. If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
+    + ``CLN``: Cleanup of code or documentation. ``SML`` can be omitted.
     + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
+    + ``FT``: (Fixed during testing) Fix bug caught by test before the code was merged into the master branch. These are issues that would be considered bugs if they had been merged into master before. Introduced February 2017.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature or functionality.
     + ``OCTV``: Change in GNU Octave compatibility.
@@ -327,7 +327,7 @@ Try to keep line lengths limited to 75 characters, so that files can be viewed i
 Indentation is 4 spaces (no tabs)
 +++++++++++++++++++++++++++++++++
 
-Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
+Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. For consitency please use exactly four spaces for every indent level; no more, no less.
 
 If this guideline and the previous one do not give you enough room to express yourself, then most likely you are overcomplicating things; consider rewriting the code and/or use subfunctions.
 
@@ -343,8 +343,21 @@ If this guideline and the previous one do not give you enough room to express yo
 
     .. code-block:: matlab
 
-       function y=plus_two(x)
-        y=x+2;
+        function r=my_min3(x,y,z)
+          if x<y
+            if z<x
+              r=z;
+            else
+              r=x;
+            end
+          else
+            if z<y
+              r=z;
+            else
+              r=y;
+            end
+         end
+
 
     .. code-block:: matlab
 
@@ -382,15 +395,26 @@ If this guideline and the previous one do not give you enough room to express yo
 
     .. code-block:: matlab
 
-      function y=plus_two(x)
-            % this function adds two the input and returns the result.
-            y=x+2;
-
+        function r=my_min3(x,y,z)
+            if x<y
+                if z<x
+                    r=z;
+                else
+                    r=x;
+                end
+            else
+                if z<y
+                    r=z;
+                else
+                    r=y;
+                end
+            end
 
 Use lower-case letters for variable names
 +++++++++++++++++++++++++++++++++++++++++
 
 Use underscores (``_``) to separate words.
+
     **bad:**
 
     .. code-block:: matlab
@@ -801,7 +825,7 @@ When implementing unit tests (in the ``tests``) directory, functions should run 
 
 Do not use global variables
 +++++++++++++++++++++++++++
-Global variables can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
+Global variables can have nasty and unpredictable side effects. Therefore, CoSMoMVPA does not use global variables. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
 
 Avoid long and complicated expressions
 ++++++++++++++++++++++++++++++++++++++
@@ -850,7 +874,7 @@ Use ``sprintf`` or ``fprint`` when formatting strings
 
 Avoid using ``eval``
 ++++++++++++++++++++
-Statements with ``eval`` can obfuscate the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+Statements with ``eval`` can obfuscate the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles.
 
     **very bad:**
 
@@ -896,6 +920,7 @@ Statements with ``eval`` can obfuscate the code considerably, and also make refa
             f_data=f_handle(data(k));
         end
 
+
 Minimize using ``try`` and ``catch``
 ++++++++++++++++++++++++++++++++++++
 The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Some current exceptions are:
@@ -903,6 +928,15 @@ The use ``try`` and ``catch`` statements is generally avoided; we aim to throw a
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``. We don't want that function to crash if any of the scripts it is publishing crashes.
     + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail, as that is a likely scenarion. In that case, even though the error is caught initially, always a subsequent error is thrown.
     + :ref:`cosmo_searchlight`, which if an error is thrown by the `measure` function handle, prefixes the error message with the feature id that caused the error, and then throws a new error.
+
+
+No private functions
+++++++++++++++++++++
+Do not use private functions. If functions are considered useful enough for one particular function, it may also be useful for other functions or for the users.
+
+No file duplication
++++++++++++++++++++
+Do not duplicate files in multiple locations. Doing so would add additional maintenance burden in keeping all files up to date.
 
 
 Check input arguments
@@ -931,30 +965,55 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. (Note: this requires Matlab's xunit). Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 
 Compatibility notes
 +++++++++++++++++++
-CoSMoMVPA_ aims to be compatible with GNU Octave 3.8 and later, and with Matlab versions from at least 2010b onwards. Features not supported by these platforms should not be used.
+CoSMoMVPA_ aims to be compatible with GNU Octave 3.8 and later, and with Matlab versions from at least 2010b onwards.
 
 
 Test suite
 ^^^^^^^^^^
-CoSMoMVPA_ uses a test suite, which can automatically test most of the code. This helps in maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (such as bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. To run them, either:
+CoSMoMVPA_ uses a test suite, which can automatically test most of the code. This helps in maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired changes in behaviour (bugs). Tests are located in ``tests/`` and use the MOxUnit_ framework. To run them, either:
 
-    - run :ref:`cosmo_run_tests`: when using xUnit_. Only supported on the Matlab platform.
-    - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet, because Octave does not support ``eval`` (as of May 2015).
+    - run :ref:`cosmo_run_tests`: when using xUnit_.
+    - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet.
 
-Currently we use `travis-ci`_ for continuous integration testing. If you have a github_ account and a CoSMoMVPA_ fork, you can also use it to test new branches. To do so:
+Currently we use `Travis-ci`_ for continuous integration testing and `coveralls.io`_ with MOcov_ for testing coverage. If you have a github_ account and a CoSMoMVPA_ fork, you can also use it to test new branches. To do so:
 
-    - Make an account on `travis-ci`.
+    - Make an account on `Travis-ci`.
     - Link it to your github_ account.
     - Now, after every 'push' to github, the test suite is run automatically using ``moxunit_run_testa`` on Octave.
     - If any tests fails, or passes if it failed before, you will be notified by email.
 
-For existing or new features, more tests are very much welcomed.
+When proposing new functionality through a pull request, please include tests that test this functionality.
+
+Good tests
+^^^^^^^^^^
+Some general features that make tests good:
+
+- expected function mapping: whether output is expected for particular input. It is even better if input is generated randomly and properties of the expected output are tested.
+- code coverage: check whether different input arguments (for example different switches or options) results in different expected outputs. Code coverage estimates from `coveralls.io`_ or `MOcov`_ can be useful in guiding which code needs more testing. Although code coverage is not a goal in itself, as a rule of thumb we like ``80%`` coverage and are very happy with coverage above ``90%``.
+- raise exceptions when expcted: test whether wrong or illegal inputs raise an exception (through ``assertExceptionThrown``).
+- modular: test one particular function (for unit tests), or whether multiple functions work together as expected (integration test)
+- no data dependencies: tests that use data as input should generate this data themselves. The :ref:`cosmo_synthetic_dataset` function can generate data in various modalities and parameters. We aim to not include binary files for testing. For example, some of our input and output tests actually generate files in AFNI, NIFTI, GIFTI and BrainVoyager format.
+
+We also like *fast* tests, because it allows running all tests, or a significant subset, in a short amount of time. This gives quick feedback to the developer whether code works or not, allowing for data-driven development techniques. It also scales well: imagine running 500 tests and each test takes 5 minutes: the suite would take more than a day and a half to run! But even half a minute per test would make take 4 hours, a very long time between implementing a change and getting feedback whether the suite passes.
+
+What is fast then? When running on the Matlab platform (which typically runs a bit faster than Octave), here some rule of thumb for the runtime ``t`` of a test:
+
+- ``t < 100 ms``: excellent.
+- ``100 ms < t < 1 s``: ok.
+- ``1 s < t < 5 s``: borderline acceptable but not preferred.
+- ``5 s < t < 60 s``: acceptable only in exceptional cases.
+- ``t > > 60 s``: generally not acceptable.
+
+One important principle in writing fast tests is using small data, as this generally reduces computation time for most functions. To estimate the runtime for a tests, you can use ``moxunit_runtsts`` with the ``verbose`` option.
+
+For examples of tests, see the ``test`` directory.
+
 
 .. include:: links.txt
 
