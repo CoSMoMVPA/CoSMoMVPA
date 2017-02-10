@@ -327,7 +327,7 @@ Try to keep line lengths limited to 75 characters, so that files can be viewed i
 Indentation is 4 spaces (no tabs)
 +++++++++++++++++++++++++++++++++
 
-Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception.
+Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. For consitency please use exactly four spaces for every indent level; no more, no less.
 
 If this guideline and the previous one do not give you enough room to express yourself, then most likely you are overcomplicating things; consider rewriting the code and/or use subfunctions.
 
@@ -343,8 +343,21 @@ If this guideline and the previous one do not give you enough room to express yo
 
     .. code-block:: matlab
 
-       function y=plus_two(x)
-        y=x+2;
+        function r=my_min3(x,y,z)
+          if x<y
+            if z<x
+              r=z;
+            else
+              r=x;
+            end
+          else
+            if z<y
+              r=z;
+            else
+              r=y;
+            end
+         end
+
 
     .. code-block:: matlab
 
@@ -382,15 +395,26 @@ If this guideline and the previous one do not give you enough room to express yo
 
     .. code-block:: matlab
 
-      function y=plus_two(x)
-            % this function adds two the input and returns the result.
-            y=x+2;
-
+        function r=my_min3(x,y,z)
+            if x<y
+                if z<x
+                    r=z;
+                else
+                    r=x;
+                end
+            else
+                if z<y
+                    r=z;
+                else
+                    r=y;
+                end
+            end
 
 Use lower-case letters for variable names
 +++++++++++++++++++++++++++++++++++++++++
 
 Use underscores (``_``) to separate words.
+
     **bad:**
 
     .. code-block:: matlab
@@ -801,7 +825,7 @@ When implementing unit tests (in the ``tests``) directory, functions should run 
 
 Do not use global variables
 +++++++++++++++++++++++++++
-Global variables can have nasty and unpredictable side effects. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
+Global variables can have nasty and unpredictable side effects. Therefore, CoSMoMVPA does not use global variables. In almost all cases it is preferable that output of a function should depend on the input only; there are some exceptions, such as :ref:`cosmo_warning` which by default shows each warning only once. If necessary (e.g. for caching), use persistent variables.
 
 Avoid long and complicated expressions
 ++++++++++++++++++++++++++++++++++++++
@@ -850,7 +874,7 @@ Use ``sprintf`` or ``fprint`` when formatting strings
 
 Avoid using ``eval``
 ++++++++++++++++++++
-Statements with ``eval`` can obfuscate the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles
+Statements with ``eval`` can obfuscate the code considerably, and also make refactoring (such as changing variable names) more difficult. In almost all cases code can rewritten that avoids eval. If necessary use function handles.
 
     **very bad:**
 
@@ -896,6 +920,7 @@ Statements with ``eval`` can obfuscate the code considerably, and also make refa
             f_data=f_handle(data(k));
         end
 
+
 Minimize using ``try`` and ``catch``
 ++++++++++++++++++++++++++++++++++++
 The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Some current exceptions are:
@@ -903,6 +928,15 @@ The use ``try`` and ``catch`` statements is generally avoided; we aim to throw a
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``. We don't want that function to crash if any of the scripts it is publishing crashes.
     + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail, as that is a likely scenarion. In that case, even though the error is caught initially, always a subsequent error is thrown.
     + :ref:`cosmo_searchlight`, which if an error is thrown by the `measure` function handle, prefixes the error message with the feature id that caused the error, and then throws a new error.
+
+
+No private functions
+++++++++++++++++++++
+Do not use private functions. If functions are considered useful enough for one particular function, it may also be useful for other functions or for the users.
+
+No file duplication
++++++++++++++++++++
+Do not duplicate files in multiple locations. Doing so would add additional maintenance burden in keeping all files up to date.
 
 
 Check input arguments
