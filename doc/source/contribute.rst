@@ -201,15 +201,15 @@ Notes on committing
   - To view the history of previous commits, ``gitk`` is useful.
   - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page. If the acknowledgement includes code or documentation (not a bug report or question), use ``CTB`` as well.
-    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
+    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page.
+    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed. If the bug was fixed before the code was merged into the master branch, use ``FT``.
     + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
     + ``BLD``: Changes in the build system.
     + ``BIG``: Major change. Please use together with another tag.
-    + ``CLN``: Code cleanup. ``SML`` can be omitted.
-    + ``CTB``: Code contribution from someone else who did not use ``git`` (for example, sent an email to the developers with new functionality that was considered useful). Use together with ``ACK``. If someone using ``git`` uses this contribution, please also add a text like '``based on contribution from Jon Doe (jon@doe.org)``'.
+    + ``CLN``: Cleanup of code or documentation. ``SML`` can be omitted.
     + ``DOC``: Change in documentation *of matlab code* (in ``examples/``, ``mvpa/``, ``tests/``).
     + ``EXC``: Change in exercises. This could go together with ``WEB`` or ``DOC``, and/or ``RUN``.
+    + ``FT``: (Fixed during testing) Fix bug caught by test before the code was merged into the master branch. These are issues that would be considered bugs if they had been merged into master before. Introduced February 2017.
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature or functionality.
     + ``OCTV``: Change in GNU Octave compatibility.
