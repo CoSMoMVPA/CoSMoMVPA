@@ -102,6 +102,28 @@ install:
                     ";
       fi
 
+
+    # ensure Octave rc file exists
+    - echo "" >> $OCTAVERC;
+
+    # load Octave io package
+    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+
+
+    # optionally enable Octave struct package
+    - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
+      fi
+
+
+    # optionally enable Octave parallel package
+    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
+          #sed -i 's/AC_CONFIG_MACRO_DIRS/AC_CONFIG_MACRO_DIR/g' octave-parallel/src/configure.ac;
+          make -C octave-parallel install;
+      fi
+
+
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
           rm -rf surfing;
@@ -166,25 +188,7 @@ before_script:
           RETRY=travis_retry;
       fi
 
-    # ensure Octave rc file exists
-    - echo "" >> $OCTAVERC;
 
-    # load Octave io package
-    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
-
-
-    # optionally enable Octave struct package
-    - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
-      fi
-
-
-    # optionally enable Octave parallel package
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
-          sed -i 's/AC_CONFIG_MACRO_DIRS/AC_CONFIG_MACRO_DIR/g' octave-parallel/src/configure.ac;
-          make -C octave-parallel install;
-      fi
 
     # optionally enable Octave statistics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
