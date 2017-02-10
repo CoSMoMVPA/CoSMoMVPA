@@ -47,8 +47,8 @@ before_install:
     - travis_retry sudo apt-get update -y -qq
     - travis_retry sudo apt-get install clang-3.9 -y --force-yes -q
 
-    - sudo update-alternatives --set c++ /usr/bin/clang++-3.9
-    - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++-3.9
+    - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
+    - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
     - c++ --version
     - g++ --version
 
