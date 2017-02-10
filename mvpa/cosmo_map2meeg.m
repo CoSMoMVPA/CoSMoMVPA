@@ -28,7 +28,7 @@ function hdr=cosmo_map2meeg(ds, fn)
 % Notes:
 %    - a typical use case is to use this function to map the dataset to a
 %      FieldTrip struct, then use FieldTrip to visualize the data
-%    - there is currently no support for wirting EEGLAB 'ersp' data.
+%    - there is currently no support for writing EEGLAB 'ersp' data.
 %
 % Examples:
 %     % convert a dataset struct to a FieldTrip struct
@@ -45,6 +45,9 @@ function hdr=cosmo_map2meeg(ds, fn)
 %
 %     % convert a time-lock dataset to an EEGLAB structure
 %     eeglab_daterp=cosmo_map2meg(ds,'-daterp');
+%
+%     % write EEGLAB time-frequency data
+%     cosmo_map2meeg(ds,'timefreq.dattimef');
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
