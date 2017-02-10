@@ -38,10 +38,10 @@ before_install:
     # use Clang 3.9
 
     #- travis_retry sudo apt-get -y install clang
-    - travis_retry sudo add-apt-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main"
-    - travis_retry sudo add-apt-repository "deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty main"
-    - travis_retry sudo add-apt-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main"
-    - travis_retry sudo add-apt-repository "deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main"
+    - travis_retry sudo add-apt-repository \"deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main\"
+    - travis_retry sudo add-apt-repository \"deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty main\"
+    - travis_retry sudo add-apt-repository \"deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main\"
+    - travis_retry sudo add-apt-repository \"deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main\"
 
     - travis_retry sudo sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y -q
     - travis_retry sudo sudo apt-get update -y -qq
