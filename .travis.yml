@@ -45,10 +45,12 @@ before_install:
 
     - travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y
     - travis_retry sudo apt-get update -y -qq
-    - travis_retry sudo apt-get install clang-3.9 -y --force-yes -q
+    - travis_retry sudo apt-get install clang-3.9 lldb-3.9 -y --force-yes -q
 
-    - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
-    - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
+    #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
+    #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
+    - update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9
+    - update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9
     - c++ --version
     - g++ --version
 
