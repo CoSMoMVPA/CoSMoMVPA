@@ -43,9 +43,9 @@ before_install:
     - travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
     #- travis_retry sudo add-apt-repository 'deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
 
-    - travis_retry sudo sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y -q
-    - travis_retry sudo sudo apt-get update -y -qq
-    - travis_retry sudo sudo apt-get install clang-3.9 -y --force-yes -q
+    - travis_retry sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y -q
+    - travis_retry sudo apt-get update -y -qq
+    - travis_retry sudo apt-get install clang-3.9 -y --force-yes -q
 
     - sudo update-alternatives --set c++ /usr/bin/clang++-3.9
     - sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++-3.9
