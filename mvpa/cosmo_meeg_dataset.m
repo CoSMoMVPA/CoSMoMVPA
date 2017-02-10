@@ -821,16 +821,19 @@ function match=eeglab_select_idx_chan_pref_suffix(all_matches,opt)
 % typical use case is data with *_erspbase and _ersp data
     key='data_field';
 
-    % bootstrap estimates - no idea how to deal with these
+    % 'erspboot' are bootstrap estimates - no idea how to deal with these
+    % so for now they are not supported
     not_supported_values={'erspboot'};
 
-    match_msk=~cellfun(@isempty,all_matches);
+    % get fieldnames to keep
+    get_match_name=@(x)x{2}(2:end);
+    match_func=@(x)~isempty(x) && ...
+                    ~cosmo_match({get_match_name(x)},not_supported_values);
+    match_msk=cellfun(match_func,all_matches);
     matches=all_matches(match_msk);
 
-    valid_values=cellfun(@(x)x{2}(2:end),matches,...
+    valid_values=cellfun(get_match_name,matches,...
                            'UniformOutput',false);
-
-    valid_values=setdiff(valid_values,not_supported_values);
 
     suffix=sprintf('Valid options for the ''%s'' option are ''%s''.',...
                          key,cosmo_strjoin(valid_values,''', '''));
@@ -845,7 +848,7 @@ function match=eeglab_select_idx_chan_pref_suffix(all_matches,opt)
                     'correction), whereas ''erspbase'' returns the '...
                     ' baseline '...
                     'values themselves (that can be used for baseline '...
-                    'correction. It is currently not possible to '...
+                    'correction). It is currently not possible to '...
                     'return baseline corrected data with this '...
                     'function.'],suffix);
     end
