@@ -965,30 +965,55 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. (Note: this requires Matlab's xunit). Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 
 Compatibility notes
 +++++++++++++++++++
-CoSMoMVPA_ aims to be compatible with GNU Octave 3.8 and later, and with Matlab versions from at least 2010b onwards. Features not supported by these platforms should not be used.
+CoSMoMVPA_ aims to be compatible with GNU Octave 3.8 and later, and with Matlab versions from at least 2010b onwards.
 
 
 Test suite
 ^^^^^^^^^^
-CoSMoMVPA_ uses a test suite, which can automatically test most of the code. This helps in maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired effects (such as bugs). They are located in ``tests/`` and use the xUnit_ or MOxUnit_ framework. To run them, either:
+CoSMoMVPA_ uses a test suite, which can automatically test most of the code. This helps in maintaining or improving the quality of the code, and to check whether refactoring code does not introduce undesired changes in behaviour (bugs). Tests are located in ``tests/`` and use the MOxUnit_ framework. To run them, either:
 
-    - run :ref:`cosmo_run_tests`: when using xUnit_. Only supported on the Matlab platform.
-    - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet, because Octave does not support ``eval`` (as of May 2015).
+    - run :ref:`cosmo_run_tests`: when using xUnit_.
+    - run ``moxunit_run_tests`` in the ``tests`` directory: when using MOxUnit_. Supported on the Matlab and Octave platform. Documentation tests are not supported yet.
 
-Currently we use `travis-ci`_ for continuous integration testing. If you have a github_ account and a CoSMoMVPA_ fork, you can also use it to test new branches. To do so:
+Currently we use `Travis-ci`_ for continuous integration testing and `coveralls.io`_ with MOcov_ for testing coverage. If you have a github_ account and a CoSMoMVPA_ fork, you can also use it to test new branches. To do so:
 
-    - Make an account on `travis-ci`.
+    - Make an account on `Travis-ci`.
     - Link it to your github_ account.
     - Now, after every 'push' to github, the test suite is run automatically using ``moxunit_run_testa`` on Octave.
     - If any tests fails, or passes if it failed before, you will be notified by email.
 
-For existing or new features, more tests are very much welcomed.
+When proposing new functionality through a pull request, please include tests that test this functionality.
+
+Good tests
+^^^^^^^^^^
+Some general features that make tests good:
+
+- expected function mapping: whether output is expected for particular input. It is even better if input is generated randomly and properties of the expected output are tested.
+- code coverage: check whether different input arguments (for example different switches or options) results in different expected outputs. Code coverage estimates from `coveralls.io`_ or `MOcov`_ can be useful in guiding which code needs more testing. Although code coverage is not a goal in itself, as a rule of thumb we like ``80%`` coverage and are very happy with coverage above ``90%``.
+- raise exceptions when expcted: test whether wrong or illegal inputs raise an exception (through ``assertExceptionThrown``).
+- modular: test one particular function (for unit tests), or whether multiple functions work together as expected (integration test)
+- no data dependencies: tests that use data as input should generate this data themselves. The :ref:`cosmo_synthetic_dataset` function can generate data in various modalities and parameters. We aim to not include binary files for testing. For example, some of our input and output tests actually generate files in AFNI, NIFTI, GIFTI and BrainVoyager format.
+
+We also like *fast* tests, because it allows running all tests, or a significant subset, in a short amount of time. This gives quick feedback to the developer whether code works or not, allowing for data-driven development techniques. It also scales well: imagine running 500 tests and each test takes 5 minutes: the suite would take more than a day and a half to run! But even half a minute per test would make take 4 hours, a very long time between implementing a change and getting feedback whether the suite passes.
+
+What is fast then? When running on the Matlab platform (which typically runs a bit faster than Octave), here some rule of thumb for the runtime ``t`` of a test:
+
+- ``t < 100 ms``: excellent.
+- ``100 ms < t < 1 s``: ok.
+- ``1 s < t < 5 s``: borderline acceptable but not preferred.
+- ``5 s < t < 60 s``: acceptable only in exceptional cases.
+- ``t > > 60 s``: generally not acceptable.
+
+One important principle in writing fast tests is using small data, as this generally reduces computation time for most functions. To estimate the runtime for a tests, you can use ``moxunit_runtsts`` with the ``verbose`` option.
+
+For examples of tests, see the ``test`` directory.
+
 
 .. include:: links.txt
 
