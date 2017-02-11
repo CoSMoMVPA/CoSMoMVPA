@@ -140,10 +140,12 @@ install:
     # optionally enable Octave parallel package
 
     #sed -i 's/AC_CONFIG_MACRO_DIRS/AC_CONFIG_MACRO_DIR/g' octave-parallel/src/configure.ac;
+    #$RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
+          #make -C octave-parallel install;
+
 
     - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY hg clone http://hg.code.sf.net/p/octave/parallel octave-parallel;
-          make -C octave-parallel install;
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
       fi
 
 
