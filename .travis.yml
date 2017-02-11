@@ -69,7 +69,7 @@ before_install:
     - c++ --version
     - g++ --version
 
-    - dpkg --status libgomp
+    #- dpkg --status libgomp
 
     #- ld -lomp --verbose
 
