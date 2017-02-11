@@ -69,6 +69,24 @@ before_install:
     - c++ --version
     - g++ --version
 
+
+    - NAME=automake-1.6
+    - wget https://ftp.gnu.org/gnu/automake/${NAME}.tar.gz
+    - tar -xzf ${NAME}.tar.gz
+    - cd ${NAME}
+    - ./configure && make && sudo make install
+    - cd ..
+
+
+    - NAME=autoconf-2.69 
+    - wget https://ftp.gnu.org/gnu/autoconf/${NAME}.tar.gz
+    - tar -xzf ${NAME}.tar.gz
+    - cd ${NAME}
+    - ./configure && make && sudo make install
+    - cd ..
+
+    
+
     #- dpkg --status libgomp
 
     #- ld -lomp --verbose
