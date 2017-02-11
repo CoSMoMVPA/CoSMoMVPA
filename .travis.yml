@@ -53,8 +53,8 @@ before_install:
     - VERSION=1.6
     - FULL=${NAME}-${VERSION}
     - wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz
-    - tar -xzf ${NAME}.tar.gz
-    - cd ${NAME}
+    - tar -xzf ${FULL}.tar.gz
+    - cd ${FULL}
     - ./configure && make && sudo make install
     - cd ..
 
@@ -63,8 +63,8 @@ before_install:
     - VERSION=2.69
     - FULL=${NAME}-${VERSION}
     - wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz
-    - tar -xzf ${NAME}.tar.gz
-    - cd ${NAME}
+    - tar -xzf ${FULL}.tar.gz
+    - cd ${FULL}
     - ./configure && make && sudo make install
     - cd ..
 
