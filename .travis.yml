@@ -28,19 +28,43 @@ before_install:
     # ensure up-to-date prior to software-properties-common
     - travis_retry sudo apt-get -y -qq update
     # get Octave 4.0
-    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
+    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties libtool autoconf automake m4
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
 
-    # use Clang
-    - travis_retry sudo apt-get -y install clang
-    - sudo update-alternatives --set c++ /usr/bin/clang++
-    - sudo ln -f -s /usr/bin/clang++ /usr/bin/g++
-    - c++ --version
-    - g++ --version
+    # when installing externals, get recent GCC for Octave parallel toolbox
+    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
+          travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
+          travis_retry sudo apt-get update -y -q;
+          travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
+          travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20;
+          travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20;
+          travis_retry sudo update-alternatives --config gcc;
+          travis_retry sudo update-alternatives --config g++;
+          travis_retry sudo apt-get install gcc-multilib;
+          travis_retry sudo apt-get install libgomp1;
+          c++ --version;
+          g++ --version;
+          NAME=automake;
+          VERSION=1.6;
+          FULL=${NAME}-${VERSION};
+          wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz;
+          tar -xzf ${FULL}.tar.gz;
+          cd ${FULL};
+          ./configure && make && sudo make install;
+          cd ..;
+          NAME=autoconf;
+          VERSION=2.69;
+          FULL=${NAME}-${VERSION};
+          wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz;
+          tar -xzf ${FULL}.tar.gz;
+          cd ${FULL};
+          ./configure && make && sudo make install;
+          cd ..;
+      fi
 
     # go up one level
     - cd ..
@@ -56,6 +80,10 @@ before_install:
           git clone git://github.com/MOcov/MOcov.git;
           make -C MOcov install;
       fi
+    # Show package info
+    - autoconf --version
+    - automake --version
+    - m4 --version
 
 install:
     - PTH=`pwd`
@@ -80,12 +108,31 @@ install:
                      fieldtrip
                      libsvm
                      gifti
+                     octave_pkg_struct
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
                      octave_savannah_evalc
                     ";
       fi
+
+
+    # ensure Octave rc file exists
+    - echo "" >> $OCTAVERC;
+
+    # load Octave io package
+    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+
+
+    # optionally enable Octave struct package
+    - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
+      fi
+
+    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+      fi
+
 
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
@@ -151,15 +198,7 @@ before_script:
           RETRY=travis_retry;
       fi
 
-    # load Octave io package
-    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
-    # optionally enable Octave parallel package
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
-          echo "" >> $OCTAVERC;
-      fi
 
     # optionally enable Octave statistics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
