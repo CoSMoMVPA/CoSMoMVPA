@@ -54,8 +54,8 @@ before_install:
     - g++ --version
 
     #
-    - ld -lomp --verbose
     - sudo find / -iname omp*
+    - ld -lomp --verbose
 
     # go up one level
     - cd ..
