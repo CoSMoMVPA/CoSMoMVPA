@@ -35,61 +35,38 @@ before_install:
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
 
-    # use Clang 3.9
-
-    #- travis_retry sudo apt-get -y install clang
-    #- travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
-    #- travis_retry sudo add-apt-repository 'deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
-    #- travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
-    #- travis_retry sudo add-apt-repository 'deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
-    #- travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y
-    #- travis_retry sudo apt-get update -y -qq
-    #- travis_retry sudo apt-get install clang-3.9 lldb-3.9 -y --force-yes -q
-
-    #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
-    #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
-    #- sudo update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9 100
-    #- sudo  update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9 100
+    # get recent GCC for Octave parallel toolbox 
     - travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y
     - travis_retry sudo apt-get update -y -q
     - travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q
-    #- travis_retry sudo update-alternatives --remove-all gcc
-    #- travis_retry sudo update-alternatives --remove-all g++
     - travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
     - travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
     - travis_retry sudo update-alternatives --config gcc
     - travis_retry sudo update-alternatives --config g++
     - travis_retry sudo apt-get install gcc-multilib
     - travis_retry sudo apt-get install libgomp1
-    #
-    - sudo find / -iname omp*
-    - sudo find / -iname libomp*
-    - sudo find / -iname libgomp*
-
     - c++ --version
     - g++ --version
-
-
-    - NAME=automake-1.6
-    - wget https://ftp.gnu.org/gnu/automake/${NAME}.tar.gz
-    - tar -xzf ${NAME}.tar.gz
-    - cd ${NAME}
-    - ./configure && make && sudo make install
-    - cd ..
-
-
-    - NAME=autoconf-2.69 
-    - wget https://ftp.gnu.org/gnu/autoconf/${NAME}.tar.gz
-    - tar -xzf ${NAME}.tar.gz
-    - cd ${NAME}
-    - ./configure && make && sudo make install
-    - cd ..
-
     
+    # install recent automake
+    - NAME=automake
+    - VERSION=1.6
+    - FULL=${NAME}-${VERSION}
+    - wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz
+    - tar -xzf ${NAME}.tar.gz
+    - cd ${NAME}
+    - ./configure && make && sudo make install
+    - cd ..
 
-    #- dpkg --status libgomp
-
-    #- ld -lomp --verbose
+    # install recent autoconf
+    - NAME=autoconf
+    - VERSION=2.69
+    - FULL=${NAME}-${VERSION}
+    - wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz
+    - tar -xzf ${NAME}.tar.gz
+    - cd ${NAME}
+    - ./configure && make && sudo make install
+    - cd ..
 
     # go up one level
     - cd ..
