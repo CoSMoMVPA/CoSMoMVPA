@@ -59,7 +59,7 @@ before_install:
     - travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
     - travis_retry sudo update-alternatives --config gcc
     - travis_retry sudo update-alternatives --config g++
-
+    - travis_retry sudo apt-get install gcc-multilib
     #
     - sudo find / -iname omp*
     - sudo find / -iname libomp*
