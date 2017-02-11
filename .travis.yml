@@ -63,6 +63,7 @@ before_install:
     #
     - sudo find / -iname omp*
     - sudo find / -iname libomp*
+    - sudo find / -iname libgomp*
 
     - c++ --version
     - g++ --version
