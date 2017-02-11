@@ -60,6 +60,7 @@ before_install:
     - travis_retry sudo update-alternatives --config gcc
     - travis_retry sudo update-alternatives --config g++
     - travis_retry sudo apt-get install gcc-multilib
+    - travis_retry sudo apt-get install libgomp1
     #
     - sudo find / -iname omp*
     - sudo find / -iname libomp*
