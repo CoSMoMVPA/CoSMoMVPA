@@ -38,20 +38,30 @@ before_install:
     # use Clang 3.9
 
     #- travis_retry sudo apt-get -y install clang
-    - travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
+    #- travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
     #- travis_retry sudo add-apt-repository 'deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
-    - travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
+    #- travis_retry sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
     #- travis_retry sudo add-apt-repository 'deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
     - travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y
-    - travis_retry sudo apt-get update -y -qq
-    - travis_retry sudo apt-get install clang-3.9 lldb-3.9 -y --force-yes -q
+    #- travis_retry sudo apt-get update -y -qq
+    #- travis_retry sudo apt-get install clang-3.9 lldb-3.9 -y --force-yes -q
 
     #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
     #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
-    - sudo update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9 100
-    - sudo  update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9 100
-    - c++ --version
-    - g++ --version
+    #- sudo update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9 100
+    #- sudo  update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9 100
+    #- c++ --version
+    #- g++ --version
+
+    - travis_retry sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    - travis_retry sudo apt-get update
+    - travis_retry sudo apt-get install gcc-4.8 g++-4.8
+    - travis_retry sudo update-alternatives --remove-all gcc
+    - travis_retry sudo update-alternatives --remove-all g++
+    - travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
+    - travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
+    - travis_retry sudo update-alternatives --config gcc
+    - travis_retry sudo update-alternatives --config g++
 
     #
     - sudo find / -iname omp*
