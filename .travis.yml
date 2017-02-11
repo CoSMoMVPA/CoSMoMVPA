@@ -48,8 +48,8 @@ before_install:
 
     #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/c++
     #- sudo ln -f -s /usr/bin/clang++-3.9 /usr/bin/g++
-    - update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9 100
-    - update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9 100
+    - sudo update-alternatives --install /usr/bin/g++ g++  /usr/bin/clang++-3.9 100
+    - sudo update-alternatives --install /usr/bin/c++ c++  /usr/bin/clang++-3.9 100
     - c++ --version
     - g++ --version
 
