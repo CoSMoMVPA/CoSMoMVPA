@@ -39,9 +39,9 @@ before_install:
     - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
           travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
-          travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
-          travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20;
-          travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20;
+          travis_retry sudo apt-get install gcc-4.6 g++-4.6 -y -q;
+          travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 20;
+          travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 20;
           travis_retry sudo update-alternatives --config gcc;
           travis_retry sudo update-alternatives --config g++;
           travis_retry sudo apt-get install gcc-multilib;
