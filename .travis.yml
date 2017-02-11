@@ -71,7 +71,7 @@ before_install:
 
     - dpkg --status libgomp
 
-    - ld -lomp --verbose
+    #- ld -lomp --verbose
 
     # go up one level
     - cd ..
