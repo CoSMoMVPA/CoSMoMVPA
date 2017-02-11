@@ -68,6 +68,8 @@ before_install:
     - c++ --version
     - g++ --version
 
+    - dpkg --status libgomp
+
     - ld -lomp --verbose
 
     # go up one level
