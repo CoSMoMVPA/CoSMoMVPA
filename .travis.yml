@@ -55,6 +55,8 @@ before_install:
 
     #
     - sudo find / -iname omp*
+    - sudo find / -iname libomp*
+
     - ld -lomp --verbose
 
     # go up one level
