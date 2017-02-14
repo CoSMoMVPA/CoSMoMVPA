@@ -264,7 +264,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
 
 
 function test_onesample_ttest_montecarlo_cluster_stat_strong
-    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',12);
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
     % lots of signal, should work with no seed specified
