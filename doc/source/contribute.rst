@@ -769,7 +769,10 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
 
             addpath('my_functions');
 
-    Along the same lines, in general functions should not change the current working directory, the path, or the warning state. Sometimes this cannot be avoided, but in that case these changes should be undone when leaving the function.
+Use onCleanup if an earlier state needs to be reset
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In general, functions should not change the current working directory, the path, or the warning state. Sometimes this cannot be avoided, but in that case these changes should be undone when leaving the function using ``onCleanup``. ``try`` - ``catch`` constructions should be avoided.
 
     **bad:**
 
@@ -794,7 +797,40 @@ Generally try to avoid side effects, and if that is not possible, indicate such 
         - the user may have set the warning state themselves to ``off``; this is undone after calling this funciton
         - the current working directory and the path are not restored when execution is interrupted because of an error or a user interrupt (``ctrl+C``).
 
-    **acceptable:**
+    **bad:**
+
+    .. code-block:: matlab
+
+        function do_computation()
+
+            original_path=path();
+            original_dir=pwd();
+
+            try
+                addpath('my_functions');
+                cd('other_functions/private');
+
+                do_stuff();
+
+            catch
+                e=lasterror();
+
+                cd(original_path);
+                path(original_path);
+
+                rethrow(e);
+            end
+
+            cd(original_path);
+            path(original_path);
+
+    Although the path and pwd are restored, this is bad because:
+
+        - it introduces code duplication.
+        - it does not protect against the user pressing ctrl+c.
+
+
+    **good:**
 
     .. code-block:: matlab
 
