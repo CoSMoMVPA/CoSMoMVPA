@@ -1111,6 +1111,31 @@ If the order is, for example, ``'freq', 'time', 'chan'`` then the channel dimens
         [ds,attr,values]=cosmo_dim_remove(ds,{label_to_move});
         ds=cosmo_dim_insert(ds,2,target_pos,{label_to_move},values,attr);
 
+Run a 2 x 2 within-subject ANOVA?
+---------------------------------
+'I would like to run a 2 x 2 ANOVA over participants where both factors are within-participant (also known as repeated-measures ANOVA). Can I use CoSMoMVPA to get the main effects and interaction statistics?'
+
+You can, but currently not directly: it involves a bit of manual work. The key thing is that in a 2 x 2 repeated measures ANOVA, main effects and interaction can all be expressed as one-sample t-tests. Say that for a single participant there are four conditions: A1, A2, B1, and B2. In CoSMoMVPA we would express this as a dataset structure ``ds`` with ``ds.samples`` of size ``4 x NF``, where ``NF`` is the number of features. Now compute:
+
+    .. code-block:: matlab
+
+        % main effect A vs B: A1+A2-B1-B2.
+        dsAvsB=cosmo_slice(ds,1);
+        dsAvsB.samples=ds.samples(1,:)+ds.samples(2,:)-ds.samples(3,:)-ds.samples(4,:)
+
+        % main effect 1 vs 2: A1-A2+B1-B2
+        ds1VS2=cosmo_slice(ds,1);
+        ds1VS2 =ds.samples(1,:)-ds.samples(2,:)+ds.samples(3,:)-ds.samples(4,:)
+
+        % interaction: A1-A2-B1+B2
+        dsinteraction=cosmo_slice(ds,1);
+        dsinteraction=ds.samples(1,:)-ds.samples(2,:)-ds.samples(3,:)+ds.samples(4,:)
+
+
+Repeat the process for each participant. For each analysis of interest (two main effects and the interaction) separately, follow the process of a one-sample t-test as explained elsewhere in the FAQ: stack the dataset from the participants using :ref:`cosmo_stack`, assign ``.sa.chunks`` to be all unique, assign ``.sa.targets`` to be all the same, and then use :ref:`cosmo_stat` (for feature-wise stats with no correction for multiple correction) or :ref:`cosmo_montecarlo_cluster_stat` (for correction with multiple comparisons).
+
+Note the advantage of a (signed( t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
+
 
 
 
