@@ -40,9 +40,12 @@ function varargout=cosmo_notify_test_skipped(reason)
         skipped_tests=cell(0);
     end
 
-    if nargin<1
+    if nargin==0
         varargout={skipped_tests};
         return;
+    elseif iscellstr(reason)
+        skipped_tests=reason;
+        return
     end
 
     varargout=cell(0);
@@ -62,6 +65,8 @@ function varargout=cosmo_notify_test_skipped(reason)
             desc=sprintf('%s: %s (%s:%d)', db_up.name, reason, ...
                                     db_up.file, db_up.line);
 
+            skipped_tests{end+1}=desc;
+
             if test_was_run_by_MOxUnit(db)
                 moxunit_throw_test_skipped_exception(desc);
             elseif test_was_run_by_cosmo_run_tests(db)
@@ -70,7 +75,7 @@ function varargout=cosmo_notify_test_skipped(reason)
                 warning('%s',desc)
             end
 
-            skipped_tests{end+1}=desc;
+
     end
 
 function tf=test_was_run_by_MOxUnit(db)
