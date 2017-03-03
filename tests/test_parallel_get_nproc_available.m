@@ -150,7 +150,27 @@ function test_parallel_get_nproc_available_override_query_func
     end
 
 function test_parallel_get_nproc_available_error_with_bad_gcp
-    func_name='gcp';
+    if ~cosmo_wtf('is_matlab') || ...
+                version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform >=2013b');
+        return;
+    end
+
+    helper_test_with_bad_function('gcp')
+
+
+function test_parallel_get_nproc_available_error_with_bad_matlabpool
+    if ~cosmo_wtf('is_matlab') || ...
+                ~version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform <2013b');
+        return;
+    end
+
+    helper_test_with_bad_function('matlabpool')
+
+
+
+function helper_test_with_bad_function(func_name)
     [pth,nm]=write_func(func_name,...
                             {sprintf('function pool=%s()',func_name),...
                             'error(''here'')'});
@@ -159,6 +179,9 @@ function test_parallel_get_nproc_available_error_with_bad_gcp
 
     result=cosmo_parallel_get_nproc_available();
     assertEqual(result,1);
+
+
+
 
 function [pth,nm]=write_func(func_name,lines)
     pth=tempname();
