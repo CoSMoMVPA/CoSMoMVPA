@@ -144,13 +144,18 @@ function [nproc_available,msg]=matlab_get_max_nproc_available_lt2013b()
     query_pool_func=@()pool_func('size');
 
     % get number of processes
-    nproc_available=query_pool_func();
-    pool_is_open=nproc_available>0;
-
-    if ~pool_is_open
-        % try to open pool
-        open_pool_func();
+    try
         nproc_available=query_pool_func();
+        pool_is_open=nproc_available>0;
+
+        if ~pool_is_open
+            % try to open pool
+            open_pool_func();
+            nproc_available=query_pool_func();
+        end
+    catch
+        msg=lasterr();
+        return
     end
 
     % ensure nproc_available>=1
@@ -169,13 +174,18 @@ function [nproc_available,msg]=matlab_get_max_nproc_available_ge2013b()
         return;
     end
 
-    pool = gcp();
+    try
+        pool = gcp();
 
-    if isempty(pool)
-        msg=['Parallel toolbox is available, but '...
-                        'unable to open pool'];
-        return;
-    end
+        if isempty(pool)
+            msg=['Parallel toolbox is available, but '...
+                            'unable to open pool'];
+            return;
+        end
+     catch
+         msg=lasterr();
+         return
+     end
 
     nproc_available=pool.NumWorkers();
 
