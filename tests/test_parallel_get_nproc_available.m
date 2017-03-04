@@ -149,6 +149,62 @@ function test_parallel_get_nproc_available_override_query_func
         end
     end
 
+function test_parallel_get_nproc_available_error_with_bad_gcp
+    if ~cosmo_wtf('is_matlab') || ...
+                version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform >=2013b');
+        return;
+    end
+
+    helper_test_with_bad_function('gcp')
+
+
+function test_parallel_get_nproc_available_error_with_bad_matlabpool
+    if ~cosmo_wtf('is_matlab') || ...
+                ~version_lt2013b()
+        cosmo_notify_test_skipped('Only for the Matlab platform <2013b');
+        return;
+    end
+
+    helper_test_with_bad_function('matlabpool')
+
+
+
+function helper_test_with_bad_function(func_name)
+    [pth,nm]=write_func(func_name,...
+                            {sprintf('function pool=%s()',func_name),...
+                            'error(''here'')'});
+    cleaner=onCleanup(@()clean_func(pth,nm));
+    addpath(pth);
+
+    result=cosmo_parallel_get_nproc_available();
+    assertEqual(result,1);
+
+
+
+
+function [pth,nm]=write_func(func_name,lines)
+    pth=tempname();
+
+    mkdir(pth);
+    nm=[func_name '.m'];
+
+    fn=fullfile(pth,nm);
+    fid=fopen(fn,'w');
+    cleaner=onCleanup(@()fclose(fid));
+    fprintf(fid,'%s\n',lines{:});
+
+
+function clean_func(pth,nm)
+    delete(fullfile(pth,nm));
+    rmpath(pth);
+    rmdir(pth);
+
+
+
+function [output,msg]=throw_error()
+    error('here');
+
 
 function [output,msg]=mock_query_func(nproc)
     msg='';
