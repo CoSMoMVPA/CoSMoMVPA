@@ -149,17 +149,6 @@ ds_sel=cosmo_slice(ds,msk,2);
 ds_sel=cosmo_dim_prune(ds_sel);
 % <@@<
 
-% make a copy of original chunks
-ds_sel.sa.orig_chunks=ds_sel.sa.chunks;
-
-% For speed, divide trials in a 4 chunks
-% (hint: use cosmo_chunkize)
-nchunks=4;
-% >@@>
-ds_sel.sa.chunks=cosmo_chunkize(ds_sel, nchunks);
-% <@@<
-
-
 % define the neighborhood for time with a time radius of 2 time points
 % Hint: use cosmo_interval_neighborhood
 
@@ -172,13 +161,21 @@ time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
 measure=@cosmo_crossvalidation_measure;
 % <@@<
 
-% Use n-fold partitioning and the LDA classifier
-% Hint: use cosmo_balance_partitions to deal with a different number of
-% trials within each chunk
+% Define the partitioning scheme using
+% cosmo_independent_samples_partitioner.
+% Use 'fold_count',5 to use 5 folds,
+% and use 'test_ratio',.2 to use 20% of the data for testing (and 80% for
+% training) in each fold.
+
+% >@@>
+partitions=cosmo_independent_samples_partitioner(ds,...
+                                    'fold_count',5,...
+                                    'test_ratio',.2);
+% <@@<
+
+% Use the LDA classifier and the partitions just defined.
 measure_args=struct();
-measure_args.partitions=cosmo_nfold_partitioner(ds_sel);
-measure_args.partitions=cosmo_balance_partitions(...
-                                            measure_args.partitions,ds_sel);
+measure_args.partitions=partitions;
 measure_args.classifier=@cosmo_classify_lda;
 
 ds_sl=cosmo_searchlight(ds_sel,time_nbrhood,measure,measure_args);
@@ -240,11 +237,22 @@ fprintf('Features have on average %.1f +/- %.1f neighbors\n', ...
 % split-half correlation measure
 measure=@cosmo_correlation_measure;
 
+
+% Define the partitioning scheme using
+% cosmo_independent_samples_partitioner.
+% Use 'fold_count',1 to use 1 folds,
+% and use 'test_ratio',.5 to use 50% of the data for testing (and 50% for
+% training) in the single fold.
+
+% >@@>
+partitions=cosmo_independent_samples_partitioner(ds,...
+                                    'fold_count',1,...
+                                    'test_ratio',.5);
+% <@@<
+
 % split-half, using oddeven partitioner
 measure_args=struct();
-measure_args.partitions=cosmo_oddeven_partitioner(ds_sel);
-measure_args.partitions=cosmo_balance_partitions(...
-                                    measure_args.partitions,ds_sel);
+measure_args.partitions=partitions;
 
 
 %% run searchlight
