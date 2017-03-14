@@ -230,4 +230,6 @@ website: html html-zip-archive html-targz-archive
 prni: website
 	$(MAKE) website WEBSITEROOT=pr:/var/www/html
 
+remote: html html-zip-archive html-targz-archive
+
 clean: clean-html
