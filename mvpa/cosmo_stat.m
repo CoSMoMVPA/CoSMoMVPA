@@ -219,7 +219,7 @@ function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
         switch output_stat_name
             case 'z'
                 % transform to z-score
-                stat=norminv_wrapper(stat);
+                stat=cosmo_norminv(stat);
                 stat_label='Zscore';
             case 'p'
                 switch tail
@@ -449,10 +449,6 @@ function y=cdf_wrapper(name, x, df1, df2)
             assert(false);
     end
 
-
-function y=norminv_wrapper(x)
-    ensure_has_stats_toolbox();
-    y=norminv(x);
 
 function ensure_has_stats_toolbox()
     % - Octave has the required functionality in the octave-forge

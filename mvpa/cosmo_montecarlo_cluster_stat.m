@@ -360,7 +360,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     ps_two_tailed(ps_two_tailed<  min_p_value)=min_p_value;
 
     % convert to z-score
-    z_two_tailed=norminv(ps_two_tailed);
+    z_two_tailed=cosmo_norminv(ps_two_tailed);
 
     % store result in dataset structure
     ds_z=struct();
@@ -827,7 +827,7 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
                 error(['Option dh not allowed with non-tfce '...
                         'cluster_stat option ''%s'''], cluster_stat);
             end
-            opt.threshold=-norminv(p_unc); % right tail
+            opt.threshold=-cosmo_norminv(p_unc); % right tail
     end
 
     % convert neighborhood struct to matrix representation, because that
