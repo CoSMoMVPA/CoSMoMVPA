@@ -225,7 +225,7 @@ function msg=check_origin_matches(nbrhood, ds, show_warning)
                 ds_a=rmfield(ds_a,dim_name);
             end
 
-            if ~isequaln(origin_a, ds_a)
+            if ~cosmo_isequaln(origin_a, ds_a)
                 error('.a mismatch between dataset and neighborhood');
             end
         end
@@ -241,7 +241,7 @@ function msg=check_xa_matches(origin,ds,infix)
         key=keys{k};
 
         if ~cosmo_isfield(origin,[attr_name '.' key]) || ...
-                ~isequaln(ds.(attr_name).(key),...
+                ~cosmo_isequaln(ds.(attr_name).(key),...
                         origin.(attr_name).(key))
             msg=sprintf(['.%sa.%s mismatch between dataset and '...
                     'neighborhood'],infix,key);
@@ -279,8 +279,8 @@ function msg=check_xdim_matches(origin_xdim, ds_xdim, dim_name)
         end
 
         for j=1:numel(origin_v)
-            if ~(isequaln(origin_v{j},ds_v{j}) || ...
-                            isequaln(origin_v{j},ds_v{j}'))
+            if ~(cosmo_isequaln(origin_v{j},ds_v{j}) || ...
+                            cosmo_isequaln(origin_v{j},ds_v{j}'))
                 msg=sprintf(['.a.%s ''%s'' value mismatch '...
                             'between dataset and neighborhood'], ...
                                     dim_name, key);
