@@ -24,9 +24,9 @@ function test_searchlight_matlab_multithread()
         return;
     end
 
-    warning_state=warning();
-    warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off');
+    warning_state=cosmo_warning();
+    warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
 
     opt=struct();
     opt.progress=false;
@@ -43,9 +43,9 @@ function test_searchlight_octave_multithread()
         return;
     end
 
-    warning_state=warning();
-    warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off');
+    warning_state=cosmo_warning();
+    warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
 
     opt=struct();
     opt.progress=false;
