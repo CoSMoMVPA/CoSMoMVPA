@@ -57,6 +57,7 @@ while true
     end
 
     % all done without error, quit this function
+    msgbox('Done! Happy CoSMoMVPA-ing!');
     return
 end
 
