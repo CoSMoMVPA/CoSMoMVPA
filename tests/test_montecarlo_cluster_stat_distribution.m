@@ -11,10 +11,6 @@ function test_suite=test_montecarlo_cluster_stat_distribution
 
 
 function test_mccs_uniformity_slow()
-    if cosmo_skip_test_if_no_external('!norminv');
-        return;
-    end
-
     show_progress=true;
 
     if show_progress

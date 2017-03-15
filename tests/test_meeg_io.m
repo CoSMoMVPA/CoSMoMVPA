@@ -294,7 +294,7 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     fdim.labels=fdim.labels(1:nkeep);
 
     keep_sizes=sizes(1:k);
-    ft.(data_label)=norminv(cosmo_rand(keep_sizes,'seed',seed));
+    ft.(data_label)=cosmo_norminv(cosmo_rand(keep_sizes,'seed',seed));
     ft.cfg=struct();
     ft.trialinfo=[(1:ntrials);(ntrials:-1:1)]';
 

@@ -250,7 +250,7 @@ function samples=generate_samples(ds, class_distance, seed)
     nfeatures=size(ds.fa.(fa_names{1}),2);
 
     r=cosmo_rand(nsamples,nfeatures,'seed',seed);
-    samples=norminv(r);
+    samples=cosmo_norminv(r);
 
     add_msk=mod(bsxfun(@minus,1:nclasses+1,targets),nclasses+1)==0;
     add_msk_full=repmat(add_msk,1,ceil(nfeatures/(nclasses+1)));
