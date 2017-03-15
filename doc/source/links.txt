@@ -20,6 +20,7 @@
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
 .. _FieldTrip: http://fieldtrip.fcdonders.nl
 .. _FreeSurfer: http://freesurfer.net
+.. _`LABMAN 2017`: http://2ndmeeting.labman.org/
 .. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. |Matlab(TM)| unicode:: MATLAB U+00AE

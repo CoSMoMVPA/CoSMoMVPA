@@ -1,7 +1,7 @@
 function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 % Compute partitioning scheme based on dataset with independent samples
 %
-% partitions=cosmo_independent_chunk_partitioner(ds,...)
+% partitions=cosmo_independent_samples_partitioner(ds,...)
 %
 % Inputs:
 %   ds                          dataset structure with fields .samples,
@@ -20,7 +20,7 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %                               provided, then this function behaves
 %                               pseudo-ranomly but deterministically, and
 %                               different calls return the same output.
-%                               If s=0, then different calls to this
+%                               If s=0, then repeated calls to this
 %                               function gives different outputs.
 %   'max_fold_count'            Safety limit to the maximum number of folds
 %                               that can be returned (default: 10000). When
@@ -99,14 +99,15 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %     >       9 ]    9 ]    9 ]       9 ]    8 ]    9 ]   }@1x20
 %
 % Notes:
-% - In almost all cases, the number of partitions returned by this function
-%   (=c) is less than the total number of possible partitions. In these
-%   cases, a random subset of possible partitions is chosen, with the
-%   contstraint that no combination of train and test indices is repeated in
-%   partitions. No attempt is made to balance the number of times each
-%   samples is used for training and/or testing.
+% - Unless the number of targets and chunks is very small, the number of
+%   partitions returned by this function (=c) is less than the total number
+%   of possible partitions. In these cases, a random subset of possible
+%   partitions is chosen, with the constraint that no combination of train
+%   and test indices is repeated in partitions. No attempt is made to
+%   balance the number of times each sample is used for training and/or
+%   testing.
 % - This function behaves, by default, pseudo-randomly and
-%   deterministically; different class to this function, with the same
+%   deterministically; different calls to this function, with the same
 %   inputs, result in the same output. To get different outputs for
 %   different calls, set the 'seed' option to 0.
 %

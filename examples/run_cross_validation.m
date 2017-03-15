@@ -66,6 +66,7 @@ for k=1:nclassifiers
     % show the confusion matrix
     figure();
     imagesc(confusion_matrix,[0 10])
+    accuracy=sum(diag(confusion_matrix))/sum(confusion_matrix(:));
     title(sprintf('%s: %.3f', strrep(func2str(classifier),'_',' '), accuracy))
 
 end

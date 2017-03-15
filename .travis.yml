@@ -148,10 +148,17 @@ install:
           $OCTAVE --eval "addpath('${PTH}/afni/src/matlab');savepath();";
       fi
 
-    # optionally install FieldTrip
+    # optionally install FieldTrip, using one of the branches below
+    # If FieldTrip temporarily breaks the build, we can switch to another
+    # custum branch that fixes the issue. The official branch is the
+    # last entry in the list below.
+    #
+    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _fix/octave_fixname_empty_input
+    # git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
+
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
-          git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
+          git clone git://github.com/nno/fieldtrip.git --depth 1 -b _fix/octave_fixname_empty_input;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
                             savepath();";
