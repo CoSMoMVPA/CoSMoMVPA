@@ -65,12 +65,11 @@ Setting up the documentation build system
 +++++++++++++++++++++++++++++++++++++++++
 The documentation is built using Sphinx_, Python_, `sphinxcontrib-matlabdomain`_, `sphinxcontrib-bibtex` and customly written Python_ code. Currently only Unix-like systems are supported; we have tested it on Linux and Mac OS. Python_ is a required dependency; we have tested with with version 2.7. Building requires using a shell, for example ``bash``.
 
-Installation is easiest using `easy_install`_. To install as root::
+Installation can be done using `easy_install`_. To install as root::
 
     easy_install sphinx
     easy_install -U sphinxcontrib-matlabdomain
     easy_install -U sphinxcontrib-bibtex
-
 
 Installation as non-root requires creating a local directory in which the Python_ packages are stored. To install these in ``~/python-lib``, for example::
 
@@ -84,6 +83,13 @@ Installation as non-root requires creating a local directory in which the Python
     easy_install --install-dir . -U sphinxcontrib-bibtex
 
 In this case, it is useful to add the ``export``-commands to ``~/.bash_profile`` so that the paths are set automatically upon login.
+
+Alternatively ``pip`` can be used::
+
+    pip install sphinxcontrib-matlab
+    pip install sphinxcontrib-matlab
+    pip install sphinxcontrib-matlabdomain
+
 
 To build the documentation:
     + (optionally) in Matlab_, ``cd`` to the     ``mvpa/`` directory, then run ``cosmo_publish_run_scripts``. This generates the matlab output of the scripts in ``examples/``.
