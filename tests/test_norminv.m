@@ -20,14 +20,26 @@ function test_norminv_stats_correspondence
     helper_test_norminv_same(rand(10,200));
     helper_test_norminv_same(rand(2,3,5)*2-.5);
 
-    helper_test_norminv_same(rand(10,5),rand(1,5),rand(10,1));
-    helper_test_norminv_same(2*rand(10,5,2),rand(1,5,2),rand(10,1,1));
-
     helper_test_norminv_same(NaN);
     helper_test_norminv_same(0);
     helper_test_norminv_same(1);
     helper_test_norminv_same(-inf);
     helper_test_norminv_same(+inf);
+
+function test_norminv_stats_non_scalar_mu_sd_correspondence
+    if cosmo_skip_test_if_no_external('!norminv')
+        return;
+    end
+
+    if cosmo_wtf('is_octave')
+        reason='Octave''s norminv cannot use bsxfun-like inputs';
+        cosmo_notify_test_skipped(reason);
+        return
+    end
+
+    helper_test_norminv_same(rand(10,5),rand(1,5),rand(10,1));
+    helper_test_norminv_same(2*rand(10,5,2),rand(1,5,2),rand(10,1,1));
+
 
 
 function test_norminv_regression
