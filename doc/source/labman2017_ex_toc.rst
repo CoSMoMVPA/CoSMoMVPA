@@ -18,6 +18,8 @@ Contents:
     ex_dataset_basics
     ex_splithalf_correlations
     ex_classify_lda
+    ex_classify_double_dipping
+    ex_nfold_crossvalidation
     ex_measures
     ex_neighborhood
     ex_searchlight_measure
