@@ -6,10 +6,7 @@
 % images of six object categories.
 %
 % The code presented here can be adapted for other MEEG analyses, but
-% there are a few potential caveats:
-% * assignment of chunks (parts of the data that are assumed to be
-%   independent) is based on a trial-by-trial basis. For cross-validation,
-%   the number of chunks is reduced to two to speed up the analysis.
+% there please note:
 % * the current examples do not perform baseline corrections or signal
 %   normalizations, which may reduce discriminatory power.
 %
