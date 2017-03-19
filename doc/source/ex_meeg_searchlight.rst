@@ -6,7 +6,7 @@
 MEEG Searchlights
 =================
 
-This exercise requires a separate dataset named `meg-obj6`; see :ref:`download <download>` section.
+This exercise requires a separate dataset named `meg_obj6`; see :ref:`download <download>` section.
 It also requires a working installation of FieldTrip_.
 
 Before starting this exercise, please make sure you have read about:
@@ -32,6 +32,21 @@ Using the same data as above, define `chan` (channel) and `time` neighborhoods; 
 Hint: :ref:`run_meeg_timelock_measures_skl`
 
 Solution: :ref:`run_meeg_timelock_measures` / :pb:`meeg_timelock_measures`
+
+
+Part 4: MEEG channel-time-frequency searchlight with Naive Bayes classifier
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This exercise requires a separate dataset named `meg_20hz`, part of the full tutorial data; see :ref:`download <download>` section.
+
+Certain questions in MEEG concern oscillations. For such analysis data is typically transformed into a time-frequency representation (for each channel) through a procedure called Fourier analysis. One question one can answer is whether power in a particular frequency band shows a different pattern across conditions.
+
+In the exercise presented here, we use a dataset with somatosensorty stimulation of the hand versus no stimultation. To localize when in time, in which frequency band, and in which channel this shows a difference in the neural patterns, use a searchlight over channels, time points and frequency bands.
+
+Hint: :ref:`run_meeg_timefreq_measures_skl`
+
+Solution: :ref:`run_meeg_timefreq_measures` / :pb:`meeg_timefreq_measures`
+
 
 .. include:: links.txt
 
