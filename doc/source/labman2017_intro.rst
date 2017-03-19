@@ -130,6 +130,8 @@ When: 20, 21, 22, 23, 25 March 2015; between 10:00 and 18:00.
 
 Location: Ciudad Universitaria de Buenos Aires, Pabellon 1, Laboratorios de Computacion.
 
+On Monday 20 March, we meet at Hall of Pabellon 1, in Ciudad Universitaria 9.30, and take it from there.
+
 Schedule to be announced.
 
 ..
