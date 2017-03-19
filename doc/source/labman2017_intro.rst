@@ -27,8 +27,8 @@ Prerequisites
     * Matlab / Octave :ref:`advanced beginner level <matlab_experience>`. experience.
     * fMRI and/or MEEG :ref:`advanced beginner level <cogneuro_experience>` analysis experience.
     * Working Matlab_ or Octave_ installation.
-    * Working FieldTrip_ installation (required for MEEG analysis)
-    * MRI data viewer, such as MRIcron_ (strongly recommended)
+    * Working FieldTrip_ installation (required for MEEG analysis).
+    * MRI data viewer, such as MRIcron_ (strongly recommended).
     * :ref:`CoSMoMVPA source code and tutorial data <get_code_and_example_data>`.
     * It is recommended, prior to the course, to:
 
@@ -60,6 +60,11 @@ Not covered in this course
 
 Datasets
 ++++++++
+For most of the course we will be using the AK6 dataset and the MEG obj6 dataset (described below). Although these can be downloaded separately, it is recommended however to use the full tutorial dataset.
+
+Download link: `full tutorial data <datadb-v0.3.zip>`_.
+
+LABMAN_ participants: this dataset should already be present on the lab computers, in which case there is no need to download this data.
 
 AK6 dataset
 -----------
