@@ -3,9 +3,9 @@
 
 .. _labman2017:
 
-LABMAN2017 workshop
-===================
-CoSMoMVPA workshop at `LABMAN 2017`_, the second Latin American Brain Mapping Network Meeting
+LABMAN 2017 course
+====================
+CoSMoMVPA hands-on course at `LABMAN 2017`_, the second Latin American Brain Mapping Network Meeting.
 
 *presented by Nick Oosterhof*
 
