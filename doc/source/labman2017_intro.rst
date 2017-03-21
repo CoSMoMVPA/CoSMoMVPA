@@ -128,10 +128,7 @@ Tentative schedule
 
 When:
 
-- 20 March: 10:00-18:00
-- 21 March: 10:00-17:00
-- 22, 23 March: 9:00-17:00
-- 25 March: 10:00-18:00
+- 20, 21, 22, 23, 25 March: 10:00-18:00
 
 Location: Ciudad Universitaria de Buenos Aires, Pabellon 1, Laboratorios de Computacion, computer room 6.
 
