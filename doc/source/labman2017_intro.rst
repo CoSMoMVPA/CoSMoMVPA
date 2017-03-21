@@ -126,11 +126,14 @@ Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6-v0.3.zip
 Tentative schedule
 ++++++++++++++++++
 
-When: 20, 21, 22, 23, 25 March 2015; between 10:00 and 18:00.
+When:
 
-Location: Ciudad Universitaria de Buenos Aires, Pabellon 1, Laboratorios de Computacion.
+- 20 March: 10:00-18:00
+- 21 March: 10:00-17:00
+- 22, 23 March: 9:00-17:00
+- 25 March: 10:00-18:00
 
-Schedule to be announced.
+Location: Ciudad Universitaria de Buenos Aires, Pabellon 1, Laboratorios de Computacion, computer room 6.
 
 ..
     ============== ===================================================================================================
