@@ -133,7 +133,13 @@ When:
 - 22, 23 March: 9:00-17:00
 - 25 March: 10:00-18:00
 
+<<<<<<< HEAD
 Location: Ciudad Universitaria de Buenos Aires, Pabellon 1, Laboratorios de Computacion, computer room 6.
+=======
+On Monday 20 March, we meet at Hall of Pabellon 1, in Ciudad Universitaria 9.30, and take it from there.
+
+Schedule to be announced.
+>>>>>>> e4e910c7ba9957915bf7ea965adc7914a30be37d
 
 ..
     ============== ===================================================================================================
