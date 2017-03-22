@@ -23,8 +23,12 @@ for iter=1:niter
     % <@@<
 
     % for the double dipping test data, assign 'double_dipping_test_data'
-    % to be the same as the training data. (For real data analyses you
-    % should never do this - its results are invalid)
+    % to be the same as the training data. 
+    %
+    % *** WARNING ***
+    % For real data analyses (that you would publish in a paper) you
+    % must never do double dipping analysis - its results are invalid
+    % ****************
     % >@@>
     double_dipping_test_data=train_data;
     % <@@<
