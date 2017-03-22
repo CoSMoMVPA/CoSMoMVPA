@@ -29,10 +29,11 @@ for iter=1:niter
     double_dipping_test_data=train_data;
     % <@@<
 
-    % for the independent data, generate test data and assign to a variable
-    % 'independent_pred'
+    % for the independent data, generate random gaussian data (of the
+    % same size as train_data) and assign to a variable
+    % 'independent_test_data'
     % >@@>
-    independent_pred=randn(nsamples,nfeatures);
+    independent_test_data=randn(nsamples,nfeatures);
     % <@@<
 
     % compute class labels predictions for both test sets using
@@ -42,7 +43,7 @@ for iter=1:niter
     double_dipping_pred=cosmo_classify_lda(train_data,targets,...
                                                 double_dipping_test_data);
     independent_pred=cosmo_classify_lda(train_data,targets,...
-                                                independent_pred);
+                                                independent_test_data);
     % <@@<
 
     % compute classification accuracies
