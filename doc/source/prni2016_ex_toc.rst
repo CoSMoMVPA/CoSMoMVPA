@@ -1,8 +1,7 @@
 .. #   For CoSMoMVPA's license terms and conditions, see   #
    #   the COPYING file distributed with CoSMoMVPA         #
 
-.. _cimec2016_ex_toc:
-.. _ex_toc:
+.. _prni2016_ex_toc:
 
 **Note: this page is under construction. Information is subject to change**
 
