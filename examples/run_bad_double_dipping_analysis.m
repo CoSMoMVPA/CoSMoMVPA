@@ -1,5 +1,9 @@
 %% Double dipping
-% Load datasets using cosmo_fmri_dataset
+
+% Warning: this exercise shows the *bad* practice of double dipping
+% (also known as circular analysis). You must never, ever use
+% results double dipping to interpret results for a real analysis that you
+% would publish.
 
 nfeatures=10;
 nsamples_per_class=20;
@@ -23,7 +27,7 @@ for iter=1:niter
     % <@@<
 
     % for the double dipping test data, assign 'double_dipping_test_data'
-    % to be the same as the training data. 
+    % to be the same as the training data.
     %
     % *** WARNING ***
     % For real data analyses (that you would publish in a paper) you
