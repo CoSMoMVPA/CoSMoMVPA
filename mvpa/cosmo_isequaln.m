@@ -12,16 +12,16 @@ function tf=cosmo_isequaln(x,y)
 %                       to be equal; false otherwise
 %
 % Examples:
-% cosmo_isequaln(2,2)
-% > true
-% cosmo_isequaln(2,3)
-% > false
-% % using the builtin isequal, NaNs are considered not equal to each other
-% isequal(NaN,NaN)
-% > false
-% % using cosmo_isequaln, NaNs are considered to be equal to each other
-% cosmo_isequaln(NaN,NaN)
-% > true
+%    cosmo_isequaln(2,2)
+%    > true
+%    cosmo_isequaln(2,3)
+%    > false
+%    % using the builtin isequal, NaNs are considered not equal
+%    isequal(NaN,NaN)
+%    > false
+%    % using cosmo_isequaln, NaNs are considered to be equal to each other
+%    cosmo_isequaln(NaN,NaN)
+%    > true
 
 % Notes:
 %   - in earlier versions of Matlab, isequaln did not exist;
@@ -40,7 +40,7 @@ function func=get_comparison_func()
     persistent cached_comparison_func
 
     if isempty(cached_comparison_func)
-        cached_comparison_func=find_comparison_func_helper;
+        cached_comparison_func=find_comparison_func_helper();
     end
 
     func=cached_comparison_func;
@@ -49,16 +49,15 @@ function func=get_comparison_func()
 function func=find_comparison_func_helper()
     candidates={@isequaln,@isequalwithequalnans};
 
-    has_func=@(x)~isempty(which(func2str(x),'builtin'));
-    idx=find(cellfun(has_func,candidates),1,'first');
+    candidates_str=cellfun(@func2str, candidates,...
+                        'UniformOutput',false);
+
+    has_func=@(x)~isempty(which(x,'builtin'));
+    idx=find(cellfun(has_func,candidates_str),1,'first');
     if ~isempty(idx)
         func=candidates{idx};
         return
     end
-
-
-    candidates_str=cellfun(@func2str, candidates,...
-                        'UniformOutput',false);
 
     error('No comparison function found from candidates: %s',...
                 cosmo_strjoin(candidates_str,', '));
