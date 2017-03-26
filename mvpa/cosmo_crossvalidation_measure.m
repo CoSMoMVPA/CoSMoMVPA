@@ -19,7 +19,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       - 'balanced_accuracy'   classificationa accuracy is
 %                                               computed for each class,
 %                                               then averaged
-%                       - 'fold_accuracy'       classificationa accuracy is
+%                       - 'fold_accuracy'       classification accuracy is
 %                                               computed for each fold
 %                       - 'winner_predictions'  class that was predicted
 %                                               for each sample in the test
