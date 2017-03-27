@@ -207,7 +207,7 @@ function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
                                                  tail,output_stat_name)
 % transform output is required
     if isempty(output_stat_name)
-        stat_label=stat_name;
+        stat_fa_name=stat_name;
     else
         % transform to left-tailed p-value
         df_cell=num2cell(df);
@@ -220,7 +220,7 @@ function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
             case 'z'
                 % transform to z-score
                 stat=cosmo_norminv(stat);
-                stat_label='Zscore';
+                stat_fa_name='Zscore';
             case 'p'
                 switch tail
                     case 'left'
@@ -234,7 +234,7 @@ function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
                     otherwise
                         assert(false,'this should not happen');
                 end
-                stat_label='Pval';
+                stat_fa_name='Pval';
             otherwise
                 error('illegal output type %s', output_stat_name);
         end
@@ -242,7 +242,7 @@ function [stat,stat_label]=compute_output_stat(stat,df,stat_name,...
 
     df_str=cellfun(@(x) sprintf('%d',x), num2cell(df),...
                     'UniformOutput',false);
-    stat_label=sprintf('%s(%s)',stat_label,cosmo_strjoin(df_str,','));
+    stat_label=sprintf('%s(%s)',stat_fa_name,cosmo_strjoin(df_str,','));
 
 function [stat,df,stat_label]=ttest1_wrapper(samples,targets,chunks,...
                                                            type,contrast)
