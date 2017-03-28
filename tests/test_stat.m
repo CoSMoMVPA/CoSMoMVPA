@@ -199,8 +199,178 @@ function test_stat_exceptions()
     aet(ds2,'F');
     aet(ds2,'t2');
 
+function test_stat_missing_values()
+    % assuming that cosmo_stat works well with no NaNs, try it
+    % with some missing values
+    randint=@(x)ceil(rand()*10+10);
+
+    output_labels={'','p','z','left','right'};
+    n_outputs=numel(output_labels);
+
+    for k=1:4
+        switch k
+            % sa_label_func (below) takes the number of chunks and
+            % returns a statistic sa label
+
+            case 1
+                stat_name='t';
+                ntargets=1;
+                is_between=true;
+                sa_label_func=@(x)sprintf('Ttest(%d)',x-1);
+
+            case 2
+                stat_name='t';
+                ntargets=2;
+                is_between=false;
+                sa_label_func=@(x)sprintf('Ttest(%d)',x-1);
+
+            case 3
+                stat_name='t2';
+                ntargets=2;
+                is_between=true;
+                sa_label_func=@(x)sprintf('Ttest(%d)',x-2);
+
+            case 4
+                stat_name='F';
+                ntargets=randint(5);
+                is_between=true;
+                sa_label_func=@(x)sprintf('Ftest(%d,%d)',...
+                                    ntargets-1,x-ntargets);
+
+            case 5
+                stat_name='F';
+                ntargets=randinit(5);
+                is_between=false;
+                sa_label_func=@(x)sprintf('Ftest(%d,%d)',...
+                                    ntargets-1,(ntargets-1)*x);
+
+            otherwise
+                assert(false)
+        end
+
+        nchunks=randint(10);
+
+        % make dataset with some elements set to NaN
+        ds=cosmo_synthetic_dataset('ntargets',ntargets,...
+                                    'nchunks',nchunks);
+        if is_between
+            nchunks=numel(ds.sa.chunks);
+            ds.sa.chunks(:)=1:nchunks;
+        end
+
+        [nsamples,nfeatures]=size(ds.samples);
+
+
+        % at least one column has no NaN values
+
+        attempt=100;
+        while true
+            attempt=attempt-1;
+            if attempt==0
+                error('unable to generate data');
+            end
+
+            % add some NaNs
+            nan_ratio=.1+rand()*.2;
+
+            non_nan_col=ceil(1+rand()*(nfeatures-1));
+            for col=1:nfeatures
+                if col==non_nan_col
+                    continue;
+                elseif col==1
+                    % at least one NaN
+                    ds.samples(ds.sa.chunks==1)=NaN;
+                else
+                    % subset of chunks set to NaN
+                    [unused,idx]=sort(rand(1,nchunks));
+                    nan_chunks=idx(1:ceil(nan_ratio*nchunks));
+
+                    msk=any(bsxfun(@eq,nan_chunks,ds.sa.chunks),2);
+                    ds.samples(msk,col)=NaN;
+                end
+            end
+
+            % verify there are some NaNs
+            has_nan=any(isnan(ds.samples(:)));
+            not_all_are_nan=any(any(~isnan(ds.samples),1));
+
+            if has_nan && not_all_are_nan
+                break;
+            end
+        end
+
+        for i_output=1:n_outputs
+            output_label=output_labels{i_output};
+            result_all=cosmo_stat(ds,stat_name,output_label);
+
+            % check values for each feature
+            for col=1:nfeatures
+                ds_full=cosmo_slice(ds,col,2);
+                ds_non_nan=cosmo_slice(ds_full,...
+                                ~isnan(ds_full.samples));
+
+                result=cosmo_stat(ds_non_nan,stat_name,output_label);
+                assertEqual(size(result.samples),[1 1]);
+
+
+                if isempty(output_label) && any(isnan(ds_full.samples))
+                    expected_value=NaN;
+                else
+                    expected_value=result.samples;
+                end
+
+                assertElementsAlmostEqual(result_all.samples(:,col),...
+                                                expected_value)
+            end
+
+            % check sa
+            return_raw_stat=isempty(output_label);
+            if return_raw_stat
+                % generate label with 'Ttest' or 'Ftest'
+                sa_label=sa_label_func(nchunks);
+            else
+                if strcmp(output_label,'z')
+                    sa_label='Zscore()';
+                else
+                    sa_label='Pval()';
+                end
+            end
+
+            expected_sa=struct();
+            expected_sa.stats={sa_label};
+            assertEqual(result_all.sa,expected_sa);
+
+            % ensure that if targets for one condition are all NaN, then
+            % output is NaN
+            nan_ds=ds;
+            msk=nan_ds.sa.targets==max(nan_ds.sa.targets);
+            nan_ds.samples(msk,:)=NaN;
+
+            result_all_nan=cosmo_stat(nan_ds,stat_name,output_label);
+            assertEqual(result_all_nan.samples,zeros(1,nfeatures)+NaN);
+
+
+            % set one target to NaN; if unbalance the resulting
+            % sample must be NaN
+            tiny_ds=cosmo_slice(ds,1,2);
+            tiny_ds.samples=randn(size(tiny_ds.samples));
+
+            result=cosmo_stat(tiny_ds,stat_name,output_label);
+            assert(~isnan(result.samples));
+
+            msk=tiny_ds.sa.chunks==1 & tiny_ds.sa.targets==1;
+            assert(sum(msk)==1);
+            tiny_ds.samples(msk)=NaN;
+
+            result=cosmo_stat(tiny_ds,stat_name,output_label);
+            must_be_nan=return_raw_stat || ~is_between;
+            assertEqual(must_be_nan,isnan(result.samples))
+        end
+    end
+
 
 function test_stat_regression()
+% using pre-generated data
     ds=cosmo_synthetic_dataset('nchunks',6,'ntargets',4,'sigma',0);
     ds=cosmo_slice(ds,[2 6],2);
 
