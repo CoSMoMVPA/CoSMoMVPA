@@ -10,6 +10,9 @@ function test_suite = test_stat
     initTestSuite;
 
 
+function r=randint(x)
+    r=ceil(rand()*x+10);
+
 function test_stat_correspondence
     is_matlab=cosmo_wtf('is_matlab');
 
@@ -19,7 +22,10 @@ function test_stat_correspondence
     end
 
     % test conformity with matlab's stat functions
-    ds=cosmo_synthetic_dataset('nchunks',5,'ntargets',4,'sigma',0);
+    ntargets=randint(5);
+    nchunks=randint(5);
+    ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',ntargets,'sigma',0);
+    ds.samples=randn(size(ds.samples)); % full random data
     ds=cosmo_slice(ds,[2 5 6],2);
     [ns,nf]=size(ds.samples);
 
@@ -202,12 +208,11 @@ function test_stat_exceptions()
 function test_stat_missing_values()
     % assuming that cosmo_stat works well with no NaNs, try it
     % with some missing values
-    randint=@(x)ceil(rand()*10+10);
 
     output_labels={'','p','z','left','right'};
     n_outputs=numel(output_labels);
 
-    for k=1:4
+    for k=1:5
         switch k
             % sa_label_func (below) takes the number of chunks and
             % returns a statistic sa label
@@ -239,10 +244,10 @@ function test_stat_missing_values()
 
             case 5
                 stat_name='F';
-                ntargets=randinit(5);
+                ntargets=randint(5);
                 is_between=false;
                 sa_label_func=@(x)sprintf('Ftest(%d,%d)',...
-                                    ntargets-1,(ntargets-1)*x);
+                                    ntargets-1,x*(ntargets-1)-ntargets+1);
 
             otherwise
                 assert(false)
