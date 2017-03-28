@@ -7,14 +7,17 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %   ds                dataset struct with
 %                       .samples PxQ, for P observations on Q features
 %                       .sa.targets Px1 observation conditions (classes)
-%                       .sa.chunks  Px1 observation chunks (e.g. subjects)
-%   stat_name         One of:
-%                     't' : one-sample t-test against zero, or paired
-%                           t-test
+%                       .sa.chunks  Px1 observation chunks (e.g. subjects).
+%   stat_name         One of [*]:
+%                     't' : one-sample t-test against zero (nclasses==1),
+%                           or paired t-test (nclasses==2)
 %                     't2': two-sample t-test with equal variance,
-%                           contrasting samples with unq(1) minus unq(2)
-%                           where unq=unique(ds.sa.targets)
-%                     'F' : one-way ANOVA or repeated measures ANOVA.
+%                           (nclasses==2) contrasting samples with unq(1)
+%                           minus unq(2) where unq=unique(ds.sa.targets)
+%                     'F' : one-way ANOVA or repeated measures ANOVA
+%                           (nclasses>=2)
+%                     [*] nclasses is the number of unique values in
+%                         ds.sa.targets
 %   output_stat_name  (optional) 'left', 'right', 'both', 'z', 'p', or
 %                      the empty string '' (default).
 %                     - 'left', 'right', and 'both' return a p-value with
@@ -26,14 +29,7 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                     Missing values can be indicated by NaNs; if these are
 %                     present and a p-value or z-score is returned, then
 %                     these values are computed with a possible variable
-%                     number of degrees of freedom across features. For
-%                     example, if the dataset has 10 samples and a
-%                     one-sample t-test is used, z-scores for samples with
-%                     no NaN values is based on the t-statistic with df=9,
-%                     but those with two missing values (NaN values) are
-%                     based on the t-statistic with df=7. If
-%                     output_stat_name is empty, then any column in
-%                     ds.samples has
+%                     number of degrees of freedom across features.
 %
 % Returns:
 %   stat_ds          dataset struct with fields:
@@ -148,7 +144,8 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %
 % Notes:
 %  - If output_stat_name is not provided or empty, then this function runs
-%    considerably faster than the builtin matlab functions.
+%    considerably faster than the builtin matlab functions
+%    (ttest, ttest2, or anova1).
 %  - When output_stat_name=='p' then the p-values returned are the same as
 %    the builtin matlab functions anova1, ttest, and ttest2 with the
 %    default tails.
@@ -161,7 +158,19 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                   : each chunk present N times => repeated measures ANOVA
 %    See cosmo_montecarlo_cluster_stat for examples on how .sa.targets and
 %    .sa.chunks should be set for different statistics.
-%  - Missing values can be indicated by NaNs
+%  - Missing values can be indicated by NaNs, and if the output is a
+%    p-value (or a z-score based on the p-value), then the output is
+%    computed for different features using varying degrees of freedom.
+%    For example, if the dataset has 10 samples and a one-sample t-test is
+%    used, z-scores for samples with no NaN values is based on the
+%    t-statistic with df=9, but those with two missing values (NaN values)
+%    are based on the t-statistic with df=7. A use case is computing fMRI
+%    group statistics where overlap across brains is not perfect at the
+%    voxel-by-voxel level, in as imilar approach as AFNI's 3dttest++ with
+%    the '-toz' option.
+%  - This function computes feature-wise statistics that are not corrected
+%    for multiple comparisons. To correct for multiple comparisons, see
+%    cosmo_montecarlo_cluster_stat.
 %
 % See also: anova1, ttest, ttest2, cosmo_montecarlo_cluster_stat
 %
@@ -175,9 +184,6 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
     [output_stat_name,tail]=get_stat_definition(stat_name,...
                                                 output_stat_name);
     [samples,targets,chunks,type]=get_descriptors(ds);
-
-    % Set label to be used for cdf (in case 'p' or 'z' has to be computed).
-    % This is only different from stat_name in the case of 't2'
 
     % run specified helper function
     if isfield(ds.sa,'contrast')
