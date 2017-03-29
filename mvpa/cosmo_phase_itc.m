@@ -28,18 +28,20 @@ function itc_ds=cosmo_phase_itc(ds,varargin)
 %                           computation of the output.
 %
 % Output:
-%   itc_ds                  dataset structu with fields
+%   itc_ds                  dataset struct with fields:
 %       .samples            (N+1)xQ array with inter-trial coherence
 %                           measure, where U=unique(ds.sa.targets) and
 %                           N=numel(U). The first N rows correspond to the
 %                           inter trial coherence for each condition. The
 %                           last row is the inter trial coherence for all
 %                           samples together.
-%       .sa.targets         (N+1)x1 vector containing the vector [U(:);1]'
-%                           with trial conditions
-%
+%       .sa.targets         (N+1)x1 vector containing the values
+%                           [U(:);NaN]' with trial conditions
 %       .a                  } if present in the input, then the output
 %       .fa                 } contains these fields as well
+%
+% #   For CoSMoMVPA's copyright information and license terms,   #
+% #   see the COPYING file distributed with CoSMoMVPA.           #
 
     defaults=struct();
     defaults.samples_are_unit_length=false;
