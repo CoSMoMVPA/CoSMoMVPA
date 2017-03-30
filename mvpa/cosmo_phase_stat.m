@@ -69,7 +69,7 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
 
     % balance dataset
     balanced_ds=balance_dataset(ds,opt);
-    
+
     % compute inter-trial coherence for the two conditions
     itc_ds=cosmo_phase_itc(balanced_ds,opt);
 

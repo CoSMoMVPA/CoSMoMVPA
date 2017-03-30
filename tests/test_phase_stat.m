@@ -14,6 +14,8 @@ function r=randint()
 
 function test_phase_stat_basics
     r=randint();
+
+    % test with both balanced and unbalanced number of trials
     helper_test_phase_stat_with_trial_counts(r,r);
     helper_test_phase_stat_with_trial_counts(r,r+randint());
     helper_test_phase_stat_with_trial_counts(r+randint(),r);
