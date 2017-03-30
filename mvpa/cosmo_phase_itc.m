@@ -21,11 +21,14 @@ function itc_ds=cosmo_phase_itc(ds,varargin)
 %                           each other
 %       .fa                 } optional feature attributes
 %       .a                  } optional sample attributes
-%  'samples_are_unit_length',u  (optional)
+%  'samples_are_unit_length',u  (optional, default=false)
 %                           If u==true, then all elements in ds.samples
 %                           are assumed to be already of unit length. If
 %                           this is indeed true, this can speed up the
 %                           computation of the output.
+%  'check_dataset',c        (optional, default=true)
+%                           if c==false, there is no check for consistency
+%                           of the ds input.
 %
 % Output:
 %   itc_ds                  dataset struct with fields:
@@ -59,9 +62,12 @@ function itc_ds=cosmo_phase_itc(ds,varargin)
         samples=samples./abs(samples);
     end
 
+    % split based on .sa.targets
     [idxs,classes]=cosmo_index_unique(ds.sa.targets);
     nclasses=numel(classes);
     nfeatures=size(samples,2);
+
+    % allocate space for output
     itc=zeros(nclasses+1,nfeatures);
 
     % ITC for each class
@@ -125,12 +131,13 @@ function quick_check_some_samples_being_unit_length(samples)
 
 function check_input(ds,opt)
     % must be a proper dataset
-    raise_exception=true;
-    cosmo_check_dataset(ds,raise_exception);
+    if opt.check_dataset
+        raise_exception=true;
+        cosmo_check_dataset(ds,raise_exception);
 
-    % must have targets and chunks
-    cosmo_isfield(ds,{'sa.targets','sa.chunks'},raise_exception);
-
+        % must have targets and chunks
+        cosmo_isfield(ds,{'sa.targets','sa.chunks'},raise_exception);
+    end
 
     % all chunks must be unique
     if ~isequal(sort(ds.sa.chunks),unique(ds.sa.chunks))

@@ -12,6 +12,7 @@ function test_suite=test_phase_itc
 function r=randint()
     r=ceil(2+rand()*10);
 
+
 function test_phase_itc_basics
     nclasses=randint();
     classes=1:2:(2*nclasses);
@@ -41,6 +42,7 @@ function test_phase_itc_basics
 
 
 function test_phase_itc_unit_length()
+    % test with 'samples_are_unit_length' option
     ds=generate_random_dataset(1:10,randint(),randint());
     ds_unit=ds;
     ds_unit.samples=ds_unit.samples./abs(ds_unit.samples);
@@ -50,6 +52,20 @@ function test_phase_itc_unit_length()
 
     assert_datasets_almost_equal(itc_ds,itc_unit_ds);
 
+
+function test_phase_itc_sdim_field
+    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',3);
+    ds.samples=ds.samples+1i*randn(size(ds.samples));
+    ds.sa.chunks(:)=1:9;
+
+    % add sample dimension
+    ds=cosmo_dim_insert(ds,1,1,{'foo'},{[1:9]},{[1:9]'});
+
+    itc_ds=cosmo_phase_itc(ds);
+    assert(~isfield(itc_ds.a,'sdim'));
+    assert(~isfield(itc_ds.sa,'foo'));
+
+
 function assert_datasets_almost_equal(p,q)
     assertElementsAlmostEqual(p.samples,q.samples);
 
@@ -58,8 +74,6 @@ function assert_datasets_almost_equal(p,q)
 
 
     assertEqual(p,q);
-
-
 
 function ds=generate_random_dataset(classes,nrepeats,nfeatures)
     nclasses=numel(classes);
@@ -76,26 +90,14 @@ function ds=generate_random_dataset(classes,nrepeats,nfeatures)
     ds=cosmo_slice(ds,cosmo_randperm(nsamples));
 
 
-function test_phase_itc_sdim_field
-    ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',3);
-    ds.samples=ds.samples+1i*randn(size(ds.samples));
-    ds.sa.chunks(:)=1:9;
-
-    % add sample dimension
-    ds=cosmo_dim_insert(ds,1,1,{'foo'},{[1:9]},{[1:9]'});
-
-    itc_ds=cosmo_phase_itc(ds);
-    assert(~isfield(itc_ds.a,'sdim'));
-    assert(~isfield(itc_ds.sa,'foo'));
-
-
 
 function itc=quick_itc(samples)
     s=samples./abs(samples);
     itc=abs(mean(s,1));
 
 
-function test_phase_itc_exceptions
+
+function test_phase_itc_exceptions()
     aet=@(varargin)assertExceptionThrown(...
                     @()cosmo_phase_itc(varargin{:}),'');
 
