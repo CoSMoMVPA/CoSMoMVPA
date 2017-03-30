@@ -137,14 +137,6 @@ function vec_subset=select_subset_from(vec, count, seed)
     vec_subset=vec(idxs);
 
 
-function [t1,t2]=get_two_targets_row(targets)
-    idxs=cosmo_index_unique(targets);
-    if numel(idxs)~=2
-        error('Input must have exactly two unique values in .sa.targets');
-    end
-    t1=idxs{1};
-    t2=idxs{2};
-
 function check_inputs(ds,opt)
     if opt.check_dataset
         cosmo_check_dataset(ds);
