@@ -11,7 +11,9 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
 %       .sa.targets         Px1 array with trial conditions.
 %                           There must be exactly two conditions, thus
 %                           .sa.targets must have exactly two unique
-%                           values.
+%                           values. A balanced number of samples is
+%                           requires, i.e. each of the two unique values in
+%                           .sa.targets must occur equally often.
 %       .sa.chunks          Px1 array indicating which samples can be
 %                           considered to be independent. It is required
 %                           that all samples are independent, therefore
@@ -28,22 +30,6 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
 %                           are assumed to be already of unit length. If
 %                           this is indeed true, this can speed up the
 %                           computation of the output.
-%  'sample_balancer', f       (optional)
-%                           If targets are unbalanced (there are more
-%                           trials in one condition than in the other one),
-%                           this function is used to balance the targets.
-%                           If the smallest number of targets is S,
-%                           this function must have the signature
-%                             idxs=f(t1,t2,seed)
-%                           where t1 and t2 are vectors with the target
-%                           positions, seed is an optional value that can
-%                           be used for a pseudo-random number generator,
-%                           and idxs is an Sx2 matrix containing the
-%                           balanced indices for the rows in targets for
-%                           the two classes.
-%                           By default a function is used that
-%                           pseudo-randomly selects a subset for each
-%                           class.
 %  'check_dataset',c        (optional, default=true)
 %                           if c==false, there is no check for consistency
 %                           of the ds input.
@@ -54,28 +40,32 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
 %       .a                  } if present in the input, then the output
 %       .fa                 } contains these fields as well
 %
+% Notes:
+%   - if a dataset is not balanced for number of trials, consider using
+%     cosmo_balance_dataset to balance it.
+%
+% See also: cosmo_balance_dataset, cosmo_phase_itc
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
 
     default=struct();
-    default.sample_balancer=@default_sample_balancer;
     default.check_dataset=true;
-    default.seed=1;
     opt=cosmo_structjoin(default,varargin{:});
 
     check_inputs(ds,opt);
 
-    % balance dataset
-    balanced_ds=balance_dataset(ds,opt);
+    % compute inter-trial coherence for the two conditions using
+    % cosmo_phase_itc, which will thrown an error if samples are not
+    % balanced.
+    itc_ds=cosmo_phase_itc(ds,opt);
 
-    % compute inter-trial coherence for the two conditions
-    itc_ds=cosmo_phase_itc(balanced_ds,opt);
 
-    %itc_ds must have three rows in .samples
-    assert(size(itc_ds.samples,1)==3);
-    assert(isnan(itc_ds.sa.targets(3)));
+    %if (size(itc_ds.samples,1)==3);
+    % itc_ds must have last entry to be NaN, indicating it is the ITC for
+    % all trials together
+    assert(isequal([false;false;true],isnan(itc_ds.sa.targets)));
 
     % compute PBI, POP or POS
     itc1=itc_ds.samples(1,:);
@@ -107,36 +97,6 @@ function s=compute_phase_stat(name, itc1, itc2, itc_all)
     end
 
 
-
-
-function balanced_ds=balance_dataset(ds,opt)
-    target_idxs=cosmo_index_unique(ds.sa.targets);
-
-    if numel(target_idxs)~=2
-        error('Need exactly two targets');
-    end
-
-    sample_idxs=opt.sample_balancer(target_idxs{1},target_idxs{2},...
-                                opt.seed);
-    balanced_ds=cosmo_slice(ds,sample_idxs,1,false);
-
-
-function idxs=default_sample_balancer(t1,t2,seed)
-    n1=numel(t1);
-    n2=numel(t2);
-
-    if n1<n2
-        idxs=[t1,select_subset_from(t2,n1,seed)];
-    else
-        idxs=[select_subset_from(t1,n2,seed),t2];
-    end
-
-function vec_subset=select_subset_from(vec, count, seed)
-    % pseudo-random selection of subset
-    idxs=cosmo_randperm(numel(vec),count,'seed',seed);
-    vec_subset=vec(idxs);
-
-
 function check_inputs(ds,opt)
     if opt.check_dataset
         cosmo_check_dataset(ds);
@@ -150,9 +110,6 @@ function check_inputs(ds,opt)
                             '.sa.targets']);
     end
 
-    if ~isa(opt.sample_balancer,'function_handle')
-        error('option ''sample_balancer'' must be a function handle');
-    end
 
     if ~isfield(opt,'output')
         error('option ''output'' is required');

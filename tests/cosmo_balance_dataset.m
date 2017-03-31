@@ -1,5 +1,5 @@
 function [balanced_ds,idxs,classes]=cosmo_balance_dataset(ds,varargin)
-% balance a dataset to have an equal number of samples for each target
+% sub-sample a dataset to have an equal number of samples for each target
 %
 % [balanced_ds,idxs,classes]=cosmo_balance_dataset(ds)
 %
@@ -61,16 +61,18 @@ function [idxs,classes]=default_sample_balancer(targets,seed)
     max_count=max(class_counts);
 
     nclasses=numel(class_counts);
+    % invoke PRNG only once
     rand_vals=cosmo_rand(max_count,nclasses,'seed',seed);
 
     idxs=zeros(min_count,nclasses);
     for k=1:nclasses
+        % set class_idxs to have values in the range 1:class_counts in
+        % random order
         [unused,class_idxs]=sort(rand_vals(1:class_counts(k),k));
+
+        % select min_count values from the indices in class_idxs
         idxs(:,k)=all_idxs{k}(class_idxs(1:min_count));
     end
-
-
-
 
 
 function check_inputs(ds,opt)

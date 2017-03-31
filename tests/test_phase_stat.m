@@ -12,13 +12,33 @@ function test_suite=test_phase_stat
 function r=randint()
     r=ceil(rand()*10+10);
 
-function test_phase_stat_basics
+function test_phase_stat_basic_balanced_trials
     r=randint();
 
     % test with both balanced and unbalanced number of trials
     helper_test_phase_stat_with_trial_counts(r,r);
-    helper_test_phase_stat_with_trial_counts(r,r+randint());
-    helper_test_phase_stat_with_trial_counts(r+randint(),r);
+
+
+function test_phase_stat_basic_unbalanced_trials
+    names={'pos','pop','pbi'};
+    for k=1:numel(names)
+        name=names{k};
+        for delta=[-1,0,1]
+            r=randint();
+            ds=generate_phase_dataset(r,r+delta);
+            opt=struct();
+            opt.output=name;
+
+            func=@()cosmo_phase_stat(ds,opt);
+            is_balanced=delta==0;
+            if is_balanced
+                % should be ok
+                func();
+            else
+                assertExceptionThrown(func,'');
+            end
+        end
+    end
 
 function helper_test_phase_stat_with_trial_counts(ntrials1,ntrials2)
     ds=generate_phase_dataset(ntrials1,ntrials2);
@@ -34,9 +54,7 @@ function helper_test_phase_stat_with_trial_counts(ntrials1,ntrials2)
 function helper_test_phase_stat_with_name(ds,stat_name)
     opt=struct();
     opt.output=stat_name;
-    opt.sample_balancer=@custom_sample_balancer;
-    opt.seed=randint()*randint()+randint();
-
+    % compute result
     result=cosmo_phase_stat(ds,opt);
 
     % compute expected result
@@ -44,29 +62,20 @@ function helper_test_phase_stat_with_name(ds,stat_name)
 
     t1=find(ds.sa.targets==1);
     t2=find(ds.sa.targets==2);
-    sample_idxs=opt.sample_balancer(t1,t2,opt.seed);
 
-    itc1=compute_itc(samples(sample_idxs(:,1),:));
-    itc2=compute_itc(samples(sample_idxs(:,2),:));
-    itc_all=compute_itc(samples(sample_idxs(:),:));
+    assert(numel(t1)==numel(t2));
+
+    itc1=compute_itc(samples(t1,:));
+    itc2=compute_itc(samples(t2,:));
+    itc_all=compute_itc(samples);
 
     expected_samples=compute_phase_stat(stat_name,itc1,itc2,itc_all);
 
+    % verify output matches expected output
     assertElementsAlmostEqual(result.samples,expected_samples);
     assertEqual(ds.a,result.a);
     assertEqual(ds.fa,result.fa);
     assertEqual(struct(),result.sa);
-
-    if numel(t1)==numel(t2)
-        % balanced case, default balancer should give same reslt
-        opt=rmfield(opt,'sample_balancer');
-
-        result_default_balancer=cosmo_phase_stat(ds,opt);
-        assertElementsAlmostEqual(result.samples,...
-                        result_default_balancer.samples);
-    end
-
-
 
 
 function idxs=custom_sample_balancer(t1,t2,seed)
@@ -113,21 +122,26 @@ function idx=select_randomly(targets,value,count)
     idx=pos(rp(1:count));
 
 
+function ds=generate_phase_dataset(varargin)
+    ndatasets=numel(varargin);
+    ds_cell=cell(ndatasets,1);
+    for k=1:ndatasets
+        ntrials=varargin{k};
 
+        ds_k=cosmo_synthetic_dataset('seed',0,...
+                                    'nchunks',ntrials,...
+                                    'ntargets',1);
+        ds_k.sa.targets(:)=k;
 
+        ds_cell{k}=ds_k;
+    end
 
-function ds=generate_phase_dataset(ntrials1,ntrials2)
-    ds1=cosmo_synthetic_dataset('seed',0,'nchunks',ntrials1);
-    ds1.sa.targets(:)=1;
-
-    ds2=cosmo_synthetic_dataset('seed',0,'nchunks',ntrials2);
-    ds2.sa.targets(:)=2;
-
-    ds=cosmo_stack({ds1,ds2});
+    ds=cosmo_stack(ds_cell);
     ds.sa.chunks(:)=1:numel(ds.sa.chunks);
 
     sz=size(ds.samples);
     ds.samples=randn(sz)+1i*randn(sz);
+
 
 
 function test_phase_stat_exceptions
@@ -157,10 +171,10 @@ function test_phase_stat_exceptions
     bad_ds.sa.chunks(1)=bad_ds.sa.chunks(2);
     aet_arg(bad_ds);
 
-    % imbalance is ok.
+    % imbalance is not ok.
     bad_ds=ds;
     bad_ds.sa.targets(:)=[repmat([1 2],1,5),[1 1]];
-    cosmo_phase_stat(bad_ds,extra_args{:});
+    aet_arg(bad_ds);
 
     % bad values for samples_are_unit_length
     bad_samples_are_unit_length_cell={[],'',1,[true false]};
