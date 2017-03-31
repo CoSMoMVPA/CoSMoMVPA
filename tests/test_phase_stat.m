@@ -78,19 +78,6 @@ function helper_test_phase_stat_with_name(ds,stat_name)
     assertEqual(struct(),result.sa);
 
 
-function idxs=custom_sample_balancer(t1,t2,seed)
-
-    count=min(numel(t1),numel(t2));
-    [unused,rp]=sort(cosmo_rand(count,1,...
-                                'seed',sum(t1)+sum(t2)+seed));
-
-    assert(count>0);
-
-    idxs=[t1(rp), t2(rp)];
-
-
-
-
 function s=compute_phase_stat(stat_name,itc1,itc2,itc_all)
     switch stat_name
         case 'pbi'
