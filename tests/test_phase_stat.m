@@ -223,7 +223,10 @@ function test_phase_stat_exceptions
     for bad_class_count=[1,3,4]
         bad_ds=ds;
         bad_ds.sa.targets(:)=mod(1:nsamples,bad_class_count)+1;
-        aet_arg(bad_ds);
+        idx=cosmo_index_unique(bad_ds.sa.targets);
+        counts=cellfun(@numel,idx);
+        assert(all(counts==counts(1))); % balanced counts
+        aet_arg(bad_ds);                % yet an error is raised
     end
 
     % no samples
