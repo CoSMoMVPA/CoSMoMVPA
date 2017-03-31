@@ -77,6 +77,50 @@ function helper_test_phase_stat_with_name(ds,stat_name)
     assertEqual(ds.fa,result.fa);
     assertEqual(struct(),result.sa);
 
+function test_phase_stat_with_signal()
+    names={'pos','pop','pbi'};
+    for k=1:numel(names)
+        name=names{k};
+
+        helper_test_phase_stat_with_signal_with_name(name);
+    end
+
+
+function helper_test_phase_stat_with_signal_with_name(name)
+    ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',50);
+    nsamples=size(ds.samples,1);
+    ds.sa.chunks(:)=1:nsamples;
+    ds=cosmo_slice(ds,1,2);
+
+    sd=pi/100;
+    signals=0:10;
+    nsignals=numel(signals);
+
+    result=zeros(nsignals,1);
+    for k=1:nsignals
+        for target=[1,2]
+            msk=ds.sa.targets==target;
+            r=rand(sum(msk),size(ds.samples,2));
+
+            rng=r;
+
+            if target==1
+                % add increasing difference between two classes
+                rng=rng+signals(k);
+            end
+
+            angle=2*pi*rng*sd;
+
+            x=exp(1i*angle);
+            ds.samples(msk,:)=x;
+        end
+
+        s=cosmo_phase_stat(ds,'output',name);
+        result(k)=s.samples;
+    end
+
+    assert(cosmo_corr(result,signals')>.5);
+
 
 function s=compute_phase_stat(stat_name,itc1,itc2,itc_all)
     switch stat_name
