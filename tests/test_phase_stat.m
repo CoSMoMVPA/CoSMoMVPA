@@ -92,6 +92,9 @@ function helper_test_phase_stat_with_signal_with_name(name)
     ds.sa.chunks(:)=1:nsamples;
     ds=cosmo_slice(ds,1,2);
 
+    % use small phase angle differences
+    % generally increase the distance, which should lead to an increase in
+    % PBI, POS and POP
     sd=pi/100;
     signals=0:10;
     nsignals=numel(signals);

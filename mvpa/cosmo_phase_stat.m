@@ -22,9 +22,9 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
 %       .fa                 } optional feature attributes
 %       .a                  } optional sample attributes
 %  'output',p               Return statistic, one of the following:
-%                           - 'pbi' - phase bifurcation index
-%                           - 'pos' - phase opposition sum
-%                           - 'pop' - phase opposition product
+%                           - 'pbi': phase bifurcation index
+%                           - 'pos': phase opposition sum
+%                           - 'pop': phase opposition product
 %  'samples_are_unit_length',u  (optional)
 %                           If u==true, then all elements in ds.samples
 %                           are assumed to be already of unit length. If
