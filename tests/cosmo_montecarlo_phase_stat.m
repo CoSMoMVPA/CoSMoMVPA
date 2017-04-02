@@ -93,8 +93,9 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
 
     permuter_func=opt.permuter_func;
     if isempty(permuter_func)
-        opt.permuter_func=get_default_permuter_func(nsamples,...
-                                        opt.niter,opt.seed);
+        opt.permuter_func=@(iter)default_permute(nsamples,...
+                                                    opt.seed,opt.niter,...
+                                                    iter);
     end
 
     zscore_func=get_zscore_func(opt.zscore);
@@ -152,8 +153,9 @@ function z=compute_zscore_non_parametric(ds,stat_orig,opt)
     niter=opt.niter;
     for iter=1:niter
         ds_null=ds;
+        sample_idxs=opt.permuter_func(iter);
 
-        ds_null.sa.targets=ds.sa.targets(opt.permuter_func(iter));
+        ds_null.sa.targets=ds.sa.targets(sample_idxs);
         stat_null=cosmo_phase_stat(ds_null,opt);
 
         msk_gt=stat_orig.samples>stat_null.samples;
@@ -178,18 +180,25 @@ function z=compute_zscore_non_parametric(ds,stat_orig,opt)
 
 
 
-function func=get_default_permuter_func(nsamples,niter,seed)
-    if isempty(seed)
-        args={};
-    else
-        args={'seed',seed};
+function idxs=default_permute(nsamples,seed,niter,iter)
+    persistent cached_args;
+    persistent cached_rand_vals;
+
+    args={nsamples,seed,niter,iter};
+    if ~isequal(cached_args,args)
+
+        if isempty(seed)
+            rand_args={};
+        else
+            rand_args={'seed',seed};
+        end
+
+        % compute once for all possible iterations
+        cached_rand_vals=cosmo_rand(nsamples,niter,rand_args{:});
+        cached_args=args;
     end
 
-    rand_vals=cosmo_rand(nsamples,niter,args{:});
-    [unused,idxs]=sort(rand_vals);
-    func=@(iter)idxs(:,iter);
-
-
+    [unused,idxs]=sort(cached_rand_vals(:,iter));
 
 
 
