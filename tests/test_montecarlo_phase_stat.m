@@ -208,7 +208,7 @@ function test_monte_carlo_phase_stat_seed
     opt.seed=randint();
     r1=cosmo_montecarlo_phase_stat(ds,opt);
     r2=cosmo_montecarlo_phase_stat(ds,opt);
-    assert(isequal(r1.samples,r2.samples));
+    assertElementsAlmostEqual(r1.samples,r2.samples);
 
     % different seed, different result
     opt.seed=opt.seed+1;
