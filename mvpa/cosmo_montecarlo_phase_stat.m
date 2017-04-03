@@ -88,12 +88,15 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
     ds.samples=ds.samples./abs(ds.samples);
 
 
+
     phase_opt=struct();
     phase_opt.output=opt.output;
     phase_opt.samples_are_unit_length=true;
     phase_opt.check_dataset=false;
 
-    stat_orig=cosmo_phase_stat(ds,phase_opt);
+    phase_func=@(phase_ds) cosmo_phase_stat(phase_ds, phase_opt);
+
+    stat_orig=phase_func(ds);
 
     permuter_func=opt.permuter_func;
     if isempty(permuter_func)
@@ -102,8 +105,10 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
                                                     iter);
     end
 
+    progress_func=get_progress_func(opt);
+
     zscore_func=get_zscore_func(opt.zscore);
-    z=zscore_func(ds,stat_orig,opt);
+    z=zscore_func(ds,stat_orig,phase_func,progress_func,opt);
 
     ds_stat=stat_orig;
     ds_stat.samples=z;
@@ -126,17 +131,20 @@ function zscore_func=get_zscore_func(zscore_name)
     zscore_func=funcs.(zscore_name);
 
 
-function z=compute_zscore_parametric(ds,stat_orig,opt)
+function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
+                                                progress_func,opt)
     niter=opt.niter;
     nfeatures=size(ds.samples,2);
 
     null_data=zeros(niter,nfeatures);
+    progress_func(0);
     for iter=1:niter
         ds_null=ds;
         ds_null.sa.targets=ds.sa.targets(opt.permuter_func(iter));
-        stat_null=cosmo_phase_stat(ds_null,opt);
+        stat_null=phase_func(ds_null);
 
         null_data(iter,:)=stat_null.samples;
+        progress_func(iter);
     end
 
     mu=mean(null_data,1);
@@ -145,7 +153,8 @@ function z=compute_zscore_parametric(ds,stat_orig,opt)
     z=(stat_orig.samples-mu)./sd;
 
 
-function z=compute_zscore_non_parametric(ds,stat_orig,opt)
+function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
+                                                progress_func,opt)
     % compute z-score non-parametrically
     % number of times the original data is less than (leading to negative
     % values) or greater than (leading to positive values) the null data.
@@ -155,18 +164,21 @@ function z=compute_zscore_non_parametric(ds,stat_orig,opt)
     exceed_count=zeros(1,nfeatures);
 
     niter=opt.niter;
+    progress_func(0);
     for iter=1:niter
         ds_null=ds;
         sample_idxs=opt.permuter_func(iter);
 
         ds_null.sa.targets=ds.sa.targets(sample_idxs);
-        stat_null=cosmo_phase_stat(ds_null,opt);
+        stat_null=phase_func(ds_null);
 
         msk_gt=stat_orig.samples>stat_null.samples;
         msk_lt=stat_orig.samples<stat_null.samples;
 
         exceed_count(msk_gt)=exceed_count(msk_gt)+1;
         exceed_count(msk_lt)=exceed_count(msk_lt)-1;
+
+        progress_func(iter);
     end
 
     p=(exceed_count+niter)/(2*niter);
@@ -182,6 +194,42 @@ function z=compute_zscore_non_parametric(ds,stat_orig,opt)
 
     z=cosmo_norminv(p);
 
+function func=get_progress_func(opt)
+    if ~(opt.progress)
+        func=@do_nothing;
+        return;
+    end
+
+    func=@(iter)show_progress(iter,opt.progress,opt.niter);
+
+function show_progress(iter,progress_step,niter)
+    persistent prev_msg;
+    persistent clock_start;
+
+    reset_state=isempty(clock_start) ...
+                    || iter==0 ...
+                    || ~ischar(prev_msg);
+
+    if reset_state
+        clock_start=clock();
+        prev_msg='';
+    end
+
+    if mod(iter,progress_step)~=0;
+        return;
+    end
+
+    msg='';
+    progress=iter/niter;
+    prev_msg=cosmo_show_progress(clock_start,progress,msg,prev_msg);
+
+
+
+
+
+function do_nothing(varargin)
+    % This is used in case of no progress reporting.
+    % This function does absolutely nothing
 
 
 function idxs=default_permute(nsamples,seed,niter,iter)
