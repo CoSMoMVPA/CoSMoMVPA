@@ -190,6 +190,17 @@ function short_args=remove_keys_from_arguments(skip_count,keys,args)
         short_args{skip_count+k}=short_arg;
     end
 
+function test_stat_no_division_by_zero_error()
+    [lastmsg,lastid]=lastwarn();
+    cleaner=onCleanup(@()lastwarn(lastmsg,lastid));
+    lastwarn('');
+
+    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',1);
+    ds.samples(:)=0;
+
+    cosmo_stat(ds,'t','z');
+    assertEqual(lastwarn(),'');
+
 
 
 

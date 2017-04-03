@@ -583,7 +583,9 @@ function [f,df]=quick_ftest_between(samples,targets,chunks,contrast)
     mbss=bss/df(1);
     mwss=wss/df(2);
 
-    f=mbss./mwss;
+    f=zeros(1,nf)+NaN;
+    msk=mbss>0;
+    f(msk)=mbss(msk)./mwss(msk);
 
 function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     % repeated measures anova
@@ -602,7 +604,13 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     for k=1:nclasses
         xk=samples(k==targets,:);
         n=size(xk,1);
-        mu=mean(xk,1);
+
+        if n==0
+            ssw(:)=NaN;
+            break;
+        end
+
+        mu=sum(xk,1)/n;
         sst=sst+n*(gm-mu).^2;
         ssw=ssw+sum(bsxfun(@minus,mu,xk).^2);
     end
@@ -621,7 +629,10 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     df2=df1*(nchunks-1);
     sse=ssw-sss;
     mse=sse/df2;
-    f=mst./mse;
+
+    msk=mse>0;
+    f=zeros(1,nfeatures)+NaN;
+    f(msk)=mst(msk)./mse(msk);
     df=[df1 df2];
 
 
@@ -629,33 +640,43 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
 function [t,df]=quick_ttest(x)
     % one-sample t-test against zero
 
-    n=size(x,1);
-    mu=sum(x,1)/n; % grand mean
+    [ns,nf]=size(x);
+    mu=sum(x,1)/ns; % grand mean
 
-    df=n-1;
-    scaling=n*df;
+    df=ns-1;
+    scaling=ns*df;
 
     % sum of squares
     ss=sum(bsxfun(@minus,x,mu).^2,1);
 
-    t=mu .* sqrt(scaling./ss);
+    t=zeros(1,nf)+NaN;
+    msk=ss>0;
+    t(msk)=mu(msk).*sqrt(scaling./ss(msk));
 
 
 function [t,df]=quick_ttest2(x,y)
     % two-sample t-test with equal variance assumption
 
-    nx=size(x,1);
+    [nx,nf]=size(x);
     ny=size(y,1);
+
+    df=nx+ny-2;
+    if nx==0 || ny==0
+        t=zeros(1,nf)+NaN;
+        return;
+    end
+
     mux=sum(x,1)/nx; % mean of class x
     muy=sum(y,1)/ny; % "           " y
 
-    df=nx+ny-2;
     scaling=(nx*ny)*df/(nx+ny);
 
     % sum of squares
     ss=sum([bsxfun(@minus,x,mux);bsxfun(@minus,y,muy)].^2,1);
 
-    t=(mux-muy) .* sqrt(scaling./ss);
+    t=zeros(1,nf)+NaN;
+    msk=ss>0;
+    t(msk)=(mux(msk)-muy(msk)) .* sqrt(scaling./ss(msk));
 
 
 
