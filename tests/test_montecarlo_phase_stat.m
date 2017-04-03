@@ -84,6 +84,7 @@ function test_random_data_nonparam_uniformity
             opt.output=output;
             opt.seed=[];
             opt.permuter_func=get_custom_permute_func(nsamples);
+            opt.progress=false;
 
             if ~isempty(method)
                 opt.zscore='non_parametric';
@@ -195,7 +196,7 @@ function test_monte_carlo_phase_stat_seed
     opt=struct();
     opt.niter=10+randint();
     opt.output='pbi';
-    %opt.permuter_func=@custom_permute;
+    opt.progress=false;
 
 
     % different results with empty seeed
