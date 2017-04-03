@@ -436,18 +436,26 @@ function cdf_stat=apply_cdf_wrapper_different_dfs(stat_name,stat,df_struct)
     [idx, unique_dfs]=cosmo_index_unique(df_struct.feature_wise_df');
 
     % allocate space for output
-    cdf_stat=zeros(size(stat));
+    cdf_stat=zeros(size(stat))+NaN;
 
     % compute result
     for k=1:numel(idx)
         cols=idx{k};
         df_cell=num2cell(unique_dfs(k,:));
 
-        cdf_stat(cols)=cdf_wrapper(stat_name,stat(cols),df_cell{:});
+        col_stat=stat(cols);
+        msk=~isnan(col_stat);
+
+        cdf_stat(cols(msk))=cdf_wrapper(stat_name,col_stat(msk),df_cell{:});
     end
 
 function y=cdf_wrapper(name, x, df1, df2)
     ensure_has_stats_functions();
+    if ~(df1>0)
+        y=zeros(size(x))+NaN;
+        return;
+    end
+
     switch name
         case 'Ttest'
             assert(nargin==3);
@@ -455,6 +463,11 @@ function y=cdf_wrapper(name, x, df1, df2)
 
         case 'Ftest'
             assert(nargin==4);
+            if ~(df2>0)
+                y=zeros(size(x))+NaN;
+            return;
+            end
+
             y=fcdf(x, df1, df2);
 
         otherwise
