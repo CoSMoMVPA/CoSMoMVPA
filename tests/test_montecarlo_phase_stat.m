@@ -28,8 +28,8 @@ function test_phase_stat_basics
             opt.niter=randint();
             opt.progress=false;
 
-            opt.permuter_func=get_custom_permute_func(nsamples);
-
+            opt.permuter_func=@(iter) deterministic_permute(nsamples,...
+                                                        opt.niter,iter);
             opt.output=output;
             opt.seed=randint();
 
@@ -59,7 +59,9 @@ function test_phase_stat_basics
                                         is_parametric,...
                                         extreme_tail_is_nan);
             result=cosmo_montecarlo_phase_stat(ds,opt);
-            assertElementsAlmostEqual(expected_samples,result.samples);
+
+            assertElementsAlmostEqual(expected_samples,result.samples,...
+                                            'absolute',1e-5);
         end
     end
 
@@ -83,7 +85,7 @@ function test_random_data_nonparam_uniformity
             opt.niter=50+randint();
             opt.output=output;
             opt.seed=[];
-            opt.permuter_func=get_custom_permute_func(nsamples);
+            opt.permuter_func=@(unused)nondeterministic_permute(nsamples);
             opt.progress=false;
 
             if ~isempty(method)
@@ -92,13 +94,6 @@ function test_random_data_nonparam_uniformity
             end
 
 
-%            is_parametric=false;
-%            extreme_tail_is_nan=~strcmp(method,'nonparam');
-%             samples=compute_expected_samples(ds,output,...
-%                                         opt.niter,opt.permuter_func,...
-%                                         is_parametric,...
-%                                         opt.seed,...
-%                                         extreme_tail_is_nan);
             stat_ds=cosmo_montecarlo_phase_stat(ds,opt);
             samples=stat_ds.samples;
             nan_msk=isnan(samples);
@@ -170,24 +165,38 @@ function samples=compute_expected_samples(ds,output,...
             extreme=min_p;
         end
 
-        p(p<min_p)=extreme;
-        p(p>1-min_p)=1-extreme;
+        p(p<=min_p)=extreme;
+        p(p>=1-min_p)=1-extreme;
 
         samples=cosmo_norminv(p);
     end
 
 
-function func=get_custom_permute_func(ntargets)
-    func=@(iter) custom_permute(ntargets,iter);
+function func=get_determistic_permute_func(ntargets,niter)
+    func=@(iter) deterministic_permute(ntargets,niter,iter);
 
+function targets_idxs=deterministic_permute(ntargets,niter,iter)
+    persistent cached_rand_vec;
+    persistent cached_args;
 
-function targets_idxs=custom_permute(ntargets,iter)
-    if isempty(iter)
-        args={};
-    else
-        args={'seed',iter};
+    args={ntargets,niter};
+
+    if ~isequal(args,cached_args)
+        cached_rand_vec=cosmo_rand(ntargets,1,'seed',ntargets*niter);
+
+        cached_args=args;
     end
-    [unused,targets_idxs]=sort(cosmo_rand(ntargets,1,args{:}));
+
+    rand_vals=cached_rand_vec+iter/niter;
+    msk=rand_vals>1;
+    rand_vals(msk)=rand_vals(msk)-1;
+
+    [unused,targets_idxs]=sort(rand_vals,1);
+
+function target_idxs=nondeterministic_permute(ntargets)
+    rand_vals=randn(ntargets,1);
+    [unused,target_idxs]=sort(rand_vals);
+
 
 
 function test_monte_carlo_phase_stat_seed
@@ -202,8 +211,15 @@ function test_monte_carlo_phase_stat_seed
     % different results with empty seeed
     opt.seed=[];
     r1=cosmo_montecarlo_phase_stat(ds,opt);
-    r2=cosmo_montecarlo_phase_stat(ds,opt);
-    assert(~isequal(r1.samples,r2.samples));
+    attempt=10;
+    while attempt>0
+        attempt=attempt-1;
+        assert(attempt>0,'results are always the same');
+        r2=cosmo_montecarlo_phase_stat(ds,opt);
+        if ~isequal(r1.samples,r2.samples);
+            break;
+        end
+    end
 
     % fixed seed, same result
     opt.seed=randint();
