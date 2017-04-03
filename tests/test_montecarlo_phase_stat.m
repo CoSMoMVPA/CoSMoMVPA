@@ -13,7 +13,7 @@ function r=randint()
     r=ceil(rand()*10+10);
 
 function test_phase_stat_basics
-    ds=generate_random_phase_dataset(40+randint(),'tiny');
+    ds=generate_random_phase_dataset(40+randint(),'small');
     nsamples=size(ds.samples,1);
 
     methods={'param','nonparam_nan','nonparam',''};
