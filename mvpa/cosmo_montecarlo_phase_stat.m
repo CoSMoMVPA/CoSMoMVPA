@@ -189,8 +189,10 @@ function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
         replacement=1/niter;
     end
 
-    p(p<1/niter)=replacement;
-    p(p>1-1/niter)=1-replacement;
+    tiny_p=(1/niter)+1e-10;
+
+    p(p<tiny_p)=replacement;
+    p(p>1-tiny_p)=1-replacement;
 
     z=cosmo_norminv(p);
 

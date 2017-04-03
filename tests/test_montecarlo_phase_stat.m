@@ -162,7 +162,7 @@ function samples=compute_expected_samples(ds,output,...
         p(msk_gt)=count_gt(msk_gt)/niter;
         p(msk_lt)=1-count_lt(msk_lt)/niter;
 
-        min_p=1/(niter);
+        min_p=1/(niter)+1e-10;
 
         if extreme_tail_is_nan
             extreme=NaN;
