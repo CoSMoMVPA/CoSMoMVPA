@@ -63,8 +63,12 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
 %   stat_ds                 Dataset with field
 %       .samples            1xQ z-scores indicating the probability of the
 %                           observed data in ds.samples, under the null
-%                           hypothesis of no phase difference
+%                           hypothesis of no phase difference. z-scores are
+%                           not corrected for multiple comparisons.
 %
+% Notes:
+%   - this function computes phase statistics for each feature separately;
+%     it does not correct for multiple comparisons
 %
 % See also: cosmo_phase_stat, cosmo_phase_itc
 
