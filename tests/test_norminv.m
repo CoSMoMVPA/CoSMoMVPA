@@ -20,6 +20,10 @@ function test_norminv_stats_correspondence
     helper_test_norminv_same(rand(10,200));
     helper_test_norminv_same(rand(2,3,5)*2-.5);
 
+    sz=ceil(2+rand(1,3)*2);
+    helper_test_norminv_same(rand(sz),rand(),rand());
+    helper_test_norminv_same(rand(sz),rand(sz),rand(sz));
+
     helper_test_norminv_same(NaN);
     helper_test_norminv_same(0);
     helper_test_norminv_same(1);
@@ -35,6 +39,14 @@ function test_norminv_stats_non_scalar_mu_sd_correspondence
         reason='Octave''s norminv cannot use bsxfun-like inputs';
         cosmo_notify_test_skipped(reason);
         return
+    end
+
+    v=cosmo_wtf('version_number');
+    if v(1)<=8 || v(2)<=0
+        % before 2016b
+        reason='Older matlab''s norminv cannot use bsxfun-like inputs';
+        cosmo_notify_test_skipped(reason);
+        return;
     end
 
     helper_test_norminv_same(rand(10,5),rand(1,5),rand(10,1));
