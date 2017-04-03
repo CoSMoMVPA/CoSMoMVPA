@@ -308,7 +308,9 @@ function [stat,df_struct,stat_label]=apply_stat_func(stat_func,...
             assert(isequal(stat_label,stat_label_k));
         end
 
-        df_matrix(:,cols)=df;
+        ncols=numel(cols);
+
+        df_matrix(:,cols)=repmat(df(:),1,ncols);
     end
 
     single_sample=samples(:,1);

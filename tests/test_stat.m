@@ -201,6 +201,14 @@ function test_stat_no_division_by_zero_error()
     cosmo_stat(ds,'t','z');
     assertEqual(lastwarn(),'');
 
+function test_stat_same_nan_fstat()
+    ds=cosmo_synthetic_dataset('nchunks',4,'ntargets',3);
+    ds.samples(ds.sa.chunks==3,[1 3 5])=NaN;
+
+    stat=cosmo_stat(ds,'F'); % should be ok
+    assertEqual(isnan(stat.samples),any(isnan(ds.samples),1));
+
+
 
 
 
