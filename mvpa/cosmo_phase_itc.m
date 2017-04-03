@@ -106,7 +106,7 @@ function itc_ds=set_output(itc,ds,classes)
 
 function itc=itc_on_unit_length_elements(samples)
     % computes inter-trial coherence for each column seperately
-    itc=abs(sum(samples,1)./size(samples,1));
+    itc=abs(sum(samples,1)/size(samples,1));
 
 
 function quick_check_some_samples_being_unit_length(samples)
