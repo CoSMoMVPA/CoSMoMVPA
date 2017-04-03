@@ -61,10 +61,13 @@ function stat_ds=cosmo_phase_stat(ds,varargin)
     % balanced.
     itc_ds=cosmo_phase_itc(ds,opt);
 
-
-    %if (size(itc_ds.samples,1)==3);
     % itc_ds must have last entry to be NaN, indicating it is the ITC for
     % all trials together
+    if size(itc_ds.samples,1)~=3
+        error(['Input must have exactly two unique values '...
+                        'for .sa.targets']);
+    end
+
     assert(isequal([false;false;true],isnan(itc_ds.sa.targets)));
 
     % compute PBI, POP or POS
