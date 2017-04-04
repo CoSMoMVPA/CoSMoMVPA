@@ -26,27 +26,32 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
 %                           - 'pos': phase opposition sum
 %                           - 'pop': phase opposition product
 %  'niter',niter            Generate niter null datasets by random
-%                           shuffling the targets
+%                           shuffling the targets.
+%                           If you have no idea what value to use, consider
+%                           using niter=1000.
 %  'zscore',z               (optional, default='non_parametric')
 %                           Compute z-score using either:
-%                           'non_parametric': non-parametric aproach based
+%                           'non_parametric': non-parametric approach based
 %                                             on how many values in the
 %                                             original dataset show an
 %                                             output greater than the
-%                                             null data
+%                                             null data.
 %                           'parametric'    : parametric approach based on
 %                                             mean and standard deviation
 %                                             of the null data. This would
 %                                             assume normality of the
-%                                             computed output statistic
+%                                             computed output statistic.
 %  'extreme_tail_set_nan',n (optional, default=true)
 %                           If n==true and all the output value in the
 %                           original dataset for a particular feature i is
 %                           less than or greater than all output values for
 %                           that feature in the null datasets, set the
 %                           output in stat.samples(i) to NaN.
-%                           If n==false,
-%  'progress',p             Show progress every p null datasets.
+%                           If n==false, the p value corresponding to the
+%                           output is limited to the range
+%                               [1/niter,1-1/niter]
+%  'progress',p             (optional,default=1)
+%                           Show progress every p null datasets.
 %  'permuter_func',f        (optional, default is function defined in
 %                            this function's body)
 %                           Function handle with signature
@@ -82,13 +87,13 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
     opt=cosmo_structjoin(defaults,varargin{:});
     check_inputs(ds,opt);
 
+    progress_func=get_progress_func(opt);
+
     [nsamples,nfeatures]=size(ds.samples);
 
-    % normalize dataset
+    % normalize dataset here. This is more efficient than letting
+    % cosmo_phase_stat normalize the data for each null dataset seperately.
     ds.samples=ds.samples./abs(ds.samples);
-
-
-
     phase_opt=struct();
     phase_opt.output=opt.output;
     phase_opt.samples_are_unit_length=true;
@@ -96,19 +101,25 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
 
     phase_func=@(phase_ds) cosmo_phase_stat(phase_ds, phase_opt);
 
+    % compute statistic for original dataset
     stat_orig=phase_func(ds);
 
-    permuter_func=opt.permuter_func;
-    if isempty(permuter_func)
-        opt.permuter_func=@(iter)default_permute(nsamples,...
-                                                    opt.seed,opt.niter,...
-                                                    iter);
-    end
+    % indicate progress
+    progress_func(0);
 
-    progress_func=get_progress_func(opt);
+%     % set permutation func
+%     permuter_func=opt.permuter_func;
+%     if isempty(permuter_func)
+%         opt.permuter_func=@(iter)default_permute(nsamples,...
+%                                                     opt.seed,opt.niter,...
+%                                                     iter);
+%     end
+
+
+    permuter_func=get_permuter_func(opt,nsamples);
 
     zscore_func=get_zscore_func(opt.zscore);
-    z=zscore_func(ds,stat_orig,phase_func,progress_func,opt);
+    z=zscore_func(ds,stat_orig,phase_func,progress_func,permuter_func,opt);
 
     ds_stat=stat_orig;
     ds_stat.samples=z;
@@ -116,6 +127,13 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
     cosmo_check_dataset(ds_stat);
 
 
+function permuter_func=get_permuter_func(opt,nsamples)
+    permuter_func=opt.permuter_func;
+    if isempty(permuter_func)
+        permuter_func=@(iter)default_permute(nsamples,...
+                                                    opt.seed,opt.niter,...
+                                                    iter);
+    end
 
 function zscore_func=get_zscore_func(zscore_name)
     funcs=struct();
@@ -132,7 +150,7 @@ function zscore_func=get_zscore_func(zscore_name)
 
 
 function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
-                                                progress_func,opt)
+                                                progress_func,permuter_func,opt)
     niter=opt.niter;
     nfeatures=size(ds.samples,2);
 
@@ -140,7 +158,7 @@ function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
     progress_func(0);
     for iter=1:niter
         ds_null=ds;
-        ds_null.sa.targets=ds.sa.targets(opt.permuter_func(iter));
+        ds_null.sa.targets=ds.sa.targets(permuter_func(iter));
         stat_null=phase_func(ds_null);
 
         null_data(iter,:)=stat_null.samples;
@@ -154,7 +172,7 @@ function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
 
 
 function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
-                                                progress_func,opt)
+                                                progress_func,permuter_func,opt)
     % compute z-score non-parametrically
     % number of times the original data is less than (leading to negative
     % values) or greater than (leading to positive values) the null data.
@@ -167,8 +185,8 @@ function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
     progress_func(0);
     for iter=1:niter
         ds_null=ds;
-        sample_idxs=opt.permuter_func(iter);
 
+        sample_idxs=permuter_func(iter);
         ds_null.sa.targets=ds.sa.targets(sample_idxs);
         stat_null=phase_func(ds_null);
 
@@ -222,7 +240,7 @@ function show_progress(iter,progress_step,niter)
     end
 
     msg='';
-    progress=iter/niter;
+    progress=(iter+1)/(niter+1);
     prev_msg=cosmo_show_progress(clock_start,progress,msg,prev_msg);
 
 
@@ -260,10 +278,15 @@ function check_inputs(ds,opt)
     raise_exception=true;
     cosmo_check_dataset(ds,raise_exception);
 
-    required_fields={'output','niter'};
-    missing_fields=setdiff(required_fields,fieldnames(opt));
-    if ~isempty(missing_fields)
-        error('Missing option ''%s''', missing_fields{1});
+    if ~isfield(opt,'niter')
+        error(['The option ''niter'' is required. If you have '...
+                'absolutely no idea what value to use, consider '...
+                'using niter=10000']);
+    end
+
+    if ~isfield(opt,'output')
+        error(['The option ''output'' is required. Use one of '...
+                    '''pos'',''pop'', or ''pos''']);
     end
 
     verify_positive_scalar_int(opt,'niter');
