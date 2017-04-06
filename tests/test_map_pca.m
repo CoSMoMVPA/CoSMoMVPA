@@ -81,7 +81,7 @@ function test_map_pca_max_feature_count_exceptions()
                 func_handle=@()cosmo_map_pca(ds,opt);
 
                 if expect_exception
-                    assertExceptionThrown(func_handle);
+                    assertExceptionThrown(func_handle,'');
                 else
                     % should not raise an exception
                     func_handle();
