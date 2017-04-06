@@ -228,9 +228,16 @@ function test_monte_carlo_phase_stat_seed
     assertElementsAlmostEqual(r1.samples,r2.samples);
 
     % different seed, different result
-    opt.seed=opt.seed+1;
-    r2=cosmo_montecarlo_phase_stat(ds,opt);
-    assert(~isequal(r1.samples,r2.samples));
+    attempt=10;
+    while attempt>0
+        opt.seed=opt.seed+1;
+        attempt=attempt-1;
+        assert(attempt>0,'results are always the same');
+        r2=cosmo_montecarlo_phase_stat(ds,opt);
+        if ~isequal(r1.samples,r2.samples);
+            break;
+        end
+    end
 
 
 
