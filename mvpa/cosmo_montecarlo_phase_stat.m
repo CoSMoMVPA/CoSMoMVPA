@@ -124,6 +124,7 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
     ds_stat=stat_orig;
     ds_stat.samples=z;
 
+    progress_func(opt.niter+1);
     cosmo_check_dataset(ds_stat);
 
 
@@ -172,7 +173,7 @@ function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
 
 
 function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
-                                                progress_func,permuter_func,opt)
+                                        progress_func,permuter_func,opt)
     % compute z-score non-parametrically
     % number of times the original data is less than (leading to negative
     % values) or greater than (leading to positive values) the null data.
@@ -182,7 +183,6 @@ function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
     exceed_count=zeros(1,nfeatures);
 
     niter=opt.niter;
-    progress_func(0);
     for iter=1:niter
         ds_null=ds;
 
