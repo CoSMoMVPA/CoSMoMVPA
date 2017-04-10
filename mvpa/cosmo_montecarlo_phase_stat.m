@@ -107,15 +107,7 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
     % indicate progress
     progress_func(0);
 
-%     % set permutation func
-%     permuter_func=opt.permuter_func;
-%     if isempty(permuter_func)
-%         opt.permuter_func=@(iter)default_permute(nsamples,...
-%                                                     opt.seed,opt.niter,...
-%                                                     iter);
-%     end
-
-
+%     % set permutation function
     permuter_func=get_permuter_func(opt,nsamples);
 
     zscore_func=get_zscore_func(opt.zscore);
@@ -156,7 +148,6 @@ function z=compute_zscore_parametric(ds,stat_orig,phase_func,...
     nfeatures=size(ds.samples,2);
 
     null_data=zeros(niter,nfeatures);
-    progress_func(0);
     for iter=1:niter
         ds_null=ds;
         ds_null.sa.targets=ds.sa.targets(permuter_func(iter));
