@@ -74,6 +74,14 @@ function ds_stat=cosmo_montecarlo_phase_stat(ds,varargin)
 % Notes:
 %   - this function computes phase statistics for each feature separately;
 %     it does not correct for multiple comparisons
+%   - p-values are computed by dividing as (r+1) / (niter+1), with r the
+%     number of times that the original data as less then the null
+%     distributions. This follows the recommendation of North et al (2002).
+%
+% Reference
+%   - North, Bernard V., David Curtis, and Pak C. Sham. "A note on the
+%     calculation of empirical P values from Monte Carlo procedures." The
+%     American Journal of Human Genetics 71.2 (2002): 439-441.
 %
 % See also: cosmo_phase_stat, cosmo_phase_itc
 
@@ -190,18 +198,30 @@ function z=compute_zscore_non_parametric(ds,stat_orig,phase_func,...
         progress_func(iter);
     end
 
-    p=(exceed_count+niter)/(2*niter);
+    % Note that exceed_count is even if niter is even.
+    %
+    % if exceed_count==-niter,     p=1/(niter+1)
+    % if             ==-(niter+2), p=2/(niter+1)
+    % if             ==-(niter+4), p=3/(niter+1)
+    % ...
+    %
+    % if exceed_count==niter,      p=niter/(niter+1)
+    % if exceed_count==niter-2,    p=(niter-1)/(niter+1)
+    % if exceed_count==niter-4,    p=(niter-2)/(niter+1)
+    p=.5+zeros(1,nfeatures);
+    neg_msk=exceed_count<0;
+    p(neg_msk)=((exceed_count(neg_msk)+niter)/2+1)/(niter+1);
+
+    pos_msk=exceed_count>0;
+    p(pos_msk)=1-((niter-exceed_count(pos_msk))/2+1)/(niter+1);
+
+    tail=1/(2*(niter+1))-1e-7;
+    assert(all(p>=tail));
+    assert(all(p<1-tail));
 
     if opt.extreme_tail_set_nan
-        replacement=NaN;
-    else
-        replacement=1/niter;
+        p(exceed_count==-niter | exceed_count==niter)=NaN;
     end
-
-    tiny_p=(1/niter)+1e-10;
-
-    p(p<tiny_p)=replacement;
-    p(p>1-tiny_p)=1-replacement;
 
     z=cosmo_norminv(p);
 
