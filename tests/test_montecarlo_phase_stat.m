@@ -154,19 +154,17 @@ function samples=compute_expected_samples(ds,output,...
         msk_lt=count_lt>niter/2;
 
         p=zeros(1,nfeatures)+.5;
-        p(msk_gt)=count_gt(msk_gt)/niter;
-        p(msk_lt)=1-count_lt(msk_lt)/niter;
+        p(msk_gt)=count_gt(msk_gt)/(1+niter);
+        p(msk_lt)=1-count_lt(msk_lt)/(1+niter);
 
-        min_p=1/(niter)+1e-10;
+        min_p=1/(1+niter)+1e-10;
+
+        assert(all(p>=min_p-2e-10));
+        assert(all((1-p)>=(min_p-2e-10)));
 
         if extreme_tail_is_nan
-            extreme=NaN;
-        else
-            extreme=min_p;
+            p(count_gt==niter | count_lt==niter)=NaN;
         end
-
-        p(p<=min_p)=extreme;
-        p(p>=1-min_p)=1-extreme;
 
         samples=cosmo_norminv(p);
     end
@@ -216,7 +214,7 @@ function test_monte_carlo_phase_stat_seed
         attempt=attempt-1;
         assert(attempt>0,'results are always the same');
         r2=cosmo_montecarlo_phase_stat(ds,opt);
-        if ~isequal(r1.samples,r2.samples);
+        if ~isequal(r1.samples,r2.samples)
             break;
         end
     end
@@ -234,7 +232,7 @@ function test_monte_carlo_phase_stat_seed
         attempt=attempt-1;
         assert(attempt>0,'results are always the same');
         r2=cosmo_montecarlo_phase_stat(ds,opt);
-        if ~isequal(r1.samples,r2.samples);
+        if ~isequal(r1.samples,r2.samples)
             break;
         end
     end
