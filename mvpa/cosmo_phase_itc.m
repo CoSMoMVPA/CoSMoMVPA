@@ -123,7 +123,8 @@ function quick_check_some_samples_being_unit_length(samples)
     samples_subset=samples(pos);
     lengths=abs(samples_subset);
 
-    delta=eps(1);
+    % safety margin
+    delta=10*eps('single');
     if any(lengths+delta<1 | lengths-delta>1)
         error('.samples input is not of unit length');
     end

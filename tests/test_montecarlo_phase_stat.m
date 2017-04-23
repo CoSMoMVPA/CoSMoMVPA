@@ -297,3 +297,20 @@ function test_montecarlo_phase_stat_exceptions()
     % invalid func(ds,extra_args,'extreme_tail_set_nan',true);
     aet(ds,extra_args,'extreme_tail_set_nan',2);
     aet(ds,extra_args,'extreme_tail_set_nan','foo');
+
+function test_unit_length_exception
+    ds=cosmo_synthetic_dataset('nchunks',10);
+    sample_size=size(ds.samples);
+    ds.sa.chunks(:)=1:sample_size(1);
+
+    rand_func=single(randn(sample_size));
+
+    ds.samples=rand_func() + 1i*rand_func();
+
+    opt=struct();
+    opt.output='pos';
+    opt.niter=100;
+    opt.progress=false;
+
+    % should not raise an exception
+    cosmo_montecarlo_phase_stat(ds,opt);
