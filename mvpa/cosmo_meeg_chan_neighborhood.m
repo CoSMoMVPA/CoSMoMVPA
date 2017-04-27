@@ -7,10 +7,19 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %   ds                  MEEG dataset struct.
 %   ft_nbrs             Optional Fieldtrip-like neighborhood struct with
 %                       fields .label and .neighblabel such as produced by
-%                       FieldTrip's ft_prepare_neighbors. In this case none
+%                       FieldTrip's ft_prepare_neighbours. In this case none
 %                       of the other options mentioned below can be
 %                       provided; and the neighborhood structure is based
-%                       on the neighbors from ft_nbrs.
+%                       on the neighbors from ft_nbrs. The struct ft_nbrs
+%                       must be structured as in this simple example:
+%                           ft_nbrs(1).name='ch1'
+%                           ft_nbrs(1).neighblabel={'ch2','ch6','ch9'}
+%                           ft_nbrs(2).name='ch2'
+%                           ft_nbrs(2).neighblabel={'ch1','ch6'}
+%                           ft_nbrs(3).name='ch6'
+%                           ft_nbrs(3).neighblabel={'ch1','ch2'}
+%                           ft_nbrs(3).name='ch9'
+%                           ft_nbrs(3).neighblabel={'ch1'}
 %   'label', lab        Optional labels to return in output, one of:
 %                       'layout'    : determine neighbors based on layout
 %                                     associated with ds (default). All
