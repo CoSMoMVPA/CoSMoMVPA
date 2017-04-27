@@ -4,11 +4,13 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 % nbrhood=cosmo_meeg_chan_neighborhood(ds, ...)
 %
 % Inputs:
-%   ds                  MEEG dataset struct, or a neighborhood struct with
+%   ds                  MEEG dataset struct.
+%   ft_nbrs             Optional Fieldtrip-like neighborhood struct with
 %                       fields .label and .neighblabel such as produced by
-%                       FieldTrip's ft_prepare_neighbors. In the latter
-%                       case, it must be the only argument to this
-%                       function; other arguments are ignored.
+%                       FieldTrip's ft_prepare_neighbors. In this case none
+%                       of the other options mentioned below can be
+%                       provided; and the neighborhood structure is based
+%                       on the neighbors from ft_nbrs.
 %   'label', lab        Optional labels to return in output, one of:
 %                       'layout'    : determine neighbors based on layout
 %                                     associated with ds (default). All
@@ -41,6 +43,8 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     .a.fdim.values    set to a cell with as only element a cell with
 %                       center channel labels
 %     .a.fdim.labels    set to {'chan'}
+%     .origin.fa        } set to the corresponding values from
+%     .origin.a         } the input dataset, ds.fa and ds.a
 %
 % Examples:
 %     % get neighbors at 4 neighboring sensor location for
