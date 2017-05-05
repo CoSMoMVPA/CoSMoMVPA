@@ -27,22 +27,20 @@ function tf=cosmo_isfield(s, name, raise)
 %     %
 %     % check for presence of 'a' in s
 %     cosmo_isfield(s,'a')
-%     > 1
+%     %|| true
 %     %
 %     % check for present of 'c' in s, 'd' in s.d, and 'e' in s.c.d
 %     cosmo_isfield(s,'c.d.e')
-%     > 1
+%     %|| true
 %     %
 %     % check for the present of four fields (two are absent)
 %     cosmo_isfield(s,{'c.d.e','c.d.f','a','x'})
-%     > 1
-%     > 0
-%     > 1
-%     > 0
+%     %|| [true, false, true, false]
 %     %
 %     % this would raise an error if 'c.d.e' is not present
-%     cosmo_isfield(s,'c.d.e',true)
-%     > 1
+%     cosmo_isfield(s,'c.not_present',true)
+%     %|| error('Struct does not have field .not_present')
+%
 %
 % Notes:
 %  - Unlike the builtin 'isfield' function

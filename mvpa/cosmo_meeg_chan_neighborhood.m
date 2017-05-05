@@ -18,8 +18,8 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %                           ft_nbrs(2).neighblabel={'ch1','ch6'}
 %                           ft_nbrs(3).name='ch6'
 %                           ft_nbrs(3).neighblabel={'ch1','ch2'}
-%                           ft_nbrs(3).name='ch9'
-%                           ft_nbrs(3).neighblabel={'ch1'}
+%                           ft_nbrs(4).name='ch9'
+%                           ft_nbrs(4).neighblabel={'ch1'}
 %   'label', lab        Optional labels to return in output, one of:
 %                       'layout'    : determine neighbors based on layout
 %                                     associated with ds (default). All
@@ -62,47 +62,47 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     nbrhood=cosmo_meeg_chan_neighborhood(ds,...
 %                            'chantype','meg_planar','count',4);
 %     cosmo_disp(nbrhood,'edgeitems',1);
-%     > .neighbors
-%     >   { [ 2  ...  2e+03 ]@1x28
-%     >                 :
-%     >     [ 149  ...  2.14e+03 ]@1x28 }@204x1
-%     > .fa
-%     >   .chan
-%     >     [ 1  ...  204 ]@1x204
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'chan' }
-%     >     .values
-%     >       { { 'MEG0113' ... 'MEG2643'   }@1x204 }
-%     >   .meeg
-%     >     .samples_type
-%     >       'timelock'
-%     >     .samples_field
-%     >       'trial'
-%     >     .samples_label
-%     >       'rpt'
-%     > .origin
-%     >   .fa
-%     >     .chan
-%     >       [ 1  ...  306 ]@1x2142
-%     >     .time
-%     >       [ 1  ...  7 ]@1x2142
-%     >   .a
-%     >     .fdim
-%     >       .labels
-%     >         { 'chan'
-%     >           'time' }
-%     >       .values
-%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
-%     >           [ -0.2  ...  0.1 ]@1x7                }
-%     >     .meeg
-%     >       .samples_type
-%     >         'timelock'
-%     >       .samples_field
-%     >         'trial'
-%     >       .samples_label
-%     >         'rpt'
+%     %|| .neighbors
+%     %||   { [ 2  ...  2e+03 ]@1x28
+%     %||                 :
+%     %||     [ 149  ...  2.14e+03 ]@1x28 }@204x1
+%     %|| .fa
+%     %||   .chan
+%     %||     [ 1  ...  204 ]@1x204
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'chan' }
+%     %||     .values
+%     %||       { { 'MEG0113' ... 'MEG2643'   }@1x204 }
+%     %||   .meeg
+%     %||     .samples_type
+%     %||       'timelock'
+%     %||     .samples_field
+%     %||       'trial'
+%     %||     .samples_label
+%     %||       'rpt'
+%     %|| .origin
+%     %||   .fa
+%     %||     .chan
+%     %||       [ 1  ...  306 ]@1x2142
+%     %||     .time
+%     %||       [ 1  ...  7 ]@1x2142
+%     %||   .a
+%     %||     .fdim
+%     %||       .labels
+%     %||         { 'chan'
+%     %||           'time' }
+%     %||       .values
+%     %||         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     %||           [ -0.2  ...  0.1 ]@1x7                }
+%     %||     .meeg
+%     %||       .samples_type
+%     %||         'timelock'
+%     %||       .samples_field
+%     %||         'trial'
+%     %||       .samples_label
+%     %||         'rpt'
 %
 %     % get neighbors with radius of .1 for
 %     % planar neuromag306 channels, but with the center labels
@@ -113,47 +113,47 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     nbrhood=cosmo_meeg_chan_neighborhood(ds,...
 %                       'chantype','meg_combined_from_planar','radius',.1);
 %     cosmo_disp(nbrhood,'edgeitems',1);
-%     > .neighbors
-%     >   { [ 2  ...  2e+03 ]@1x42
-%     >                 :
-%     >     [ 149  ...  2.14e+03 ]@1x56 }@102x1
-%     > .fa
-%     >   .chan
-%     >     [ 1  ...  102 ]@1x102
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'chan' }
-%     >     .values
-%     >       { { 'MEG0112+0113' ... 'MEG2642+2643'   }@1x102 }
-%     >   .meeg
-%     >     .samples_type
-%     >       'timelock'
-%     >     .samples_field
-%     >       'trial'
-%     >     .samples_label
-%     >       'rpt'
-%     > .origin
-%     >   .fa
-%     >     .chan
-%     >       [ 1  ...  306 ]@1x2142
-%     >     .time
-%     >       [ 1  ...  7 ]@1x2142
-%     >   .a
-%     >     .fdim
-%     >       .labels
-%     >         { 'chan'
-%     >           'time' }
-%     >       .values
-%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
-%     >           [ -0.2  ...  0.1 ]@1x7                }
-%     >     .meeg
-%     >       .samples_type
-%     >         'timelock'
-%     >       .samples_field
-%     >         'trial'
-%     >       .samples_label
-%     >         'rpt'
+%     %|| .neighbors
+%     %||   { [ 2  ...  2e+03 ]@1x42
+%     %||                 :
+%     %||     [ 149  ...  2.14e+03 ]@1x56 }@102x1
+%     %|| .fa
+%     %||   .chan
+%     %||     [ 1  ...  102 ]@1x102
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'chan' }
+%     %||     .values
+%     %||       { { 'MEG0112+0113' ... 'MEG2642+2643'   }@1x102 }
+%     %||   .meeg
+%     %||     .samples_type
+%     %||       'timelock'
+%     %||     .samples_field
+%     %||       'trial'
+%     %||     .samples_label
+%     %||       'rpt'
+%     %|| .origin
+%     %||   .fa
+%     %||     .chan
+%     %||       [ 1  ...  306 ]@1x2142
+%     %||     .time
+%     %||       [ 1  ...  7 ]@1x2142
+%     %||   .a
+%     %||     .fdim
+%     %||       .labels
+%     %||         { 'chan'
+%     %||           'time' }
+%     %||       .values
+%     %||         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     %||           [ -0.2  ...  0.1 ]@1x7                }
+%     %||     .meeg
+%     %||       .samples_type
+%     %||         'timelock'
+%     %||       .samples_field
+%     %||         'trial'
+%     %||       .samples_label
+%     %||         'rpt'
 %
 %     % As above, but combine the two types of channels
 %     % Here the axial channels only have axial neighbors, and the planar
@@ -166,47 +166,47 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     nbrhood=cosmo_meeg_chan_neighborhood(ds,...
 %                            'chantype','all_combined','count',10);
 %     cosmo_disp(nbrhood,'edgeitems',1);
-%     > .neighbors
-%     >   { [ 1  ...  2.07e+03 ]@1x70
-%     >                 :
-%     >     [ 71  ...  2.14e+03 ]@1x140 }@204x1
-%     > .fa
-%     >   .chan
-%     >     [ 1  ...  204 ]@1x204
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'chan' }
-%     >     .values
-%     >       { { 'MEG0111' ... 'MEG2642+2643'   }@1x204 }
-%     >   .meeg
-%     >     .samples_type
-%     >       'timelock'
-%     >     .samples_field
-%     >       'trial'
-%     >     .samples_label
-%     >       'rpt'
-%     > .origin
-%     >   .fa
-%     >     .chan
-%     >       [ 1  ...  306 ]@1x2142
-%     >     .time
-%     >       [ 1  ...  7 ]@1x2142
-%     >   .a
-%     >     .fdim
-%     >       .labels
-%     >         { 'chan'
-%     >           'time' }
-%     >       .values
-%     >         { { <char>@1x7 ... <char>@1x7   }@1x306
-%     >           [ -0.2  ...  0.1 ]@1x7                }
-%     >     .meeg
-%     >       .samples_type
-%     >         'timelock'
-%     >       .samples_field
-%     >         'trial'
-%     >       .samples_label
-%     >         'rpt'
+%     %|| .neighbors
+%     %||   { [ 1  ...  2.07e+03 ]@1x70
+%     %||                 :
+%     %||     [ 71  ...  2.14e+03 ]@1x140 }@204x1
+%     %|| .fa
+%     %||   .chan
+%     %||     [ 1  ...  204 ]@1x204
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'chan' }
+%     %||     .values
+%     %||       { { 'MEG0111' ... 'MEG2642+2643'   }@1x204 }
+%     %||   .meeg
+%     %||     .samples_type
+%     %||       'timelock'
+%     %||     .samples_field
+%     %||       'trial'
+%     %||     .samples_label
+%     %||       'rpt'
+%     %|| .origin
+%     %||   .fa
+%     %||     .chan
+%     %||       [ 1  ...  306 ]@1x2142
+%     %||     .time
+%     %||       [ 1  ...  7 ]@1x2142
+%     %||   .a
+%     %||     .fdim
+%     %||       .labels
+%     %||         { 'chan'
+%     %||           'time' }
+%     %||       .values
+%     %||         { { <char>@1x7 ... <char>@1x7   }@1x306
+%     %||           [ -0.2  ...  0.1 ]@1x7                }
+%     %||     .meeg
+%     %||       .samples_type
+%     %||         'timelock'
+%     %||       .samples_field
+%     %||         'trial'
+%     %||       .samples_label
+%     %||         'rpt'
 %
 %
 % Notes:

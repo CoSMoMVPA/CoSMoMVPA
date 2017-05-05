@@ -37,67 +37,67 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
 %     % get layout for the planar channels
 %     pl_layout=cosmo_meeg_find_layout(ds,'chantype','meg_planar');
 %     cosmo_disp(pl_layout.label)
-%     > { 'MEG0113'
-%     >   'MEG0112'
-%     >   'MEG0122'
-%     >      :
-%     >   'MEG2643'
-%     >   'COMNT'
-%     >   'SCALE'   }@206x1
+%     %|| { 'MEG0113'
+%     %||   'MEG0112'
+%     %||   'MEG0122'
+%     %||      :
+%     %||   'MEG2643'
+%     %||   'COMNT'
+%     %||   'SCALE'   }@206x1
 %     cosmo_disp([pl_layout.pos pl_layout.width pl_layout.height])
-%     > [ -0.408     0.253    0.0323    0.0332
-%     >   -0.408     0.284    0.0323    0.0332
-%     >   -0.328     0.285    0.0323    0.0332
-%     >      :         :         :         :
-%     >    0.373    -0.082    0.0323    0.0332
-%     >    -0.45     -0.45    0.0323    0.0332
-%     >     0.45     -0.45    0.0323    0.0332 ]@206x4
+%     %|| [ -0.408     0.253    0.0323    0.0332
+%     %||   -0.408     0.284    0.0323    0.0332
+%     %||   -0.328     0.285    0.0323    0.0332
+%     %||      :         :         :         :
+%     %||    0.373    -0.082    0.0323    0.0332
+%     %||    -0.45     -0.45    0.0323    0.0332
+%     %||     0.45     -0.45    0.0323    0.0332 ]@206x4
 %     pl_layout.name
-%     > neuromag306planar.lay
+%     %|| 'neuromag306planar.lay'
 %     %
 %     % get layout for axial (magnetometer) channels
 %     mag_layout=cosmo_meeg_find_layout(ds,'chantype','meg_axial');
 %     cosmo_disp(mag_layout.label);
-%     > { 'MEG0111'
-%     >   'MEG0121'
-%     >   'MEG0131'
-%     >      :
-%     >   'MEG2641'
-%     >   'COMNT'
-%     >   'SCALE'   }@104x1
+%     %|| { 'MEG0111'
+%     %||   'MEG0121'
+%     %||   'MEG0131'
+%     %||      :
+%     %||   'MEG2641'
+%     %||   'COMNT'
+%     %||   'SCALE'   }@104x1
 %     %
 %     % get layout for planar channels, but add a 'parent' layout which has the
 %     % combined_planar channels
 %     combined_from_planar_layout=cosmo_meeg_find_layout(ds,'chantype',...
 %                                             'meg_combined_from_planar');
 %     cosmo_disp(combined_from_planar_layout.label);
-%     > { 'MEG0113'
-%     >   'MEG0112'
-%     >   'MEG0122'
-%     >      :
-%     >   'MEG2643'
-%     >   'COMNT'
-%     >   'SCALE'   }@206x1
+%     %|| { 'MEG0113'
+%     %||   'MEG0112'
+%     %||   'MEG0122'
+%     %||      :
+%     %||   'MEG2643'
+%     %||   'COMNT'
+%     %||   'SCALE'   }@206x1
 %     cosmo_disp(combined_from_planar_layout.parent.label);
-%     > { 'MEG0112+0113'
-%     >   'MEG0122+0123'
-%     >   'MEG0132+0133'
-%     >         :
-%     >   'MEG2642+2643'
-%     >   'COMNT'
-%     >   'SCALE'        }@104x1
+%     %|| { 'MEG0112+0113'
+%     %||   'MEG0122+0123'
+%     %||   'MEG0132+0133'
+%     %||         :
+%     %||   'MEG2642+2643'
+%     %||   'COMNT'
+%     %||   'SCALE'        }@104x1
 %     cosmo_disp(combined_from_planar_layout.parent.child_label);
-%     > { { 'MEG0112'
-%     >     'MEG0113' }
-%     >   { 'MEG0122'
-%     >     'MEG0123' }
-%     >   { 'MEG0132'
-%     >     'MEG0133' }
-%     >               :
-%     >   { 'MEG2642'
-%     >     'MEG2643' }
-%     >   {  }
-%     >   {  }          }@104x1
+%     %|| { { 'MEG0112'
+%     %||     'MEG0113' }
+%     %||   { 'MEG0122'
+%     %||     'MEG0123' }
+%     %||   { 'MEG0132'
+%     %||     'MEG0133' }
+%     %||               :
+%     %||   { 'MEG2642'
+%     %||     'MEG2643' }
+%     %||   {  }
+%     %||   {  }          }@104x1
 %
 % See also: ft_prepare_neighbors, cosmo_meeg_chan_neighbors,
 %           cosmo_meeg_chan_neighborhood

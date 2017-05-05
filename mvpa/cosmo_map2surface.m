@@ -38,21 +38,24 @@ function s=cosmo_map2surface(ds, fn, varargin)
 %                       NIML data, an xff object, or a GIFTI object.
 %
 % Examples:
+%     % (this example requires the AFNI Matlab toolbox)
+%     cosmo_skip_test_if_no_external('afni');
+%     %
 %     ds=cosmo_synthetic_dataset('type','surface');
 %     %
 %     % convert to AFNIML NIML format
 %     % (to store a file to disc, use a filename as the second argument)
 %     niml=cosmo_map2surface(ds,'-niml_dset');
 %     cosmo_disp(niml);
-%     > .node_indices
-%     >   [ 0         1         2         3         4         5 ]
-%     > .data
-%     >   [   2.03     0.584     -1.44    -0.518      1.19     -1.33
-%     >     -0.892      1.84    -0.262      2.34    -0.204      2.72
-%     >     -0.826      1.17     -1.92     0.441    -0.209     0.148
-%     >       1.16    -0.848      3.09      1.86      1.76     0.502
-%     >       1.16      3.49     -1.37     0.479    -0.955      3.41
-%     >      -1.29    -0.199      1.73    0.0832     0.501     -0.48 ]
+%     %|| .node_indices
+%     %||   [ 0         1         2         3         4         5 ]
+%     %|| .data
+%     %||   [   2.03     0.584     -1.44    -0.518      1.19     -1.33
+%     %||     -0.892      1.84    -0.262      2.34    -0.204      2.72
+%     %||     -0.826      1.17     -1.92     0.441    -0.209     0.148
+%     %||       1.16    -0.848      3.09      1.86      1.76     0.502
+%     %||       1.16      3.49     -1.37     0.479    -0.955      3.41
+%     %||      -1.29    -0.199      1.73    0.0832     0.501     -0.48 ]
 %
 % Notes:
 %   - this function is intended for datasets with surface data, i.e. with

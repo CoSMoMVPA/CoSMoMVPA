@@ -20,11 +20,11 @@ function predicted=cosmo_classify_nn(samples_train, targets_train, samples_test,
 %     pred=cosmo_classify_nn(tr.samples,tr.sa.targets,te.samples,struct);
 %     % show targets and predicted labels (100% accuracy)
 %     disp([te.sa.targets pred])
-%     >      1     1
-%     >      2     2
-%     >      3     3
-%     >      4     4
-%     >      5     5
+%     %||      1     1
+%     %||      2     2
+%     %||      3     3
+%     %||      4     4
+%     %||      5     5
 %
 % See also: cosmo_crossvalidate, cosmo_crossvalidation_measure
 %

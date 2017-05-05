@@ -25,45 +25,45 @@ function [cell_indices, unique_values]=cosmo_index_unique(values)
 % Examples:
 %     [i,u]=cosmo_index_unique({[3 2 2 2 1],[3 2 3 3 3]});
 %     cosmo_disp(i);
-%     > { [ 5 ]
-%     >   [ 2 ]
-%     >   [ 3
-%     >     4 ]
-%     >   [ 1 ] }
+%     %|| { [ 5 ]
+%     %||   [ 2 ]
+%     %||   [ 3
+%     %||     4 ]
+%     %||   [ 1 ] }
 %     cosmo_disp(u);
-%     > { [ 1    [ 3
-%     >     2      2
-%     >     2      3
-%     >     3 ]    3 ] }
+%     %|| { [ 1    [ 3
+%     %||     2      2
+%     %||     2      3
+%     %||     3 ]    3 ] }
 %
 %     % the same operation in matrix operation (input is transposed)
 %     [i,u]=cosmo_index_unique([3 2 2 2 1;3 2 3 3 3]');
 %     cosmo_disp(i);
-%     > { [ 5 ]
-%     >   [ 2 ]
-%     >   [ 3
-%     >     4 ]
-%     >   [ 1 ] }
+%     %|| { [ 5 ]
+%     %||   [ 2 ]
+%     %||   [ 3
+%     %||     4 ]
+%     %||   [ 1 ] }
 %     cosmo_disp(u);
-%     > [ 1         3
-%     >   2         2
-%     >   2         3
-%     >   3         3 ]
+%     %|| [ 1         3
+%     %||   2         2
+%     %||   2         3
+%     %||   3         3 ]
 %
 %     % it also works if (some of the) input contains cell strings
 %     [i,u]=cosmo_index_unique({{'ccc','bb','bb','bb','a'},...
 %                                 [4 3 4 4 4]});
 %     cosmo_disp(i);
-%     > { [ 5 ]
-%     >   [ 2 ]
-%     >   [ 3
-%     >     4 ]
-%     >   [ 1 ] }
+%     %|| { [ 5 ]
+%     %||   [ 2 ]
+%     %||   [ 3
+%     %||     4 ]
+%     %||   [ 1 ] }
 %     cosmo_disp(u);
-%     > { { 'a'      [ 4
-%     >     'bb'       3
-%     >     'bb'       4
-%     >     'ccc' }    4 ] }
+%     %|| { { 'a'      [ 4
+%     %||     'bb'       3
+%     %||     'bb'       4
+%     %||     'ccc' }    4 ] }
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

@@ -27,63 +27,63 @@ function senstypes=cosmo_meeg_senstype_collection()
 %     %
 %     % show neuromag306 MEG magnetometers
 %     cosmo_disp(senstypes.neuromag306alt_mag)
-%     > .label
-%     >   { 'MEG0111'
-%     >     'MEG0121'
-%     >     'MEG0131'
-%     >        :
-%     >     'MEG2621'
-%     >     'MEG2631'
-%     >     'MEG2641' }@102x1
-%     > .sens
-%     >   'neuromag306'
-%     > .type
-%     >   'meg_axial'
+%     %|| .label
+%     %||   { 'MEG0111'
+%     %||     'MEG0121'
+%     %||     'MEG0131'
+%     %||        :
+%     %||     'MEG2621'
+%     %||     'MEG2631'
+%     %||     'MEG2641' }@102x1
+%     %|| .sens
+%     %||   'neuromag306'
+%     %|| .type
+%     %||   'meg_axial'
 %     %
 %     % show neuromag306 MEG planar gradiometers
 %     cosmo_disp(senstypes.neuromag306alt_planar)
-%     > .label
-%     >   { 'MEG0112'  'MEG0113'
-%     >     'MEG0122'  'MEG0123'
-%     >     'MEG0132'  'MEG0133'
-%     >        :          :
-%     >     'MEG2622'  'MEG2623'
-%     >     'MEG2632'  'MEG2633'
-%     >     'MEG2642'  'MEG2643' }@102x2
-%     > .sens
-%     >   'neuromag306'
-%     > .type
-%     >   'meg_planar'
+%     %|| .label
+%     %||   { 'MEG0112'  'MEG0113'
+%     %||     'MEG0122'  'MEG0123'
+%     %||     'MEG0132'  'MEG0133'
+%     %||        :          :
+%     %||     'MEG2622'  'MEG2623'
+%     %||     'MEG2632'  'MEG2633'
+%     %||     'MEG2642'  'MEG2643' }@102x2
+%     %|| .sens
+%     %||   'neuromag306'
+%     %|| .type
+%     %||   'meg_planar'
 %     %
 %     % show neuromag306 MEG combined planar gradiometers
 %     cosmo_disp(senstypes.neuromag306alt_planar_combined)
-%     > .label
-%     >   { 'MEG0112+0113'
-%     >     'MEG0122+0123'
-%     >     'MEG0132+0133'
-%     >           :
-%     >     'MEG2622+2623'
-%     >     'MEG2632+2633'
-%     >     'MEG2642+2643' }@102x1
-%     > .sens
-%     >   'neuromag306'
-%     > .type
-%     >   'meg_planar_combined'
+%     %|| .label
+%     %||   { 'MEG0112+0113'
+%     %||     'MEG0122+0123'
+%     %||     'MEG0132+0133'
+%     %||           :
+%     %||     'MEG2622+2623'
+%     %||     'MEG2632+2633'
+%     %||     'MEG2642+2643' }@102x1
+%     %|| .sens
+%     %||   'neuromag306'
+%     %|| .type
+%     %||   'meg_planar_combined'
 %     %
 %     % show BTI 148 planar gradiometers
 %     cosmo_disp(senstypes.bti148_planar)
-%     > .label
-%     >   { 'A1_dH'    'A1_dV'
-%     >     'A2_dH'    'A2_dV'
-%     >     'A3_dH'    'A3_dV'
-%     >        :          :
-%     >     'A146_dH'  'A146_dV'
-%     >     'A147_dH'  'A147_dV'
-%     >     'A148_dH'  'A148_dV' }@148x2
-%     > .sens
-%     >   'bti148'
-%     > .type
-%     >   'meg_planar'
+%     %|| .label
+%     %||   { 'A1_dH'    'A1_dV'
+%     %||     'A2_dH'    'A2_dV'
+%     %||     'A3_dH'    'A3_dV'
+%     %||        :          :
+%     %||     'A146_dH'  'A146_dV'
+%     %||     'A147_dH'  'A147_dV'
+%     %||     'A148_dH'  'A148_dV' }@148x2
+%     %|| .sens
+%     %||   'bti148'
+%     %|| .type
+%     %||   'meg_planar'
 %
 % Note:
 %   - this function requires FieldTrip, as it uses its collection of

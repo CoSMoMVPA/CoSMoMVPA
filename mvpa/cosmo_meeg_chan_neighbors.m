@@ -41,7 +41,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %                                        'sens','eeg1010','size','big');
 %     % show all channel labels
 %     cosmo_disp(ds.a.fdim.values{1});
-%     > { 'TP10'  'TP7'  'TP8' ... 'A2'  'M1'  'M2'   }@1x94
+%     %|| { 'TP10'  'TP7'  'TP8' ... 'A2'  'M1'  'M2'   }@1x94
 %     %
 %     % simulate the case where some channels are missing; here, every 7-th
 %     % channels is removed
@@ -50,7 +50,7 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %
 %     % show remaining channel labels
 %     cosmo_disp(ds.a.fdim.values{1});
-%     > { 'TP10'  'TP8'  'TP9' ... 'A1'  'A2'  'M2'   }@1x80
+%     %|| { 'TP10'  'TP8'  'TP9' ... 'A1'  'A2'  'M2'   }@1x80
 %     %
 %     % get neighbors for the channel layout associated with this
 %     % dataset. This layout ('EEG1010.lay') has 88 channel positions,
@@ -58,20 +58,20 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     % 'SCALE'
 %     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3);
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@86x1
-%     >    (1,1) .label
-%     >            'Fp1'
-%     >          .neighblabel
-%     >            { 'Fp1'
-%     >               :
-%     >              'FC1' }@21x1
-%     >      :           :
-%     >    (86,1).label
-%     >            'I2'
-%     >          .neighblabel
-%     >            { 'P4'
-%     >               :
-%     >              'I2' }@16x1
+%     %|| <struct>@86x1
+%     %||    (1,1) .label
+%     %||            'Fp1'
+%     %||          .neighblabel
+%     %||            { 'Fp1'
+%     %||               :
+%     %||              'FC1' }@21x1
+%     %||      :           :
+%     %||    (86,1).label
+%     %||            'I2'
+%     %||          .neighblabel
+%     %||            { 'P4'
+%     %||               :
+%     %||              'I2' }@16x1
 %     %
 %     % since the dataset has only 80 channels, 74 of which are in the
 %     % layout, using the dataset's labels only (with the 'labels'
@@ -80,20 +80,20 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     nbrs=cosmo_meeg_chan_neighbors(ds,'radius',.3,...
 %                                         'label','dataset');
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@74x1
-%     >    (1,1) .label
-%     >            'Fp1'
-%     >          .neighblabel
-%     >            { 'Fp1'
-%     >               :
-%     >              'FC1' }@21x1
-%     >      :           :
-%     >    (74,1).label
-%     >            'I2'
-%     >          .neighblabel
-%     >            { 'P4'
-%     >               :
-%     >              'I2' }@16x1
+%     %|| <struct>@74x1
+%     %||    (1,1) .label
+%     %||            'Fp1'
+%     %||          .neighblabel
+%     %||            { 'Fp1'
+%     %||               :
+%     %||              'FC1' }@21x1
+%     %||      :           :
+%     %||    (74,1).label
+%     %||            'I2'
+%     %||          .neighblabel
+%     %||            { 'P4'
+%     %||               :
+%     %||              'I2' }@16x1
 %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels
@@ -101,22 +101,22 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                     'chantype','meg_planar','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@204x1
-%     >    (1,1)  .label
-%     >             'MEG0113'
-%     >           .neighblabel
-%     >             { 'MEG0113'
-%     >               'MEG0112'
-%     >               'MEG0122'
-%     >               'MEG0133' }
-%     >      :            :
-%     >    (204,1).label
-%     >             'MEG2643'
-%     >           .neighblabel
-%     >             { 'MEG2423'
-%     >               'MEG2422'
-%     >               'MEG2642'
-%     >               'MEG2643' }
+%     %|| <struct>@204x1
+%     %||    (1,1)  .label
+%     %||             'MEG0113'
+%     %||           .neighblabel
+%     %||             { 'MEG0113'
+%     %||               'MEG0112'
+%     %||               'MEG0122'
+%     %||               'MEG0133' }
+%     %||      :            :
+%     %||    (204,1).label
+%     %||             'MEG2643'
+%     %||           .neighblabel
+%     %||             { 'MEG2423'
+%     %||               'MEG2422'
+%     %||               'MEG2642'
+%     %||               'MEG2643' }
 %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels, but with the center labels
@@ -127,20 +127,20 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                     'chantype','meg_combined_from_planar','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@102x1
-%     >    (1,1)  .label
-%     >             'MEG0112+0113'
-%     >           .neighblabel
-%     >             { 'MEG0112'
-%     >                  :
-%     >               'MEG0343' }@8x1
-%     >      :              :
-%     >    (102,1).label
-%     >             'MEG2642+2643'
-%     >           .neighblabel
-%     >             { 'MEG2422'
-%     >                  :
-%     >               'MEG2643' }@8x1
+%     %|| <struct>@102x1
+%     %||    (1,1)  .label
+%     %||             'MEG0112+0113'
+%     %||           .neighblabel
+%     %||             { 'MEG0112'
+%     %||                  :
+%     %||               'MEG0343' }@8x1
+%     %||      :              :
+%     %||    (102,1).label
+%     %||             'MEG2642+2643'
+%     %||           .neighblabel
+%     %||             { 'MEG2422'
+%     %||                  :
+%     %||               'MEG2643' }@8x1
 %
 %     % As above, but now use both the axial and planar channels.
 %     % Here the axial channels only have axial neighbors, and the planar
@@ -149,22 +149,22 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                            'chantype','all','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@306x1
-%     >    (1,1)  .label
-%     >             'MEG0111'
-%     >           .neighblabel
-%     >             { 'MEG0111'
-%     >               'MEG0121'
-%     >               'MEG0131'
-%     >               'MEG0341' }
-%     >      :            :
-%     >    (306,1).label
-%     >             'MEG2643'
-%     >           .neighblabel
-%     >             { 'MEG2423'
-%     >               'MEG2422'
-%     >               'MEG2642'
-%     >               'MEG2643' }
+%     %|| <struct>@306x1
+%     %||    (1,1)  .label
+%     %||             'MEG0111'
+%     %||           .neighblabel
+%     %||             { 'MEG0111'
+%     %||               'MEG0121'
+%     %||               'MEG0131'
+%     %||               'MEG0341' }
+%     %||      :            :
+%     %||    (306,1).label
+%     %||             'MEG2643'
+%     %||           .neighblabel
+%     %||             { 'MEG2423'
+%     %||               'MEG2422'
+%     %||               'MEG2642'
+%     %||               'MEG2643' }
 %
 %     % As above, but now use both the axial and planar channels with
 %     % center labels for the planar channels from the combined_planar set.
@@ -175,21 +175,21 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     nbrs=cosmo_meeg_chan_neighbors(ds,...
 %                            'chantype','all_combined','count',4);
 %     cosmo_disp(nbrs,'edgeitems',1);
-%     > <struct>@204x1
-%     >    (1,1)  .label
-%     >             'MEG0111'
-%     >           .neighblabel
-%     >             { 'MEG0111'
-%     >               'MEG0121'
-%     >               'MEG0131'
-%     >               'MEG0341' }
-%     >      :              :
-%     >    (204,1).label
-%     >             'MEG2642+2643'
-%     >           .neighblabel
-%     >             { 'MEG2422'
-%     >                  :
-%     >               'MEG2643' }@8x1
+%     %|| <struct>@204x1
+%     %||    (1,1)  .label
+%     %||             'MEG0111'
+%     %||           .neighblabel
+%     %||             { 'MEG0111'
+%     %||               'MEG0121'
+%     %||               'MEG0131'
+%     %||               'MEG0341' }
+%     %||      :              :
+%     %||    (204,1).label
+%     %||             'MEG2642+2643'
+%     %||           .neighblabel
+%     %||             { 'MEG2422'
+%     %||                  :
+%     %||               'MEG2643' }@8x1
 %
 %
 % Notes:

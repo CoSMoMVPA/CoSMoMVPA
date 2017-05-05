@@ -23,23 +23,23 @@ function db=cosmo_meeg_layout_collection()
 %     % show neuromag306 combined planar layout (with 102 channels)
 %     pl_layout=layouts{i};
 %     cosmo_disp(pl_layout.label)
-%     > { 'MEG0112+0113'
-%     >   'MEG0122+0123'
-%     >   'MEG0132+0133'
-%     >         :
-%     >   'MEG2642+2643'
-%     >   'COMNT'
-%     >   'SCALE'        }@104x1
+%     %|| { 'MEG0112+0113'
+%     %||   'MEG0122+0123'
+%     %||   'MEG0132+0133'
+%     %||         :
+%     %||   'MEG2642+2643'
+%     %||   'COMNT'
+%     %||   'SCALE'        }@104x1
 %     cosmo_disp([pl_layout.pos pl_layout.width pl_layout.height])
-%     > [ -0.408     0.273    0.0645    0.0712
-%     >   -0.328     0.306    0.0645    0.0712
-%     >   -0.377     0.179    0.0645    0.0712
-%     >      :         :         :         :
-%     >    0.373    -0.104    0.0645    0.0712
-%     >    -0.45     -0.45    0.0645    0.0712
-%     >     0.45     -0.45    0.0645    0.0712 ]@104x4
+%     %|| [ -0.408     0.273    0.0645    0.0712
+%     %||   -0.328     0.306    0.0645    0.0712
+%     %||   -0.377     0.179    0.0645    0.0712
+%     %||      :         :         :         :
+%     %||    0.373    -0.104    0.0645    0.0712
+%     %||    -0.45     -0.45    0.0645    0.0712
+%     %||     0.45     -0.45    0.0645    0.0712 ]@104x4
 %     pl_layout.name
-%     > neuromag306cmb.lay
+%     %|| 'neuromag306cmb.lay'
 %
 % Note:
 %   - this function requires FieldTrip, as it uses its collection of

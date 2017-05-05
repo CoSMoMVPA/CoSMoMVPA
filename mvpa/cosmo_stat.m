@@ -49,49 +49,49 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.targets=ones(12,1);
 %     ds.sa.chunks=(1:12)';
 %     cosmo_disp(ds.samples);
-%     >   [ -2         4        -3
-%     >      5        -2         4
-%     >     -1         5        -2
-%     >      :         :         :
-%     >      9         2         8
-%     >      3         9         2
-%     >     -3         3         9 ]@12x3
+%     %||   [ -2         4        -3
+%     %||      5        -2         4
+%     %||     -1         5        -2
+%     %||      :         :         :
+%     %||      9         2         8
+%     %||      3         9         2
+%     %||     -3         3         9 ]@12x3
 %     %
 %     % run one-sample t-test
 %     s=cosmo_stat(ds,'t');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 2.49      3.36      2.55 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Ttest(11)' }
+%     %|| .samples
+%     %||   [ 2.49      3.36      2.55 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Ttest(11)' }
 %     %
 %     % compute z-score of t-test
 %     s=cosmo_stat(ds,'t','z');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 2.17      2.73      2.21 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Zscore()' }
+%     %|| .samples
+%     %||   [ 2.17      2.73      2.21 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Zscore()' }
 %     %
 %     % compute (two-tailed) p-value of t-test
 %     s=cosmo_stat(ds,'t','p');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.03   0.00633    0.0268 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.03   0.00633    0.0268 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %     %
 %     % compute left-tailed p-value of t-test
 %     s=cosmo_stat(ds,'t','left');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.985     0.997     0.987 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.985     0.997     0.987 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %
 %     % one-way ANOVA
 %     % each observation is independent and thus each chunk is unique;
@@ -102,19 +102,19 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.chunks=(1:12)';
 %     s=cosmo_stat(ds,'F');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.472    0.0638      0.05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Ftest(2,9)' }
+%     %|| .samples
+%     %||   [ 0.472    0.0638      0.05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Ftest(2,9)' }
 %     % compute z-score
 %     s=cosmo_stat(ds,'F','z'); % convert to z-score
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ -0.354     -1.54     -1.66 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Zscore()' }
+%     %|| .samples
+%     %||   [ -0.354     -1.54     -1.66 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Zscore()' }
 %
 %
 %     % two-sample t-test
@@ -126,21 +126,21 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.chunks=(1:12)';
 %     s=cosmo_stat(ds,'t2','p'); % return p-value
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.0307  0.000242  7.07e-05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.0307  0.000242  7.07e-05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %     %
 %     % for illustration, this test gives the same p-values as a
 %     % repeated measures ANOVA
 %     s=cosmo_stat(ds,'F','p');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.0307  0.000242  7.07e-05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.0307  0.000242  7.07e-05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %
 % Notes:
 %  - If output_stat_name is not provided or empty, then this function runs

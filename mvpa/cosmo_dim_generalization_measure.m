@@ -67,17 +67,17 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     %
 %     % the output has train_time and test_time as sample dimensions
 %     cosmo_disp(dgm_ds.a)
-%     > .sdim
-%     >   .labels
-%     >     { 'train_time'  'test_time' }
-%     >   .values
-%     >     { [  -0.2        [  -0.2
-%     >         -0.15          -0.15
-%     >          -0.1           -0.1
-%     >           :              :
-%     >             0              0
-%     >          0.05           0.05
-%     >           0.1 ]@7x1      0.1 ]@7x1 }
+%     %|| .sdim
+%     %||   .labels
+%     %||     { 'train_time'  'test_time' }
+%     %||   .values
+%     %||     { [  -0.2        [  -0.2
+%     %||         -0.15          -0.15
+%     %||          -0.1           -0.1
+%     %||           :              :
+%     %||             0              0
+%     %||          0.05           0.05
+%     %||           0.1 ]@7x1      0.1 ]@7x1 }
 %     %
 %     % Searchlight example
 %     %
@@ -99,25 +99,25 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     % the output has train_time and test_time as sample dimensions,
 %     % and chan as feature dimension
 %     cosmo_disp(dgm_sl_ds.a,'edgeitems',1)
-%     > .fdim
-%     >   .labels
-%     >     { 'chan' }
-%     >   .values
-%     >     { { 'MEG0112+0113' ... 'MEG0712+0713'   }@1x7 }
-%     > .meeg
-%     >   .samples_type
-%     >     'timelock'
-%     >   .samples_field
-%     >     'trial'
-%     >   .samples_label
-%     >     'rpt'
-%     > .sdim
-%     >   .labels
-%     >     { 'train_time'  'test_time' }
-%     >   .values
-%     >     { [ -0.2        [ -0.2
-%     >           :             :
-%     >          0.1 ]@7x1     0.1 ]@7x1 }
+%     %|| .fdim
+%     %||   .labels
+%     %||     { 'chan' }
+%     %||   .values
+%     %||     { { 'MEG0112+0113' ... 'MEG0712+0713'   }@1x7 }
+%     %|| .meeg
+%     %||   .samples_type
+%     %||     'timelock'
+%     %||   .samples_field
+%     %||     'trial'
+%     %||   .samples_label
+%     %||     'rpt'
+%     %|| .sdim
+%     %||   .labels
+%     %||     { 'train_time'  'test_time' }
+%     %||   .values
+%     %||     { [ -0.2        [ -0.2
+%     %||           :             :
+%     %||          0.1 ]@7x1     0.1 ]@7x1 }
 %
 %
 % Notes:

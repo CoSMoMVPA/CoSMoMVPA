@@ -36,31 +36,31 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %     % note that chunks=6 ends up in the odd chunks and chunks=7 in the
 %     % even chunks, as 6 [7] is the third [fourth] unique value of chunks.
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 1    [ 3
-%     >       2      4
-%     >       5      6
-%     >       8 ]    7 ] }
-%     > .test_indices
-%     >   { [ 3    [ 1
-%     >       4      2
-%     >       6      5
-%     >       7 ]    8 ] }
-%     >
+%     %|| .train_indices
+%     %||   { [ 1    [ 3
+%     %||       2      4
+%     %||       5      6
+%     %||       8 ]    7 ] }
+%     %|| .test_indices
+%     %||   { [ 3    [ 1
+%     %||       4      2
+%     %||       6      5
+%     %||       7 ]    8 ] }
+%     %||
 %     %
 %     % only half-partition (for correlation-based analysis)
 %     p=cosmo_oddeven_partitioner(ds,'half');
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 1
-%     >       2
-%     >       5
-%     >       8 ] }
-%     > .test_indices
-%     >   { [ 3
-%     >       4
-%     >       6
-%     >       7 ] }
+%     %|| .train_indices
+%     %||   { [ 1
+%     %||       2
+%     %||       5
+%     %||       8 ] }
+%     %|| .test_indices
+%     %||   { [ 3
+%     %||       4
+%     %||       6
+%     %||       7 ] }
 %
 % Notes:
 %   - typically, the 'half' option can be used with

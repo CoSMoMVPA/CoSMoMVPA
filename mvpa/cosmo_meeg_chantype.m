@@ -13,16 +13,21 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %                       the sensor (acquisition) type
 %
 % Example:
+%     % This example requires FieldTrip
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % generate synthetic dataset with meg_planar and meg_axial channels
 %     % as found in the neuromag306 system
 %     ds=cosmo_synthetic_dataset('type','meeg','sens','neuromag306_all',...
 %                     'size','big','nchunks',1,'ntargets',1);
 %     [chantypes,senstypes]=cosmo_meeg_chantype(ds);
 %     cosmo_disp(chantypes,'edgeitems',2);
-%     > { 'meg_axial'  'meg_planar' ... 'meg_planar'  'meg_planar' }@1x306
-%     disp(senstypes)
-%     >      meg_axial: 'neuromag306alt_mag'
-%     >     meg_planar: 'neuromag306alt_planar'
+%     %|| { 'meg_axial'  'meg_planar' ... 'meg_planar' 'meg_planar' }@1x306
+%     cosmo_disp(senstypes,'strlen',inf);
+%     %|| .meg_axial
+%     %||   'neuromag306alt_mag'
+%     %|| .meg_planar
+%     %||   'neuromag306alt_planar'
 %     %
 %     % filter the dataset to only contain the planar channels:
 %     %
@@ -34,15 +39,15 @@ function [chantypes,senstype_mapping]=cosmo_meeg_chantype(ds,varargin)
 %     ds_planar=cosmo_dim_prune(ds_planar);
 %     % the output dataset has only the 204 planar channels left
 %     cosmo_disp(ds_planar.a.fdim,'edgeitems',2);
-%     > .labels
-%     >   { 'chan'
-%     >     'time' }
-%     > .values
-%     >   { { 'MEG0112'  'MEG0113' ... 'MEG2642'  'MEG2643'   }@1x204
-%     >     [ -0.2     -0.15  ...  0.05       0.1 ]@1x7               }
+%     %|| .labels
+%     %||   { 'chan'
+%     %||     'time' }
+%     %|| .values
+%     %||   { { 'MEG0112'  'MEG0113' ... 'MEG2642'  'MEG2643'   }@1x204
+%     %||     [ -0.2     -0.15  ...  0.05       0.1 ]@1x7               }
 %     %
 %     cosmo_disp(ds_planar.fa.chan);
-%     > [ 1         2         3  ...  202       203       204 ]@1x1428
+%     %|| [ 1         2         3  ...  202       203       204 ]@1x1428
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

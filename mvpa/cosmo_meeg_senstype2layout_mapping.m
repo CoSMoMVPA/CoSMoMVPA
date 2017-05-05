@@ -21,68 +21,68 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     % get layout for neuromag306 MEG planar (gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar;
 %     cosmo_disp(layout.label)
-%     > { 'MEG0113'
-%     >   'MEG0112'
-%     >   'MEG0122'
-%     >      :
-%     >   'MEG2643'
-%     >   'COMNT'
-%     >   'SCALE'   }@206x1
+%     %|| { 'MEG0113'
+%     %||   'MEG0112'
+%     %||   'MEG0122'
+%     %||      :
+%     %||   'MEG2643'
+%     %||   'COMNT'
+%     %||   'SCALE'   }@206x1
 %     cosmo_disp([layout.pos layout.width layout.height])
-%     > [ -0.408     0.253    0.0323    0.0332
-%     >   -0.408     0.284    0.0323    0.0332
-%     >   -0.328     0.285    0.0323    0.0332
-%     >      :         :         :         :
-%     >    0.373    -0.082    0.0323    0.0332
-%     >    -0.45     -0.45    0.0323    0.0332
-%     >     0.45     -0.45    0.0323    0.0332 ]@206x4
+%     %|| [ -0.408     0.253    0.0323    0.0332
+%     %||   -0.408     0.284    0.0323    0.0332
+%     %||   -0.328     0.285    0.0323    0.0332
+%     %||      :         :         :         :
+%     %||    0.373    -0.082    0.0323    0.0332
+%     %||    -0.45     -0.45    0.0323    0.0332
+%     %||     0.45     -0.45    0.0323    0.0332 ]@206x4
 %     layout.name
-%     > neuromag306planar.lay
+%     %|| 'neuromag306planar.lay'
 %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for neuromag306 MEG combined planar
 %     % (combined gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar_combined;
 %     cosmo_disp(layout.label)
-%     > { 'MEG0112+0113'
-%     >   'MEG0122+0123'
-%     >   'MEG0132+0133'
-%     >         :
-%     >   'MEG2642+2643'
-%     >   'COMNT'
-%     >   'SCALE'        }@104x1
+%     %|| { 'MEG0112+0113'
+%     %||   'MEG0122+0123'
+%     %||   'MEG0132+0133'
+%     %||         :
+%     %||   'MEG2642+2643'
+%     %||   'COMNT'
+%     %||   'SCALE'        }@104x1
 %     cosmo_disp([layout.pos layout.width layout.height])
-%     > [ -0.408     0.273    0.0645    0.0712
-%     >   -0.328     0.306    0.0645    0.0712
-%     >   -0.377     0.179    0.0645    0.0712
-%     >      :         :         :         :
-%     >    0.373    -0.104    0.0645    0.0712
-%     >    -0.45     -0.45    0.0645    0.0712
-%     >     0.45     -0.45    0.0645    0.0712 ]@104x4
+%     %|| [ -0.408     0.273    0.0645    0.0712
+%     %||   -0.328     0.306    0.0645    0.0712
+%     %||   -0.377     0.179    0.0645    0.0712
+%     %||      :         :         :         :
+%     %||    0.373    -0.104    0.0645    0.0712
+%     %||    -0.45     -0.45    0.0645    0.0712
+%     %||     0.45     -0.45    0.0645    0.0712 ]@104x4
 %     layout.name
-%     > neuromag306cmb.lay
+%     %|| 'neuromag306cmb.lay'
 %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for EEG elec1020
 %     layout=senstype2layout.eeg1020;
 %     cosmo_disp(layout.label)
-%     > { 'Fp1'
-%     >   'Fpz'
-%     >   'Fp2'
-%     >     :
-%     >   'O2'
-%     >   'COMNT'
-%     >   'SCALE' }@23x1
+%     %|| { 'Fp1'
+%     %||   'Fpz'
+%     %||   'Fp2'
+%     %||     :
+%     %||   'O2'
+%     %||   'COMNT'
+%     %||   'SCALE' }@23x1
 %     cosmo_disp([layout.pos layout.width layout.height])
-%     > [ -0.139     0.428     0.125    0.0938
-%     >        0      0.45     0.125    0.0938
-%     >    0.139     0.428     0.125    0.0938
-%     >      :         :         :         :
-%     >    0.139    -0.428     0.125    0.0938
-%     >    -0.45      0.45     0.125    0.0938
-%     >     0.45      0.45     0.125    0.0938 ]@23x4
+%     %|| [ -0.139     0.428     0.125    0.0938
+%     %||        0      0.45     0.125    0.0938
+%     %||    0.139     0.428     0.125    0.0938
+%     %||      :         :         :         :
+%     %||    0.139    -0.428     0.125    0.0938
+%     %||    -0.45      0.45     0.125    0.0938
+%     %||     0.45      0.45     0.125    0.0938 ]@23x4
 %     layout.name
-%     > EEG1020.lay
+%     %|| 'EEG1020.lay'
 %
 % Notes:
 %   - this function requires FieldTrip, as it uses its collection of
