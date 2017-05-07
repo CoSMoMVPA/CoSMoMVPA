@@ -74,6 +74,11 @@ before_install:
     - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
 
+    # retrieve MOdox
+    - rm -rf MOdox
+    - travis_retry git clone -v git://github.com/MOdox/MOdox.git
+    - make -C MOdox install
+
     # optionally retrieve MOcov
     - if [[ "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
           rm -rf MOcov;
