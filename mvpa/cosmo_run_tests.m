@@ -4,7 +4,7 @@ function did_pass=cosmo_run_tests(varargin)
 % did_pass=cosmo_run_tests(['verbose',v]['output',fn])
 %
 % Inputs:
-%   '-verbose'        do not run with verbose output
+%   '-verbose'        run with verbose output
 %   '-logfile',fn     store output in a file named fn (optional, if omitted
 %                     output is written to the terminal window)
 %   'file.m'          run tests in 'file.m'
@@ -22,12 +22,11 @@ function did_pass=cosmo_run_tests(varargin)
 %   cosmo_run_tests('verbose',true,'output','~/mylogfile.txt');
 %
 % Notes:
-%   - Running the documentation tests requires the xUnit framework by
-%     S. Eddings (2009), http://www.mathworks.it/matlabcentral/
-%                         fileexchange/22846-matlab-xunit-test-framework
 %   - Doctest functionality was inspired by T. Smith.
-%   - Unit tests can be run using MOxUnit by N.N. Oosterhof (2015),
+%   - Unit tests can be run using MOxUnit by N.N. Oosterhof (2015-2017),
 %           https://github.com/MOxUnit/MOxUnit
+%   - Documentation tests can be run usxing MOdox by N.N. Oosterhof (2017),
+%           https://github.com/MOdox/MOdox
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -35,125 +34,59 @@ function did_pass=cosmo_run_tests(varargin)
     orig_pwd=pwd();
     pwd_resetter=onCleanup(@()cd(orig_pwd));
 
-    [opt,args]=get_opt(varargin{:});
+    [opt,test_locations,moxunit_args]=get_opt(varargin{:});
 
     run_doctest=~opt.no_doctest;
     run_unittest=~opt.no_unittest;
 
-    has_logfile=~isempty(opt.logfile);
-
-    if has_logfile && run_doctest && run_unittest
-        error('Cannot have logfile with both doctest and unittest');
-    end
-
-    runners={@run_doctest_helper,@run_unittest_helper};
-
     orig_path=path();
     path_resetter=onCleanup(@()path(orig_path));
 
-    did_pass=all(cellfun(@(runner) runner(opt,args),runners));
+    suite=MOxUnitTestSuite();
 
-
-function did_pass=run_doctest_helper(opt,unused)
-    did_pass=true;
-
-    location=opt.doctest_location;
-    if ~ischar(location)
-        return;
-    elseif isempty(location)
-        location=get_default_dir('doc');
+    if run_doctest
+        doctest_suite=get_doctest_suite(test_locations);
+        suite=addFromSuite(suite,doctest_suite);
     end
 
-    if cosmo_wtf('is_octave')
-        cosmo_warning('Doctest not (yet) available for GNU Octave, skip');
-        return
+    if run_unittest
+        unittest_suite=get_unittest_suite(test_locations);
+        suite=addFromSuite(suite,unittest_suite);
     end
 
-    % xUnit is required
-    cosmo_check_external('xunit');
+    did_pass=moxunit_runtests(suite,moxunit_args{:});
 
-    % run test using custom CosmoDocTestSuite
-    cd(opt.run_from_dir);
-    suite=CosmoDocTestSuite(location);
-    if opt.verbose
-        monitor_constructor=@VerboseTestRunDisplay;
-    else
-        monitor_constructor=@TestRunDisplay;
+
+function suite=get_doctest_suite(test_locations)
+    cosmo_check_external({'moxunit','modox'});
+    suite=MOdoxTestSuite();
+    suite=add_test_locations(suite,'doc',test_locations);
+
+
+
+function suite=get_unittest_suite(test_locations)
+    cosmo_check_external({'moxunit'});
+    suite=MOxUnitTestSuite();
+    suite=add_test_locations(suite,'unit',test_locations);
+
+
+
+function suite=add_test_locations(suite,type,test_locations)
+    if isempty(test_locations)
+        test_locations={get_default_dir(type)};
     end
 
-    has_logfile=ischar(opt.logfile);
-    if has_logfile
-        fid=fopen(opt.logfile,'w');
-        file_closer=onCleanup(@()fclose(fid));
-    else
-        fid=1;
+    pat='^.*\.m$';
+    for k=1:numel(test_locations)
+
+        location=test_locations{k};
+
+        if isdir(location)
+            suite=addFromDirectory(suite,location,pat);
+        else
+            suite=addFromFile(suite,location);
+        end
     end
-
-    monitor=monitor_constructor(fid);
-    did_pass=suite.run(monitor);
-
-
-function did_pass=run_unittest_helper(opt,args)
-    did_pass=true;
-
-    location=opt.unittest_location;
-    if ~ischar(location)
-        return;
-    elseif isempty(location)
-        location=get_default_dir('unit');
-        args{end+1}=location;
-    end
-
-
-    unittest_dir=get_directory(location);
-    addpath(unittest_dir);
-
-    test_runner=get_test_field('runner');
-    did_pass=test_runner(args{:});
-
-function directory=get_directory(location)
-    if isdir(location)
-        directory=location;
-    elseif exist(location,'file')
-        directory=fileparts(location);
-    else
-        error('illegal location %s',location);
-    end
-
-function s=get_all_test_runners_struct()
-    s=struct();
-    s.moxunit.runner=@moxunit_runtests;
-    s.moxunit.arg_with_value={'-cover',...
-                              '-cover_xml_file',...
-                              '-cover_html_dir',...
-                              '-cover_json_file',...
-                              '-with_coverage',...
-                              '-junit_xml_file',...
-                              '-cover_method',...
-                              '-partition_index',...
-                              '-partition_count'};
-
-    s.xunit.runner=@runtests;
-    s.xunit.arg_with_value={};
-
-function key=get_test_runner_name()
-    runners_struct=get_all_test_runners_struct();
-    keys=fieldnames(runners_struct);
-
-    present_ids=find(cosmo_check_external(keys,false));
-
-    if isempty(present_ids)
-        raise_exception=true;
-        cosmo_check_external(keys, raise_exception);
-    end
-
-    key=keys{present_ids};
-
-
-function value=get_test_field(sub_key)
-    key=get_test_runner_name();
-    s=get_all_test_runners_struct();
-    value=s.(key).(sub_key);
 
 
 function d=get_default_dir(name)
@@ -169,69 +102,70 @@ function d=get_default_dir(name)
     end
 
 
-function [opt,passthrough_args]=get_opt(varargin)
+function [opt,test_locations,moxunit_args]=get_opt(varargin)
     defaults=struct();
-    defaults.verbose=false;
     defaults.no_doctest=false;
     defaults.no_unittest=false;
-    defaults.logfile=[];
-    defaults.unittest_location='';
-    defaults.doctest_location='';
+    opt=defaults;
 
     n_args=numel(varargin);
-    passthrough_args=varargin;
-    keep_in_passthrough=true(1,n_args);
+
+
+    is_key_value_arg={'-cover',...
+                      '-cover_xml_file',...
+                      '-cover_html_dir',...
+                      '-cover_json_file',...
+                      '-with_coverage',...
+                      '-junit_xml_file',...
+                      '-cover_method',...
+                      '-partition_index',...
+                      '-partition_count',...
+                      '-logfile'};
+
+    test_locations=cell(n_args,1);
+    moxunit_args=cell(n_args,1);
+
     k=0;
-
-    arg_with_value=get_test_field('arg_with_value');
-    opt=defaults;
-    opt.run_from_dir=get_default_dir('unit');
-
     while k<n_args
         k=k+1;
         arg=varargin{k};
 
         switch arg
-            case '-verbose'
-                opt.verbose=true;
-
             case '-no_doctest'
                 opt.no_doctest=true;
-                keep_in_passthrough(k)=false;
 
             case '-no_unittest'
                 opt.no_unittest=true;
-                keep_in_passthrough(k)=false;
-
-            case '-logfile'
-                [opt.logfile,k]=next_arg(varargin,k);
 
             otherwise
                 is_option=~isempty(regexp(arg,'^-','once'));
 
                 if is_option
-                    arg_has_value=~isempty(strmatch(arg,arg_with_value));
-                    if arg_has_value
+                    moxunit_args{k}=arg;
+
+                    has_value=~isempty(strmatch(arg,is_key_value_arg));
+                    if has_value
+                        if k==n_args
+                            error('Missing value after key ''%s''',arg);
+                        end
                         k=k+1;
+                        arg=varargin{k};
+                        moxunit_args{k}=arg;
                     end
                 else
                     test_location=get_location(arg);
-                    passthrough_args{k}=test_location;
-
-                    opt.unittest_location=test_location;
-                    opt.doctest_location=test_location;
+                    test_locations{k}=test_location;
                 end
         end
     end
 
-    passthrough_args=passthrough_args(keep_in_passthrough);
-    if opt.no_unittest
-        opt.unittest_location=[];
-    end
+    moxunit_args=remove_empty_from_cell(moxunit_args);
+    test_locations=remove_empty_from_cell(test_locations);
 
-    if opt.no_doctest
-        opt.doctest_location=[];
-    end
+
+function ys=remove_empty_from_cell(xs)
+    keep=~cellfun(@isempty,xs);
+    ys=xs(keep);
 
 function full_path=get_location(location)
     if exist(location,'file')
@@ -269,12 +203,3 @@ function full_path=get_location(location)
 
 
     error('Unable to find ''%s''',location);
-
-
-function [value,next_k]=next_arg(args,k)
-    n=numel(args);
-    next_k=k+1;
-    if next_k>n
-        error('missing argument after ''%s''',args{k});
-    end
-    value=args{next_k};
