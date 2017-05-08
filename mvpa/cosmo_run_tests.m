@@ -8,8 +8,8 @@ function did_pass=cosmo_run_tests(varargin)
 %   '-logfile',fn     store output in a file named fn (optional, if omitted
 %                     output is written to the terminal window)
 %   'file.m'          run tests in 'file.m'
-%   '-no_doctest'     skip doctest
-%   '-no_unittest'    skip unittest
+%   '-no_doc_test'    skip doctest
+%   '-no_unit)test'   skip unittest
 %
 % Examples:
 %   % run tests with defaults
@@ -36,8 +36,8 @@ function did_pass=cosmo_run_tests(varargin)
 
     [opt,test_locations,moxunit_args]=get_opt(varargin{:});
 
-    run_doctest=~opt.no_doctest;
-    run_unittest=~opt.no_unittest;
+    run_doctest=~opt.no_doc_test;
+    run_unittest=~opt.no_unit_test;
 
     orig_path=path();
     path_resetter=onCleanup(@()path(orig_path));
@@ -116,8 +116,8 @@ function prefix=get_default_prefix(name)
 
 function [opt,test_locations,moxunit_args]=get_opt(varargin)
     defaults=struct();
-    defaults.no_doctest=false;
-    defaults.no_unittest=false;
+    defaults.no_doc_test=false;
+    defaults.no_unit_test=false;
     opt=defaults;
 
     n_args=numel(varargin);
@@ -143,11 +143,11 @@ function [opt,test_locations,moxunit_args]=get_opt(varargin)
         arg=varargin{k};
 
         switch arg
-            case '-no_doctest'
-                opt.no_doctest=true;
+            case '-no_doc_test'
+                opt.no_doc_test=true;
 
-            case '-no_unittest'
-                opt.no_unittest=true;
+            case '-no_unit_test'
+                opt.no_unit_test=true;
 
             otherwise
                 is_option=~isempty(regexp(arg,'^-','once'));
