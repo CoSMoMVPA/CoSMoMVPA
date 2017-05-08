@@ -546,7 +546,7 @@ function externals=get_externals_helper()
 
     externals.modox.is_present=@() has('mocov');
     externals.modox.is_recent=yes;
-    externals.modox.label=['Matlab/Octave MOcov '...
+    externals.modox.label=['Matlab/Octave MOdox '...
                                         'documentation test framework'];
     externals.modox.authors={'N. N. Oosterhof'};
     externals.modox.url='https://github.com/MOdox/MOdox';
