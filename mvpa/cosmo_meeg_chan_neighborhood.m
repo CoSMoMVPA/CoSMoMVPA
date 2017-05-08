@@ -56,6 +56,9 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     .origin.a         } the input dataset, ds.fa and ds.a
 %
 % Examples:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels
 %     ds=cosmo_synthetic_dataset('type','meeg','size','big');
@@ -104,6 +107,9 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     %||       .samples_label
 %     %||         'rpt'
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors with radius of .1 for
 %     % planar neuromag306 channels, but with the center labels
 %     % the set of combined planar channels
@@ -155,6 +161,9 @@ function nbrhood=cosmo_meeg_chan_neighborhood(ds, varargin)
 %     %||       .samples_label
 %     %||         'rpt'
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % As above, but combine the two types of channels
 %     % Here the axial channels only have axial neighbors, and the planar
 %     % channels only have planar neighbors. With 7 timepoints and 10

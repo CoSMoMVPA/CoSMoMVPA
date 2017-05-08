@@ -17,6 +17,9 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %                         .name    string with name of layout
 %
 % Examples:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for neuromag306 MEG planar (gradiometers)
 %     layout=senstype2layout.neuromag306alt_planar;
@@ -39,6 +42,9 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     layout.name
 %     %|| 'neuromag306planar.lay'
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for neuromag306 MEG combined planar
 %     % (combined gradiometers)
@@ -62,6 +68,9 @@ function senstype2layout=cosmo_meeg_senstype2layout_mapping(varargin)
 %     layout.name
 %     %|| 'neuromag306cmb.lay'
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
 %     % get layout for EEG elec1020
 %     layout=senstype2layout.eeg1020;

@@ -13,6 +13,9 @@ function db=cosmo_meeg_layout_collection()
 %                   .name     string with filename of layout
 %
 % Example:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get all layouts
 %     layouts=cosmo_meeg_layout_collection();
 %     %

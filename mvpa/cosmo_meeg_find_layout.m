@@ -32,6 +32,9 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
 %                      channel labels in layout.name.
 %
 % Examples:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % generate neuromag306 dataset
 %     ds=cosmo_synthetic_dataset('type','meeg','sens','neuromag306_all');
 %     % get layout for the planar channels

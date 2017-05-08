@@ -23,6 +23,9 @@ function senstypes=cosmo_meeg_senstype_collection()
 %                                           provided for neuromag systems
 %
 % Example:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     senstypes=cosmo_meeg_senstype_collection();
 %     %
 %     % show neuromag306 MEG magnetometers

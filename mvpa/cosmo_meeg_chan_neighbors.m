@@ -36,6 +36,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     .neighblabel      cell with labels of neighbors
 %
 % Examples:
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors within radius of .3 for EEG dataset
 %     ds=cosmo_synthetic_dataset('type','meeg',...
 %                                        'sens','eeg1010','size','big');
@@ -95,6 +98,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %||               :
 %     %||              'I2' }@16x1
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels
 %     ds=cosmo_synthetic_dataset('type','meeg','size','big');
@@ -118,6 +124,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %||               'MEG2642'
 %     %||               'MEG2643' }
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors at 4 neighboring sensor location for
 %     % planar neuromag306 channels, but with the center labels
 %     % the set of combined planar channels
@@ -142,6 +151,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %||                  :
 %     %||               'MEG2643' }@8x1
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % As above, but now use both the axial and planar channels.
 %     % Here the axial channels only have axial neighbors, and the planar
 %     % channels only have planar neighbors
@@ -166,6 +178,9 @@ function neighbors=cosmo_meeg_chan_neighbors(ds, varargin)
 %     %||               'MEG2642'
 %     %||               'MEG2643' }
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % As above, but now use both the axial and planar channels with
 %     % center labels for the planar channels from the combined_planar set.
 %     % Here the axial center channels have 4 axial neighbors each, while
