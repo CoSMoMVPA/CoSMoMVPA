@@ -25,9 +25,9 @@ function samples=cosmo_sample_unique(k,n,count,varargin)
 %     % (in this example a seed is used to get the same result upon every
 %     % function call)
 %     cosmo_sample_unique(3,6,4,'seed',3)
-%     >      1     2     1     2
-%     >      3     5     3     4
-%     >      4     6     5     6
+%     %||      1     2     1     2
+%     %||      3     5     3     4
+%     %||      4     6     5     6
 %
 % Notes:
 %   - this is a utility function; it does not work on dataset structures.

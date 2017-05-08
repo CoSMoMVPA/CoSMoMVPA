@@ -20,45 +20,45 @@ function [tail_values, idxs]=cosmo_tail(values, to_select)
 % Examples:
 %     % two largest values
 %     [v,i]=cosmo_tail(10:15,2)
-%     > v = 15 14
-%     > i = 6 5
+%     %|| v = 15 14
+%     %|| i = 6 5
 %
 %     % two smallest values
 %     [v,i]=cosmo_tail(10:15,-2)
-%     > v = 10 11
-%     > i = 1 2
+%     %|| v = 10 11
+%     %|| i = 1 2
 %
 %     % 40% largest values
 %     [v,i]=cosmo_tail(10:15,.4)
-%     > v = 15 14 13
-%     > i = 6 5 4
+%     %|| v = 15 14 13
+%     %|| i = 6 5 4
 %
 %     % 40% smallest values
 %     [v,i]=cosmo_tail(10:15,-.4)
-%     > v = 10 11 12
-%     > i = 1 2 3
+%     %|| v = 10 11 12
+%     %|| i = 1 2 3
 %
 %     % 40% largest values
 %     [v,i]=cosmo_tail({'a','d','c','b'},.4)
-%     > v = 'd' 'c'
-%     > i = 2 3
+%     %|| v = {'d' 'c'}
+%     %|| i = [2 3]
 %
 %     % 70% smallest values
 %     [v,i]=cosmo_tail({'a','d','c','b'},-.7)
-%     > v = 'a' 'b' 'c'
-%     > i = 1 4 3
+%     %|| v = {'a' 'b' 'c'}
+%     %|| i = [1 4 3]
 %
 %     % matrix input is not supported
 %     [v,i]=cosmo_tail(zeros(3),-.7)
-%     > error('Only vector or cell with strings input is supported');
+%     %|| error('Only vector or cell with strings input is supported');
 %
 %     % values exceeding the size of the input is not supported
 %     [v,i]=cosmo_tail(10:15,66)
-%     > error('Cannot select 66 values: input has 6 values');
+%     %|| error('Cannot select 66 values: input has 6 values');
 %
 %     % second argument must be scalar
 %     [v,i]=cosmo_tail(10:15,[2,3])
-%     > error('Second argument must be scalar');
+%     %|| error('Second argument must be scalar');
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

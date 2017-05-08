@@ -41,55 +41,55 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     %
 %     % show original (unbalanced) partitioning
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 2    [ 1
-%     >       3      4
-%     >       7      5
-%     >       8      6 ]
-%     >       9 ]        }
-%     > .test_indices
-%     >   { [ 1    [ 2
-%     >       4      3
-%     >       5      7
-%     >       6 ]    8
-%     >              9 ] }
+%     %|| .train_indices
+%     %||   { [ 2    [ 1
+%     %||       3      4
+%     %||       7      5
+%     %||       8      6 ]
+%     %||       9 ]        }
+%     %|| .test_indices
+%     %||   { [ 1    [ 2
+%     %||       4      3
+%     %||       5      7
+%     %||       6 ]    8
+%     %||              9 ] }
 %     %
 %     % make standard balancing (nsets=1); some targets are not used
 %     q=cosmo_balance_partitions(p,ds);
 %     cosmo_disp(q);
-%     > .train_indices
-%     >   { [ 2    [ 1
-%     >       3      5
-%     >       7 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 2
-%     >       5      3
-%     >       6 ]    7 ] }
+%     %|| .train_indices
+%     %||   { [ 2    [ 1
+%     %||       3      5
+%     %||       7 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 2
+%     %||       5      3
+%     %||       6 ]    7 ] }
 %     %
 %     % make balancing where each sample in each training fold is used at
 %     % least once
 %     q=cosmo_balance_partitions(p,ds,'nmin',1);
 %     cosmo_disp(q);
-%     > .train_indices
-%     >   { [ 2    [ 2    [ 2    [ 1    [ 1
-%     >       3      3      3      5      4
-%     >       7 ]    9 ]    8 ]    6 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 1    [ 1    [ 2    [ 2
-%     >       5      4      5      3      3
-%     >       6 ]    6 ]    6 ]    7 ]    9 ] }
+%     %|| .train_indices
+%     %||   { [ 2    [ 2    [ 2    [ 1    [ 1
+%     %||       3      3      3      5      4
+%     %||       7 ]    9 ]    8 ]    6 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 1    [ 1    [ 2    [ 2
+%     %||       5      4      5      3      3
+%     %||       6 ]    6 ]    6 ]    7 ]    9 ] }
 %     %
 %     % triple the number of partitions and sample from training indices
 %     q=cosmo_balance_partitions(p,ds,'nrepeats',3);
 %     cosmo_disp(q);
-%     > .train_indices
-%     >   { [ 2    [ 2    [ 2    [ 1    [ 1    [ 1
-%     >       3      3      3      5      4      5
-%     >       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
-%     >       5      4      5      3      3      3
-%     >       6 ]    6 ]    6 ]    7 ]    9 ]    8 ] }
+%     %|| .train_indices
+%     %||   { [ 2    [ 2    [ 2    [ 1    [ 1    [ 1
+%     %||       3      3      3      5      4      5
+%     %||       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
+%     %||       5      4      5      3      3      3
+%     %||       6 ]    6 ]    6 ]    7 ]    9 ]    8 ] }
 %
 % Notes:
 % - this function is intended for datasets where the number of

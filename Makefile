@@ -74,6 +74,10 @@ ifdef WITH_COVERAGE
 		 export JUNIT_XML_FILE
 	endif
 endif
+
+ifdef NO_DOC_TEST
+	 RUNTESTS_ARGS+=,'-no_doc_test'
+endif
 		
 	
 ADDPATH="cd('$(MVPADIR)');cosmo_set_path()"

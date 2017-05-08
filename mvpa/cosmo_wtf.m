@@ -21,7 +21,7 @@ function s=cosmo_wtf(param)
 %
 % Examples:
 %   % print the information to standard out (the command window)
-%   cosmo_wtf()
+%   cosmo_wtf();
 %
 %   % store the information in the variable 'w':
 %   w=cosmo_wtf();
