@@ -47,11 +47,13 @@ function did_pass=cosmo_run_tests(varargin)
     if run_doctest
         doctest_suite=get_doctest_suite(test_locations);
         suite=addFromSuite(suite,doctest_suite);
+        fprintf('doc test %s\n',str(doctest_suite));
     end
 
     if run_unittest
         unittest_suite=get_unittest_suite(test_locations);
         suite=addFromSuite(suite,unittest_suite);
+        fprintf('unit test %s\n',str(unittest_suite));
     end
 
     did_pass=moxunit_runtests(suite,moxunit_args{:});
