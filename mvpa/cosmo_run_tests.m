@@ -74,9 +74,12 @@ function suite=get_unittest_suite(test_locations)
 function suite=add_test_locations(suite,type,test_locations)
     if isempty(test_locations)
         test_locations={get_default_dir(type)};
+        prefix=get_default_prefix(type);
+    else
+        prefix='';
     end
 
-    pat='^.*\.m$';
+    pat=['^' prefix '.*\.m$'];
     for k=1:numel(test_locations)
 
         location=test_locations{k};
@@ -99,7 +102,16 @@ function d=get_default_dir(name)
 
         case 'doc'
             d=fullfile(get_default_dir('root'),'mvpa');
+
+        otherwise
+            assert(false);
     end
+
+function prefix=get_default_prefix(name)
+    s=struct();
+    s.unit='test_';
+    s.doc='cosmo_';
+    prefix=s.(name);
 
 
 function [opt,test_locations,moxunit_args]=get_opt(varargin)
@@ -153,8 +165,7 @@ function [opt,test_locations,moxunit_args]=get_opt(varargin)
                         moxunit_args{k}=arg;
                     end
                 else
-                    test_location=get_location(arg);
-                    test_locations{k}=test_location;
+                    test_locations{k}=get_location(arg);
                 end
         end
     end
@@ -168,38 +179,23 @@ function ys=remove_empty_from_cell(xs)
     ys=xs(keep);
 
 function full_path=get_location(location)
-    if exist(location,'file')
-        p=fileparts(location);
-        if isempty(p)
-            full_path=fullfile(pwd(),location);
-        else
-            full_path=location;
-        end
-        return
-    end
+    candidate_dirs={'',...
+                    get_default_dir('unit'),...
+                    get_default_dir('doc')};
 
-    parent_dirs={'',get_default_dir('unit'),get_default_dir('doc')};
-    n=numel(parent_dirs);
-    for use_which=[false,true]
-        for k=1:n
-            full_path=fullfile(parent_dirs{k},location);
+    suffixes={'','.m'};
 
-            if isdir(full_path) || ~isempty(dir(full_path))
+    n_dirs=numel(candidate_dirs);
+    n_suffixes=numel(suffixes);
+    for k=1:n_dirs
+        for j=1:1:n_suffixes
+            fn=sprintf('%s%s',location,suffixes{j});
+            full_path=fullfile(candidate_dirs{k},fn);
+
+            if exist(location,'file')
                 return;
             end
-
-            if use_which && isdir(parent_dirs{k})
-                orig_pwd=pwd();
-                cleaner=onCleanup(@()cd(orig_pwd));
-                cd(parent_dirs{k});
-                full_path=which(location);
-                if ~isempty(full_path)
-                    return;
-                end
-                clear cleaner;
-            end
         end
     end
-
 
     error('Unable to find ''%s''',location);
