@@ -62,6 +62,9 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     %||   [ 1         2         3         4         5         6 ]
 %     %||   [ 2         3         5         6 ]                     }
 %
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
 %     % get neighbors in time-lock MEEG dataset from the neuromag306
 %     % system (subset of channels), with combined planar and
 %     % axial channels
@@ -78,6 +81,9 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     %||   [ 1         3         4         6 ]
 %     %||   [ 2         5 ]
 %     %||   [ 1         3         4         6 ] }
+%
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
 %     %
 %     % get neighbors in EEG dataset, either with clustering over all
 %     % feature dimensions (channels x time x freq) or with all feature
