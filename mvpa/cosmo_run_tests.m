@@ -83,7 +83,6 @@ function suite=add_test_locations(suite,type,test_locations)
 
     pat=['^' prefix '.*\.m$'];
     for k=1:numel(test_locations)
-
         location=test_locations{k};
 
         if isdir(location)
@@ -129,7 +128,6 @@ function [opt,test_locations,moxunit_args]=get_opt(varargin)
                       '-cover_xml_file',...
                       '-cover_html_dir',...
                       '-cover_json_file',...
-                      '-with_coverage',...
                       '-junit_xml_file',...
                       '-cover_method',...
                       '-partition_index',...
@@ -157,7 +155,7 @@ function [opt,test_locations,moxunit_args]=get_opt(varargin)
                 if is_option
                     moxunit_args{k}=arg;
 
-                    has_value=~isempty(strmatch(arg,is_key_value_arg));
+                    has_value=~isempty(strmatch(arg,is_key_value_arg,'exact'));
                     if has_value
                         if k==n_args
                             error('Missing value after key ''%s''',arg);
