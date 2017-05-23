@@ -386,14 +386,13 @@ The the resulting datasets can be combined through:
 
     .. code-block:: matlab
 
-        ds_all=cosmo_stack(ds_intersect_cell,2);
+        ds_all=cosmo_stack(ds_intersect_cell,1);
 
 Note: The above line may give an error ``non-unique elements in fa.X``, with ``X`` some feature attribute such as ``center_ids`` or ``radius``. This is to be expected if the datasets are the result from another analysis, such as :ref:`cosmo_searchlight`. In that case, the data can be combined using:
 
     .. code-block:: matlab
 
-        ds_all=cosmo_stack(ds_intersect_cell,2,'drop_nonunique');
-
+        ds_all=cosmo_stack(ds_intersect_cell,1,'drop_nonunique');
 
 Run group analysis on time-by-time generalization measures
 ----------------------------------------------------------
