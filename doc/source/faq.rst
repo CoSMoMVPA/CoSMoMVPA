@@ -1190,6 +1190,115 @@ You can, but currently not directly: it involves a bit of manual work. The key t
 
 Repeat the process for each participant. For each analysis of interest (two main effects and the interaction) separately, follow the process of a one-sample t-test as explained elsewhere in the FAQ: stack the dataset from the participants using :ref:`cosmo_stack`, assign ``.sa.chunks`` to be all unique, assign ``.sa.targets`` to be all the same, and then use :ref:`cosmo_stat` (for feature-wise stats with no correction for multiple correction) or :ref:`cosmo_montecarlo_cluster_stat` (for correction with multiple comparisons).
 
-Note the advantage of a (signed( t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
+Note the advantage of a (signed) t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
+
+
+Use a FieldTrip source dataset that uses a 'fake' channel structure
+-------------------------------------------------------------------
+'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is ``src_ft = ``
+
+   .. code-block:: text
+
+            label: {2982x1 cell}
+           dimord: 'chan_freq_time'
+             freq: [1x25 double]
+             time: [1x15 double]
+        powspctrm: [2982x25x15 double]
+              cfg: [1x1 struct]
+
+where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using a ``template_grid =``
+
+   .. code-block:: text
+
+         xgrid: [-8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
+         ygrid: [-11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
+         zgrid: [-7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8 9]
+           dim: [17 20 17]
+           pos: [5780x3 double]
+          unit: 'cm'
+        inside: [5780x1 logical]
+           cfg: [1x1 struct]
+
+where there are 2972 positions in the .inside field that are equal to ``true`` representing the voxels in the brain. How can I use these dataset structures in CoSMoMVPA?'
+
+The ``src_ft`` struct can be converted to a dataset structure using
+
+    .. code-block:: matlab
+
+        src_ds=cosmo_meeg_dataset(src_ft);
+
+but it uses channel labels (representing voxels) for which the positions are not known (and thus, neighborhoods cannot be used). To add the position information, you can use the following helper function
+
+    .. code-block:: matlab
+
+        function ds=convert_ds_mni_grid(ds,template_grid)
+        % Converts dataset with 'fake' channels numbered '1' to 'N' (N numeric)
+        % and an mni template structure
+        %
+        % Inputs:
+        %   ds              dataset struct with first fdim dimension being
+        %                   'chan' with "fake" channels representing MEEG source
+        %                   structure
+        %   template_grid   struct with fields .{x,y,z}grid and .inside
+
+
+            check_inputs(ds,template_grid);
+
+            % voxels representing the brain
+            inside=template_grid.inside;
+            pos=template_grid.pos(inside,:)';
+
+            % change first dimension to position
+            ds.a.fdim.values{1}=pos;
+            ds.a.fdim.labels{1}='pos';
+            chan=ds.fa.chan;
+            ds.fa=rmfield(ds.fa,'chan');
+            ds.fa.pos=chan;
+
+            % sanity check
+            cosmo_check_dataset(ds);
+
+        function check_inputs(ds,template_grid)
+            if isfield(ds,'label')
+                error(['First input is not a CoSMo dataset structure. '...
+                        'Use cosmo_meeg_dataset to convert to a CoSMo structure']);
+            end
+
+            cosmo_check_dataset(ds);
+
+            if ~isequal(ds.a.fdim.labels{1},'chan')
+                error('First fdim must be channel');
+            end
+
+            raise=true;
+            cosmo_isfield(template_grid,...
+                            {'xgrid','ygrid','zgrid','pos','inside'},...
+                            raise);
+
+            labels=ds.a.fdim.values{1};
+            n_inside=sum(template_grid.inside);
+            if n_inside~=numel(labels)
+                error('Source count mismatch: %d ~= %d', n_inside, numel(labels));
+            end
+
+            numeric_labels=cellfun(@str2num,labels,'UniformOutput',false);
+            expected_numeric_labels=arrayfun(@(x)x,1:n_inside,...
+                                    'UniformOutput',false);
+
+            if ~isequal(expected_numeric_labels,numeric_labels)
+                error(['Labels are not as expected. This could mean that '...
+                        'you are using this function not as intended. '...
+                        'Proceed carefully']);
+            end
+
+and then get a 'proper' dataset in source space using
+
+    .. code-block:: matlab
+
+        ds=convert_ds_mni_grid(src_ds,template_grid);
+
+
+
+
 
 .. include:: links.txt
