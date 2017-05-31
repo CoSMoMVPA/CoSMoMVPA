@@ -394,6 +394,63 @@ Note: The above line may give an error ``non-unique elements in fa.X``, with ``X
 
         ds_all=cosmo_stack(ds_intersect_cell,1,'drop_nonunique');
 
+Compute for a group of participants who were scanned with MRI the overlap of their masks
+----------------------------------------------------------------------------------------
+    'I analyzed data for individual fMRI participants that are all in a common MNI space, but with individual masks. When using :ref:`cosmo_mask_dim_intersect` I seem to lose about a third of the voxels present in each participant. How can I visualize which voxels are not shared across participants?'
+
+The following code illustrates how this can be done, using synthetic data.
+
+    .. code-block:: matlab
+
+        keep_ratio=0.95;
+        n_subj=10;
+
+        % simulate data for all subjects with their masks mostly overlapping
+        ds_cell=cell(n_subj,1);
+        for k=1:n_subj
+            ds_full=cosmo_synthetic_dataset('seed',0,'size','big');
+
+            n_features=size(ds_full.samples,2);
+            keep=cosmo_randperm(n_features,round(n_features*keep_ratio));
+            ds=cosmo_slice(ds_full,keep,2);
+
+            ds_cell{k}=ds;
+        end
+
+        % do simple intersection mask
+        [idxs,ds_cell_common]=cosmo_mask_dim_intersect(ds_cell);
+        ds_common=cosmo_stack(ds_cell_common);
+
+        fprintf('Ratio in common: %d / %d\n',size(ds_common.samples,2),n_features);
+
+        % see how often each voxel was in the mask for each participant
+        for k=1:n_subj
+            ds_single_volume=cosmo_slice(ds_cell{k},1);
+            ds_single_volume.samples(:)=1;
+            ni=cosmo_map2fmri(ds_single_volume,'-nii');
+            img=ni.img;
+
+            if k==1
+                img_sum=zeros(size(img));
+            end
+
+            img_sum=img_sum+img;
+        end
+
+        % convert to a ratio between 0 and 1 (for each voxel)
+        ni.img=img_sum / n_subj;
+
+        % convert to dataset structure
+        ds_ratio=cosmo_fmri_dataset(ni);
+
+        % the ds_ratio dataset can be visualized as shown here,
+        % or stored to disc using cosmo_map2fmri
+        cosmo_plot_slices(ds_ratio)
+
+
+
+
+
 Run group analysis on time-by-time generalization measures
 ----------------------------------------------------------
     'I used :ref:`cosmo_dim_generalization_measure` on MEEG data to get time-by-time generalization results. How do I run group analysis with cluster correction (:ref:`cosmo_montecarlo_cluster_stat`) on these?'
@@ -1134,8 +1191,5 @@ You can, but currently not directly: it involves a bit of manual work. The key t
 Repeat the process for each participant. For each analysis of interest (two main effects and the interaction) separately, follow the process of a one-sample t-test as explained elsewhere in the FAQ: stack the dataset from the participants using :ref:`cosmo_stack`, assign ``.sa.chunks`` to be all unique, assign ``.sa.targets`` to be all the same, and then use :ref:`cosmo_stat` (for feature-wise stats with no correction for multiple correction) or :ref:`cosmo_montecarlo_cluster_stat` (for correction with multiple comparisons).
 
 Note the advantage of a (signed( t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
-
-
-
 
 .. include:: links.txt
