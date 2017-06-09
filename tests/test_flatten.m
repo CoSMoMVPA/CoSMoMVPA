@@ -129,3 +129,12 @@ function run_helper_test_flatten(nsamples, nfdim, dim)
     aet(ds,3);
     aet(ds,[1 1]*dim,opt);
 
+function test_unflatten_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_unflatten(varargin{:}),'');
+    ds=cosmo_synthetic_dataset();
+    cosmo_unflatten(ds); % should be ok
+
+    bad_ds=ds;
+    bad_ds.foo=2;
+    aet(bad_ds);
