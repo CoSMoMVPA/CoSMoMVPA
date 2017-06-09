@@ -33,14 +33,10 @@ function test_onesample_ttest_montecarlo_cluster_extremes
             z_expected=signal_sign*z_lookup(niter+1);
 
             nfeatures=size(ds.samples,2);
-            try
             assertElementsAlmostEqual(z_ds.samples,...
                                 z_expected+zeros(1,nfeatures),...
                                 'absolute',1e-4);
 
-            catch
-                22
-            end
 
         end
     end
