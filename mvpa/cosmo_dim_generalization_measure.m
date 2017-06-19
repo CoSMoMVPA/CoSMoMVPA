@@ -36,7 +36,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %                       values in dimension d.
 %
 % Examples:
-%
+%     % Generalization over time
 %     sz='big';
 %     train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
 %                                              'nchunks',2,'seed',1);
@@ -67,19 +67,46 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     %
 %     % the output has train_time and test_time as sample dimensions
 %     cosmo_disp(dgm_ds.a)
-%     > .sdim
-%     >   .labels
-%     >     { 'train_time'  'test_time' }
-%     >   .values
-%     >     { [  -0.2        [  -0.2
-%     >         -0.15          -0.15
-%     >          -0.1           -0.1
-%     >           :              :
-%     >             0              0
-%     >          0.05           0.05
-%     >           0.1 ]@7x1      0.1 ]@7x1 }
-%     %
+%     %|| .sdim
+%     %||   .labels
+%     %||     { 'train_time'  'test_time' }
+%     %||   .values
+%     %||     { [  -0.2        [  -0.2
+%     %||         -0.15          -0.15
+%     %||          -0.1           -0.1
+%     %||           :              :
+%     %||             0              0
+%     %||          0.05           0.05
+%     %||           0.1 ]@7x1      0.1 ]@7x1 }
+%
+%
 %     % Searchlight example
+%     % (This example requires FieldTrip)
+%     cosmo_skip_test_if_no_external('fieldtrip');
+%     %
+%     sz='big';
+%     train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+%                                              'nchunks',2,'seed',1);
+%     test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+%                                              'nchunks',3,'seed',2);
+%     % set chunks
+%     train_ds.sa.chunks(:)=1;
+%     test_ds.sa.chunks(:)=2;
+%     %
+%     % construct the dataset
+%     ds=cosmo_stack({train_ds, test_ds});
+%     %
+%     % make time a sample dimension
+%     dim_label='time';
+%     ds_time=cosmo_dim_transpose(ds,dim_label,1);
+%     %
+%     % set measure and its arguments
+%     measure_args=struct();
+%     %
+%     % use correlation measure
+%     measure_args.measure=@cosmo_correlation_measure;
+%     % dimension of interest is 'time'
+%     measure_args.dimension=dim_label;
 %     %
 %     % only to make this example run fast, most channels are eliminated
 %     % (there is no other reason to do this step)
@@ -99,25 +126,25 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %     % the output has train_time and test_time as sample dimensions,
 %     % and chan as feature dimension
 %     cosmo_disp(dgm_sl_ds.a,'edgeitems',1)
-%     > .fdim
-%     >   .labels
-%     >     { 'chan' }
-%     >   .values
-%     >     { { 'MEG0112+0113' ... 'MEG0712+0713'   }@1x7 }
-%     > .meeg
-%     >   .samples_type
-%     >     'timelock'
-%     >   .samples_field
-%     >     'trial'
-%     >   .samples_label
-%     >     'rpt'
-%     > .sdim
-%     >   .labels
-%     >     { 'train_time'  'test_time' }
-%     >   .values
-%     >     { [ -0.2        [ -0.2
-%     >           :             :
-%     >          0.1 ]@7x1     0.1 ]@7x1 }
+%     %|| .fdim
+%     %||   .labels
+%     %||     { 'chan' }
+%     %||   .values
+%     %||     { { 'MEG0112+0113' ... 'MEG0712+0713'   }@1x7 }
+%     %|| .meeg
+%     %||   .samples_type
+%     %||     'timelock'
+%     %||   .samples_field
+%     %||     'trial'
+%     %||   .samples_label
+%     %||     'rpt'
+%     %|| .sdim
+%     %||   .labels
+%     %||     { 'train_time'  'test_time' }
+%     %||   .values
+%     %||     { [ -0.2        [ -0.2
+%     %||           :             :
+%     %||          0.1 ]@7x1     0.1 ]@7x1 }
 %
 %
 % Notes:

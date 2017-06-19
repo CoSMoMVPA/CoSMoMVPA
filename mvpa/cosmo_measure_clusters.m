@@ -59,31 +59,33 @@ function cval=cosmo_measure_clusters(sample,nbrhood_mat,cluster_stat,varargin)
 %     % as a function of dh, and that both features in clusters with a
 %     % larger extent but less extreme value and features in clusters with
 %     % smaller extent but more extreme values have larger values
-%     cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.1)
-%     > 0.7700  2.8550  0.7700  0.7700       0  3.4931  3.4931
+%     s=cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.1);
+%     cosmo_disp(s,'threshold',inf)
+%     %|| [ 0.77  2.86  0.77  0.77     0  3.49  3.49 ]
 %     %
-%     cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.05)
-%     > 0.6175  2.8763  0.6175  0.6175       0  3.6310  3.6310
+%     s=cosmo_measure_clusters(samples,nbrhood_mat,'tfce','dh',.05);
+%     cosmo_disp(s,'threshold',inf)
+%     %|| [ 0.618  2.88  0.618  0.618     0  3.63  3.63 ]
 %     %
 %     % illustrate other cluster stats. Note that the results varies more
 %     % as a function of the chosen threshold
 %     cosmo_measure_clusters(samples,nbrhood_mat,'max','threshold',1)
-%     >  2     2     2     2     0     2     2
+%     %||  2     2     2     2     0     2     2
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'max','threshold',2)
-%     >  0     2     0     0     0     2     2
+%     %||  0     2     0     0     0     2     2
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'maxsize','threshold',1)
-%     >  4     4     4     4     0     2     2
+%     %||  4     4     4     4     0     2     2
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'maxsize','threshold',2)
-%     >  0     1     0     0     0     2     2
+%     %||  0     1     0     0     0     2     2
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'maxsum','threshold',1)
-%     >  5     5     5     5     0     4     4
+%     %||  5     5     5     5     0     4     4
 %     %
 %     cosmo_measure_clusters(samples,nbrhood_mat,'maxsum','threshold',2)
-%     >  0     2     0     0     0     4     4
+%     %||  0     2     0     0     0     4     4
 %
 % Notes:
 %   - the 'method' argument is similar to FieldTrip's clusterstat method,

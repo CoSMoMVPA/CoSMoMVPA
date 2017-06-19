@@ -11,29 +11,34 @@ function test_suite=test_montecarlo_cluster_stat
 
 function test_onesample_ttest_montecarlo_cluster_extremes
     ds=cosmo_synthetic_dataset('ntargets',1,...
-                                'nchunks',10,...
+                                'nchunks',20,...
                                 'size','normal');
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     z_lookup=get_zscore_lookup_table();
 
-    for signal_sign=[-1 1]
-        magnitude=10;
-        ds_pos=ds;
-        ds_pos.samples=ds_pos.samples+signal_sign*magnitude;
+    for repeat=1:5
+        for signal_sign=[-1 1]
+            magnitude=10;
+            ds_pos=ds;
+            ds_pos.samples=randn(size(ds.samples))+signal_sign*magnitude;
 
-        niter=10+ceil(rand()*(numel(z_lookup)-10));
-        opt.niter=niter;
-        opt.h0_mean=0;
-        opt.progress=false;
-        z_ds=cosmo_montecarlo_cluster_stat(ds_pos,nh,opt);
+            niter=10+ceil(rand()*(numel(z_lookup)-11));
+            opt.niter=niter;
+            opt.h0_mean=0;
+            opt.dh=.25;
+            opt.progress=false;
+            z_ds=cosmo_montecarlo_cluster_stat(ds_pos,nh,opt);
 
-        z_expected=signal_sign*z_lookup(niter);
+            z_expected=signal_sign*z_lookup(niter+1);
 
-        nfeatures=size(ds.samples,2);
-        assertElementsAlmostEqual(z_ds.samples,...
-                            z_expected+zeros(1,nfeatures),...
-                            'absolute',1e-4);
+            nfeatures=size(ds.samples,2);
+            assertElementsAlmostEqual(z_ds.samples,...
+                                z_expected+zeros(1,nfeatures),...
+                                'absolute',1e-4);
+
+
+        end
     end
 
 function z_lookup=get_zscore_lookup_table()
@@ -138,7 +143,7 @@ function helper_test_mccs_with_tail(left_tail,right_tail)
             maximum_tail_ratio=.1;
         end
 
-        expected_extreme_z=tail_sign*z_table(opt.niter);
+        expected_extreme_z=tail_sign*z_table(opt.niter+1);
         if has_effect
             extreme_z=max(z.samples*tail_sign)*tail_sign;
             assertElementsAlmostEqual(extreme_z,...
@@ -182,14 +187,14 @@ function test_onesample_ttest_montecarlo_cluster_stat_basics
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.h0_mean=0;
     opt.seed=7;
     opt.progress=false;
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
 
     assertElementsAlmostEqual(z.samples,...
-                    [1.2816 0 1.2816 0 1.2816 0],...
+                    [0.8416 0 1.2816 0 1.2816 0],...
                     'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_other_mean
@@ -198,14 +203,14 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_mean
 
     % different h0_mean
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=7;
     opt.progress=false;
     opt.h0_mean=1.2;
 
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     assertElementsAlmostEqual(z.samples,...
-                [0 -1.2816 1.2816 -1.2816 0.5244 -1.2816],...
+                [0 -1.2816 1.2816 -1.2816 0.25335 -1.2816],...
                 'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_other_dh
@@ -213,7 +218,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_dh
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.h0_mean=1.2;
     opt.seed=7;
     opt.progress=false;
@@ -222,7 +227,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_dh
 
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     assertElementsAlmostEqual(z.samples,...
-                [0 -1.2816 0 -0.84162 0 -0.84162],...
+                [0 -1.2816 0 -0.5244 0 -0.5244],...
                 'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_exceptions
@@ -233,7 +238,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
                         cosmo_montecarlo_cluster_stat(varargin{:}),'');
 
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.h0_mean=1.2;
     opt.seed=7;
     opt.progress=false;
@@ -249,7 +254,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
     opt.h0_mean=0;
     z_ds4=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
     assertElementsAlmostEqual(z_ds4.samples,...
-                [0.84162 0 0 0.84162 0.84162 0],...
+                [0.5244 0 0 0.5244 0.5244 0],...
                 'absolute',1e-4);
 
 
@@ -272,7 +277,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_strong
     for effect_sign=[-1,1]
         niter=ceil(rand()*10+10);
         z_table=get_zscore_lookup_table();
-        expected_z=z_table(niter);
+        expected_z=z_table(niter+1);
 
         opt=struct();
         opt.h0_mean=(-effect_sign)*15;
@@ -294,14 +299,14 @@ function test_twosample_ttest_montecarlo_cluster_stat_basics
 
     % test within-subjects
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
 
     z=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
 
     assertElementsAlmostEqual(z.samples,...
-                    [0.5244 -1.2816 0 0.8416 -0.5244 0],...
+                    [0.5244 -1.2816 0 0.84162 -0.25335 0],...
                      'absolute',1e-4);
 
 
@@ -313,7 +318,7 @@ function test_twosample_ttest_montecarlo_cluster_stat_ws
 
     % test within-subjects
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
     opt.cluster_stat='maxsum';
@@ -334,7 +339,7 @@ function test_twosample_ttest_montecarlo_cluster_stat_bs
     ds.sa.chunks=ds.sa.chunks*2+ds.sa.targets;
 
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
@@ -352,7 +357,7 @@ function test_twosample_ttest_montecarlo_cluster_stat_strong
 
     % lots of signal, should work with no seed specified
     opt=struct();
-    opt.niter=15;
+    opt.niter=14;
     opt.progress=false;
     msk1=ds.sa.targets==1;
     ds.samples(msk1,:)=ds.samples(msk1,:)+10;
@@ -382,12 +387,12 @@ function test_anova_montecarlo_cluster_stat_ws
 
     % test within-subjects
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
     z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds1.samples,...
-                    [1.2816 0 0 0 1.2816 0],...
+                   [1.2816 0 0 0 0.84162 0],...
                     'absolute',1e-4);
 
 
@@ -397,7 +402,7 @@ function test_anova_montecarlo_cluster_stat_bs
 
     % test within-subjects
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
 
@@ -417,7 +422,7 @@ function test_anova_montecarlo_cluster_stat_exceptions
     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',6,'sigma',2);
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
     opt=struct();
-    opt.niter=10;
+    opt.niter=9;
     opt.seed=1;
     opt.progress=false;
 
@@ -502,13 +507,13 @@ function test_null_data_montecarlo_cluster_stat
     opt.h0_mean=0;
     z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds1.samples,...
-                    [0 -1.2816 0.5244 0 0 0],...
+                    [0 -0.90846 0.34876 0 0 0],...
                     'absolute',1e-4);
 
     opt.h0_mean=0.5;
     z_ds2=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds2.samples,...
-                    [0 -0.25335 1.2816 0 1.2816 0],...
+                    [0 -0.11419 1.3352 0 1.3352 0],...
                     'absolute',1e-4);
 
 
@@ -519,7 +524,7 @@ function test_null_data_montecarlo_cluster_stat
     opt.h0_mean=-10;
     z_ds3=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds3.samples,...
-                    repmat(1.2816,1,6),...
+                    repmat(1.3352,1,6),...
                     'absolute',1e-4);
 
 
@@ -588,7 +593,7 @@ function test_feature_stat_montecarlo_cluster_stat
     % simple regression test
     res=cosmo_montecarlo_cluster_stat(ds1,nh,opt);
 
-    expected_samples=[0 0 0 0 0.25335 0];
+    expected_samples=[0 0 0 0 0.11419 0];
     assertElementsAlmostEqual(res.samples,expected_samples,...
                                 'absolute',1e-4)
     assertEqual(res.fa,ds1.fa);

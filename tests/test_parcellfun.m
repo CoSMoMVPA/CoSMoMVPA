@@ -106,7 +106,7 @@ function assert_equal_result_or_both_exception_thrown(f, g)
         end
     else
         if g_threw_exception
-            g_exception.message=sprintf('only f threw exception: %s',...
+            g_exception.message=sprintf('only g threw exception: %s',...
                                         g_exception.message);
             rethrow(g_exception);
         end

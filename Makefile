@@ -74,6 +74,10 @@ ifdef WITH_COVERAGE
 		 export JUNIT_XML_FILE
 	endif
 endif
+
+ifdef NO_DOC_TEST
+	 RUNTESTS_ARGS+=,'-no_doc_test'
+endif
 		
 	
 ADDPATH="cd('$(MVPADIR)');cosmo_set_path()"
@@ -254,7 +258,7 @@ remote: website-content
 	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
 
 html-remote: html
-	$(MAKE) website-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
+	# $(MAKE) website-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
 	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
 
 # LABMAN: local server

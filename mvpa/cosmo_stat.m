@@ -49,49 +49,49 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.targets=ones(12,1);
 %     ds.sa.chunks=(1:12)';
 %     cosmo_disp(ds.samples);
-%     >   [ -2         4        -3
-%     >      5        -2         4
-%     >     -1         5        -2
-%     >      :         :         :
-%     >      9         2         8
-%     >      3         9         2
-%     >     -3         3         9 ]@12x3
+%     %||   [ -2         4        -3
+%     %||      5        -2         4
+%     %||     -1         5        -2
+%     %||      :         :         :
+%     %||      9         2         8
+%     %||      3         9         2
+%     %||     -3         3         9 ]@12x3
 %     %
 %     % run one-sample t-test
 %     s=cosmo_stat(ds,'t');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 2.49      3.36      2.55 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Ttest(11)' }
+%     %|| .samples
+%     %||   [ 2.49      3.36      2.55 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Ttest(11)' }
 %     %
 %     % compute z-score of t-test
 %     s=cosmo_stat(ds,'t','z');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 2.17      2.73      2.21 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Zscore()' }
+%     %|| .samples
+%     %||   [ 2.17      2.73      2.21 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Zscore()' }
 %     %
 %     % compute (two-tailed) p-value of t-test
 %     s=cosmo_stat(ds,'t','p');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.03   0.00633    0.0268 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.03   0.00633    0.0268 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %     %
 %     % compute left-tailed p-value of t-test
 %     s=cosmo_stat(ds,'t','left');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.985     0.997     0.987 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.985     0.997     0.987 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %
 %     % one-way ANOVA
 %     % each observation is independent and thus each chunk is unique;
@@ -102,19 +102,19 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.chunks=(1:12)';
 %     s=cosmo_stat(ds,'F');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.472    0.0638      0.05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Ftest(2,9)' }
+%     %|| .samples
+%     %||   [ 0.472    0.0638      0.05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Ftest(2,9)' }
 %     % compute z-score
 %     s=cosmo_stat(ds,'F','z'); % convert to z-score
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ -0.354     -1.54     -1.66 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Zscore()' }
+%     %|| .samples
+%     %||   [ -0.354     -1.54     -1.66 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Zscore()' }
 %
 %
 %     % two-sample t-test
@@ -126,21 +126,21 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %     ds.sa.chunks=(1:12)';
 %     s=cosmo_stat(ds,'t2','p'); % return p-value
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.0307  0.000242  7.07e-05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.0307  0.000242  7.07e-05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %     %
 %     % for illustration, this test gives the same p-values as a
 %     % repeated measures ANOVA
 %     s=cosmo_stat(ds,'F','p');
 %     cosmo_disp(s);
-%     > .samples
-%     >   [ 0.0307  0.000242  7.07e-05 ]
-%     > .sa
-%     >   .stats
-%     >     { 'Pval()' }
+%     %|| .samples
+%     %||   [ 0.0307  0.000242  7.07e-05 ]
+%     %|| .sa
+%     %||   .stats
+%     %||     { 'Pval()' }
 %
 % Notes:
 %  - If output_stat_name is not provided or empty, then this function runs
@@ -308,7 +308,9 @@ function [stat,df_struct,stat_label]=apply_stat_func(stat_func,...
             assert(isequal(stat_label,stat_label_k));
         end
 
-        df_matrix(:,cols)=df;
+        ncols=numel(cols);
+
+        df_matrix(:,cols)=repmat(df(:),1,ncols);
     end
 
     single_sample=samples(:,1);
@@ -436,18 +438,26 @@ function cdf_stat=apply_cdf_wrapper_different_dfs(stat_name,stat,df_struct)
     [idx, unique_dfs]=cosmo_index_unique(df_struct.feature_wise_df');
 
     % allocate space for output
-    cdf_stat=zeros(size(stat));
+    cdf_stat=zeros(size(stat))+NaN;
 
     % compute result
     for k=1:numel(idx)
         cols=idx{k};
         df_cell=num2cell(unique_dfs(k,:));
 
-        cdf_stat(cols)=cdf_wrapper(stat_name,stat(cols),df_cell{:});
+        col_stat=stat(cols);
+        msk=~isnan(col_stat);
+
+        cdf_stat(cols(msk))=cdf_wrapper(stat_name,col_stat(msk),df_cell{:});
     end
 
 function y=cdf_wrapper(name, x, df1, df2)
     ensure_has_stats_functions();
+    if ~(df1>0)
+        y=zeros(size(x))+NaN;
+        return;
+    end
+
     switch name
         case 'Ttest'
             assert(nargin==3);
@@ -455,6 +465,11 @@ function y=cdf_wrapper(name, x, df1, df2)
 
         case 'Ftest'
             assert(nargin==4);
+            if ~(df2>0)
+                y=zeros(size(x))+NaN;
+            return;
+            end
+
             y=fcdf(x, df1, df2);
 
         otherwise
@@ -583,7 +598,9 @@ function [f,df]=quick_ftest_between(samples,targets,chunks,contrast)
     mbss=bss/df(1);
     mwss=wss/df(2);
 
-    f=mbss./mwss;
+    f=zeros(1,nf)+NaN;
+    msk=mbss>0;
+    f(msk)=mbss(msk)./mwss(msk);
 
 function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     % repeated measures anova
@@ -602,7 +619,13 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     for k=1:nclasses
         xk=samples(k==targets,:);
         n=size(xk,1);
-        mu=mean(xk,1);
+
+        if n==0
+            ssw(:)=NaN;
+            break;
+        end
+
+        mu=sum(xk,1)/n;
         sst=sst+n*(gm-mu).^2;
         ssw=ssw+sum(bsxfun(@minus,mu,xk).^2);
     end
@@ -621,7 +644,10 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
     df2=df1*(nchunks-1);
     sse=ssw-sss;
     mse=sse/df2;
-    f=mst./mse;
+
+    msk=mse>0;
+    f=zeros(1,nfeatures)+NaN;
+    f(msk)=mst(msk)./mse(msk);
     df=[df1 df2];
 
 
@@ -629,33 +655,43 @@ function [f,df]=quick_ftest_within(samples,targets,chunks,contrast)
 function [t,df]=quick_ttest(x)
     % one-sample t-test against zero
 
-    n=size(x,1);
-    mu=sum(x,1)/n; % grand mean
+    [ns,nf]=size(x);
+    mu=sum(x,1)/ns; % grand mean
 
-    df=n-1;
-    scaling=n*df;
+    df=ns-1;
+    scaling=ns*df;
 
     % sum of squares
     ss=sum(bsxfun(@minus,x,mu).^2,1);
 
-    t=mu .* sqrt(scaling./ss);
+    t=zeros(1,nf)+NaN;
+    msk=ss>0;
+    t(msk)=mu(msk).*sqrt(scaling./ss(msk));
 
 
 function [t,df]=quick_ttest2(x,y)
     % two-sample t-test with equal variance assumption
 
-    nx=size(x,1);
+    [nx,nf]=size(x);
     ny=size(y,1);
+
+    df=nx+ny-2;
+    if nx==0 || ny==0
+        t=zeros(1,nf)+NaN;
+        return;
+    end
+
     mux=sum(x,1)/nx; % mean of class x
     muy=sum(y,1)/ny; % "           " y
 
-    df=nx+ny-2;
     scaling=(nx*ny)*df/(nx+ny);
 
     % sum of squares
     ss=sum([bsxfun(@minus,x,mux);bsxfun(@minus,y,muy)].^2,1);
 
-    t=(mux-muy) .* sqrt(scaling./ss);
+    t=zeros(1,nf)+NaN;
+    msk=ss>0;
+    t(msk)=(mux(msk)-muy(msk)) .* sqrt(scaling./ss(msk));
 
 
 

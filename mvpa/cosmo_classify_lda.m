@@ -28,11 +28,11 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 %     pred=cosmo_classify_lda(tr.samples,tr.sa.targets,te.samples,struct);
 %     % show targets and predicted labels
 %     disp([te.sa.targets pred])
-%     >       1     1
-%     >       2     2
-%     >       3     3
-%     >       4     4
-%     >       5     5
+%     %||       1     1
+%     %||       2     2
+%     %||       3     3
+%     %||       4     4
+%     %||       5     5
 %
 % Notes:
 % - this classifier does not support a prior, that is it assumes that all

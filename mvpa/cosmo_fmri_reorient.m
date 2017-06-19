@@ -11,52 +11,52 @@ function ds=cosmo_fmri_reorient(ds, new_orient)
 % Example:
 %     ds=cosmo_synthetic_dataset();
 %     cosmo_disp(ds.a);
-%     > .fdim
-%     >   .labels
-%     >     { 'i'  'j'  'k' }
-%     >   .values
-%     >     { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     > .vol
-%     >   .mat
-%     >       [ 2         0         0        -3
-%     >         0         2         0        -3
-%     >         0         0         2        -3
-%     >         0         0         0         1 ]
-%     >   .dim
-%     >     [ 3         2         1 ]
-%     >     .xform
-%     >       'scanner_anat'
+%     %|| .fdim
+%     %||   .labels
+%     %||     { 'i'  'j'  'k' }
+%     %||   .values
+%     %||     { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     %|| .vol
+%     %||   .mat
+%     %||       [ 2         0         0        -3
+%     %||         0         2         0        -3
+%     %||         0         0         2        -3
+%     %||         0         0         0         1 ]
+%     %||   .dim
+%     %||     [ 3         2         1 ]
+%     %||     .xform
+%     %||       'scanner_anat'
 %     cosmo_disp(ds.fa);
-%     > .i
-%     >   [ 1         2         3         1         2         3 ]
-%     > .j
-%     >   [ 1         1         1         2         2         2 ]
-%     > .k
-%     >   [ 1         1         1         1         1         1 ]
+%     %|| .i
+%     %||   [ 1         2         3         1         2         3 ]
+%     %|| .j
+%     %||   [ 1         1         1         2         2         2 ]
+%     %|| .k
+%     %||   [ 1         1         1         1         1         1 ]
 %     ds_reorient=cosmo_fmri_reorient(ds,'AIR');
 %     cosmo_disp(ds_reorient.a);
-%     > .fdim
-%     >   .labels
-%     >     { 'i'  'j'  'k' }
-%     >   .values
-%     >     { [ 1         2 ]  [ 1 ]  [ 1         2         3 ] }
-%     > .vol
-%     >   .mat
-%     >     [   0         0        -2         5
-%     >        -2         0         0         3
-%     >         0         2         0        -3
-%     >         0         0         0         1 ]
-%     >   .dim
-%     >     [ 2         1         3 ]
-%     >     .xform
-%     >       'scanner_anat'
+%     %|| .fdim
+%     %||   .labels
+%     %||     { 'i'  'j'  'k' }
+%     %||   .values
+%     %||     { [ 1         2 ]  [ 1 ]  [ 1         2         3 ] }
+%     %|| .vol
+%     %||   .mat
+%     %||     [   0         0        -2         5
+%     %||        -2         0         0         3
+%     %||         0         2         0        -3
+%     %||         0         0         0         1 ]
+%     %||   .dim
+%     %||     [ 2         1         3 ]
+%     %||     .xform
+%     %||       'scanner_anat'
 %     cosmo_disp(ds_reorient.fa);
-%     > .i
-%     >   [ 1         2         1         2         1         2 ]
-%     > .j
-%     >   [ 1         1         1         1         1         1 ]
-%     > .k
-%     >   [ 1         1         2         2         3         3 ]
+%     %|| .i
+%     %||   [ 1         2         1         2         1         2 ]
+%     %|| .j
+%     %||   [ 1         1         1         1         1         1 ]
+%     %|| .k
+%     %||   [ 1         1         2         2         3         3 ]
 %
 %     % Many orientations are invalid, for example
 %     ds=cosmo_synthetic_dataset();
