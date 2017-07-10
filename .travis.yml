@@ -125,6 +125,9 @@ install:
     # ensure Octave rc file exists
     - echo "" >> $OCTAVERC;
 
+    # use travis-retry
+    - RETRY=travis_retry
+
     # load Octave io package
     - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
