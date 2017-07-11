@@ -228,6 +228,8 @@ else
 
     params=cosmo_structjoin(defaults, varargin);
 
+    show_warning_if_no_defaults(defaults,params);
+
     cached_params=params;
     cached_varargin=varargin;
 end
@@ -423,3 +425,28 @@ function data=get_data(ds, sample_idxs, class_ids, merge_func)
     end
 
 
+function show_warning_if_no_defaults(defaults,params)
+    keys={'output','post_corr_func'};
+    has_defaults=isequal(select_fields(defaults,keys),...
+                         select_fields(params,keys));
+
+    if ~has_defaults && isequal(params.post_corr_func,@atanh)
+        name=mfilename();
+        msg=sprintf(...
+                ['Please note that the ''%s'' function applies '...
+                'Fisher transformation after the correlations '...
+                'have been computed. This was a somewhat unfortunate '...
+                'implementation decision that will not be changed '...
+                'to avoid breaking behaviour with earlier versions.\n'...
+                'To disable using the Fisher transformation, use the '...
+                '''%s'' function while setting the ''post_corr_func'''...
+                'option to the empty array ([])'],name,name);
+        cosmo_warning(msg);
+    end
+
+function subset=select_fields(s, keys)
+    n=numel(keys);
+    for k=1:n
+        key=keys{k};
+        subset.(key)=s.(key);
+    end
