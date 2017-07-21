@@ -114,6 +114,8 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
         error('second argument must be numeric');
     end
 
+    cosmo_check_dataset(ds);
+
     defaults=struct();
     defaults.set_missing_to=0;
     defaults.matrix_labels=cell(0);

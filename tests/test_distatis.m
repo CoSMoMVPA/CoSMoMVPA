@@ -143,6 +143,12 @@ function test_statis_
     % cannot take non-matrix input
     aet({zeros([2 2 2])},opt);
 
+    % illegal field in dataset
+    ds_bad=ds;
+    ds_bad.foo=2;
+    opt=struct();
+    aet(ds_bad,opt);
+
 
 
 function ds=get_distance_dataset(d)
