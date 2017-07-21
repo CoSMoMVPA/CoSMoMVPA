@@ -1301,4 +1301,123 @@ and then get a 'proper' dataset in source space using
 
 
 
+Run `cosmo_montecarlo_cluster_stat` on a cluster with multiple nodes
+--------------------------------------------------------------------
+'I am running group statistics using :ref:`cosmo_montecarlo_cluster_stat` but it is very slow when using the recommended 10,000 iterations. I have access to a computer cluster. Can I use the cluster to speed up the computations?'
+
+Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montecarlo_cluster_stat` on multiple computer nodes with fewer iterations, then combine their results. Consider the following script (and comments in there):
+
+    .. code-block:: matlab
+
+        % example on combining results of multiple invocations of
+        % cosmo_montecarlo_cluster_stat into a single dataset with effectively
+        % more iterations
+        %
+        % Use case: running 10,000 iterations with cosmo_montecarlo_cluster_stat
+        % on a single machine takes to long, but there are 50 computer nodes
+        % available in a computer cluster. Then each node can do 200 iterations;
+        % results from each node are combined afterwards to get
+        % effectively 10,000 iteraations
+        %
+
+        % generate some random data for 20 participants
+        nsubjects=20;
+        ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',nsubjects,...
+                                'sigma',0,'size','normal','seed',2);
+
+        % Generate TFCE z-scores in 50 blocks, each with 20 iterations.
+        %
+        % In this example a simple for-loop is used to compute results for each
+        % block, but typically results in each block are computed in different
+        % Matlab sessions (e.g. when using multiple computer nodes in a clusters).
+        % In that case, a script or function should be used that stores the result
+        % (a dataset with TFCE z-scores) for each block in a .mat file. For
+        % example, the following function could be run on each computing node (each
+        % with a different value for block_id):
+        %
+        %     function run_tfce_block(block_id,niter_per_block)
+        %
+        %     % load dataset with data from each subject
+        %     ds=load('my_subject_data.mat');
+        %
+        %     % define neighborhood
+        %     nh=cosmo_cluster_neighborhood(ds);
+        %
+        %     % set TFCE options
+        %     opt=struct();
+        %     opt.niter=niter_per_block;
+        %     opt.h0_mean=0;
+        %     opt.seed=block_id;
+        %
+        %     % compute TFCE z-scores
+        %     z_ds=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+        %
+        %     % save results to disk
+        %     fn=sprintf('tfce_z_block%02d.mat',block_id);
+        %     save(fn,'-struct','z_ds');
+        %
+        % After running this function for aech block, the resulting .mat files
+        % would then be loaded and combined with cosmo_stack as illustrated below.
+        %
+        % If a seed is set for cosmo_montecarlo_cluster_stat, then it is crucial
+        % that different seed values are used in different blocks (otherwise each
+        % block would yield identical results)
+
+        nblocks=50;
+        niter_per_block=20;
+
+        ds_tfce_cell=cell(nblocks,1);
+        for k=1:nblocks
+            % Set TFCE options for each block.
+            % A different seed value is used for each block to obtain repeatable
+            % (determnistic) but different results in each block
+            opt=struct();
+            opt.niter=niter_per_block;
+            opt.h0_mean=0;
+            opt.seed=k;
+
+            % define the neighborhood
+            nbrhood=cosmo_cluster_neighborhood(ds);
+
+            % compute TFCE z-scores
+            ds_tfce_k=cosmo_montecarlo_cluster_stat(ds,nbrhood,opt);
+
+            % store result
+            ds_tfce_cell{k}=ds_tfce_k;
+        end
+
+        % combine TFCE z-scores from all blocks into one dataset
+        % (due to a tail cutoff protection this approach is very minorly
+        % conservative in its p-value computation)
+        ds_tfce_all=cosmo_stack(ds_tfce_cell);
+
+        % convert TFCE z-scores to TFCE p-values
+        % (the p-values represent the left tail probability)
+        ps_all=normcdf(ds_tfce_all.samples);
+
+        % compute the average p value over blocks, for each feature separately
+        combined_ps=mean(ps_all,1);
+
+        % convert TFCE p value back to TFCE z-scores
+        combined_z=norminv(combined_ps);
+
+        % make a new dataset in which the combined z-scores
+        % are going to be stored
+        ds_tfce=cosmo_slice(ds_tfce_all,1);
+
+        % ensure empty sample attributes
+        ds_tfce.sa=struct();
+
+        % store dataset
+        ds_tfce.samples=combined_z;
+        cosmo_check_dataset(ds_tfce)
+
+
+
+
+
+
+
+
+
 .. include:: links.txt
