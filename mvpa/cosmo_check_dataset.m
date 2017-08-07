@@ -28,40 +28,40 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %
 % Examples:
 %     cosmo_check_dataset([])
-%     > error('dataset not a struct')
+%     %|| error('dataset not a struct')
 %
 %     cosmo_check_dataset(struct())
-%     > error('dataset has no field .samples')
+%     %|| error('dataset has no field .samples')
 %
 %     % this (very minimal) dataset is kosher
 %     cosmo_check_dataset(struct('samples',zeros(2)))
-%     > true
+%     %|| true
 %
 %     % error can be silenced
 %     cosmo_check_dataset('this is not ok',false)
-%     > false
+%     %|| false
 %
 %     % run some more tests
 %     ds=cosmo_synthetic_dataset('type','fmri');
 %     cosmo_check_dataset(ds)
-%     > true
+%     %|| true
 %     ds.sa.chunks=[2;3]; % wrong size
 %     cosmo_check_dataset(ds)
-%     > error('sa.chunks has 2 values in dimension 1, expected 6')
+%     %|| error('sa.chunks has 2 values in dimension 1, expected 6')
 %     ds.sa.chunks={'a','b','c','a','b','c'}';
 %     cosmo_check_dataset(ds)
-%     > error('.sa.chunks must be numeric vector with integers')
+%     %|| error('.sa.chunks must be numeric vector with integers')
 %
 %     % set illegal dimension values
 %     ds=cosmo_synthetic_dataset('type','fmri');
 %     ds.a.fdim.values{1}=[1 2];
 %     cosmo_check_dataset(ds)
-%     > error('.fa.i must be vector with integers in range 1..2')
+%     %|| error('.fa.i must be vector with integers in range 1..2')
 %
 %     % check for specific type of dataset
 %     ds=cosmo_synthetic_dataset('type','fmri');
 %     cosmo_check_dataset(ds,'meeg')
-%     > error('missing field .a.meeg for meeg-dataset');
+%     %|| error('missing field .a.meeg for meeg-dataset');
 %
 %     % destroy crucial information in fmri dataset
 %     % this error is only caught if explicit checking for fmri dataset is
@@ -71,17 +71,17 @@ function is_ok=cosmo_check_dataset(ds, ds_type, error_if_not_ok)
 %     % destroy volume information
 %     ds.a=rmfield(ds.a,'vol');
 %     cosmo_check_dataset(ds)
-%     > true  % error not caught
+%     %|| true  % error not caught
 %     cosmo_check_dataset(ds,'fmri')
-%     > error('missing field .a.vol for fmri-dataset')
+%     %|| error('missing field .a.vol for fmri-dataset')
 %
 %     % check meeg dataset
 %     ds=cosmo_synthetic_dataset('type','meeg');
 %     cosmo_check_dataset(ds,'meeg')
-%     > true
+%     %|| true
 %     ds.fa.chan=ds.fa.chan+6; % outside range
 %     cosmo_check_dataset(ds)
-%     > error('.fa.chan must be vector with integers in range 1..3')
+%     %|| error('.fa.chan must be vector with integers in range 1..3')
 %
 % Notes:
 %  - if the second argument is a boolean then its value is used for

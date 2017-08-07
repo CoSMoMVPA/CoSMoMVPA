@@ -3,7 +3,10 @@ function test_suite=test_meeg_io()
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
@@ -291,7 +294,7 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
     fdim.labels=fdim.labels(1:nkeep);
 
     keep_sizes=sizes(1:k);
-    ft.(data_label)=norminv(cosmo_rand(keep_sizes,'seed',seed));
+    ft.(data_label)=cosmo_norminv(cosmo_rand(keep_sizes,'seed',seed));
     ft.cfg=struct();
     ft.trialinfo=[(1:ntrials);(ntrials:-1:1)]';
 
@@ -301,7 +304,17 @@ function [ft,fdim,data_label]=generate_ft_struct(dimord)
 
 
 function test_eeglab_io()
+<<<<<<< HEAD
     args=cosmo_cartprod(repmat({{true;false}},1,3));
+=======
+    datatypes={'timef','erp','itc'};
+
+    args=cosmo_cartprod({{true,false},...
+                         {true,false},...
+                         datatypes});
+
+
+>>>>>>> CoSMoMVPA/master
     ncombi=size(args,1);
     for k=1:ncombi
         arg=args(k,:);
@@ -334,8 +347,18 @@ function test_eeglab_io()
     end
 
 function test_eeglab_io_trials()
+<<<<<<< HEAD
 
     args=cosmo_cartprod(repmat({{true;false}},1,3));
+=======
+% test with loading a subset of trials
+    datatypes={'timef','erp','itc'};
+
+    args=cosmo_cartprod({{true,false},...
+                         {true,false},...
+                         datatypes});
+
+>>>>>>> CoSMoMVPA/master
     ncombi=size(args,1);
     for k=1:ncombi
         arg=args(k,:);
@@ -372,6 +395,63 @@ function test_eeglab_io_trials()
         clear cleaner;
     end
 
+<<<<<<< HEAD
+=======
+function test_eeglab_io_ersp()
+    aet=@(varargin)assertExceptionThrown(@()...
+                    cosmo_meeg_dataset(varargin{:}),'');
+
+    args=cosmo_cartprod({{true,false},...
+                         {false},...
+                         {'ersp'},...
+                         {false,true}});
+
+     ncombi=size(args,1);
+    for k=1:ncombi
+        arg=args(k,1:3);
+        [s,ds_cell,ext]=build_eeglab_dataset_struct(arg{:});
+
+        % either load baseline data or original data
+        with_baseline=args{k,4};
+        if with_baseline
+            load_args={'data_field','erspbase'};
+            ds=ds_cell{2};
+        else
+            load_args={'data_field','ersp'};
+            ds=ds_cell{1};
+        end
+
+        % illegal without arguments or wrong arguments
+        aet(s);
+        aet(s,'data_field','foo');
+        aet(s,'data_field',false);
+
+        % load data with correct arguments
+        ds_loaded=cosmo_meeg_dataset(s,load_args{:});
+        assertEqual(ds_loaded,ds);
+
+
+         % store, then read using cosmo_meeg_dataset
+        fn=sprintf('%s.%s',tempname(),ext);
+        save(fn,'-mat','-struct','s');
+        cleaner=onCleanup(@()delete(fn));
+
+        ds_loaded=cosmo_meeg_dataset(fn,load_args);
+
+        % writing the file is not supported
+        assertExceptionThrown(@()cosmo_map2meeg(ds,fn),'');
+
+        clear cleaner
+
+        assertEqual(ds_loaded,ds);
+    end
+
+
+
+
+
+
+>>>>>>> CoSMoMVPA/master
 
 function test_eeglab_io_exceptions()
     aet_md=@(varargin)assertExceptionThrown(@()...
@@ -379,7 +459,11 @@ function test_eeglab_io_exceptions()
     aet_m2m=@(varargin)assertExceptionThrown(@()...
                             cosmo_map2meeg(varargin{:}),'');
 
+<<<<<<< HEAD
     s=build_eeglab_dataset_struct(true,true,true);
+=======
+    s=build_eeglab_dataset_struct(true,true,'timef');
+>>>>>>> CoSMoMVPA/master
 
     % bad datatype
     s.datatype='foo';
@@ -405,9 +489,27 @@ function test_eeglab_io_exceptions()
     end
 
 
+<<<<<<< HEAD
 
 
 function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
+=======
+function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype,...
+                        chan_dim,freq_dim,time_dim)
+    if nargin<6
+        time_dim=randint();
+    end
+
+    if nargin<5
+        freq_dim=randint();
+    end
+
+    if nargin<4
+        chan_dim=randint();
+    end
+
+
+>>>>>>> CoSMoMVPA/master
     % trial dimension
     if has_trial
         trial_dim=randint();
@@ -415,9 +517,47 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
         trial_dim=1;
     end
 
+<<<<<<< HEAD
 
     % channel / component dimension
     chan_dim=randint();
+=======
+    if strcmp(datatype,'ersp')
+        % has baseline corrected data together with baseline data
+        builder=@build_eeglab_dataset_struct;
+        args={chan_dim,freq_dim,time_dim};
+        [s1,ds1,ext]=builder(has_ica,has_trial,...
+                                'ersp_baselinecorrected',args{:});
+        [s2,ds2]=builder(has_ica,has_trial,...
+                                'erspbase',args{:});
+
+        keys=fieldnames(s1);
+        for k=1:numel(keys)
+            key=keys{k};
+            s2.(key)=s1.(key);
+        end
+
+        s=s2;
+        s.datatype=upper(datatype);
+
+        % make sure parameters are the same
+        ds1.a.meeg.parameters=s.parameters;
+        ds2.a.meeg.parameters=s.parameters;
+
+        if isfield(s,'chanlabels')
+            chan_labels=s.chanlabels;
+            ds1.a.fdim.values{1}=chan_labels;
+            ds2.a.fdim.values{1}=chan_labels;
+        end
+
+        ds={ds1,ds2};
+        % remove second part from extension
+        ext=regexprep(ext,'_.*','');
+        return;
+    end
+
+    % channel / component dimension
+>>>>>>> CoSMoMVPA/master
     if has_ica
         chan_prefix='comp';
         ext_prefix='ica';
@@ -430,10 +570,33 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
         make_chan_prefix_func=@randstr;
     end
 
+<<<<<<< HEAD
     if has_freq
         chan_suffix='_timef';
     else
         chan_suffix='';
+=======
+    has_freq=2;
+
+    switch datatype
+        case 'timef'
+            chan_suffix='_timef';
+
+        case 'erp'
+            chan_suffix='';
+
+        case 'ersp_baselinecorrected'
+            chan_suffix='_ersp';
+
+        case 'erspbase'
+            chan_suffix='_erspbase';
+
+        case 'itc';
+            chan_suffix='_itc';
+
+        otherwise
+            assert(false);
+>>>>>>> CoSMoMVPA/master
     end
 
     make_chan_label=@(idx) sprintf('%s%d',make_chan_prefix_func(),idx);
@@ -443,17 +606,37 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
                             'UniformOutput',false)};
 
     % frequency dimension
+<<<<<<< HEAD
     if has_freq
         freq_dim=randint();
         freq_label={'freq'};
         freq_value={(1:freq_dim)*2};
         samples_type='timefreq';
         ext_suffix='timef';
+=======
+    switch datatype
+        case {'timef','ersp_baselinecorrected','itc','erspbase'}
+            has_freq=true;
+
+
+        case {'erp'};
+            has_freq=false;
+
+        otherwise
+            assert(false);
+    end
+
+    if has_freq
+        freq_label={'freq'};
+        freq_value={(1:freq_dim)*2};
+        samples_type='timefreq';
+>>>>>>> CoSMoMVPA/master
     else
         freq_dim=[];
         freq_label={};
         freq_value={};
         samples_type='timelock';
+<<<<<<< HEAD
         ext_suffix='erp';
     end
 
@@ -465,6 +648,28 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     % data
     dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
     dim_sizes_without_chan=dim_sizes([1, 3:end]);
+=======
+    end
+
+    ext_suffix=datatype;
+
+    hastime=~strcmp(datatype,'erspbase');
+
+    if hastime
+        % include time dimension
+        time_label={'time'};
+        time_value={(1:time_dim())*.2-.1};
+    else
+        % no time dimension
+        time_dim=[];
+        time_label={};
+        time_value={};
+    end
+
+    % data
+    dim_sizes=[trial_dim,chan_dim,freq_dim,time_dim];
+    dim_sizes_without_chan=[dim_sizes([1, 3:end]), 1];
+>>>>>>> CoSMoMVPA/master
     data_arr=randn(dim_sizes);
 
     % params
@@ -505,7 +710,15 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_freq,has_trial)
     if has_freq
         s.freqs=freq_value{1};
     end
+<<<<<<< HEAD
     s.times=time_value{1};
+=======
+
+    if hastime
+        s.times=time_value{1};
+    end
+
+>>>>>>> CoSMoMVPA/master
     s.datatype=upper(ext_suffix);
     s.parameters=parameters;
 

@@ -18,21 +18,21 @@ function [offsets,distances]=cosmo_sphere_offsets(radius)
 %     % that only share a corner (because sqrt(2) < 1.5 < sqrt(3)).
 %     [o, d]=cosmo_sphere_offsets(1.5);
 %     cosmo_disp(o);
-%     > [  0         0         0
-%     >   -1         0         0
-%     >    0        -1         0
-%     >    :         :         :
-%     >    1         0        -1
-%     >    1         0         1
-%     >    1         1         0 ]@19x3
+%     %|| [  0         0         0
+%     %||   -1         0         0
+%     %||    0        -1         0
+%     %||    :         :         :
+%     %||    1         0        -1
+%     %||    1         0         1
+%     %||    1         1         0 ]@19x3
 %     cosmo_disp(d)
-%     > [    0
-%     >      1
-%     >      1
-%     >     :
-%     >   1.41
-%     >   1.41
-%     >   1.41 ]@19x1
+%     %|| [    0
+%     %||      1
+%     %||      1
+%     %||     :
+%     %||   1.41
+%     %||   1.41
+%     %||   1.41 ]@19x1
 %
 % Notes:
 %   - this function computes distances in voxel space, not in world space.

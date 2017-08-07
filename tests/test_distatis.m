@@ -3,7 +3,10 @@ function test_suite = test_distatis
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
@@ -139,6 +142,12 @@ function test_statis_
 
     % cannot take non-matrix input
     aet({zeros([2 2 2])},opt);
+
+    % illegal field in dataset
+    ds_bad=ds;
+    ds_bad.foo=2;
+    opt=struct();
+    aet(ds_bad,opt);
 
 
 

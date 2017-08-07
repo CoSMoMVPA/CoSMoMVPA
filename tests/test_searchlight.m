@@ -3,7 +3,10 @@ function test_suite = test_searchlight
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
@@ -21,9 +24,9 @@ function test_searchlight_matlab_multithread()
         return;
     end
 
-    warning_state=warning();
-    warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off');
+    warning_state=cosmo_warning();
+    warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
 
     opt=struct();
     opt.progress=false;
@@ -40,9 +43,9 @@ function test_searchlight_octave_multithread()
         return;
     end
 
-    warning_state=warning();
-    warning_resetter=onCleanup(@()warning(warning_state));
-    warning('off');
+    warning_state=cosmo_warning();
+    warning_resetter=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
 
     opt=struct();
     opt.progress=false;

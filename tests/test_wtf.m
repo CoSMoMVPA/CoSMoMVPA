@@ -3,7 +3,10 @@ function test_suite=test_wtf
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 function test_wtf_basics()
@@ -53,6 +56,20 @@ function test_wtf_warnings()
         assert_contains(w,sprintf('%s: %s',warning_id,label));
         assert_not_contains(w,sprintf('%s: %s',warning_id,anti_label));
     end
+<<<<<<< HEAD
+=======
+
+function test_wtf_version_number()
+    vn=cosmo_wtf('version_number');
+    assert(isnumeric(vn));
+
+    vs=sprintf('%d.',vn);
+    vs=vs(1:(end-1));
+
+    vs_expected=regexp(version(),'^\S*','match');
+    assert(numel(vs_expected{1})>=3);
+    assertEqual(vs,vs_expected{1});
+>>>>>>> CoSMoMVPA/master
 
 function test_wtf_is_matlab
     is_octave=environment_is_octave;

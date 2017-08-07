@@ -23,15 +23,18 @@ function joined=cosmo_strjoin(strings, delim)
 %
 % Examples:
 %   cosmo_strjoin({'a','b','c'})
-%   > 'a b c'
+%   %|| 'a b c'
+%
 %   cosmo_strjoin({'a','b','c'}, '>#<')
-%   > 'a>#<b>#<c'
-%   cosmo_strjoin({'a','b','c'}, '\t')
-%   > 'a	b	c'   % each string of spaces is a tab character
+%   %|| 'a>#<b>#<c'
+%
+%   % '\\' is the escaped backslash character
 %   cosmo_strjoin({'a','b','c'}, '\\')
-%   > 'a\b\c'        % '\\' is the escaped backslash character
+%   %|| 'a\b\c'
+%
+%   % use multiple delimiters
 %   cosmo_strjoin({'a','b','c'},{'*','='})
-%   > 'a*b=c'
+%   %|| 'a*b=c'
 %
 % Notes:
 %   - this function implements similar functionality as matlab's strjoin

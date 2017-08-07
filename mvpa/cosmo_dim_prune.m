@@ -21,9 +21,9 @@ function ds=cosmo_dim_prune(ds, varargin)
 %     % For an MEEG dataset, get a selection of some channels
 %     ds=cosmo_synthetic_dataset('type','meeg','size','huge');
 %     cosmo_disp(ds.a.fdim.values{1},'edgeitems',2);
-%     > { 'MEG0111'  'MEG0112'  ...  'MEG2642'  'MEG2643'   }@1x306
+%     %|| { 'MEG0111'  'MEG0112'  ...  'MEG2642'  'MEG2643'   }@1x306
 %     cosmo_disp(ds.fa.chan)
-%     > [ 1         2         3  ...  304       305       306 ]@1x5202
+%     %|| [ 1         2         3  ...  304       305       306 ]@1x5202
 %     %
 %     % select channels
 %     msk=cosmo_dim_match(ds,'chan',{'MEG1843','MEG2441'});
@@ -35,10 +35,10 @@ function ds=cosmo_dim_prune(ds, varargin)
 %     %
 %     % show result
 %     cosmo_disp(ds_pruned.a.fdim.values{1}); % 'chan' is first dimension
-%     > { 'MEG1843'
-%     >   'MEG2441' }
+%     %|| { 'MEG1843'
+%     %||   'MEG2441' }
 %     cosmo_disp(ds_pruned.fa.chan)
-%     > [ 1         2         1  ...  2         1         2 ]@1x34
+%     %|| [ 1         2         1  ...  2         1         2 ]@1x34
 %     %
 %     % For the same MEEG dataset, get a selection of time points between 0
 %     % and .3 seconds. A function handle is used to select the timepoints
@@ -49,9 +49,9 @@ function ds=cosmo_dim_prune(ds, varargin)
 %     %
 %     % show result
 %     cosmo_disp(ds_pruned.a.fdim.values{2}); % 'time' is second dimension
-%     > [ 0      0.05       0.1  ...  0.2      0.25       0.3 ]@1x7
+%     %|| [ 0      0.05       0.1  ...  0.2      0.25       0.3 ]@1x7
 %     cosmo_disp(ds_pruned.fa.time)
-%     > [ 1         1         1  ...  7         7         7 ]@1x2142
+%     %|| [ 1         1         1  ...  7         7         7 ]@1x2142
 %     %
 %     % For the same MEEG dataset, compute a conjunction mask of the
 %     % channels and time points selected above
@@ -60,17 +60,17 @@ function ds=cosmo_dim_prune(ds, varargin)
 %     ds_pruned=cosmo_dim_prune(ds_sel);
 %     %
 %     % show result
-%     > { { 'MEG1843'    [    0
-%     >     'MEG2441' }    0.05
-%     >                     0.1
-%     >                      :
-%     >                     0.2
-%     >                    0.25
-%     >                     0.3 ]@7x1 }
+%     cosmo_disp(ds_pruned.a.fdim);
+%     %||.labels
+%     %||  { 'chan'
+%     %||    'time' }
+%     %||.values
+%     %||  { { 'MEG1843'  'MEG2441' }
+%     %||    [ 0      0.05       0.1  ...  0.2      0.25       0.3 ]@1x7 }
 %     cosmo_disp(ds_pruned.fa.chan)
-%     > [ 1         2         1  ...  2         1         2 ]@1x14
+%     %|| [ 1         2         1  ...  2         1         2 ]@1x14
 %     cosmo_disp(ds_pruned.fa.time)
-%     > [ 1         1         2  ...  6         7         7 ]@1x14
+%     %|| [ 1         1         2  ...  6         7         7 ]@1x14
 % Notes:
 %  - Using this function makes sense for MEEG data, but not at all
 %    for fMRI or surface data.

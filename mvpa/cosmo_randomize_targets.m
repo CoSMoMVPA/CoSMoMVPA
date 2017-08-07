@@ -28,21 +28,21 @@ function [randomized_targets,permutation]=cosmo_randomize_targets(ds,varargin)
 %     ds=cosmo_synthetic_dataset('nchunks',15);
 %     % show number of samples with targets 1 or 2
 %     histc(ds.sa.targets',1:2)
-%     > [15 15]
+%     %|| [15 15]
 %     % generate randomized targets
 %     rand_targets=cosmo_randomize_targets(ds);
 %     % the number of samples with targets 1 or 2 is the same ...
 %     histc(rand_targets',1:2)
-%     > [15 15]
+%     %|| [15 15]
 %     % ... but the targets are re-ordered
 %     all(ds.sa.targets==rand_targets)
-%     > false
+%     %|| false
 %     %
 %     % when using the 'seed' option, the output is deterministic
 %     % (multiple calls to this function always give the same output)
 %     rand_targets_deterministic=cosmo_randomize_targets(ds,'seed',314);
 %     rand_targets_deterministic'
-%     > [ 2 1 1 2 2 1 2 1 2 1 2 1 1 2 2 1 1 2 2 1 1 2 2 1 2 1 2 1 2 1 ]
+%     %|| [ 2 1 1 2 2 1 2 1 2 1 2 1 1 2 2 1 1 2 2 1 1 2 2 1 2 1 2 1 2 1 ]
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

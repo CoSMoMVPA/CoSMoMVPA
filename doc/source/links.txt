@@ -13,17 +13,20 @@
 .. _CoSMoMVPA: http://cosmomvpa.org
 .. _`CoSMoMVPA Google group`: https://groups.google.com/forum/#!forum/cosmomvpa
 .. _`CoSMoMVPA issues`: https://github.com/CoSMoMVPA/CoSMoMVPA/issues
+.. _`coveralls.io`:  https://coveralls.io/github/CoSMoMVPA/CoSMoMVPA
 .. _`easy_install`: https://pypi.python.org/pypi/setuptools
 .. _EEGLAB: http://sccn.ucsd.edu/eeglab
 .. _git: http://gitscm.com
 .. _GitHub: https://github.com/CoSMoMVPA/CoSMoMVPA
 .. _FieldTrip: http://fieldtrip.fcdonders.nl
 .. _FreeSurfer: http://freesurfer.net
+.. _`LABMAN 2017`: http://2ndmeeting.labman.org/
 .. _LIBSVM: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 .. _Matlab: http://www.mathworks.com/products/matlab/
 .. |Matlab(TM)| unicode:: MATLAB U+00AE
 .. _Matlab statistics: http://www.mathworks.it/products/statistics/
-.. _MOxUnit: http://github.com/nno/MOxUnit
+.. _MOcov: https://github.com/MOcov/MOcov
+.. _MOxUnit: https://github.com/MOxUnit/MOxUnit
 .. _MRIcron: http://www.nitrc.org/projects/mricron
 .. _NeuroElf: http://neuroelf.net
 .. _NIFTI: http://www.nitrc.org/projects/nifti

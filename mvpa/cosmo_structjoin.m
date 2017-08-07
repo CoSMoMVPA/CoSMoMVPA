@@ -21,25 +21,25 @@ function s=cosmo_structjoin(varargin)
 % Example:
 %     x=cosmo_structjoin('a',{1;2},'b',{3,4});
 %     cosmo_disp(x);
-%     > .a
-%     >   { [ 1 ]
-%     >     [ 2 ] }
-%     > .b
-%     >   { [ 3 ]  [ 4 ] }
+%     %|| .a
+%     %||   { [ 1 ]
+%     %||     [ 2 ] }
+%     %|| .b
+%     %||   { [ 3 ]  [ 4 ] }
 %     y=cosmo_structjoin(x,'a',66,'x',x,{'c','hello'});
 %     cosmo_disp(y);
-%     > .a
-%     >   [ 66 ]
-%     > .b
-%     >   { [ 3 ]  [ 4 ] }
-%     > .x
-%     >   .a
-%     >     { [ 1 ]
-%     >       [ 2 ] }
-%     >   .b
-%     >     { [ 3 ]  [ 4 ] }
-%     > .c
-%     >   'hello'
+%     %|| .a
+%     %||   [ 66 ]
+%     %|| .b
+%     %||   { [ 3 ]  [ 4 ] }
+%     %|| .x
+%     %||   .a
+%     %||     { [ 1 ]
+%     %||       [ 2 ] }
+%     %||   .b
+%     %||     { [ 3 ]  [ 4 ] }
+%     %|| .c
+%     %||   'hello'
 %
 %     % simulate a function definition function out=f(varargin)
 %     % to illustrate overriding default values
@@ -49,12 +49,12 @@ function s=cosmo_structjoin(varargin)
 %     defaults.nfeatures=2;
 %     params=cosmo_structjoin(defaults,varargin);
 %     cosmo_disp(params);
-%     > .radius
-%     >   [ 2 ]
-%     > .nfeatures
-%     >   [ 2 ]
-%     > .nsamples
-%     >   [ 12 ]
+%     %|| .radius
+%     %||   [ 2 ]
+%     %|| .nfeatures
+%     %||   [ 2 ]
+%     %|| .nsamples
+%     %||   [ 12 ]
 %
 %     % illustrate overriding values in 'sub-structs' (structs as values in
 %     % other structs)
@@ -66,15 +66,15 @@ function s=cosmo_structjoin(varargin)
 %     w.c=4;
 %     j=cosmo_structjoin(v,w);
 %     cosmo_disp(j)
-%     > .a
-%     >   .foo
-%     >     { [ 1 ]  [ 2 ] }
-%     >   .bar
-%     >     [ 2         3 ]
-%     > .b
-%     >   [ 3 ]
-%     > .c
-%     >   [ 4 ]
+%     %|| .a
+%     %||   .foo
+%     %||     { [ 1 ]  [ 2 ] }
+%     %||   .bar
+%     %||     [ 2         3 ]
+%     %|| .b
+%     %||   [ 3 ]
+%     %|| .c
+%     %||   [ 4 ]
 %
 %
 % Notes:
