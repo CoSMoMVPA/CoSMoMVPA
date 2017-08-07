@@ -1,4 +1,4 @@
-function predicted = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
+function [predicted,decisionvalues] = cosmo_classify_lda(samples_train, targets_train, samples_test, opt)
 % linear discriminant analysis classifier - without prior
 %
 % predicted=cosmo_classify_lda(samples_train, targets_train, samples_test[,opt])
@@ -16,6 +16,9 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
 %                       for large values of R, because training the
 %                       classifier typically requires in the order of 8*R^2
 %                       bytes of memory
+%    .check_data        Check for balanced data. Default true; if set to
+%                       false and the training data is not balanced, then
+%                       the classifier can (and likely, will) become biased
 %
 % Output:
 %   predicted          Qx1 predicted data classes for samples_test
@@ -50,6 +53,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
     end
     if ~isfield(opt, 'regularization'), opt.regularization=.01; end
     if ~isfield(opt, 'max_feature_count'), opt.max_feature_count=5000; end
+    if ~isfield(opt, 'check_data'), opt.check_data=1; end
 
     % support repeated testing on different data after training every time
     % on the same data. This is achieved by caching the training data
@@ -76,7 +80,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
     end
 
     % test classifier
-    predicted=test(model, samples_test);
+    [predicted,decisionvalues]=test(model, samples_test);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % helper functions
@@ -138,7 +142,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
                                 'in training']);
                 end
                 nfirst=n; % keep track of number of samples
-            elseif nfirst~=n
+            elseif opt.check_data & nfirst~=n
                 error(['Different number of classes (%d and %d) - this '...
                         'is not supported. When using partitions, '...
                         'consider using cosmo_balance_partitions'], ...
@@ -166,7 +170,7 @@ function predicted = cosmo_classify_lda(samples_train, targets_train, samples_te
         model.class_weight=class_weight;
         model.classes=classes;
 
-function predicted=test(model, samples_test)
+function [predicted,decisionvalues]=test(model, samples_test)
     % test LDA classifier
 
     class_offset=model.class_offset;
@@ -179,8 +183,8 @@ function predicted=test(model, samples_test)
     end
 
     class_proj=bsxfun(@plus,-.5*class_offset,class_weight*samples_test');
-
-    [unused,class_idxs]=max(class_proj);
+    decisionvalues=zeros(size(class_proj,2),1);
+    [decisionvalues(:),class_idxs]=max(class_proj);
     predicted=classes(class_idxs);
 
 function unq_xs=fast_vector_unique(xs)
