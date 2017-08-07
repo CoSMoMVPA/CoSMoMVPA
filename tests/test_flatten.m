@@ -3,7 +3,10 @@ function test_suite=test_flatten()
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 function test_flatten_and_unflatten()
@@ -126,3 +129,12 @@ function run_helper_test_flatten(nsamples, nfdim, dim)
     aet(ds,3);
     aet(ds,[1 1]*dim,opt);
 
+function test_unflatten_exceptions()
+    aet=@(varargin)assertExceptionThrown(@()...
+                        cosmo_unflatten(varargin{:}),'');
+    ds=cosmo_synthetic_dataset();
+    cosmo_unflatten(ds); % should be ok
+
+    bad_ds=ds;
+    bad_ds.foo=2;
+    aet(bad_ds);

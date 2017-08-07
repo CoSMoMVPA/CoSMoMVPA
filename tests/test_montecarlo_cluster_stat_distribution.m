@@ -3,15 +3,14 @@ function test_suite=test_montecarlo_cluster_stat_distribution
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
 function test_mccs_uniformity_slow()
-    if cosmo_skip_test_if_no_external('!norminv');
-        return;
-    end
-
     show_progress=true;
 
     if show_progress

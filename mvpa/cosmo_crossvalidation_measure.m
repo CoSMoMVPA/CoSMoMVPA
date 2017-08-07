@@ -19,7 +19,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %                       - 'balanced_accuracy'   classificationa accuracy is
 %                                               computed for each class,
 %                                               then averaged
-%                       - 'fold_accuracy'       classificationa accuracy is
+%                       - 'fold_accuracy'       classification accuracy is
 %                                               computed for each fold
 %                       - 'winner_predictions'  class that was predicted
 %                                               for each sample in the test
@@ -80,11 +80,11 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     % run crossvalidation and return accuracy (the default)
 %     acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(acc_ds);
-%     > .samples
-%     >   [ 0.917 ]
-%     > .sa
-%     >   .labels
-%     >     { 'accuracy' }
+%     %|| .samples
+%     %||   [ 0.917 ]
+%     %|| .sa
+%     %||   .labels
+%     %||     { 'accuracy' }
 %
 %     % let the measure return predictions instead of accuracy,
 %     % and use take-1-chunks out for testing crossvalidation;
@@ -99,24 +99,24 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     % show results. Because each sample was predicted just once,
 %     % .sa.chunks contains the chunks of the original input
 %     cosmo_disp(pred_ds);
-%     > .samples
-%     >   [ 9
-%     >     8
-%     >     9
-%     >     :
-%     >     7
-%     >     9
-%     >     7 ]@12x1
-%     > .sa
-%     >   .targets
-%     >     [ 7
-%     >       8
-%     >       9
-%     >       :
-%     >       7
-%     >       8
-%     >       9 ]@12x1
-%     >
+%     %|| .samples
+%     %||   [ 9
+%     %||     8
+%     %||     9
+%     %||     :
+%     %||     7
+%     %||     9
+%     %||     7 ]@12x1
+%     %|| .sa
+%     %||   .targets
+%     %||     [ 7
+%     %||       8
+%     %||       9
+%     %||       :
+%     %||       7
+%     %||       8
+%     %||       9 ]@12x1
+%     %||
 %     %
 %     % return accuracy, but use z-scoring on each training set
 %     % and apply the estimated mean and std to the test set.
@@ -129,11 +129,11 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
 %     z_acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp(z_acc_ds);
-%     > .samples
-%     >   [ 0.75 ]
-%     > .sa
-%     >   .labels
-%     >     { 'accuracy' }
+%     %|| .samples
+%     %||   [ 0.75 ]
+%     %|| .sa
+%     %||   .labels
+%     %||     { 'accuracy' }
 %
 %     % illustrate accuracy for partial test set
 %     ds=cosmo_synthetic_dataset('ntargets',2,'nchunks',5);
@@ -147,21 +147,21 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     acc_ds=cosmo_crossvalidation_measure(ds,opt);
 %     % show accuracy
 %     cosmo_disp(acc_ds.samples)
-%     > 0.75
+%     %|| 0.75
 %     % show predictions
 %     opt.output='winner_predictions';
 %     pred_ds=cosmo_crossvalidation_measure(ds,opt);
 %     cosmo_disp([pred_ds.samples pred_ds.sa.targets],'threshold',inf);
-%     > [ NaN         1
-%     >   NaN         2
-%     >     1         1
-%     >     2         2
-%     >   NaN         1
-%     >   NaN         2
-%     >     1         1
-%     >     1         2
-%     >   NaN         1
-%     >   NaN         2 ]
+%     %|| [ NaN         1
+%     %||   NaN         2
+%     %||     1         1
+%     %||     2         2
+%     %||   NaN         1
+%     %||   NaN         2
+%     %||     1         1
+%     %||     1         2
+%     %||   NaN         1
+%     %||   NaN         2 ]
 %
 %     % return predictions for each fold, using output='fold_predictions'.
 %     % The output has now multiple predictions for each original input
@@ -172,20 +172,20 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     % nchoosek(4,2)=6 folds
 %     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
 %     cosmo_disp(opt.partitions);
-%     > .train_indices
-%     >   { [  7    [  4    [ 4    [  1    [ 1    [ 1
-%     >        8       5      5       2      2      2
-%     >        9       6      6       3      3      3
-%     >       10      10      7      10      7      4
-%     >       11      11      8      11      8      5
-%     >       12 ]    12 ]    9 ]    12 ]    9 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 1    [  1    [ 4    [  4    [  7
-%     >       2      2       2      5       5       8
-%     >       3      3       3      6       6       9
-%     >       4      7      10      7      10      10
-%     >       5      8      11      8      11      11
-%     >       6 ]    9 ]    12 ]    9 ]    12 ]    12 ] }
+%     %|| .train_indices
+%     %||   { [  7    [  4    [ 4    [  1    [ 1    [ 1
+%     %||        8       5      5       2      2      2
+%     %||        9       6      6       3      3      3
+%     %||       10      10      7      10      7      4
+%     %||       11      11      8      11      8      5
+%     %||       12 ]    12 ]    9 ]    12 ]    9 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 1    [  1    [ 4    [  4    [  7
+%     %||       2      2       2      5       5       8
+%     %||       3      3       3      6       6       9
+%     %||       4      7      10      7      10      10
+%     %||       5      8      11      8      11      11
+%     %||       6 ]    9 ]    12 ]    9 ]    12 ]    12 ] }
 %     %
 %     % set output to return predictions for each fold
 %     opt.output='fold_predictions';
@@ -193,23 +193,23 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %     pred_ds=cosmo_crossvalidation_measure(ds,opt);
 %     to_show={pred_ds.samples,pred_ds.sa.targets,pred_ds.sa.folds};
 %     cosmo_disp(to_show,'edgeitems',8)
-%     > { [ 9         [ 7         [ 1
-%     >     8           8           1
-%     >     9           9           1
-%     >     7           7           1
-%     >     8           8           1
-%     >     9           9           1
-%     >     9           7           2
-%     >     8           8           2
-%     >     :           :           :
-%     >     8           8           5
-%     >     7           9           5
-%     >     7           7           6
-%     >     8           8           6
-%     >     9           9           6
-%     >     7           7           6
-%     >     9           8           6
-%     >     7 ]@36x1    9 ]@36x1    6 ]@36x1 }
+%     %|| { [ 9         [ 7         [ 1
+%     %||     8           8           1
+%     %||     9           9           1
+%     %||     7           7           1
+%     %||     8           8           1
+%     %||     9           9           1
+%     %||     9           7           2
+%     %||     8           8           2
+%     %||     :           :           :
+%     %||     8           8           5
+%     %||     7           9           5
+%     %||     7           7           6
+%     %||     8           8           6
+%     %||     9           9           6
+%     %||     7           7           6
+%     %||     9           8           6
+%     %||     7 ]@36x1    9 ]@36x1    6 ]@36x1 }
 %
 % Notes:
 %   - using this function, crossvalidation can be run using a searchlight

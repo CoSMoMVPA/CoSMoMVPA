@@ -147,7 +147,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     % One feature has abs(z_ds.samples)>1.96, indicating it
 %     % survives correction for multiple comparisons
 %     cosmo_disp(z_ds.samples)
-%     > [ 0.994         0      2.05         0      1.41         0 ]
+%     ||[ 0.929         0      1.76         0      1.29         0 ]
 %
 %
 % Notes:
@@ -217,6 +217,9 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %   - Versions of this function from before 23 November 2016 incorrectly
 %     producted z-scores corresponding to one-tailed, rather than
 %     two-tailed, probablity values.
+%   - p-values are computed by dividing as (r+1) / (niter+1), with r the
+%     number of times that the original data as less then the null
+%     distributions. This follows the recommendation of North et al (2002).
 %
 % References:
 %   - Stephen M. Smith, Thomas E. Nichols (2009), Threshold-free
@@ -229,6 +232,9 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %     inference and multiple testing correction in classification-based
 %     multi-voxel pattern analysis (MVPA): Random permutations and cluster
 %     size control. NeuroImage, Volume 65, 69-82.
+%   - North, Bernard V., David Curtis, and Pak C. Sham. "A note on the
+%     calculation of empirical P values from Monte Carlo procedures." The
+%     American Journal of Human Genetics 71.2 (2002): 439-441.
 %
 % See also: cosmo_cluster_neighborhood
 %
@@ -309,13 +315,14 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 
     % split iterations in multiple parts, so that each thread can do a
     % subset of all the work
-    block_size = ceil(niter/nproc_available);
-    iter_start=1:block_size:niter;
-    iter_end=[block_size:block_size:(niter-1) niter];
+
+
+    [iter_start, iter_end]=divide_in_blocks(niter, nproc_available);
+    nproc_used=numel(iter_start);
 
     % set options for each worker process
-    worker_opt_cell=cell(1,nproc_available);
-    for p=1:nproc_available
+    worker_opt_cell=cell(1,nproc_used);
+    for p=1:nproc_used
         worker_opt=struct();
         worker_opt.orig_cluster_vals=orig_cluster_vals;
         worker_opt.permutation_preproc_func=permutation_preproc_func;
@@ -323,7 +330,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
         worker_opt.cluster_func=cluster_func;
         worker_opt.nfeatures=nfeatures;
         worker_opt.worker_id=p;
-        worker_opt.nworkers=nproc_available;
+        worker_opt.nworkers=nproc_used;
         worker_opt.progress=opt.progress;
         worker_opt.progress_suffix=progress_suffix;
         worker_opt.iters=iter_start(p):iter_end(p);
@@ -333,7 +340,7 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     % Run process for each worker in parallel
     % Note that when using nproc=1, cosmo_parcellfun does actually not
     % use any parallellization; the result is a cell with a single element.
-    result_cell=cosmo_parcellfun(nproc_available,...
+    result_cell=cosmo_parcellfun(nproc_used,...
                                     @run_with_worker,...
                                     worker_opt_cell,...
                                     'UniformOutput',false);
@@ -345,21 +352,30 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     assert(max(sum(less_than_orig_count>0,1))<=1);
 
     % convert p-values of two tails into one p-value
-    pos_mask=less_than_orig_count(1,:)>0 & less_than_orig_count(1,:)>niter/2;
-    neg_mask=less_than_orig_count(2,:)>0 & less_than_orig_count(2,:)>niter/2;
+    pos_mask=less_than_orig_count(1,:)>niter/2;
+    neg_mask=less_than_orig_count(2,:)>niter/2;
     nfeatures=numel(pos_mask);
     ps_two_tailed=zeros(1,nfeatures)+.5;
 
-    ps_two_tailed(pos_mask)=1-less_than_orig_count(1,pos_mask)/niter;
-    ps_two_tailed(neg_mask)=less_than_orig_count(2,neg_mask)/niter;
+    min_p_value=1/(niter+1);
 
-    % deal with extreme tails
-    min_p_value=1/niter;
-    ps_two_tailed(ps_two_tailed>1-min_p_value)=1-min_p_value;
-    ps_two_tailed(ps_two_tailed<  min_p_value)=min_p_value;
+    % - in the extreme case of highly positive values
+    %     less_than_orig_count==0
+    %   and we want to set p=1-1/(niter+1),
+    % - in the case of no positive values
+    %     less_than_orig_count==niter/2
+    %   and we want to set p=0.5 = 1-(niter/2+1)/(niter+1)
+
+    ps_two_tailed(pos_mask)=(niter-less_than_orig_count(1,pos_mask)+1)*min_p_value;
+    ps_two_tailed(neg_mask)=1-(niter-less_than_orig_count(2,neg_mask)+1)*min_p_value;
+
+
+    tiny=1e-8;
+    assert(all(ps_two_tailed+tiny>=  min_p_value));
+    assert(all(ps_two_tailed-tiny<=1-min_p_value));
 
     % convert to z-score
-    z_two_tailed=norminv(ps_two_tailed);
+    z_two_tailed=cosmo_norminv(ps_two_tailed);
 
     % store result in dataset structure
     ds_z=struct();
@@ -367,6 +383,15 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
     ds_z.sa.stats={'Zscore()'};
     ds_z.a=ds.a;
     ds_z.fa=ds.fa;
+
+function [iter_start, iter_end]=divide_in_blocks(niter, nproc_available)
+    nblocks=min(niter,nproc_available);
+    block_size = ceil(niter/nblocks);
+
+    iter_start=1:block_size:niter;
+    iter_end=iter_start+(block_size-1);
+    iter_end(end)=niter;
+
 
 function less_than_orig_count=run_with_worker(worker_opt)
 
@@ -817,7 +842,7 @@ function clustering_func=get_clusterizer_func(nbrhood,opt)
                 error(['Option dh not allowed with non-tfce '...
                         'cluster_stat option ''%s'''], cluster_stat);
             end
-            opt.threshold=-norminv(p_unc); % right tail
+            opt.threshold=-cosmo_norminv(p_unc); % right tail
     end
 
     % convert neighborhood struct to matrix representation, because that

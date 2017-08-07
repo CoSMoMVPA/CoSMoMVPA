@@ -9,14 +9,13 @@
 
         * In that case, use :ref:`cosmo_set_path` to set the path.
 
-- Full CoSMOMVPA tutorial data in `zip format <datadb.zip>`_.
-
-        * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <datadb-ak6.zip>`_
-
-        * MEEG data (only obj-6 data for exercises): `tutorial data with MEEG obj6 data only <datadb-meg_obj6.zip>`_
+- Full CoSMOMVPA tutorial data in `zip format <datadb-v0.3.zip>`_; used for :ref:`labman2017`.
 
         * fMRI AK6 and MEEG obj-6 data (for `PRNI 2016`_ exercises): `tutorial data with fMRI AK6 and MEEG obj6 data only <datadb-ak6-meg_obj6-v0.3.zip>`_
 
+        * A minimal set of data (only fMRI AK6 data for exercises): `tutorial data with AK6 data only <datadb-ak6-v0.3.zip>`_
+
+        * MEEG data (only obj-6 data for exercises): `tutorial data with MEEG obj6 data only <datadb-meg_obj6-v0.3.zip>`_
 
 - CoSMOMVPA documentation in HTML format (for off-line viewing) is available in `zip <_static/CoSMoMVPA_documentation_html.zip>`_ and `gzipped tar archive <_static/CoSMoMVPA_documentation_html.tar.gz>`_.
 

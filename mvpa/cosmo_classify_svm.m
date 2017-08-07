@@ -32,18 +32,6 @@ function predicted=cosmo_classify_svm(samples_train, targets_train, samples_test
 %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
 %    provide an option 'normalization' to perform data scaling.
 %
-% Example:
-%     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',10);
-%     test_chunk=2;
-%     te=cosmo_slice(ds,ds.sa.chunks==test_chunk);
-%     tr=cosmo_slice(ds,ds.sa.chunks~=test_chunk);
-%     pred=cosmo_classify_svm(tr.samples,tr.sa.targets,te.samples,struct);
-%     disp(pred)
-%     >      3
-%     >      2
-%     >      3
-%     >      4
-%     >      5
 %
 % See also: svmtrain, svmclassify, cosmo_classify_svm,
 %           cosmo_classify_libsvm, cosmo_crossvalidate,

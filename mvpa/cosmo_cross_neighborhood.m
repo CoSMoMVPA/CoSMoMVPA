@@ -27,25 +27,25 @@ function crossed_nbrhood=cosmo_cross_neighborhood(ds, nbrhoods, varargin)
 %     nbrhood=cosmo_cross_neighborhood(ds, {freq_nbrhood, time_nbrhood},...
 %                                                    'progress',false);
 %     cosmo_disp(nbrhood.a.fdim)
-%     > .values
-%     >   { [ 2         4         6  ...  10        12        14 ]@1x7
-%     >     [ -0.2     -0.15      -0.1     -0.05         0 ]           }
-%     > .labels
-%     >   { 'freq'
-%     >     'time' }
+%     %|| .values
+%     %||   { [ 2         4         6  ...  10        12        14 ]@1x7
+%     %||     [ -0.2     -0.15      -0.1     -0.05         0 ]           }
+%     %|| .labels
+%     %||   { 'freq'
+%     %||     'time' }
 %     cosmo_disp(nbrhood.fa)
-%     > .freq
-%     >   [ 1         2         3  ...  5         6         7 ]@1x35
-%     > .time
-%     >   [ 1         1         1  ...  5         5         5 ]@1x35
+%     %|| .freq
+%     %||   [ 1         2         3  ...  5         6         7 ]@1x35
+%     %|| .time
+%     %||   [ 1         1         1  ...  5         5         5 ]@1x35
 %     cosmo_disp(nbrhood.neighbors)
-%     > { [ 1   2   3  ...  9.79e+03  9.79e+03  9.79e+03 ]@1x6120
-%     >   [ 1   2   3  ...  1.01e+04  1.01e+04  1.01e+04 ]@1x7650
-%     >   [ 1   2   3  ...  1.04e+04  1.04e+04  1.04e+04 ]@1x9180
-%     >                                    :
-%     >   [ 307 308 309  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x9180
-%     >   [ 613 614 615  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x7650
-%     >   [ 919 920 921  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x6120 }@35x1
+%     %|| { [ 1   2   3  ...  9.79e+03  9.79e+03  9.79e+03 ]@1x6120
+%     %||   [ 1   2   3  ...  1.01e+04  1.01e+04  1.01e+04 ]@1x7650
+%     %||   [ 1   2   3  ...  1.04e+04  1.04e+04  1.04e+04 ]@1x9180
+%     %||                                    :
+%     %||   [ 307 308 309  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x9180
+%     %||   [ 613 614 615  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x7650
+%     %||   [ 919 920 921  ...  1.07e+04  1.07e+04  1.07e+04 ]@1x6120 }@35x1
 %
 % See also: cosmo_spherical_neighborhood, cosmo_meeg_chan_neighborhood,
 %           cosmo_interval_neighborhood

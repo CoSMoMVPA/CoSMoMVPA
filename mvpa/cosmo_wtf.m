@@ -11,6 +11,9 @@ function s=cosmo_wtf(param)
 %   s         - if param is not provided it returns a string
 %               representation with system information;
 %             - if param is 'is_{octave,matlab}' a boolean is returned
+%             - if param is 'version_number' then a numeric vector with
+%               version information is returned; for example version
+%                '8.5.0.197613' results in [8, 5, 0, 197613].
 %             - if param is one of 'computer', 'environment', version',
 %               'toolboxes', 'cosmo_externals', 'cosmo_files', or 'java',
 %               then the information of that parameter is returned.
@@ -18,7 +21,7 @@ function s=cosmo_wtf(param)
 %
 % Examples:
 %   % print the information to standard out (the command window)
-%   cosmo_wtf()
+%   cosmo_wtf();
 %
 %   % store the information in the variable 'w':
 %   w=cosmo_wtf();
@@ -54,6 +57,7 @@ params2func.toolboxes=@toolboxes;
 params2func.warnings=@warning_helper;
 params2func.cosmo_config=@cosmo_config_helper;
 params2func.cosmo_files=@cosmo_files;
+params2func.version_number=@version_number_;
 
 
 
@@ -100,6 +104,11 @@ function s=version_()
     else
         s=sprintf('%s',version());
     end
+
+function v=version_number_()
+    v_str=regexp(version(),'^\S*','match');
+    parts=cosmo_strsplit(v_str{1},'.');
+    v=cellfun(@str2num,parts);
 
 function s=java_()
     if environment_is_matlab()

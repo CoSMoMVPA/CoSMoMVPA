@@ -39,35 +39,35 @@ function [split, nsplit]=cosmo_strsplit(string, delim, varargin)
 % Examples:
 %   % split by '*'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','*')
-%   >      'A'    'AbbAbA'    'AbA'    'A'    'Ab'
+%   %||      { 'A'    'AbbAbA'    'AbA'    'A'    'Ab' }
 %
 %   % split by 'A*A'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A')
-%   >   ''    'bbAb'    'b'    '*Ab'
+%   %||  { ''    'bbAb'    'b'    '*Ab' }
 %
 %   % take second element after split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2)
-%   >  bbAb
+%   %||  'bbAb'
 %
 %   % get last element after split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',-1)
-%   >  *Ab
+%   %||  '*Ab'
 %
 %   % split twice, first on 'A*A', take second element, then on 'A'
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A')
-%   >     'bb'    'b'
+%   %||    { 'bb'    'b' }
 %
 %   % take first element after second split
 %   cosmo_strsplit('A*AbbAbA*AbA*A*Ab','A*A',2,'A',1)
-%   >  bb
+%   %||  'bb'
 %
 %   % illustrate effect of not using a delimiter string
 %   % (which causes the string to be split by whitespace) and using
 %   % a space as delimiter
 %   cosmo_strsplit(' CoSMoMVPA makes live...  easy!')
-%   >    'CoSMoMVPA'    'makes'    'live...'    'easy!'
+%   %||   { 'CoSMoMVPA'    'makes'    'live...'    'easy!' }
 %   cosmo_strsplit(' CoSMoMVPA makes live...  easy!',' ')
-%   >     ''    'CoSMoMVPA'    'makes'    'live...'    ''    'easy!'
+%   %||   {  ''    'CoSMoMVPA'    'makes'    'live...'    ''    'easy!' }
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

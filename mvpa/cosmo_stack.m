@@ -46,27 +46,27 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %     % stacking makes .samples a (3+3)x6 matrix
 %     merged=cosmo_stack({half1,half2});
 %     cosmo_disp(merged.samples)
-%     > [  2.03    -0.892    -0.826     -1.08       3.4     -1.29
-%     >   0.584      1.84      1.17    -0.848      1.25      2.04
-%     >   -3.68    -0.262     0.321     0.844     -1.37      1.73
-%     >    1.72    0.0975     0.441      1.86     0.479    0.0832
-%     >   -1.05      2.04    -0.209    -0.486    -0.955      2.74
-%     >   -1.33     0.482      2.39     0.502      1.17     -0.48 ]
+%     %|| [  2.03    -0.892    -0.826     -1.08       3.4     -1.29
+%     %||   0.584      1.84      1.17    -0.848      1.25      2.04
+%     %||   -3.68    -0.262     0.321     0.844     -1.37      1.73
+%     %||    1.72    0.0975     0.441      1.86     0.479    0.0832
+%     %||   -1.05      2.04    -0.209    -0.486    -0.955      2.74
+%     %||   -1.33     0.482      2.39     0.502      1.17     -0.48 ]
 %     cosmo_disp(merged.sa)
-%     > .chunks
-%     >   [ 1
-%     >     1
-%     >     1
-%     >     2
-%     >     2
-%     >     2 ]
-%     > .targets
-%     >   [ 1
-%     >     2
-%     >     3
-%     >     1
-%     >     2
-%     >     3 ]
+%     %|| .chunks
+%     %||   [ 1
+%     %||     1
+%     %||     1
+%     %||     2
+%     %||     2
+%     %||     2 ]
+%     %|| .targets
+%     %||   [ 1
+%     %||     2
+%     %||     3
+%     %||     1
+%     %||     2
+%     %||     3 ]
 %     %
 %     % data can also be merged over features, by using dim=2
 %     % here generated data simulates two (tiny) regions of interest
@@ -75,25 +75,25 @@ function ds_stacked=cosmo_stack(ds_cell,varargin)
 %     % stacking makes .samples a 6x(2+3) matrix
 %     roi_both=cosmo_stack({roi1,roi2},2);
 %     cosmo_disp(roi_both.samples)
-%     > [  2.03    -0.826    -0.892     -1.08       3.4
-%     >   0.584      1.17      1.84    -0.848      1.25
-%     >   -3.68     0.321    -0.262     0.844     -1.37
-%     >    1.72     0.441    0.0975      1.86     0.479
-%     >   -1.05    -0.209      2.04    -0.486    -0.955
-%     >   -1.33      2.39     0.482     0.502      1.17 ]
+%     %|| [  2.03    -0.826    -0.892     -1.08       3.4
+%     %||   0.584      1.17      1.84    -0.848      1.25
+%     %||   -3.68     0.321    -0.262     0.844     -1.37
+%     %||    1.72     0.441    0.0975      1.86     0.479
+%     %||   -1.05    -0.209      2.04    -0.486    -0.955
+%     %||   -1.33      2.39     0.482     0.502      1.17 ]
 %     cosmo_disp(roi_both.fa)
-%     > .i
-%     >   [ 1         3         2         1         2 ]
-%     > .j
-%     >   [ 1         1         1         2         2 ]
-%     > .k
-%     >   [ 1         1         1         1         1 ]
+%     %|| .i
+%     %||   [ 1         3         2         1         2 ]
+%     %|| .j
+%     %||   [ 1         1         1         2         2 ]
+%     %|| .k
+%     %||   [ 1         1         1         1         1 ]
 %     %
 %     % stacking incompatible datasets gives an error
 %     cosmo_stack({roi1,half1})
-%     > error('value mismatch: .fa.i')
+%     %|| error('value mismatch: .fa.i')
 %     cosmo_stack({roi1,half1},2)
-%     > error('value mismatch: .sa.targets')
+%     %|| error('value mismatch: .sa.targets')
 %
 % Note:
 %   - This function is like the inverse of cosmo_split, i.e. if
@@ -289,7 +289,7 @@ function [has_unique_elem, unique_elem]=get_single_unique_element(vs)
         end
 
         if has_elem
-            if ~isequaln(v, unique_elem)
+            if ~cosmo_isequaln(v, unique_elem)
                 has_unique_elem=false;
                 return;
             end

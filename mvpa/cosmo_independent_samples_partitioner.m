@@ -1,7 +1,7 @@
 function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 % Compute partitioning scheme based on dataset with independent samples
 %
-% partitions=cosmo_independent_chunk_partitioner(ds,...)
+% partitions=cosmo_independent_samples_partitioner(ds,...)
 %
 % Inputs:
 %   ds                          dataset structure with fields .samples,
@@ -20,7 +20,7 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %                               provided, then this function behaves
 %                               pseudo-ranomly but deterministically, and
 %                               different calls return the same output.
-%                               If s=0, then different calls to this
+%                               If s=0, then repeated calls to this
 %                               function gives different outputs.
 %   'max_fold_count'            Safety limit to the maximum number of folds
 %                               that can be returned (default: 10000). When
@@ -54,32 +54,32 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %                                             'test_count',1,...
 %                                             'fold_count',5);
 %     cosmo_disp(partitions)
-%     > .test_indices
-%     >   { [ 2    [ 4    [ 2    [ 5    [ 1
-%     >       6 ]    8 ]    7 ]    8 ]    7 ] }
-%     > .train_indices
-%     >   { [ 1    [ 1    [ 1    [ 1    [ 3
-%     >       3      3      3      2      4
-%     >       5      5      5      4      5
-%     >       7      6      6      6      6
-%     >       8      7      8      7      8
-%     >       9 ]    9 ]    9 ]    9 ]    9 ] }
+%     %|| .test_indices
+%     %||   { [ 2    [ 4    [ 2    [ 5    [ 1
+%     %||       6 ]    8 ]    7 ]    8 ]    7 ] }
+%     %|| .train_indices
+%     %||   { [ 1    [ 1    [ 1    [ 1    [ 3
+%     %||       3      3      3      2      4
+%     %||       5      5      5      4      5
+%     %||       7      6      6      6      6
+%     %||       8      7      8      7      8
+%     %||       9 ]    9 ]    9 ]    9 ]    9 ] }
 %     %
 %     % As above, but now with 2 targets in each chunk used for testing
 %     partitions=cosmo_independent_samples_partitioner(ds,...
 %                                             'test_count',2,...
 %                                             'fold_count',5);
 %     cosmo_disp(partitions)
-%     > .test_indices
-%     >   { [ 1    [ 4    [ 2    [ 1    [ 1
-%     >       2      5      3      5      5
-%     >       6      7      6      6      6
-%     >       7 ]    8 ]    7 ]    8 ]    7 ] }
-%     > .train_indices
-%     >   { [ 3    [ 1    [ 1    [ 2    [ 3
-%     >       5      3      5      4      4
-%     >       8      6      8      7      8
-%     >       9 ]    9 ]    9 ]    9 ]    9 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 4    [ 2    [ 1    [ 1
+%     %||       2      5      3      5      5
+%     %||       6      7      6      6      6
+%     %||       7 ]    8 ]    7 ]    8 ]    7 ] }
+%     %|| .train_indices
+%     %||   { [ 3    [ 1    [ 1    [ 2    [ 3
+%     %||       5      3      5      4      4
+%     %||       8      6      8      7      8
+%     %||       9 ]    9 ]    9 ]    9 ]    9 ] }
 %     %
 %     % Now use 30% of the targets in each chunk for testing,
 %     % and return 20 chunks.
@@ -87,26 +87,27 @@ function partitions=cosmo_independent_samples_partitioner(ds,varargin)
 %                                             'test_ratio',0.3,...
 %                                             'fold_count',20);
 %     cosmo_disp(partitions)
-%     > .test_indices
-%     >   { [ 3    [ 4    [ 1   ... [ 5    [ 1    [ 4
-%     >       6 ]    7 ]    8 ]       6 ]    9 ]    7 ]   }@1x20
-%     > .train_indices
-%     >   { [ 1    [ 2    [ 2   ... [ 1    [ 3    [ 1
-%     >       2      3      4         2      4      2
-%     >       4      5      5         3      5      5
-%     >       7      6      6         7      6      6
-%     >       8      8      7         8      7      8
-%     >       9 ]    9 ]    9 ]       9 ]    8 ]    9 ]   }@1x20
+%     %|| .test_indices
+%     %||   { [ 3    [ 4    [ 1   ... [ 5    [ 1    [ 4
+%     %||       6 ]    7 ]    8 ]       6 ]    9 ]    7 ]   }@1x20
+%     %|| .train_indices
+%     %||   { [ 1    [ 2    [ 2   ... [ 1    [ 3    [ 1
+%     %||       2      3      4         2      4      2
+%     %||       4      5      5         3      5      5
+%     %||       7      6      6         7      6      6
+%     %||       8      8      7         8      7      8
+%     %||       9 ]    9 ]    9 ]       9 ]    8 ]    9 ]   }@1x20
 %
 % Notes:
-% - In almost all cases, the number of partitions returned by this function
-%   (=c) is less than the total number of possible partitions. In these
-%   cases, a random subset of possible partitions is chosen, with the
-%   contstraint that no combination of train and test indices is repeated in
-%   partitions. No attempt is made to balance the number of times each
-%   samples is used for training and/or testing.
+% - Unless the number of targets and chunks is very small, the number of
+%   partitions returned by this function (=c) is less than the total number
+%   of possible partitions. In these cases, a random subset of possible
+%   partitions is chosen, with the constraint that no combination of train
+%   and test indices is repeated in partitions. No attempt is made to
+%   balance the number of times each sample is used for training and/or
+%   testing.
 % - This function behaves, by default, pseudo-randomly and
-%   deterministically; different class to this function, with the same
+%   deterministically; different calls to this function, with the same
 %   inputs, result in the same output. To get different outputs for
 %   different calls, set the 'seed' option to 0.
 %
@@ -183,8 +184,8 @@ function fold_count=get_fold_count(unique_fold_count,opt)
         error(['the option ''fold_count'', indicating how many '...
                 'cross-validation folds this function should '...
                 'generate, is required. It should have a value '...
-                'between 1 and %d\n'...
-                'If in doubt, a value between 10'...
+                'between 1 and %d.\n'...
+                'If in doubt, a value between 10 '...
                 'and 1000 may be quite adequate for most use cases; '...
                 'with the lower value more appropriate for cases of '...
                 'within-subject analysis with many trials in '...
@@ -192,7 +193,7 @@ function fold_count=get_fold_count(unique_fold_count,opt)
                 'stimuli, or seen versus unseen stimulus), and the '...
                 'upper value more appropriate for classification ' ...
                 'of participants in different groups (such as '...
-                'patient versus control'],...
+                'patient versus control).'],...
                 min(unique_fold_count,opt.max_fold_count));
     end
 

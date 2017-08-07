@@ -33,25 +33,25 @@ function [pca_samples,params]=cosmo_pca(samples,retain)
 %     %
 %     % show samples in PC space
 %     cosmo_disp(pca_samples);
-%     > [  -2.64     0.654
-%     >    0.923      1.43
-%     >   -0.723     -2.48
-%     >     1.64     0.265
-%     >    -1.46     0.569
-%     >     2.27    -0.438 ]
+%     %|| [  -2.64     0.654
+%     %||    0.923      1.43
+%     %||   -0.723     -2.48
+%     %||     1.64     0.265
+%     %||    -1.46     0.569
+%     %||     2.27    -0.438 ]
 %     %
 %     % show parameters
 %     cosmo_disp(params);
-%     > .coef
-%     >   [ -0.512     0.744
-%     >      0.794     0.219
-%     >      0.328     0.632 ]
-%     > .mu
-%     >   [ 0.0864     0.925      -0.2 ]
-%     > .explained
-%     >   [    66
-%     >      33.3
-%     >     0.676 ]
+%     %|| .coef
+%     %||   [ -0.512     0.744
+%     %||      0.794     0.219
+%     %||      0.328     0.632 ]
+%     %|| .mu
+%     %||   [ 0.0864     0.925      -0.2 ]
+%     %|| .explained
+%     %||   [    66
+%     %||      33.3
+%     %||     0.676 ]
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

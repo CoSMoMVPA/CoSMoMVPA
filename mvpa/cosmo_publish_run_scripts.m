@@ -186,22 +186,22 @@ function publish_wrapper(srcfn,trgfn)
     orig_pwd=pwd();
     pwd_resetter=onCleanup(@()cd(orig_pwd));
 
+    orig_fig_handles=findobj('Type','figure');
+    fig_cleaner=onCleanup(@()close(setdiff(findobj('Type','figure'),...
+                                                    orig_fig_handles)));
+
+
     addpath(srcdir);
     cd(trgdir);
+
     if cosmo_wtf('is_matlab')
         args={struct('outputDir',trgdir,'catchError',false)};
-        post_command=@do_nothing;
     else
         args={'format','html','imageFormat','jpg'};
-        post_command=@()close('all');
     end
 
     publish(srcnm,args{:});
-    post_command();
 
-
-function do_nothing()
-    % empty because do nothing
 
 
 function [srcfn_cell,opt]=process_input(varargin)

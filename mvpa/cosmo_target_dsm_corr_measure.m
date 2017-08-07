@@ -71,12 +71,12 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     %
 %     % show the target dissimilarity matrix
 %     cosmo_disp(target_dsm);
-%     > [ 0         0         1         1         1         1
-%     >   0         0         1         1         1         1
-%     >   1         1         0         0         1         1
-%     >   1         1         0         0         1         1
-%     >   1         1         1         1         0         0
-%     >   1         1         1         1         0         0 ]
+%     %|| [ 0         0         1         1         1         1
+%     %||   0         0         1         1         1         1
+%     %||   1         1         0         0         1         1
+%     %||   1         1         0         0         1         1
+%     %||   1         1         1         1         0         0
+%     %||   1         1         1         1         0         0 ]
 %     %
 %     % compute similarity between pairw-wise similarity of the
 %     % patterns in the dataset and the target dissimilarity matrix
@@ -84,15 +84,15 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     %
 %     % Pearson correlation is about 0.56
 %     cosmo_disp(dcm_ds)
-%     > .samples
-%     >   [ 0.562 ]
-%     > .sa
-%     >   .labels
-%     >     { 'rho' }
-%     >   .metric
-%     >     { 'correlation' }
-%     >   .type
-%     >     { 'Pearson' }
+%     %|| .samples
+%     %||   [ 0.562 ]
+%     %|| .sa
+%     %||   .labels
+%     %||     { 'rho' }
+%     %||   .metric
+%     %||     { 'correlation' }
+%     %||   .type
+%     %||     { 'Pearson' }
 %     %
 %     % do not consider classses 3 and 5
 %     target_dsm([3,5],:)=NaN;
@@ -100,14 +100,14 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     target_dsm(3,3)=0;
 %     target_dsm(5,5)=0;
 %     %
-%     % show the updatedtarget dissimilarity matrix
+%     % show the updated target dissimilarity matrix
 %     cosmo_disp(target_dsm);
-%     > [   0         0       NaN         1       NaN         1
-%     >     0         0       NaN         1       NaN         1
-%     >   NaN       NaN         0       NaN       NaN       NaN
-%     >     1         1       NaN         0       NaN         1
-%     >   NaN       NaN       NaN       NaN         0       NaN
-%     >     1         1       NaN         1       NaN         0 ]
+%     %|| [   0         0       NaN         1       NaN         1
+%     %||     0         0       NaN         1       NaN         1
+%     %||   NaN       NaN         0       NaN       NaN       NaN
+%     %||     1         1       NaN         0       NaN         1
+%     %||   NaN       NaN       NaN       NaN         0       NaN
+%     %||     1         1       NaN         1       NaN         0 ]
 %     %
 %     % compute similarity between pairw-wise similarity of the
 %     % patterns in the dataset and the target dissimilarity matrix
@@ -115,15 +115,15 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     %
 %     % Correlation is different because classes 3 and 5 were left out
 %     cosmo_disp(dcm_ds)
-%     > .samples
-%     >   [ 0.705 ]
-%     > .sa
-%     >   .labels
-%     >     { 'rho' }
-%     >   .metric
-%     >     { 'correlation' }
-%     >   .type
-%     >     { 'Pearson' }
+%     %|| .samples
+%     %||   [ 0.705 ]
+%     %|| .sa
+%     %||   .labels
+%     %||     { 'rho' }
+%     %||   .metric
+%     %||     { 'correlation' }
+%     %||   .type
+%     %||     { 'Pearson' }
 %
 %
 %

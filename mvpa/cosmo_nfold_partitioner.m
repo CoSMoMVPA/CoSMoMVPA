@@ -18,14 +18,14 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     % (chunk values are not necessarily in increasing order)
 %     p=cosmo_nfold_partitioner([3 1 2 3 2 1]);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 1    [ 1    [ 2
-%     >       3      2      3
-%     >       4      4      5
-%     >       5 ]    6 ]    6 ] }
-%     > .test_indices
-%     >   { [ 2    [ 3    [ 1
-%     >       6 ]    5 ]    4 ] }
+%     %|| .train_indices
+%     %||   { [ 1    [ 1    [ 2
+%     %||       3      2      3
+%     %||       4      4      5
+%     %||       5 ]    6 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 2    [ 3    [ 1
+%     %||       6 ]    5 ]    4 ] }
 %
 %     % show the same with a dataset struct
 %     ds=struct();
@@ -34,14 +34,14 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     ds.sa.chunks=[3 1 2 3 2 1]';  % used for partitioning
 %     p=cosmo_nfold_partitioner(ds);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 1    [ 1    [ 2
-%     >       3      2      3
-%     >       4      4      5
-%     >       5 ]    6 ]    6 ] }
-%     > .test_indices
-%     >   { [ 2    [ 3    [ 1
-%     >       6 ]    5 ]    4 ] }
+%     %|| .train_indices
+%     %||   { [ 1    [ 1    [ 2
+%     %||       3      2      3
+%     %||       4      4      5
+%     %||       5 ]    6 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 2    [ 3    [ 1
+%     %||       6 ]    5 ]    4 ] }
 %
 %
 %     % Example of an unbalanced partitioning scheme. Generally it is
@@ -53,18 +53,18 @@ function partitions = cosmo_nfold_partitioner(chunks)
 %     ds.sa.chunks= [1 1 3 3 3 3 3]';
 %     p=cosmo_nfold_partitioner(ds);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 3    [ 1
-%     >       4      2 ]
-%     >       5
-%     >       6
-%     >       7 ]        }
-%     > .test_indices
-%     >   { [ 1    [ 3
-%     >       2 ]    4
-%     >              5
-%     >              6
-%     >              7 ] }
+%     %|| .train_indices
+%     %||   { [ 3    [ 1
+%     %||       4      2 ]
+%     %||       5
+%     %||       6
+%     %||       7 ]        }
+%     %|| .test_indices
+%     %||   { [ 1    [ 3
+%     %||       2 ]    4
+%     %||              5
+%     %||              6
+%     %||              7 ] }
 %
 %
 % Note:

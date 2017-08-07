@@ -102,13 +102,18 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Get the tutorial data:
 
-    Download the  `tutorial data <datadb.zip>`_ zip archive, and unzip it.
+    The full dataset is in the `tutorial data <datadb-v0.3.zip>`_ zip archive.
 
-    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6.zip>`_
+    For :ref:`labman2017`: the tutorial data should already be on your work station.
 
-    Additional MEEG ``obj-6`` data, used for the exercises, is here: `MEG obj6 data <datadb-meg_obj6.zip>`_.
 
-    For `PRNI 2016`_, we use fMRI ``AK6`` and MEEG ``obj-6``: `tutorial data with fMRI AK6 and MEEG obj6 data only <datadb-ak6-meg_obj6-v0.3.zip>`_.
+    For  `PRNI 2016`_, we used fMRI ``AK6`` and MEEG ``obj-6``: `tutorial data with fMRI AK6 and MEEG obj6 data only <datadb-ak6-meg_obj6-v0.3.zip>`_.
+
+
+    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6-v0.3.zip>`_
+
+    Additional MEEG ``obj-6`` data, used for the exercises, is here: `MEG obj6 data <datadb-meg_obj6-v0.3.zip>`_.
+
 
     You can move the directory to another location on your file system, if desired.
 

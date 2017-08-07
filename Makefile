@@ -2,11 +2,15 @@
         install-matlab install-octave install \
         uninstall-matlab uninstall-octave uninstall \
         test-matlab test-octave test \
-        html clean-html website \
-		html-archive-dir html-zip-archive html-targz-archive
+        html clean-html website website-content \
+		html-archive-dir html-zip-archive html-targz-archive \
+		prni labman remote fast \
+		website-sync
 
 MATLAB?=matlab
 OCTAVE?=octave
+RSYNC=rsync -vrcu --progress
+SSH=ssh
 
 TESTDIR=$(CURDIR)/tests
 ROOTDIR=$(CURDIR)
@@ -14,11 +18,18 @@ MVPADIR=$(ROOTDIR)/mvpa
 DOCDIR=$(CURDIR)/doc
 DOCBUILDDIR=$(DOCDIR)/build
 HTMLDOCBUILDDIR=$(DOCBUILDDIR)/html
-WEBSITEROOT=db:~/web
 WEBSITESTATIC=$(WEBSITEROOT)/_static
 DOCUMENTATION_HTML_PREFIX=CoSMoMVPA_documentation_html
 DOCARCHIVEDIR=$(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX)
 DOCUMENTATION_FILES_TO_ARCHIVE=AUTHOR copyright README.rst
+
+WEBSITEHOST=db
+WEBSITEDIR=web
+INDIRECT_WEBSITEHOST=hydra
+INDIRECT_WEBSITEDIR=web
+
+WEBSITEROOT?=$(WEBSITEHOST):$(WEBSITEDIR)
+INDIRECT_WEBSITEROOT?=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
 
 RUNTESTS_ARGS?='-verbose'
 	
@@ -62,6 +73,10 @@ ifdef WITH_COVERAGE
 		 RUNTESTS_ARGS+=,'-junit_xml_file','$(JUNIT_XML_FILE)'
 		 export JUNIT_XML_FILE
 	endif
+endif
+
+ifdef NO_DOC_TEST
+	 RUNTESTS_ARGS+=,'-no_doc_test'
 endif
 		
 	
@@ -220,14 +235,50 @@ html-targz-archive: html-archive-dir
 	tar -zchf $(DOCUMENTATION_HTML_PREFIX).tar.gz \
 			$(DOCUMENTATION_HTML_PREFIX)
 
+website-content: html html-zip-archive html-targz-archive
 
-website: html html-zip-archive html-targz-archive
-	@rsync -vrcu $(HTMLDOCBUILDDIR)/* $(WEBSITEROOT)/
-	@rsync -vcru $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
+website-html-sync:
+	$(RSYNC) $(HTMLDOCBUILDDIR)/* $(WEBSITEROOT)/
+
+website-sync: website-html-sync
+	$(RSYNC) $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
 				 $(WEBSITESTATIC)/
 
 
-prni: website
+
+website: website-content website-sync
+
+prni: website-content
 	$(MAKE) website WEBSITEROOT=pr:/var/www/html
+
+# LABMAN = latin america brain mapping network
+# LABMAN: remove server
+remote: website-content 
+	$(MAKE) website-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
+	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
+
+html-remote: html
+	# $(MAKE) website-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
+	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
+
+# LABMAN: local server
+local: website-content
+	$(MAKE) website-sync WEBSITEROOT=cm:/var/www/html
+
+# LABMAN: local and remote server
+labman: website-content
+	$(MAKE) website-sync WEBSITEROOT=cm:/var/www/html
+	$(MAKE) website-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
+	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
+
+# LABMAN: local and remote server, only html (no .zip or .tar.gz)
+fast: html
+	$(MAKE) website-html-sync WEBSITEROOT=cm:/var/www/html
+	$(MAKE) website-html-sync WEBSITEROOT=$(INDIRECT_WEBSITEHOST):$(INDIRECT_WEBSITEDIR)
+	$(SSH) $(INDIRECT_WEBSITEHOST) "$(RSYNC) $(INDIRECT_WEBSITEDIR)/ $(WEBSITEHOST):$(WEBSITEDIR)"
+
+
+
+remote: html html-zip-archive html-targz-archive
 
 clean: clean-html

@@ -3,13 +3,34 @@ function test_suite = test_parcellfun
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 
 function test_parcellfun_single_proc()
     nproc=1;
     helper_test_parcellfun(nproc);
+
+function test_cosmo_parallel_get_nproc_available()
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
+    nproc=cosmo_parallel_get_nproc_available();
+    assert(nproc>=1);
+
+    % should not have shown any warnings
+    w=cosmo_warning();
+    assert(isempty(w.shown_warnings),sprintf('warning shown: %s',...
+                                      w.shown_warnings{:}));
+
+
+
+
 
 function test_parcellfun_multi_proc()
     nproc=cosmo_parallel_get_nproc_available();
@@ -85,7 +106,7 @@ function assert_equal_result_or_both_exception_thrown(f, g)
         end
     else
         if g_threw_exception
-            g_exception.message=sprintf('only f threw exception: %s',...
+            g_exception.message=sprintf('only g threw exception: %s',...
                                         g_exception.message);
             rethrow(g_exception);
         end
@@ -119,6 +140,7 @@ function test_illegal_arguments
     % (note: Octave accepts output when using
     %           @(x)[x x]
     %  This may be a bug)
+    aet(1,@(x) repmat(x,1,x),{1;2});
     aet(2,@(x) repmat(x,1,x),{1;2});
 
 

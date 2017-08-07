@@ -16,41 +16,41 @@ function ds=cosmo_dim_rename(ds, old_name, new_name, raise)
 % Example:
 %     ds=cosmo_synthetic_dataset('type','timefreq');
 %     cosmo_disp(ds.a.fdim)
-%     > .labels
-%     >   { 'chan'
-%     >     'freq'
-%     >     'time' }
-%     > .values
-%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
-%     >     [ 2         4 ]
-%     >     [ -0.2 ]                            }
+%     %|| .labels
+%     %||   { 'chan'
+%     %||     'freq'
+%     %||     'time' }
+%     %|| .values
+%     %||   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     %||     [ 2         4 ]
+%     %||     [ -0.2 ]                            }
 %     cosmo_disp(ds.fa)
-%     > .chan
-%     >   [ 1         2         3         1         2         3 ]
-%     > .freq
-%     >   [ 1         1         1         2         2         2 ]
-%     > .time
-%     >   [ 1         1         1         1         1         1 ]
+%     %|| .chan
+%     %||   [ 1         2         3         1         2         3 ]
+%     %|| .freq
+%     %||   [ 1         1         1         2         2         2 ]
+%     %|| .time
+%     %||   [ 1         1         1         1         1         1 ]
 %     %
 %     % rename 'freq' to 'frequency' (there is no good reason to do this
 %     % except to illustrate its use here)
 %     ds=cosmo_dim_rename(ds,'freq','frequency');
 %     cosmo_disp(ds.a.fdim)
-%     > .labels
-%     >   { 'chan'
-%     >     'frequency'
-%     >     'time'      }
-%     > .values
-%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
-%     >     [ 2         4 ]
-%     >     [ -0.2 ]                            }
+%     %|| .labels
+%     %||   { 'chan'
+%     %||     'frequency'
+%     %||     'time'      }
+%     %|| .values
+%     %||   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     %||     [ 2         4 ]
+%     %||     [ -0.2 ]                            }
 %     cosmo_disp(ds.fa)
-%     > .chan
-%     >   [ 1         2         3         1         2         3 ]
-%     > .time
-%     >   [ 1         1         1         1         1         1 ]
-%     > .frequency
-%     >   [ 1         1         1         2         2         2 ]
+%     %|| .chan
+%     %||   [ 1         2         3         1         2         3 ]
+%     %|| .time
+%     %||   [ 1         1         1         1         1         1 ]
+%     %|| .frequency
+%     %||   [ 1         1         1         2         2         2 ]
 %
 % Notes:
 %  - a use case is renaming dimensions to time and freq
