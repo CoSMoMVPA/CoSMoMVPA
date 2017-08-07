@@ -13,14 +13,12 @@ function [orient,cano_rot]=cosmo_fmri_orientation(ds)
 %
 % Example:
 %     ds=cosmo_synthetic_dataset();
-%     [orient,cano_rot]=cosmo_fmri_orientation(ds);
-%     disp(orient)
-%     %|| LPI
-%     disp(cano_rot)
-%     %|| 1 0 0 0
-%     %|| 0 1 0 0
-%     %|| 0 0 1 0
-%     %|| 0 0 0 1
+%     [orient,cano_rot]=cosmo_fmri_orientation(ds)
+%     > orient = LPI
+%     > cano_rot = 1 0 0 0
+%     >            0 1 0 0
+%     >            0 0 1 0
+%     >            0 0 0 1
 %
 % Notes:
 %   - there are 3!*3^2 valid orientations, these are:

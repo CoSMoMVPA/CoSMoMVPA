@@ -31,62 +31,62 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     ds=struct();
 %     ds.samples=reshape(1:15,5,3)*2;
 %     cosmo_disp(ds);
-%     %|| .samples
-%     %||   [  2        12        22
-%     %||      4        14        24
-%     %||      6        16        26
-%     %||      8        18        28
-%     %||     10        20        30 ]
+%     > .samples
+%     >   [  2        12        22
+%     >      4        14        24
+%     >      6        16        26
+%     >      8        18        28
+%     >     10        20        30 ]
 %     %
 %     % demean along first dimension
 %     dsn=cosmo_normalize(ds,'demean',1);
 %     cosmo_disp(dsn);
-%     %|| .samples
-%     %||   [ -4        -4        -4
-%     %||     -2        -2        -2
-%     %||      0         0         0
-%     %||      2         2         2
-%     %||      4         4         4 ]
+%     > .samples
+%     >   [ -4        -4        -4
+%     >     -2        -2        -2
+%     >      0         0         0
+%     >      2         2         2
+%     >      4         4         4 ]
 %     %
 %     % demean along second dimension
 %     dsn=cosmo_normalize(ds,'demean',2);
 %     cosmo_disp(dsn);
-%     %|| .samples
-%     %||   [ -10         0        10
-%     %||     -10         0        10
-%     %||     -10         0        10
-%     %||     -10         0        10
-%     %||     -10         0        10 ]
+%     > .samples
+%     >   [ -10         0        10
+%     >     -10         0        10
+%     >     -10         0        10
+%     >     -10         0        10
+%     >     -10         0        10 ]
 %     %
 %     % scale to range [-1,1] along first dimension
 %     dsn=cosmo_normalize(ds,'scale_unit',1);
 %     cosmo_disp(dsn);
-%     %|| .samples
-%     %||   [   -1        -1        -1
-%     %||     -0.5      -0.5      -0.5
-%     %||        0         0         0
-%     %||      0.5       0.5       0.5
-%     %||        1         1         1 ]
+%     > .samples
+%     >   [   -1        -1        -1
+%     >     -0.5      -0.5      -0.5
+%     >        0         0         0
+%     >      0.5       0.5       0.5
+%     >        1         1         1 ]
 %     %
 %     % z-score along first dimension
 %     dsn=cosmo_normalize(ds,'zscore',1);
 %     cosmo_disp(dsn);
-%     %|| .samples
-%     %||   [  -1.26     -1.26     -1.26
-%     %||     -0.632    -0.632    -0.632
-%     %||          0         0         0
-%     %||      0.632     0.632     0.632
-%     %||       1.26      1.26      1.26 ]
+%     > .samples
+%     >   [  -1.26     -1.26     -1.26
+%     >     -0.632    -0.632    -0.632
+%     >          0         0         0
+%     >      0.632     0.632     0.632
+%     >       1.26      1.26      1.26 ]
 %     %
 %     % z-score along second dimension
 %     dsn=cosmo_normalize(ds,'zscore',2);
 %     cosmo_disp(dsn);
-%     %|| .samples
-%     %||   [ -1         0         1
-%     %||     -1         0         1
-%     %||     -1         0         1
-%     %||     -1         0         1
-%     %||     -1         0         1 ]
+%     > .samples
+%     >   [ -1         0         1
+%     >     -1         0         1
+%     >     -1         0         1
+%     >     -1         0         1
+%     >     -1         0         1 ]
 %     %
 %     % use samples 1, 3, and 4 to estimate parameters ('training set'),
 %     % and apply these to samples 2 and 5
@@ -94,29 +94,29 @@ function [ds, params]=cosmo_normalize(ds, params, dim)
 %     ds_test=cosmo_slice(ds,[2 5]);
 %     [dsn_train,params]=cosmo_normalize(ds_train,'scale_unit', 1);
 %     cosmo_disp(dsn_train);
-%     %|| .samples
-%     %||   [    -1        -1        -1
-%     %||     0.333     0.333     0.333
-%     %||         1         1         1 ]
+%     > .samples
+%     >   [    -1        -1        -1
+%     >     0.333     0.333     0.333
+%     >         1         1         1 ]
 %     %
 %     % show estimated parameters (min and max for each column, in this
 %     % case)
 %     cosmo_disp(params);
-%     %|| .method
-%     %||   'scale_unit'
-%     %|| .dim
-%     %||   [ 1 ]
-%     %|| .min
-%     %||   [ 2        12        22 ]
-%     %|| .max
-%     %||   [ 8        18        28 ]
+%     > .method
+%     >   'scale_unit'
+%     > .dim
+%     >   [ 1 ]
+%     > .min
+%     >   [ 2        12        22 ]
+%     > .max
+%     >   [ 8        18        28 ]
 %     %
 %     % apply parameters to test dataset
 %     dsn_test=cosmo_normalize(ds_test,params);
 %     cosmo_disp(dsn_test);
-%     %|| .samples
-%     %||   [ -0.333    -0.333    -0.333
-%     %||       1.67      1.67      1.67 ]
+%     > .samples
+%     >   [ -0.333    -0.333    -0.333
+%     >       1.67      1.67      1.67 ]
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

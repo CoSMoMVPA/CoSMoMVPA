@@ -4,9 +4,9 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 % cosmo_check_partitions(partitions, ds, varargin)
 %
 % Inputs:
+%   ds          dataset struct with fields .sa.{targets,chunks}
 %   partitions  struct with partitions, e.g. from
 %               cosmo_{nfold,oddeven,nchoosek}_partitioner
-%   ds          dataset struct with fields .sa.{targets,chunks}
 %   opt         (optional) struct with optional field:
 %     .unbalanced_partitions_ok    if set to true, then unbalanced
 %                                  partitions (with a different number of
@@ -26,36 +26,36 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 %     % make unbalanced partitions
 %     partitions=cosmo_nfold_partitioner(ds);
 %     cosmo_check_partitions(partitions,ds);
-%     %|| error('Unbalance in partition 1 [...]')
+%     > error('Unbalance in partition 1 [...]')
 %     %
 %     % disable unbalanced check
 %     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
-%     %|| true
+%     > true
 %     %
 %     % balance partitions and check without unbalanced check
 %     partitions=cosmo_balance_partitions(partitions,ds);
 %     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',false)
-%     %|| true
+%     > true
 %     %
 %     % make the partitions double dippy
 %     partitions.train_indices{1}=partitions.test_indices{1};
 %     cosmo_check_partitions(partitions,ds,'unbalanced_partitions_ok',true)
-%     %|| error('double dipping in fold 1: chunk 1 is in train and test set')
+%     > error('double dipping in fold 1: chunk 1 is in train and test set')
 %     %
 %     % make partitions empty
 %     partitions.train_indices{1}=[];
 %     cosmo_check_partitions(partitions,ds);
-%     %|| error('partition 1: .train_indices are empty')
+%     > error('partition 1: .train_indices are empty')
 %     %
 %     % partitions have values outside range
 %     partitions.train_indices{1}=100;
 %     cosmo_check_partitions(partitions,ds);
-%     %|| error('partition 1: .train_indices are outside range 1..9');
+%     > error('partition 1: .train_indices are outside range 1..9');
 %     %
 %     % use non-integers
 %     partitions.train_indices{1}=1.5;
 %     cosmo_check_partitions(partitions,ds);
-%     %|| error('partition 1: .train_indices are not integers');
+%     > error('partition 1: .train_indices are not integers');
 %
 % Notes:
 %   - the reason to require balancing by default is that chance level is

@@ -41,61 +41,61 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     % compute dissimilarity with centered data
 %     dsm_ds=cosmo_dissimilarity_matrix_measure(ds,'center_data',true);
 %     cosmo_disp(dsm_ds);
-%     %|| .sa
-%     %||   .targets1
-%     %||     [ 2
-%     %||       3
-%     %||       4
-%     %||       :
-%     %||       4
-%     %||       5
-%     %||       5 ]@10x1
-%     %||   .targets2
-%     %||     [ 1
-%     %||       1
-%     %||       1
-%     %||       :
-%     %||       3
-%     %||       3
-%     %||       4 ]@10x1
-%     %|| .a
-%     %||   .sdim
-%     %||     .labels
-%     %||       { 'targets1'  'targets2' }
-%     %||     .values
-%     %||       { [ 11    [ 11
-%     %||           12      12
-%     %||           13      13
-%     %||           14      14
-%     %||           15 ]    15 ] }
-%     %|| .samples
-%     %||   [         0
-%     %||             2
-%     %||             2
-%     %||         :
-%     %||      1.11e-16
-%     %||      1.11e-16
-%     %||     -2.22e-16 ]@10x1
+%     > .sa
+%     >   .targets1
+%     >     [ 2
+%     >       3
+%     >       4
+%     >       :
+%     >       4
+%     >       5
+%     >       5 ]@10x1
+%     >   .targets2
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       :
+%     >       3
+%     >       3
+%     >       4 ]@10x1
+%     > .a
+%     >   .sdim
+%     >     .labels
+%     >       { 'targets1'  'targets2' }
+%     >     .values
+%     >       { [ 11    [ 11
+%     >           12      12
+%     >           13      13
+%     >           14      14
+%     >           15 ]    15 ] }
+%     > .samples
+%     >   [         0
+%     >             2
+%     >             2
+%     >         :
+%     >      1.11e-16
+%     >      1.11e-16
+%     >     -2.22e-16 ]@10x1
 %     %
 %     % map results to matrix. values of 0 mean perfect correlation
 %     [samples, labels, values]=cosmo_unflatten(dsm_ds,1,...
 %                                           'set_missing_to',NaN);
 %     cosmo_disp(samples)
-%     %|| [ NaN       NaN       NaN       NaN       NaN
-%     %||     0       NaN       NaN       NaN       NaN
-%     %||     2         2       NaN       NaN       NaN
-%     %||     2         2  1.11e-16       NaN       NaN
-%     %||     2         2  1.11e-16 -2.22e-16       NaN ]
+%     > [ NaN       NaN       NaN       NaN       NaN
+%     >     0       NaN       NaN       NaN       NaN
+%     >     2         2       NaN       NaN       NaN
+%     >     2         2  1.11e-16       NaN       NaN
+%     >     2         2  1.11e-16 -2.22e-16       NaN ]
 %     %
 %     cosmo_disp(labels)
-%     %|| { 'targets1'  'targets2' }
+%     > { 'targets1'  'targets2' }
 %     %
 %     cosmo_disp(values)
-%     %|| { [ 11    [ 11
-%     %||     12      12
-%     %||     13      13
-%     %||     14      14
-%     %||     15 ]    15 ] }
+%     > { [ 11    [ 11
+%     >     12      12
+%     >     13      13
+%     >     14      14
+%     >     15 ]    15 ] }
 %
 %     % Searchlight using this measure
 %     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
@@ -109,104 +109,85 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     measure=@cosmo_dissimilarity_matrix_measure;
 %     sl_ds=cosmo_searchlight(ds, nbrhood, measure, opt);
 %     cosmo_disp(sl_ds);
-%     %|| .a
-%     %||   .fdim
-%     %||     .labels
-%     %||       { 'i'  'j'  'k' }
-%     %||     .values
-%     %||       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     %||   .vol
-%     %||     .mat
-%     %||       [ 2         0         0        -3
-%     %||         0         2         0        -3
-%     %||         0         0         2        -3
-%     %||         0         0         0         1 ]
-%     %||     .dim
-%     %||       [ 3         2         1 ]
-%     %||     .xform
-%     %||       'scanner_anat'
-%     %||   .sdim
-%     %||     .labels
-%     %||       { 'targets1'  'targets2' }
-%     %||     .values
-%     %||       { [ 1    [ 1
-%     %||           2      2
-%     %||           3      3
-%     %||           4      4
-%     %||           5      5
-%     %||           6 ]    6 ] }
-%     %|| .fa
-%     %||   .nvoxels
-%     %||     [ 3         4         3         3         4         3 ]
-%     %||   .radius
-%     %||     [ 1         1         1         1         1         1 ]
-%     %||   .center_ids
-%     %||     [ 1         2         3         4         5         6 ]
-%     %||   .i
-%     %||     [ 1         2         3         1         2         3 ]
-%     %||   .j
-%     %||     [ 1         1         1         2         2         2 ]
-%     %||   .k
-%     %||     [ 1         1         1         1         1         1 ]
-%     %|| .samples
-%     %||   [  3.1      3.68      3.56      1.47      2.96      2.27
-%     %||     6.06      6.39      3.29      6.54      4.43       4.1
-%     %||     5.85       4.2      2.11      6.47      6.18      3.47
-%     %||       :         :        :          :         :         :
-%     %||     4.62      3.18     0.829      5.53      5.53      3.14
-%     %||      3.7      3.08      1.75      4.71      4.95      3.39
-%     %||     1.23      0.83      1.48      1.03      1.75      1.31 ]@15x6
-%     %|| .sa
-%     %||   .targets1
-%     %||     [ 2
-%     %||       3
-%     %||       4
-%     %||       :
-%     %||       5
-%     %||       6
-%     %||       6 ]@15x1
-%     %||   .targets2
-%     %||     [ 1
-%     %||       1
-%     %||       1
-%     %||       :
-%     %||       4
-%     %||       4
-%     %||       5 ]@15x1
-%     %||
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'i'  'j'  'k' }
+%     >     .values
+%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     >   .vol
+%     >     .mat
+%     >       [ 2         0         0        -3
+%     >         0         2         0        -3
+%     >         0         0         2        -3
+%     >         0         0         0         1 ]
+%     >     .dim
+%     >       [ 3         2         1 ]
+%     >     .xform
+%     >       'scanner_anat'
+%     >   .sdim
+%     >     .labels
+%     >       { 'targets1'  'targets2' }
+%     >     .values
+%     >       { [ 1    [ 1
+%     >           2      2
+%     >           3      3
+%     >           4      4
+%     >           5      5
+%     >           6 ]    6 ] }
+%     > .fa
+%     >   .nvoxels
+%     >     [ 3         4         3         3         4         3 ]
+%     >   .radius
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .center_ids
+%     >     [ 1         2         3         4         5         6 ]
+%     >   .i
+%     >     [ 1         2         3         1         2         3 ]
+%     >   .j
+%     >     [ 1         1         1         2         2         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     > .samples
+%     >   [  3.1      3.68      3.56      1.47      2.96      2.27
+%     >     6.06      6.39      3.29      6.54      4.43       4.1
+%     >     5.85       4.2      2.11      6.47      6.18      3.47
+%     >       :         :        :          :         :         :
+%     >     4.62      3.18     0.829      5.53      5.53      3.14
+%     >      3.7      3.08      1.75      4.71      4.95      3.39
+%     >     1.23      0.83      1.48      1.03      1.75      1.31 ]@15x6
+%     > .sa
+%     >   .targets1
+%     >     [ 2
+%     >       3
+%     >       4
+%     >       :
+%     >       5
+%     >       6
+%     >       6 ]@15x1
+%     >   .targets2
+%     >     [ 1
+%     >       1
+%     >       1
+%     >       :
+%     >       4
+%     >       4
+%     >       5 ]@15x1
+%     >
 %
 %     % limitation: cannot have repeated targets
 %     ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',3);
 %     cosmo_dissimilarity_matrix_measure(ds);
-%     %|| error('...')
+%     > error('...')
 %
 %     % averaging the samples for each unique target resolves the issue of
 %     % repeated targets
 %     ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',3);
 %     ds_avg=cosmo_fx(ds,@(x)mean(x,1),'targets');
-%     ds_dsm=cosmo_dissimilarity_matrix_measure(ds_avg);
-%     cosmo_disp(ds_dsm);
-%     ||.sa
-%||  .targets1
-%||    [ 2
-%||      3
-%||      3 ]
-%||  .targets2
-%||    [ 1
-%||      1
-%||      2 ]
-%||.a
-%||  .sdim
-%||    .labels
-%||      { 'targets1'  'targets2' }
-%||    .values
-%||      { [ 1    [ 1
-%||          2      2
-%||          3 ]    3 ] }
-%||.samples
-%||  [  1.68
-%||     1.71
-%||    0.711 ]
+%     cosmo_dissimilarity_matrix_measure(ds_avg)
+%     >          sa: [1x1 struct]
+%     >           a: [1x1 struct]
+%     >     samples: [3x1 double]
 %
 % Notes:
 %   - it is recommended to set the 'center_data' to true when using

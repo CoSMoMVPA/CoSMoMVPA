@@ -22,29 +22,29 @@ function is_ok=cosmo_check_neighborhood(nbrhood,varargin)
 %     ds=cosmo_synthetic_dataset();
 %     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     cosmo_check_neighborhood(nbrhood)
-%     %|| true
+%     > true
 %     %
 %     cosmo_check_neighborhood(2)
-%     %|| error('neighborhood is not a struct')
+%     > error('neighborhood is not a struct')
 %     %
 %     % error can be silenced
 %     cosmo_check_neighborhood(2,false)
-%     %|| false
+%     > false
 %     %
 %     fa=nbrhood.fa;
 %     nbrhood=rmfield(nbrhood,'fa');
 %     cosmo_check_neighborhood(nbrhood)
-%     %|| error('field ''fa'' missing in neighborhood')
+%     > error('field ''fa'' missing in neighborhood')
 %     %
 %     nbrhood.fa=fa;
 %     nbrhood.neighbors{2}=-1;
 %     cosmo_check_neighborhood(nbrhood)
-%     %|| error('.neighbors{2} is not a row vector with integers')
+%     > error('.neighbors{2} is not a row vector with integers')
 %     %
 %     nbrhood.neighbors{2}=[1];
 %     nbrhood.fa.chan=[3 2 1];
 %     cosmo_check_neighborhood(nbrhood)
-%     %|| error('fa.chan has 3 values in dimension 2, expected 6')
+%     > error('fa.chan has 3 values in dimension 2, expected 6')
 %
 % See also: cosmo_spherical_neighborhood, surfing_interval_neighborhood
 %           cosmo_surficial_neighborhood, cosmo_meeg_chan_neighborhood
@@ -225,11 +225,7 @@ function msg=check_origin_matches(nbrhood, ds, show_warning)
                 ds_a=rmfield(ds_a,dim_name);
             end
 
-<<<<<<< HEAD
             if ~isequaln(origin_a, ds_a)
-=======
-            if ~cosmo_isequaln(origin_a, ds_a)
->>>>>>> CoSMoMVPA/master
                 error('.a mismatch between dataset and neighborhood');
             end
         end
@@ -245,7 +241,7 @@ function msg=check_xa_matches(origin,ds,infix)
         key=keys{k};
 
         if ~cosmo_isfield(origin,[attr_name '.' key]) || ...
-                ~cosmo_isequaln(ds.(attr_name).(key),...
+                ~isequaln(ds.(attr_name).(key),...
                         origin.(attr_name).(key))
             msg=sprintf(['.%sa.%s mismatch between dataset and '...
                     'neighborhood'],infix,key);
@@ -283,8 +279,8 @@ function msg=check_xdim_matches(origin_xdim, ds_xdim, dim_name)
         end
 
         for j=1:numel(origin_v)
-            if ~(cosmo_isequaln(origin_v{j},ds_v{j}) || ...
-                            cosmo_isequaln(origin_v{j},ds_v{j}'))
+            if ~(isequaln(origin_v{j},ds_v{j}) || ...
+                            isequaln(origin_v{j},ds_v{j}'))
                 msg=sprintf(['.a.%s ''%s'' value mismatch '...
                             'between dataset and neighborhood'], ...
                                     dim_name, key);

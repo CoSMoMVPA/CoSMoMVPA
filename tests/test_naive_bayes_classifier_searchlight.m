@@ -3,10 +3,7 @@ function test_suite=test_naive_bayes_classifier_searchlight
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
-        test_functions=localfunctions();
-    catch % no problem; early Matlab versions can use initTestSuite fine
-    end
+
     initTestSuite;
 
 function test_naive_bayes_classifier_searchlight_tiny

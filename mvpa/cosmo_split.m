@@ -24,70 +24,70 @@ function ds_splits=cosmo_split(ds, split_by, dim, check)
 %     % split by targets
 %     splits=cosmo_split(ds,'targets');
 %     cosmo_disp(splits{2}.sa);
-%     %|| .targets
-%     %||   [ 2
-%     %||     2
-%     %||     2 ]
-%     %|| .chunks
-%     %||   [ 1
-%     %||     2
-%     %||     3 ]
+%     > .targets
+%     >   [ 2
+%     >     2
+%     >     2 ]
+%     > .chunks
+%     >   [ 1
+%     >     2
+%     >     3 ]
 %     %
 %     % split by chunks
 %     splits=cosmo_split(ds,'chunks');
 %     cosmo_disp(splits{3}.sa);
-%     %|| .targets
-%     %||   [ 1
-%     %||     2 ]
-%     %|| .chunks
-%     %||   [ 3
-%     %||     3 ]
+%     > .targets
+%     >   [ 1
+%     >     2 ]
+%     > .chunks
+%     >   [ 3
+%     >     3 ]
 %     %
 %     % split by chunks and targets
 %     splits=cosmo_split(ds,{'chunks','targets'});
 %     cosmo_disp(splits{5}.sa);
-%     %|| .targets
-%     %||   [ 1 ]
-%     %|| .chunks
-%     %||   [ 3 ]
+%     > .targets
+%     >   [ 1 ]
+%     > .chunks
+%     >   [ 3 ]
 %
 %     % take an MEEG time-freq dataset, and split by time and channel
 %     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
 %     %
 %     % dataset has 11 channels, 7 frequencies and 5 time points
 %     cosmo_disp(ds.fa)
-%     %|| .chan
-%     %||   [ 1         2         3  ...  304       305       306 ]@1x10710
-%     %|| .freq
-%     %||   [ 1         1         1  ...  7         7         7 ]@1x10710
-%     %|| .time
-%     %||   [ 1         1         1  ...  5         5         5 ]@1x10710
+%     > .chan
+%     >   [ 1         2         3  ...  304       305       306 ]@1x10710
+%     > .freq
+%     >   [ 1         1         1  ...  7         7         7 ]@1x10710
+%     > .time
+%     >   [ 1         1         1  ...  5         5         5 ]@1x10710
 %     %
 %     % split by time and frequency. Since splitting is done on the feature
 %     % dimension, the third argument (with value 2) is mandatory
 %     splits=cosmo_split(ds,{'time','freq'},2);
 %     % there are 7 * 5 = 35 splits, each with 11 features
 %     numel(splits)
-%     %|| 35
+%     > 35
 %     cosmo_disp(cellfun(@(x) size(x.samples,2),splits))
-%     %|| [ 306       306       306  ...  306       306       306 ]@1x35
+%     > [ 306       306       306  ...  306       306       306 ]@1x35
 %     cosmo_disp(splits{18}.fa)
-%     %|| .chan
-%     %||   [ 1         2         3  ...  304       305       306 ]@1x306
-%     %|| .freq
-%     %||   [ 4         4         4  ...  4         4         4 ]@1x306
-%     %|| .time
-%     %||   [ 3         3         3  ...  3         3         3 ]@1x306
+%     > .chan
+%     >   [ 1         2         3  ...  304       305       306 ]@1x306
+%     > .freq
+%     >   [ 4         4         4  ...  4         4         4 ]@1x306
+%     > .time
+%     >   [ 3         3         3  ...  3         3         3 ]@1x306
 %     %
 %     % using cosmo_stack brings the split elements together again
 %     humpty_dumpty=cosmo_stack(splits,2);
 %     cosmo_disp(humpty_dumpty.fa)
-%     %|| .chan
-%     %||   [ 1         2         3  ...  304       305       306 ]@1x10710
-%     %|| .freq
-%     %||   [ 1         1         1  ...  7         7         7 ]@1x10710
-%     %|| .time
-%     %||   [ 1         1         1  ...  5         5         5 ]@1x10710
+%     > .chan
+%     >   [ 1         2         3  ...  304       305       306 ]@1x10710
+%     > .freq
+%     >   [ 1         1         1  ...  7         7         7 ]@1x10710
+%     > .time
+%     >   [ 1         1         1  ...  5         5         5 ]@1x10710
 %
 % Note:
 %   - This function is like the inverse of cosmo_stack; if

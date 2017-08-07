@@ -15,9 +15,6 @@ Reading material
 ++++++++++++++++
 
 - :cite:`KiD14`: Description of the time generalization method.
-- :cite:`KOP16`: Paper using the time generalization method.
-
-
 
 The time generalization method
 ++++++++++++++++++++++++++++++

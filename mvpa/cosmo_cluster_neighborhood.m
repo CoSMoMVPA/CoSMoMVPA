@@ -55,16 +55,13 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     nh_fmri=cosmo_cluster_neighborhood(ds_fmri,'progress',false);
 %     % each voxel has 4 or 6 neighbors
 %     cosmo_disp(nh_fmri.neighbors);
-%     %|| { [ 1         2         4         5 ]
-%     %||   [ 1         2         3         4         5         6 ]
-%     %||   [ 2         3         5         6 ]
-%     %||   [ 1         2         4         5 ]
-%     %||   [ 1         2         3         4         5         6 ]
-%     %||   [ 2         3         5         6 ]                     }
+%     > { [ 1         2         4         5 ]
+%     >   [ 1         2         3         4         5         6 ]
+%     >   [ 2         3         5         6 ]
+%     >   [ 1         2         4         5 ]
+%     >   [ 1         2         3         4         5         6 ]
+%     >   [ 2         3         5         6 ]                     }
 %
-%     % (This example requires FieldTrip)
-%     cosmo_skip_test_if_no_external('fieldtrip');
-%     %
 %     % get neighbors in time-lock MEEG dataset from the neuromag306
 %     % system (subset of channels), with combined planar and
 %     % axial channels
@@ -75,15 +72,12 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     % neighbors are seperate for axial channels (odd features)
 %     % and planar_combined channels (even features)
 %     cosmo_disp(nh_meg.neighbors)
-%     %|| { [ 1         3         4         6 ]
-%     %||   [ 2         5 ]
-%     %||   [ 1         3         4         6 ]
-%     %||   [ 1         3         4         6 ]
-%     %||   [ 2         5 ]
-%     %||   [ 1         3         4         6 ] }
-%
-%     % (This example requires FieldTrip)
-%     cosmo_skip_test_if_no_external('fieldtrip');
+%     > { [ 1         3         4         6 ]
+%     >   [ 2         5 ]
+%     >   [ 1         3         4         6 ]
+%     >   [ 1         3         4         6 ]
+%     >   [ 2         5 ]
+%     >   [ 1         3         4         6 ] }
 %     %
 %     % get neighbors in EEG dataset, either with clustering over all
 %     % feature dimensions (channels x time x freq) or with all feature
@@ -95,26 +89,26 @@ function nbrhood=cosmo_cluster_neighborhood(ds,varargin)
 %     nh_eeg_full=cosmo_cluster_neighborhood(ds_eeg,'progress',false);
 %     % each feature has up to 18 neighbors
 %     cosmo_disp(nh_eeg_full.neighbors)
-%     %|| { [ 1         2         3  ...  10       11       12 ]@1x12
-%     %||   [ 1         2         3  ...  10       11       12 ]@1x12
-%     %||   [ 1         2         3  ...  10       11       12 ]@1x12
-%     %||                                :
-%     %||   [ 19        20        21  ...  28       29       30 ]@1x12
-%     %||   [ 19        20        21  ...  28       29       30 ]@1x12
-%     %||   [ 19        20        21  ...  28       29       30 ]@1x12 }@30x1
+%     > { [ 1         2         3  ...  10       11       12 ]@1x12
+%     >   [ 1         2         3  ...  10       11       12 ]@1x12
+%     >   [ 1         2         3  ...  10       11       12 ]@1x12
+%     >                                :
+%     >   [ 19        20        21  ...  28       29       30 ]@1x12
+%     >   [ 19        20        21  ...  28       29       30 ]@1x12
+%     >   [ 19        20        21  ...  28       29       30 ]@1x12 }@30x1
 %     %
 %     % neighborhood with clustering over time x freq (not over chan)
 %     nh_eeg_tf=cosmo_cluster_neighborhood(ds_eeg,'progress',false,...
 %                                                 'chan',false);
 %     % each feature has at most 6 neighbors
 %     cosmo_disp(nh_eeg_tf.neighbors)
-%     %|| { [ 1         4         7        10 ]
-%     %||   [ 2         5         8        11 ]
-%     %||   [ 3         6         9        12 ]
-%     %||                    :
-%     %||   [ 19        22        25        28 ]
-%     %||   [ 20        23        26        29 ]
-%     %||   [ 21        24        27        30 ] }@30x1
+%     > { [ 1         4         7        10 ]
+%     >   [ 2         5         8        11 ]
+%     >   [ 3         6         9        12 ]
+%     >                    :
+%     >   [ 19        22        25        28 ]
+%     >   [ 20        23        26        29 ]
+%     >   [ 21        24        27        30 ] }@30x1
 %
 %
 % Notes:

@@ -32,43 +32,35 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %     % Generate tiny dataset with 6 voxels
 %     ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',1);
 %     cosmo_disp(ds.samples)
-%     %|| [ 2.03     0.584     -1.44    -0.518      1.19     -1.33 ]
+%     > [ 2.03     0.584     -1.44    -0.518      1.19     -1.33 ]
 %     %
 %     % show unflattened shape
-%     cosmo_disp(squeeze(cosmo_unflatten(ds)))
-%     %|| [  2.03    -0.518
-%     %||   0.584      1.19
-%     %||   -1.44     -1.33 ]
+%     squeeze(cosmo_unflatten(ds))
+%     >     2.0317   -0.5177
+%     >     0.5838    1.1908
+%     >    -1.4437   -1.3265
 %     %
 %     nh=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     % find local maxima within neighborhood of 1 voxel radius
-%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh);
-%     cosmo_disp(feature_ids)
-%     %|| [ 1         5         3 ]
-%     cosmo_disp(scores)
-%     %|| [ 2.03      1.19     -1.44 ]
+%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh)
+%     > feature_ids =  1         5         3
+%     > scores      =  2.0317    1.1908   -1.4437
 %     %
 %     % only return two feature ids
-%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh,'count',2);
-%     cosmo_disp(feature_ids)
-%     %|| [ 1         5 ]
-%     cosmo_disp(scores)
-%     %|| [ 2.03      1.19 ]
+%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh,'count',2)
+%     > feature_ids =  1         5
+%     > scores      =  2.0317    1.1908
 %     %
 %     % use another fitness function, namely local minima
-%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh,'fitness',@min);
-%     cosmo_disp(feature_ids)
-%     %|| [ 3         4 ]
-%     cosmo_disp(scores)
-%     %|| [ -1.44    -0.518 ]
+%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh,'fitness',@min)
+%     > feature_ids =  3         4
+%     > scores      = -1.4437   -0.5177
 %     %
 %     % find local maxima within neighborhood of 2 voxel radius
 %     nh=cosmo_spherical_neighborhood(ds,'radius',2,'progress',false);
-%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh);
-%     cosmo_disp(feature_ids)
-%     %|| [ 1         6 ]
-%     cosmo_disp(scores)
-%     %|| [ 2.03     -1.33 ]
+%     [feature_ids,scores]=cosmo_find_local_extrema(ds,nh)
+%     > feature_ids =   1         6
+%     > scores      =   2.0317   -1.3265
 %
 %
 %     % A more sophisticated example showing how a table of local maxima
@@ -103,12 +95,12 @@ function [feature_ids,scores]=cosmo_find_local_extrema(ds, nbrhood, varargin)
 %     %
 %     % show table with coordinates and value at local extrema
 %     fprintf('x=% 3d y=% 3d z=% 3d   score=%.3f\n',[xyz; scores]);
-%     %|| x= 11 y=  7 z=  3   score=3.679
-%     %|| x= -1 y=  3 z= -1   score=3.458
-%     %|| x= 27 y=  7 z=  7   score=3.361
-%     %|| x= 35 y= -1 z=  3   score=3.288
-%     %|| x= 23 y=  1 z= -1   score=2.899
-%     %|| x= 35 y= 11 z= -1   score=2.268
+%     > x= 11 y=  7 z=  3   score=3.679
+%     > x= -1 y=  3 z= -1   score=3.458
+%     > x= 27 y=  7 z=  7   score=3.361
+%     > x= 35 y= -1 z=  3   score=3.288
+%     > x= 23 y=  1 z= -1   score=2.899
+%     > x= 35 y= 11 z= -1   score=2.268
 %
 % Notes:
 %   - this function can be used to define regions of interest in a

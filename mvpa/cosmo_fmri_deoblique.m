@@ -14,25 +14,25 @@ function ds_plumb=cosmo_fmri_deoblique(ds)
 %     x.a.vol.mat(2,1)=.6;
 %     y=cosmo_fmri_deoblique(x);
 %     cosmo_disp(x.a.vol)
-%     %|| .mat
-%     %||   [ 0.8         0         0        -3
-%     %||     0.6         2         0        -3
-%     %||       0         0         2        -3
-%     %||       0         0         0         1 ]
-%     %|| .dim
-%     %||   [ 20        17        19 ]
-%     %|| .xform
-%     %||   'scanner_anat'
+%     > .mat
+%     >   [ 0.8         0         0        -3
+%     >     0.6         2         0        -3
+%     >       0         0         2        -3
+%     >       0         0         0         1 ]
+%     > .dim
+%     >   [ 20        17        19 ]
+%     > .xform
+%     >   'scanner_anat'
 %     cosmo_disp(y.a.vol)
-%     %|| .mat
-%     %||   [ 1         0         0      -3.2
-%     %||     0         2         0      -2.4
-%     %||     0         0         2        -3
-%     %||     0         0         0         1 ]
-%     %|| .dim
-%     %||   [ 20        17        19 ]
-%     %|| .xform
-%     %||   'scanner_anat'
+%     > .mat
+%     >   [ 1         0         0      -3.2
+%     >     0         2         0      -2.4
+%     >     0         0         2        -3
+%     >     0         0         0         1 ]
+%     > .dim
+%     >   [ 20        17        19 ]
+%     > .xform
+%     >   'scanner_anat'
 %     %
 %     % other attributes are unchanged:
 %     assert(isequal({x.samples x.fa x.sa x.a.fdim},...
@@ -41,7 +41,7 @@ function ds_plumb=cosmo_fmri_deoblique(ds)
 %     % a plump dataset does not change after de-obliqueing
 %     z=cosmo_fmri_deoblique(y);
 %     isequal(y,z)
-%     %|| true
+%     > true
 %
 % Notes:
 %   - Using this function changes the location of the voxels in

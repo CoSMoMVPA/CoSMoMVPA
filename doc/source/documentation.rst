@@ -16,7 +16,7 @@ Overview
    contents_demo
    get_started
    download
-   labman2017
+   cimec2016
    faq
    contact
    contribute
@@ -34,7 +34,7 @@ Detailed
    contents_demo
    get_started
    download
-   labman2017
+   cimec2016
    faq
    contact
    contribute
@@ -52,7 +52,6 @@ Full documentation
    cimec2014
    rhul2016
    cimec2016
-   labman2017
    faq
    contact
    contribute

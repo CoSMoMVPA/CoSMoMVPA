@@ -24,29 +24,29 @@ function f_ds=cosmo_fx(ds, f, split_by, dim, check)
 %     ds=cosmo_synthetic_dataset();
 %     f_ds=cosmo_fx(ds, @(x)mean(x,1), 'targets');
 %     cosmo_disp(f_ds.samples)
-%     %|| [ 0.593    -0.452    -0.985         2     -0.39     0.312
-%     %||   -0.42       2.3     0.585     0.503      2.46    -0.199 ]
+%     > [ 0.593    -0.452    -0.985         2     -0.39     0.312
+%     >   -0.42       2.3     0.585     0.503      2.46    -0.199 ]
 %     cosmo_disp(f_ds.sa)
-%     %|| .chunks
-%     %||   [ 1
-%     %||     1 ]
-%     %|| .targets
-%     %||   [ 1
-%     %||     2 ]
+%     > .chunks
+%     >   [ 1
+%     >     1 ]
+%     > .targets
+%     >   [ 1
+%     >     2 ]
 %
 %     % Compute the average sample value for each unique combination
 %     % of targets and chunks:
 %     ds=cosmo_synthetic_dataset('nreps',4);
 %     size(ds.samples)
-%     %|| 24 6
+%     > 24 6
 %     f_ds=cosmo_fx(ds, @(x)mean(x,1), {'targets','chunks'});
 %     size(f_ds.samples)
-%     %|| 6 6
+%     > 6 6
 %
 %     % Downsample MEEG data by a factor of two
 %     ds=cosmo_synthetic_dataset('type','meeg','size','small');
 %     size(ds.samples)
-%     %|| 6 6
+%     > 6 6
 %     downsampling_factor=2;
 %     ds.fa.time_downsamp=ceil(ds.fa.time/downsampling_factor);
 %     %
@@ -55,7 +55,7 @@ function f_ds=cosmo_fx(ds, f, split_by, dim, check)
 %     ds_downsamp=cosmo_fx(ds, @(x) mean(x,2), {'chan','time_downsamp'}, 2);
 %     ds_downsamp=cosmo_dim_prune(ds_downsamp); % update dim attributes
 %     size(ds_downsamp.samples)
-%     %||  6 3
+%     >  6 3
 %
 % See also: cosmo_split, cosmo_stack
 %

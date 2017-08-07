@@ -16,9 +16,6 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %   ds                dataset struct
 %
 % Examples:
-%     % (this example requires the surfing toolbox)
-%     cosmo_skip_test_if_no_external('afni');
-%     %
 %     % construct AFNI NIML dataset struct
 %     cosmo_check_external('afni');
 %     niml=struct();
@@ -30,22 +27,22 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     % (a filename of a NIML dataset in ASCII format is supported as well)
 %     ds=cosmo_surface_dataset(niml);
 %     cosmo_disp(ds)
-%     %|| .samples
-%     %||   [ 1         3         5
-%     %||     2         4         6 ]
-%     %|| .sa
-%     %||   .stats
-%     %||     { 'Ttest(10)'
-%     %||       'Zscore()'  }
-%     %|| .fa
-%     %||   .node_indices
-%     %||     [ 1         2         3 ]
-%     %|| .a
-%     %||   .fdim
-%     %||     .labels
-%     %||       { 'node_indices' }
-%     %||     .values
-%     %||       { [ 2 21 202 ] }
+%     > .samples
+%     >   [ 1         3         5
+%     >     2         4         6 ]
+%     > .sa
+%     >   .stats
+%     >     { 'Ttest(10)'
+%     >       'Zscore()'  }
+%     > .fa
+%     >   .node_indices
+%     >     [ 1         2         3 ]
+%     > .a
+%     >   .fdim
+%     >     .labels
+%     >       { 'node_indices' }
+%     >     .values
+%     >       { [ 2 21 202 ] }
 %
 %
 % Notes:

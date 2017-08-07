@@ -42,24 +42,24 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     % generate simple dataset with 3 times (2 targets x 3 chunks)
 %     ds=cosmo_synthetic_dataset('nreps',3);
 %     size(ds.samples)
-%     %|| [ 18 6 ]
+%     > [ 18 6 ]
 %     cosmo_disp([ds.sa.targets ds.sa.chunks])
-%     %|| [ 1         1
-%     %||   2         1
-%     %||   1         2
-%     %||   :         :
-%     %||   2         2
-%     %||   1         3
-%     %||   2         3 ]@18x2
+%     > [ 1         1
+%     >   2         1
+%     >   1         2
+%     >   :         :
+%     >   2         2
+%     >   1         3
+%     >   2         3 ]@18x2
 %     % average each unique combination of chunks and targets
 %     ds_avg=cosmo_average_samples(ds);
 %     cosmo_disp([ds_avg.sa.targets ds_avg.sa.chunks]);
-%     %|| [ 1         1
-%     %||   1         2
-%     %||   1         3
-%     %||   2         1
-%     %||   2         2
-%     %||   2         3 ]
+%     > [ 1         1
+%     >   1         2
+%     >   1         3
+%     >   2         1
+%     >   2         2
+%     >   2         3 ]
 %     %
 %     % for each unique target-chunk combination, select 50% of the samples
 %     % randomly and average these; repeat the random selection process 4
@@ -67,17 +67,17 @@ function ds_avg=cosmo_average_samples(ds, varargin)
 %     % to compute an average. The output has 24 samples
 %     ds_avg2=cosmo_average_samples(ds,'ratio',.5,'repeats',4);
 %     cosmo_disp([ds_avg2.sa.targets ds_avg2.sa.chunks],'edgeitems',5);
-%     %|| [ 1         1
-%     %||   1         1
-%     %||   1         1
-%     %||   1         1
-%     %||   1         2
-%     %||   :         :
-%     %||   2         2
-%     %||   2         3
-%     %||   2         3
-%     %||   2         3
-%     %||   2         3 ]@24x2
+%     > [ 1         1
+%     >   1         1
+%     >   1         1
+%     >   1         1
+%     >   1         2
+%     >   :         :
+%     >   2         2
+%     >   2         3
+%     >   2         3
+%     >   2         3
+%     >   2         3 ]@24x2
 %
 % Notes:
 %  - this function averages feature-wise; the output has the same features

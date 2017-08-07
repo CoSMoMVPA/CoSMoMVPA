@@ -25,20 +25,20 @@ function chunks=cosmo_chunkize(ds,nchunks_out)
 %     % with no chunks set, this function gives an error
 %     ds.sa=rmfield(ds.sa,'chunks');
 %     cosmo_chunkize(ds)
-%     %|| error('dataset has no field .sa.chunks. ...');
+%     > error('dataset has no field .sa.chunks. ...');
 %     %
 %     % set chunks so that all samples are assumed to be independent
 %     ds.sa.chunks=(1:size(ds.samples,1))';
 %     %
 %     % show initial dataset targets and chunks
 %     cosmo_disp([ds.sa.targets ds.sa.chunks])
-%     %|| [ 1         1
-%     %||   2         2
-%     %||   1         3
-%     %||   :         :
-%     %||   2        46
-%     %||   1        47
-%     %||   2        48 ]@48x2
+%     > [ 1         1
+%     >   2         2
+%     >   1         3
+%     >   :         :
+%     >   2        46
+%     >   1        47
+%     >   2        48 ]@48x2
 %     %
 %     % Re-assign chunks pseudo-randomly in the range 1:4.
 %     % samples (rows) with the same chunk original chunk value
@@ -50,13 +50,13 @@ function chunks=cosmo_chunkize(ds,nchunks_out)
 %     cosmo_check_dataset(ds);
 %     % Show result
 %     cosmo_disp([ds.sa.targets ds.sa.chunks])
-%     %|| [ 1         1
-%     %||   2         1
-%     %||   1         2
-%     %||   :         :
-%     %||   2         3
-%     %||   1         4
-%     %||   2         4 ]@48x2
+%     > [ 1         1
+%     >   2         1
+%     >   1         2
+%     >   :         :
+%     >   2         3
+%     >   1         4
+%     >   2         4 ]@48x2
 %
 % Notes:
 %  - This function is indended for MEEG datasets, or other datasets

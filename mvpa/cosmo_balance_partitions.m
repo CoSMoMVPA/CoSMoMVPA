@@ -11,25 +11,20 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %   ds                dataset struct with field .sa.targets.
 %   'nrepeats',nr     Number of repeats (default: 1). The output will
 %                     have nrep as many partitions as the input set. This
-%                     option is not compatible with 'nmin'.
+%                     option, if provided, is not compatible with 'nmin'.
 %   'nmin',nm         Ensure that each sample occurs at least
 %                     nmin times in each training set (some samples may
-%                     be repeated more often than than). This option is not
-%                     compatible with 'nrepeats'.
+%                     be repeated more often than than). This option, if
+%                     provided, is not compatible with 'nrepeats'.
 %   'balance_test'    If set to false, indices in the test set are not
-%                     necessarily balanced. The default is true.
-%   'seed',sd         Use seed sd for pseudoo-random number generation.
-%                     Different values lead almost always to different
-%                     pseudo-random orders. To disable using a seed - which
-%                     causes this function to give different results upon
-%                     subsequent calls with identical inputs - use sd=0.
+%                     necessarility balanced. The default is true
 %
 % Ouput:
-%   bpartitions       similar struct as input partitions, except that
-%                     - each field is a 1x(N*nsets) cell
-%                     - each unique target is represented about equally often
-%                     - each target in each training chunk occurs equally
-%                       often
+%   bpartitions    similar struct as input partitions, except that
+%                  - each field is a 1x(N*nsets) cell
+%                  - each unique target is represented about equally often
+%                  - each target in each training chunk occurs equally
+%                    often
 %
 % Examples:
 %     % generate a simple dataset with unbalanced partitions
@@ -41,55 +36,55 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     %
 %     % show original (unbalanced) partitioning
 %     cosmo_disp(p);
-%     %|| .train_indices
-%     %||   { [ 2    [ 1
-%     %||       3      4
-%     %||       7      5
-%     %||       8      6 ]
-%     %||       9 ]        }
-%     %|| .test_indices
-%     %||   { [ 1    [ 2
-%     %||       4      3
-%     %||       5      7
-%     %||       6 ]    8
-%     %||              9 ] }
+%     > .train_indices
+%     >   { [ 2    [ 1
+%     >       3      4
+%     >       7      5
+%     >       8      6 ]
+%     >       9 ]        }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       4      3
+%     >       5      7
+%     >       6 ]    8
+%     >              9 ] }
 %     %
 %     % make standard balancing (nsets=1); some targets are not used
 %     q=cosmo_balance_partitions(p,ds);
 %     cosmo_disp(q);
-%     %|| .train_indices
-%     %||   { [ 2    [ 1
-%     %||       3      5
-%     %||       7 ]    6 ] }
-%     %|| .test_indices
-%     %||   { [ 1    [ 2
-%     %||       5      3
-%     %||       6 ]    7 ] }
+%     > .train_indices
+%     >   { [ 2    [ 1
+%     >       3      5
+%     >       7 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 2
+%     >       5      3
+%     >       6 ]    7 ] }
 %     %
 %     % make balancing where each sample in each training fold is used at
 %     % least once
 %     q=cosmo_balance_partitions(p,ds,'nmin',1);
 %     cosmo_disp(q);
-%     %|| .train_indices
-%     %||   { [ 2    [ 2    [ 2    [ 1    [ 1
-%     %||       3      3      3      5      4
-%     %||       7 ]    9 ]    8 ]    6 ]    6 ] }
-%     %|| .test_indices
-%     %||   { [ 1    [ 1    [ 1    [ 2    [ 2
-%     %||       5      4      5      3      3
-%     %||       6 ]    6 ]    6 ]    7 ]    9 ] }
+%     > .train_indices
+%     >   { [ 2    [ 2    [ 2    [ 1    [ 1
+%     >       3      3      3      5      4
+%     >       7 ]    9 ]    8 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1    [ 2    [ 2
+%     >       5      4      5      3      3
+%     >       6 ]    6 ]    6 ]    7 ]    9 ] }
 %     %
 %     % triple the number of partitions and sample from training indices
 %     q=cosmo_balance_partitions(p,ds,'nrepeats',3);
 %     cosmo_disp(q);
-%     %|| .train_indices
-%     %||   { [ 2    [ 2    [ 2    [ 1    [ 1    [ 1
-%     %||       3      3      3      5      4      5
-%     %||       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
-%     %|| .test_indices
-%     %||   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
-%     %||       5      4      5      3      3      3
-%     %||       6 ]    6 ]    6 ]    7 ]    9 ]    8 ] }
+%     > .train_indices
+%     >   { [ 2    [ 2    [ 2    [ 1    [ 1    [ 1
+%     >       3      3      3      5      4      5
+%     >       7 ]    9 ]    8 ]    6 ]    6 ]    6 ] }
+%     > .test_indices
+%     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 2
+%     >       5      4      5      3      3      3
+%     >       6 ]    6 ]    6 ]    7 ]    9 ]    8 ] }
 %
 % Notes:
 % - this function is intended for datasets where the number of
@@ -107,11 +102,11 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
 %     set also contains 75% of class A, then classification accuracy would
 %     be 75%, which is higher than 1/2 (with 2 the number of classes).
 %   * Balancing the training set only would accomodate this issue, but it
-%     may still be the case that a classifier consistently predicts one
-%     class more often than other classes. While this may be unbiased with
-%      respect to predictions of one particular class over many dataset
-%     instances, it could lead to biases (either above or below chance)
-%     in particular instances.
+%     may still be the case that a classifier (in particular, non-linear
+%     classifiers) consistently predicts one class more often than other
+%     classes. While this may be unbiased with respect to predictions of
+%     one particular class over many dataset instances, it could lead to
+%     biases (either above or below chance) in particular instances.
 %
 % See also: cosmo_nchoosek_partitioner, cosmo_nfold_partitioner
 %

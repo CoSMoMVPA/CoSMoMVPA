@@ -19,35 +19,34 @@ function [y_in_x,x_in_y]=cosmo_overlap(xs,ys)
 %     % Compute overlap between two cells with cellstrings
 %     xs={{'a'},{'a','b'},{'a','b','c'},{}};
 %     ys={{'b'},{'c','b','a'}};
-%     [x_in_y,y_in_x]=cosmo_overlap(xs,ys);
-%     cosmo_disp(x_in_y);
-%     %|| [ 0     0.333
-%     %||   1     0.667
-%     %||   1         1
-%     %||   0         0 ]
-%     %||
-%     cosmo_disp(y_in_x);
-%     %|| [     0         1
-%     %||     0.5         1
-%     %||   0.333         1
-%     %||     NaN       NaN ]
+%     [x_in_y,y_in_x]=cosmo_overlap(xs,ys)
+%     > x_in_y =
+%     >          0    0.3333
+%     >     1.0000    0.6667
+%     >     1.0000    1.0000
+%     >          0         0
+%     >
+%     > y_in_x =
+%     >          0    1.0000
+%     >     0.5000    1.0000
+%     >     0.3333    1.0000
+%     >        NaN       NaN
 %
 %     % Compute overlap between two cells with numeric arrays
 %     xs={1,[1 2],1:3,[]};
 %     ys={2,[3,2,1]};
-%     [x_in_y,y_in_x]=cosmo_overlap(xs,ys);
-%     cosmo_disp(x_in_y);
-%     %|| [ 0     0.333
-%     %||   1     0.667
-%     %||   1         1
-%     %||   0         0 ]
-%     %||
-%     cosmo_disp(y_in_x);
-%     %|| [     0         1
-%     %||     0.5         1
-%     %||   0.333         1
-%     %||     NaN       NaN ]
-%
+%     [x_in_y,y_in_x]=cosmo_overlap(xs,ys)
+%     > x_in_y =
+%     >          0    0.3333
+%     >     1.0000    0.6667
+%     >     1.0000    1.0000
+%     >          0         0
+%     >
+%     > y_in_x =
+%     >          0    1.0000
+%     >     0.5000    1.0000
+%     >     0.3333    1.0000
+%     >        NaN       NaN
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

@@ -21,34 +21,34 @@ function [ds,attr,values]=cosmo_dim_remove(ds,dim_labels)
 %     % generate tiny fmri dataset
 %     ds=cosmo_synthetic_dataset();
 %     cosmo_disp(ds.a.fdim);
-%     %|| .labels
-%     %||   { 'i'  'j'  'k' }
-%     %|| .values
-%     %||   { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     > .labels
+%     >   { 'i'  'j'  'k' }
+%     > .values
+%     >   { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
 %     cosmo_disp(ds.fa);
-%     %|| .i
-%     %||   [ 1         2         3         1         2         3 ]
-%     %|| .j
-%     %||   [ 1         1         1         2         2         2 ]
-%     %|| .k
-%     %||   [ 1         1         1         1         1         1 ]
+%     > .i
+%     >   [ 1         2         3         1         2         3 ]
+%     > .j
+%     >   [ 1         1         1         2         2         2 ]
+%     > .k
+%     >   [ 1         1         1         1         1         1 ]
 %     % remove 'j' and 'k' dimension label; only 'i' is left
 %     [ds_without_jk,attr,values]=cosmo_dim_remove(ds,{'j','k'});
 %     cosmo_disp(ds_without_jk.a.fdim);
-%     %|| .labels
-%     %||   { 'i' }
-%     %|| .values
-%     %||   { [ 1         2         3 ] }
+%     > .labels
+%     >   { 'i' }
+%     > .values
+%     >   { [ 1         2         3 ] }
 %     cosmo_disp(ds_without_jk.fa);
-%     %|| .i
-%     %||   [ 1         2         3         1         2         3 ]
+%     > .i
+%     >   [ 1         2         3         1         2         3 ]
 %     cosmo_disp(attr)
-%     %|| .j
-%     %||   [ 1         1         1         2         2         2 ]
-%     %|| .k
-%     %||   [ 1         1         1         1         1         1 ]
+%     > .j
+%     >   [ 1         1         1         2         2         2 ]
+%     > .k
+%     >   [ 1         1         1         1         1         1 ]
 %     cosmo_disp(values)
-%     %|| { [ 1         2 ]  [ 1 ] }
+%     > { [ 1         2 ]  [ 1 ] }
 %
 % See also: cosmo_dim_transpose
 %

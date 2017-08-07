@@ -33,16 +33,16 @@ function bl_ds=cosmo_meeg_baseline_correct(ds, reference, method)
 %     ds=cosmo_slice(ds,1:2); % take first two samples
 %     ds_rel=cosmo_meeg_baseline_correct(ds,[-.3,-.18],'relative');
 %     cosmo_disp(ds_rel.samples);
-%     %|| [ 1     0.572         1      -1.3         1      1.56
-%     %||   1     -1.45         1      1.89         1    -0.171 ]
+%     > [ 1     0.572         1      -1.3         1      1.56
+%     >   1     -1.45         1      1.89         1    -0.171 ]
 %
 %     % illustrate 'absolute' baseline correction
 %     ds=cosmo_synthetic_dataset('type','timelock','size','small');
 %     ds=cosmo_slice(ds,1:2); % take first two samples
 %     ds_abs=cosmo_meeg_baseline_correct(ds,[-.3,-.18],'absolute');
 %     cosmo_disp(ds_abs.samples);
-%     %|| [ 0    -0.869         0      2.05         0    -0.465
-%     %||   0     -1.43         0      1.65         0     -1.36 ]
+%     > [ 0    -0.869         0      2.05         0    -0.465
+%     >   0     -1.43         0      1.65         0     -1.36 ]
 %
 %     % illustrate use of another dataset as reference
 %     ds=cosmo_synthetic_dataset('type','timelock','size','small');
@@ -51,8 +51,8 @@ function bl_ds=cosmo_meeg_baseline_correct(ds, reference, method)
 %     ref=cosmo_slice(ref,1:2);
 %     ds_ref_relch=cosmo_meeg_baseline_correct(ds,ref,'relchange');
 %     cosmo_disp(ds_ref_relch.samples);
-%     %|| [ 0.272    -0.272     -7.72      7.72     -0.22      0.22
-%     %||   -5.41      5.41    -0.309     0.309      1.41     -1.41 ]
+%     > [ 0.272    -0.272     -7.72      7.72     -0.22      0.22
+%     >   -5.41      5.41    -0.309     0.309      1.41     -1.41 ]
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

@@ -44,8 +44,8 @@ function clusters=cosmo_clusterize(sample,nbrhood_mat)
 %     %
 %     % show cluster indices
 %     cosmo_disp(cl)
-%     %|| { [ 1 ]  [ 3    [ 4 ]
-%     %||            6 ]        }
+%     > { [ 1 ]  [ 3    [ 4 ]
+%     >            6 ]        }
 %
 % Notes:
 %   - Two features j and k are in the same cluster if:

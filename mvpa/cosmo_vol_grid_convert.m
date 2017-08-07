@@ -18,59 +18,59 @@ function ds_conv=cosmo_vol_grid_convert(ds,varargin)
 %     ds=cosmo_synthetic_dataset('size','normal');
 %     % feature attributes are i, j, k
 %     cosmo_disp(ds.fa,'edgeitems',2);
-%     %|| .i
-%     %||   [ 1         2  ...  2         3 ]@1x30
-%     %|| .j
-%     %||   [ 1         1  ...  2         2 ]@1x30
-%     %|| .k
-%     %||   [ 1         1  ...  5         5 ]@1x30
+%     > .i
+%     >   [ 1         2  ...  2         3 ]@1x30
+%     > .j
+%     >   [ 1         1  ...  2         2 ]@1x30
+%     > .k
+%     >   [ 1         1  ...  5         5 ]@1x30
 %     % fmri dataset has .a.vol
 %     cosmo_disp(ds.a,'edgeitems',2);
-%     %|| .fdim
-%     %||   .labels
-%     %||     { 'i'
-%     %||       'j'
-%     %||       'k' }
-%     %||   .values
-%     %||     { [ 1         2         3 ]
-%     %||       [ 1         2 ]
-%     %||       [ 1         2         3         4         5 ] }
-%     %|| .vol
-%     %||   .mat
-%     %||     [ 2         0         0        -3
-%     %||       0         2         0        -3
-%     %||       0         0         2        -3
-%     %||       0         0         0         1 ]
-%     %||   .dim
-%     %||     [ 3         2         5 ]
-%     %||   .xform
-%     %||     'scanner_anat'
+%     > .fdim
+%     >   .labels
+%     >     { 'i'
+%     >       'j'
+%     >       'k' }
+%     >   .values
+%     >     { [ 1         2         3 ]
+%     >       [ 1         2 ]
+%     >       [ 1         2         3         4         5 ] }
+%     > .vol
+%     >   .mat
+%     >     [ 2         0         0        -3
+%     >       0         2         0        -3
+%     >       0         0         2        -3
+%     >       0         0         0         1 ]
+%     >   .dim
+%     >     [ 3         2         5 ]
+%     >   .xform
+%     >     'scanner_anat'
 %     %
 %     % convert to get grid representation
 %     ds_grid=cosmo_vol_grid_convert(ds,'togrid');
 %     % feature attribute is pos
 %     cosmo_disp(ds_grid.fa,'edgeitems',2);
-%     %|| .pos
-%     %||   [ 1        11  ...  20        30 ]@1x30
+%     > .pos
+%     >   [ 1        11  ...  20        30 ]@1x30
 %     % meeg source dataset has no .a.vol
 %     cosmo_disp(ds_grid.a,'edgeitems',2);
-%     %|| .fdim
-%     %||   .labels
-%     %||     { 'pos' }
-%     %||   .values
-%     %||     { [ -1        -1  ...  3         3
-%     %||         -1        -1  ...  1         1
-%     %||         -1         1  ...  5         7 ]@3x30 }
+%     > .fdim
+%     >   .labels
+%     >     { 'pos' }
+%     >   .values
+%     >     { [ -1        -1  ...  3         3
+%     >         -1        -1  ...  1         1
+%     >         -1         1  ...  5         7 ]@3x30 }
 %     %
 %     % convert it back to a format identical to the input
 %     ds_vol=cosmo_vol_grid_convert(ds_grid,'tovol');
 %     %
 %     isequal(ds.fa,ds_vol.fa)
-%     %|| true
+%     > true
 %     isequal(ds.a.vol.mat,ds_vol.a.vol.mat)
-%     %|| true
+%     > true
 %     isequal(ds.a.fdim,ds_vol.a.fdim)
-%     %|| true
+%     > true
 %
 % Notes:
 %   - when ds is an meeg source dataset, it is required that the positions

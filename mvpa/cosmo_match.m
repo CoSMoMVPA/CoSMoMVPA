@@ -26,10 +26,10 @@ function msk=cosmo_match(haystack, needle, varargin)
 % Examples
 %     % simple character comparison
 %     cosmo_match({'a','b','c'},{'b','c','d','e','b'})
-%     %|| [false true true]
+%     > [false true true]
 %     % swap the order of inputs
 %     cosmo_match({'b','c','d','e','b'},{'a','b','c'})
-%     %|| [true true false false true]
+%     > [true true false false true]
 %
 %     % in an fMRI dataset, get mask for features with with first spatial
 %     % dimension indices 5 or 7.

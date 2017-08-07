@@ -20,26 +20,26 @@ function [winners,classes]=cosmo_winner_indices(pred)
 %     pred=[4; 4; NaN; 5];
 %     [p, c]=cosmo_winner_indices(pred);
 %     p'
-%     %|| [1 1 NaN 2]
+%     > [1 1 NaN 2]
 %     c'
-%     %|| [4, 5]
+%     > [4, 5]
 %
 %     % one prediction per fold (e.g. using cosmo_nfold_partitioner)
 %     pred=[4 NaN NaN; 6 NaN NaN; NaN 3 NaN; NaN NaN NaN; NaN NaN 3];
 %     [p, c]=cosmo_winner_indices(pred);
 %     p'
-%     %|| [2, 3, 1, NaN, 1]
+%     > [2, 3, 1, NaN, 1]
 %     c'
-%     %|| [3 4 6]
+%     > [3 4 6]
 %
 %     % given up to three predictions each for eight samples, compute
 %     % which predictions occur most often. NaNs are ignored.
 %     pred=[4 4 4;4 5 6;6 5 4;5 6 4;4 5 6; NaN NaN NaN; 6 0 0;0 0 NaN];
 %     [p, c]=cosmo_winner_indices(pred);
 %     p'
-%     %|| [2, 3, 4, 2, 3, NaN, 1, 1]
+%     > [2, 3, 4, 2, 3, NaN, 1, 1]
 %     c'
-%     %|| [0, 4, 5, 6]
+%     > [0, 4, 5, 6]
 %
 % Notes:
 % - The typical use case is combining results from multiple classification

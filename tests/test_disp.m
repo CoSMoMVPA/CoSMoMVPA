@@ -3,10 +3,7 @@ function test_suite = test_disp
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
-        test_functions=localfunctions();
-    catch % no problem; early Matlab versions can use initTestSuite fine
-    end
+
     initTestSuite;
 
 

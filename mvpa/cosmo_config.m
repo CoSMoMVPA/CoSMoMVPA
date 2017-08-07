@@ -177,8 +177,7 @@ function path_fn=find_config_file(fn, raise_)
         % is it in the user path?
         % (not supported on octave)
         if cosmo_wtf('is_matlab')
-            upaths=cosmo_strsplit(userpath(),pathsep());
-
+            upaths=cosmo_strsplit(userpath(),':');
             for k=1:numel(upaths)
                 u_fn=fullfile(upaths{k},fn);
                 if exist_(u_fn)
@@ -268,7 +267,7 @@ function config=read_config(fn)
 function verify_no_illegal_char(fn,line_number,s)
     illegal_chars=sprintf('"''');
     matching=bsxfun(@eq,s,illegal_chars(:));
-    if any(matching(:))
+    if any(matching(:));
         error(['File %s, line %d: found illegal character. '...
             'note that quote characters are not allowed '...
             'for keys or values'],fn,line_number)

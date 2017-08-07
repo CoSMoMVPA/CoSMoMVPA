@@ -348,7 +348,7 @@ function [hdr,ds]=new_bv_mat_hdr(ds,bv_type)
         check_isotropic_voxels(ds);
     end
 
-    % automatically set orientation to ASR
+    % automatically set orientation to ARS
     if ~strcmp(cosmo_fmri_orientation(ds),'ASR')
         ds=cosmo_fmri_reorient(ds,'ASR');
     end
@@ -362,7 +362,7 @@ function [hdr,ds]=new_bv_mat_hdr(ds,bv_type)
     if ~isequal(rot_asr,diag(diag(rot_asr)))
         % should never get here because of the ASR orientation
         % forced earlier
-        error('Unsupported orientation: need ASR');
+        error('Unsupported orientation: need ARS');
     end
 
     hdr=xff(['new:' bv_type]);

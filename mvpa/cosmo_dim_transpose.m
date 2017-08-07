@@ -32,58 +32,58 @@ function ds=cosmo_dim_transpose(ds, dim_labels, target_dim, target_pos)
 %     % dataset attribute dimensions are
 %     % (<empty> [samples]) x (chan x freq x time [features])
 %     cosmo_disp(ds.a.fdim)
-%     %|| .labels
-%     %||   { 'chan'
-%     %||     'freq'
-%     %||     'time' }
-%     %|| .values
-%     %||   { { 'MEG0111'  'MEG0112'  'MEG0113' }
-%     %||     [ 2         4 ]
-%     %||     [ -0.2 ]                            }
+%     > .labels
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
+%     > .values
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %     % transpose 'time' from features to samples
 %     ds_tr_time=cosmo_dim_transpose(ds,'time');
 %     % dataset attribute dimensions are (time) x (chan x freq)
 %     cosmo_disp({ds_tr_time.a.sdim,ds_tr_time.a.fdim})
-%     %|| { .labels         .labels
-%     %||     { 'time' }      { 'chan'
-%     %||   .values             'freq' }
-%     %||     { [ -0.2 ] }  .values
-%     %||                     { { 'MEG0111'  'MEG0112'  'MEG0113' }
-%     %||                       [ 2         4 ]                     } }
+%     > { .labels         .labels
+%     >     { 'time' }      { 'chan'
+%     >   .values             'freq' }
+%     >     { [ -0.2 ] }  .values
+%     >                     { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >                       [ 2         4 ]                     } }
 %     % using the defaults, chan is moved from features to samples, and
 %     % added at the end of .a.sdim.labels
 %     ds_tr_time_chan=cosmo_dim_transpose(ds_tr_time,'chan');
 %     % dataset attribute dimensions are (time x chan) x (freq)
 %     cosmo_disp({ds_tr_time_chan.a.sdim,ds_tr_time_chan.a.fdim})
-%     %|| { .labels                        .labels
-%     %||     { 'time'  'chan' }             { 'freq' }
-%     %||   .values                        .values
-%     %||     { [ -0.2 ]  { 'MEG0111'        { [ 2         4 ] }
-%     %||                   'MEG0112'
-%     %||                   'MEG0113' } }                        }
+%     > { .labels                        .labels
+%     >     { 'time'  'chan' }             { 'freq' }
+%     >   .values                        .values
+%     >     { [ -0.2 ]  { 'MEG0111'        { [ 2         4 ] }
+%     >                   'MEG0112'
+%     >                   'MEG0113' } }                        }
 %     % when setting the position explicitly, chan is moved from features to
 %     % samples, and inserted to the first position in .a.sdim.labels
 %     ds_tr_chan_time=cosmo_dim_transpose(ds_tr_time,'chan',1,1);
 %     % dataset attribute dimensions are (chan x time) x (freq)
 %     cosmo_disp({ds_tr_chan_time.a.sdim,ds_tr_chan_time.a.fdim})
-%     %|| { .labels                        .labels
-%     %||     { 'chan'  'time' }             { 'freq' }
-%     %||   .values                        .values
-%     %||     { { 'MEG0111'    [ -0.2 ]      { [ 2         4 ] }
-%     %||         'MEG0112'
-%     %||         'MEG0113' }           }                        }
+%     > { .labels                        .labels
+%     >     { 'chan'  'time' }             { 'freq' }
+%     >   .values                        .values
+%     >     { { 'MEG0111'    [ -0.2 ]      { [ 2         4 ] }
+%     >         'MEG0112'
+%     >         'MEG0113' }           }                        }
 %     %
 %     % this moves the time dimension back to the feature dimension.
 %     ds_orig=cosmo_dim_transpose(ds_tr_time,'time');
 %     cosmo_disp(ds_orig.a.fdim)
-%     %|| .labels
-%     %||   { 'chan'
-%     %||     'freq'
-%     %||     'time' }
-%     %|| .values
-%     %||   { { 'MEG0111'  'MEG0112'  'MEG0113' }
-%     %||     [ 2         4 ]
-%     %||     [ -0.2 ]                            }
+%     > .labels
+%     >   { 'chan'
+%     >     'freq'
+%     >     'time' }
+%     > .values
+%     >   { { 'MEG0111'  'MEG0112'  'MEG0113' }
+%     >     [ 2         4 ]
+%     >     [ -0.2 ]                            }
 %
 %
 % Notes:

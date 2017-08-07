@@ -115,6 +115,7 @@ function res=find_files_recursively(root_dir,file_re)
     n=numel(d);
 
     res_cell=cell(n,1);
+    keep_msk=false(n,1);
     for k=1:n
         d_k=d(k);
         fn=d_k.name;
@@ -129,7 +130,7 @@ function res=find_files_recursively(root_dir,file_re)
                 % recursive call
                 res=find_files_recursively(path_fn,file_re);
 
-            elseif ~isempty(regexp(fn,file_re,'once'))
+            elseif ~isempty(regexp(fn,file_re,'once'));
                 % file matches the pattern
                 d_k.name=path_fn;
                 res=d_k;
@@ -139,13 +140,10 @@ function res=find_files_recursively(root_dir,file_re)
                 continue;
             end
 
-            if ~isempty(res)
-                res_cell{k}=res;
-            end
+            res_cell{k}=res;
+            keep_msk(k)=true;
         end
     end
-
-    keep_msk=~cellfun(@isempty,res_cell);
 
     if any(keep_msk)
         % at least one file found

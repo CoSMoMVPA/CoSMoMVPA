@@ -29,30 +29,30 @@ function conv_nbrhood=cosmo_convert_neighborhood(nbrhood, output_type)
 %     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
 %     % show the neighbor indices
 %     cosmo_disp(nbrhood.neighbors)
-%     %|| { [ 1         4         2 ]
-%     %||   [ 2         1         5         3 ]
-%     %||   [ 3         2         6 ]
-%     %||   [ 4         1         5 ]
-%     %||   [ 5         4         2         6 ]
-%     %||   [ 6         5         3 ]           }
+%     > { [ 1         4         2 ]
+%     >   [ 2         1         5         3 ]
+%     >   [ 3         2         6 ]
+%     >   [ 4         1         5 ]
+%     >   [ 5         4         2         6 ]
+%     >   [ 6         5         3 ]           }
 %     %
 %     % convert to matrix representation
 %     mx=cosmo_convert_neighborhood(nbrhood,'matrix');
 %     cosmo_disp(mx)
-%     %|| [ 1         2         3         4         5         6
-%     %||   4         1         2         1         4         5
-%     %||   2         5         6         5         2         3
-%     %||   0         3         0         0         6         0 ]
+%     > [ 1         2         3         4         5         6
+%     >   4         1         2         1         4         5
+%     >   2         5         6         5         2         3
+%     >   0         3         0         0         6         0 ]
 %     %
 %     % convert to cell representation
 %     neighbors=cosmo_convert_neighborhood(nbrhood,'cell');
 %     cosmo_disp(neighbors)
-%     %|| { [ 1         4         2 ]
-%     %||   [ 2         1         5         3 ]
-%     %||   [ 3         2         6 ]
-%     %||   [ 4         1         5 ]
-%     %||   [ 5         4         2         6 ]
-%     %||   [ 6         5         3 ]           }
+%     > { [ 1         4         2 ]
+%     >   [ 2         1         5         3 ]
+%     >   [ 3         2         6 ]
+%     >   [ 4         1         5 ]
+%     >   [ 5         4         2         6 ]
+%     >   [ 6         5         3 ]           }
 %
 % Notes:
 %    - the rationale of this function is that cell or struct

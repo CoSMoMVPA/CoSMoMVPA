@@ -21,45 +21,30 @@ function [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds, dim_label,
 % Examples:
 %     % fMRI dataset, find first voxel dimension
 %     ds=cosmo_synthetic_dataset('type','fmri');
-%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'i');
-%     disp(dim)
-%     %|| 2
-%     disp(index)
-%     %|| 1
-%     disp(attr_name)
-%     %|| fa
-%     disp(dim_name)
-%     %|| fdim
-%     cosmo_disp(values)
-%     %|| [ 1 2 3 ]
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'i')
+%     > dim = 2
+%     > index = 1
+%     > attr_name = fa
+%     > dim_name = fdim
+%     > values = 1 2 3
 %
 %     % MEEG time-frequency dataset, find 'time' dimension
 %     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
-%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'time');
-%     disp(dim)
-%     %|| 2
-%     disp(index)
-%     %|| 3
-%     disp(attr_name)
-%     %|| fa
-%     disp(dim_name)
-%     %|| fdim
-%     cosmo_disp(values)
-%     %|| [ -0.2000 -0.1500 -0.1000 -0.0500 0 ]
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(ds,'time')
+%     > dim = 2
+%     > index = 3
+%     > attr_name = fa
+%     > dim_name = fdim
+%     > values = -0.2000 -0.1500 -0.1000 -0.0500 0
 %     %
 %     % move 'time' from feature to sample dimension
 %     dst=cosmo_dim_transpose(ds,'time',1);
-%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(dst,'time');
-%     disp(dim)
-%     %|| 1
-%     disp(index)
-%     %|| 1
-%     disp(attr_name)
-%     %|| sa
-%     disp(dim_name)
-%     %|| sdim
-%     cosmo_disp(values)
-%     %|| [ -0.2000 ; -0.1500 ; -0.1000 ; -0.0500 ; 0 ]
+%     [dim, index, attr_name, dim_name, values]=cosmo_dim_find(dst,'time')
+%     > dim = 1
+%     > index = 1
+%     > attr_name = sa
+%     > dim_name = sdim
+%     > values = -0.2000 -0.1500 -0.1000 -0.0500 0
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

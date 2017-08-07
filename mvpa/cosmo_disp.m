@@ -39,121 +39,120 @@ function cosmo_disp(x,varargin)
 %     x.a_struct.another_struct.name='me';
 %     x.a_struct.another_struct.func=@abs;
 %     cosmo_disp(x);
-%     %|| .a_cell
-%     %||   { [  ]  { 'cell within cell'  [ 1         2
-%     %||                                   3         4 ] } }
-%     %|| .small_matrix
-%     %||   [ 10        11        12
-%     %||     13        14        15 ]
-%     %|| .big_matrix
-%     %||   [  1        11        21  ...  171       181       191
-%     %||      2        12        22  ...  172       182       192
-%     %||      3        13        23  ...  173       183       193
-%     %||      :         :         :        :         :         :
-%     %||      8        18        28  ...  178       188       198
-%     %||      9        19        29  ...  179       189       199
-%     %||     10        20        30  ...  180       190       200 ]@10x20
-%     %|| .huge
-%     %||   [ 1.1e+12 ]
-%     %|| .tiny
-%     %||   [ 9.09e-13 ]
-%     %|| .a_string
-%     %||   'hello world'
-%     %|| .a_struct
-%     %||   .another_struct
-%     %||     .name
-%     %||       'me'
-%     %||     .func
-%     %||       @abs
+%     > .a_cell
+%     >   { [  ]  { 'cell within cell'  [ 1         2
+%     >                                   3         4 ] } }
+%     > .small_matrix
+%     >   [ 10        11        12
+%     >     13        14        15 ]
+%     > .big_matrix
+%     >   [  1        11        21  ...  171       181       191
+%     >      2        12        22  ...  172       182       192
+%     >      3        13        23  ...  173       183       193
+%     >      :         :         :        :         :         :
+%     >      8        18        28  ...  178       188       198
+%     >      9        19        29  ...  179       189       199
+%     >     10        20        30  ...  180       190       200 ]@10x20
+%     > .huge
+%     >   [ 1.1e+12 ]
+%     > .tiny
+%     >   [ 9.09e-13 ]
+%     > .a_string
+%     >   'hello world'
+%     > .a_struct
+%     >   .another_struct
+%     >     .name
+%     >       'me'
+%     >     .func
+%     >       @abs
 %     %
 %     cosmo_disp(x.a_cell)
-%     %|| { [  ]  { 'cell within cell'  [ 1         2
-%     %||                                 3         4 ] } }
+%     > { [  ]  { 'cell within cell'  [ 1         2
+%     >                                 3         4 ] } }
 %     cosmo_disp(x.a_cell{2}{2})
-%     %|| [ 1         2
-%     %||   3         4 ]
+%     > [ 1         2
+%     >   3         4 ]
 %
+%     % illustrate recursion 'depth' argument
+%     m={'hello'};
 %     % make a cell in a cell in a cell in a cell ...
-%     m={{{{{{{{{{{'hello'}}}}}}}}}}};
+%     for k=1:10, m{1}=m; end;
 %     cosmo_disp(m)
-%     %|| { { { { { { <cell> } } } } } }
+%     > { { { { { { <cell> } } } } } }
 %     cosmo_disp(m,'depth',8)
-%     %|| { { { { { { { { <cell> } } } } } } } }
+%     > { { { { { { { { <cell> } } } } } } } }
 %     cosmo_disp(m,'depth',Inf)
-%     %|| { { { { { { { { { { { 'hello' } } } } } } } } } } }
+%     > { { { { { { { { { { { 'hello' } } } } } } } } } } }
 %
 %     % illustrate 'threshold' and 'edgeitems' arguments
 %     cosmo_disp(num2cell('a':'k'))
-%     %|| { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
+%     > { 'a'  'b'  'c' ... 'i'  'j'  'k'   }@1x11
 %     cosmo_disp(num2cell('a':'k'),'threshold',Inf)
-%     %|| { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }
+%     > { 'a'  'b'  'c'  'd'  'e'  'f'  'g'  'h'  'i'  'j'  'k' }
 %     cosmo_disp(num2cell('a':'k'),'edgeitems',2)
-%     %|| { 'a'  'b' ... 'j'  'k'   }@1x11
+%     > { 'a'  'b' ... 'j'  'k'   }@1x11
 %
 %     % illustrate 'precision' argument
-%     cosmo_disp(pi*[1 2],'precision',1);
-%     %|| [ 3       6 ]
-%     cosmo_disp(pi*[1 2],'precision',3);
-%     %|| [ 3.14      6.28 ]
-%     cosmo_disp(pi*[1 2],'precision',5);
-%     %|| [ 3.1416      6.2832 ]
-%     cosmo_disp(pi*[1 2],'precision',7);
-%     %|| [ 3.141593      6.283185 ]
+%     for p=1:2:7, cosmo_disp(pi*[1 2],'precision',p); end
+%     > [ 3       6 ]
+%     > [ 3.14      6.28 ]
+%     > [ 3.1416      6.2832 ]
+%     > [ 3.141593      6.283185 ]
 %
 %     % illustrate n-dimensional arrays
 %     x=zeros([2 2 1 2 3]);
 %     x(:)=2*(1:numel(x));
 %     cosmo_disp(x)
-%     %|| <double>@2x2x1x2x3
-%     %||    (:,:,1,1,1) =  [ 2         6
-%     %||                     4         8 ]
-%     %||    (:,:,1,2,1) =  [ 10        14
-%     %||                     12        16 ]
-%     %||    (:,:,1,1,2) =  [ 18        22
-%     %||                     20        24 ]
-%     %||    (:,:,1,2,2) =  [ 26        30
-%     %||                     28        32 ]
-%     %||    (:,:,1,1,3) =  [ 34        38
-%     %||                     36        40 ]
-%     %||    (:,:,1,2,3) =  [ 42        46
-%     %||                     44        48 ]
+%     > <double>@2x2x1x2x3
+%     >    (:,:,1,1,1) =  [ 2         6
+%     >                     4         8 ]
+%     >    (:,:,1,2,1) =  [ 10        14
+%     >                     12        16 ]
+%     >    (:,:,1,1,2) =  [ 18        22
+%     >                     20        24 ]
+%     >    (:,:,1,2,2) =  [ 26        30
+%     >                     28        32 ]
+%     >    (:,:,1,1,3) =  [ 34        38
+%     >                     36        40 ]
+%     >    (:,:,1,2,3) =  [ 42        46
+%     >                     44        48 ]
 %     cosmo_disp(reshape(char(65:72),[2 2 2]))
-%     %|| <char>@2x2x2
-%     %||    (:,:,1) = 'AC
-%     %||               BD'
-%     %||    (:,:,2) = 'EG
-%     %||               FH'
+%     > <char>@2x2x2
+%     >    (:,:,1) = 'AC
+%     >               BD'
+%     >    (:,:,2) = 'EG
+%     >               FH'
 %     cosmo_disp(zeros([2 3 5 7 0 2]))
-%     %|| <double>@2x3x5x7x0x2 (empty)
+%     > <double>@2x3x5x7x0x2 (empty)
 %
 %     % illustrate non-singleton structs
 %     x=struct('x',{1 2; 3 4});
 %     cosmo_disp(x);
-%     %|| <struct>@2x2
-%     %||    (1,1).x
-%     %||           [ 1 ]
-%     %||    (2,1).x
-%     %||           [ 3 ]
-%     %||    (1,2).x
-%     %||           [ 2 ]
-%     %||    (2,2).x
-%     %||           [ 4 ]
+%     > <struct>@2x2
+%     >    (1,1).x
+%     >           [ 1 ]
+%     >    (2,1).x
+%     >           [ 3 ]
+%     >    (1,2).x
+%     >           [ 2 ]
+%     >    (2,2).x
+%     >           [ 4 ]
 %     x3=cat(3,x,x,x);
 %     cosmo_disp(x3);
-%     %|| <struct>@2x2x3
-%     %||    (1,1,1).x
-%     %||             [ 1 ]
-%     %||    (2,1,1).x
-%     %||             [ 3 ]
-%     %||    (1,2,1).x
-%     %||             [ 2 ]
-%     %||      :        :
-%     %||    (2,1,3).x
-%     %||             [ 3 ]
-%     %||    (1,2,3).x
-%     %||             [ 2 ]
-%     %||    (2,2,3).x
-%     %||             [ 4 ]
+%     > <struct>@2x2x3
+%     >    (1,1,1).x
+%     >             [ 1 ]
+%     >    (2,1,1).x
+%     >             [ 3 ]
+%     >    (1,2,1).x
+%     >             [ 2 ]
+%     >      :        :
+%     >    (2,1,3).x
+%     >             [ 3 ]
+%     >    (1,2,3).x
+%     >             [ 2 ]
+%     >    (2,2,3).x
+%     >             [ 4 ]
 %
 % Notes:
 %   - Unlike the builtin 'disp' function, this function shows the contents

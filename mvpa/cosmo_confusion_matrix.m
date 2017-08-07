@@ -27,12 +27,12 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %     pred_ds=cosmo_crossvalidation_measure(ds,args);
 %     confusion=cosmo_confusion_matrix(pred_ds.sa.targets,pred_ds.samples);
 %     cosmo_disp(confusion)
-%     %|| [ 3         0         1
-%     %||   0         3         1
-%     %||   1         0         3 ]
+%     > [ 3         0         1
+%     >   0         3         1
+%     >   1         0         3 ]
 %     confusion_alt=cosmo_confusion_matrix(pred_ds);
 %     isequal(confusion,confusion_alt)
-%     %|| true
+%     > true
 %     %
 %     % run a searchlight with tiny radius of 1 voxel (3 is more common)
 %     nbrhood=cosmo_spherical_neighborhood(ds,'radius',1,'progress',false);
@@ -43,30 +43,30 @@ function [confusion_matrix, classes]=cosmo_confusion_matrix(ds, varargin)
 %     % matrices. Here the dataset is passed directly
 %     sl_confusion=cosmo_confusion_matrix(sl_ds);
 %     cosmo_disp(sl_confusion)
-%     %|| <double>@3x3x6
-%     %||    (:,:,1) = [ 4         0         0
-%     %||                0         4         0
-%     %||                0         1         3 ]
-%     %||    (:,:,2) = [ 4         0         0
-%     %||                0         4         0
-%     %||                0         1         3 ]
-%     %||    (:,:,3) = [ 2         1         1
-%     %||                0         4         0
-%     %||                1         0         3 ]
-%     %||    (:,:,4) = [ 4         0         0
-%     %||                0         3         1
-%     %||                0         1         3 ]
-%     %||    (:,:,5) = [ 3         0         1
-%     %||                0         4         0
-%     %||                1         1         2 ]
-%     %||    (:,:,6) = [ 3         0         1
-%     %||                0         4         0
-%     %||                1         1         2 ]
+%     > <double>@3x3x6
+%     >    (:,:,1) = [ 4         0         0
+%     >                0         4         0
+%     >                0         1         3 ]
+%     >    (:,:,2) = [ 4         0         0
+%     >                0         4         0
+%     >                0         1         3 ]
+%     >    (:,:,3) = [ 2         1         1
+%     >                0         4         0
+%     >                1         0         3 ]
+%     >    (:,:,4) = [ 4         0         0
+%     >                0         3         1
+%     >                0         1         3 ]
+%     >    (:,:,5) = [ 3         0         1
+%     >                0         4         0
+%     >                1         1         2 ]
+%     >    (:,:,6) = [ 3         0         1
+%     >                0         4         0
+%     >                1         1         2 ]
 %
 %     % using samples that are not predictions gives an error
 %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4);
 %     confusion=cosmo_confusion_matrix(ds)
-%     %|| error('72 predictions mismatch targets, first is (1,1)=2.211999e+00')
+%     > error('72 predictions mismatch targets, first is (1,1)=2.211999e+00')
 %
 % Notes:
 %   - this function counts the number of times each sample was classified

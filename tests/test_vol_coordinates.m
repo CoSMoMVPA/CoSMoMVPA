@@ -3,10 +3,7 @@ function test_suite = test_vol_coordinates
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
-        test_functions=localfunctions();
-    catch % no problem; early Matlab versions can use initTestSuite fine
-    end
+
     initTestSuite;
 
 
@@ -176,7 +173,7 @@ function test_test_vol_coordinates_exceptions()
 function remove_dir_helper(tmp_dir)
     if cosmo_wtf('is_octave')
         rmdir_state=confirm_recursive_rmdir();
-        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state));
+        state_resetter=onCleanup(@()confirm_recursive_rmdir(rmdir_state);
         confirm_recursive_rmdir(false,'local');
     end
     rmdir(tmp_dir,'s');

@@ -27,10 +27,6 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %
 %
 % Example:
-%     % (This example cannot be documentation tested using Octave,
-%     %  since Octave does not allow for-loops with evalc)
-%     cosmo_skip_test_if_no_external('matlab');
-%     %
 %     % the following example shows how a neighborhood can be split in
 %     % parts, a searchlight run on each part, and the different outputs
 %     % joined together. This gives identical results as running the
@@ -56,24 +52,24 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %     %
 %     % show output from searchlight
 %     cosmo_disp({result.samples; result.fa});
-%     %|| { [ 0.768     0.368        -1      1.45    0.0342     -0.32
-%     %||     0.526      1.77     0.937      1.08      1.07      1.49
-%     %||      0.46     -1.25    -0.152    0.0899     0.795    -0.522
-%     %||      1.23     0.685     0.954     0.606      1.19     0.335
-%     %||     0.914   -0.0442    0.0295     0.664     0.274    -0.221
-%     %||     0.633      1.24     0.797     0.861      1.54      1.02 ]
-%     %||   .nvoxels
-%     %||     [ 3         4         3         3         4         3 ]
-%     %||   .radius
-%     %||     [ 1         1         1         1         1         1 ]
-%     %||   .center_ids
-%     %||     [ 1         2         3         4         5         6 ]
-%     %||   .i
-%     %||     [ 1         2         3         1         2         3 ]
-%     %||   .j
-%     %||     [ 1         1         1         2         2         2 ]
-%     %||   .k
-%     %||     [ 1         1         1         1         1         1 ]   }
+%     > { [ 0.768     0.368        -1      1.45    0.0342     -0.32
+%     >     0.526      1.77     0.937      1.08      1.07      1.49
+%     >      0.46     -1.25    -0.152    0.0899     0.795    -0.522
+%     >      1.23     0.685     0.954     0.606      1.19     0.335
+%     >     0.914   -0.0442    0.0295     0.664     0.274    -0.221
+%     >     0.633      1.24     0.797     0.861      1.54      1.02 ]
+%     >   .nvoxels
+%     >     [ 3         4         3         3         4         3 ]
+%     >   .radius
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .center_ids
+%     >     [ 1         2         3         4         5         6 ]
+%     >   .i
+%     >     [ 1         2         3         1         2         3 ]
+%     >   .j
+%     >     [ 1         1         1         2         2         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]   }
 %     %
 %     [nh_splits,masks_split]=cosmo_neighborhood_split(nh);
 %     n_split=numel(nh_splits);
@@ -101,7 +97,7 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %         %
 %         % run the searchlight for this split, and store the result
 %         res2_cell{k}=cosmo_searchlight(ds_sel,nh_sel,averager,opt);
-%     end;
+%     end
 %     %
 %     % join the results along the second (feature) dimension
 %     result2=cosmo_stack(res2_cell,2);
@@ -109,24 +105,24 @@ function [nh_split,masks]=cosmo_neighborhood_split(nh, varargin)
 %     % show the results; they are identical to the original output, modulo
 %     % a possible permutation of the features.
 %     cosmo_disp({result2.samples; result2.fa});
-%     %|| { [ 0.768     0.368      1.45    0.0342        -1     -0.32
-%     %||     0.526      1.77      1.08      1.07     0.937      1.49
-%     %||      0.46     -1.25    0.0899     0.795    -0.152    -0.522
-%     %||      1.23     0.685     0.606      1.19     0.954     0.335
-%     %||     0.914   -0.0442     0.664     0.274    0.0295    -0.221
-%     %||     0.633      1.24     0.861      1.54     0.797      1.02 ]
-%     %||   .center_ids
-%     %||     [ 1         2         3         4         1         2 ]
-%     %||   .i
-%     %||     [ 1         2         1         2         3         3 ]
-%     %||   .j
-%     %||     [ 1         1         2         2         1         2 ]
-%     %||   .k
-%     %||     [ 1         1         1         1         1         1 ]
-%     %||   .nvoxels
-%     %||     [ 3         4         3         4         3         3 ]
-%     %||   .radius
-%     %||     [ 1         1         1         1         1         1 ]   }
+%     > { [ 0.768     0.368      1.45    0.0342        -1     -0.32
+%     >     0.526      1.77      1.08      1.07     0.937      1.49
+%     >      0.46     -1.25    0.0899     0.795    -0.152    -0.522
+%     >      1.23     0.685     0.606      1.19     0.954     0.335
+%     >     0.914   -0.0442     0.664     0.274    0.0295    -0.221
+%     >     0.633      1.24     0.861      1.54     0.797      1.02 ]
+%     >   .center_ids
+%     >     [ 1         2         3         4         1         2 ]
+%     >   .i
+%     >     [ 1         2         1         2         3         3 ]
+%     >   .j
+%     >     [ 1         1         2         2         1         2 ]
+%     >   .k
+%     >     [ 1         1         1         1         1         1 ]
+%     >   .nvoxels
+%     >     [ 3         4         3         4         3         3 ]
+%     >   .radius
+%     >     [ 1         1         1         1         1         1 ]   }
 %
 %
 % Notes:
