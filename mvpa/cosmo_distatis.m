@@ -25,6 +25,10 @@ function res=cosmo_distatis(ds, varargin)
 %
 %
 % Example:
+%     % (This example cannot be documentation tested using Octave,
+%     %  since Octave does not allow for-loops with evalc)
+%     cosmo_skip_test_if_no_external('matlab');
+%     %
 %     ds=cosmo_synthetic_dataset('nsubjects',5,'nchunks',1,'ntargets',4);
 %     %
 %     % define neighborhood (here a searchlight with radius of 1 voxel)
@@ -45,72 +49,72 @@ function res=cosmo_distatis(ds, varargin)
 %     %
 %     r=cosmo_distatis(dsms,'return','distance','progress',false);
 %     cosmo_disp(r);
-%     > .samples
-%     >   [     0         0         0         0         0         0
-%     >     0.818      1.09      0.77     0.653      1.03     0.421
-%     >     0.869       1.3      1.06      1.04     0.932      1.07
-%     >       :         :         :         :         :         :
-%     >      1.16     0.889      0.99     0.631      1.48     0.621
-%     >     0.268     0.952     0.965     0.462     0.943      1.04
-%     >         0         0         0         0         0         0 ]@16x6
-%     > .fa
-%     >   .center_ids
-%     >     [ 1         2         3         4         5         6 ]
-%     >   .i
-%     >     [ 1         2         3         1         2         3 ]
-%     >   .j
-%     >     [ 1         1         1         2         2         2 ]
-%     >   .k
-%     >     [ 1         1         1         1         1         1 ]
-%     >   .nvoxels
-%     >     [ 3         4         3         3         4         3 ]
-%     >   .radius
-%     >     [ 1         1         1         1         1         1 ]
-%     >   .quality
-%     >     [ 0.685     0.742     0.617     0.648     0.757     0.591 ]
-%     >   .nchunks
-%     >     [ 5         5         5         5         5         5 ]
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'i'  'j'  'k' }
-%     >     .values
-%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     >   .sdim
-%     >     .labels
-%     >       { 'targets1'  'targets2' }
-%     >     .values
-%     >       { [ 1    [ 1
-%     >           2      2
-%     >           3      3
-%     >           4 ]    4 ] }
-%     >   .vol
-%     >     .mat
-%     >       [ 2         0         0        -3
-%     >         0         2         0        -3
-%     >         0         0         2        -3
-%     >         0         0         0         1 ]
-%     >     .dim
-%     >       [ 3         2         1 ]
-%     >     .xform
-%     >       'scanner_anat'
-%     > .sa
-%     >   .targets1
-%     >     [ 1
-%     >       2
-%     >       3
-%     >       :
-%     >       2
-%     >       3
-%     >       4 ]@16x1
-%     >   .targets2
-%     >     [ 1
-%     >       1
-%     >       1
-%     >       :
-%     >       4
-%     >       4
-%     >       4 ]@16x1
+%     %|| .samples
+%     %||   [     0         0         0         0         0         0
+%     %||     0.818      1.09      0.77     0.653      1.03     0.421
+%     %||     0.869       1.3      1.06      1.04     0.932      1.07
+%     %||       :         :         :         :         :         :
+%     %||      1.16     0.889      0.99     0.631      1.48     0.621
+%     %||     0.268     0.952     0.965     0.462     0.943      1.04
+%     %||         0         0         0         0         0         0 ]@16x6
+%     %|| .fa
+%     %||   .center_ids
+%     %||     [ 1         2         3         4         5         6 ]
+%     %||   .i
+%     %||     [ 1         2         3         1         2         3 ]
+%     %||   .j
+%     %||     [ 1         1         1         2         2         2 ]
+%     %||   .k
+%     %||     [ 1         1         1         1         1         1 ]
+%     %||   .nvoxels
+%     %||     [ 3         4         3         3         4         3 ]
+%     %||   .radius
+%     %||     [ 1         1         1         1         1         1 ]
+%     %||   .quality
+%     %||     [ 0.685     0.742     0.617     0.648     0.757     0.591 ]
+%     %||   .nchunks
+%     %||     [ 5         5         5         5         5         5 ]
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'i'  'j'  'k' }
+%     %||     .values
+%     %||       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     %||   .sdim
+%     %||     .labels
+%     %||       { 'targets1'  'targets2' }
+%     %||     .values
+%     %||       { [ 1    [ 1
+%     %||           2      2
+%     %||           3      3
+%     %||           4 ]    4 ] }
+%     %||   .vol
+%     %||     .mat
+%     %||       [ 2         0         0        -3
+%     %||         0         2         0        -3
+%     %||         0         0         2        -3
+%     %||         0         0         0         1 ]
+%     %||     .dim
+%     %||       [ 3         2         1 ]
+%     %||     .xform
+%     %||       'scanner_anat'
+%     %|| .sa
+%     %||   .targets1
+%     %||     [ 1
+%     %||       2
+%     %||       3
+%     %||       :
+%     %||       2
+%     %||       3
+%     %||       4 ]@16x1
+%     %||   .targets2
+%     %||     [ 1
+%     %||       1
+%     %||       1
+%     %||       :
+%     %||       4
+%     %||       4
+%     %||       4 ]@16x1
 %
 % Reference:
 %   - Abdi, H., Valentin, D., O?Toole, A. J., & Edelman, B. (2005).

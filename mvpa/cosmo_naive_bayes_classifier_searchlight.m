@@ -55,40 +55,40 @@ function result=cosmo_naive_bayes_classifier_searchlight(ds, nbrhood, varargin)
 %     %
 %     % show result
 %     cosmo_disp(result);
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'i'  'j'  'k' }
-%     >     .values
-%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     >   .vol
-%     >     .mat
-%     >       [ 2         0         0        -3
-%     >         0         2         0        -3
-%     >         0         0         2        -3
-%     >         0         0         0         1 ]
-%     >     .dim
-%     >       [ 3         2         1 ]
-%     >     .xform
-%     >       'scanner_anat'
-%     > .fa
-%     >   .nvoxels
-%     >     [ 3         4         3         3         4         3 ]
-%     >   .radius
-%     >     [ 1         1         1         1         1         1 ]
-%     >   .center_ids
-%     >     [ 1         2         3         4         5         6 ]
-%     >   .i
-%     >     [ 1         2         3         1         2         3 ]
-%     >   .j
-%     >     [ 1         1         1         2         2         2 ]
-%     >   .k
-%     >     [ 1         1         1         1         1         1 ]
-%     > .samples
-%     >   [ 0.6      0.74      0.44       0.6       0.7       0.4 ]
-%     > .sa
-%     >   .labels
-%     >     { 'accuracy' }
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'i'  'j'  'k' }
+%     %||     .values
+%     %||       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     %||   .vol
+%     %||     .mat
+%     %||       [ 2         0         0        -3
+%     %||         0         2         0        -3
+%     %||         0         0         2        -3
+%     %||         0         0         0         1 ]
+%     %||     .dim
+%     %||       [ 3         2         1 ]
+%     %||     .xform
+%     %||       'scanner_anat'
+%     %|| .fa
+%     %||   .nvoxels
+%     %||     [ 3         4         3         3         4         3 ]
+%     %||   .radius
+%     %||     [ 1         1         1         1         1         1 ]
+%     %||   .center_ids
+%     %||     [ 1         2         3         4         5         6 ]
+%     %||   .i
+%     %||     [ 1         2         3         1         2         3 ]
+%     %||   .j
+%     %||     [ 1         1         1         2         2         2 ]
+%     %||   .k
+%     %||     [ 1         1         1         1         1         1 ]
+%     %|| .samples
+%     %||   [ 0.6      0.74      0.44       0.6       0.7       0.4 ]
+%     %|| .sa
+%     %||   .labels
+%     %||     { 'accuracy' }
 %
 %
 % Notes:

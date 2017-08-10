@@ -49,7 +49,7 @@ As a first exercise, load two datasets using subject ``s01``'s T-statistics for 
 (``glm_T_stats_even.nii`` and ``glm_T_stats_odd.nii``) and the VT mask.
 Assign targets and chunks, then join the two datasets using ``cosmo_stack``. Then use :ref:`cosmo_correlation_measure` to:
 
-    - compute the correlation information (Fisher-transformed average of no-diagonal versus off-diagonal elements).
+    - compute the correlation information (Fisher-transformed average of on-diagonal versus off-diagonal elements).
     - the raw correlation matrix.
 
 Then compute the correlation information for each subject, and perform a t-test against zero over subjects.

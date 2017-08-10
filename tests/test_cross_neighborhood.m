@@ -3,7 +3,10 @@ function test_suite=test_cross_neighborhood()
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 function test_cross_neighborhood_time_freq()
@@ -146,7 +149,7 @@ function test_cross_neighborhood_transpose
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',1);
     nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
 
-    nh=cosmo_cross_neighborhood(ds,{nh_time,nh_freq},opt);
+    nh=cosmo_cross_neighborhood(ds,{nh_freq,nh_time},opt);
 
     cp=cosmo_cartprod(repmat({[false,true]},4,1));
     n=size(cp,1);
@@ -178,7 +181,7 @@ function test_cross_neighborhood_transpose
         nh2_time=cosmo_interval_neighborhood(ds2,'time','radius',1);
         nh2_freq=cosmo_interval_neighborhood(ds2,'freq','radius',0);
 
-        nh2=cosmo_cross_neighborhood(ds2,{nh2_time,nh2_freq},opt);
+        nh2=cosmo_cross_neighborhood(ds2,{nh2_freq,nh2_time},opt);
         assertEqual(nh2.a,nh.a);
         assertEqual(nh2.fa,nh.fa);
         assertEqual(nh2.neighbors,nh.neighbors);
@@ -256,11 +259,22 @@ function test_warning_weird_dimension_order
     end
 
     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
+<<<<<<< HEAD
+=======
+    keep=ds.fa.chan<20;
+    ds=cosmo_slice(ds,keep,2);
+    ds=cosmo_dim_prune(ds);
+>>>>>>> CoSMoMVPA/master
 
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',0);
     nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
     nh_chan=cosmo_meeg_chan_neighborhood(ds,'count',4,...
+<<<<<<< HEAD
                                     'chantype','meg_planar');
+=======
+                                    'chantype','meg_planar',...
+                                    'label','dataset');
+>>>>>>> CoSMoMVPA/master
 
     nh_cell={nh_chan,nh_freq,nh_time};
     for ndim=1:3

@@ -41,136 +41,136 @@ function ds=cosmo_synthetic_dataset(varargin)
 %                           attribute.
 %
 % Examples:
-%    ds=cosmo_synthetic_dataset();
-%    cosmo_disp(ds);
-%     > .samples
-%     >   [   2.03    -0.892    -0.826      1.16      1.16     -1.29
-%     >      0.584      1.84      1.17    -0.848      3.49    -0.199
-%     >      -1.44    -0.262     -1.92      3.09     -1.37      1.73
-%     >     -0.518      2.34     0.441      1.86     0.479    0.0832
-%     >       1.19    -0.204    -0.209      1.76    -0.955     0.501
-%     >      -1.33      2.72     0.148     0.502      3.41     -0.48 ]
-%     > .fa
-%     >   .i
-%     >     [ 1         2         3         1         2         3 ]
-%     >   .j
-%     >     [ 1         1         1         2         2         2 ]
-%     >   .k
-%     >     [ 1         1         1         1         1         1 ]
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'i'  'j'  'k' }
-%     >     .values
-%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     >   .vol
-%     >     .mat
-%     >       [ 2         0         0        -3
-%     >         0         2         0        -3
-%     >         0         0         2        -3
-%     >         0         0         0         1 ]
-%     >     .dim
-%     >       [ 3         2         1 ]
-%     >     .xform
-%     >       'scanner_anat'
-%     > .sa
-%     >   .targets
-%     >     [ 1
-%     >       2
-%     >       1
-%     >       2
-%     >       1
-%     >       2 ]
-%     >   .chunks
-%     >     [ 1
-%     >       1
-%     >       2
-%     >       2
-%     >       3
-%     >       3 ]
+%     ds=cosmo_synthetic_dataset();
+%     cosmo_disp(ds);
+%     %|| .samples
+%     %||   [   2.03    -0.892    -0.826      1.16      1.16     -1.29
+%     %||      0.584      1.84      1.17    -0.848      3.49    -0.199
+%     %||      -1.44    -0.262     -1.92      3.09     -1.37      1.73
+%     %||     -0.518      2.34     0.441      1.86     0.479    0.0832
+%     %||       1.19    -0.204    -0.209      1.76    -0.955     0.501
+%     %||      -1.33      2.72     0.148     0.502      3.41     -0.48 ]
+%     %|| .fa
+%     %||   .i
+%     %||     [ 1         2         3         1         2         3 ]
+%     %||   .j
+%     %||     [ 1         1         1         2         2         2 ]
+%     %||   .k
+%     %||     [ 1         1         1         1         1         1 ]
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'i'  'j'  'k' }
+%     %||     .values
+%     %||       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     %||   .vol
+%     %||     .mat
+%     %||       [ 2         0         0        -3
+%     %||         0         2         0        -3
+%     %||         0         0         2        -3
+%     %||         0         0         0         1 ]
+%     %||     .dim
+%     %||       [ 3         2         1 ]
+%     %||     .xform
+%     %||       'scanner_anat'
+%     %|| .sa
+%     %||   .targets
+%     %||     [ 1
+%     %||       2
+%     %||       1
+%     %||       2
+%     %||       1
+%     %||       2 ]
+%     %||   .chunks
+%     %||     [ 1
+%     %||       1
+%     %||       2
+%     %||       2
+%     %||       3
+%     %||       3 ]
 %
 %     ds=cosmo_synthetic_dataset('sigma',5,...
 %                                'nchunks',5,'ntargets',4,...
 %                                'nsubjects',10);
 %     cosmo_disp(ds)
-%     > .samples
-%     >   [   3.53      1.65      1.74     0.453      1.22      3.28
-%     >      0.584      3.88     0.856     0.841    -0.899      1.23
-%     >      -3.68      1.38      1.89      -1.4     0.216      0.68
-%     >        :         :         :        :          :         :
-%     >     -0.725      4.41    -0.313     0.111     0.437     -1.03
-%     >      0.297    0.0279       1.8   -0.0303    -0.451     0.346
-%     >       1.64     0.103     -1.22       4.8     0.754      1.03 ]@200x6
-%     > .fa
-%     >   .i
-%     >     [ 1         2         3         1         2         3 ]
-%     >   .j
-%     >     [ 1         1         1         2         2         2 ]
-%     >   .k
-%     >     [ 1         1         1         1         1         1 ]
-%     > .a
-%     >   .fdim
-%     >     .labels
-%     >       { 'i'  'j'  'k' }
-%     >     .values
-%     >       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
-%     >   .vol
-%     >     .mat
-%     >       [ 2         0         0        -3
-%     >         0         2         0        -3
-%     >         0         0         2        -3
-%     >         0         0         0         1 ]
-%     >     .dim
-%     >       [ 3         2         1 ]
-%     >     .xform
-%     >       'scanner_anat'
-%     > .sa
-%     >   .targets
-%     >     [ 1
-%     >       2
-%     >       3
-%     >       :
-%     >       2
-%     >       3
-%     >       4 ]@200x1
-%     >   .chunks
-%     >     [ 1
-%     >       1
-%     >       1
-%     >       :
-%     >       5
-%     >       5
-%     >       5 ]@200x1
-%     >   .subject
-%     >     [  1
-%     >        1
-%     >        1
-%     >        :
-%     >       10
-%     >       10
-%     >       10 ]@200x1
+%     %|| .samples
+%     %||   [   3.53      1.65      1.74     0.453      1.22      3.28
+%     %||      0.584      3.88     0.856     0.841    -0.899      1.23
+%     %||      -3.68      1.38      1.89      -1.4     0.216      0.68
+%     %||        :         :         :        :          :         :
+%     %||     -0.725      4.41    -0.313     0.111     0.437     -1.03
+%     %||      0.297    0.0279       1.8   -0.0303    -0.451     0.346
+%     %||       1.64     0.103     -1.22       4.8     0.754      1.03 ]@200x6
+%     %|| .fa
+%     %||   .i
+%     %||     [ 1         2         3         1         2         3 ]
+%     %||   .j
+%     %||     [ 1         1         1         2         2         2 ]
+%     %||   .k
+%     %||     [ 1         1         1         1         1         1 ]
+%     %|| .a
+%     %||   .fdim
+%     %||     .labels
+%     %||       { 'i'  'j'  'k' }
+%     %||     .values
+%     %||       { [ 1         2         3 ]  [ 1         2 ]  [ 1 ] }
+%     %||   .vol
+%     %||     .mat
+%     %||       [ 2         0         0        -3
+%     %||         0         2         0        -3
+%     %||         0         0         2        -3
+%     %||         0         0         0         1 ]
+%     %||     .dim
+%     %||       [ 3         2         1 ]
+%     %||     .xform
+%     %||       'scanner_anat'
+%     %|| .sa
+%     %||   .targets
+%     %||     [ 1
+%     %||       2
+%     %||       3
+%     %||       :
+%     %||       2
+%     %||       3
+%     %||       4 ]@200x1
+%     %||   .chunks
+%     %||     [ 1
+%     %||       1
+%     %||       1
+%     %||       :
+%     %||       5
+%     %||       5
+%     %||       5 ]@200x1
+%     %||   .subject
+%     %||     [  1
+%     %||        1
+%     %||        1
+%     %||        :
+%     %||       10
+%     %||       10
+%     %||       10 ]@200x1
 %
 %     % example of MEEG dataset with ctf151 layout
 %     ds=cosmo_synthetic_dataset('type','meeg',...
 %                                   'sens','ctf151','size','huge');
 %     % show labels and values for feature dimensions
 %     cosmo_disp(ds.a.fdim,'edgeitems',2)
-%     > .labels
-%     >   { 'chan'
-%     >     'time' }
-%     > .values
-%     >   { { 'MLC11'  'MLC12' ... 'MZP01'  'MZP02'   }@1x151
-%     >     [ -0.2     -0.15  ...  0.55       0.6 ]@1x17      }
+%     %|| .labels
+%     %||   { 'chan'
+%     %||     'time' }
+%     %|| .values
+%     %||   { { 'MLC11'  'MLC12' ... 'MZP01'  'MZP02'   }@1x151
+%     %||     [ -0.2     -0.15  ...  0.55       0.6 ]@1x17      }
 %
 %     % example of MEEG dataset with 4d148 layout (3 channels only)
 %     ds=cosmo_synthetic_dataset('type','meeg','sens','4d148_planar');
 %     cosmo_disp(ds.a.fdim)
-%     > .labels
-%     >   { 'chan'
-%     >     'time' }
-%     > .values
-%     >   { { 'A148_dH'  'A147_dH'  'A146_dH' }
-%     >     [ -0.2     -0.15 ]                  }
+%     %|| .labels
+%     %||   { 'chan'
+%     %||     'time' }
+%     %|| .values
+%     %||   { { 'A148_dH'  'A147_dH'  'A146_dH' }
+%     %||     [ -0.2     -0.15 ]                  }
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -250,7 +250,7 @@ function samples=generate_samples(ds, class_distance, seed)
     nfeatures=size(ds.fa.(fa_names{1}),2);
 
     r=cosmo_rand(nsamples,nfeatures,'seed',seed);
-    samples=norminv(r);
+    samples=cosmo_norminv(r);
 
     add_msk=mod(bsxfun(@minus,1:nclasses+1,targets),nclasses+1)==0;
     add_msk_full=repmat(add_msk,1,ceil(nfeatures/(nclasses+1)));

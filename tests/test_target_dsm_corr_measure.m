@@ -3,7 +3,10 @@ function test_suite=test_target_dsm_corr_measure
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions=localfunctions();
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
     initTestSuite;
 
 function test_target_dsm_corr_measure_pearson
@@ -300,6 +303,7 @@ function test_target_dsm_corr_measure_mask_exceptions
         nan_msk=true(npairs,1);
         rp=randperm(npairs);
         nan_msk(rp(1:num_non_nan))=false;
+<<<<<<< HEAD
 
         for num_glms=-1:3
             opt=struct();
@@ -309,6 +313,17 @@ function test_target_dsm_corr_measure_mask_exceptions
                 opt.regress_dsm(nan_msk)=NaN;
             end
 
+=======
+
+        for num_glms=-1:3
+            opt=struct();
+
+            if num_glms==-1
+                opt.regress_dsm=randn(npairs,1);
+                opt.regress_dsm(nan_msk)=NaN;
+            end
+
+>>>>>>> CoSMoMVPA/master
             if num_glms<=0
                 opt.target_dsm=randn(npairs,1);
                 opt.target_dsm(nan_msk)=NaN;

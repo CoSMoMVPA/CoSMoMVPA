@@ -29,18 +29,18 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %
 % Examples:
 %     cosmo_cartprod({{1,2},{'a','b','c'}})'
-%     > {1,2,1,2,1,2;
-%     > 'a','a' ,'b','b','c','c'}
+%     %|| {1,2,1,2,1,2;
+%     %|| 'a','a' ,'b','b','c','c'}
 %
 %     cosmo_cartprod({[1,2],[5,6,7]})'
-%     > [1,2,1,2,1,2;
-%     >  5,5,6,6,7,7]
+%     %|| [1,2,1,2,1,2;
+%     %||  5,5,6,6,7,7]
 %
 %     cosmo_cartprod(repmat({1:2},1,4))'
-%     > [1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2;
-%     >  1 1 2 2 1 1 2 2 1 1 2 2 1 1 2 2;
-%     >  1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2;
-%     >  1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2]
+%     %|| [1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2;
+%     %||  1 1 2 2 1 1 2 2 1 1 2 2 1 1 2 2;
+%     %||  1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2;
+%     %||  1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2]
 %
 %     s=struct();
 %     s.roi={'v1','loc'};
@@ -50,31 +50,17 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
 %     s.beta=4;
 %     p=cosmo_cartprod(s)';
 %     cosmo_disp(p);
-%     > { .roi     .roi     .roi    ... .roi     .roi     .roi
-%     >     'v1'     'loc'    'v1'        'loc'    'v1'     'loc'
-%     >   .hemi    .hemi    .hemi       .hemi    .hemi    .hemi
-%     >     'L'      'L'      'R'         'L'      'R'      'R'
-%     >   .subj    .subj    .subj       .subj    .subj    .subj
-%     >     [ 1 ]    [ 1 ]    [ 1 ]       [ 9 ]    [ 9 ]    [ 9 ]
-%     >   .ana     .ana     .ana        .ana     .ana     .ana
-%     >     'vis'    'vis'    'vis'       'vis'    'vis'    'vis'
-%     >   .beta    .beta    .beta       .beta    .beta    .beta
-%     >     [ 4 ]    [ 4 ]    [ 4 ]       [ 4 ]    [ 4 ]    [ 4 ]   }@1x12
+%     %|| { .roi     .roi     .roi    ... .roi     .roi     .roi
+%     %||     'v1'     'loc'    'v1'        'loc'    'v1'     'loc'
+%     %||   .hemi    .hemi    .hemi       .hemi    .hemi    .hemi
+%     %||     'L'      'L'      'R'         'L'      'R'      'R'
+%     %||   .subj    .subj    .subj       .subj    .subj    .subj
+%     %||     [ 1 ]    [ 1 ]    [ 1 ]       [ 9 ]    [ 9 ]    [ 9 ]
+%     %||   .ana     .ana     .ana        .ana     .ana     .ana
+%     %||     'vis'    'vis'    'vis'       'vis'    'vis'    'vis'
+%     %||   .beta    .beta    .beta       .beta    .beta    .beta
+%     %||     [ 4 ]    [ 4 ]    [ 4 ]       [ 4 ]    [ 4 ]    [ 4 ] }@1x12
 %     %
-%     % print all combinations
-%     for k=1:numel(p),fprintf('#%d:%s%s\n',p{k}.subj,p{k}.hemi,p{k}.roi);end
-%     > #1:Lv1
-%     > #1:Lloc
-%     > #1:Rv1
-%     > #1:Rloc
-%     > #3:Lv1
-%     > #3:Lloc
-%     > #3:Rv1
-%     > #3:Rloc
-%     > #9:Lv1
-%     > #9:Lloc
-%     > #9:Rv1
-%     > #9:Rloc
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

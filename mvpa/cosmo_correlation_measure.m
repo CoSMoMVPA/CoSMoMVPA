@@ -57,54 +57,57 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     % compute on-minus-off diagonal correlations
 %     c=cosmo_correlation_measure(ds);
 %     cosmo_disp(c)
-%     > .samples
-%     >   [ 1.23 ]
-%     > .sa
-%     >   .labels
-%     >   { 'corr' }
+%     %|| .samples
+%     %||   [ 1.23 ]
+%     %|| .sa
+%     %||   .labels
+%     %||   { 'corr' }
 %     %
-%     % use Spearman correlations
+%     % Spearman correlation requires the Matlab statistics toolbox
+%     cosmo_skip_test_if_no_external('@stats');
+%     %
 %     c=cosmo_correlation_measure(ds,'corr_type','Spearman');
 %     cosmo_disp(c)
-%     > .samples
-%     >   [ 1.28 ]
-%     > .sa
-%     >   .labels
-%     >   { 'corr' }
-%     %
+%     %|| .samples
+%     %||   [ 1.28 ]
+%     %|| .sa
+%     %||   .labels
+%     %||   { 'corr' }
+%
+%     ds=cosmo_synthetic_dataset();
 %     % get raw output
 %     c_raw=cosmo_correlation_measure(ds,'output','correlation');
 %     cosmo_disp(c_raw)
-%     > .samples
-%     >   [  0.447
-%     >     -0.538
-%     >     -0.525
-%     >      0.959 ]
-%     > .sa
-%     >   .half1
-%     >     [ 1
-%     >       2
-%     >       1
-%     >       2 ]
-%     >   .half2
-%     >     [ 1
-%     >       1
-%     >       2
-%     >       2 ]
-%     > .a
-%     >   .sdim
-%     >     .labels
-%     >       { 'half1'  'half2' }
-%     >     .values
-%     >       { [ 1    [ 1
-%     >           2 ]    2 ] }
+%     %|| .samples
+%     %||   [  0.447
+%     %||     -0.538
+%     %||     -0.525
+%     %||      0.959 ]
+%     %|| .sa
+%     %||   .half1
+%     %||     [ 1
+%     %||       2
+%     %||       1
+%     %||       2 ]
+%     %||   .half2
+%     %||     [ 1
+%     %||       1
+%     %||       2
+%     %||       2 ]
+%     %|| .a
+%     %||   .sdim
+%     %||     .labels
+%     %||       { 'half1'  'half2' }
+%     %||     .values
+%     %||       { [ 1    [ 1
+%     %||           2 ]    2 ] }
 %     %
 %     % convert to matrix form (N x N x P, with N the number of classes and
 %     % P=1)
 %     matrices=cosmo_unflatten(c_raw,1);
 %     cosmo_disp(matrices)
-%     > [  0.447    -0.525
-%     >   -0.538     0.959 ]
+%     %|| [  0.447    -0.525
+%     %||   -0.538     0.959 ]
 %
 %     % compute for each fold separately, using a custom take-one-chunk
 %     % out partitioning scheme. c.sa.chunks in the output
@@ -114,16 +117,16 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     c=cosmo_correlation_measure(ds,'output','mean_by_fold',...
 %                         'partitions',partitions);
 %     cosmo_disp(c.samples);
-%     > [  1.72
-%     >   0.728
-%     >    1.25
-%     >    2.02 ]
+%     %|| [  1.72
+%     %||   0.728
+%     %||    1.25
+%     %||    2.02 ]
 %     cosmo_disp(c.sa);
-%     > .partition
-%     >   [ 1
-%     >     2
-%     >     3
-%     >     4 ]
+%     %|| .partition
+%     %||   [ 1
+%     %||     2
+%     %||     3
+%     %||     4 ]
 %
 %     % minimal searchlight example
 %     ds=cosmo_synthetic_dataset('type','fmri');
@@ -133,10 +136,10 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     res=cosmo_searchlight(ds,nbrhood,@cosmo_correlation_measure,...
 %                               'progress',false);
 %     cosmo_disp(res.samples)
-%     > [ 1.87      1.25      1.51      1.68      1.71     0.879 ]
+%     %|| [ 1.87      1.25      1.51      1.68      1.71     0.879 ]
 %     cosmo_disp(res.sa)
-%     > .labels
-%     >   { 'corr' }
+%     %|| .labels
+%     %||   { 'corr' }
 %
 % Notes:
 %   - by default the post_corr_func is set to @atanh. This is equivalent to
@@ -224,6 +227,8 @@ else
     defaults.check_partitions=true;
 
     params=cosmo_structjoin(defaults, varargin);
+
+    show_warning_if_no_defaults(defaults,params);
 
     cached_params=params;
     cached_varargin=varargin;
@@ -420,3 +425,28 @@ function data=get_data(ds, sample_idxs, class_ids, merge_func)
     end
 
 
+function show_warning_if_no_defaults(defaults,params)
+    keys={'output','post_corr_func'};
+    has_defaults=isequal(select_fields(defaults,keys),...
+                         select_fields(params,keys));
+
+    if ~has_defaults && isequal(params.post_corr_func,@atanh)
+        name=mfilename();
+        msg=sprintf(...
+                ['Please note that the ''%s'' function applies '...
+                'Fisher transformation after the correlations '...
+                'have been computed. This was a somewhat unfortunate '...
+                'implementation decision that will not be changed '...
+                'to avoid breaking behaviour with earlier versions.\n'...
+                'To disable using the Fisher transformation, use the '...
+                '''%s'' function while setting the ''post_corr_func'''...
+                'option to the empty array ([])'],name,name);
+        cosmo_warning(msg);
+    end
+
+function subset=select_fields(s, keys)
+    n=numel(keys);
+    for k=1:n
+        key=keys{k};
+        subset.(key)=s.(key);
+    end

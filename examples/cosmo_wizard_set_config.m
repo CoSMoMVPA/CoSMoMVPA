@@ -57,6 +57,7 @@ while true
     end
 
     % all done without error, quit this function
+    msgbox('Done! Happy CoSMoMVPA-ing!');
     return
 end
 
@@ -225,7 +226,10 @@ function tf=can_write(fn)
 
     % try to open in append mode
     fid=fopen(fn,'a');
+    file_closer=onCleanup(@()fclose(fid));
     tf=fid>0;
+
+    clear file_closer;
 
     if ~file_existed
         delete(fn);

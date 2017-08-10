@@ -34,7 +34,7 @@ function predicted=cosmo_classify_meta_feature_selection(samples_train, targets_
 %     res=cosmo_searchlight(ds_tl,nbrhood,measure,measure_args,...
 %                                             'progress',false);
 %     cosmo_disp(res.samples)
-%     > [ 0.28      0.52 ]
+%     %|| [ 0.28      0.52 ]
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

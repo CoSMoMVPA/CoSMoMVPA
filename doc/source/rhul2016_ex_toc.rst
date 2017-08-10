@@ -2,7 +2,6 @@
    #   the COPYING file distributed with CoSMoMVPA         #
 
 .. _rhul2016_ex_toc:
-.. _ex_toc:
 
 Exercises
 =========
