@@ -14,33 +14,57 @@ env:
   matrix:
     - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true  NO_DOC_TEST=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
     # ensure up-to-date prior to software-properties-common
     - travis_retry sudo apt-get -y -qq update
     # get Octave 4.0
-    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties
+    - travis_retry sudo apt-get install -y -qq software-properties-common python-software-properties libtool autoconf automake m4
     - travis_retry sudo apt-add-repository -y ppa:octave/stable
     - travis_retry sudo apt-get -y -qq update
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
 
-    # use Clang
-    - travis_retry sudo apt-get -y install clang
-    - sudo update-alternatives --set c++ /usr/bin/clang++
-    - sudo ln -f -s /usr/bin/clang++ /usr/bin/g++
-    - c++ --version
-    - g++ --version
+    # when installing externals, get recent GCC for Octave parallel toolbox
+    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
+          travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
+          travis_retry sudo apt-get update -y -q;
+          travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
+          travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20;
+          travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20;
+          travis_retry sudo update-alternatives --config gcc;
+          travis_retry sudo update-alternatives --config g++;
+          travis_retry sudo apt-get install gcc-multilib;
+          travis_retry sudo apt-get install libgomp1;
+          c++ --version;
+          g++ --version;
+          NAME=automake;
+          VERSION=1.6;
+          FULL=${NAME}-${VERSION};
+          wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz;
+          tar -xzf ${FULL}.tar.gz;
+          cd ${FULL};
+          ./configure && make && sudo make install;
+          cd ..;
+          NAME=autoconf;
+          VERSION=2.69;
+          FULL=${NAME}-${VERSION};
+          wget https://ftp.gnu.org/gnu/${NAME}/${FULL}.tar.gz;
+          tar -xzf ${FULL}.tar.gz;
+          cd ${FULL};
+          ./configure && make && sudo make install;
+          cd ..;
+      fi
 
     # go up one level
     - cd ..
@@ -50,12 +74,21 @@ before_install:
     - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
 
+    # retrieve MOdox
+    - rm -rf MOdox
+    - travis_retry git clone -v git://github.com/MOdox/MOdox.git
+    - make -C MOdox install
+
     # optionally retrieve MOcov
     - if [[ "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
           rm -rf MOcov;
           git clone git://github.com/MOcov/MOcov.git;
           make -C MOcov install;
       fi
+    # Show package info
+    - autoconf --version
+    - automake --version
+    - m4 --version
 
 install:
     - PTH=`pwd`
@@ -80,12 +113,34 @@ install:
                      fieldtrip
                      libsvm
                      gifti
+                     octave_pkg_struct
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
                      octave_savannah_evalc
                     ";
       fi
+
+
+    # ensure Octave rc file exists
+    - echo "" >> $OCTAVERC;
+
+    # use travis-retry
+    - RETRY=travis_retry
+
+    # load Octave io package
+    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
+
+
+    # optionally enable Octave struct package
+    - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
+      fi
+
+    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+      fi
+
 
     # optionally install surfing toolbox
     - if [[ " $EXTERNALS " = *" surfing "* ]]; then
@@ -101,7 +156,14 @@ install:
           $OCTAVE --eval "addpath('${PTH}/afni/src/matlab');savepath();";
       fi
 
-    # optionally install FieldTrip
+    # optionally install FieldTrip, using one of the branches below
+    # If FieldTrip temporarily breaks the build, we can switch to another
+    # custum branch that fixes the issue. The official branch is the
+    # last entry in the list below.
+    #
+    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _fix/octave_fixname_empty_input
+    # git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
+
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
           git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
@@ -151,15 +213,7 @@ before_script:
           RETRY=travis_retry;
       fi
 
-    # load Octave io package
-    - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
-    # optionally enable Octave parallel package
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
-          echo "" >> $OCTAVERC;
-      fi
 
     # optionally enable Octave statistics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
