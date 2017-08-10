@@ -1,7 +1,7 @@
-function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test, unused)
+function [predicted,decisionvalues]=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test, unused)
 % naive bayes classifier
 %
-% predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test[, opt])
+% [predicted,decisionvalues]=cosmo_classify_naive_bayes(samples_train, targets_train, samples_test[, opt])
 %
 % Inputs:
 %   samples_train      PxR training data for P samples and R features
@@ -11,6 +11,7 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
 %
 % Output:
 %   predicted          Qx1 predicted data classes for samples_test
+%   decisionvalues     Qx1 decision values
 %
 % Example:
 %     ds=cosmo_synthetic_dataset('ntargets',5,'nchunks',15);
@@ -46,9 +47,9 @@ function predicted=cosmo_classify_naive_bayes(samples_train, targets_train, samp
         cached_model=model;
     end
 
-    predicted=test(model, samples_test);
+    [predicted,decisionvalues]=test(model, samples_test);
 
-function predicted=test(model, samples_test)
+function [predicted,decisionvalues]=test(model, samples_test)
     mus=model.mus;
     vars=model.vars;
     log_class_probs=model.log_class_probs;
@@ -60,6 +61,7 @@ function predicted=test(model, samples_test)
     end
 
     predicted=zeros(ntest,1);
+    decisionvalues=zeros(ntest,1);
 
     for k=1:ntest
         sample=samples_test(k,:);
@@ -74,7 +76,7 @@ function predicted=test(model, samples_test)
         log_test_prob=sum(log_ps,2)+log_class_probs;
 
         % find the one with the highest probability
-        [unused, mx_idx]=max(log_test_prob);
+        [decisionvalues(k), mx_idx]=max(log_test_prob);
 
         predicted(k)=classes(mx_idx);
     end
