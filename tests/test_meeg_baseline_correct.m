@@ -58,7 +58,6 @@ function helper_test_meeg_baseline_correct_comparison(interval,method,...
 
     chan_to_select=cosmo_randperm(max(ds.fa.chan),ceil(rand()*3+1));
     freq_to_select=cosmo_randperm(max(ds.fa.freq),ceil(rand()*3+1));
-<<<<<<< HEAD
 
     m=cosmo_match(ds.fa.chan,chan_to_select) & ...
             cosmo_match(ds.fa.freq,freq_to_select);
@@ -90,56 +89,16 @@ function helper_test_meeg_baseline_correct_comparison(interval,method,...
                         @(t) t>=min(interval) & t<=max(interval));
             ds_ref=cosmo_slice(ds,msk,2);
 
-=======
-
-    m=cosmo_match(ds.fa.chan,chan_to_select) & ...
-            cosmo_match(ds.fa.freq,freq_to_select);
-    ds=cosmo_slice(ds,m,2);
-    ds=cosmo_dim_prune(ds);
-
-    y=cosmo_meeg_baseline_correct(ds,interval,method);
-
-    % (unsupported in octave)
-    switch reference
-        case 'ft'
-            ft=cosmo_map2meeg(ds);
-
-            opt=struct();
-            opt.baseline=interval;
-            opt.baselinetype=method;
-
-            ft_bl=ft_freqbaseline(opt,ft);
-            x=cosmo_meeg_dataset(ft_bl);
-
-        case 'ds'
-            msk=cosmo_dim_match(ds,'time',...
-                        @(t) t>=min(interval) & t<=max(interval));
-            ds_ref=cosmo_slice(ds,msk,2);
-            x=cosmo_meeg_baseline_correct(ds,ds_ref,method);
-
-        case 'manual'
-            msk=cosmo_dim_match(ds,'time',...
-                        @(t) t>=min(interval) & t<=max(interval));
-            ds_ref=cosmo_slice(ds,msk,2);
-
->>>>>>> CoSMoMVPA/master
             x=ds;
 
             for chan=1:max(ds.fa.chan)
                 for freq=1:max(ds.fa.freq)
                     msk=ds.fa.chan==chan & ds.fa.freq==freq;
                     s=ds.samples(:,msk);
-<<<<<<< HEAD
 
                     ref_msk=ds_ref.fa.chan==chan & ds_ref.fa.freq==freq;
                     r=mean(ds_ref.samples(:,ref_msk),2);
 
-=======
-
-                    ref_msk=ds_ref.fa.chan==chan & ds_ref.fa.freq==freq;
-                    r=mean(ds_ref.samples(:,ref_msk),2);
-
->>>>>>> CoSMoMVPA/master
                     switch method
                         case 'absolute'
                             v=bsxfun(@minus,s,r);
@@ -162,7 +121,6 @@ function helper_test_meeg_baseline_correct_comparison(interval,method,...
 
         otherwise
             assert(false)
-<<<<<<< HEAD
 
     end
 
@@ -189,34 +147,6 @@ function helper_test_meeg_baseline_correct_comparison(interval,method,...
 
     end
 
-=======
-
-    end
-
-    x_unq=cosmo_index_unique({x.fa.time,x.fa.chan});
-    y_unq=cosmo_index_unique({y.fa.time,y.fa.chan});
-
-    n=numel(x_unq);
-    max_n_to_choose=10;
-    n_to_choose=min(max_n_to_choose,n);
-    rp=cosmo_randperm(n,n_to_choose);
-    assert(numel(x_unq)==numel(y_unq));
-    for j=1:n_to_choose;
-        idx=rp(j);
-        x_sel=cosmo_slice(x,x_unq{idx},2,false);
-        y_sel=cosmo_slice(y,y_unq{idx},2,false);
-
-        p=x_sel.samples;
-        q=y_sel.samples;
-
-        desc=sprintf('method %s, reference %s',method,reference);
-        assertElementsAlmostEqual(p,q,...
-                        'relative',1e-6,desc);
-        assertEqual(x_sel.fa,y_sel.fa);
-
-    end
-
->>>>>>> CoSMoMVPA/master
     assertEqual(x.a.fdim,y.a.fdim);
 
 

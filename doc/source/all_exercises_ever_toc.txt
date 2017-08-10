@@ -1,5 +1,6 @@
 History of exercises:
 
+- 2017  :ref:`LABMAN 2017, the second Latin American Brain Mapping Network Meeting <labman2017>`.
 - 2016  :ref:`PRNI 2016, the 6th International Workshop on Pattern Recognition in Neuroimaging workshop<prni2016>`.
 - 2016  :ref:`CIMeC 2016 Hands-on Methods <cimec2016>`.
 - 2016  :ref:`Royal Holloway University of London CoSMoMVPA workshop <rhul2016>`.

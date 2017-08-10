@@ -259,22 +259,15 @@ function test_warning_weird_dimension_order
     end
 
     ds=cosmo_synthetic_dataset('type','timefreq','size','big');
-<<<<<<< HEAD
-=======
     keep=ds.fa.chan<20;
     ds=cosmo_slice(ds,keep,2);
     ds=cosmo_dim_prune(ds);
->>>>>>> CoSMoMVPA/master
 
     nh_time=cosmo_interval_neighborhood(ds,'time','radius',0);
     nh_freq=cosmo_interval_neighborhood(ds,'freq','radius',0);
     nh_chan=cosmo_meeg_chan_neighborhood(ds,'count',4,...
-<<<<<<< HEAD
-                                    'chantype','meg_planar');
-=======
                                     'chantype','meg_planar',...
                                     'label','dataset');
->>>>>>> CoSMoMVPA/master
 
     nh_cell={nh_chan,nh_freq,nh_time};
     for ndim=1:3

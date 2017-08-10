@@ -3,19 +3,6 @@ function test_suite=test_parallel_get_nproc_available()
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
-<<<<<<< HEAD
-
-    initTestSuite;
-
-
-function test_parallel_get_nproc_available_matlab()
-    if ~cosmo_wtf('is_matlab')
-        cosmo_notify_test_skipped('Only for the Matlab platform');
-        return;
-    end
-
-    has_parallel_toolbox=cosmo_check_external('@distcomp',false);
-=======
     try % assignment of 'localfunctions' is necessary in Matlab >= 2016
         test_functions=localfunctions();
     catch % no problem; early Matlab versions can use initTestSuite fine
@@ -32,7 +19,6 @@ function test_parallel_get_nproc_available_matlab_ge2013b()
 
     has_parallel_toolbox=cosmo_check_external('@distcomp',false) && ...
                                 ~isempty(which('gcp'));
->>>>>>> CoSMoMVPA/master
 
     aeq=@(expeced_output,varargin)assertEqual(expeced_output,...
                     cosmo_parallel_get_nproc_available(varargin{:}));
@@ -65,8 +51,6 @@ function test_parallel_get_nproc_available_matlab_ge2013b()
         aeq(1,'nproc',2);
     end
 
-<<<<<<< HEAD
-=======
 function tf=version_lt2013b()
     v_num=cosmo_wtf('version_number');
     tf=v_num(1)<8 || v_num(2)<2;
@@ -105,7 +89,6 @@ function test_parallel_get_nproc_available_matlab_lt2013b()
         aeq(1,'nproc',2);
     end
 
->>>>>>> CoSMoMVPA/master
 
 function test_parallel_get_nproc_available_octave()
     if ~cosmo_wtf('is_octave')
@@ -132,10 +115,6 @@ function test_parallel_get_nproc_available_octave()
         aeq(1,'nproc',2);
     end
 
-<<<<<<< HEAD
-
-
-=======
 function test_parallel_get_nproc_available_override_query_func
     for navailable=1:3
         opt=struct();
@@ -230,18 +209,14 @@ function [output,msg]=throw_error()
 function [output,msg]=mock_query_func(nproc)
     msg='';
     output=nproc;
->>>>>>> CoSMoMVPA/master
 
 
 
 function test_parallel_get_nproc_available_exceptiont()
-<<<<<<< HEAD
-=======
     warning_state=cosmo_warning();
     state_resetter=onCleanup(@()cosmo_warning(warning_state));
     cosmo_warning('off');
 
->>>>>>> CoSMoMVPA/master
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_parallel_get_nproc_available(varargin{:}),'');
     illegal_args={{'foo'},...

@@ -303,7 +303,6 @@ function test_target_dsm_corr_measure_mask_exceptions
         nan_msk=true(npairs,1);
         rp=randperm(npairs);
         nan_msk(rp(1:num_non_nan))=false;
-<<<<<<< HEAD
 
         for num_glms=-1:3
             opt=struct();
@@ -313,17 +312,6 @@ function test_target_dsm_corr_measure_mask_exceptions
                 opt.regress_dsm(nan_msk)=NaN;
             end
 
-=======
-
-        for num_glms=-1:3
-            opt=struct();
-
-            if num_glms==-1
-                opt.regress_dsm=randn(npairs,1);
-                opt.regress_dsm(nan_msk)=NaN;
-            end
-
->>>>>>> CoSMoMVPA/master
             if num_glms<=0
                 opt.target_dsm=randn(npairs,1);
                 opt.target_dsm(nan_msk)=NaN;

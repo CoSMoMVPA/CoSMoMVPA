@@ -245,11 +245,6 @@ website-sync: website-html-sync
 				 $(WEBSITESTATIC)/
 
 
-<<<<<<< HEAD
-prni: website
-	$(MAKE) website WEBSITEROOT=pr:/var/www/html
-
-=======
 
 website: website-content website-sync
 
@@ -286,5 +281,4 @@ fast: html
 
 remote: html html-zip-archive html-targz-archive
 
->>>>>>> CoSMoMVPA/master
 clean: clean-html

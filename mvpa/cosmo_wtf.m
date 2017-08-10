@@ -61,7 +61,6 @@ params2func.version_number=@version_number_;
 
 
 
-
 has_param=nargin>=1 && ~isempty(param);
 if has_param;
     if ~isfield(params2func,param)

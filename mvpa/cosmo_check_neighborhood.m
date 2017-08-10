@@ -225,11 +225,7 @@ function msg=check_origin_matches(nbrhood, ds, show_warning)
                 ds_a=rmfield(ds_a,dim_name);
             end
 
-<<<<<<< HEAD
-            if ~isequaln(origin_a, ds_a)
-=======
             if ~cosmo_isequaln(origin_a, ds_a)
->>>>>>> CoSMoMVPA/master
                 error('.a mismatch between dataset and neighborhood');
             end
         end

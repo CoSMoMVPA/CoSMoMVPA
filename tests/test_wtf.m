@@ -56,8 +56,6 @@ function test_wtf_warnings()
         assert_contains(w,sprintf('%s: %s',warning_id,label));
         assert_not_contains(w,sprintf('%s: %s',warning_id,anti_label));
     end
-<<<<<<< HEAD
-=======
 
 function test_wtf_version_number()
     vn=cosmo_wtf('version_number');
@@ -69,7 +67,6 @@ function test_wtf_version_number()
     vs_expected=regexp(version(),'^\S*','match');
     assert(numel(vs_expected{1})>=3);
     assertEqual(vs,vs_expected{1});
->>>>>>> CoSMoMVPA/master
 
 function test_wtf_is_matlab
     is_octave=environment_is_octave;

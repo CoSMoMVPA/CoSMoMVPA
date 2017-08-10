@@ -1,4 +1,4 @@
-function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
+function predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
 % libsvm-based SVM classifier
 %
 % predicted=cosmo_classify_libsvm(samples_train, targets_train, samples_test, opt)
@@ -68,7 +68,7 @@ function [predicted,decisionvalues]=cosmo_classify_libsvm(samples_train, targets
         cached_model=model;
     end
 
-    [predicted,decisionvalues]=test(model, samples_test);
+    predicted=test(model, samples_test);
 
 function model=train(samples_train,targets_train,opt)
     [ntrain, nfeatures]=size(samples_train);
@@ -120,7 +120,7 @@ function output=eval_with_check_external(func)
     end
 
 
-function [predicted,decisionvalues]=test(model, samples_test)
+function predicted=test(model, samples_test)
     [ntest, nfeatures]=size(samples_test);
     if nfeatures~=model.nfeatures
         error(['Number of features in train set (%d) and '...
@@ -135,7 +135,7 @@ function [predicted,decisionvalues]=test(model, samples_test)
     test_opt_str='-q'; % quiet (no output)
     test_func=@()svmpredict(NaN(ntest,1), samples_test, ...
                             model.libsvm_model, test_opt_str);
-    [predicted,unused,decisionvalues]=eval_with_check_external(test_func);
+    predicted=eval_with_check_external(test_func);
 
 
 

@@ -32,7 +32,6 @@ function test_crossvalidation_measure_regression
     assertEqual(res3.samples,10+[1 2 3 4 5 5 4 6 2 4 2 6 ...
                                 1 2 3 4 6 6 1 3 3 4 3 1]');
     assertEqual(res3.sa,rmfield(ds.sa,'chunks'));
-<<<<<<< HEAD
 
     % use deprecated output options
     warning_state=cosmo_warning();
@@ -42,17 +41,6 @@ function test_crossvalidation_measure_regression
     res3a=cosmo_crossvalidation_measure(ds,opt);
     assertEqual(res3,res3a);
 
-=======
-
-    % use deprecated output options
-    warning_state=cosmo_warning();
-    warning_state_resetter=onCleanup(@()cosmo_warning(warning_state));
-    cosmo_warning('off');
-    opt.output='winner_predictions';
-    res3a=cosmo_crossvalidation_measure(ds,opt);
-    assertEqual(res3,res3a);
-
->>>>>>> CoSMoMVPA/master
 
     opt.output='fold_accuracy';
     res4=cosmo_crossvalidation_measure(ds,opt);
@@ -254,10 +242,7 @@ function test_crossvalidation_measure_exceptions
     bad_opt.output='accuracy_by_chunk'; % not supported anymore
     aet(ds,bad_opt);
 
-<<<<<<< HEAD
 
-=======
->>>>>>> CoSMoMVPA/master
 
 function test_balanced_accuracy()
     nclasses=10;
@@ -266,16 +251,6 @@ function test_balanced_accuracy()
                                 'nchunks',nchunks,...
                                 'nreps',4);
 
-<<<<<<< HEAD
-=======
-function test_balanced_accuracy()
-    nclasses=10;
-    nchunks=20;
-    ds=cosmo_synthetic_dataset('ntargets',nclasses,...
-                                'nchunks',nchunks,...
-                                'nreps',4);
-
->>>>>>> CoSMoMVPA/master
     % shuffle targets, use random data - assume data is unbalanced
     % afterwards
     ds.samples=randn(size(ds.samples));

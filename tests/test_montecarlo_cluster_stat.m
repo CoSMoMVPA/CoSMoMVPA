@@ -11,35 +11,12 @@ function test_suite=test_montecarlo_cluster_stat
 
 function test_onesample_ttest_montecarlo_cluster_extremes
     ds=cosmo_synthetic_dataset('ntargets',1,...
-<<<<<<< HEAD
-                                'nchunks',10,...
-=======
                                 'nchunks',20,...
->>>>>>> CoSMoMVPA/master
                                 'size','normal');
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
 
     z_lookup=get_zscore_lookup_table();
 
-<<<<<<< HEAD
-    for signal_sign=[-1 1]
-        magnitude=10;
-        ds_pos=ds;
-        ds_pos.samples=ds_pos.samples+signal_sign*magnitude;
-
-        niter=10+ceil(rand()*(numel(z_lookup)-10));
-        opt.niter=niter;
-        opt.h0_mean=0;
-        opt.progress=false;
-        z_ds=cosmo_montecarlo_cluster_stat(ds_pos,nh,opt);
-
-        z_expected=signal_sign*z_lookup(niter);
-
-        nfeatures=size(ds.samples,2);
-        assertElementsAlmostEqual(z_ds.samples,...
-                            z_expected+zeros(1,nfeatures),...
-                            'absolute',1e-4);
-=======
     for repeat=1:5
         for signal_sign=[-1 1]
             magnitude=10;
@@ -62,7 +39,6 @@ function test_onesample_ttest_montecarlo_cluster_extremes
 
 
         end
->>>>>>> CoSMoMVPA/master
     end
 
 function z_lookup=get_zscore_lookup_table()
@@ -167,11 +143,7 @@ function helper_test_mccs_with_tail(left_tail,right_tail)
             maximum_tail_ratio=.1;
         end
 
-<<<<<<< HEAD
-        expected_extreme_z=tail_sign*z_table(opt.niter);
-=======
         expected_extreme_z=tail_sign*z_table(opt.niter+1);
->>>>>>> CoSMoMVPA/master
         if has_effect
             extreme_z=max(z.samples*tail_sign)*tail_sign;
             assertElementsAlmostEqual(extreme_z,...
@@ -222,11 +194,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_basics
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
 
     assertElementsAlmostEqual(z.samples,...
-<<<<<<< HEAD
-                    [1.2816 0 1.2816 0 1.2816 0],...
-=======
                     [0.8416 0 1.2816 0 1.2816 0],...
->>>>>>> CoSMoMVPA/master
                     'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_other_mean
@@ -235,22 +203,14 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_mean
 
     % different h0_mean
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.seed=7;
     opt.progress=false;
     opt.h0_mean=1.2;
 
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     assertElementsAlmostEqual(z.samples,...
-<<<<<<< HEAD
-                [0 -1.2816 1.2816 -1.2816 0.5244 -1.2816],...
-=======
                 [0 -1.2816 1.2816 -1.2816 0.25335 -1.2816],...
->>>>>>> CoSMoMVPA/master
                 'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_other_dh
@@ -258,11 +218,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_dh
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.h0_mean=1.2;
     opt.seed=7;
     opt.progress=false;
@@ -271,11 +227,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_other_dh
 
     z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
     assertElementsAlmostEqual(z.samples,...
-<<<<<<< HEAD
-                [0 -1.2816 0 -0.84162 0 -0.84162],...
-=======
                 [0 -1.2816 0 -0.5244 0 -0.5244],...
->>>>>>> CoSMoMVPA/master
                 'absolute',1e-4);
 
 function test_onesample_ttest_montecarlo_cluster_stat_exceptions
@@ -286,11 +238,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
                         cosmo_montecarlo_cluster_stat(varargin{:}),'');
 
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.h0_mean=1.2;
     opt.seed=7;
     opt.progress=false;
@@ -306,11 +254,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
     opt.h0_mean=0;
     z_ds4=cosmo_montecarlo_cluster_stat(ds,nh2,opt);
     assertElementsAlmostEqual(z_ds4.samples,...
-<<<<<<< HEAD
-                [0.84162 0 0 0.84162 0.84162 0],...
-=======
                 [0.5244 0 0 0.5244 0.5244 0],...
->>>>>>> CoSMoMVPA/master
                 'absolute',1e-4);
 
 
@@ -325,11 +269,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_exceptions
 
 
 function test_onesample_ttest_montecarlo_cluster_stat_strong
-<<<<<<< HEAD
-    ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',6);
-=======
     ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',12);
->>>>>>> CoSMoMVPA/master
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
     % lots of signal, should work with no seed specified
@@ -337,11 +277,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_strong
     for effect_sign=[-1,1]
         niter=ceil(rand()*10+10);
         z_table=get_zscore_lookup_table();
-<<<<<<< HEAD
-        expected_z=z_table(niter);
-=======
         expected_z=z_table(niter+1);
->>>>>>> CoSMoMVPA/master
 
         opt=struct();
         opt.h0_mean=(-effect_sign)*15;
@@ -370,11 +306,7 @@ function test_twosample_ttest_montecarlo_cluster_stat_basics
     z=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
 
     assertElementsAlmostEqual(z.samples,...
-<<<<<<< HEAD
-                    [0.5244 -1.2816 0 0.8416 -0.5244 0],...
-=======
                     [0.5244 -1.2816 0 0.84162 -0.25335 0],...
->>>>>>> CoSMoMVPA/master
                      'absolute',1e-4);
 
 
@@ -386,11 +318,7 @@ function test_twosample_ttest_montecarlo_cluster_stat_ws
 
     % test within-subjects
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.seed=1;
     opt.progress=false;
     opt.cluster_stat='maxsum';
@@ -464,11 +392,7 @@ function test_anova_montecarlo_cluster_stat_ws
     opt.progress=false;
     z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds1.samples,...
-<<<<<<< HEAD
-                    [1.2816 0 0 0 1.2816 0],...
-=======
                    [1.2816 0 0 0 0.84162 0],...
->>>>>>> CoSMoMVPA/master
                     'absolute',1e-4);
 
 
@@ -478,11 +402,7 @@ function test_anova_montecarlo_cluster_stat_bs
 
     % test within-subjects
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.seed=1;
     opt.progress=false;
 
@@ -502,11 +422,7 @@ function test_anova_montecarlo_cluster_stat_exceptions
     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',6,'sigma',2);
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
     opt=struct();
-<<<<<<< HEAD
-    opt.niter=10;
-=======
     opt.niter=9;
->>>>>>> CoSMoMVPA/master
     opt.seed=1;
     opt.progress=false;
 
@@ -591,21 +507,13 @@ function test_null_data_montecarlo_cluster_stat
     opt.h0_mean=0;
     z_ds1=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds1.samples,...
-<<<<<<< HEAD
-                    [0 -1.2816 0.5244 0 0 0],...
-=======
                     [0 -0.90846 0.34876 0 0 0],...
->>>>>>> CoSMoMVPA/master
                     'absolute',1e-4);
 
     opt.h0_mean=0.5;
     z_ds2=cosmo_montecarlo_cluster_stat(ds,nh1,opt);
     assertElementsAlmostEqual(z_ds2.samples,...
-<<<<<<< HEAD
-                    [0 -0.25335 1.2816 0 1.2816 0],...
-=======
                     [0 -0.11419 1.3352 0 1.3352 0],...
->>>>>>> CoSMoMVPA/master
                     'absolute',1e-4);
 
 
@@ -685,11 +593,7 @@ function test_feature_stat_montecarlo_cluster_stat
     % simple regression test
     res=cosmo_montecarlo_cluster_stat(ds1,nh,opt);
 
-<<<<<<< HEAD
-    expected_samples=[0 0 0 0 0.25335 0];
-=======
     expected_samples=[0 0 0 0 0.11419 0];
->>>>>>> CoSMoMVPA/master
     assertElementsAlmostEqual(res.samples,expected_samples,...
                                 'absolute',1e-4)
     assertEqual(res.fa,ds1.fa);
@@ -781,8 +685,6 @@ function test_montecarlo_cluster_stat_default_dh
     assertTrue(corr(res_dh_naught_one.samples(:),...
                         res_dh_naught_five.samples(:))>min_corr);
 
-<<<<<<< HEAD
-=======
 function test_montecarlo_cluster_stat_tiny_niter_singlethread
     helper_test_tiny_niter_with_nproc(1);
 
@@ -815,4 +717,3 @@ function helper_test_tiny_niter_with_nproc(nproc)
 
 
 
->>>>>>> CoSMoMVPA/master
