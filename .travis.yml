@@ -137,9 +137,31 @@ install:
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
       fi
 
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
-      fi
+    # As of Aug 2017, the parallel package is disabled because it made Octave crash
+    # when using travis
+    #
+    # For example see https://travis-ci.org/CoSMoMVPA/CoSMoMVPA/jobs/264122792
+    #
+    # Relevant command & travis output
+    #
+    # if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');"; fi
+    # octave: X11 DISPLAY environment variable not set
+    # octave: disabling GUI features
+    # warning: pkg: autoload is no longer supported.  Add a 'pkg load ...' command to octaverc instead.
+    # warning: called from
+    #     pkg at line 316 column 9
+    # warning: doc_cache_create: unusable help text found in file 'parallel_interface'
+    # For information about changes from previous versions of the parallel package, run 'news parallel'.
+    # *** Error in `/usr/bin/octave-cli': double free or corruption (fasttop): 0x0000000001669e00 ***
+    # panic: Aborted -- stopping myself...
+    # attempting to save variables to 'octave-workspace'...
+    # panic: attempted clean up failed -- aborting...
+    # /home/travis/.travis/job_stages: line 229: 15780 Aborted                 (core dumped) "$@"
+    # The command "octave --eval pkg('install','-auto','-forge','parallel');" failed. Retrying, 2 of 3.
+    #
+    ## - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+    ##       $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+    ##  fi
 
 
     # optionally install surfing toolbox
