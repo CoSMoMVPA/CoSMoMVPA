@@ -52,20 +52,20 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     % show targets, chunks, and predictions labels for each of the
 %     % four folds
 %     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
-%     > { [ 3    [ 1    [   3   NaN   NaN   NaN
-%     >     4      1        4   NaN   NaN   NaN
-%     >     5      1        5   NaN   NaN   NaN
-%     >     3      2      NaN     3   NaN   NaN
-%     >     4      2      NaN     5   NaN   NaN
-%     >     5      2      NaN     5   NaN   NaN
-%     >     3      3      NaN   NaN     3   NaN
-%     >     4      3      NaN   NaN     4   NaN
-%     >     5      3      NaN   NaN     5   NaN
-%     >     3      4      NaN   NaN   NaN     3
-%     >     4      4      NaN   NaN   NaN     4
-%     >     5 ]    4 ]    NaN   NaN   NaN     5 ] }
-%     disp(accuracy)
-%     >     0.9167
+%     %|| { [ 3    [ 1    [   3   NaN   NaN   NaN
+%     %||     4      1        4   NaN   NaN   NaN
+%     %||     5      1        5   NaN   NaN   NaN
+%     %||     3      2      NaN     3   NaN   NaN
+%     %||     4      2      NaN     5   NaN   NaN
+%     %||     5      2      NaN     5   NaN   NaN
+%     %||     3      3      NaN   NaN     3   NaN
+%     %||     4      3      NaN   NaN     4   NaN
+%     %||     5      3      NaN   NaN     5   NaN
+%     %||     3      4      NaN   NaN   NaN     3
+%     %||     4      4      NaN   NaN   NaN     4
+%     %||     5 ]    4 ]    NaN   NaN   NaN     5 ] }
+%     cosmo_disp(accuracy)
+%     %||  0.917
 %     %
 %     % use take-2-chunks out for testing crossvalidation, LDA classifier
 %     partitions=cosmo_nchoosek_partitioner(ds,2);
@@ -76,20 +76,20 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %     % show targets, chunks, and predictions labels for each of the
 %     % four folds
 %     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
-%     > { [ 3    [ 1    [   5     5     3   NaN   NaN   NaN
-%     >     4      1        4     4     4   NaN   NaN   NaN
-%     >     5      1        5     5     4   NaN   NaN   NaN
-%     >     3      2        3   NaN   NaN     3     3   NaN
-%     >     4      2        4   NaN   NaN     4     4   NaN
-%     >     5      2        5   NaN   NaN     4     5   NaN
-%     >     3      3      NaN     5   NaN     3   NaN     3
-%     >     4      3      NaN     4   NaN     4   NaN     4
-%     >     5      3      NaN     5   NaN     5   NaN     5
-%     >     3      4      NaN   NaN     3   NaN     3     3
-%     >     4      4      NaN   NaN     4   NaN     4     5
-%     >     5 ]    4 ]    NaN   NaN     5   NaN     3     3 ] }
-%     disp(accuracy)
-%     >     0.7778
+%     %|| { [ 3    [ 1    [   5     5     3   NaN   NaN   NaN
+%     %||     4      1        4     4     4   NaN   NaN   NaN
+%     %||     5      1        5     5     4   NaN   NaN   NaN
+%     %||     3      2        3   NaN   NaN     3     3   NaN
+%     %||     4      2        4   NaN   NaN     4     4   NaN
+%     %||     5      2        5   NaN   NaN     4     5   NaN
+%     %||     3      3      NaN     5   NaN     3   NaN     3
+%     %||     4      3      NaN     4   NaN     4   NaN     4
+%     %||     5      3      NaN     5   NaN     5   NaN     5
+%     %||     3      4      NaN   NaN     3   NaN     3     3
+%     %||     4      4      NaN   NaN     4   NaN     4     5
+%     %||     5 ]    4 ]    NaN   NaN     5   NaN     3     3 ] }
+%     cosmo_disp(accuracy)
+%     %||   0.778
 %     %
 %     % as the example above, but (1) use z-scoring on each training set
 %     % and apply the estimated mean and std to the test set, and (2)
@@ -102,20 +102,20 @@ function [pred, accuracy] = cosmo_crossvalidate(ds, classifier, partitions, opt)
 %                                                        partitions, opt);
 %     % show targets, predicted labels, and accuracy
 %     cosmo_disp({ds.sa.targets,ds.sa.chunks,pred},'threshold',inf)
-%     > { [ 3    [ 1    [ NaN     5
-%     >     4      1      NaN     4
-%     >     5      1      NaN     5
-%     >     3      2        3   NaN
-%     >     4      2        4   NaN
-%     >     5      2        5   NaN
-%     >     3      3      NaN     5
-%     >     4      3      NaN     4
-%     >     5      3      NaN     5
-%     >     3      4        3   NaN
-%     >     4      4        4   NaN
-%     >     5 ]    4 ]      3   NaN ] }
-%     disp(accuracy)
-%     >     0.7500
+%     %|| { [ 3    [ 1    [ NaN     5
+%     %||     4      1      NaN     4
+%     %||     5      1      NaN     5
+%     %||     3      2        3   NaN
+%     %||     4      2        4   NaN
+%     %||     5      2        5   NaN
+%     %||     3      3      NaN     5
+%     %||     4      3      NaN     4
+%     %||     5      3      NaN     5
+%     %||     3      4        3   NaN
+%     %||     4      4        4   NaN
+%     %||     5 ]    4 ]      3   NaN ] }
+%     cosmo_disp(accuracy)
+%     %||   0.75
 %
 % Notes:
 %   - to apply this to a dataset struct as a measure (for searchlights),

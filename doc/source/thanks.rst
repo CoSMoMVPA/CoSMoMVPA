@@ -17,7 +17,7 @@ We would like to thank the following people for specific contributions:
 +  **Jimmy Shen**: for providing a free/open source NIFTI library.
 +  **Joern Diedrichsen** and **Tobias Wiestler** for contributions in the LDA classifier, and contributions to the surfing toolbox.
 +  **Nathan Weisz** and **Gianpaolo Demarchi**: for providing an MEEG dataset.
-+  **Steve Eddins** for the MATLAB xUnit_ Test Framework.
++  **Steve Eddins** for the formerly used MATLAB xUnit_ Test Framework.
 +  **Thomas Smith** for inspiration for the doctest functionality.
 +  **Jimmy Shen** for providing the NIfTI toolbox.
 +  **Jens Scharzbach** for help with improving and adding exercises.
@@ -34,6 +34,7 @@ The following people have provided valuable suggestions, advice, support, or cod
 + Robert W. Cox
 + Karen Cuculiza
 + Sarah Belinda Aimee Degosciu
++ Sara Fabri
 + Hanna Gertz
 + Tijl Grootswagers
 + Yaroslav Halchenko

@@ -90,7 +90,7 @@ function [result,output]=helper_run_tests(args)
     % ensure path is set; disable warnings by cosmo_set_path
     cosmo_warning('off');
 
-    more_args={'-verbose','-logfile',log_fn,'-no_doctest'};
+    more_args={'-verbose','-logfile',log_fn,'-no_doc_test'};
     result=cosmo_run_tests(more_args{:},args{:});
     fid=fopen(log_fn);
     file_closer=onCleanup(@()fclose(fid));

@@ -386,13 +386,69 @@ The the resulting datasets can be combined through:
 
     .. code-block:: matlab
 
-        ds_all=cosmo_stack(ds_intersect_cell,2);
+        ds_all=cosmo_stack(ds_intersect_cell,1);
 
 Note: The above line may give an error ``non-unique elements in fa.X``, with ``X`` some feature attribute such as ``center_ids`` or ``radius``. This is to be expected if the datasets are the result from another analysis, such as :ref:`cosmo_searchlight`. In that case, the data can be combined using:
 
     .. code-block:: matlab
 
-        ds_all=cosmo_stack(ds_intersect_cell,2,'drop_nonunique');
+        ds_all=cosmo_stack(ds_intersect_cell,1,'drop_nonunique');
+
+Compute for a group of participants who were scanned with MRI the overlap of their masks
+----------------------------------------------------------------------------------------
+    'I analyzed data for individual fMRI participants that are all in a common MNI space, but with individual masks. When using :ref:`cosmo_mask_dim_intersect` I seem to lose about a third of the voxels present in each participant. How can I visualize which voxels are not shared across participants?'
+
+The following code illustrates how this can be done, using synthetic data.
+
+    .. code-block:: matlab
+
+        keep_ratio=0.95;
+        n_subj=10;
+
+        % simulate data for all subjects with their masks mostly overlapping
+        ds_cell=cell(n_subj,1);
+        for k=1:n_subj
+            ds_full=cosmo_synthetic_dataset('seed',0,'size','big');
+
+            n_features=size(ds_full.samples,2);
+            keep=cosmo_randperm(n_features,round(n_features*keep_ratio));
+            ds=cosmo_slice(ds_full,keep,2);
+
+            ds_cell{k}=ds;
+        end
+
+        % do simple intersection mask
+        [idxs,ds_cell_common]=cosmo_mask_dim_intersect(ds_cell);
+        ds_common=cosmo_stack(ds_cell_common);
+
+        fprintf('Ratio in common: %d / %d\n',size(ds_common.samples,2),n_features);
+
+        % see how often each voxel was in the mask for each participant
+        for k=1:n_subj
+            ds_single_volume=cosmo_slice(ds_cell{k},1);
+            ds_single_volume.samples(:)=1;
+            ni=cosmo_map2fmri(ds_single_volume,'-nii');
+            img=ni.img;
+
+            if k==1
+                img_sum=zeros(size(img));
+            end
+
+            img_sum=img_sum+img;
+        end
+
+        % convert to a ratio between 0 and 1 (for each voxel)
+        ni.img=img_sum / n_subj;
+
+        % convert to dataset structure
+        ds_ratio=cosmo_fmri_dataset(ni);
+
+        % the ds_ratio dataset can be visualized as shown here,
+        % or stored to disc using cosmo_map2fmri
+        cosmo_plot_slices(ds_ratio)
+
+
+
 
 
 Run group analysis on time-by-time generalization measures
@@ -1134,7 +1190,232 @@ You can, but currently not directly: it involves a bit of manual work. The key t
 
 Repeat the process for each participant. For each analysis of interest (two main effects and the interaction) separately, follow the process of a one-sample t-test as explained elsewhere in the FAQ: stack the dataset from the participants using :ref:`cosmo_stack`, assign ``.sa.chunks`` to be all unique, assign ``.sa.targets`` to be all the same, and then use :ref:`cosmo_stat` (for feature-wise stats with no correction for multiple correction) or :ref:`cosmo_montecarlo_cluster_stat` (for correction with multiple comparisons).
 
-Note the advantage of a (signed( t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
+Note the advantage of a (signed) t-test over an (always positive) F value: the t value tells you which way the main effect or interaction goes, whereas the F value does not tell this.
+
+
+Use a FieldTrip source dataset that uses a 'fake' channel structure
+-------------------------------------------------------------------
+'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is ``src_ft = ``
+
+   .. code-block:: text
+
+            label: {2982x1 cell}
+           dimord: 'chan_freq_time'
+             freq: [1x25 double]
+             time: [1x15 double]
+        powspctrm: [2982x25x15 double]
+              cfg: [1x1 struct]
+
+where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using a ``template_grid =``
+
+   .. code-block:: text
+
+         xgrid: [-8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
+         ygrid: [-11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
+         zgrid: [-7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8 9]
+           dim: [17 20 17]
+           pos: [5780x3 double]
+          unit: 'cm'
+        inside: [5780x1 logical]
+           cfg: [1x1 struct]
+
+where there are 2972 positions in the .inside field that are equal to ``true`` representing the voxels in the brain. How can I use these dataset structures in CoSMoMVPA?'
+
+The ``src_ft`` struct can be converted to a dataset structure using
+
+    .. code-block:: matlab
+
+        src_ds=cosmo_meeg_dataset(src_ft);
+
+but it uses channel labels (representing voxels) for which the positions are not known (and thus, neighborhoods cannot be used). To add the position information, you can use the following helper function
+
+    .. code-block:: matlab
+
+        function ds=convert_ds_mni_grid(ds,template_grid)
+        % Converts dataset with 'fake' channels numbered '1' to 'N' (N numeric)
+        % and an mni template structure
+        %
+        % Inputs:
+        %   ds              dataset struct with first fdim dimension being
+        %                   'chan' with "fake" channels representing MEEG source
+        %                   structure
+        %   template_grid   struct with fields .{x,y,z}grid and .inside
+
+
+            check_inputs(ds,template_grid);
+
+            % voxels representing the brain
+            inside=template_grid.inside;
+            pos=template_grid.pos(inside,:)';
+
+            % change first dimension to position
+            ds.a.fdim.values{1}=pos;
+            ds.a.fdim.labels{1}='pos';
+            chan=ds.fa.chan;
+            ds.fa=rmfield(ds.fa,'chan');
+            ds.fa.pos=chan;
+
+            % sanity check
+            cosmo_check_dataset(ds);
+
+        function check_inputs(ds,template_grid)
+            if isfield(ds,'label')
+                error(['First input is not a CoSMo dataset structure. '...
+                        'Use cosmo_meeg_dataset to convert to a CoSMo structure']);
+            end
+
+            cosmo_check_dataset(ds);
+
+            if ~isequal(ds.a.fdim.labels{1},'chan')
+                error('First fdim must be channel');
+            end
+
+            raise=true;
+            cosmo_isfield(template_grid,...
+                            {'xgrid','ygrid','zgrid','pos','inside'},...
+                            raise);
+
+            labels=ds.a.fdim.values{1};
+            n_inside=sum(template_grid.inside);
+            if n_inside~=numel(labels)
+                error('Source count mismatch: %d ~= %d', n_inside, numel(labels));
+            end
+
+            numeric_labels=cellfun(@str2num,labels,'UniformOutput',false);
+            expected_numeric_labels=arrayfun(@(x)x,1:n_inside,...
+                                    'UniformOutput',false);
+
+            if ~isequal(expected_numeric_labels,numeric_labels)
+                error(['Labels are not as expected. This could mean that '...
+                        'you are using this function not as intended. '...
+                        'Proceed carefully']);
+            end
+
+and then get a 'proper' dataset in source space using
+
+    .. code-block:: matlab
+
+        ds=convert_ds_mni_grid(src_ds,template_grid);
+
+
+
+
+
+Run `cosmo_montecarlo_cluster_stat` on a cluster with multiple nodes
+--------------------------------------------------------------------
+'I am running group statistics using :ref:`cosmo_montecarlo_cluster_stat` but it is very slow when using the recommended 10,000 iterations. I have access to a computer cluster. Can I use the cluster to speed up the computations?'
+
+Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montecarlo_cluster_stat` on multiple computer nodes with fewer iterations, then combine their results. Consider the following script (and comments in there):
+
+    .. code-block:: matlab
+
+        % example on combining results of multiple invocations of
+        % cosmo_montecarlo_cluster_stat into a single dataset with effectively
+        % more iterations
+        %
+        % Use case: running 10,000 iterations with cosmo_montecarlo_cluster_stat
+        % on a single machine takes to long, but there are 50 computer nodes
+        % available in a computer cluster. Then each node can do 200 iterations;
+        % results from each node are combined afterwards to get
+        % effectively 10,000 iteraations
+        %
+
+        % generate some random data for 20 participants
+        nsubjects=20;
+        ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',nsubjects,...
+                                'sigma',0,'size','normal','seed',2);
+
+        % Generate TFCE z-scores in 50 blocks, each with 20 iterations.
+        %
+        % In this example a simple for-loop is used to compute results for each
+        % block, but typically results in each block are computed in different
+        % Matlab sessions (e.g. when using multiple computer nodes in a clusters).
+        % In that case, a script or function should be used that stores the result
+        % (a dataset with TFCE z-scores) for each block in a .mat file. For
+        % example, the following function could be run on each computing node (each
+        % with a different value for block_id):
+        %
+        %     function run_tfce_block(block_id,niter_per_block)
+        %
+        %     % load dataset with data from each subject
+        %     ds=load('my_subject_data.mat');
+        %
+        %     % define neighborhood
+        %     nh=cosmo_cluster_neighborhood(ds);
+        %
+        %     % set TFCE options
+        %     opt=struct();
+        %     opt.niter=niter_per_block;
+        %     opt.h0_mean=0;
+        %     opt.seed=block_id;
+        %
+        %     % compute TFCE z-scores
+        %     z_ds=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+        %
+        %     % save results to disk
+        %     fn=sprintf('tfce_z_block%02d.mat',block_id);
+        %     save(fn,'-struct','z_ds');
+        %
+        % After running this function for aech block, the resulting .mat files
+        % would then be loaded and combined with cosmo_stack as illustrated below.
+        %
+        % If a seed is set for cosmo_montecarlo_cluster_stat, then it is crucial
+        % that different seed values are used in different blocks (otherwise each
+        % block would yield identical results)
+
+        nblocks=50;
+        niter_per_block=20;
+
+        ds_tfce_cell=cell(nblocks,1);
+        for k=1:nblocks
+            % Set TFCE options for each block.
+            % A different seed value is used for each block to obtain repeatable
+            % (determnistic) but different results in each block
+            opt=struct();
+            opt.niter=niter_per_block;
+            opt.h0_mean=0;
+            opt.seed=k;
+
+            % define the neighborhood
+            nbrhood=cosmo_cluster_neighborhood(ds);
+
+            % compute TFCE z-scores
+            ds_tfce_k=cosmo_montecarlo_cluster_stat(ds,nbrhood,opt);
+
+            % store result
+            ds_tfce_cell{k}=ds_tfce_k;
+        end
+
+        % combine TFCE z-scores from all blocks into one dataset
+        % (due to a tail cutoff protection this approach is very minorly
+        % conservative in its p-value computation)
+        ds_tfce_all=cosmo_stack(ds_tfce_cell);
+
+        % convert TFCE z-scores to TFCE p-values
+        % (the p-values represent the left tail probability)
+        ps_all=normcdf(ds_tfce_all.samples);
+
+        % compute the average p value over blocks, for each feature separately
+        combined_ps=mean(ps_all,1);
+
+        % convert TFCE p value back to TFCE z-scores
+        combined_z=norminv(combined_ps);
+
+        % make a new dataset in which the combined z-scores
+        % are going to be stored
+        ds_tfce=cosmo_slice(ds_tfce_all,1);
+
+        % ensure empty sample attributes
+        ds_tfce.sa=struct();
+
+        % store dataset
+        ds_tfce.samples=combined_z;
+        cosmo_check_dataset(ds_tfce)
+
+
+
+
+
 
 
 

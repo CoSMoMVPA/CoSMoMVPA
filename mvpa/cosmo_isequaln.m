@@ -47,15 +47,12 @@ function func=get_comparison_func()
 
 
 function func=find_comparison_func_helper()
-    candidates={@isequaln,@isequalwithequalnans};
-
-    candidates_str=cellfun(@func2str, candidates,...
-                        'UniformOutput',false);
+    candidates_str={'isequaln','isequalwithequalnans'};
 
     has_func=@(x)~isempty(which(x,'builtin'));
     idx=find(cellfun(has_func,candidates_str),1,'first');
     if ~isempty(idx)
-        func=candidates{idx};
+        func=str2func(candidates_str{idx});
         return
     end
 

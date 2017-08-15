@@ -16,14 +16,14 @@ env:
   matrix:
     - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true  NO_DOC_TEST=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -76,6 +76,11 @@ before_install:
     - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
     - make -C MOxUnit install
 
+    # retrieve MOdox
+    - rm -rf MOdox
+    - travis_retry git clone -v git://github.com/MOdox/MOdox.git
+    - make -C MOdox install
+
     # optionally retrieve MOcov
     - if [[ "$TRAVIS_WITH_COVERAGE" == "true" ]]; then
           rm -rf MOcov;
@@ -122,6 +127,9 @@ install:
     # ensure Octave rc file exists
     - echo "" >> $OCTAVERC;
 
+    # use travis-retry
+    - RETRY=travis_retry
+
     # load Octave io package
     - $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','io');";
 
@@ -131,9 +139,31 @@ install:
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
       fi
 
-    - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
-      fi
+    # As of Aug 2017, the parallel package is disabled because it made Octave crash
+    # when using travis
+    #
+    # For example see https://travis-ci.org/CoSMoMVPA/CoSMoMVPA/jobs/264122792
+    #
+    # Relevant command & travis output
+    #
+    # if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');"; fi
+    # octave: X11 DISPLAY environment variable not set
+    # octave: disabling GUI features
+    # warning: pkg: autoload is no longer supported.  Add a 'pkg load ...' command to octaverc instead.
+    # warning: called from
+    #     pkg at line 316 column 9
+    # warning: doc_cache_create: unusable help text found in file 'parallel_interface'
+    # For information about changes from previous versions of the parallel package, run 'news parallel'.
+    # *** Error in `/usr/bin/octave-cli': double free or corruption (fasttop): 0x0000000001669e00 ***
+    # panic: Aborted -- stopping myself...
+    # attempting to save variables to 'octave-workspace'...
+    # panic: attempted clean up failed -- aborting...
+    # /home/travis/.travis/job_stages: line 229: 15780 Aborted                 (core dumped) "$@"
+    # The command "octave --eval pkg('install','-auto','-forge','parallel');" failed. Retrying, 2 of 3.
+    #
+    ## - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
+    ##       $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
+    ##  fi
 
 
     # optionally install surfing toolbox
@@ -178,7 +208,7 @@ install:
 
     # optionally install gifti library
     - if [[ " $EXTERNALS " = *" gifti "* ]]; then
-          GIFTI_VERSION=1.5;
+          GIFTI_VERSION=1.6;
           GIFTI_NAME=gifti-${GIFTI_VERSION};
           rm -rf ${GIFTI_NAME}.zip;
           wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;

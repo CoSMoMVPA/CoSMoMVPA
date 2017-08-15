@@ -30,6 +30,12 @@ function test_correlation_measure_basis()
     assertElementsAlmostEqual(delta,c1.samples,'relative',1e-5);
     assertEqual(c1.sa.labels,{'corr'});
 
+    % reset state and do not show warnings
+    orig_warning_state=cosmo_warning();
+    warning_cleaner=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
     c2=cosmo_correlation_measure(ds,'output','correlation');
     assertElementsAlmostEqual(reshape(cxy,[],1),c2.samples);
     assertEqual(kron((1:4)',ones(4,1)),c2.sa.half2);
@@ -99,6 +105,12 @@ function test_correlation_measure_regression_spearman()
     helper_test_correlation_measure_regression(true);
 
 function helper_test_correlation_measure_regression(test_spearman)
+    % reset state and do not show warnings
+    orig_warning_state=cosmo_warning();
+    warning_cleaner=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',5,'sigma',.5);
     params=get_regression_test_params(test_spearman);
 
@@ -189,6 +201,12 @@ function test_correlation_measure_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                 cosmo_correlation_measure(varargin{:}),'');
 
+    % reset state and do not show warnings
+    orig_warning_state=cosmo_warning();
+    warning_cleaner=onCleanup(@()cosmo_warning(orig_warning_state));
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
     ds=cosmo_synthetic_dataset('nchunks',2);
     aet(ds,'template',eye(4));
     aet(ds,'output','foo');
@@ -203,3 +221,53 @@ function test_correlation_measure_exceptions
 
     ds.sa.targets(1)=2;
     aet(ds);
+
+function x=identity(x)
+
+function test_correlation_measure_warning_shown_if_no_defaults()
+    orig_warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(orig_warning_state));
+
+    % reset state and do not show warnings
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
+    funcs={[],@atanh};
+    outputs={[],'mean','raw','correlation'};
+
+
+
+    for k=1:numel(funcs)
+        func=funcs{k};
+        for j=1:numel(outputs)
+            output=outputs{j};
+
+            is_default_func=k<=2;
+            is_default_output=j<=2;
+            expect_warning=~(is_default_func && is_default_output);
+
+            opt=struct();
+            if ~isempty(func)
+                opt.post_corr_func=func;
+            end
+
+            if ~isempty(output)
+                opt.output=output;
+            end
+
+            cosmo_warning('reset');
+            cosmo_warning('off');
+
+            ds=cosmo_synthetic_dataset('nchunks',2);
+            cosmo_correlation_measure(ds,opt);
+
+            s=cosmo_warning();
+
+            showed_warning=numel(s.shown_warnings)>0;
+
+            assertEqual(expect_warning,showed_warning);
+        end
+    end
+
+
+

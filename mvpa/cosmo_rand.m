@@ -18,18 +18,18 @@ function result=cosmo_rand(varargin)
 %     x1=cosmo_rand(2,2);
 %     x2=cosmo_rand(2,2);
 %     isequal(x1,x2)
-%     > false
+%     %|| false
 %     %
 %     % as above, but specify a seed; repeated calls give the same output
 %     x3=cosmo_rand(2,2,'seed',314);
 %     x4=cosmo_rand(2,2,'seed',314);
 %     isequal(x3,x4)
-%     > true
+%     %|| true
 %     %
 %     % using a different seed gives a different output
 %     x5=cosmo_rand(2,2,'seed',315);
 %     isequal(x3,x5)
-%     > false
+%     %|| false
 %
 %
 % Notes:

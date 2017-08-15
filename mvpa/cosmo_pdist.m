@@ -18,13 +18,19 @@ function d=cosmo_pdist(x, distance)
 %     data=[1 4 3; 2 2 3; 4 2 0;0 1 1];
 %     % compute pair-wise distances with euclidean distance metric.
 %     % since there are 4 samples, there are 4*3/2=6 pairs of samples.
-%     cosmo_pdist(data)
-%     > 2.2361    4.6904    3.7417    3.6056    3.0000    4.2426
-%     cosmo_pdist(data,'euclidean')
-%     > 2.2361    4.6904    3.7417    3.6056    3.0000    4.2426
+%     d=cosmo_pdist(data);
+%     cosmo_disp(d);
+%     %|| [ 2.24      4.69      3.74      3.61         3      4.24 ]
+%     %
+%     % this gives the same output
+%     d=cosmo_pdist(data,'euclidean');
+%     cosmo_disp(d);
+%     %|| [ 2.24      4.69      3.74      3.61         3      4.24 ]
+%     %
 %     % compute distances with one-minus-correlation distance metric
-%     cosmo_pdist(data,'correlation')
-%     > 0.8110    1.6547    0.0551    1.8660    0.5000    1.8660
+%     d_c=cosmo_pdist(data,'correlation');
+%     cosmo_disp(d_c);
+%     %|| [ 0.811      1.65    0.0551      1.87       0.5      1.87 ]
 %
 % Notes:
 %   - this function provides a native implementation for 'euclidean' and

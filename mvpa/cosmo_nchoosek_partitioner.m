@@ -55,93 +55,93 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     % take-one-chunk out partitioning
 %     p=cosmo_nchoosek_partitioner(ds,1);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 2    [ 1    [ 1    [ 1
-%     >       3      3      2      2
-%     >       4      4      4      3
-%     >       5      5      5      6
-%     >       6      6      7      7
-%     >       7 ]    8 ]    8 ]    8 ] }
-%     > .test_indices
-%     >   { [ 1    [ 2    [ 3    [ 4
-%     >       8 ]    7 ]    6 ]    5 ] }
+%     %|| .train_indices
+%     %||   { [ 2    [ 1    [ 1    [ 1
+%     %||       3      3      2      2
+%     %||       4      4      4      3
+%     %||       5      5      5      6
+%     %||       6      6      7      7
+%     %||       7 ]    8 ]    8 ]    8 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 2    [ 3    [ 4
+%     %||       8 ]    7 ]    6 ]    5 ] }
 %     %
 %     % take-two chunks out partitioning
 %     p=cosmo_nchoosek_partitioner(ds,2);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 3    [ 2    [ 2    [ 1    [ 1    [ 1
-%     >       4      4      3      4      3      2
-%     >       5      5      6      5      6      7
-%     >       6 ]    7 ]    7 ]    8 ]    8 ]    8 ] }
-%     > .test_indices
-%     >   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 3
-%     >       2      3      4      3      4      4
-%     >       7      6      5      6      5      5
-%     >       8 ]    8 ]    8 ]    7 ]    7 ]    6 ] }
+%     %|| .train_indices
+%     %||   { [ 3    [ 2    [ 2    [ 1    [ 1    [ 1
+%     %||       4      4      3      4      3      2
+%     %||       5      5      6      5      6      7
+%     %||       6 ]    7 ]    7 ]    8 ]    8 ]    8 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 1    [ 1    [ 2    [ 2    [ 3
+%     %||       2      3      4      3      4      4
+%     %||       7      6      5      6      5      5
+%     %||       8 ]    8 ]    8 ]    7 ]    7 ]    6 ] }
 %     %
 %     % take-half-of-the-chunks out partitioning
 %     % (this effectively gives same chunks as above)
 %     p_alt=cosmo_nchoosek_partitioner(ds,.5);
 %     isequal(p, p_alt)
-%     > true
+%     %|| true
 %     %
 %     % do half split (for correlation measure); this leaves out
 %     % mirror partitions of train and test indices
 %     p=cosmo_nchoosek_partitioner(ds,'half');
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 1    [ 1    [ 1
-%     >       2      3      4
-%     >       7      6      5
-%     >       8 ]    8 ]    8 ] }
-%     > .test_indices
-%     >   { [ 3    [ 2    [ 2
-%     >       4      4      3
-%     >       5      5      6
-%     >       6 ]    7 ]    7 ] }
+%     %|| .train_indices
+%     %||   { [ 1    [ 1    [ 1
+%     %||       2      3      4
+%     %||       7      6      5
+%     %||       8 ]    8 ]    8 ] }
+%     %|| .test_indices
+%     %||   { [ 3    [ 2    [ 2
+%     %||       4      4      3
+%     %||       5      5      6
+%     %||       6 ]    7 ]    7 ] }
 %     %
 %     % test on samples with chunk=3 only using take-one-fold out
 %     p=cosmo_nchoosek_partitioner(ds,1,'chunks',3);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 2
-%     >       3
-%     >       4
-%     >       5
-%     >       6
-%     >       7 ] }
-%     > .test_indices
-%     >   { [ 1
-%     >       8 ] }
+%     %|| .train_indices
+%     %||   { [ 2
+%     %||       3
+%     %||       4
+%     %||       5
+%     %||       6
+%     %||       7 ] }
+%     %|| .test_indices
+%     %||   { [ 1
+%     %||       8 ] }
 %     % test on samples with chunk=[3 4] only using take-one-fold out;
 %     % only samples with chunks=1 or 2 are used for training
 %     p=cosmo_nchoosek_partitioner(ds,1,'chunks',{[3 4]});
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 3    [ 3
-%     >       4      4
-%     >       5      5
-%     >       6 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 2
-%     >       8 ]    7 ] }
+%     %|| .train_indices
+%     %||   { [ 3    [ 3
+%     %||       4      4
+%     %||       5      5
+%     %||       6 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 2
+%     %||       8 ]    7 ] }
 %     % test separately on samples with chunk=3 and samples with chunk=4;
 %     % in some folds, samples with chunks=1,2,4 are used for training, in
 %     % other folds samples with chunks=1,2,3 are used for training
 %     p=cosmo_nchoosek_partitioner(ds,1,'chunks',{[3],[4]});
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 2    [ 1
-%     >       3      3
-%     >       4      4
-%     >       5      5
-%     >       6      6
-%     >       7 ]    8 ] }
-%     > .test_indices
-%     >   { [ 1    [ 2
-%     >       8 ]    7 ] }
-%     >
+%     %|| .train_indices
+%     %||   { [ 2    [ 1
+%     %||       3      3
+%     %||       4      4
+%     %||       5      5
+%     %||       6      6
+%     %||       7 ]    8 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 2
+%     %||       8 ]    7 ] }
+%     %||
 %
 %
 %     % make a slightly more complicated dataset: with three chunks,
@@ -159,38 +159,38 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     % on samples with other modalities, i.e. modality=2)
 %     p=cosmo_nchoosek_partitioner(ds,1,'modality',1);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [  7    [  3    [ 3
-%     >        8       4      4
-%     >       11      11      7
-%     >       12 ]    12 ]    8 ] }
-%     > .test_indices
-%     >   { [ 1    [ 5    [  9
-%     >       2 ]    6 ]    10 ] }
+%     %|| .train_indices
+%     %||   { [  7    [  3    [ 3
+%     %||        8       4      4
+%     %||       11      11      7
+%     %||       12 ]    12 ]    8 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 5    [  9
+%     %||       2 ]    6 ]    10 ] }
 %     %
 %     % take-one-chunk out, test on samples with modality=2
 %     p=cosmo_nchoosek_partitioner(ds,1,'modality',2);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [  5    [  1    [ 1
-%     >        6       2      2
-%     >        9       9      5
-%     >       10 ]    10 ]    6 ] }
-%     > .test_indices
-%     >   { [ 3    [ 7    [ 11
-%     >       4 ]    8 ]    12 ] }
+%     %|| .train_indices
+%     %||   { [  5    [  1    [ 1
+%     %||        6       2      2
+%     %||        9       9      5
+%     %||       10 ]    10 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 3    [ 7    [ 11
+%     %||       4 ]    8 ]    12 ] }
 %     % take-one-chunk out, test on samples with modality=1 (and train on
 %     % modality=2) and vice verse
 %     p=cosmo_nchoosek_partitioner(ds,1,'modality',[]);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [  7    [  3    [ 3    [  5    [  1    [ 1
-%     >        8       4      4       6       2      2
-%     >       11      11      7       9       9      5
-%     >       12 ]    12 ]    8 ]    10 ]    10 ]    6 ] }
-%     > .test_indices
-%     >   { [ 1    [ 5    [  9    [ 3    [ 7    [ 11
-%     >       2 ]    6 ]    10 ]    4 ]    8 ]    12 ] }
+%     %|| .train_indices
+%     %||   { [  7    [  3    [ 3    [  5    [  1    [ 1
+%     %||        8       4      4       6       2      2
+%     %||       11      11      7       9       9      5
+%     %||       12 ]    12 ]    8 ]    10 ]    10 ]    6 ] }
+%     %|| .test_indices
+%     %||   { [ 1    [ 5    [  9    [ 3    [ 7    [ 11
+%     %||       2 ]    6 ]    10 ]    4 ]    8 ]    12 ] }
 %
 %     % between-subject classification: 3 chunks, 2 modalities, 5 subjects
 %     ds=struct();
@@ -204,19 +204,19 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     % test on subject 1, train on other subjects using take-one-chunk out
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',1);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 17         [ 13         [ 13
-%     >       18           14           14
-%     >       19           15           15
-%     >        :            :            :
-%     >       58           58           54
-%     >       59           59           55
-%     >       60 ]@32x1    60 ]@32x1    56 ]@32x1 }
-%     > .test_indices
-%     >   { [ 1    [ 5    [  9
-%     >       2      6      10
-%     >       3      7      11
-%     >       4 ]    8 ]    12 ] }
+%     %|| .train_indices
+%     %||   { [ 17         [ 13         [ 13
+%     %||       18           14           14
+%     %||       19           15           15
+%     %||        :            :            :
+%     %||       58           58           54
+%     %||       59           59           55
+%     %||       60 ]@32x1    60 ]@32x1    56 ]@32x1 }
+%     %|| .test_indices
+%     %||   { [ 1    [ 5    [  9
+%     %||       2      6      10
+%     %||       3      7      11
+%     %||       4 ]    8 ]    12 ] }
 %     %
 %     % test on each subject after training on each other subject
 %     % in each fold, the test data is from one subject and one chunk,
@@ -224,51 +224,51 @@ function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
 %     % since there are 5 subjects and 3 chunks, there are 15 folds.
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[]);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1
-%     >       18           14           14               6            2            2
-%     >       19           15           15               7            3            3
-%     >        :            :            :               :            :            :
-%     >       58           58           54              46           46           42
-%     >       59           59           55              47           47           43
-%     >       60 ]@32x1    60 ]@32x1    56 ]@32x1       48 ]@32x1    48 ]@32x1    44 ]@32x1   }@1x15
-%     > .test_indices
-%     >   { [ 1    [ 5    [  9   ... [ 49    [ 53    [ 57
-%     >       2      6      10         50      54      58
-%     >       3      7      11         51      55      59
-%     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15
+%     %|| .train_indices
+%     %||   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1
+%     %||       18           14           14               6            2            2
+%     %||       19           15           15               7            3            3
+%     %||        :            :            :               :            :            :
+%     %||       58           58           54              46           46           42
+%     %||       59           59           55              47           47           43
+%     %||       60 ]@32x1    60 ]@32x1    56 ]@32x1       48 ]@32x1    48 ]@32x1    44 ]@32x1   }@1x15
+%     %|| .test_indices
+%     %||   { [ 1    [ 5    [  9   ... [ 49    [ 53    [ 57
+%     %||       2      6      10         50      54      58
+%     %||       3      7      11         51      55      59
+%     %||       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15
 %     %
 %     % as above, but test on modality=2 (and train on other values for
 %     % modality, i.e. modality=1)
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',2);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1
-%     >       18           14           14               6            2            2
-%     >       21           21           17               9            9            5
-%     >        :            :            :               :            :            :
-%     >       54           50           50              42           38           38
-%     >       57           57           53              45           45           41
-%     >       58 ]@16x1    58 ]@16x1    54 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x15
-%     > .test_indices
-%     >   { [ 3    [ 7    [ 11   ... [ 51    [ 55    [ 59
-%     >       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15
+%     %|| .train_indices
+%     %||   { [ 17         [ 13         [ 13        ... [  5         [  1         [  1
+%     %||       18           14           14               6            2            2
+%     %||       21           21           17               9            9            5
+%     %||        :            :            :               :            :            :
+%     %||       54           50           50              42           38           38
+%     %||       57           57           53              45           45           41
+%     %||       58 ]@16x1    58 ]@16x1    54 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x15
+%     %|| .test_indices
+%     %||   { [ 3    [ 7    [ 11   ... [ 51    [ 55    [ 59
+%     %||       4 ]    8 ]    12 ]       52 ]    56 ]    60 ]   }@1x15
 %     %
 %     % as above, but test on each modality after training on the other
 %     % modality. There are 30 folds (5 subjects, 3 chunks, 2 modalities).
 %     p=cosmo_nchoosek_partitioner(ds,1,'subject',[],'modality',[]);
 %     cosmo_disp(p);
-%     > .train_indices
-%     >   { [ 19         [ 15         [ 15        ... [  5         [  1         [  1
-%     >       20           16           16               6            2            2
-%     >       23           23           19               9            9            5
-%     >        :            :            :               :            :            :
-%     >       56           52           52              42           38           38
-%     >       59           59           55              45           45           41
-%     >       60 ]@16x1    60 ]@16x1    56 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x30
-%     > .test_indices
-%     >   { [ 1    [ 5    [  9   ... [ 51    [ 55    [ 59
-%     >       2 ]    6 ]    10 ]       52 ]    56 ]    60 ]   }@1x30
+%     %|| .train_indices
+%     %||   { [ 19         [ 15         [ 15        ... [  5         [  1         [  1
+%     %||       20           16           16               6            2            2
+%     %||       23           23           19               9            9            5
+%     %||        :            :            :               :            :            :
+%     %||       56           52           52              42           38           38
+%     %||       59           59           55              45           45           41
+%     %||       60 ]@16x1    60 ]@16x1    56 ]@16x1       46 ]@16x1    46 ]@16x1    42 ]@16x1   }@1x30
+%     %|| .test_indices
+%     %||   { [ 1    [ 5    [  9   ... [ 51    [ 55    [ 59
+%     %||       2 ]    6 ]    10 ]       52 ]    56 ]    60 ]   }@1x30
 %
 % Notes:
 %    - When k=1 and two input arguments, this function behaves equivalently

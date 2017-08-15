@@ -34,68 +34,69 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %     % ds is an FMRI dataset with 6 samples, volumes are 3 x 2 x 5 voxels
 %     ds=cosmo_synthetic_dataset('size','normal','type','fmri');
 %     size(ds.samples)
-%     > [ 6 30 ]
+%     %|| [ 6 30 ]
 %     cosmo_disp(ds.a.fdim)
-%     > .labels
-%     >   { 'i'  'j'  'k' }
-%     > .values
-%     >   { [ 1 2 3 ]  [ 1 2 ]  [ 1 2 3 4 5 ] }
+%     %|| .labels
+%     %||   { 'i'  'j'  'k' }
+%     %|| .values
+%     %||   { [ 1 2 3 ]  [ 1 2 ]  [ 1 2 3 4 5 ] }
 %     %
 %     % flatten the dataset
 %     [unfl,labels,values]=cosmo_unflatten(ds);
 %     %
 %     % the unflattened dataset is of size 6 x 3 x 2 x 5
 %     size(unfl)
-%     > [ 6 3 2 5 ]
+%     %|| [ 6 3 2 5 ]
 %     cosmo_disp(labels)
-%     > { 'i'  'j'  'k' }
+%     %|| { 'i'  'j'  'k' }
 %     cosmo_disp(values)
-%     > { [ 1 2 3 ]  [ 1 2 ]  [ 1 2 3 4 5 ] }
+%     %|| { [ 1 2 3 ]  [ 1 2 ]  [ 1 2 3 4 5 ] }
 %
 %     % ds is a small dataset with 2 classes
 %     ds=cosmo_synthetic_dataset();
 %     %
 %     % compute all (2x2) split-half correlation values
-%     res=cosmo_correlation_measure(ds,'output','raw');
+%     res=cosmo_correlation_measure(ds,'output','raw',...
+%                                       'post_corr_func',[]);
 %     cosmo_disp(res)
-%     > .samples
-%     >   [  0.447
-%     >     -0.538
-%     >     -0.525
-%     >      0.959 ]
-%     > .sa
-%     >   .half1
-%     >     [ 1
-%     >       2
-%     >       1
-%     >       2 ]
-%     >   .half2
-%     >     [ 1
-%     >       1
-%     >       2
-%     >       2 ]
-%     > .a
-%     >   .sdim
-%     >     .labels
-%     >       { 'half1'  'half2' }
-%     >     .values
-%     >       { [ 1    [ 1
-%     >           2 ]    2 ] }
+%     %|| .samples
+%     %||   [  0.363
+%     %||     -0.404
+%     %||     -0.447
+%     %||      0.606 ]
+%     %|| .sa
+%     %||   .half1
+%     %||     [ 1
+%     %||       2
+%     %||       1
+%     %||       2 ]
+%     %||   .half2
+%     %||     [ 1
+%     %||       1
+%     %||       2
+%     %||       2 ]
+%     %|| .a
+%     %||   .sdim
+%     %||     .labels
+%     %||       { 'half1'  'half2' }
+%     %||     .values
+%     %||       { [ 1    [ 1
+%     %||           2 ]    2 ] }
 %     %
 %     % reshape the correlations into a square matrix
 %     [unfl,labels,values]=cosmo_unflatten(res,1);
 %     %
 %     % yields a 2x2x1 matrix (matlab omits the last, singleton dimension)
 %     cosmo_disp(unfl)
-%     > [  0.447    -0.525
-%     >   -0.538     0.959 ]
+%     %|| [  0.363    -0.447
+%     %||   -0.404     0.606 ]
 %     %
 %     cosmo_disp(labels)
-%     > { 'half1'  'half2' }
+%     %|| { 'half1'  'half2' }
 %     %
 %     cosmo_disp(values)
-%     > { [ 1    [ 1
-%     >     2 ]    2 ] }
+%     %|| { [ 1    [ 1
+%     %||     2 ]    2 ] }
 %
 %
 % Notes:
@@ -113,6 +114,8 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
     if ~(isnumeric(dim) && isscalar(dim))
         error('second argument must be numeric');
     end
+
+    cosmo_check_dataset(ds);
 
     defaults=struct();
     defaults.set_missing_to=0;

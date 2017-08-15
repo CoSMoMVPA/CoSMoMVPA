@@ -54,14 +54,14 @@ function test_isequaln_regression()
     end
 
 function test_isequaln_compare_builtin_isequaln
-    helper_test_comparison(@isequaln);
+    helper_test_comparison('isequaln');
 
 function test_isequaln_compare_builtin_isequalwithequalnans
-    helper_test_comparison(@isequalwithequalnans);
+    helper_test_comparison('isequalwithequalnans');
 
-function helper_test_comparison(func)
-    func_name=func2str(func);
+function helper_test_comparison(func_name)
     ext_name=sprintf('!%s',func_name);
+
     if cosmo_skip_test_if_no_external(ext_name)
         return
     end
@@ -75,6 +75,8 @@ function helper_test_comparison(func)
 
     is_eq_diff_cell=get_eq_diff_cells();
     all_eq_diff=cat(1,is_eq_diff_cell{:});
+
+    func=str2func(func_name);
 
     for row=1:size(all_eq_diff,1);
         args=all_eq_diff(row,:);

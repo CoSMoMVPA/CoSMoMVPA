@@ -544,6 +544,13 @@ function externals=get_externals_helper()
     externals.mocov.authors={'N. N. Oosterhof'};
     externals.mocov.url='https://github.com/MOcov/MOcov';
 
+    externals.modox.is_present=@() has('modox_runtests');
+    externals.modox.is_recent=yes;
+    externals.modox.label=['Matlab/Octave MOdox '...
+                                        'documentation test framework'];
+    externals.modox.authors={'N. N. Oosterhof'};
+    externals.modox.url='https://github.com/MOdox/MOdox';
+
 function tf=has_octave_package(label)
     tf=false;
     if ~cosmo_wtf('is_octave')
