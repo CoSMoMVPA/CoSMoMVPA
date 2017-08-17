@@ -68,6 +68,18 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
     dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'regress_dsm',mat2);
     assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
+    
+    dcm1_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
+                                                'regress_dsm',vec2,...
+                                                'type','Spearman');
+    pcorr_s=partialcorr(distance',vec1',vec2','type','Spearman');
+
+    assertElementsAlmostEqual(dcm1_s.samples,pcorr_s);
+
+    dcm2_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
+                                                'regress_dsm',mat2,...
+                                                'type','Spearman');
+    assertElementsAlmostEqual(dcm1_s.samples,dcm2_s.samples);
 
 
 function test_target_dsm_corr_measure_partial_cell_partialcorr
