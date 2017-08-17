@@ -75,14 +75,15 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     %||   { 'corr' }
 %
 %     ds=cosmo_synthetic_dataset();
-%     % get raw output
-%     c_raw=cosmo_correlation_measure(ds,'output','correlation');
+%     % get raw correlations without fisher transformation
+%     c_raw=cosmo_correlation_measure(ds,'output','correlation',...
+%                                       'post_corr_func',[]);
 %     cosmo_disp(c_raw)
 %     %|| .samples
-%     %||   [  0.447
-%     %||     -0.538
-%     %||     -0.525
-%     %||      0.959 ]
+%     %||   [  0.363
+%     %||     -0.404
+%     %||     -0.447
+%     %||      0.606 ]
 %     %|| .sa
 %     %||   .half1
 %     %||     [ 1
@@ -106,21 +107,24 @@ function ds_sa=cosmo_correlation_measure(ds, varargin)
 %     % P=1)
 %     matrices=cosmo_unflatten(c_raw,1);
 %     cosmo_disp(matrices)
-%     %|| [  0.447    -0.525
-%     %||   -0.538     0.959 ]
+%     %|| [  0.363    -0.447
+%     %||   -0.404     0.606 ]
 %
 %     % compute for each fold separately, using a custom take-one-chunk
-%     % out partitioning scheme. c.sa.chunks in the output
-%     % reflects the test chunk in each partition
+%     % out partitioning scheme and without Fisher transformation of
+%     % the correlations.
+%     % Note that c.sa.chunks in the output reflects the test chunk
+%     % in each partition
 %     ds=cosmo_synthetic_dataset('type','fmri','nchunks',4);
 %     partitions=cosmo_nfold_partitioner(ds);
 %     c=cosmo_correlation_measure(ds,'output','mean_by_fold',...
-%                         'partitions',partitions);
+%                                    'partitions',partitions,...
+%                                    'post_corr_func',[]);
 %     cosmo_disp(c.samples);
-%     %|| [  1.72
-%     %||   0.728
-%     %||    1.25
-%     %||    2.02 ]
+%     %|| [  1.32
+%     %||   0.512
+%     %||    1.05
+%     %||    1.23 ]
 %     cosmo_disp(c.sa);
 %     %|| .partition
 %     %||   [ 1
