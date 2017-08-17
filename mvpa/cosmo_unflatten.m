@@ -56,13 +56,14 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %     ds=cosmo_synthetic_dataset();
 %     %
 %     % compute all (2x2) split-half correlation values
-%     res=cosmo_correlation_measure(ds,'output','raw');
+%     res=cosmo_correlation_measure(ds,'output','raw',...
+%                                       'post_corr_func',[]);
 %     cosmo_disp(res)
 %     %|| .samples
-%     %||   [  0.447
-%     %||     -0.538
-%     %||     -0.525
-%     %||      0.959 ]
+%     %||   [  0.363
+%     %||     -0.404
+%     %||     -0.447
+%     %||      0.606 ]
 %     %|| .sa
 %     %||   .half1
 %     %||     [ 1
@@ -87,8 +88,8 @@ function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 %     %
 %     % yields a 2x2x1 matrix (matlab omits the last, singleton dimension)
 %     cosmo_disp(unfl)
-%     %|| [  0.447    -0.525
-%     %||   -0.538     0.959 ]
+%     %|| [  0.363    -0.447
+%     %||   -0.404     0.606 ]
 %     %
 %     cosmo_disp(labels)
 %     %|| { 'half1'  'half2' }
