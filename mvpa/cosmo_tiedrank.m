@@ -103,37 +103,46 @@ function ranks=cosmo_tiedrank(data, dim)
 
 
 function ranks=vector_tied_rank(sorted_values, sort_idx)
-% sorted_values and sort_idx are the result from applying 'sort'
-    ranks=sort_idx+NaN;
+% sorted_values and sort_idx are the output from 'sort'
+% it is assumes that sorted_values is a vector
+    n_values=numel(sorted_values);
+    nan_msk=isnan(sorted_values);
+    nan_count=sum(nan_msk);
+    non_nan_count=numel(sorted_values)-nan_count;
 
-    n=numel(sorted_values);
+    % first set ranks for values without ties
+    ranks=sort_idx+NaN;
+    ranks(sort_idx(1:non_nan_count))=1:non_nan_count;
+
+    % now deal with ties
+    tie_msk=sorted_values(2:end)==sorted_values(1:(end-1));
+    tie_idx=find(tie_msk);
+    tie_count=numel(tie_idx);
+
     k=0;
-    while k<n
+    while k<tie_count
         k=k+1;
 
-        if isnan(sorted_values(k))
-            break;
-        end
+        tie_start=tie_idx(k);
+        tie_end=tie_start+1;
 
-        tie_start=k;
-        tie_count=1;
-
-        while k<n && sorted_values(k)==sorted_values(k+1)
-            tie_count=tie_count+1;
+        while tie_end<n_values ...
+                && sorted_values(tie_end)==sorted_values(tie_end+1)
+            tie_end=tie_end+1;
             k=k+1;
         end
 
-        tie=tie_start;
-
-        if tie_count==1
-            pos=sort_idx(k);
-        else
-            pos=sort_idx(tie_start+(0:(tie_count-1)));
-            tie=tie+(tie_count-1)/2;
-        end
-
-        ranks(pos)=tie;
+        tie_value=(tie_start+tie_end)/2;
+        pos=tie_start+(0:(tie_end-tie_start));
+        ranks(sort_idx(pos))=tie_value;
     end
+
+
+
+
+
+
+
 
 function ranks=singleton_ranks(data)
     % all ranks are either NaN or 1
