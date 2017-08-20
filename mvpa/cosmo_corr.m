@@ -11,15 +11,14 @@ function c=cosmo_corr(x,y,corr_type)
 %              significantly reduced for small matrices x and y (with
 %              /tiny/ numerical imprecisions) by the use of a custom
 %              implementation.
-%              Using 'Spearman' or 'Kendall' required the matlab stats
-%              toolbox.
+%              Using 'Kendall' required the matlab stats
+%              toolbox and is currently not supported in Octave.
 % Output:
 %   c          MxN matrix with c(i,j)=corr(x(:,i),y(:,j),'type',corr_type).
 %
 % Notes:
 %  - this function does not compute probability values.
-%  - Using 'Spearman' or 'Kendall' for corr_type requires the matlab stats
-%    toolbox.
+%  - Using 'Kendall' for corr_type requires the matlab stats toolbox.
 %
 % Example:
 %   % generate some pseudo-random data.
@@ -58,33 +57,44 @@ function c=cosmo_corr(x,y,corr_type)
 
     switch corr_type
         case 'Pearson'
-            % speed-optimized version
-            nx=size(x,1);
-            ny=size(y,1);
+            c=corr_pearson(x,y,y_as_x);
 
-            % subtract mean
-            xd=bsxfun(@minus,x,sum(x,1)/nx);
-            yd=bsxfun(@minus,y,sum(y,1)/ny);
+        case 'Spearman'
+            x_ranks=cosmo_tiedrank(x);
+            y_ranks=cosmo_tiedrank(y);
 
-            % normalization
-            n=1/(size(x,1)-1);
-
-            % standard deviation
-            xs=(n*sum(xd .^ 2)).^-0.5;
-            ys=(n*sum(yd .^ 2)).^-0.5;
-
-            % compute correlations
-            c=n * (xd' * yd) .* (xs' * ys);
-
-            if y_as_x
-                % ensure diagonal elements are 1
-                c=(c+c')*.5;
-                dc=diag(c);
-                c=(c-diag(dc))+eye(numel(dc));
-            end
+            c=corr_pearson(x_ranks,y_ranks,y_as_x);
 
         otherwise
             % fall-back: use Matlab's function
             % will puke if no Matlab stat toolbox
             c=corr(x,y,'type',corr_type);
+    end
+
+
+function c=corr_pearson(x,y,y_as_x)
+
+    % speed-optimized version
+    nx=size(x,1);
+    ny=size(y,1);
+
+    % subtract mean
+    xd=bsxfun(@minus,x,sum(x,1)/nx);
+    yd=bsxfun(@minus,y,sum(y,1)/ny);
+
+    % normalization
+    n=1/(size(x,1)-1);
+
+    % standard deviation
+    xs=(n*sum(xd .^ 2)).^-0.5;
+    ys=(n*sum(yd .^ 2)).^-0.5;
+
+    % compute correlations
+    c=n * (xd' * yd) .* (xs' * ys);
+
+    if y_as_x
+        % ensure diagonal elements are 1
+        c=(c+c')*.5;
+        dc=diag(c);
+        c=(c-diag(dc))+eye(numel(dc));
     end
