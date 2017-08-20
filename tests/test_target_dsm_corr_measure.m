@@ -373,18 +373,10 @@ function test_target_dsm_corr_measure_mask_exceptions
 
                 expect_error=set_inconsistent_non_nan_msk;
                 if expect_error
-                    try
                     assertExceptionThrown(func_handle,'');
-                    catch
-                        2
-                    end
                 else
                     % should be ok
-                    try
                     func_handle();
-                    catch
-                        2
-                    end
                 end
             end
         end
