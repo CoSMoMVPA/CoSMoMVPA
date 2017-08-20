@@ -138,12 +138,6 @@ function ranks=vector_tied_rank(sorted_values, sort_idx)
     end
 
 
-
-
-
-
-
-
 function ranks=singleton_ranks(data)
     % all ranks are either NaN or 1
     ranks=ones(size(data));
