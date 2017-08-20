@@ -174,7 +174,7 @@ function test_target_dsm_corr_measure_non_pearson
     dcm1=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'type','Spearman');
 
-    assertElementsAlmostEqual(dcm1.samples,0.2506,'absolute',1e-4);
+    assertElementsAlmostEqual(dcm1.samples,0.2558,'absolute',1e-4);
 
 
 function test_target_dsm_corr_measure_glm_dsm
