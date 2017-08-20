@@ -58,33 +58,38 @@ function c=cosmo_corr(x,y,corr_type)
 
     switch corr_type
         case 'Pearson'
-            % speed-optimized version
-            nx=size(x,1);
-            ny=size(y,1);
-
-            % subtract mean
-            xd=bsxfun(@minus,x,sum(x,1)/nx);
-            yd=bsxfun(@minus,y,sum(y,1)/ny);
-
-            % normalization
-            n=1/(size(x,1)-1);
-
-            % standard deviation
-            xs=(n*sum(xd .^ 2)).^-0.5;
-            ys=(n*sum(yd .^ 2)).^-0.5;
-
-            % compute correlations
-            c=n * (xd' * yd) .* (xs' * ys);
-
-            if y_as_x
-                % ensure diagonal elements are 1
-                c=(c+c')*.5;
-                dc=diag(c);
-                c=(c-diag(dc))+eye(numel(dc));
-            end
+            c=corr_pearson(x,y,y_as_x);
 
         otherwise
             % fall-back: use Matlab's function
             % will puke if no Matlab stat toolbox
             c=corr(x,y,'type',corr_type);
+    end
+
+
+function c=corr_pearson(x,y,y_as_x)
+
+    % speed-optimized version
+    nx=size(x,1);
+    ny=size(y,1);
+
+    % subtract mean
+    xd=bsxfun(@minus,x,sum(x,1)/nx);
+    yd=bsxfun(@minus,y,sum(y,1)/ny);
+
+    % normalization
+    n=1/(size(x,1)-1);
+
+    % standard deviation
+    xs=(n*sum(xd .^ 2)).^-0.5;
+    ys=(n*sum(yd .^ 2)).^-0.5;
+
+    % compute correlations
+    c=n * (xd' * yd) .* (xs' * ys);
+
+    if y_as_x
+        % ensure diagonal elements are 1
+        c=(c+c')*.5;
+        dc=diag(c);
+        c=(c-diag(dc))+eye(numel(dc));
     end
