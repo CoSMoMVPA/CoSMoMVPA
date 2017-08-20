@@ -48,6 +48,7 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
         return;
     end
     ntargets=ceil(rand()*6+6);
+
     ds=cosmo_synthetic_dataset('ntargets',ntargets,'nchunks',1);
     ds.samples(:,:)=randn(size(ds.samples));
 
@@ -68,7 +69,7 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
     dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'regress_dsm',mat2);
     assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
-    
+
     dcm1_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
                                                 'regress_dsm',vec2,...
                                                 'type','Spearman');
@@ -167,17 +168,13 @@ function test_target_dsm_corr_measure_partial_no_correlation
 
 function test_target_dsm_corr_measure_non_pearson
     % test non-Pearson correlations
-    if cosmo_skip_test_if_no_external('@stats')
-        return;
-    end
-
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
     mat1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
 
     dcm1=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'type','Spearman');
 
-    assertElementsAlmostEqual(dcm1.samples,0.2558,'absolute',1e-4);
+    assertElementsAlmostEqual(dcm1.samples,0.2506,'absolute',1e-4);
 
 
 function test_target_dsm_corr_measure_glm_dsm
