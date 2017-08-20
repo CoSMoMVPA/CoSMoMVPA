@@ -11,15 +11,14 @@ function c=cosmo_corr(x,y,corr_type)
 %              significantly reduced for small matrices x and y (with
 %              /tiny/ numerical imprecisions) by the use of a custom
 %              implementation.
-%              Using 'Spearman' or 'Kendall' required the matlab stats
-%              toolbox.
+%              Using 'Kendall' required the matlab stats
+%              toolbox and is currently not supported in Octave.
 % Output:
 %   c          MxN matrix with c(i,j)=corr(x(:,i),y(:,j),'type',corr_type).
 %
 % Notes:
 %  - this function does not compute probability values.
-%  - Using 'Spearman' or 'Kendall' for corr_type requires the matlab stats
-%    toolbox.
+%  - Using 'Kendall' for corr_type requires the matlab stats toolbox.
 %
 % Example:
 %   % generate some pseudo-random data.
@@ -59,6 +58,12 @@ function c=cosmo_corr(x,y,corr_type)
     switch corr_type
         case 'Pearson'
             c=corr_pearson(x,y,y_as_x);
+
+        case 'Spearman'
+            x_ranks=cosmo_tiedrank(x);
+            y_ranks=cosmo_tiedrank(y);
+
+            c=corr_pearson(x_ranks,y_ranks,y_as_x);
 
         otherwise
             % fall-back: use Matlab's function
