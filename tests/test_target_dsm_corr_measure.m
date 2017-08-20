@@ -420,6 +420,10 @@ function test_target_dsm_corr_measure_exceptions
     mat2_ds_stacked=cat(1,mat2_ds_rep{:});
     aet(ds,'target_dsm',mat2_ds_stacked);
 
+    % illegal correlation type
+    aet(ds,'target_dsm',mat1,'type','Kendall');
+    aet(ds,'target_dsm',mat1,'type',2);
+
 
 
 

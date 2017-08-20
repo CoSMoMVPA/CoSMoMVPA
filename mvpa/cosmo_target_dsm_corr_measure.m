@@ -18,8 +18,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
-%                  ds, one of 'Pearson' (default), 'Spearman', or
-%                  'Kendall'.
+%                  ds, one of 'Pearson' (default) or 'Spearman'.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -392,5 +391,10 @@ function check_params(params)
         end
     elseif ~isfield(params,'target_dsm')
         error('''target_dsm'' or ''glm_dsm'' option is required');
+    end
+
+    if ~(ischar(params.type) ...
+            && any(strmatch(params.type,{'Spearman','Pearson'},'exact')))
+        error('''type'' argument must be Spearman or Pearson');
     end
 
