@@ -72,14 +72,14 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
 
     dcm1_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
                                                 'regress_dsm',vec2,...
-                                                'type','Spearman');
+                                                'partial_type','Spearman');
     pcorr_s=partialcorr(distance',vec1',vec2','type','Spearman');
 
     assertElementsAlmostEqual(dcm1_s.samples,pcorr_s);
 
     dcm2_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'regress_dsm',mat2,...
-                                                'type','Spearman');
+                                                'partial_type','Spearman');
     assertElementsAlmostEqual(dcm1_s.samples,dcm2_s.samples);
 
 
@@ -416,6 +416,9 @@ function test_target_dsm_corr_measure_exceptions
     aet(ds,'target_dsm',mat1,'type','Kendall');
     aet(ds,'target_dsm',mat1,'type',2);
 
+    % illegal partial correlation type
+    aet(ds,'target_dsm',mat1,'partial_type','Kendall');
+    aet(ds,'target_dsm',mat1,'partial_type',2);
 
 
 

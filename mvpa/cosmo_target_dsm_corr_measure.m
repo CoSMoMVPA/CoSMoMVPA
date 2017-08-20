@@ -19,6 +19,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
 %                  ds, one of 'Pearson' (default) or 'Spearman'.
+%     .partial_type (optional) type of partial correlation type, in case
+%                  the regress_dsm option is used; one of  one of
+%                  'Pearson' (default) or 'Spearman'.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -144,7 +147,8 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % process input arguments
-    params=cosmo_structjoin('type','Pearson',... % set default
+    params=cosmo_structjoin('type','Pearson',...
+                            'partial_type','Pearson',...
                             'metric','correlation',...
                             'center_data',false,...
                             varargin);
@@ -224,13 +228,14 @@ function ds_sa=correlation_dsm(samples_pdist,params)
         [samples_pdist(:),target_dsm_vec(:)]=regress_out(...
                                                 samples_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_mat);
+                                                regress_dsm_mat,...
+                                                params.partial_type);
     end
 
 
     % >@@>
     % compute correlations between 'pd' and 'target_dsm_vec', store in 'rho'
-    rho=cosmo_corr(samples_pdist,target_dsm_vec, params.type);
+    rho=cosmo_corr(samples_pdist,target_dsm_vec,params.type);
     % <@@<
 
     % store results
@@ -276,7 +281,16 @@ function ds_sa=linear_regression_dsm(samples_pdist, params)
 
 function [ds_resid,target_resid]=regress_out(ds_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_mat)
+                                                regress_dsm_mat,...
+                                                partial_corr_type)
+
+    if strcmp(partial_corr_type,'Spearman')
+        % use ranks of the dissimilarity matrices
+        ds_pdist=cosmo_tiedrank(ds_pdist,1);
+        target_dsm_vec=cosmo_tiedrank(target_dsm_vec,1);
+        regress_dsm_mat=cosmo_tiedrank(regress_dsm_mat,1);
+    end
+
     % set up design matrix
     nsamples=size(ds_pdist,1);
     regr=[regress_dsm_mat ones(nsamples,1)];
@@ -393,8 +407,14 @@ function check_params(params)
         error('''target_dsm'' or ''glm_dsm'' option is required');
     end
 
-    if ~(ischar(params.type) ...
-            && any(strmatch(params.type,{'Spearman','Pearson'},'exact')))
-        error('''type'' argument must be Spearman or Pearson');
+    ensure_is_valid_correlation(params,'type');
+    ensure_is_valid_correlation(params,'partial_type');
+
+function ensure_is_valid_correlation(params,key)
+    value=params.(key);
+
+    if ~(ischar(value) ...
+            && any(strmatch(value,{'Spearman','Pearson'},'exact')))
+        error('''%s'' argument must be ''Spearman'' or ''Pearson''',key);
     end
 
