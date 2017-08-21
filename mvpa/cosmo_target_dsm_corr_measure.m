@@ -18,7 +18,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
-%                  ds, one of 'Pearson' (default) or 'Spearman'.
+%                  ds, one of 'Pearson' (default) or 'Spearman'. If the
+%                  'regress_dsm' option is used, then the specified
+%                  correlation type is used for the partial correlaton
+%                  computation.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -35,15 +38,19 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  matrices are z-scored before estimating the regression
 %                  coefficients.
 %                  This option is required when 'target_dsm' is not
-%                  provided; it cannot cannot used together with
-%                  .target_dsm or regress_dsm.
-%                  When using this option, the 'type' option is ignored.
+%                  provided; it cannot cannot used together with the
+%                  'target_dsm' or 'regress_dsm' options.
+%                  When using this option, the 'type' option cannot be
+%                  set to 'Spearman'
 %                  For this option, the output has as many rows (samples)
 %                  as there are elements (dissimilarity matrices) in
 %                  .glm_dsm.
 %     .center_data If set to true, then the mean of each feature (column in
 %                  ds.samples) is subtracted from each column prior to
 %                  computing the pairwise distances for all samples in ds.
+%                  This is generally recommended but is not the default in
+%                  order to avoid breaking behavaiour from earlier
+%                  versions.
 %                  Default: false
 %
 % Output:
