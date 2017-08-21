@@ -19,9 +19,6 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
 %                  ds, one of 'Pearson' (default) or 'Spearman'.
-%     .partial_type (optional) type of partial correlation type, in case
-%                  the regress_dsm option is used; one of  one of
-%                  'Pearson' (default) or 'Spearman'.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -229,14 +226,16 @@ function ds_sa=correlation_dsm(samples_pdist,params)
                                                 samples_pdist,...
                                                 target_dsm_vec,...
                                                 regress_dsm_mat,...
-                                                params.partial_type);
+                                                params.type);
+        % regressed out samples are already based on Spearman correlations,
+        % so use Pearson for the final correlation computation
+        corr_type='Pearson';
+    else
+        corr_type=params.type;
     end
 
 
-    % >@@>
-    % compute correlations between 'pd' and 'target_dsm_vec', store in 'rho'
-    rho=cosmo_corr(samples_pdist,target_dsm_vec,params.type);
-    % <@@<
+    rho=cosmo_corr(samples_pdist,target_dsm_vec,corr_type);
 
     % store results
     ds_sa=struct();
@@ -408,7 +407,7 @@ function check_params(params)
     end
 
     ensure_is_valid_correlation(params,'type');
-    ensure_is_valid_correlation(params,'partial_type');
+
 
 function ensure_is_valid_correlation(params,key)
     value=params.(key);
