@@ -246,6 +246,10 @@ function ds_sa=correlation_dsm(samples_pdist,params)
 
 
 function ds_sa=linear_regression_dsm(samples_pdist, params)
+    if ~strcmp(params.type,'Pearson')
+        error(['For linear regression, only ''Pearson'' is '...
+                'currently allowed']);
+    end
     npairs_dataset=numel(samples_pdist);
 
     [dsm_mat,msk]=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...

@@ -416,6 +416,8 @@ function test_target_dsm_corr_measure_exceptions
     aet(ds,'target_dsm',mat1,'type','Kendall');
     aet(ds,'target_dsm',mat1,'type',2);
 
+    % Spearman not allowed when using regress_dsm
+    aet(ds,'glm_dsm',mat1,'type','Spearman');
 
 
 function test_target_dsm_corr_measure_warnings_zero()
