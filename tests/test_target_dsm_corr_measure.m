@@ -413,11 +413,15 @@ function test_target_dsm_corr_measure_exceptions
     aet(ds,'target_dsm',mat2_ds_stacked);
 
     % illegal correlation type
-    aet(ds,'target_dsm',mat1,'type','Kendall');
+    aet(ds,'target_dsm',mat1,'type','foo');
     aet(ds,'target_dsm',mat1,'type',2);
 
-    % Spearman not allowed when using regress_dsm
+    % Spearman or Kendall not allowed when using glm_dsm
     aet(ds,'glm_dsm',mat1,'type','Spearman');
+    aet(ds,'glm_dsm',mat1,'type','Kendall');
+
+    % Kendall not allowed with regress_dsm
+    aet(ds,'target_dsm',mat1,'regress_dsm',{mat1},'type','Kendall');
 
 
 function test_target_dsm_corr_measure_warnings_zero()

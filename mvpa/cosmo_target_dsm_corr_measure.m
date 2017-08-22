@@ -18,10 +18,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  pair-wise distances between samples in ds. It accepts
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
-%                  ds, one of 'Pearson' (default) or 'Spearman'. If the
-%                  'regress_dsm' option is used, then the specified
-%                  correlation type is used for the partial correlaton
-%                  computation.
+%                  ds, one of 'Pearson' (default), 'Spearman', or
+%                  'Kendall'. If the 'regress_dsm' option is used, then the
+%                  specified correlation type is used for the partial
+%                  correlaton computation.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -30,7 +30,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  after controlling for the effect of the matrix
 %                  (or matrices) in regress_dsm. (Using this option yields
 %                  similar behaviour as the Matlab function
-%                  'partial_corr')
+%                  'partial_corr').
+%                  When using this option, the 'type' option cannot be
+%                  set to 'Kendall'.
 %     .glm_dsm     (optional) cell with model dissimilarity matrices or
 %                  vectors (as .target_dsm) for using a general linear
 %                  model to get regression coefficients for each element in
@@ -41,7 +43,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  provided; it cannot cannot used together with the
 %                  'target_dsm' or 'regress_dsm' options.
 %                  When using this option, the 'type' option cannot be
-%                  set to 'Spearman'
+%                  set to 'Spearman' or 'Kendall'.
 %                  For this option, the output has as many rows (samples)
 %                  as there are elements (dissimilarity matrices) in
 %                  .glm_dsm.
@@ -298,6 +300,8 @@ function [ds_resid,target_resid]=regress_out(ds_pdist,...
         ds_pdist=cosmo_tiedrank(ds_pdist,1);
         target_dsm_vec=cosmo_tiedrank(target_dsm_vec,1);
         regress_dsm_mat=cosmo_tiedrank(regress_dsm_mat,1);
+    elseif strcmp(partial_corr_type,'Kendall')
+        error('Kendall cannot be used with the ''regress_dsm'' option');
     end
 
     % set up design matrix
@@ -422,8 +426,11 @@ function check_params(params)
 function ensure_is_valid_correlation(params,key)
     value=params.(key);
 
+    allowed_types={'Spearman','Pearson','Kendall'};
+
     if ~(ischar(value) ...
-            && any(strmatch(value,{'Spearman','Pearson'},'exact')))
-        error('''%s'' argument must be ''Spearman'' or ''Pearson''',key);
+            && any(strcmp(value,allowed_types)))
+        error('''%s'' argument must be one of: ''%s''',...
+                key,cosmo_strjoin(allowed_types,'''%s'', '));
     end
 
