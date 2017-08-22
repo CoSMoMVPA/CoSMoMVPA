@@ -48,6 +48,7 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
         return;
     end
     ntargets=ceil(rand()*6+6);
+
     ds=cosmo_synthetic_dataset('ntargets',ntargets,'nchunks',1);
     ds.samples(:,:)=randn(size(ds.samples));
 
@@ -68,6 +69,18 @@ function test_target_dsm_corr_measure_partial_vector_partialcorr
     dcm2=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
                                                 'regress_dsm',mat2);
     assertElementsAlmostEqual(dcm1.samples,dcm2.samples);
+
+    dcm1_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',vec1,...
+                                                'regress_dsm',vec2,...
+                                                'type','Spearman');
+    pcorr_s=partialcorr(distance',vec1',vec2','type','Spearman');
+
+    assertElementsAlmostEqual(dcm1_s.samples,pcorr_s);
+
+    dcm2_s=cosmo_target_dsm_corr_measure(ds,'target_dsm',mat1,...
+                                                'regress_dsm',mat2,...
+                                                'type','Spearman');
+    assertElementsAlmostEqual(dcm1_s.samples,dcm2_s.samples);
 
 
 function test_target_dsm_corr_measure_partial_cell_partialcorr
@@ -155,10 +168,6 @@ function test_target_dsm_corr_measure_partial_no_correlation
 
 function test_target_dsm_corr_measure_non_pearson
     % test non-Pearson correlations
-    if cosmo_skip_test_if_no_external('@stats')
-        return;
-    end
-
     ds=cosmo_synthetic_dataset('ntargets',6,'nchunks',1);
     mat1=[1 2 3 4 2 3 2 1 2 3 1 2 3 2 2];
 
@@ -364,18 +373,10 @@ function test_target_dsm_corr_measure_mask_exceptions
 
                 expect_error=set_inconsistent_non_nan_msk;
                 if expect_error
-                    try
                     assertExceptionThrown(func_handle,'');
-                    catch
-                        2
-                    end
                 else
                     % should be ok
-                    try
                     func_handle();
-                    catch
-                        2
-                    end
                 end
             end
         end
@@ -411,7 +412,16 @@ function test_target_dsm_corr_measure_exceptions
     mat2_ds_stacked=cat(1,mat2_ds_rep{:});
     aet(ds,'target_dsm',mat2_ds_stacked);
 
+    % illegal correlation type
+    aet(ds,'target_dsm',mat1,'type','foo');
+    aet(ds,'target_dsm',mat1,'type',2);
 
+    % Spearman or Kendall not allowed when using glm_dsm
+    aet(ds,'glm_dsm',mat1,'type','Spearman');
+    aet(ds,'glm_dsm',mat1,'type','Kendall');
+
+    % Kendall not allowed with regress_dsm
+    aet(ds,'target_dsm',mat1,'regress_dsm',{mat1},'type','Kendall');
 
 
 function test_target_dsm_corr_measure_warnings_zero()

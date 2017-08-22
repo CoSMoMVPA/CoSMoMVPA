@@ -19,7 +19,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  any metric supported by pdist (default: 'correlation')
 %     .type        (optional) type of correlation between target_dsm and
 %                  ds, one of 'Pearson' (default), 'Spearman', or
-%                  'Kendall'.
+%                  'Kendall'. If the 'regress_dsm' option is used, then the
+%                  specified correlation type is used for the partial
+%                  correlaton computation.
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
@@ -28,7 +30,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  after controlling for the effect of the matrix
 %                  (or matrices) in regress_dsm. (Using this option yields
 %                  similar behaviour as the Matlab function
-%                  'partial_corr')
+%                  'partial_corr').
+%                  When using this option, the 'type' option cannot be
+%                  set to 'Kendall'.
 %     .glm_dsm     (optional) cell with model dissimilarity matrices or
 %                  vectors (as .target_dsm) for using a general linear
 %                  model to get regression coefficients for each element in
@@ -36,15 +40,19 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  matrices are z-scored before estimating the regression
 %                  coefficients.
 %                  This option is required when 'target_dsm' is not
-%                  provided; it cannot cannot used together with
-%                  .target_dsm or regress_dsm.
-%                  When using this option, the 'type' option is ignored.
+%                  provided; it cannot cannot used together with the
+%                  'target_dsm' or 'regress_dsm' options.
+%                  When using this option, the 'type' option cannot be
+%                  set to 'Spearman' or 'Kendall'.
 %                  For this option, the output has as many rows (samples)
 %                  as there are elements (dissimilarity matrices) in
 %                  .glm_dsm.
 %     .center_data If set to true, then the mean of each feature (column in
 %                  ds.samples) is subtracted from each column prior to
 %                  computing the pairwise distances for all samples in ds.
+%                  This is generally recommended but is not the default in
+%                  order to avoid breaking behavaiour from earlier
+%                  versions.
 %                  Default: false
 %
 % Output:
@@ -145,7 +153,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
     % process input arguments
-    params=cosmo_structjoin('type','Pearson',... % set default
+    params=cosmo_structjoin('type','Pearson',...
                             'metric','correlation',...
                             'center_data',false,...
                             varargin);
@@ -225,14 +233,17 @@ function ds_sa=correlation_dsm(samples_pdist,params)
         [samples_pdist(:),target_dsm_vec(:)]=regress_out(...
                                                 samples_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_mat);
+                                                regress_dsm_mat,...
+                                                params.type);
+        % regressed out samples are already based on Spearman correlations,
+        % so use Pearson for the final correlation computation
+        corr_type='Pearson';
+    else
+        corr_type=params.type;
     end
 
 
-    % >@@>
-    % compute correlations between 'pd' and 'target_dsm_vec', store in 'rho'
-    rho=cosmo_corr(samples_pdist,target_dsm_vec, params.type);
-    % <@@<
+    rho=cosmo_corr(samples_pdist,target_dsm_vec,corr_type);
 
     % store results
     ds_sa=struct();
@@ -243,6 +254,10 @@ function ds_sa=correlation_dsm(samples_pdist,params)
 
 
 function ds_sa=linear_regression_dsm(samples_pdist, params)
+    if ~strcmp(params.type,'Pearson')
+        error(['For linear regression, only ''Pearson'' is '...
+                'currently allowed']);
+    end
     npairs_dataset=numel(samples_pdist);
 
     [dsm_mat,msk]=get_dsm_mat_from_vector_or_cell(params.glm_dsm,...
@@ -277,7 +292,18 @@ function ds_sa=linear_regression_dsm(samples_pdist, params)
 
 function [ds_resid,target_resid]=regress_out(ds_pdist,...
                                                 target_dsm_vec,...
-                                                regress_dsm_mat)
+                                                regress_dsm_mat,...
+                                                partial_corr_type)
+
+    if strcmp(partial_corr_type,'Spearman')
+        % use ranks of the dissimilarity matrices
+        ds_pdist=cosmo_tiedrank(ds_pdist,1);
+        target_dsm_vec=cosmo_tiedrank(target_dsm_vec,1);
+        regress_dsm_mat=cosmo_tiedrank(regress_dsm_mat,1);
+    elseif strcmp(partial_corr_type,'Kendall')
+        error('Kendall cannot be used with the ''regress_dsm'' option');
+    end
+
     % set up design matrix
     nsamples=size(ds_pdist,1);
     regr=[regress_dsm_mat ones(nsamples,1)];
@@ -392,5 +418,19 @@ function check_params(params)
         end
     elseif ~isfield(params,'target_dsm')
         error('''target_dsm'' or ''glm_dsm'' option is required');
+    end
+
+    ensure_is_valid_correlation(params,'type');
+
+
+function ensure_is_valid_correlation(params,key)
+    value=params.(key);
+
+    allowed_types={'Spearman','Pearson','Kendall'};
+
+    if ~(ischar(value) ...
+            && any(strcmp(value,allowed_types)))
+        error('''%s'' argument must be one of: ''%s''',...
+                key,cosmo_strjoin(allowed_types,'''%s'', '));
     end
 
