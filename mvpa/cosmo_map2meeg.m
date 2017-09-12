@@ -488,13 +488,6 @@ function ft=init_ft_source_fields(ds)
     if cosmo_isfield(ds,'a.meeg.tri');
         ft.tri=ds.a.meeg.tri;
     end
-%
-%     else
-%         % use regular grid to determine
-%         ds_vol=cosmo_vol_grid_convert(ds,'tovol');
-%         ft.dim=ds_vol.a.vol.dim(:)';
-%     end
-
 
 
 function ft=build_ft(ds,unused)
