@@ -113,6 +113,7 @@ function test_synthetic_meeg_dataset()
     assertExceptionThrown(@()cosmo_meeg_dataset(ds,'targets',[1 2]),'');
 
 
+
 function test_meeg_eeglab_txt_io()
     ds=cosmo_synthetic_dataset('type','meeg');
 
@@ -720,6 +721,53 @@ function test_dimord_label()
 
     end
 
+
+function test_meeg_source_dataset_pos_dim_inside_fields()
+% mapping back and forth should be fine whether or not the
+% 'pos', 'dim' and 'inside' fields are there or not
+    ds_orig=cosmo_synthetic_dataset('type','source','size','huge');
+    ft_orig=cosmo_map2meeg(ds_orig);
+
+    for has_dim=[false,true]
+        for has_tri=[false,true]
+            for has_inside=[false,true]
+                ft=ft_orig;
+
+                if has_dim
+                    ft.dim=[2 2 2];
+                end
+
+                n_pos=size(ft.pos,1);
+
+                if has_tri
+                    ft.tri=ceil(rand(5,3)*max(n_pos));
+                end
+
+                if ~has_inside
+                    ft=rmfield(ft,'inside');
+                end
+
+                func=@()cosmo_meeg_dataset(ft);
+
+                % verify fields are there
+                ds=func();
+                assertEqual(has_dim,isfield(ds.a.meeg,'dim'));
+                assertEqual(has_tri,isfield(ds.a.meeg,'tri'));
+
+                % map back
+                ft_back=cosmo_map2meeg(ds);
+
+                % cosmo_map2meeg always returns an inside field, so for
+                % now we remove it if it is present here
+                if ~has_inside
+                    ft_back=rmfield(ft_back,'inside');
+                end
+
+                % ensure expected fields are preserved
+                assertEqual(ft,ft_back);
+            end
+        end
+    end
 
 
 function x=randint()
