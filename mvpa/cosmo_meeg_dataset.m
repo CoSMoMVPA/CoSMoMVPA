@@ -276,9 +276,13 @@ function ds=convert_ft(ft, opt)
     ds.a.meeg.samples_field=samples_field;
 
     if is_ft_source_struct(ft)
-        ds=apply_ft_source_inside(ds,fdim.labels,fdim.values,...
+        if isfield(ft,'inside')
+            ds=apply_ft_source_inside(ds,fdim.labels,fdim.values,...
                                         ft.inside);
-        ds.a.meeg.dim=ft.dim;
+        end
+
+        optional_fields={'dim','tri'};
+        ds.a.meeg=copy_optional_fields(ds.a.meeg,ft,optional_fields);
     end
 
     ds.a.meeg=set_samples_label_explicitly_if_necessary(ds.a.meeg,ft);
@@ -289,6 +293,14 @@ function ds=convert_ft(ft, opt)
 
     ds=posthoc_slice_dataset_if_necessary(ds,opt);
 
+
+function s=copy_optional_fields(s,source,optional_fields)
+    for k=1:numel(optional_fields)
+        key=optional_fields{k};
+        if isfield(source,key)
+            s.(key)=source.(key);
+        end
+    end
 
 function a_meeg=set_samples_label_explicitly_if_necessary(a_meeg,ft)
     % deal with grand average data
@@ -625,7 +637,7 @@ function [data, sample_field]=get_sensor_data_ft(ft)
 
 
 function tf=is_ft_source_struct(ft)
-    tf=isstruct(ft) && isfield(ft,'pos') && isfield(ft,'inside');
+    tf=isstruct(ft) && isfield(ft,'pos');
 
 function tf=is_ft_sensor_struct(ft)
     tf=isfield(ft,'dimord') && isfield(ft,'label');

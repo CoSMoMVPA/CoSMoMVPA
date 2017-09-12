@@ -335,8 +335,6 @@ function [ft, samples_label, dim_labels]=get_ft_samples(ds)
     [arr, dim_labels]=cosmo_unflatten(ds,[],'set_missing_to',NaN,...
                                             'matrix_labels',{'pos'});
 
-    is_without_samples_dim=size(ds.samples,1);
-
     if cosmo_isfield(ds,'a.meeg.samples_label')
         samples_label={ds.a.meeg.samples_label};
     else
@@ -485,12 +483,11 @@ function ft=init_ft_source_fields(ds)
 
     if cosmo_isfield(ds,'a.meeg.dim')
         ft.dim=ds.a.meeg.dim;
-    else
-        % use regular grid to determine
-        ds_vol=cosmo_vol_grid_convert(ds,'tovol');
-        ft.dim=ds_vol.a.vol.dim(:)';
     end
 
+    if cosmo_isfield(ds,'a.meeg.tri');
+        ft.tri=ds.a.meeg.tri;
+    end
 
 
 function ft=build_ft(ds,unused)
