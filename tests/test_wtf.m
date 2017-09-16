@@ -73,6 +73,10 @@ function test_wtf_is_matlab
     assertEqual(cosmo_wtf('is_matlab'),~is_octave);
     assertEqual(cosmo_wtf('is_octave'),is_octave);
 
+function test_wtf_cosmo_externals()
+    s=cosmo_wtf('cosmo_externals');
+    assert(iscellstr(s));
+
 
 function assert_contains(haystack, needle)
     assert_contains_helper(haystack, needle, true);
