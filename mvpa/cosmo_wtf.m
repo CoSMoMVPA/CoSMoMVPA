@@ -56,8 +56,8 @@ params2func.cosmo_externals=@cosmo_externals;
 params2func.toolboxes=@toolboxes;
 params2func.warnings=@warning_helper;
 params2func.cosmo_config=@cosmo_config_helper;
-params2func.cosmo_files=@cosmo_files;
 params2func.version_number=@version_number_;
+params2func.cosmo_files=@cosmo_files;
 
 
 
