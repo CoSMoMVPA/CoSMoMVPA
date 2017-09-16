@@ -31,7 +31,7 @@ function test_wtf_basics()
     assert_contains(h,['environment: ' env_string]);
     assertEqual(cosmo_wtf('environment'),env_string);
 
-    external_cell=cosmo_strsplit(h,'cosmo_externals: ',2,'\n',1, ', ');
+    external_cell=cosmo_wtf('cosmo_externals');
     external_expected_cell=cosmo_check_external('-list');
     assertEqual(sort(external_cell(:)), sort(external_expected_cell(:)));
 
@@ -52,7 +52,8 @@ function test_wtf_warnings()
         warning(anti_label,'all');
         warning(label,warning_id);
 
-        w=cosmo_wtf('warnings');
+        w_cell=cosmo_wtf('warnings');
+        w=cosmo_strjoin(w_cell,', ');
         assert_contains(w,sprintf('%s: %s',warning_id,label));
         assert_not_contains(w,sprintf('%s: %s',warning_id,anti_label));
     end
