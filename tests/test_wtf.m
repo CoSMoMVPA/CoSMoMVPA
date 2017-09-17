@@ -78,6 +78,12 @@ function test_wtf_cosmo_externals()
     s=cosmo_wtf('cosmo_externals');
     assert(iscellstr(s));
 
+function test_wtf_path()
+    s=cosmo_wtf('path');
+    assert(iscellstr(s));
+    p=path();
+    assertEqual(cosmo_strjoin(s,pathsep()),p);
+
 
 function assert_contains(haystack, needle)
     assert_contains_helper(haystack, needle, true);

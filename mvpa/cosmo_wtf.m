@@ -87,8 +87,8 @@ function s=helper_get_param_from_func_value(key)
     param2func=get_param2func();
 
     if ~isfield(param2func,key)
-        error('Unsupported parameter ''%s''. Supported are: %s',...
-                    key, cosmo_strjoin(fieldnames(param2func),', '));
+        error('Unsupported parameter ''%s''. Supported are:\n  ''%s''',...
+                    key, cosmo_strjoin(fieldnames(param2func),'''\n  '''));
     end
     f=param2func.(key);
     s=f();
@@ -102,13 +102,14 @@ function param2func=get_param2func()
         cached_param2func.computer=@computer_;
         cached_param2func.environment=@environment;
         cached_param2func.version=version_;
+        cached_param2func.version_number=@version_number_;
         cached_param2func.java=java_;
         cached_param2func.cosmo_externals=@cosmo_externals;
         cached_param2func.toolboxes=@toolboxes;
         cached_param2func.warnings=@warning_helper;
         cached_param2func.cosmo_config=@cosmo_config_helper;
-        cached_param2func.version_number=@version_number_;
         cached_param2func.cosmo_files=@cosmo_files;
+        cached_param2func.path=@path_;
     end
 
     param2func=cached_param2func;
@@ -188,6 +189,9 @@ function s=cosmo_config_helper()
         s=caught_error.message;
     end
 
+function s=path_()
+    s=cosmo_strsplit(path(),pathsep());
+
 function parts=warning_helper()
     s=warning();
     n=numel(s);
@@ -222,3 +226,5 @@ function s=dir2str(d, formatter)
         ww{pos}=formatter(dk);
     end
     s=cosmo_strjoin(ww(1:pos),'\n');
+
+
