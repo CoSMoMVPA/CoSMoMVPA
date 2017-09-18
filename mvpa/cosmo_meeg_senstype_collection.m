@@ -139,7 +139,12 @@ function senstypes=get_senstypes()
 
 
 function sens_type_names=get_initial_sens_type_names()
-    h=help('ft_senslabel');
+    func_name='ft_senslabel';
+    if isempty(which(func_name))
+        error('Cannot find ''%s'' in search path:\n  %s',...
+                    func_name,cosmo_strjoin(cosmo_wtf('path'),'\n  '));
+    end
+    h=help(func_name);
     match=regexp(cosmo_strsplit(h,'\n'),'\s*''(\w*)''\s*','tokens');
     msk=~cellfun(@isempty,match);
 

@@ -36,47 +36,84 @@ function s=cosmo_wtf(param)
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-has_param=nargin>=1 && ~isempty(param);
-if has_param
-    if strcmp(param,'is_matlab')
-        s=environment_is_matlab();
-        return
-    elseif strcmp(param,'is_octave')
-        s=environment_is_octave();
-        return
+    has_param=nargin>=1 && ~isempty(param);
+    if has_param
+        s=get_single_param_value(param);
+    else
+        s=get_all_param_values();
     end
-end
-
-params2func=struct();
-params2func.computer=@computer_;
-params2func.environment=@environment;
-params2func.version=version_;
-params2func.java=java_;
-params2func.cosmo_externals=@cosmo_externals;
-params2func.toolboxes=@toolboxes;
-params2func.warnings=@warning_helper;
-params2func.cosmo_config=@cosmo_config_helper;
-params2func.cosmo_files=@cosmo_files;
-params2func.version_number=@version_number_;
 
 
 
-has_param=nargin>=1 && ~isempty(param);
-if has_param;
-    if ~isfield(params2func,param)
-        error('Unsupported parameter ''%s''. Supported are: %s',...
-                    param, cosmo_strjoin(fieldnames(params2func),', '));
+
+
+function s=get_all_param_values()
+    param2func=get_param2func();
+    keys=fieldnames(param2func);
+    value_printer=@(key)as_string(helper_get_param_from_func_value(key));
+    printer=@(key) sprintf('%s: %s',...
+                        key,value_printer(key));
+    s_cell=cellfun(printer,keys,'UniformOutput',false);
+    s=cosmo_strjoin(s_cell,'\n');
+
+function s=as_string(v)
+    if ischar(v)
+        s=v;
+    elseif isnumeric(v)
+        s=sprintf('[ %s]',sprintf('%d ',v));
+    elseif iscellstr(v)
+        s=sprintf('\n  %s',v{:});
+    else
+        assert(false,'unsupported type');
     end
-    f=params2func.(param);
+
+function s=get_single_param_value(param)
+    if ~ischar(param)
+        error('argument must be a string');
+    end
+
+    switch param
+        case 'is_matlab'
+            s=environment_is_matlab();
+
+        case 'is_octave'
+            s=environment_is_octave();
+
+        otherwise
+            s=helper_get_param_from_func_value(param);
+    end
+
+function s=helper_get_param_from_func_value(key)
+    param2func=get_param2func();
+
+    if ~isfield(param2func,key)
+        error('Unsupported parameter ''%s''. Supported are:\n  ''%s''',...
+                    key, cosmo_strjoin(fieldnames(param2func),'''\n  '''));
+    end
+    f=param2func.(key);
     s=f();
-    return
-end
 
-me=str2func(mfilename());
-params=fieldnames(params2func);
-printer=@(param) sprintf('%s: %s',param,me(param));
-s_cell=cellfun(printer,params,'UniformOutput',false);
-s=cosmo_strjoin(s_cell,'\n');
+
+function param2func=get_param2func()
+    persistent cached_param2func;
+
+    if ~isstruct(cached_param2func)
+        cached_param2func=struct();
+        cached_param2func.computer=@computer_;
+        cached_param2func.environment=@environment;
+        cached_param2func.version=version_;
+        cached_param2func.version_number=@version_number_;
+        cached_param2func.java=java_;
+        cached_param2func.cosmo_externals=@cosmo_externals;
+        cached_param2func.toolboxes=@toolboxes;
+        cached_param2func.warnings=@warning_helper;
+        cached_param2func.cosmo_config=@cosmo_config_helper;
+        cached_param2func.cosmo_files=@cosmo_files;
+        cached_param2func.path=@path_;
+    end
+
+    param2func=cached_param2func;
+
 
 
 function s=computer_()
@@ -127,7 +164,8 @@ function s=toolboxes()
     s=dir2str(v,formatter);
 
 function s=cosmo_externals()
-    s=cosmo_strjoin(cosmo_check_external('-list'),', ');
+    s=cosmo_check_external('-list');
+
 
 function s=cosmo_files()
     pth=fileparts(which(mfilename())); % cosmo root directory
@@ -151,15 +189,15 @@ function s=cosmo_config_helper()
         s=caught_error.message;
     end
 
-function s=warning_helper()
+function s=path_()
+    s=cosmo_strsplit(path(),pathsep());
+
+function parts=warning_helper()
     s=warning();
     n=numel(s);
 
-    s_parts=arrayfun(@(i)sprintf('%s: %s', s(i).identifier, s(i).state),...
+    parts=arrayfun(@(i)sprintf('%s: %s', s(i).identifier, s(i).state),...
                     1:n,'UniformOutput',false);
-    s=cosmo_strjoin(s_parts, ', ');
-
-
 
 function s=dir2str(d, formatter)
     % d is the result from 'dir' or 'cosmo_dir'
@@ -188,3 +226,5 @@ function s=dir2str(d, formatter)
         ww{pos}=formatter(dk);
     end
     s=cosmo_strjoin(ww(1:pos),'\n');
+
+
