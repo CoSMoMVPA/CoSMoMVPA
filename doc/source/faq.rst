@@ -1417,6 +1417,165 @@ Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montec
         cosmo_check_dataset(ds_tfce)
 
 
+Import BrainStorm data
+----------------------
+'I have preprocessed my data using BrainStorm. How can I import time-locked and time-frequency data in CoSMoMVPA?'
+
+Currently this functionality is not included in :ref:`cosmo_meeg_dataset`, but below are some example scripts that illustrate the approach.
+
+For time-locked data:
+
+    .. code-block:: matlab
+
+        % Example script showing importing BrainStorm M/EEG time-locked data into
+        % CoSMoMVPA.
+        %
+        % The result is a CoSMoMVPA dataset structure 'ds'
+        %
+        % NNO Sep 2017
+        %
+        % Input data:
+        %   '195_trial001.mat' : contains data in FieldTrip timelock struct format,
+        %                        with data from a single trial, for 701 time points
+        %                        and 319 channels
+        %
+        %                             template_trial =
+        %
+        %                                 dimord: 'chan_time'
+        %                                    avg: [319x701 double]
+        %                                   time: [1x701 double]
+        %                                  label: {319x1 cell}
+        %                                   grad: [1x1 struct]
+        %
+        %   'out.mat'          : 3D array of size 180 x 319 x 701
+        %                           180 trials, 90 of condition A followed by
+        %                                       90 of condition B
+        %                           319 channels
+        %                           701 time points
+        %
+
+        % Indices of the trial conditions
+        % - the first 90 trials are condition A
+        % - the nextt 90 trials are condition B
+        trials_condA=1:90;
+        trials_condB=91:180;
+
+        % load all data
+        all_data=importdata('out.mat');
+
+        % get template trial
+        template_trial=load('195_trial001.mat');
+
+        % set trial condition in a vector
+        targets=NaN(numel(trials_condA)+numel(trials_condA),1);
+        targets(trials_condA)=1;
+        targets(trials_condB)=2;
+
+        % count number of trials
+        n_trials=numel(targets);
+
+        % just verify that trial count matches
+        assert(numel(targets)==size(all_data,1),'trial count mismatch');
+
+        % allocate space for output
+        ds_cell=cell(n_trials,1);
+
+        % convert each trial
+        for k=1:n_trials
+            % make a copy from the template
+            trial=template_trial;
+
+            % take data from trial
+            trial.avg(:,:)=squeeze(all_data(k,:,:));
+
+            % convert to CoSMo struct
+            ds_trial=cosmo_meeg_dataset(trial);
+
+            % all trials are assumed to be independent
+            ds_trial.sa.chunks=k;
+
+            % set condition
+            ds_trial.sa.targets=targets(k);
+
+            % since we are merging trials, this is not an average anymore
+            % (this is a bit of a hack since we're not really importing from
+            % FieldTrip, but BrainStorm sets (arguablye misleading) the single
+            % trial data as if it is an average)
+            ds_trial.a.meeg=rmfield(ds_trial.a.meeg,'samples_field');
+
+            % store dataset
+            ds_cell{k}=ds_trial;
+        end
+
+        % merge all trials into a big dataset
+        ds=cosmo_stack(ds_cell);
+
+For time-frequency data:
+
+    .. code-block:: matlab
+
+        bs_data=load('trial001_morlet_170919_0805.mat');
+
+        % Brainstorm time-frequency data import in CoSMoMVPA
+        %
+        % The script below takes data from BrainStorm representing a single trial
+        % in time-frequency space, and converts it to a CoSMoMVPA dataset
+        % structure. The contents of TFmask (representing a mask) is applied.
+        %
+        % The input data bs_data (BrainStorm data) has the following structure:
+        %
+        %     bs_data =
+        %
+        %                TF: [306x701x60 double]
+        %            TFmask: [60x701 logical]
+        %           Comment: 'Power,1-60Hz (MEG)'
+        %          DataType: 'data'
+        %              Time: [1x701 double]
+        %             Freqs: [1x60 double]
+        %          RowNames: {1x306 cell}
+        %           Measure: 'power'
+        %            Method: 'morlet'
+        %
+        %           (with some fields omitted).
+        %
+
+        % bs_data contains time-freq data from BrainStorm
+
+        tf_arr=bs_data.TF;
+        tf_msk=bs_data.TFmask;
+        n_chan=size(tf_arr,1);
+
+        % get single trial data of size 1 x Nchan x NTime x NFreq
+        tf_msk_tr=tf_msk';
+        msk=repmat(reshape(tf_msk_tr,[1 size(tf_msk_tr)]),[n_chan 1 1]);
+
+        % sanity check that mask size matches TF data size
+        assert(isequal(size(msk),size(tf_arr)));
+
+        tf_4d=reshape(tf_arr,[1 size(bs_data.TF)]);
+        msk_4d=reshape(msk,[1 size(msk)]);
+
+        % make it a dataset
+        labels={'chan','time','freq'};
+        values={bs_data.RowNames,bs_data.Time,bs_data.Freqs};
+        full_ds=cosmo_flatten(tf_4d,labels,values);
+
+        % convert mask into dataset
+        msk_ds=cosmo_flatten(msk_4d,labels,values);
+
+        % apply mask
+        ds=cosmo_slice(full_ds,msk_ds.samples,2);
+
+        % label it as meeg data
+        ds.a.meeg=struct();
+
+        % sanity check
+        cosmo_check_dataset(ds);
+
+        % illutration of mapping data to FieldTrip structure
+        data_ft=cosmo_map2meeg(ds);
+
+Note that there is no example script (yet) showing how to transform this data back into BrainStorm.
 
 
 
