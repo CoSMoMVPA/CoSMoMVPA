@@ -93,7 +93,7 @@ What does CoSMoMVPA *not* provide?
 ----------------------------------
     It does not provide (and probably never will):
 
-    + Preprocessing of data. It assumed that the data has been preprocessed using other packages (such as AFNI, SPM, or FieldTrip). For fMRI analyses, in most use-case scenarios, it is preferable to use response estimates from a General Linear Model.
+    + Preprocessing of data. It assumed that the data has been preprocessed using other packages (such as AFNI, SPM, or FieldTrip for fMRI; EEGLAB or FieldTrip for MEEG). For fMRI analyses, in most use-case scenarios, it may be preferable to use response estimates from a General Linear Model.
     + Implementations of complicated analyses (such as hyperalignment, nested cross validation, recursive feature elimination). If you want to do these, consider using PyMVPA_.
     + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing the code to perform the analyses could be considered as more instructive: it requires one to actually *think* about the analysis, rather than just clicking on buttons.
     + Pretty visualization of fMRI data. Although there is basic functionality for showing slices of fMRI data (through ``cosmo_plot_slices``, for better visualization we suggest to use either your preferred fMRI analysis package, or MRIcron_.
@@ -108,14 +108,13 @@ Does it run on GNU Octave?
 --------------------------
     Almost all functionality runs in Octave_ 3.8, including unit tests through MOxUnit_, but there may be parts that function with limitations:
 
-        - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``).
         - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
 
 
 
 How fast does it run?
 -----------------------
-    CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). The naive Bayes searchlights takes a few seconds for whole-brain fMRI per classification fold. Analyses on regions of interest are typically completed in seconds.
+    CoSMoMVPA_ is not a speed monster, but on limited hardware a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). The naive Bayes searchlights takes a few seconds for whole-brain fMRI per classification fold. Analyses on regions of interest are typically completed in seconds. Certain analysed (searchlight, multiple comparison correction) can be parallelized over multiple cores if a supported toolbox is available.
 
 What should I use as input for MVPA?
 ------------------------------------
@@ -154,12 +153,11 @@ What future features can be expected?
 -------------------------------------
     Time permitting, there are some features that may be added in the future:
 
-    + MEEG tutorial.
-    + Snippets of useful code no the website.
+    + Snippets of useful code on the website.
 
 How can I contact the developers directly?
 ------------------------------------------
-    Please send an email to a@c or b@d, where a=andrew.c.connolly, b=nikolaas.oosterhof, c=dartmouth.edu, d=unitn.it.
+    Please send an email to a@c or b@d, where a=andrew.c.connolly, b=n.n.oosterhof, c=dartmouth.edu, googlemail.com.
 
 Is there a mailinglist?
 -----------------------
@@ -1513,8 +1511,6 @@ For time-locked data:
 For time-frequency data:
 
     .. code-block:: matlab
-
-        bs_data=load('trial001_morlet_170919_0805.mat');
 
         % Brainstorm time-frequency data import in CoSMoMVPA
         %
