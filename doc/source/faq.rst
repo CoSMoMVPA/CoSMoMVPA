@@ -1195,9 +1195,11 @@ Note the advantage of a (signed) t-test over an (always positive) F value: the t
 
 Use a FieldTrip source dataset that uses a 'fake' channel structure
 -------------------------------------------------------------------
-'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is ``src_ft = ``
+'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is
 
    .. code-block:: text
+
+        src_ft =
 
             label: {2982x1 cell}
            dimord: 'chan_freq_time'
@@ -1206,9 +1208,11 @@ Use a FieldTrip source dataset that uses a 'fake' channel structure
         powspctrm: [2982x25x15 double]
               cfg: [1x1 struct]
 
-where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using a ``template_grid =``
+where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using
 
    .. code-block:: text
+
+        template_grid =`
 
          xgrid: [-8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
          ygrid: [-11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
