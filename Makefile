@@ -279,6 +279,4 @@ fast: html
 
 
 
-remote: html html-zip-archive html-targz-archive
-
 clean: clean-html
