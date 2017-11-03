@@ -908,7 +908,8 @@ Use ``sprintf`` or ``fprint`` when formatting strings
 
     .. code-block:: matlab
 
-        fprintf('Accuracy for %s is %.3f +/- %.3f\n', label, mean_value, std_value);
+        fprintf('Accuracy for %s is %.3f +/- %.3f\n', ...
+                            label, mean_value, std_value);
 
 
     *Note*: newer Matlab versions provide ``strjoin``, but for compatibility reasons with older versions, an alternative implementation is provided as ``cosmo_strjoin``.
@@ -1007,7 +1008,7 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. (Note: this requires Matlab's xunit). Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``>``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. This uses the MOdox_ framework. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``%|| ``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 
@@ -1042,17 +1043,17 @@ Some general features that make tests good:
 - modular: test one particular function (for unit tests), or whether multiple functions work together as expected (integration test)
 - no data dependencies: tests that use data as input should generate this data themselves. The :ref:`cosmo_synthetic_dataset` function can generate data in various modalities and parameters. We aim to not include binary files for testing. For example, some of our input and output tests actually generate files in AFNI, NIFTI, GIFTI and BrainVoyager format.
 
-We also like *fast* tests, because it allows running all tests, or a significant subset, in a short amount of time. This gives quick feedback to the developer whether code works or not, allowing for data-driven development techniques. It also scales well: imagine running 500 tests and each test takes 5 minutes: the suite would take more than a day and a half to run! But even half a minute per test would make take 4 hours, a very long time between implementing a change and getting feedback whether the suite passes.
+We also like *fast* tests, because it allows running all tests, or a significant subset, in a short amount of time. This gives quick feedback to the developer whether code works or not, allowing for data-driven development techniques. It also scales well: imagine running 500 tests and each test takes 5 minutes: the suite would take more than a day and a half to run! But even half a minute per test would make take 4 hours, which can be used to drink lots of cups of coffee between implementing a change and getting feedback whether the suite passes.
 
-What is fast then? When running on the Matlab platform (which typically runs a bit faster than Octave), here some rule of thumb for the runtime ``t`` of a test:
+What is fast then? Running on the Matlab platform (which typically runs a bit faster than Octave), here are some rule of thumb for the runtime ``t`` of a test:
 
 - ``t < 100 ms``: excellent.
 - ``100 ms < t < 1 s``: ok.
 - ``1 s < t < 5 s``: borderline acceptable but not preferred.
 - ``5 s < t < 60 s``: acceptable only in exceptional cases.
-- ``t > > 60 s``: generally not acceptable.
+- ``t > 60 s``: generally not acceptable.
 
-One important principle in writing fast tests is using small data, as this generally reduces computation time for most functions. To estimate the runtime for a tests, you can use ``moxunit_runtsts`` with the ``verbose`` option.
+One important principle in writing fast tests is using small data, as this generally reduces computation time for most functions. To estimate the runtime for tests, you can use ``moxunit_runtests`` with the ``verbose`` option.
 
 For examples of tests, see the ``test`` directory.
 

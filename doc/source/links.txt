@@ -26,6 +26,7 @@
 .. |Matlab(TM)| unicode:: MATLAB U+00AE
 .. _Matlab statistics: http://www.mathworks.it/products/statistics/
 .. _MOcov: https://github.com/MOcov/MOcov
+.. _MOdox: https://github.com/MOdox/MOdox
 .. _MOxUnit: https://github.com/MOxUnit/MOxUnit
 .. _MRIcron: http://www.nitrc.org/projects/mricron
 .. _NeuroElf: http://neuroelf.net

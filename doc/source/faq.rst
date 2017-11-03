@@ -93,7 +93,7 @@ What does CoSMoMVPA *not* provide?
 ----------------------------------
     It does not provide (and probably never will):
 
-    + Preprocessing of data. It assumed that the data has been preprocessed using other packages (such as AFNI, SPM, or FieldTrip). For fMRI analyses, in most use-case scenarios, it is preferable to use response estimates from a General Linear Model.
+    + Preprocessing of data. It assumed that the data has been preprocessed using other packages (such as AFNI, SPM, or FieldTrip for fMRI; EEGLAB or FieldTrip for MEEG). For fMRI analyses, in most use-case scenarios, it may be preferable to use response estimates from a General Linear Model.
     + Implementations of complicated analyses (such as hyperalignment, nested cross validation, recursive feature elimination). If you want to do these, consider using PyMVPA_.
     + A Graphical User Interface (GUI). First, it's a lot of work to build such a thing. Second, writing the code to perform the analyses could be considered as more instructive: it requires one to actually *think* about the analysis, rather than just clicking on buttons.
     + Pretty visualization of fMRI data. Although there is basic functionality for showing slices of fMRI data (through ``cosmo_plot_slices``, for better visualization we suggest to use either your preferred fMRI analysis package, or MRIcron_.
@@ -108,14 +108,13 @@ Does it run on GNU Octave?
 --------------------------
     Almost all functionality runs in Octave_ 3.8, including unit tests through MOxUnit_, but there may be parts that function with limitations:
 
-        - Unit tests require MOxUnit_ (because xUnit_ uses object-oriented features not supported by Octave_), and doc-tests are not supported in MOxUnit_ (because Octave_ does not provide ``evalc_``).
         - BrainVoyager_ support through NeuroElf_ is not supported, because NeuroElf_ uses object-oriented features not supported by Octave_.
 
 
 
 How fast does it run?
 -----------------------
-    CoSMoMVPA_ is not a speed monster, but on our hardware (Macbook Pro early 2012) a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). The naive Bayes searchlights takes a few seconds for whole-brain fMRI per classification fold. Analyses on regions of interest are typically completed in seconds.
+    CoSMoMVPA_ is not a speed monster, but on limited hardware a searchlight using typical fMRI data takes one minute for simple analyses (correlation split-half), and a few minutes for more advanced analyses (classifier with cross-validation). The naive Bayes searchlights takes a few seconds for whole-brain fMRI per classification fold. Analyses on regions of interest are typically completed in seconds. Certain analysed (searchlight, multiple comparison correction) can be parallelized over multiple cores if a supported toolbox is available.
 
 What should I use as input for MVPA?
 ------------------------------------
@@ -154,12 +153,11 @@ What future features can be expected?
 -------------------------------------
     Time permitting, there are some features that may be added in the future:
 
-    + MEEG tutorial.
-    + Snippets of useful code no the website.
+    + Snippets of useful code on the website.
 
 How can I contact the developers directly?
 ------------------------------------------
-    Please send an email to a@c or b@d, where a=andrew.c.connolly, b=nikolaas.oosterhof, c=dartmouth.edu, d=unitn.it.
+    Please send an email to a@c or b@d, where a=andrew.c.connolly, b=n.n.oosterhof, c=dartmouth.edu, googlemail.com.
 
 Is there a mailinglist?
 -----------------------
@@ -1195,9 +1193,11 @@ Note the advantage of a (signed) t-test over an (always positive) F value: the t
 
 Use a FieldTrip source dataset that uses a 'fake' channel structure
 -------------------------------------------------------------------
-'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is ``src_ft = ``
+'I use an analysis pipeline where MEEG source data in MNI space is represented (faked) as a sensor-like structure [such as done by some at CIMeC, Trento; or University of Salzberg, Austria]. In particular, the FieldTrip dataset structure is
 
    .. code-block:: text
+
+        src_ft =
 
             label: {2982x1 cell}
            dimord: 'chan_freq_time'
@@ -1206,9 +1206,11 @@ Use a FieldTrip source dataset that uses a 'fake' channel structure
         powspctrm: [2982x25x15 double]
               cfg: [1x1 struct]
 
-where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using a ``template_grid =``
+where the labels are strings from ``'1'`` to ``'2972'``. These labels refer to positions in source space using
 
    .. code-block:: text
+
+        template_grid =`
 
          xgrid: [-8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
          ygrid: [-11 -10 -9 -8 -7 -6 -5 -4 -3 -2 -1 0 1 2 3 4 5 6 7 8]
@@ -1422,6 +1424,163 @@ This is explained well in :cite:`DK17`:
 
 
 
+Import BrainStorm data
+----------------------
+'I have preprocessed my data using BrainStorm. How can I import time-locked and time-frequency data in CoSMoMVPA?'
+
+Currently this functionality is not included in :ref:`cosmo_meeg_dataset`, but below are some example scripts that illustrate the approach.
+
+For time-locked data:
+
+    .. code-block:: matlab
+
+        % Example script showing importing BrainStorm M/EEG time-locked data into
+        % CoSMoMVPA.
+        %
+        % The result is a CoSMoMVPA dataset structure 'ds'
+        %
+        % NNO Sep 2017
+        %
+        % Input data:
+        %   '195_trial001.mat' : contains data in FieldTrip timelock struct format,
+        %                        with data from a single trial, for 701 time points
+        %                        and 319 channels
+        %
+        %                             template_trial =
+        %
+        %                                 dimord: 'chan_time'
+        %                                    avg: [319x701 double]
+        %                                   time: [1x701 double]
+        %                                  label: {319x1 cell}
+        %                                   grad: [1x1 struct]
+        %
+        %   'out.mat'          : 3D array of size 180 x 319 x 701
+        %                           180 trials, 90 of condition A followed by
+        %                                       90 of condition B
+        %                           319 channels
+        %                           701 time points
+        %
+
+        % Indices of the trial conditions
+        % - the first 90 trials are condition A
+        % - the nextt 90 trials are condition B
+        trials_condA=1:90;
+        trials_condB=91:180;
+
+        % load all data
+        all_data=importdata('out.mat');
+
+        % get template trial
+        template_trial=load('195_trial001.mat');
+
+        % set trial condition in a vector
+        targets=NaN(numel(trials_condA)+numel(trials_condA),1);
+        targets(trials_condA)=1;
+        targets(trials_condB)=2;
+
+        % count number of trials
+        n_trials=numel(targets);
+
+        % just verify that trial count matches
+        assert(numel(targets)==size(all_data,1),'trial count mismatch');
+
+        % allocate space for output
+        ds_cell=cell(n_trials,1);
+
+        % convert each trial
+        for k=1:n_trials
+            % make a copy from the template
+            trial=template_trial;
+
+            % take data from trial
+            trial.avg(:,:)=squeeze(all_data(k,:,:));
+
+            % convert to CoSMo struct
+            ds_trial=cosmo_meeg_dataset(trial);
+
+            % all trials are assumed to be independent
+            ds_trial.sa.chunks=k;
+
+            % set condition
+            ds_trial.sa.targets=targets(k);
+
+            % since we are merging trials, this is not an average anymore
+            % (this is a bit of a hack since we're not really importing from
+            % FieldTrip, but BrainStorm sets (arguablye misleading) the single
+            % trial data as if it is an average)
+            ds_trial.a.meeg=rmfield(ds_trial.a.meeg,'samples_field');
+
+            % store dataset
+            ds_cell{k}=ds_trial;
+        end
+
+        % merge all trials into a big dataset
+        ds=cosmo_stack(ds_cell);
+
+For time-frequency data:
+
+    .. code-block:: matlab
+
+        % Brainstorm time-frequency data import in CoSMoMVPA
+        %
+        % The script below takes data from BrainStorm representing a single trial
+        % in time-frequency space, and converts it to a CoSMoMVPA dataset
+        % structure. The contents of TFmask (representing a mask) is applied.
+        %
+        % The input data bs_data (BrainStorm data) has the following structure:
+        %
+        %     bs_data =
+        %
+        %                TF: [306x701x60 double]
+        %            TFmask: [60x701 logical]
+        %           Comment: 'Power,1-60Hz (MEG)'
+        %          DataType: 'data'
+        %              Time: [1x701 double]
+        %             Freqs: [1x60 double]
+        %          RowNames: {1x306 cell}
+        %           Measure: 'power'
+        %            Method: 'morlet'
+        %
+        %           (with some fields omitted).
+        %
+
+        % bs_data contains time-freq data from BrainStorm
+
+        tf_arr=bs_data.TF;
+        tf_msk=bs_data.TFmask;
+        n_chan=size(tf_arr,1);
+
+        % get single trial data of size 1 x Nchan x NTime x NFreq
+        tf_msk_tr=tf_msk';
+        msk=repmat(reshape(tf_msk_tr,[1 size(tf_msk_tr)]),[n_chan 1 1]);
+
+        % sanity check that mask size matches TF data size
+        assert(isequal(size(msk),size(tf_arr)));
+
+        tf_4d=reshape(tf_arr,[1 size(bs_data.TF)]);
+        msk_4d=reshape(msk,[1 size(msk)]);
+
+        % make it a dataset
+        labels={'chan','time','freq'};
+        values={bs_data.RowNames,bs_data.Time,bs_data.Freqs};
+        full_ds=cosmo_flatten(tf_4d,labels,values);
+
+        % convert mask into dataset
+        msk_ds=cosmo_flatten(msk_4d,labels,values);
+
+        % apply mask
+        ds=cosmo_slice(full_ds,msk_ds.samples,2);
+
+        % label it as meeg data
+        ds.a.meeg=struct();
+
+        % sanity check
+        cosmo_check_dataset(ds);
+
+        % illutration of mapping data to FieldTrip structure
+        data_ft=cosmo_map2meeg(ds);
+
+Note that there is no example script (yet) showing how to transform this data back into BrainStorm.
 
 
 
