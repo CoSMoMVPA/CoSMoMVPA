@@ -52,7 +52,9 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  computing the pairwise distances for all samples in ds.
 %                  This is generally recommended but is not the default in
 %                  order to avoid breaking behavaiour from earlier
-%                  versions.
+%                  versions. For a rationale why this is recommendable, see
+%                  the Diedrichsen & Kriegeskorte article (below in
+%                  references)
 %                  Default: false
 %
 % Output:
@@ -147,6 +149,12 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %     case their value, as well as the corresponding location in the
 %     dataset's samples, are ignored. Masking is done prior to z-score
 %     normalization.
+%
+% Reference:
+%   - Diedrichsen, J., & Kriegeskorte, N. (2017). Representational
+%     models: A common framework for understanding encoding,
+%     pattern-component, and representational-similarity analysis.
+%     PLoS computational biology, 13(4), e1005508.
 %
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #

@@ -1412,6 +1412,15 @@ Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montec
         ds_tfce.samples=combined_z;
         cosmo_check_dataset(ds_tfce)
 
+Why should I consider re-meaning when doing representational similarity analysis (RSA)?
+---------------------------------------------------------------------------------------
+'In the * :ref:`cosmo_target_dsm_corr_measure` *documentation it is recommended to subtract the mean activity pattern first. Why is this recommended?'
+
+This is explained well in :cite:`DK17`:
+
+    `Activity estimates commonly co-vary together across fMRI imaging runs, because all activity estimates within a partition are measured relative to the same resting baseline. This positive correlation can be reduced by subtracting, within each partition, the mean activity pattern (across conditions) from each activity pattern. This makes the mean of each measurement channel (across condition) zero and thus centers the ensemble of points in activity-pattern space that is centered on the origin.'
+
+
 
 
 
