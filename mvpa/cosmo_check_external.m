@@ -557,10 +557,16 @@ function tf=has_octave_package(label)
         return;
     end
 
-    result=pkg('list',label);
+    result=pkg('list');
     if isempty(result)
         return;
     end
+
+    idx_label=find(cellfun(@(x) strcmp(x.name,label),result));
+    if isempty(idx_label)
+        return;
+    end
+    result=result(idx_label);
 
     assert(numel(result)==1);
 
