@@ -1,7 +1,7 @@
 function ds=cosmo_surface_dataset(fn, varargin)
 % Returns a dataset structure based on surface mesh data
 %
-% ds=cosmo_meeg_dataset(filename, varargin)
+% ds=cosmo_surface_dataset(filename, varargin)
 %
 % Inputs:
 %   filename          filename of surface data to be loaded. Currently
