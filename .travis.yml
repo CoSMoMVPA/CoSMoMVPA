@@ -5,8 +5,8 @@
 # We pretend to be java because we need GNU Octave which is not 
 # available (as of April 2015)
 
-
 language: java
+dist: trusty
 cache:
   - apt
 env:
