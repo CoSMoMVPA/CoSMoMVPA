@@ -19,14 +19,14 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %
 % Output:
 %    ds_sa            Struct with fields:
-%      .samples       Nx1 flattened upper triangle of a dissimilarity
+%      .samples       Nx1 flattened lower triangle of a dissimilarity
 %                     matrix as returned by [cosmo_]pdist, where
 %                     N=P*(P-1)/2 is the number of pairwise distances
 %                     between all samples in the dataset.
 %      .a.sdim.labels Set to
 %      .sa            Struct with field:
 %        .targets1    } Nx1 vectors indicating the pairs of indices in the
-%        .targets2    } upper part of the square form of the dissimilarity
+%        .targets2    } lower part of the square form of the dissimilarity
 %                       matrix. if .dsm_pairs(k,:)==[i,j] then .samples(k)
 %                     the dissimlarity between the i-th and j-th sample
 %                     target.

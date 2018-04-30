@@ -11,7 +11,7 @@ function d=cosmo_pdist(x, distance)
 %
 % Outputs:
 %   d            1xN row vector with pairwise distances, where N=M*(M-1),
-%                containing the distances of the lower diagonal of the
+%                containing the distances of the lower triangle of the
 %                distance matrix
 %
 % Examples:
