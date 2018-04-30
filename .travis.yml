@@ -156,10 +156,10 @@ install:
     # Load all Octave packages (auto-load option removed in Octave 4.2)
     - for e in $EXTERNALS; do
 	if [[ "$e" == octave_pkg* ]]; then
-		nm=`echo $e | cut -f3 -d'_'`
-		echo "pkg load $nm" >> $OCTAVERC
-	fi
-        done
+		nm=`echo $e | cut -f3 -d'_'`;
+		echo "pkg load $nm" >> $OCTAVERC;
+	fi;
+      done
 
 
     # optionally install surfing toolbox
