@@ -6,7 +6,6 @@
 # available (as of April 2015)
 
 language: java
-dist: precise
 cache:
   - apt
 env:
@@ -15,13 +14,6 @@ env:
   matrix:
     - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true  NO_DOC_TEST=true
 before_install:
     # to prevent IPv6 being used for APT
@@ -38,13 +30,8 @@ before_install:
 
     # when installing externals, get recent GCC for Octave parallel toolbox
     - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
-          travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
-          travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
-          travis_retry sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20;
-          travis_retry sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20;
-          travis_retry sudo update-alternatives --config gcc;
-          travis_retry sudo update-alternatives --config g++;
+          travis_retry sudo apt-get install gcc g++ -y -q;
           travis_retry sudo apt-get install gcc-multilib;
           travis_retry sudo apt-get install libgomp1;
           c++ --version;
@@ -118,7 +105,6 @@ install:
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
-                     octave_savannah_evalc
                     ";
       fi
 
@@ -163,6 +149,14 @@ install:
     ## - if [[ " $EXTERNALS " = *" octave_pkg_parallel "* ]]; then
     ##       $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','parallel');";
     ##  fi
+
+    # Load all Octave packages (auto-load option removed in Octave 4.2)
+    - for e in $EXTERNALS; do
+	if [[ "$e" == octave_pkg* ]]; then
+		nm=`echo $e | cut -f3 -d'_'`;
+		echo "pkg load $nm" >> $OCTAVERC;
+	fi;
+      done
 
 
     # optionally install surfing toolbox
