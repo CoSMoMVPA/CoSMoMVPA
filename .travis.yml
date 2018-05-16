@@ -31,7 +31,6 @@ before_install:
 
     # when installing externals, get recent GCC for Octave parallel toolbox
     - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
-          travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
           travis_retry sudo apt-get install gcc g++ -y -q;
           travis_retry sudo apt-get install gcc-multilib;
