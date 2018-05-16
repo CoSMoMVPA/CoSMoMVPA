@@ -106,7 +106,6 @@ install:
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
-                     octave_savannah_evalc
                     ";
       fi
 
