@@ -6,7 +6,7 @@
 # available (as of April 2015)
 
 language: java
-dist: precise
+dist: trusty
 cache:
   - apt
 env:
@@ -118,7 +118,6 @@ install:
                      octave_pkg_parallel
                      octave_pkg_statistics
                      octave_pkg_miscellaneous
-                     octave_savannah_evalc
                     ";
       fi
 
@@ -250,14 +249,6 @@ before_script:
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
           $RETRY sudo apt-get -y -qq install units;
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
-      fi
-
-
-    # optionally enable experimental evalc implementation
-    - if [[ " $EXTERNALS " = *" octave_savannah_evalc "* ]]; then
-          mkdir savannah_evalc;
-          $RETRY wget -O savannah_evalc/evalc.cc https://savannah.gnu.org/patch/download.php?file_id=34015;
-          $RETRY $OCTAVE --eval "cd('savannah_evalc');mkoctfile('evalc.cc');addpath(pwd);savepath();";
       fi
 
     # show Octave-rc
