@@ -71,7 +71,7 @@ function test_onesample_ttest_mccs_no_tail
 
 
 function helper_test_mccs_with_tail(left_tail,right_tail)
-    nchunks=ceil(rand()*10)+10;
+    nchunks=ceil(rand()*5)+20;
     ds=cosmo_synthetic_dataset('size','big',...
                                 'nchunks',nchunks,...
                                 'ntargets',1);
