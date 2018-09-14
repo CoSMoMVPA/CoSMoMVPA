@@ -317,9 +317,6 @@ function result=run_with_worker(worker_opt)
         end
 
         if show_progress
-            msg=sprintf('%d / %d', k*ntest, ntrain*ntest);
-            prev_progress_msg=cosmo_show_progress(clock_start, ...
-                            k/ntrain, msg, prev_progress_msg);
             if nworkers>1
                 if k==ntrain
                     % other workers may be slower than first worker
