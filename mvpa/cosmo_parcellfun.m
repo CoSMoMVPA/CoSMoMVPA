@@ -34,7 +34,7 @@ function result=cosmo_parcellfun(nproc,func,arg_cell,varargin)
     if narg_cell==1
         nproc_to_use=1;
     else
-        nproc_available=cosmo_parallel_get_nproc_available();
+        nproc_available=cosmo_parallel_get_nproc_available(opt);
         nproc_to_use=min([nproc,narg_cell,nproc_available]);
     end
 
