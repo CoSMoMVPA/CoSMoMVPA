@@ -1645,9 +1645,35 @@ You could use the function below.
             f_merged = cat(1,f_s{:});
 
 
+Compute the correlation between two dissimilarity matrices
+----------------------------------------------------------
+'I would like to correlate behavioural ratings with a theoretical model, how can I do this'
 
+You can use the example below to correlate two dissimilarity matrices; these can also be
 
+    .. code-block:: matlab
 
+        % two dissimilarity matrices
+        x_dsm = [0 1 3 2;
+                 1 0 3 4;
+                 3 3 0 1;
+                 2 4 1 0];
+
+        y_dsm = [0 5 3 1;
+                 5 0 1 2;
+                 3 1 0 0;
+                 1 2 0 0];
+
+        % convert to linear vectors
+        x_vec = squareform(x_dsm);
+        y_vec = squareform(y_dsm);
+
+        % compute Spearman correlation between the matrices
+        % ( - for non-Parametric Spearman correlations, use 'Spearman'.)
+        % ( - Matlab's corr can be used instead)
+        r = cosmo_corr(x_vec(:), y_vec(:), 'Pearson')
+
+For analysis at the group level, compute for each participant the correlation between their behavioural ratings, then use a one-sample t-test against a difference of zero.
 
 
 .. include:: links.txt
