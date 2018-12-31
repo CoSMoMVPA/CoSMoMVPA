@@ -54,5 +54,5 @@ Hint: :ref:`run_rsm_measure_searchlight_skl`
 
 Solution: :ref:`run_rsm_measure_searchlight` / run_rsm_measure_searchlight_pb_
 
-.. _run_rsm_measure_searchlight_pb: _static/publish/run_rmm_measure_searchlight.html
+.. _run_rsm_measure_searchlight_pb: _static/publish/run_rsm_measure_searchlight.html
 
