@@ -22,6 +22,10 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %                       assumed that splits of the dataset by dimension d
 %                       have corresponding elements in the same order
 %                       (such as provided by cosmo_dim_transpose).
+%   'nproc', np         Use np parallel threads. (Multiple threads may
+%                       speed up computations). If parallel processing is 
+%                       not available, or if this option is not provided, 
+%                       then a single thread is used.
 %   K,V                 any other key-value pairs necessary for the measure
 %                       m, for example 'classifier' if
 %                       m=@cosmo_crossvalidation_measure.
@@ -172,6 +176,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     defaults.radius=0;
     defaults.progress=1;
     defaults.check_partitions=false;
+    defaults.nproc=1;
     opt=cosmo_structjoin(defaults,varargin);
 
     cosmo_check_dataset(ds);
@@ -185,7 +190,68 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     [test_values,test_splits]=split_half_by_dimension(halves{2},opt);
 
     halves=[]; % let GC do its work
+    
+    % get number of processes available
+    nproc_available=cosmo_parallel_get_nproc_available(opt);
+    
+    % Matlab needs newline character at progress message to show it in
+    % parallel mode; Octave should not have newline character
+    environment=cosmo_wtf('environment');
+    progress_suffix=get_progress_suffix(environment);
+        
+    % split training data in multiple parts, so that each thread can do a
+    % subset of all the work
+    % set options for each worker process
+    worker_opt_cell=cell(1,nproc_available);
+    block_size=ceil(length(train_values)/nproc_available);
+    first=1;
+    for p=1:nproc_available
+        last=min(first+block_size-1,length(train_values));
+        block_idxs=first:last;
+        
+        worker_opt=struct();
+        worker_opt.train_splits=train_splits(block_idxs);
+        worker_opt.train_values=train_values(block_idxs);
+        worker_opt.train_values_ori=train_values;
+        worker_opt.train_values_idx=block_idxs;
+        worker_opt.test_splits=test_splits;
+        worker_opt.test_values=test_values;
+        worker_opt.opt=opt;
+        worker_opt.worker_id=p;
+        worker_opt.nworkers=nproc_available;
+        worker_opt.progress=opt.progress;
+        worker_opt.progress_suffix=progress_suffix;
+        worker_opt_cell{p}=worker_opt;
+        first=last+1;
+    end
 
+    % Run process for each worker in parallel
+    % Note that when using nproc=1, cosmo_parcellfun does actually not
+    % use any parallellization; the result is a cell with a single element.
+    result_map_cell=cosmo_parcellfun(opt.nproc,...
+                                     @run_with_worker,...
+                                    worker_opt_cell,...
+                                    'UniformOutput',false);
+    
+    result=cosmo_stack(result_map_cell,1);
+    cosmo_check_dataset(result);
+    
+    
+function result=run_with_worker(worker_opt)
+% run dimgen using the options in worker_opt
+
+    train_splits = worker_opt.train_splits;
+    train_values = worker_opt.train_values;
+    train_values_ori = worker_opt.train_values_ori;
+    train_values_idx = worker_opt.train_values_idx;
+    test_splits = worker_opt.test_splits;
+    test_values = worker_opt.test_values;
+    opt = worker_opt.opt;
+    worker_id=worker_opt.worker_id;
+    nworkers=worker_opt.nworkers;
+    progress=worker_opt.progress;
+    progress_suffix=worker_opt.progress_suffix;
+    
     % set partitions in case a crossvalidation or correlation measure is
     % used
     ntrain_elem=cellfun(@(x)size(x.samples,1),train_splits);
@@ -205,7 +271,9 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     test_label=['test_' dimension];
 
     % see if progress has to be shown
-    show_progress=~isempty(opt.progress) && opt.progress;
+    show_progress=~isempty(progress) && ...
+                        progress && ...
+                        worker_id==1;
     if show_progress
         prev_progress_msg='';
         clock_start=clock();
@@ -239,7 +307,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 
             % set dimension attributes
             nsamples=size(ds_result.samples,1);
-            ds_result.sa.(train_label)=repmat(k,nsamples,1);
+            ds_result.sa.(train_label)=repmat(train_values_idx(k),...
+                                            nsamples,1);
             ds_result.sa.(test_label)=repmat(j,nsamples,1);
 
             % store result
@@ -248,7 +317,22 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
         end
 
         if show_progress
-            msg=sprintf('%d / %d', k*ntest, ntrain*ntest);
+            if nworkers>1
+                if k==ntrain
+                    % other workers may be slower than first worker
+                    msg=sprintf(['worker %d has completed; waiting for '...
+                                    'other workers to finish...%s'],...
+                                    worker_id, progress_suffix);
+                else
+                    % can only show progress from a single worker;
+                    % therefore show progress of first worker
+                    msg=sprintf('for worker %d / %d%s', worker_id, ...
+                                    nworkers, progress_suffix);
+                end
+            else
+                % no specific message
+                msg='';
+            end
             prev_progress_msg=cosmo_show_progress(clock_start, ...
                             k/ntrain, msg, prev_progress_msg);
         end
@@ -263,7 +347,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 
     % set dimension attributes in the sample dimension
     result=add_sample_attr(result, {train_label;test_label},...
-                                    {train_values;test_values});
+                                    {train_values_ori;test_values});
 
 
 
@@ -364,3 +448,13 @@ function ds=remove_fa_field(ds,label)
         ds.a.(dim_name)=sfdim;
     end
 
+function suffix=get_progress_suffix(environment)
+    % Matlab needs newline character at progress message to show it in
+    % parallel mode; Octave should not have newline character
+
+    switch environment
+        case 'matlab'
+            suffix=sprintf('\n');
+        case 'octave'
+            suffix='';
+    end
