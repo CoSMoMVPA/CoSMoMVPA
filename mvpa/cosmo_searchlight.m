@@ -166,7 +166,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
                                                     nproc_available);
 
     % if we have more processes than parts, run on limited threads
-   	nproc_used = min(numel(nbrhood_cell),nproc_available);
+   	nproc_used=min(numel(nbrhood_cell),nproc_available);
                                                 
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
@@ -341,7 +341,7 @@ function nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,nproc)
     ncenters=numel(center_ids);
 
     block_size=ceil(ncenters/nproc);
-    nproc_used = ceil(ncenters/block_size);
+    nproc_used=ceil(ncenters/block_size);
     nbrhood_cell=cell(nproc_used,1);
 
     first=1;
