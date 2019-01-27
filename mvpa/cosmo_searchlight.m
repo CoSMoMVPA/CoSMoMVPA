@@ -165,20 +165,23 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
     nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,...
                                                     nproc_available);
 
+    % if we have more processes than parts, run on limited threads
+   	nproc_used=min(numel(nbrhood_cell),nproc_available);
+                                                
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
     environment=cosmo_wtf('environment');
     progress_suffix=get_progress_suffix(environment);
 
     % set options for each worker process
-    worker_opt_cell=cell(1,nproc_available);
-    for p=1:nproc_available
+    worker_opt_cell=cell(1,nproc_used);
+    for p=1:nproc_used
         worker_opt=struct();
         worker_opt.ds=ds;
         worker_opt.measure=measure;
         worker_opt.measure_opt=measure_opt;
         worker_opt.worker_id=p;
-        worker_opt.nworkers=nproc_available;
+        worker_opt.nworkers=nproc_used;
         worker_opt.progress=sl_opt.progress;
         worker_opt.progress_suffix=progress_suffix;
         worker_opt.nbrhood=nbrhood_cell{p};
@@ -338,10 +341,11 @@ function nbrhood_cell=split_nbrhood_for_workers(nbrhood,center_ids,nproc)
     ncenters=numel(center_ids);
 
     block_size=ceil(ncenters/nproc);
-    nbrhood_cell=cell(nproc,1);
+    nproc_used=ceil(ncenters/block_size);
+    nbrhood_cell=cell(nproc_used,1);
 
     first=1;
-    for block=1:nproc
+    for block=1:nproc_used
         last=min(first+block_size-1,ncenters);
         block_idxs=first:last;
 
