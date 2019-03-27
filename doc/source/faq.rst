@@ -1685,7 +1685,7 @@ Please see the code below for an example. It is similar to the documentation of 
 
         % Generalization over time
 
-        % Make some synthetic datat
+        % Make some synthetic data
         sz='big';
         train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
                                                'nchunks',2,'seed',1);
