@@ -3,7 +3,7 @@
 # based on nipype configuration, which in turn was based on nipy)
 #
 # We pretend to be java because we need GNU Octave which is not 
-# available (as of April 2015)
+# available (as of June 2019)
 
 language: java
 dist: xenial
