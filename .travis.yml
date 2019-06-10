@@ -75,7 +75,7 @@ before_install:
     # retrieve MOxUnit
     - rm -rf MOxUnit
     - travis_retry git clone -v git://github.com/MOxUnit/MOxUnit.git
-    - make -C MOxUnit install
+    - make -d -C MOxUnit install
 
     # retrieve MOdox
     - rm -rf MOdox
