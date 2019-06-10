@@ -241,7 +241,7 @@ before_script:
 
     # optionally enable Octave statistics package
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
+          $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
       fi
 
     # optionally enable Octave miscellaneous package
