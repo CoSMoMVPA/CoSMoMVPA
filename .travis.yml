@@ -36,6 +36,7 @@ before_install:
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
     - octave --version
+    - which make
 
     # when installing externals, get recent GCC for Octave parallel toolbox
     - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
