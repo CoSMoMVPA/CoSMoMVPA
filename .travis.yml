@@ -13,7 +13,7 @@ env:
   global:
     - COVERALLS_PARALLEL=true
   matrix:
-    - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    # - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
     # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
@@ -39,7 +39,7 @@ before_install:
     - which make
 
     # when installing externals, get recent GCC for Octave parallel toolbox
-    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
+    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "trueDISABLED" ]]; then
           travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
           travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
