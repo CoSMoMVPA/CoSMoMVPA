@@ -132,6 +132,8 @@ Where:
 
 - Magdeburg, Germany; Universitätsplatz campus, Gebäude 28, room 27
 
+For dinner and other information, see: https://www.noesseltlab.org/events-presentations/3rd-modelling-symposium-1/
+
 
 
 ============== ===================================================================================================
