@@ -1675,5 +1675,56 @@ You can use the example below to correlate two dissimilarity matrices; these can
 
 For analysis at the group level, compute for each participant the correlation between their behavioural ratings, then use a one-sample t-test against a difference of zero.
 
+Use the generalization measure with different durations for training and test set?
+----------------------------------------------------------------------------------
+'I would like to use the :ref:`cosmo_dim_generalization_measure` but with different time intervals for training and test set. For the training set I have 3 seconds of data per trial, but for the test set only 1 second. How can I run this analysis.'
+
+Please see the code below for an example. It is similar to the documentation of :ref:`cosmo_dim_generalization_measure`, except that in the preparation phase the :ref:`cosmo_dim_transpose`  step is done before the :ref:`cosmo_stack` step. This order is also necessary when using :ref:`cosmo_searchlight`.
+
+    .. code-block:: matlab
+
+        % Generalization over time
+
+        % Make some synthetic data
+        sz='big';
+        train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                               'nchunks',2,'seed',1);
+        test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                               'nchunks',3,'seed',2);
+
+        % select a smaller time period for the testing dataset
+        % here, only the time period between -0.15 and 0.05 seconds is selected
+        msk=cosmo_dim_match(test_ds, 'time', @(t) -0.15 <= t & t <= .05);
+        smaller_test_ds = cosmo_slice(test_ds, msk, 2);
+
+        % set chunks
+        train_ds.sa.chunks(:)=1;
+        smaller_test_ds.sa.chunks(:)=2;
+
+        % make time a sample dimension
+        dim_label='time';
+        train_ds_tr = cosmo_dim_transpose(train_ds, dim_label, 1);
+        smaller_test_ds_tr = cosmo_dim_transpose(smaller_test_ds, dim_label, 1);
+
+        % construct the dataset
+        ds_time=cosmo_stack({train_ds_tr, smaller_test_ds_tr});
+
+        %
+        % set measure and its arguments
+        measure_args=struct();
+        %
+        % use correlation measure
+        measure_args.measure=@cosmo_correlation_measure;
+        % dimension of interest is 'time'
+        measure_args.dimension=dim_label;
+        %
+        % run time-by-time generalization analysis
+        dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args,...
+                                                'progress',false);
+        %
+        % the output has train_time and test_time as sample dimensions
+        cosmo_disp(dgm_ds.a)
+
+
 
 .. include:: links.txt
