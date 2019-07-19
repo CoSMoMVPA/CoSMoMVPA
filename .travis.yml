@@ -3,10 +3,10 @@
 # based on nipype configuration, which in turn was based on nipy)
 #
 # We pretend to be java because we need GNU Octave which is not 
-# available (as of April 2015)
+# available (as of June 2019)
 
 language: java
-dist: trusty
+dist: xenial
 cache:
   - apt
 env:
@@ -14,15 +14,15 @@ env:
     - COVERALLS_PARALLEL=true
   matrix:
     - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
-    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=4 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=5 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=6 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=7 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
+    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=8 PARTITION_COUNT=8 TRAVIS_AFTER_ALL_ARGS='--is_master' COVERALLS_PARALLEL=true  NO_DOC_TEST=true
 before_install:
     # to prevent IPv6 being used for APT
     - sudo bash -c "echo 'Acquire::ForceIPv4 \"true\";' > /etc/apt/apt.conf.d/99force-ipv4"
@@ -35,9 +35,11 @@ before_install:
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
+    - octave --version
+    - which make
 
     # when installing externals, get recent GCC for Octave parallel toolbox
-    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
+    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "trueDISABLED" ]]; then
           travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
           travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
@@ -136,6 +138,23 @@ install:
     - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
       fi
+
+    # optionally enable Octave statistics package
+    # $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
+    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
+	  $RETRY sudo apt-get -y -qq octave-statistics;
+      fi
+
+    # optionally enable Octave miscellaneous package
+    # (the "general" package is required for the "miscellaneous" package)
+    # (the "miscellaneous" package also requires "units")
+    - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
+          $RETRY sudo apt-get -y -qq install units;
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
+      fi
+
+
 
     # As of Aug 2017, the parallel package is disabled because it made Octave crash
     # when using travis
@@ -237,20 +256,6 @@ before_script:
 
 
 
-    # optionally enable Octave statistics package
-    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
-      fi
-
-    # optionally enable Octave miscellaneous package
-    # (the "general" package is required for the "miscellaneous" package)
-    # (the "miscellaneous" package also requires "units")
-    - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
-          $RETRY sudo apt-get -y -qq install units;
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
-      fi
-
     # show Octave-rc
     - echo "Octave-rc:"; cat $OCTAVERC
 
@@ -258,7 +263,7 @@ before_script:
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
 
-     # show WTF
+    # show WTF
     - $OCTAVE --eval "addpath('${PTH}/CoSMoMVPA/mvpa');cosmo_wtf()"
 
 script:
