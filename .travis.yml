@@ -142,9 +142,8 @@ install:
     # optionally enable Octave statistics package
     # $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-	  $RETRY sudo apt-get -y -qq octave-statistics;
+        $RETRY sudo apt-get -y -qq octave-statistics;
       fi
-
     # optionally enable Octave miscellaneous package
     # (the "general" package is required for the "miscellaneous" package)
     # (the "miscellaneous" package also requires "units")
