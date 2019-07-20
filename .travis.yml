@@ -13,8 +13,8 @@ env:
   global:
     - COVERALLS_PARALLEL=true
   matrix:
-    - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
-    # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    # - TRAVIS_WITH_EXTERNALS=false TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
+    - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=false COVERALLS_PARALLEL=false
     # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=1 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
     # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=2 PARTITION_COUNT=8 COVERALLS_PARALLEL=false  NO_DOC_TEST=true
     # - TRAVIS_WITH_EXTERNALS=true  TRAVIS_WITH_COVERAGE=true PARTITION_INDEX=3 PARTITION_COUNT=8 COVERALLS_PARALLEL=false NO_DOC_TEST=true
@@ -109,13 +109,13 @@ install:
                                 Octave:mixed-string-concat
                                 Octave:variable-switch-label"
     - OCTAVE=octave
+    # TODO: add gifti back
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
                      afni
                      surfing
                      fieldtrip
                      libsvm
-                     gifti
                      octave_pkg_struct
                      octave_pkg_parallel
                      octave_pkg_statistics
@@ -140,9 +140,9 @@ install:
       fi
 
     # optionally enable Octave statistics package
-    # $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
+    #$RETRY sudo apt-get -y -qq install octave-statistics;
     - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-        $RETRY sudo apt-get -y -qq octave-statistics;
+           $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
       fi
     # optionally enable Octave miscellaneous package
     # (the "general" package is required for the "miscellaneous" package)
@@ -201,14 +201,16 @@ install:
     # custum branch that fixes the issue. The official branch is the
     # last entry in the list below.
     #
-    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _fix/octave_fixname_empty_input
+    # 2019-07-19: https://github.com/fieldtrip/fieldtrip/pull/1171
+    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _octave/fix_compat;
     # git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
 
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
-          git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
+          git clone git://github.com/nno/fieldtrip.git --depth 1 -b _octave/fix_compat;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
+                            rmpath('${PTH}/fieldtrip/external/gifti');
                             savepath();";
       fi
 
@@ -223,16 +225,15 @@ install:
       fi
 
     # optionally install gifti library
+    # Note: FieldTrip brings its own version, which we remove from the path
     - if [[ " $EXTERNALS " = *" gifti "* ]]; then
-          GIFTI_VERSION=1.6;
-          GIFTI_NAME=gifti-${GIFTI_VERSION};
-          rm -rf ${GIFTI_NAME}.zip;
-          wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;
-          unzip ${GIFTI_NAME}.zip;
-          $OCTAVE --eval "cd('${PTH}/${GIFTI_NAME}/@gifti/private');
+          git clone https://github.com/gllmflndn/gifti.git;
+          $OCTAVE --eval "cd('gifti/@gifti/private');
                           mex('zstream.c');
-                          addpath('${PTH}/${GIFTI_NAME}');
+                          addpath('${PTH}/gifti');
+                          rmpath('${PTH}/fieldtrip/external/gifti');
                           savepath();";
+          ls ${PTH}/gifti/@gifti/private;
       fi
 
     # disable "more"
