@@ -23,8 +23,8 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
 %                       have corresponding elements in the same order
 %                       (such as provided by cosmo_dim_transpose).
 %   'nproc', np         Use np parallel threads. (Multiple threads may
-%                       speed up computations). If parallel processing is 
-%                       not available, or if this option is not provided, 
+%                       speed up computations). If parallel processing is
+%                       not available, or if this option is not provided,
 %                       then a single thread is used.
 %   K,V                 any other key-value pairs necessary for the measure
 %                       m, for example 'classifier' if
@@ -190,15 +190,15 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     [test_values,test_splits]=split_half_by_dimension(halves{2},opt);
 
     halves=[]; % let GC do its work
-    
+
     % get number of processes available
     nproc_available=cosmo_parallel_get_nproc_available(opt);
-    
+
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
     environment=cosmo_wtf('environment');
     progress_suffix=get_progress_suffix(environment);
-        
+
     % split training data in multiple parts, so that each thread can do a
     % subset of all the work
     % set options for each worker process
@@ -208,7 +208,7 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
     for p=1:nproc_available
         last=min(first+block_size-1,length(train_values));
         block_idxs=first:last;
-        
+
         worker_opt=struct();
         worker_opt.train_splits=train_splits(block_idxs);
         worker_opt.train_values=train_values(block_idxs);
@@ -232,11 +232,11 @@ function result=cosmo_dim_generalization_measure(ds,varargin)
                                      @run_with_worker,...
                                     worker_opt_cell,...
                                     'UniformOutput',false);
-    
+
     result=cosmo_stack(result_map_cell,1);
     cosmo_check_dataset(result);
-    
-    
+
+
 function result=run_with_worker(worker_opt)
 % run dimgen using the options in worker_opt
 
@@ -251,7 +251,7 @@ function result=run_with_worker(worker_opt)
     nworkers=worker_opt.nworkers;
     progress=worker_opt.progress;
     progress_suffix=worker_opt.progress_suffix;
-    
+
     % set partitions in case a crossvalidation or correlation measure is
     % used
     ntrain_elem=cellfun(@(x)size(x.samples,1),train_splits);

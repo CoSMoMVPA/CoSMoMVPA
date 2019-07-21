@@ -95,7 +95,6 @@ fprintf('There are %d channel neighborhood centers\n',...
 freq_radius=0; % 4*2+1=9 freq bins
 
 % >@@>
-
 % Use cosmo_interval_neighborhood to define the frequency neighborhood.
 % Assign the result to a variable 'freq_nbrhood'
 % How many searchlight centers are in the neighborhood?

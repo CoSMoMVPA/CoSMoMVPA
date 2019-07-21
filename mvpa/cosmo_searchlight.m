@@ -167,7 +167,7 @@ function results_map = cosmo_searchlight(ds, nbrhood, measure, varargin)
 
     % if we have more processes than parts, run on limited threads
    	nproc_used=min(numel(nbrhood_cell),nproc_available);
-                                                
+
     % Matlab needs newline character at progress message to show it in
     % parallel mode; Octave should not have newline character
     environment=cosmo_wtf('environment');
