@@ -16,8 +16,9 @@ ds=cosmo_remove_useless_data(ds);
 
 %% set sample attributes
 
-ds.sa.targets = repmat((1:6)',10,1);
-ds.sa.chunks = floor(((1:60)-1)/6)'+1;
+dFF = fullfact([6, 10]);
+ds.sa.targets = dFF(:,1);
+ds.sa.chunks = dFF(:,2);
 
 % Add labels as sample attributes
 classes = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};

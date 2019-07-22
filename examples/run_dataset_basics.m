@@ -25,7 +25,8 @@ ds = cosmo_fmri_dataset(fn);
 % set ds.sa.targets (trial conditions) to the 60x1 column vector:
 % [ 1 2 3 4 5 6 1 2 3 ... 5 6 ]'
 % >@@>
-targets=repmat((1:6)',10,1);
+dFF = fullfact([6, 10]);
+targets=dFF(:,1);
 ds.sa.targets = targets;
 % <@@<
 
@@ -35,7 +36,7 @@ cosmo_check_dataset(ds);
 % set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
-ds.sa.chunks = repelem(1:10, 6)';
+ds.sa.chunks = dFF(:,2);
 
 % ( alternative:   ds.sa.chunks = ceil((1:60)'/6);     )
 % <@@<
@@ -90,9 +91,10 @@ cosmo_disp(ds_masked);
 % 'mask','targets','chunks' parameters.
 % Assign the result to ds_masked_alt
 % >@@>
+dFF = fullfact([6, 10]);
 ds_masked_alt=cosmo_fmri_dataset(fn,'mask',fn_mask,...
-                                'targets',targets,...
-                                'chunks',chunks);
+                                'targets',dFF(:,1),...
+                                'chunks',dFF(:,2));
 % <@@<
 
 % set labels again

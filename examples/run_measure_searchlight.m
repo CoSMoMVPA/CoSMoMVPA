@@ -10,8 +10,9 @@
 config=cosmo_config();
 data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
-targets=repmat(1:6,1,10);
-chunks=floor(((1:60)-1)/6)+1;
+dFF = fullfact([6, 10]);
+targets=dFF(:,1);
+chunks=dFF(:,2);
 
 ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
                         'mask',fullfile(data_path, 'brain_mask.nii'), ...

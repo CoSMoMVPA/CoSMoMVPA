@@ -53,7 +53,7 @@ data_path=digit_study_path;
 data_fn=fullfile(data_path,'glm_T_stats_perblock+orig');
 
 targets=repmat(1:2,1,16)';    % class labels:  1 2 1 2 1 2 1 2 1 2 ... 1 2
-chunks=floor(((1:32)-1)/4)+1; % half-run:      1 1 1 1 2 2 2 2 3 3 ... 8 8
+chunks=repelem(1:8, 4)'; % half-run:      1 1 1 1 2 2 2 2 3 3 ... 8 8
 
 vol_ds = cosmo_fmri_dataset(data_fn,'targets',targets,'chunks',chunks);
 

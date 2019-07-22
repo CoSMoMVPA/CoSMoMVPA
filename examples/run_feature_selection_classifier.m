@@ -10,9 +10,10 @@ data_path=fullfile(config.tutorial_data_path,'ak6','s01');
 
 data_fn=fullfile(data_path,'glm_T_stats_perrun.nii');
 mask_fn=fullfile(data_path,'vt_mask.nii');
+dFF = fullfact([6, 10]);
 ds=cosmo_fmri_dataset(data_fn,'mask',mask_fn,...
-                        'targets',repmat(1:6,1,10),...
-                        'chunks',floor(((1:60)-1)/6)+1);
+                        'targets',dFF(:,1),...
+                        'chunks',dFF(:,2));
 
 
 % remove constant features

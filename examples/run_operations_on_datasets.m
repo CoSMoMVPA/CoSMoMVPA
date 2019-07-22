@@ -16,13 +16,14 @@ ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 % set ds.sa.targets (trial conditions) to the 60x1 column vector:
 % [ 1 2 3 4 5 6 1 2 3 ... 5 6 ]'
 % >@@>
-ds.sa.targets = repmat((1:6)',10,1);
+dFF = fullfact([6, 10]);
+ds.sa.targets = dFF(:, 1);
 % <@@<
 
 % set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
-ds.sa.chunks = ceil((1:60)'/6);
+ds.sa.chunks = dFF(:, 2);
 % <@@<
 
 % set the labels
@@ -44,7 +45,7 @@ ds=cosmo_remove_useless_data(ds);
 %% Various slicing operations on the samples
 
 % only get data in chunks 1 and 2.
-% Make a logical mask indicating where .ds.chunks less than or equal to 2
+% Make a logical mask indicating where ds.sa.chunks less than or equal to 2
 % and store the result in a variable 'chunks12_msk'.
 % Then use cosmo_slice to select these samples and assign it to a variable
 % 'ds_chunks12'
@@ -71,7 +72,7 @@ cosmo_disp(ds_targets13_alt);
 % sanity check showing they are the same
 assert(isequal(ds_targets13,ds_targets13_alt));
 
-% alterative using cosmo_match and the labels
+% alternative using cosmo_match and the labels
 labels_monkey_or_mallard=cosmo_match(ds.sa.labels,{'monkey','mallard'});
 ds_targets13_alt2=cosmo_slice(ds,labels_monkey_or_mallard);
 cosmo_disp(ds_targets13_alt2);

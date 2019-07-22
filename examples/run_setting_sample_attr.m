@@ -26,14 +26,14 @@ ds=cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 %remember that targets are part of ds.sa and that they are stored in a
 %column vector
 % >@@>
-ds.sa.targets = repmat(1:6, [1, 10])'; %10 times labels 1 to 6, column vector
+dFF = fullfact([6, 10]);
+ds.sa.targets = dFF(:,1); %10 times labels 1 to 6, column vector
 % <@@<
 %% set chunks
 %remember that chunks are part of ds.sa and that they are stored in a
 %column vector
 % >@@>
-chunks = repmat(1:10, [6, 1]);
-chunks = chunks(:); %flatten matrix to a column vector
+chunks = dFF(:,2);
 ds.sa.chunks = chunks;
 % <@@<
 

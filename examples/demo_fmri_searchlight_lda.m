@@ -39,7 +39,7 @@ data_fn=fullfile(data_path,'glm_T_stats_perblock+orig.HEAD');
 mask_fn=fullfile(data_path,'brain_mask+orig.HEAD');
 
 targets=repmat(1:2,1,16)';    % class labels: 1 2 1 2 1 2 1 2 1 2 ... 1 2
-chunks=floor(((1:32)-1)/8)+1; % run labels:   1 1 1 1 1 1 1 1 2 2 ... 4 4
+chunks=repelem(1:4,8)'; % run labels:   1 1 1 1 1 1 1 1 2 2 ... 4 4
 
 ds_per_run = cosmo_fmri_dataset(data_fn, 'mask', mask_fn,...
                                 'targets',targets,'chunks',chunks);
