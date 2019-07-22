@@ -35,12 +35,7 @@ cosmo_check_dataset(ds);
 % set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
-chunks = zeros(60,1);
-for i=1:10
-    idxs=(i-1)*6+(1:6);
-    chunks(idxs)=i;
-end
-ds.sa.chunks = chunks;
+ds.sa.chunks = repelem(1:10, 6)';
 
 % ( alternative:   ds.sa.chunks = ceil((1:60)'/6);     )
 % <@@<
