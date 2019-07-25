@@ -54,14 +54,19 @@ cosmo_disp(ds);
 
 %%
 
-% set the target (trial condition)
+% set the targets in ds.sa.targets (trial condition)
 % Hint: use the first column from ds.sa.trialinfo
+% >@@>
 ds.sa.targets=ds.sa.trialinfo(:,1); % 6 categories
+% <@@<
 
-% set the chunks (independent measurements)
-% all trials are here considered to be independent
+% set the chunks in ds.sa.chunks (independent measurements)
+% all trials are here considered to be independent, so the chunks
+% must all have a different value
+% >@@>
 nsamples=size(ds.samples,1);
 ds.sa.chunks=(1:nsamples)';
+% <@@<
 
 % in addition give a label to each trial
 index2label={'body','car','face','flower','insect','scene'};

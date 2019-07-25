@@ -5,8 +5,8 @@
 % results double dipping to interpret results for a real analysis that you
 % would publish.
 
-nfeatures=10;
-nsamples_per_class=20;
+nfeatures=100;
+nsamples_per_class=200;
 nclasses=2;
 niter=1000;
 

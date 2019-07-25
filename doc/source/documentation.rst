@@ -16,7 +16,7 @@ Overview
    contents_demo
    get_started
    download
-   labman2017
+   nmsm2019
    faq
    contact
    contribute
