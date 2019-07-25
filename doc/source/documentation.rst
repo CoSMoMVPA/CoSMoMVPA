@@ -34,7 +34,7 @@ Detailed
    contents_demo
    get_started
    download
-   labman2017
+   nmsm2019
    faq
    contact
    contribute
@@ -52,7 +52,9 @@ Full documentation
    cimec2014
    rhul2016
    cimec2016
+   prni2016
    labman2017
+   nmsm2019
    faq
    contact
    contribute
