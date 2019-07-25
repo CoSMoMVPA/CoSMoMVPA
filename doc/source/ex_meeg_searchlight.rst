@@ -41,7 +41,7 @@ This exercise requires a separate dataset named `meg_20hz`, part of the full tut
 
 Certain questions in MEEG concern oscillations. For such analysis data is typically transformed into a time-frequency representation (for each channel) through a procedure called Fourier analysis. One question one can answer is whether power in a particular frequency band shows a different pattern across conditions.
 
-In the exercise presented here, we use a dataset with somatosensorty stimulation of the hand versus no stimultation. To localize when in time, in which frequency band, and in which channel this shows a difference in the neural patterns, use a searchlight over channels, time points and frequency bands.
+In the exercise presented here, we use a dataset with somatosensory stimulation of the hand versus no stimulation. To localize when in time, in which frequency band, and in which channel this shows a difference in the neural patterns, use a searchlight over channels, time points and frequency bands.
 
 Hint: :ref:`run_meeg_timefreq_measures_skl`
 
