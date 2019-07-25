@@ -131,7 +131,7 @@ for k=1:numel(group_cell)
     % take data from the k-th participant and store
     % in a varibale ds_time_gen
     ds_time_gen=group_cell{k};
-    
+
     % change 'train_time' and 'test_time' from being sample dimensions
     % to become feature dimensions.
     % Hint: use cosmo_dim_transpose.

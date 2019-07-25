@@ -126,6 +126,8 @@ cfg.layout=layout;
 ft_multiplotER(cfg, ft_faceVSscene);
 %%
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Part 2: run searchlight over time
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,41 +148,59 @@ msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4,...
 
 % first slice the dataset, then use cosmo_dim_prune to avoid using
 % non-selected data. Assign the result to ds_sel
-% >@@>
-ds_sel=cosmo_slice(ds,msk,2);
-ds_sel=cosmo_dim_prune(ds_sel);
-% <@@<
+%%%% >>> Your code here <<< %%%%
+ds_sel_orig=cosmo_slice(ds,msk,2);
+cosmo_disp(ds_sel_orig);
+
+ft_orig=cosmo_map2meeg(ds_sel_orig);
+%%
+ds_sel=cosmo_dim_prune(ds_sel_orig);
+cosmo_disp(ds_sel);
+ft_sel=cosmo_map2meeg(ds_sel);
+
+%%
 
 % define the neighborhood for time with a time radius of 2 time points,
 % and assign to time_nbrhood.
 % Hint: use cosmo_interval_neighborhood,
 
-% >@@>
 time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
-% <@@<
+cosmo_disp(time_nbrhood)
+
+%%
+
+%%%% >>> Your code here <<< %%%%
 
 % Define the measure to be cosmo_crossvalidation_measure,
 % and assign to measure
-% >@@>
 measure=@cosmo_crossvalidation_measure;
-% <@@<
 
+%%%% >>> Your code here <<< %%%%
+
+%nsamples=numel(ds_sel.samples);
+%rp=cosmo_randperm(nsamples);
+%ds_sel.sa.targets=ds_sel.sa.targets(rp);
+
+partitions=cosmo_independent_samples_partitioner(ds_sel,...
+                                    'fold_count',5,...
+                                    'test_ratio',0.2);
+
+cosmo_disp(partitions)
+%%
 % Define the partitioning scheme using
 % cosmo_independent_samples_partitioner, and assign to partitions.
 % Use 'fold_count',5 to use 5 folds,
 % and use 'test_ratio',.2 to use 20% of the data for testing (and 80% for
 % training) in each fold.
 
-% >@@>
-partitions=cosmo_independent_samples_partitioner(ds,...
-                                    'fold_count',5,...
-                                    'test_ratio',.2);
-% <@@<
+%%%% >>> Your code here <<< %%%%
 
-% Use the LDA classifier and the partitions just defined, 
+% Use the LDA classifier and the partitions just defined,
 measure_args=struct();
 measure_args.partitions=partitions;
 measure_args.classifier=@cosmo_classify_lda;
+
+
 
 ds_sl=cosmo_searchlight(ds_sel,time_nbrhood,measure,measure_args);
 
@@ -212,30 +232,37 @@ chan_type='meg_combined_from_planar';
 % First, set 'chan_nbrhood' using cosmo_meeg_chan_neighborhood,
 % and use the 'chantype' and 'count' parameters to set the channel type
 % and the number of sensors in each searchlight.
-% >@@>
-chan_nbrhood=cosmo_meeg_chan_neighborhood(ds_sel, 'count', chan_count, ...
-                                                'chantype', chan_type);
-% <@@<
+chan_nbrhood=cosmo_meeg_chan_neighborhood(ds_sel,'chantype',chan_type,...
+                                    'count',chan_count);
+
+
+cosmo_disp(chan_nbrhood);
+%%
+
+
+%%%% >>> Your code here <<< %%%%
 
 % Second, set 'time_nbrhood' using cosmo_interval_neighborhood,
 % using the 'time' dimension
-% >@@>
-time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time',...
-                                            'radius',time_radius);
-% <@@<
+
+time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
+
+%%%% >>> Your code here <<< %%%%
 
 % cross neighborhoods for chan-time searchlight
 % Hint: use cosmo_cross_neighborhood, and use chan_nbrhood and time_nbrhood
 % (in that order) in a cell as the second argument
-% >@@>
-nbrhood=cosmo_cross_neighborhood(ds_sel,{chan_nbrhood,...
-                                        time_nbrhood});
-% <@@<
+nbrhood=cosmo_cross_neighborhood(ds_sel,{chan_nbrhood,time_nbrhood});
+
+
+%%%% >>> Your code here <<< %%%%
 
 % print how many neighbors features have on average
 nbrhood_nfeatures=cellfun(@numel,nbrhood.neighbors);
 fprintf('Features have on average %.1f +/- %.1f neighbors\n', ...
             mean(nbrhood_nfeatures), std(nbrhood_nfeatures));
+
+%%
 
 % set the 'measure' variable to a function handle to the
 % split-half correlation measure
@@ -247,14 +274,12 @@ measure=@cosmo_correlation_measure;
 % Use 'fold_count',1 to use 1 folds,
 % and use 'test_ratio',.5 to use 50% of the data for testing (and 50% for
 % training) in the single fold.
+partitions=cosmo_independent_samples_partitioner(ds_sel,'fold_count',1,...
+                                            'test_ratio',0.5);
 
-% >@@>
-partitions=cosmo_independent_samples_partitioner(ds,...
-                                    'fold_count',1,...
-                                    'test_ratio',.5);
-% <@@<
 
-% split-half, using oddeven partitioner
+
+%%%% >>> Your code here <<< %%%%
 measure_args=struct();
 measure_args.partitions=partitions;
 
@@ -263,9 +288,9 @@ measure_args.partitions=partitions;
 % run the searchlight using the parameters above, and assign the result
 % to a varibale 'ds_sl'
 
-% >@@>
 ds_sl=cosmo_searchlight(ds_sel,nbrhood,measure,measure_args);
-% <@@<
+
+%%%% >>> Your code here <<< %%%%
 
 %% visualize timeseries results
 
@@ -274,9 +299,9 @@ layout=cosmo_meeg_find_layout(ds_sl);
 fprintf('The output uses layout %s\n', layout.name);
 
 % map ds_sl to a FieldTrip structure. Assign the result to 'sl_ft'
-% >@@>
 sl_ft=cosmo_map2meeg(ds_sl);
-% <@@<
+
+%%%% >>> Your code here <<< %%%%
 
 figure();
 cfg = [];
@@ -284,7 +309,7 @@ cfg.interactive = 'yes';
 cfg.zlim=[-1 1];
 cfg.layout       = layout;
 
-% show figure with accuracy for each sensor
+% show figure with fisher-transformed correlations for each sensor
 ft_multiplotER(cfg, sl_ft);
 
 %% visualize topology results
@@ -296,4 +321,3 @@ ft_topoplotER(cfg, sl_ft);
 
 %% Show citation information
 cosmo_check_external('-cite');
-
