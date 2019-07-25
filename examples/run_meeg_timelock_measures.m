@@ -145,26 +145,28 @@ msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4,...
                         'chan',sensor_posterior_axial);
 
 % first slice the dataset, then use cosmo_dim_prune to avoid using
-% non-selected data
+% non-selected data. Assign the result to ds_sel
 % >@@>
 ds_sel=cosmo_slice(ds,msk,2);
 ds_sel=cosmo_dim_prune(ds_sel);
 % <@@<
 
-% define the neighborhood for time with a time radius of 2 time points
-% Hint: use cosmo_interval_neighborhood
+% define the neighborhood for time with a time radius of 2 time points,
+% and assign to time_nbrhood.
+% Hint: use cosmo_interval_neighborhood,
 
 % >@@>
 time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
 % <@@<
 
-% Define the measure to be cosmo_crossvalidation_measure
+% Define the measure to be cosmo_crossvalidation_measure,
+% and assign to measure
 % >@@>
 measure=@cosmo_crossvalidation_measure;
 % <@@<
 
 % Define the partitioning scheme using
-% cosmo_independent_samples_partitioner.
+% cosmo_independent_samples_partitioner, and assign to partitions.
 % Use 'fold_count',5 to use 5 folds,
 % and use 'test_ratio',.2 to use 20% of the data for testing (and 80% for
 % training) in each fold.
@@ -175,7 +177,7 @@ partitions=cosmo_independent_samples_partitioner(ds,...
                                     'test_ratio',.2);
 % <@@<
 
-% Use the LDA classifier and the partitions just defined.
+% Use the LDA classifier and the partitions just defined, 
 measure_args=struct();
 measure_args.partitions=partitions;
 measure_args.classifier=@cosmo_classify_lda;
@@ -208,7 +210,7 @@ chan_type='meg_combined_from_planar';
 
 % define the neighborhood for each dimensions
 % First, set 'chan_nbrhood' using cosmo_meeg_chan_neighborhood,
-% and use the 'chantype' and 'count paramters to set the channel type
+% and use the 'chantype' and 'count' parameters to set the channel type
 % and the number of sensors in each searchlight.
 % >@@>
 chan_nbrhood=cosmo_meeg_chan_neighborhood(ds_sel, 'count', chan_count, ...
