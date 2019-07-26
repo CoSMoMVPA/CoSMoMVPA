@@ -121,7 +121,7 @@ hist(thickness,100);
 xlabel('thickness (mm)');
 % <@@<
 
-%% For visualization purposed, read inflated surface
+%% For visualization purposes, read inflated surface
 inflated_fn=fullfile(digit_study_path,...
                             sprintf('ico%d_mh.inflated_alCoMmedial.asc', surface_ld));
 [infl_v,infl_f]=surfing_read(inflated_fn);
@@ -175,7 +175,7 @@ end
 output_fn=fullfile(config.output_data_path,'thickness.niml.dset');
 cosmo_map2surface(ds_thickness,output_fn);
 
-%% Part 3: run surface-based searchlight
+%% Part 2: run surface-based searchlight
 
 % Load volumetric functional data
 data_path=digit_study_path;

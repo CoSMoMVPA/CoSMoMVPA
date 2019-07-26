@@ -9,7 +9,7 @@ Surface-based fMRI searchlight
 Reading material
 ----------------
 
-- :cite:`OWDD11`: One of the early papers using a surface-based searchlight, with comparison between volumetric and surface-based searchlight..
+- :cite:`OWD+11`: One of the early papers using a surface-based searchlight, with comparison between volumetric and surface-based searchlight.
 
 Required toolboxes
 ------------------
@@ -31,7 +31,7 @@ Part 1 (cortical thickness)
 ---------------------------
 Load the anatomical surface models for the outer (pial) and inner (white) surfaces that separate the grey matter from non-gray matter. Compute, for each node on the surface, the cortical thickness, and then plot the thickness on a 3D surface model.
 
-Part 2 (Classificiation analysis)
+Part 2 (Classification analysis)
 ---------------------------------
 Load the anatomical surface models and the functional data.
 Define a surface-based neighborhood with approximately 100 voxels per searchlight center. Then run the searchlight with a classifier to distinguish between the different digit presses and visualize the results.
