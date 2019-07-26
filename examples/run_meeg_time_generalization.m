@@ -84,7 +84,7 @@ ds_sel=cosmo_dim_prune(ds_sel);
 ds_sel.sa.chunks=cosmo_chunkize(ds_sel,2);
 % <@@<
 
-% Now use cosmo_dim_transpose to make 'time' a sample dimension, and 
+% Now use cosmo_dim_transpose to make 'time' a sample dimension, and
 % assign to ds_tr
 % Hint: the third argument to cosmo_dim_transpose must be 1, because
 % time now describes the first (sample) dimension in .samples

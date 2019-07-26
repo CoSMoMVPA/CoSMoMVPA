@@ -227,6 +227,9 @@ surface_def={pial_v,white_v,pial_f};
 % Define a surface-based neighborhood (using cosmo_surficial_neighborhood)
 % with approximately 100 voxels per searchlight. Assign the result
 % to nbrhood.
+% Note: if you have issues compiling the fast marching toolbox,
+% you could alternatively (with little loss of precision / change in
+% results) add as additional arguments: 'metric','dijkstra'
 
 % >@@>
 nbrhood=cosmo_surficial_neighborhood(ds,surface_def,'count',100);
