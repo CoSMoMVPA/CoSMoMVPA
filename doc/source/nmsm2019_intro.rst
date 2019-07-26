@@ -208,12 +208,17 @@ Friday
 16:00-17:30    Multiple comparison correction. Concluding remarks. :doc:`ex_multiple_comparisons`
 ============== ===================================================================================================
 
+Acknowledgements
+++++++++++++++++
+Thanks to Felix Ball, Emanuele Porcu, Peter Vavra, Nico Marek, Camila Agostino, Tömme Noesselt for organizing the symposium.
 
 
 Contact
 +++++++
 Please send an email to a@b, b=gmail.com, a=n.n.oosterhof.
 
-:ref:`Back to index <prni2016>`
+
+
+:ref:`Back to index <nmsm2019>`
 
 .. include:: links.txt
