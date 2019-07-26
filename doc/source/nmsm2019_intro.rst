@@ -1,7 +1,7 @@
 .. #   For CoSMoMVPA's license terms and conditions, see   #
    #   the COPYING file distributed with CoSMoMVPA         #
 
-.. _labman2017_intro:
+.. _nmsm2019_intro:
 
 Introduction
 ============
