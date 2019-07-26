@@ -54,6 +54,7 @@ ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
 %% Define a cluster neighborhood for this dataset and assign the result to
 % a variable 'cl_nh'.
 % hint: use cosmo_cluster_neighborhood
+
 % >@@>
 cl_nh=cosmo_cluster_neighborhood(ds_stim);
 % <@@<
