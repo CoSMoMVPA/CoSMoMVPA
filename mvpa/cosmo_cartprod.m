@@ -84,7 +84,7 @@ function p=cosmo_cartprod(xs, convert_to_numeric)
     p=cartprod(xs);
 
     % if input was a struct, output is a cell with structs
-    if as_struct();
+    if as_struct
         p=cell2structs(p, fns);
     elseif convert_to_numeric && ~isempty(p) && ...
                         all(cellfun(@isnumeric,p(:)))
