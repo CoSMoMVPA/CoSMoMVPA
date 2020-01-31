@@ -10,11 +10,11 @@ function test_suite=test_oddeven_partitioner
     initTestSuite;
 
 function test_test_oddeven_partitioner_basics
-    for nchunks=[2 6 7 8]
+    for nchunks=[2 6 8]
         ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',nchunks);
 
         nsamples=size(ds.samples,1);
-        rp=randperm(ceil(nsamples*.7));
+        rp=randperm(nsamples);
         ds=cosmo_slice(ds,[rp rp]);
 
         unq_chunks=unique(ds.sa.chunks);
@@ -27,15 +27,15 @@ function test_test_oddeven_partitioner_basics
         fp.train_indices={idx_odd, idx_even};
         fp.test_indices={idx_even, idx_odd};
         assert_partitions_equal(fp,cosmo_oddeven_partitioner(ds,'full'));
-        c=ds.sa.chunks;
-        assert_partitions_equal(fp,cosmo_oddeven_partitioner(c,'full'));
+        %c=ds.sa.chunks;
+        %assert_partitions_equal(fp,cosmo_oddeven_partitioner(c,'full'));
 
         hp=struct();
         hp.train_indices={idx_odd};
         hp.test_indices={idx_even};
         assert_partitions_equal(hp,cosmo_oddeven_partitioner(ds,'half'));
-        c=ds.sa.chunks;
-        assert_partitions_equal(hp,cosmo_oddeven_partitioner(c,'half'));
+        %c=ds.sa.chunks;
+        %assert_partitions_equal(hp,cosmo_oddeven_partitioner(c,'half'));
     end
 
 
@@ -69,7 +69,25 @@ function assert_cell_same_elements(p,q)
         assertEqual(sort(p{k}),sort(q{k}));
     end
 
+function test_unbalanced_partitions()
+    ds=struct();
+    ntargets=randi();
+    nchunks=randi();
+    ds.samples=randn(ntargets*nchunks,1);
+    ds.sa.chunks=repmat(1:nchunks,1,ntargets)';
+    ds.sa.targets=repmat(1:ntargets,1,nchunks)';
 
+    idxs=cosmo_randperm(numel(ds.sa.chunks));
+    ds=cosmo_slice(ds,idxs);
 
+    % should be ok
+    cosmo_oddeven_partitioner(ds);
+
+    idx=ceil(rand()*ntargets*nchunks);
+    ds.sa.chunks(idx)=ds.sa.chunks(idx)+1;
+    assertExceptionThrown(@() cosmo_oddeven_partitioner(ds),'*');
+
+function v=randi()
+    v=ceil(rand()*10+2);
 
 

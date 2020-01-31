@@ -4,8 +4,7 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 % partitions=cosmo_oddeven_partitioner(chunks,[type])
 %
 % Input
-%    ds              dataset struct with field .ds.chunks, or Px1 chunk
-%                    indices (for P samples).
+%    ds              dataset struct with field .ds.chunks.
 %    type            One of:
 %                    - 'full': two partitions are returned, training on odd
 %                       unique chunks and testing on even unique chunks,
@@ -30,7 +29,8 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
 %
 % Example:
 %     ds=struct();
-%     ds.sa.samples=NaN(6,99); % will be ignored by this function
+%     ds.samples=NaN(8,99); % will be ignored by this function
+%     ds.sa.targets=[8 9 8 9 8 9 8 9]';
 %     ds.sa.chunks=[1 1 2 2 6 7 7 6]';
 %     p=cosmo_oddeven_partitioner(ds);
 %     % note that chunks=6 ends up in the odd chunks and chunks=7 in the
@@ -133,7 +133,8 @@ function partitions = cosmo_oddeven_partitioner(ds, type)
     partitions.train_indices=train_indices;
     partitions.test_indices=test_indices;
 
-
+    % final check to make sure all is kosher (including balanced-ness)
+    cosmo_check_partitions(partitions,ds);
 
 function ds=get_chunks(ds)
     if isnumeric(ds) && isvector(ds)
