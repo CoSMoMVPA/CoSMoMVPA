@@ -71,23 +71,24 @@ function assert_cell_same_elements(p,q)
 
 function test_unbalanced_partitions()
     ds=struct();
-    ntargets=randi();
-    nchunks=randi();
-    ds.samples=randn(ntargets*nchunks,1);
-    ds.sa.chunks=repmat(1:nchunks,1,ntargets)';
-    ds.sa.targets=repmat(1:ntargets,1,nchunks)';
+    for ntargets=2:5
+        for nchunks=2:5
+            nsamples=ntargets*nchunks;
+            ds.samples=randn(nsamples,1);
+            ds.sa.chunks=repmat(1:nchunks,1,ntargets)';
+            ds.sa.targets=ceil((1:nsamples)'/nchunks);
 
-    idxs=cosmo_randperm(numel(ds.sa.chunks));
-    ds=cosmo_slice(ds,idxs);
+            idxs=cosmo_randperm(numel(ds.sa.chunks));
+            ds=cosmo_slice(ds,idxs);
 
-    % should be ok
-    cosmo_oddeven_partitioner(ds);
+            % should be ok
+            cosmo_oddeven_partitioner(ds);
 
-    idx=ceil(rand()*ntargets*nchunks);
-    ds.sa.chunks(idx)=ds.sa.chunks(idx)+1;
-    assertExceptionThrown(@() cosmo_oddeven_partitioner(ds),'*');
+            idx=ceil(rand()*ntargets*nchunks);
+            ds.sa.chunks(idx)=ds.sa.chunks(idx)+1;
+            assertExceptionThrown(@() cosmo_oddeven_partitioner(ds),'*');
+        end
+    end
 
-function v=randi()
-    v=ceil(rand()*10+2);
 
 
