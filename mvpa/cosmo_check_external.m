@@ -162,7 +162,7 @@ function is_ok=check_which(command_name,raise_)
 
 function is_ok=check_external_toolbox(external_name,raise_)
     externals=get_externals();
-    if ~isfield(externals, external_name);
+    if ~isfield(externals, external_name)
         error('Unknown external ''%s''', external_name);
     end
 
@@ -292,10 +292,6 @@ function tf=toolbox_in_matlab_path(toolbox_dir)
 
     tf=cached_tf;
 
-    %paths=cosmo_strsplit(path(),pathsep());
-    %starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
-    %f=any(cellfun(starts_with_toolbox_dir,paths));
-
 
 function s=url2str(url)
     if strcmp(cosmo_wtf('environment'),'matlab')
@@ -404,6 +400,18 @@ function externals=get_externals_helper()
                               'Neuroscience, vol. 2011, ',...
                               'Article ID 156869, 9 pages.',...
                               'doi:10.1155/2011/156869'];
+
+    externals.eeglab.is_present=@() has('eeglab') ...
+                                       && has('pop_loadset');
+    externals.eeglab.is_recent=yes;
+    externals.eeglab.label='EEGLAB toolbox';
+    externals.eeglab.url='https://sccn.ucsd.edu/eeglab/';
+    externals.eeglab.authors={'A. Delorme','S. Makeig'};
+    externals.eeglab.year='2004';
+    externals.eeglab.ref=['EEGLAB: an open source toolbox for analysis '...
+                            'of single-trial EEG dynamics. '...
+                            'Journal of Neuroscience Methods 134:9-21'];
+
 
     externals.libsvm.is_present=@() has('svmpredict') && ...
                                         has('svmtrain');
