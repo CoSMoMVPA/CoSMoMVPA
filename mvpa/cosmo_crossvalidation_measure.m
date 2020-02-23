@@ -313,6 +313,7 @@ function [fold_pred,folds,fold_targets]=compute_fold_predictions(pred,...
     folds=cat(1,fold_cell{:});
     fold_targets=cat(1,target_cell{:});
 
+    2;
 
 
 function winner_pred=compute_winner_predictions(pred)

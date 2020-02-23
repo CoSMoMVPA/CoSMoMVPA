@@ -16,7 +16,8 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          'xunit'     xUnit unit test framework
 %                          'moxunit'   MOxUnit unit test framework
 %                          'matlabsvm' SVM classifier in matlab stats
-%                                      toolbox
+%                                      toolbox (prior 2018a)
+%                          'matlabcsvm'
 %                          'svm'       Either matlabsvm or libsvm
 %                          '@{name}'   Matlab toolbox {name}
 %                          It can also be '-list', '-tic', '-toc',' or
@@ -489,6 +490,14 @@ function externals=get_externals_helper()
                                                 path_of('svmclassify'));
     externals.matlabsvm.label='Matlab stats or bioinfo toolbox';
     externals.matlabsvm.url='http://www.mathworks.com';
+
+    externals.matlabcsvm.is_present=@() cosmo_wtf('is_matlab') && ...
+                                        has('fitcsvm');
+
+    externals.matlabcsvm.is_recent=yes;
+    externals.matlabcsvm.label='Matlab stats or bioinfo toolbox';
+    externals.matlabcsvm.url='http://www.mathworks.com';
+
 
     externals.svm={'libsvm', 'matlabsvm'}; % need either
 
