@@ -477,7 +477,9 @@ function externals=get_externals_helper()
     externals.matlabsvm.is_present=@() (has_toolbox('stats') || ...
                                             has_toolbox('bioinfo')) && ...
                                         has('svmtrain') && ...
-                                        has('svmclassify');
+                                        has('svmclassify') && ...
+                                        is_matlab_prior_2018a();
+
     externals.matlabsvm.is_recent=yes;
     externals.matlabsvm.conflicts.neuroelf=@() isequal(...
                                                 path_of('svmtrain'),...
@@ -558,6 +560,24 @@ function externals=get_externals_helper()
                                         'documentation test framework'];
     externals.modox.authors={'N. N. Oosterhof'};
     externals.modox.url='https://github.com/MOdox/MOdox';
+
+
+function tf=is_matlab_prior_2018a()
+    this_version=cosmo_wtf('version_number');
+
+    matlab_pivot=[9, 4]; % verison 2018a
+    n_elem = numel(matlab_pivot);
+
+    delta = this_version(1:n_elem) - matlab_pivot;
+    if all(delta==0)
+        % this is version 2018a
+        tf=false;
+    else
+        idx=find(delta~=0,1);
+        % positive delta means that the current matlab version
+        % is later than 2018a
+        tf=delta(idx)<0;
+    end
 
 function tf=has_octave_package(label)
     tf=false;
