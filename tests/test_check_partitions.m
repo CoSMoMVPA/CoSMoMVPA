@@ -81,6 +81,66 @@ function test_check_partitions_exceptions()
     aet(p,ds);
 
 
+function test_warning_shown_unsorted_indices()
+    orig_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(orig_state));
+
+    cosmo_warning('reset');
+    cosmo_warning('off');
+
+
+    ds=cosmo_synthetic_dataset();
+
+    max_chunk=max(ds.sa.chunks);
+    sorted_partitions=struct();
+    sorted_partitions.train_indices={find(ds.sa.chunks<max_chunk)};
+    sorted_partitions.test_indices={find(ds.sa.chunks==max_chunk)};
+
+    fns={'train_indices','test_indices'};
+    prev_warning_count=0; % because of reset
+    for k=0:2
+        switch k
+            case 0
+                partitions=sorted_partitions;
+            otherwise
+                partitions=sorted_partitions;
+                fn=fns{k};
+
+                reversed_idx=partitions.(fn){1}(end:-1:1);
+                partitions.(fn){1}=reversed_idx;
+                assertFalse(issorted(reversed_idx))
+        end
+
+        cosmo_check_partitions(partitions,ds);
+
+        state=cosmo_warning();
+        warning_count=numel(state.shown_warnings);
+
+        should_have_new_warning=k>0;
+        if should_have_new_warning
+            delta=1;
+        else
+            delta=0;
+        end
+
+        assertEqual(warning_count,prev_warning_count+delta);
+
+        prev_warning_count=warning_count;
+    end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

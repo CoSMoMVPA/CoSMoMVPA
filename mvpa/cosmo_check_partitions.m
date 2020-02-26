@@ -110,6 +110,7 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     end
 
     nsamples=numel(targets);
+    unsorted_train_test_fold=false(npartitions,2);
 
     for k=1:npartitions
         train_idxs=train_indices{k};
@@ -117,6 +118,14 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
 
         check_range(train_idxs,nsamples,k,'train');
         check_range(test_idxs,nsamples,k,'test');
+
+        if ~issorted(train_idxs)
+            unsorted_train_test_fold(k,1)=true;
+        end
+
+        if ~issorted(test_idxs)
+            unsorted_train_test_fold(k,2)=true;
+        end
 
         if check_balance
             % counts of number of samples in each each class must be the
@@ -203,6 +212,22 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
                        'train and test set'],k,ctrain(idx));
             end
         end
+    end
+
+    has_unsorted_indices=any(unsorted_train_test_fold(:));
+    if has_unsorted_indices
+        fns={'train_indices','test_indices'};
+        msg_parts={'',''};
+        for k=1:2
+            fn=fns{k};
+            folds=find(unsorted_train_test_fold(:,k));
+            msg_parts{k}=sprintf('Unsorted %s in fold(s):%s',...
+                                    fn,sprintf(' %d',folds));
+        end
+
+        msk=~cellfun(@isempty,msg_parts);
+        msg=cosmo_strjoin(msg_parts(msk),'\n');
+        cosmo_warning(msg);
     end
 
     is_ok=true;
