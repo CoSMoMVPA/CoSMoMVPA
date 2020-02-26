@@ -245,9 +245,59 @@ function test_balance_partitions_exceptions
     aet(p,ds);
 
 
+function test_sorted_indices()
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
+    nchunks=ceil(cosmo_rand()*10+10);
+    ntargets=ceil(cosmo_rand()*10+10);
+    ds=cosmo_synthetic_dataset('nchunks',nchunks,'ntargets',ntargets);
+
+    nchunks=numel(unique(ds.sa.chunks));
+
+    partitions=struct();
+    partitions.train_indices=cell(nchunks,1);
+    partitions.test_indices=cell(nchunks,1);
+
+    % build partitions with unsorted indices
+    for k=1:nchunks
+        rp=cosmo_randperm(nchunks);
+
+        train_msk=(ds.sa.chunks)==rp(1) | (ds.sa.chunks)==rp(2);
+        train_idx=find(train_msk);
+        test_idx=find(~train_msk);
+
+        rp_train=cosmo_randperm(numel(train_idx));
+        rp_test=cosmo_randperm(numel(test_idx));
+
+        partitions.train_indices{k}=train_idx(rp_train);
+        partitions.test_indices{k}=test_idx(rp_test);
+    end
+
+    % balance partitions
+    bal_partitions=cosmo_balance_partitions(partitions,ds);
+
+    % all partitions must be sorted
+
+    fns={'train_indices','test_indices'};
+    for k=1:nchunks
+        for j=1:2
+            fn=fns{j};
+            idx=partitions.(fn){k};
+            bal_idx=bal_partitions.(fn){k};
+
+            % indices must be the same
+            assertEqual(sort(idx(:)),sort(bal_idx(:)));
+
+            % balanced partitions must be sorted
+            assertTrue(issorted(bal_idx));
+        end
+    end
+
+
+
 function [p,ds]=get_sample_data(nsamples,nchunks,nclasses)
-
-
     ds=struct();
     ds.samples=(1:nsamples)';
     ds.sa.targets=ceil(cosmo_rand(nsamples,1)*nclasses);
