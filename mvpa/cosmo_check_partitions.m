@@ -217,7 +217,16 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
     has_unsorted_indices=any(unsorted_train_test_fold(:));
     if has_unsorted_indices
         fns={'train_indices','test_indices'};
-        msg_parts={'',''};
+        msg_parts={'','',['Unsorted partitions can lead to unintuitive '...
+            'ordering of results (e.g. when using fold_predictions)']};
+        for k=1:2
+            fn=fns{k};
+            folds=find(unsorted_train_test_fold(:,k));
+            if ~isempty(folds)
+                msg_parts{k}=sprintf('Unsorted %s in fold(s):%s',...
+                                    fn,sprintf(' %d',folds));
+            end
+        end
         for k=1:2
             fn=fns{k};
             folds=find(unsorted_train_test_fold(:,k));
@@ -257,7 +266,6 @@ function check_dataset(ds)
     end
 
     error('second input must be a dataset struct with field .sa');
-
 
 
 
