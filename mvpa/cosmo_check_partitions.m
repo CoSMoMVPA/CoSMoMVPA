@@ -227,12 +227,6 @@ function is_ok=cosmo_check_partitions(partitions, ds, varargin)
                                     fn,sprintf(' %d',folds));
             end
         end
-        for k=1:2
-            fn=fns{k};
-            folds=find(unsorted_train_test_fold(:,k));
-            msg_parts{k}=sprintf('Unsorted %s in fold(s):%s',...
-                                    fn,sprintf(' %d',folds));
-        end
 
         msk=~cellfun(@isempty,msg_parts);
         msg=cosmo_strjoin(msg_parts(msk),'\n');
