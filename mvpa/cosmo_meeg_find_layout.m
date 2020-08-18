@@ -114,7 +114,7 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
     opt=cosmo_structjoin(defaults, varargin);
 
     % get the sensor labels and channel types applicable to this dataset
-    chantype2senstype=get_dataset_senstypes(ds);
+    chantype2senstype=get_dataset_senstypes(ds,opt);
 
     % get the single channel type based on the input and available channels
     ds_chantype=get_base_chantype(chantype2senstype,opt);
@@ -182,9 +182,9 @@ function label=get_senstype_label(senstype)
     sc=cosmo_meeg_senstype_collection();
     label=sc.(senstype).label;
 
-function senstype_mapping=get_dataset_senstypes(ds)
+function senstype_mapping=get_dataset_senstypes(ds,opt)
     % helper function to get supported senstypes
-    [unused,senstype_mapping]=cosmo_meeg_chantype(ds);
+    [unused,senstype_mapping]=cosmo_meeg_chantype(ds,opt);
     keys=fieldnames(senstype_mapping);
 
     if cosmo_match({'meg_planar'},keys)
