@@ -282,7 +282,9 @@ function neighbors=reorder_neighbors(ds,neighbors)
     nbr_cell=cellfun(@(x){x},nbr_label,'UniformOutput',false);
 
     overlap=cosmo_overlap(ds_cell,nbr_cell);
-    assert(all(sum(overlap,1)) &&all(sum(overlap,2)));
+    if ~(all(sum(overlap,1)) && all(sum(overlap,2)))
+        return;
+    end
 
     [i,j]=find(overlap);
     n=numel(i);
