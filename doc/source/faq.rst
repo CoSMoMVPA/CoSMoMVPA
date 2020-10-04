@@ -1726,5 +1726,23 @@ Please see the code below for an example. It is similar to the documentation of 
         cosmo_disp(dgm_ds.a)
 
 
+Get the classifier weights after training a classifier?
+-------------------------------------------------------
+'Using ROI-based MVPA, I would like to know which voxels get a large weight to drve classification. How can I get these weights as output?' [Original question on Google Groups by Lina T., 2018-01-08]
+
+Getting the weights back is currently not supported, and there are no short-term plans to add this. Rationale: the searchlight does generally not work well together with the measure concept, as the measure must return a Nx1 .samples (column vector) dataset. So the only way to make this fit with feature weights is to return the weights, but this is problematic when different searchlight locations have a different number of features associated with them. But even when the number of features would match there is no clear correspondence for each row with a particular feature location. So it all becomes quite messy really.
+
+It is also questionable how useful or interpretable these weights are, see:
+
+    Haufe, S., Meinecke, F., Görgen, K., Dähne, S., Haynes, J. D., Blankertz, B., & Bießmann, F. (2014). On the interpretation of weight vectors of linear models in multivariate neuroimaging. Neuroimage, 87, 96-110.
+
+If you really want the classifier weights back, then you could write your own custom function (maybe even a measure, if you want to use a searchlight).
+
+
+Get coordinates of voxels in a CoSMoMVPA fMRI dataset?
+------------------------------------------------------
+These can be accessed using :ref:`cosmo_vol_coordinates`.
+
+
 
 .. include:: links.txt
