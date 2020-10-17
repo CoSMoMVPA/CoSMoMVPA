@@ -71,7 +71,7 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %    'radius', r         } select neighbors either within radius r, grow
 %    'count', c          } the radius to get neighbors are c locations, 
 %    'area', a           } grow the radius to get neighbors whose area size
-%                        } is about a mm^2 (just below a mm^2?,
+%                        } is about a mm^2 (just below a mm^2),
 %    'direct', true      } or get direct neighbors only (nodes who share an
 %                        } edge)
 %                        } These four options are mutually exclusive
