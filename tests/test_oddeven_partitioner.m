@@ -9,7 +9,11 @@ function test_suite=test_oddeven_partitioner
     end
     initTestSuite;
 
-function test_test_oddeven_partitioner_basics
+function test_oddeven_partitioner_basics
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     for nchunks=[2 6 8]
         ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',nchunks);
 
@@ -39,7 +43,7 @@ function test_test_oddeven_partitioner_basics
     end
 
 
-function test_test_oddeven_partitioner_exceptions
+function test_oddeven_partitioner_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
                     cosmo_oddeven_partitioner(varargin{:}),'');
     ds=struct();
@@ -70,6 +74,10 @@ function assert_cell_same_elements(p,q)
     end
 
 function test_unbalanced_partitions()
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
+
     ds=struct();
     for ntargets=2:5
         for nchunks=2:5
