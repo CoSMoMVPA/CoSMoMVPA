@@ -351,7 +351,7 @@ function assert_chance_null_data(cfy)
     assert_accuracy_in_range(cfy, 0, 0.3, 0.7);
 
 function assert_above_chance_informative_data(cfy)
-    assert_accuracy_in_range(cfy, 2, 0.8, 1);
+    assert_accuracy_in_range(cfy, 4, 0.8, 1);
 
 function assert_accuracy_in_range(cfy, sigma, min_val, max_val)
     [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma);
