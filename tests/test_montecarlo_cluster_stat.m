@@ -275,7 +275,7 @@ function test_onesample_ttest_montecarlo_cluster_stat_strong
     % lots of signal, should work with no seed specified
 
     for effect_sign=[-1,1]
-        niter=ceil(rand()*10+10);
+        niter=ceil(rand()*10+20);
         z_table=get_zscore_lookup_table();
         expected_z=z_table(niter+1);
 
