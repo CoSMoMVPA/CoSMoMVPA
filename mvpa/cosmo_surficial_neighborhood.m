@@ -68,13 +68,14 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                    - {fn}
 %                    - {fn, niter}
 %                    - {v, f, niter}
-%    'radius', r         } select neighbors either within radius r, grow
-%    'count', c          } the radius to get neighbors are c locations, 
+%                        select neighbors:
+%    'radius', r         } either within radius r (usually in mm), grow
+%    'count', c          } the radius to get the nearest c neighbors,
 %    'area', a           } grow the radius to get neighbors whose area size
-%                        } is about a mm^2 (just below a mm^2),
+%                        } is less than or equal area a (usually in mm^2)
 %    'direct', true      } or get direct neighbors only (nodes who share an
 %                        } edge)
-%                        } These four options are mutually exclusive
+%                        These four options are mutually exclusive
 %    'metric',metric     distance metric along cortical surface. One of
 %                        'geodesic' (default), 'dijkstra' or 'euclidean'.
 %    'line_def',line_def definition of lines from inner to outer surface
@@ -102,6 +103,10 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                   .a.fdim.values   set to {center_ids} with center_ids
 %                                    Mx1 ids of each neighborhood
 %                   .fa.node_indices identical to center_ids
+%                   .fa.radius       } if ds is a surface-based dataset,
+%                   .fa.area         } these fields are present and contain
+%                                    } the radius and total surface area of
+%                                      the selected nodes
 %     v_o           NVx3 coordinates for N nodes of the output surface
 %     f_o           NFx3 node indices for Q faces of the output surface
 %     out2in        Node mapping from output to input surface.
@@ -388,18 +393,14 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
     nbrhood.fa.node_indices=zeros(1,ncenters);
 
     % add area fieldname
-    if numel(circle_def)==3
-        basedarea=1;
-        node2area=surfing_surfacearea(vertices,faces);
-        nbrhood.fa.area=zeros(1,ncenters);
-    else
-        basedarea = 0;
-    end
+    node2area=surfing_surfacearea(vertices,faces);
+    nbrhood.fa.area=zeros(1,ncenters);
 
     for k=1:ncenters
         center_node=unq_nodes(k);
         nbrhood.fa.node_indices(k)=unq_fa_indices(k);
         nbrhood.fa.radius(k)=radii(center_node);
+        nbrhood.fa.area(k)=sum(node2area(n2ns{center_node}));
 
         if ignore_vertices_msk(center_node)
             around_feature_ids=zeros(1,0);
@@ -409,12 +410,8 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
         end
 
         nbrhood.neighbors{k}=around_feature_ids(:)';
-        
-        % update area value
-        if basedarea
-            nbrhood.fa.area(k)=sum(node2area(nbrhood.neighbors{center_node}));
-        end
     end
+
 
 
 

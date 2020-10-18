@@ -131,11 +131,15 @@ function test_dim_generalization_measure_basics
     % try with correlation measure
     ds=cosmo_stack({ds,ds},2);
     ds.samples=randn(size(ds.samples));
-    ds_perm=cosmo_slice(ds,rp);
 
     opt.radius=0;
     opt.measure=@cosmo_correlation_measure;
     opt.output='correlation';
+
+    % avoid Fisher transformation warning
+    warning_state=cosmo_warning();
+    cleaner=onCleanup(@()cosmo_warning(warning_state));
+    cosmo_warning('off');
     result=cosmo_dim_generalization_measure(ds,opt);
 
 

@@ -10,7 +10,7 @@ function test_suite = test_classify
     initTestSuite;
 
 function test_general_classifiers_strong_signal()
-    % note: part of these checks are also implemented in 
+    % note: part of these checks are also implemented in
     % general_test_classifier (included below)
 
     cfy_cell={{@cosmo_classify_lda,''},...
@@ -19,18 +19,18 @@ function test_general_classifiers_strong_signal()
               {@cosmo_classify_libsvm,'libsvm'},...
               {@cosmo_classify_matlabsvm,'matlabsvm'},...
               {@cosmo_classify_matlabcsvm,'matlabcsvm'}};
-          
+
     n_cfy=numel(cfy_cell);
-    
+
     no_information=0;
     strong_information=2+rand();
     for sigma=[no_information, strong_information]
         [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma);
-    
+
         for k=1:n_cfy
             cfy=cfy_cell{k}{1};
             predictor_func=@()cfy(tr_s, tr_t, te_s);
-            
+
             external=cfy_cell{k}{2};
             if ~strcmp(external,'')
                 if ~cosmo_check_external(external,false)
@@ -53,8 +53,8 @@ function test_general_classifiers_strong_signal()
             end
         end
     end
-    
-    
+
+
 function test_classify_lda
     cfy=@cosmo_classify_lda;
     handle=get_predictor(cfy);
@@ -159,7 +159,7 @@ function test_classify_matlabsvm
     assert_predictions_equal(handle,[1 3 9 7 6 6 9 3 7 5 6 6 4 ...
                                     1 7 7 7 7 1 7 7 1 7 6 7 1 9]');
     general_test_classifier(cfy);
-    
+
 function test_classify_matlabcsvm
     warning_state=cosmo_warning();
     cleaner=onCleanup(@()cosmo_warning(warning_state));
@@ -176,7 +176,7 @@ function test_classify_matlabcsvm
 
     assert_predictions_equal(handle,[1 2 3 4 5 6 7 8 9 1 2 3 4 ...
                                     5 6 7 8 9 1 2 3 4 5 6 7 8 9]');
-    general_test_classifier(cfy);    
+    general_test_classifier(cfy);
 
 function test_classify_matlabsvm_2class
     warning_state=cosmo_warning();
@@ -351,7 +351,7 @@ function assert_chance_null_data(cfy)
     assert_accuracy_in_range(cfy, 0, 0.3, 0.7);
 
 function assert_above_chance_informative_data(cfy)
-    assert_accuracy_in_range(cfy, 2, 0.8, 1);
+    assert_accuracy_in_range(cfy, 4, 0.8, 1);
 
 function assert_accuracy_in_range(cfy, sigma, min_val, max_val)
     [tr_s,tr_t, te_s, te_t]=generate_informative_data(sigma);

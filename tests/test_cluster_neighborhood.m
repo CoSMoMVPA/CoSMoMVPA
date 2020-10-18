@@ -238,6 +238,7 @@ function test_cluster_neighborhood_surface
     assertEqual(ds.a,nh1.a);
     ds.fa.sizes=[1 3 2 2 3 1]/6;
     ds.fa.radius=sqrt([1 2 2 2 2 1]);
+    ds.fa.area=[6 11 9 9 11 6]/6;
     assertEqual(ds.fa,nh1.fa);
 
     opt.direct=false;
@@ -245,6 +246,7 @@ function test_cluster_neighborhood_surface
     assertEqual(nh2.neighbors,num2cell((1:6)'));
     assertEqual(ds.a,nh2.a);
     ds.fa.radius(:)=0;
+    ds.fa.area=[1 3 2 2 3 1]/6;
     assertEqual(ds.fa,nh2.fa);
 
     % take a subset of features
