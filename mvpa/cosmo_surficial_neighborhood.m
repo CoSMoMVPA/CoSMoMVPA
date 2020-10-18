@@ -69,10 +69,12 @@ function [nbrhood,vo,fo,out2in]=cosmo_surficial_neighborhood(ds, surfs, varargin
 %                    - {fn, niter}
 %                    - {v, f, niter}
 %    'radius', r         } select neighbors either within radius r, grow
-%    'count', c          } the radius to get neighbors are c locations,
+%    'count', c          } the radius to get neighbors are c locations, 
+%    'area', a           } grow the radius to get neighbors whose area size
+%                        } is about a mm^2 (just below a mm^2),
 %    'direct', true      } or get direct neighbors only (nodes who share an
 %                        } edge)
-%                        } These three options are mutually exclusive
+%                        } These four options are mutually exclusive
 %    'metric',metric     distance metric along cortical surface. One of
 %                        'geodesic' (default), 'dijkstra' or 'euclidean'.
 %    'line_def',line_def definition of lines from inner to outer surface
@@ -385,6 +387,15 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
     nbrhood.fa.radius=zeros(1,ncenters);
     nbrhood.fa.node_indices=zeros(1,ncenters);
 
+    % add area fieldname
+    if numel(circle_def)==3
+        basedarea=1;
+        node2area=surfing_surfacearea(vertices,faces);
+        nbrhood.fa.area=zeros(1,ncenters);
+    else
+        basedarea = 0;
+    end
+
     for k=1:ncenters
         center_node=unq_nodes(k);
         nbrhood.fa.node_indices(k)=unq_fa_indices(k);
@@ -398,6 +409,11 @@ function nbrhood=surface_to_surface_neighborhood(ds,vertices,faces,opt)
         end
 
         nbrhood.neighbors{k}=around_feature_ids(:)';
+        
+        % update area value
+        if basedarea
+            nbrhood.fa.area(k)=sum(node2area(nbrhood.neighbors{center_node}));
+        end
     end
 
 
@@ -591,6 +607,7 @@ function circle_def=get_circle_def(opt)
     metric2circle_def_func=struct();
     metric2circle_def_func.radius=@(x)x;
     metric2circle_def_func.count=@(x)[0 x]; % fixed initial radius
+    metric2circle_def_func.area=@(x)[5 Inf x]; % default initial radius
     metric2circle_def_func.direct=@get_direct_circle_def;
 
     % options are mutually exclusive
