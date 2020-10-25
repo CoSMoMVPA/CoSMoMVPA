@@ -1744,5 +1744,74 @@ Get coordinates of voxels in a CoSMoMVPA fMRI dataset?
 These can be accessed using :ref:`cosmo_vol_coordinates`.
 
 
+Compute representational similarity across chunks?
+--------------------------------------------------
+'I have collected data in an fMRI study with 15 targets for run 1 (``chunks=1``) and another (disjoint set of) 15 targets in run 2 (``chunks=2``). I would like to compute the similarity for all 255 (=15*15) targets, but not for targets within the same chunk. How can I achieve this?  [Original question on Google Groups by Lyam B., 2020-09-15]
+
+You could use the following code:
+
+    .. code-block:: matlab
+
+	function ds_result=my_across_chunks_dissimilarity_matrix_measure(ds,opt)
+	% compute dissimilarity across chunks
+	%
+	% ds_result=my_across_chunks_dissimilarity_matrix_measure(ds,opt)
+	%
+	% Input:
+	%   ds              dataset struct with two unique valus in ds.sa.chunks
+	%   opt             optional options to be passed to
+	%                   cosmo_dissimilarity_matrix_measure
+	%
+	% Output:
+	%   ds_result       output dataset with all similarities computed between
+	%                   samples with different values for chunks. Thus if the
+	%                   input dataset has A values for the first chunk and B
+	%                   for the second chunk, the output has A*B samples.
+	%     .sa           sample attributes indicating
+	%        .targets1  } target indices for the dissimilarity matrix, similar
+	%        .targets2  } as in cosmo_dissimilarity_matrix_measure
+	%        .t1         } the target (experimental condition) labels
+	%        .t2         }
+	%
+	% See also: cosmo_dissimilarity_matrix_measure
+
+	    if nargin<2
+		opt=struct();
+	    end
+
+	    dsm=cosmo_dissimilarity_matrix_measure(ds,opt);
+
+	    [chunk_idxs, unq_chunks]=cosmo_index_unique(ds.sa.chunks);
+
+	    if numel(unq_chunks) ~= 2
+		error('Expected two chunks');
+	    end
+
+	    % targets present in the two chunks
+	    ch_t1 = ds.sa.targets(chunk_idxs{1});
+	    ch_t2 = ds.sa.targets(chunk_idxs{2});
+
+	    % two vectors should be disjoint
+	    overlapping_msk=bsxfun(@eq,ch_t1,ch_t2');
+	    if any(overlapping_msk(:))
+		error('At least one target present in both chunks');
+	    end
+
+	    [unused,unq_t]=cosmo_index_unique(ds.sa.targets);
+
+	    % find relevant rows in dsm
+	    sa_t1 = unq_t(dsm.sa.targets1);
+	    sa_t2 = unq_t(dsm.sa.targets2);
+
+	    msk1 = cosmo_match(sa_t1,ch_t1) & cosmo_match(sa_t2,ch_t2);
+	    msk2 = cosmo_match(sa_t1,ch_t2) & cosmo_match(sa_t2,ch_t1);
+
+	    msk = msk1 | msk2;
+
+	    ds_result = cosmo_slice(dsm, msk, 1, false);
+	    ds_result.sa.t1 = unq_t(ds_result.sa.targets1);
+	    ds_result.sa.t2 = unq_t(ds_result.sa.targets2);
+
+
 
 .. include:: links.txt
