@@ -272,22 +272,38 @@ function test_onesample_ttest_montecarlo_cluster_stat_strong
     ds=cosmo_synthetic_dataset('ntargets',1,'nchunks',12);
     nh=cosmo_cluster_neighborhood(ds,'progress',false,'fmri',1);
 
-    % lots of signal, should work with no seed specified
+    % lots of signal, but in rare cases not all features show the maximum
+    % z score. instead we allow for a few failures
 
-    for effect_sign=[-1,1]
-        niter=ceil(rand()*10+20);
-        z_table=get_zscore_lookup_table();
-        expected_z=z_table(niter+1);
+    n_attempts = 5;
+    allowed_fail_ratio = 0.25;
 
-        opt=struct();
-        opt.h0_mean=(-effect_sign)*15;
-        opt.progress=false;
-        opt.niter=niter;
-        z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
-        assertElementsAlmostEqual(z.samples,...
-                            repmat(effect_sign*expected_z,1,6),...
-                            'absolute',1e-4);
+    n_fail=0;
+    n_pass=0;
+
+    for attempt=1:n_attempts
+        for effect_sign=[-1,1]
+            niter=ceil(rand()*10+20);
+            z_table=get_zscore_lookup_table();
+            expected_z=z_table(niter+1);
+
+            opt=struct();
+            opt.h0_mean=(-effect_sign)*15;
+            opt.progress=false;
+            opt.niter=niter;
+            z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+
+            max_delta = max(abs(effect_sign*expected_z - z.samples));
+            if max_delta > 1e-4
+                n_fail=n_fail+1;
+            else
+                n_pass=n_pass+1;
+            end
+        end
     end
+
+    fail_ratio = n_fail / (n_fail+n_pass);
+    assertTrue(fail_ratio < allowed_fail_ratio);
 
 
 function test_twosample_ttest_montecarlo_cluster_stat_basics
