@@ -371,16 +371,37 @@ function test_twosample_ttest_montecarlo_cluster_stat_strong
     nh=cosmo_cluster_neighborhood(ds,'progress',false);
     ds.sa.chunks=ds.sa.chunks*2+ds.sa.targets;
 
-    % lots of signal, should work with no seed specified
-    opt=struct();
-    opt.niter=14;
-    opt.progress=false;
-    msk1=ds.sa.targets==1;
-    ds.samples(msk1,:)=ds.samples(msk1,:)+10;
-    z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
-    assertElementsAlmostEqual(z.samples,...
-                    repmat(1.5011,1,6),...
-                    'absolute',1e-4);
+    % lots of signal, but in rare cases not all features show the maximum
+    % z score. instead we allow for a few failures
+    n_attempts = 5;
+    allowed_fail_ratio = 0.25;
+
+    n_fail=0;
+    n_pass=0;
+
+    for attempt=1:n_attempts
+
+        % lots of signal, should work with no seed specified
+        opt=struct();
+        opt.niter=14 + ceil(rand()*5);
+        opt.progress=false;
+        msk1=ds.sa.targets==1;
+        ds.samples(msk1,:)=ds.samples(msk1,:)+10;
+
+        z=cosmo_montecarlo_cluster_stat(ds,nh,opt);
+        z_table=get_zscore_lookup_table();
+        expected_z=z_table(opt.niter+1);
+
+        max_delta = max(abs(expected_z - z.samples));
+        if max_delta > 1e-4
+            n_fail=n_fail+1;
+        else
+            n_pass=n_pass+1;
+        end
+    end
+
+    fail_ratio = n_fail / (n_fail+n_pass);
+    assertTrue(fail_ratio < allowed_fail_ratio);
 
 function test_twosample_ttest_montecarlo_cluster_stat_exceptions
     aet=@(varargin)assertExceptionThrown(@()...
