@@ -105,7 +105,11 @@ function func=get_max_nproc_available_func(opt)
     if cosmo_wtf('is_matlab')
         v_num=cosmo_wtf('version_number');
         % Matlab 2013b is version 8.2
-        is_matlab_ge_2013b=v_num(1)>=8 && v_num(2)>=2;
+        if v_num(1)>8
+            is_matlab_ge_2013b=1;
+        else
+            is_matlab_ge_2013b=v_num(1)==8 && v_num(2)>=2;
+        end
 
         if is_matlab_ge_2013b
             func=@matlab_get_max_nproc_available_ge2013b;
@@ -169,24 +173,22 @@ function [nproc_available,msg]=matlab_get_max_nproc_available_ge2013b()
 
     matlab_parallel_functions={'gcp','parpool'};
     if ~(usejava('jvm') && ...
-                platform_has_functions(matlab_parallel_functions))
+                platform_has_functions(matlab_parallel_functions)) 
         msg='java or parallel functions not available';
         return;
     end
 
     try
         pool = gcp();
-
         if isempty(pool)
             msg=['Parallel toolbox is available, but '...
                             'unable to open pool'];
             return;
         end
-     catch
+    catch
          msg=lasterr();
          return
-     end
-
+    end
     nproc_available=pool.NumWorkers();
 
 
