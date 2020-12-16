@@ -173,7 +173,7 @@ function [nproc_available,msg]=matlab_get_max_nproc_available_ge2013b()
 
     matlab_parallel_functions={'gcp','parpool'};
     if ~(usejava('jvm') && ...
-                platform_has_functions(matlab_parallel_functions)) 
+                platform_has_functions(matlab_parallel_functions))
         msg='java or parallel functions not available';
         return;
     end

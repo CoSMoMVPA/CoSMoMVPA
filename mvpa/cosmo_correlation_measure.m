@@ -294,6 +294,10 @@ switch nclasses
             if abs(sum(template(:)))>max_tolerance
                 error('Template matrix does not have a sum of zero');
             end
+            expected_size=[nclasses,nclasses];
+            if ~isequal(size(template),[nclasses,nclasses])
+                error('Template must be of size %dx%d',expected_size);
+            end
         end
 end
 

@@ -269,5 +269,15 @@ function test_correlation_measure_warning_shown_if_no_defaults()
         end
     end
 
+function test_correlation_measure_wrong_template_size()
+    ds=cosmo_synthetic_dataset('nchunks',2,'ntargets',2);
+
+    measure_args=struct();
+    measure_args.template = [ 1 -1  0  0 ; ...
+                             -1  1  0  0 ; ...
+                              0  0  1 -1 ;
+                              0  0 -1  1 ];
+    measure=@cosmo_correlation_measure;
+    assertExceptionThrown(@()measure(ds,measure_args));
 
 
