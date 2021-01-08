@@ -3,6 +3,13 @@
 
 .. _`ex_meeg_searchlight`:
 
+
+General MEEG analysis toolboxes
+===============================
+On the matlab platform:
+- :cite:`DM04`: EEGLAB
+- :cite:`OFM+11`: FieldTrip
+
 MEEG Searchlights
 =================
 

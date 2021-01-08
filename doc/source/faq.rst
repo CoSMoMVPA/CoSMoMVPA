@@ -175,6 +175,17 @@ It is considerably simple when chance is 1/c, with c the number of classes; in p
 In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can re-use the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
 
 
+Does the LDA (linear discriminant analysis) classifier use shrinkage / normalization?
+-------------------------------------------------------------------------------------
+Yes, the LDA classifier (:ref:`cosmo_classify_lda`) uses shrinkage / normalization. This classifier was already used in  :cite:`OWD+11`, where we wrote:
+
+'Because typically the number of voxels in selected regions was larger than the number of β-estimates from the GLM, the estimate of the covariance matrix is rank deficient. We therefore regularized the matrix by adding the identity matrix scaled by one percent of the mean of the diagonal elements.'
+
+Note that the regularization value of one percent is a parameter which can be adjusted in (:ref:`cosmo_classify_lda`).
+
+At some point some effort was put in supporting a fancier shrinkage method (:cite:`LW04`), but this implementation for CoSMoMVPA was not completed. Currently it has low priority as the currently used regularisation seems to work quite well, but Pull Requests with such a feature will definitely be considered.
+
+
 
 ============
 How do I ...
@@ -1416,7 +1427,7 @@ Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montec
 
 Why should I consider re-meaning when doing representational similarity analysis (RSA)?
 ---------------------------------------------------------------------------------------
-'In the * :ref:`cosmo_target_dsm_corr_measure` *documentation it is recommended to subtract the mean activity pattern first. Why is this recommended?'
+'In the  :ref:`cosmo_target_dsm_corr_measure` documentation it is recommended to subtract the mean activity pattern first. Why is this recommended?'
 
 This is explained well in :cite:`DK17`:
 
@@ -1811,6 +1822,9 @@ You could use the following code:
 	    ds_result = cosmo_slice(dsm, msk, 1, false);
 	    ds_result.sa.t1 = unq_t(ds_result.sa.targets1);
 	    ds_result.sa.t2 = unq_t(ds_result.sa.targets2);
+
+
+
 
 
 

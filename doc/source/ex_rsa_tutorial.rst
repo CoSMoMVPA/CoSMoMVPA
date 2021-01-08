@@ -6,6 +6,14 @@
 Representational similarity analysis
 ====================================
 
+Reading material
+++++++++++++++++
+
+- :cite:`EGK+98`: early (earliest?) fMRI RSA paper.
+- :cite:`KMR+08`: RSA paper with human and macaque data.
+- :cite:`DK17`: Overview paper.
+
+
 Visualizing dissimilarity matrices
 ++++++++++++++++++++++++++++++++++
 

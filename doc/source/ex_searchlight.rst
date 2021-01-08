@@ -1,6 +1,13 @@
 .. #   For CoSMoMVPA's license terms and conditions, see   #
    #   the COPYING file distributed with CoSMoMVPA         #
 
+.. _`ex_searchlight`:
+
+Reading material
+================
+:cite:`KGB06`: first fMRI searchlight paper.
+:cite:`OWD+10`: surface based searchlight (outside the scope of this exercise).
+
 Write a searchlight function that computes a generic dataset measure
 ====================================================================
 
