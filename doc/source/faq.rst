@@ -1748,7 +1748,7 @@ Get the classifier weights after training a classifier?
 
 Getting the weights back is currently not supported, and there are no short-term plans to add this. Rationale: the searchlight does generally not work well together with the measure concept, as the measure must return a Nx1 .samples (column vector) dataset. So the only way to make this fit with feature weights is to return the weights, but this is problematic when different searchlight locations have a different number of features associated with them. But even when the number of features would match there is no clear correspondence for each row with a particular feature location. So it all becomes quite messy really.
 
-It is also questionable how useful or interpretable these weights are (cite:`HFK+14`:
+It is also questionable how useful or interpretable these weights are, see :cite:`HMK+14` :
 
     'the interpretation of backward model [such as multivariate classifier] parameters can lead to wrong conclusions regarding the spatial or temporal origin of the neural signals of interest, since significant nonzero weights may also be observed at channels the activity of which is statistically independent of the brain process under study.'
 

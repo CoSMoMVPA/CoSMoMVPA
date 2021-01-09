@@ -385,7 +385,7 @@ MEG Exercises - deadline 23:59, 15 June 2016
         #) Lowpass filter the raw data with a cut-off frequency of 40 Hz.
         #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels. Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
         #) Do the time-locked analysis with respect to stimulus presentation for all the different conditions. Plot the evoked responses summarized across all channels for the different conditions. In particular, plot the different stimulation conditions in different subplots. In each subplot, the evoked responses for detected and not-detected stimuli.
-        # ) Plot the topography at different peak latencies. For the different stimuli
+        #) Plot the topography at different peak latencies. For the different stimuli
 
 
 #) Time-frequency analysis
@@ -395,9 +395,9 @@ MEG Exercises - deadline 23:59, 15 June 2016
         #) Define trials with a prestimulus interval and a poststimulus interval of 2 s each.
         #) Lowpass filter the raw data with a cutoff frequency at 40 Hz.
         #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels.
-        Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
+        #) Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
         #) Perform two different analyses:  first a time-frequency analysis and then a spectral analysis. Focus on the baseline period.
-        Compare detected stimuli versus not-detected stimuli. Since the number of trials is critical for the power make sure that you analyze the same number of trials for both conditions.
+        #) Compare detected stimuli versus not-detected stimuli. Since the number of trials is critical for the power make sure that you analyze the same number of trials for both conditions.
 
 
 #) Source analysis

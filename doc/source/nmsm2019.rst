@@ -4,7 +4,7 @@
 .. _nmsm2019:
 
 NMSM 2019, Noesselt’s lab 3rd Modelling Symposium, University of Magdeburg
-=========================================================================
+==========================================================================
 Noesselt’s lab 3rd Modelling Symposium, University of Magdeburg
 
 *presented by Nick Oosterhof*
