@@ -84,18 +84,22 @@ ds_sel=cosmo_dim_prune(ds_sel);
 ds_sel.sa.chunks=cosmo_chunkize(ds_sel,2);
 % <@@<
 
-% Now use cosmo_dim_transpose to make 'time' a sample dimension
+% Now use cosmo_dim_transpose to make 'time' a sample dimension, and
+% assign to ds_tr
 % Hint: the third argument to cosmo_dim_transpose must be 1, because
 % time now describes the first (sample) dimension in .samples
 % >@@>
 ds_tr=cosmo_dim_transpose(ds_sel,'time',1);
 % <@@<
 
-
+cosmo_disp(ds_tr);
 
 % Set the measure to be a function handle to
 % cosmo_dim_generalization_measure
+% >@@>
 measure=@cosmo_dim_generalization_measure;
+% <@@<
+
 
 % Set measure arguments
 measure_args=struct();
@@ -104,13 +108,17 @@ measure_args=struct();
 % - measure: @cosmo_crossvalidation_measure
 % - classifier: @cosmo_classify_lda
 % - dimension: 'time'
+% >@@>
 measure_args.measure=@cosmo_crossvalidation_measure;
 measure_args.classifier=@cosmo_classify_lda;
 measure_args.dimension='time';
+% <@@<
 
 % Now apply the measure to the dataset, and store the output in a variable
 % 'result'
+% >@@>
 result=measure(ds_tr,measure_args);
+% <@@<
 
 %% Visualize results
 

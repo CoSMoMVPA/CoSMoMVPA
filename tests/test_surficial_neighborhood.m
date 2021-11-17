@@ -37,6 +37,7 @@ function test_surficial_neighborhood_surface_dijkstra
 
     assertEqual(nh1.fa.radius,[2 1 sqrt(2) sqrt(2) 1 2]);
     assertEqual(nh1.fa.node_indices,1:6);
+    check_area(vertices,faces,nh1);
 
     args={{vertices,faces},'radius',2.5,'metric','dijkstra',opt};
     nh2=cosmo_surficial_neighborhood(ds,args{:});
@@ -50,6 +51,7 @@ function test_surficial_neighborhood_surface_dijkstra
     assertEqual(nh2.fa.radius,[2,2,1+sqrt(2),1+sqrt(2),2,2]);
     assertEqual(nh2.fa.node_indices,1:6);
     check_partial_neighborhood(ds,nh2,args);
+    check_area(vertices,faces,nh2);
 
     args{1}{1}([2,6],:)=NaN;
 
@@ -62,6 +64,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      []; });
     assertEqual(nh3.fa.radius,[2,NaN,1+sqrt(2),1+sqrt(2),2,NaN]);
     check_partial_neighborhood(ds,nh3,args);
+    check_area(args{1}{:},nh3);
 
     args{2}='count';
     args{3}=3;
@@ -74,6 +77,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [5 4 3];
                                      []; });
     assertEqual(nh4.fa.radius,[2,NaN,1+sqrt(2),1,sqrt(2),NaN]);
+    check_area(args{1}{:},nh4);
 
     args{1}{1}=vertices;
     args{1}{1}([2,5],:)=NaN; % split in two surfaces
@@ -86,6 +90,7 @@ function test_surficial_neighborhood_surface_dijkstra
                                      [];
                                      [6 3]; });
     assertEqual(nh5.fa.radius,[1,NaN,1,1,NaN,1]);
+    check_area(args{1}{:},nh5);
 
     % throw error when too many nodes asked for
     aet=@(varargin)assertExceptionThrown(@()...
@@ -550,6 +555,24 @@ function test_surface_subsampling
     % surfs are not a cell
     aet(ds,struct,opt);
     aet(ds,{pial,white,{}});
+
+
+function check_area(vertices,faces,nh)
+    assert(isfield(nh.fa,'area'));
+    area=surfing_surfacearea(vertices,faces);
+
+    node_idxs=nh.fa.node_indices;
+    n_nodes=numel(node_idxs);
+    for k=1:n_nodes
+        nbr_idxs=node_idxs(nh.neighbors{k});
+        expected_area=sum(area(nbr_idxs));
+        if isnan(expected_area)
+            assertEqual(expected_area,nh.fa.area(k))
+        else
+            assertElementsAlmostEqual(expected_area,nh.fa.area(k));
+        end
+    end
+
 
 
 

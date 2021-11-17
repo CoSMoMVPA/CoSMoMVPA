@@ -1,7 +1,7 @@
 function [arr, dim_labels, dim_values]=cosmo_unflatten(ds, dim, varargin)
 % unflattens a dataset from 2 to (1+K) dimensions.
 %
-% [arr, dim_labels]=cosmo_unflatten(ds, [dim, ][,...])
+% [arr, dim_labels, dim_values]=cosmo_unflatten(ds, [dim, ][,...])
 %
 % Inputs:
 %   ds                 dataset structure, with fields:

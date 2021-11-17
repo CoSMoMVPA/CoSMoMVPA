@@ -396,7 +396,7 @@ function test_eeglab_io_ersp()
                          {'ersp'},...
                          {false,true}});
 
-     ncombi=size(args,1);
+    ncombi=size(args,1);
     for k=1:ncombi
         arg=args(k,1:3);
         [s,ds_cell,ext]=build_eeglab_dataset_struct(arg{:});
@@ -558,7 +558,7 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype,...
         case 'erspbase'
             chan_suffix='_erspbase';
 
-        case 'itc';
+        case 'itc'
             chan_suffix='_itc';
 
         otherwise
@@ -577,7 +577,7 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype,...
             has_freq=true;
 
 
-        case {'erp'};
+        case {'erp'}
             has_freq=false;
 
         otherwise
@@ -602,7 +602,7 @@ function [s,ds,ext]=build_eeglab_dataset_struct(has_ica,has_trial,datatype,...
     if hastime
         % include time dimension
         time_label={'time'};
-        time_value={(1:time_dim())*.2-.1};
+        time_value={(1:time_dim)*.2-.1};
     else
         % no time dimension
         time_dim=[];

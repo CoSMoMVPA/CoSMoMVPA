@@ -27,10 +27,15 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
 %    provide an option 'normalization' to perform data scaling
 %  - As of Matlab 2017a (maybe earlier), Matlab gives the warning that
 %      'svmtrain will be removed in a future release. Use fitcsvm instead.'
-%    however fitcsvm gives different results than svmtrain. In this
-%    function the warning message is suppressed.
+%    however fitcsvm gives different results than svmtrain; as a result
+%    cosmo_classify_matlabcsvm gives different results than
+%    cosmo_classify_matlabsvm. In this function the warning message is
+% .  suppressed.
+%  - As of Matlab 2018a, this function cannot be used anymore. Use
+%    cosmo_classify_matlabcsvm instead.
 %
-% See also svmtrain, svmclassify, cosmo_classify_matlabsvm
+% See also svmtrain, svmclassify, cosmo_classify_matlabsvm,
+%          cosmo_classify_matlabcsvm
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -91,17 +96,15 @@ function predicted=cosmo_classify_matlabsvm_2class(samples_train, targets_train,
             % only show warning once (by default) if this is a
             % a stats:obsolete message
             suffix=['CoSMoMVPA note: the more recent '...
-                        'fitcsvm / svmsmoset classifiers'...
+                        'fitcsvm / svmsmoset classifiers produce '...
                         'different results '...
                         'than the older svmtrain function. '...
-                        'Currently there is no support '...
-                        'in CoSMoMVPA for using fitcsvm in a '...
-                        'classifier'];
+                        'To use fitcsvm, use cosmo_classify_matlabcsvm'];
             cosmo_warning('%s\n%s',warning_msg,suffix);
         elseif ~strcmp(warning_id,orig_lastid)
             % new warning was issued , different from stats:obsolete one;
             % show warning message
-            warning(warning_id,warning_msg);
+            cosmo_warning(warning_id,warning_msg);
         end
 
 

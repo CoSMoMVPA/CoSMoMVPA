@@ -6,6 +6,14 @@
 Representational similarity analysis
 ====================================
 
+Reading material
+++++++++++++++++
+
+- :cite:`EGK+98`: early (earliest?) fMRI RSA paper.
+- :cite:`KMR+08`: RSA paper with human and macaque data.
+- :cite:`DK17`: Overview paper.
+
+
 Visualizing dissimilarity matrices
 ++++++++++++++++++++++++++++++++++
 
@@ -54,5 +62,5 @@ Hint: :ref:`run_rsm_measure_searchlight_skl`
 
 Solution: :ref:`run_rsm_measure_searchlight` / run_rsm_measure_searchlight_pb_
 
-.. _run_rsm_measure_searchlight_pb: _static/publish/run_rmm_measure_searchlight.html
+.. _run_rsm_measure_searchlight_pb: _static/publish/run_rsm_measure_searchlight.html
 

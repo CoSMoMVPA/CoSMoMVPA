@@ -1,5 +1,4 @@
 
-.. _`links`: Links
 
 .. _AFNI: http://afni.nimh.nih.gov
 .. _AFNI Matlab: http://afni.nimh.nih.gov/afni/matlab/

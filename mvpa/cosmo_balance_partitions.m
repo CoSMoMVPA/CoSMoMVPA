@@ -169,6 +169,23 @@ function bal_partitions=cosmo_balance_partitions(partitions,ds, varargin)
     bal_partitions.train_indices=cat(2,train_indices_out{:});
     bal_partitions.test_indices=cat(2,test_indices_out{:});
 
+    bal_partitions=ensure_sorted_indices(bal_partitions);
+
+    cosmo_check_partitions(bal_partitions,ds);
+
+function partitions=ensure_sorted_indices(partitions)
+    fns={'train_indices','test_indices'};
+    for k=1:numel(fns)
+        fn=fns{k};
+        idx_cell=partitions.(fn);
+        for j=1:numel(idx_cell)
+            idx=idx_cell{j};
+            if ~issorted(idx)
+                partitions.(fn){j}=sort(idx);
+            end
+        end
+    end
+
 
 function tr_folds_out=sample_indices(target_idx,fold_class_pos,...
                                         nfolds_out,params)

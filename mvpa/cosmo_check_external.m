@@ -16,7 +16,8 @@ function is_ok=cosmo_check_external(external, raise_)
 %                          'xunit'     xUnit unit test framework
 %                          'moxunit'   MOxUnit unit test framework
 %                          'matlabsvm' SVM classifier in matlab stats
-%                                      toolbox
+%                                      toolbox (prior 2018a)
+%                          'matlabcsvm'
 %                          'svm'       Either matlabsvm or libsvm
 %                          '@{name}'   Matlab toolbox {name}
 %                          It can also be '-list', '-tic', '-toc',' or
@@ -162,7 +163,7 @@ function is_ok=check_which(command_name,raise_)
 
 function is_ok=check_external_toolbox(external_name,raise_)
     externals=get_externals();
-    if ~isfield(externals, external_name);
+    if ~isfield(externals, external_name)
         error('Unknown external ''%s''', external_name);
     end
 
@@ -292,10 +293,6 @@ function tf=toolbox_in_matlab_path(toolbox_dir)
 
     tf=cached_tf;
 
-    %paths=cosmo_strsplit(path(),pathsep());
-    %starts_with_toolbox_dir=@(x)isempty(cosmo_strsplit(x,toolbox_dir,1));
-    %f=any(cellfun(starts_with_toolbox_dir,paths));
-
 
 function s=url2str(url)
     if strcmp(cosmo_wtf('environment'),'matlab')
@@ -405,6 +402,18 @@ function externals=get_externals_helper()
                               'Article ID 156869, 9 pages.',...
                               'doi:10.1155/2011/156869'];
 
+    externals.eeglab.is_present=@() has('eeglab') ...
+                                       && has('pop_loadset');
+    externals.eeglab.is_recent=yes;
+    externals.eeglab.label='EEGLAB toolbox';
+    externals.eeglab.url='https://sccn.ucsd.edu/eeglab/';
+    externals.eeglab.authors={'A. Delorme','S. Makeig'};
+    externals.eeglab.year='2004';
+    externals.eeglab.ref=['EEGLAB: an open source toolbox for analysis '...
+                            'of single-trial EEG dynamics. '...
+                            'Journal of Neuroscience Methods 134:9-21'];
+
+
     externals.libsvm.is_present=@() has('svmpredict') && ...
                                         has('svmtrain');
     % require version 3.18 or later, because it has a 'quiet' option
@@ -469,7 +478,9 @@ function externals=get_externals_helper()
     externals.matlabsvm.is_present=@() (has_toolbox('stats') || ...
                                             has_toolbox('bioinfo')) && ...
                                         has('svmtrain') && ...
-                                        has('svmclassify');
+                                        has('svmclassify') && ...
+                                        is_matlab_prior_2018a();
+
     externals.matlabsvm.is_recent=yes;
     externals.matlabsvm.conflicts.neuroelf=@() isequal(...
                                                 path_of('svmtrain'),...
@@ -479,6 +490,14 @@ function externals=get_externals_helper()
                                                 path_of('svmclassify'));
     externals.matlabsvm.label='Matlab stats or bioinfo toolbox';
     externals.matlabsvm.url='http://www.mathworks.com';
+
+    externals.matlabcsvm.is_present=@() cosmo_wtf('is_matlab') && ...
+                                        has('fitcsvm');
+
+    externals.matlabcsvm.is_recent=yes;
+    externals.matlabcsvm.label='Matlab stats or bioinfo toolbox';
+    externals.matlabcsvm.url='http://www.mathworks.com';
+
 
     externals.svm={'libsvm', 'matlabsvm'}; % need either
 
@@ -550,6 +569,24 @@ function externals=get_externals_helper()
                                         'documentation test framework'];
     externals.modox.authors={'N. N. Oosterhof'};
     externals.modox.url='https://github.com/MOdox/MOdox';
+
+
+function tf=is_matlab_prior_2018a()
+    this_version=cosmo_wtf('version_number');
+
+    matlab_pivot=[9, 4]; % verison 2018a
+    n_elem = numel(matlab_pivot);
+
+    delta = this_version(1:n_elem) - matlab_pivot;
+    if all(delta==0)
+        % this is version 2018a
+        tf=false;
+    else
+        idx=find(delta~=0,1);
+        % positive delta means that the current matlab version
+        % is later than 2018a
+        tf=delta(idx)<0;
+    end
 
 function tf=has_octave_package(label)
     tf=false;

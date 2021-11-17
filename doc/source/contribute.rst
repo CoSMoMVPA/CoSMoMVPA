@@ -207,8 +207,8 @@ Notes on committing
   - To view the history of previous commits, ``gitk`` is useful.
   - Use the following tags (inspired by PyMVPA_) for commits:
 
-    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that the build system can generate acknowledgements on the web page.
-    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed. If the bug was fixed before the code was merged into the master branch, use ``FT``.
+    + ``ACK``: Acknowledge someone else. Acknowledgees should be placed between ``#`` characters, so that acknowledgements can be generated automatically.
+    + ``BF``: Bugfix. Preferably this comes also with a unit test (i.e., ``BF+TST``) that checks whether the bug was indeed fixed.
     + ``BK``: Breaks existing functionality, or the signature of functions (changes in the number, or the meaning, of input and output arguments).
     + ``BLD``: Changes in the build system.
     + ``BIG``: Major change. Please use together with another tag.
@@ -219,11 +219,10 @@ Notes on committing
     + ``MSC``: Miscellaneous changes, not covered by any of the other tags.
     + ``NF``: New feature or functionality.
     + ``OCTV``: Change in GNU Octave compatibility.
-    + ``OPT``: Optimalization. It should be used when the new code runs faster or uses less memory.
-    + ``RF``: Refactoring (changes in functions that do not affect their external behaviour).
+    + ``OPT``: Optimalization. A special case of refactoring. It should be used when the new code runs faster or uses less memory.
+    + ``RF``: Refactoring. To be used for changes in code that does not affect its external behaviour.
     + ``RUN``: Change in runnable example scripts (in ``examples/``).
-    + ``SML``: Minor change. Can be without an explanation of what was changed.  Please use together with another tag.
-    + ``STD``: Change to adhere better to coding standards. ``SML`` can be omitted.
+    + ``SML``: Minor change.
     + ``TST``: Change in test functions (functions in ``tests/``, or documentation tests).
     + ``WEB``: Changes affecting web site content (either documentation in ``.rst`` files, or other files such as images).
 
@@ -1008,7 +1007,7 @@ To indicate that a code block is an exercise, place a line containing ``% >@@>``
 
 Documentation tests
 +++++++++++++++++++
-When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. This uses the MOdox_ framework. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``%|| ``. For example:
+When providing examples it is a good idea to write them in the shape of examples, so that running :ref:`cosmo_run_tests` will actually test whether the code runs as advertised. This uses the MOdox_ framework. Many `modules <matindex.html>`_ have such doctests; you can spot them in the ``Examples:`` section of the help info, where the expected output is preceded by ``%||``. For example:
 
     .. include:: matlab/cosmo_strsplit_hdr.txt
 

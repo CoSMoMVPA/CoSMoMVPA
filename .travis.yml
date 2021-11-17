@@ -3,10 +3,10 @@
 # based on nipype configuration, which in turn was based on nipy)
 #
 # We pretend to be java because we need GNU Octave which is not 
-# available (as of April 2015)
+# available (as of June 2019)
 
 language: java
-dist: trusty
+dist: xenial
 cache:
   - apt
 env:
@@ -35,9 +35,11 @@ before_install:
     - travis_retry sudo apt-get -y install octave
     - travis_retry sudo apt-get -y install liboctave-dev
     - travis_retry sudo apt-get -y -qq install octave
+    - octave --version
+    - which make
 
     # when installing externals, get recent GCC for Octave parallel toolbox
-    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "true" ]]; then
+    - if [[ "${TRAVIS_WITH_EXTERNALS}" == "trueDISABLED" ]]; then
           travis_retry sudo add-apt-repository 'ppa:ubuntu-toolchain-r/test' -y;
           travis_retry sudo apt-get update -y -q;
           travis_retry sudo apt-get install gcc-4.8 g++-4.8 -y -q;
@@ -107,13 +109,13 @@ install:
                                 Octave:mixed-string-concat
                                 Octave:variable-switch-label"
     - OCTAVE=octave
+    # TODO: add gifti back
     - if [[ "$TRAVIS_WITH_EXTERNALS" == "true" ]]; then
           EXTERNALS="
                      afni
                      surfing
                      fieldtrip
                      libsvm
-                     gifti
                      octave_pkg_struct
                      octave_pkg_parallel
                      octave_pkg_statistics
@@ -136,6 +138,22 @@ install:
     - if [[ " $EXTERNALS " = *" octave_pkg_struct "* ]]; then
           $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','struct');";
       fi
+
+    # optionally enable Octave statistics package
+    #$RETRY sudo apt-get -y -qq install octave-statistics;
+    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
+           $RETRY $OCTAVE --eval "pkg('install','-forge','statistics');";
+      fi
+    # optionally enable Octave miscellaneous package
+    # (the "general" package is required for the "miscellaneous" package)
+    # (the "miscellaneous" package also requires "units")
+    - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
+          $RETRY sudo apt-get -y -qq install units;
+          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
+      fi
+
+
 
     # As of Aug 2017, the parallel package is disabled because it made Octave crash
     # when using travis
@@ -183,14 +201,16 @@ install:
     # custum branch that fixes the issue. The official branch is the
     # last entry in the list below.
     #
-    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _fix/octave_fixname_empty_input
+    # 2019-07-19: https://github.com/fieldtrip/fieldtrip/pull/1171
+    # git clone git://github.com/nno/fieldtrip.git --depth 1 -b _octave/fix_compat;
     # git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
 
     - if [[ " $EXTERNALS " = *" fieldtrip "* ]]; then
           rm -rf fieldtrip;
-          git clone git://github.com/fieldtrip/fieldtrip.git --depth 1;
+          git clone git://github.com/nno/fieldtrip.git --depth 1 -b _octave/fix_compat;
           $OCTAVE --eval "cd('${PTH}/fieldtrip');
                             ft_defaults();
+                            rmpath('${PTH}/fieldtrip/external/gifti');
                             savepath();";
       fi
 
@@ -205,16 +225,15 @@ install:
       fi
 
     # optionally install gifti library
+    # Note: FieldTrip brings its own version, which we remove from the path
     - if [[ " $EXTERNALS " = *" gifti "* ]]; then
-          GIFTI_VERSION=1.6;
-          GIFTI_NAME=gifti-${GIFTI_VERSION};
-          rm -rf ${GIFTI_NAME}.zip;
-          wget http://www.artefact.tk/software/matlab/gifti/${GIFTI_NAME}.zip;
-          unzip ${GIFTI_NAME}.zip;
-          $OCTAVE --eval "cd('${PTH}/${GIFTI_NAME}/@gifti/private');
+          git clone https://github.com/gllmflndn/gifti.git;
+          $OCTAVE --eval "cd('gifti/@gifti/private');
                           mex('zstream.c');
-                          addpath('${PTH}/${GIFTI_NAME}');
+                          addpath('${PTH}/gifti');
+                          rmpath('${PTH}/fieldtrip/external/gifti');
                           savepath();";
+          ls ${PTH}/gifti/@gifti/private;
       fi
 
     # disable "more"
@@ -237,20 +256,6 @@ before_script:
 
 
 
-    # optionally enable Octave statistics package
-    - if [[ " $EXTERNALS " = *" octave_pkg_statistics "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','statistics');";
-      fi
-
-    # optionally enable Octave miscellaneous package
-    # (the "general" package is required for the "miscellaneous" package)
-    # (the "miscellaneous" package also requires "units")
-    - if [[ " $EXTERNALS " = *" octave_pkg_miscellaneous "* ]]; then
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','general');";
-          $RETRY sudo apt-get -y -qq install units;
-          $RETRY $OCTAVE --eval "pkg('install','-auto','-forge','miscellaneous');";
-      fi
-
     # show Octave-rc
     - echo "Octave-rc:"; cat $OCTAVERC
 
@@ -258,7 +263,7 @@ before_script:
     # show which packages are installed
     - $OCTAVE --eval "pkg('list')"
 
-     # show WTF
+    # show WTF
     - $OCTAVE --eval "addpath('${PTH}/CoSMoMVPA/mvpa');cosmo_wtf()"
 
 script:

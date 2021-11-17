@@ -28,7 +28,7 @@ CoSMoMVPA
    get_started
    download
    documentation
-   labman2017
+   nmsm2019
    tips
    faq
    contact
@@ -48,7 +48,7 @@ CoSMoMVPA
 .. image:: _static/icon_documentation.png
    :target: documentation.html
 .. image:: _static/icon_exercises.png
-   :target: labman2017.html
+   :target: nmsm2019.html
 .. image:: _static/icon_tips.png
    :target: tips.html
 .. image:: _static/icon_faq.png

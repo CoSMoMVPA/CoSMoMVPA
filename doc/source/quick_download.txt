@@ -9,7 +9,7 @@
 
         * In that case, use :ref:`cosmo_set_path` to set the path.
 
-- Full CoSMOMVPA tutorial data in `zip format <datadb-v0.3.zip>`_; used for :ref:`labman2017`.
+- Full CoSMOMVPA tutorial data in `zip format <datadb-v0.3.zip>`_; used for :ref:`labman2017` and :ref:`nmsm2019`.
 
         * fMRI AK6 and MEEG obj-6 data (for `PRNI 2016`_ exercises): `tutorial data with fMRI AK6 and MEEG obj6 data only <datadb-ak6-meg_obj6-v0.3.zip>`_
 

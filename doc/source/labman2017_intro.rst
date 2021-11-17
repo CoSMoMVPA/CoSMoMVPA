@@ -64,7 +64,7 @@ For most of the course we will be using the AK6 dataset and the MEG obj6 dataset
 
 Download link: `full tutorial data <datadb-v0.3.zip>`_.
 
-LABMAN_ participants: this dataset should already be present on the lab computers, in which case there is no need to download this data.
+:ref:`labman2017` participants: this dataset should already be present on the lab computers, in which case there is no need to download this data.
 
 AK6 dataset
 -----------

@@ -175,6 +175,17 @@ It is considerably simple when chance is 1/c, with c the number of classes; in p
 In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can re-use the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
 
 
+Does the LDA (linear discriminant analysis) classifier use shrinkage / normalization?
+-------------------------------------------------------------------------------------
+Yes, the LDA classifier (:ref:`cosmo_classify_lda`) uses shrinkage / normalization. This classifier was already used in  :cite:`OWD+11`, where we wrote:
+
+'Because typically the number of voxels in selected regions was larger than the number of β-estimates from the GLM, the estimate of the covariance matrix is rank deficient. We therefore regularized the matrix by adding the identity matrix scaled by one percent of the mean of the diagonal elements.'
+
+Note that the regularization value of one percent is a parameter which can be adjusted in (:ref:`cosmo_classify_lda`).
+
+At some point some effort was put in supporting a fancier shrinkage method (:cite:`LW04`), but this implementation for CoSMoMVPA was not completed. Currently it has low priority as the currently used regularisation seems to work quite well, but Pull Requests with such a feature will definitely be considered.
+
+
 
 ============
 How do I ...
@@ -511,30 +522,30 @@ Run group analysis on time-by-time generalization measures
 Use LIBSVM
 ----------
 
-    Download LIBSVM_, then in Matlab or Octave, do
+Download LIBSVM_, then in Matlab or Octave, do
 
-         .. code-block:: matlab
+ .. code-block:: matlab
 
-            cd libsvm; % change this to the directory where you put LIBSVM
-            cd matlab  % go to matlab sub-directory
-            make       % compile libsvm mex functions; requires a working compiler
-            rmpath(pwd)   % } ensure directory is on top
-            addpath(pwd)  % } of the search path
+    cd libsvm; % change this to the directory where you put LIBSVM
+    cd matlab  % go to matlab sub-directory
+    make       % compile libsvm mex functions; requires a working compiler
+    rmpath(pwd)   % } ensure directory is on top
+    addpath(pwd)  % } of the search path
 
-            % verify it worked.
-            cosmo_check_external('libsvm'); % should not give an error
+    % verify it worked.
+    cosmo_check_external('libsvm'); % should not give an error
 
-    + If the ``make`` command failed, make sure you are in the LIBSVM's ``matlab`` subdirectory, and that you have a working `compiler under Matlab`_ or `compiler under Octave`_.
++ If the ``make`` command failed, make sure you are in the LIBSVM's ``matlab`` subdirectory, and that you have a working `compiler under Matlab`_ or `compiler under Octave`_.
 
-    + If you want to store the path, you can also do
++ If you want to store the path, you can also do
 
-         .. code-block:: matlab
+ .. code-block:: matlab
 
-            savepath
+    savepath
 
-    so that the next time you start Matlab or Octave, the correct path is used.
+so that the next time you start Matlab or Octave, the correct path is used.
 
-    Matlab also provides an SVM implementation in the ``stats`` (and possible other) toolboxes, and the naming of the training functions are not compatible with LIBSVM. Thus, you can use either Matlab's SVM or LIBSVM, but not both at the same time. To select which SVM implementation is used, set the Matlab search path so that either LIBSVM is on top (comes earlier; to use LIBSVM) or at the bottom (comes later; to use Matlab's SVM).
+Matlab also provides an SVM implementation in the ``stats`` (and possible other) toolboxes, and the naming of the training functions are not compatible with LIBSVM. Thus, you can use either Matlab's SVM or LIBSVM, but not both at the same time. To select which SVM implementation is used, set the Matlab search path so that either LIBSVM is on top (comes earlier; to use LIBSVM) or at the bottom (comes later; to use Matlab's SVM).
 
 
 .. _compiler under Matlab: http://it.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html
@@ -651,6 +662,74 @@ If ``pred_ds`` is the dataset with predictions, then accuracies can be computed 
         acc_ds.sa=struct();             % reset sample attributes
         acc_ds.samples=nanmean(bsxfun(@eq,pred_ds.samples,pred_ds.sa.targets));
 
+
+
+
+Make a merged hemisphere from a left and right hemisphere
+---------------------------------------------------------
+'Using Freesurfer I generated left and right hemisphere anatomical surface files. How can I combine them into a merged hemisphere?'
+
+You could use the function below.
+
+    .. code-block:: matlab
+
+        function [v_merged, f_merged] = merge_surfaces(filenames)
+        % merge surface filesep
+        %
+        % Input:
+        %   filenames:      cell filenames of surfaces to merge, for example
+        %                   these can be '.asc'  files as generated by FreeSurfer's
+        %                   recon_all
+        %
+        % Output:
+        %   v_merged        Nx3 matrix with vertex coordinates for N vertices
+        %   f_merged        Mx3 matrix with face indices for M faces
+        %
+        % Example:
+        %   % merge left and right hemispheres of pial surface
+        %   fns = {'lh.pial.asc', 'rh.pial.asc'}
+        %   [v,f]=merge_surfaces(fns)
+        %   surfing_write('mh.pial.asc',v,f);
+        %
+        % Note:
+        % - this function uses surfing_read from the Surfing toolbox.
+        %   See https://github.com/surfing/surfing
+        % - the output can be saved with surfing_write
+        %
+        % Nick Oosterhof 2018-10-12
+
+            if ~iscellstr(filenames)
+                error('input must be cell with filenames')
+            end
+
+            n_surfaces = numel(filenames);
+            v_s = cell(n_surfaces,1);
+            f_s = cell(n_surfaces,1);
+
+            n_total = 0;
+            for k=1:n_surfaces
+                filename = filenames{k};
+                [v, f] = surfing_read(filename);
+                cosmo_disp(v)
+                cosmo_disp(f)
+
+                % keep the vertex coordinates
+                v_s{k} = v;
+
+                % update face indices to take into account previous input surfaces
+                f_s{k} = f + n_total;
+
+                # update index of first face for next surface
+                n_vertices = size(v,1);
+                n_total = n_total + n_vertices;
+            end
+
+            v_merged = cat(1,v_s{:});
+            f_merged = cat(1,f_s{:});
+
+
+
+Note: this question is about anatomical information (positions of nodes on the surface and node indices that form triangles on the surface); the question below is about functional, statistical or other data for maps on the surface. They share the approach in incrementing node indices for all but the first surface.
 
 Merge surface data from two hemispheres
 ---------------------------------------
@@ -1416,11 +1495,11 @@ Yes, although it requires a bit of extra work. You would run  :ref:`cosmo_montec
 
 Why should I consider re-meaning when doing representational similarity analysis (RSA)?
 ---------------------------------------------------------------------------------------
-'In the * :ref:`cosmo_target_dsm_corr_measure` *documentation it is recommended to subtract the mean activity pattern first. Why is this recommended?'
+'In the  :ref:`cosmo_target_dsm_corr_measure` documentation it is recommended to subtract the mean activity pattern first. Why is this recommended?'
 
 This is explained well in :cite:`DK17`:
 
-    `Activity estimates commonly co-vary together across fMRI imaging runs, because all activity estimates within a partition are measured relative to the same resting baseline. This positive correlation can be reduced by subtracting, within each partition, the mean activity pattern (across conditions) from each activity pattern. This makes the mean of each measurement channel (across condition) zero and thus centers the ensemble of points in activity-pattern space that is centered on the origin.'
+'Activity estimates commonly co-vary together across fMRI imaging runs, because all activity estimates within a partition are measured relative to the same resting baseline. This positive correlation can be reduced by subtracting, within each partition, the mean activity pattern (across conditions) from each activity pattern. This makes the mean of each measurement channel (across condition) zero and thus centers the ensemble of points in activity-pattern space that is centered on the origin.'
 
 
 
@@ -1582,74 +1661,11 @@ For time-frequency data:
 
 Note that there is no example script (yet) showing how to transform this data back into BrainStorm.
 
-Make a merged hemisphere from a left and right hemisphere
----------------------------------------------------------
-'Using Freesurfer I generated left and right hemisphere surface files. How can I combine them into a merged hemisphere?'
-
-You could use the function below.
-
-    .. code-block:: matlab
-
-        function [v_merged, f_merged] = merge_surfaces(filenames)
-        % merge surface filesep
-        %
-        % Input:
-        %   filenames:      cell filenames of surfaces to merge, for example
-        %                   these can be '.asc'  files as generated by FreeSurfer's
-        %                   recon_all
-        %
-        % Output:
-        %   v_merged        Nx3 matrix with vertex coordinates for N vertices
-        %   f_merged        Mx3 matrix with face indices for M faces
-        %
-        % Example:
-        %   % merge left and right hemispheres of pial surface
-        %   fns = {'lh.pial.asc', 'rh.pial.asc'}
-        %   [v,f]=merge_surfaces(fns)
-        %   surfing_write('mh.pial.asc',v,f);
-        %
-        % Note:
-        % - this function uses surfing_read from the Surfing toolbox.
-        %   See https://github.com/surfing/surfing
-        % - the output can be saved with surfing_write
-        %
-        % Nick Oosterhof 2018-10-12
-
-            if ~iscellstr(filenames)
-                error('input must be cell with filenames')
-            end
-
-            n_surfaces = numel(filenames);
-            v_s = cell(n_surfaces,1);
-            f_s = cell(n_surfaces,1);
-
-            n_total = 0;
-            for k=1:n_surfaces
-                filename = filenames{k};
-                [v, f] = surfing_read(filename);
-                cosmo_disp(v)
-                cosmo_disp(f)
-
-                % keep the vertex coordinates
-                v_s{k} = v;
-
-                % update face indices to take into account previous input surfaces
-                f_s{k} = f + n_total;
-
-                # update index of first face for next surface
-                n_vertices = size(v,1);
-                n_total = n_total + n_vertices;
-            end
-
-            v_merged = cat(1,v_s{:});
-            f_merged = cat(1,f_s{:});
-
-
 Compute the correlation between two dissimilarity matrices
 ----------------------------------------------------------
 'I would like to correlate behavioural ratings with a theoretical model, how can I do this'
 
-You can use the example below to correlate two dissimilarity matrices; these can also be
+You can use the example below to correlate two dissimilarity matrices. Note that instead of ``cosmo_squareform`` and ``cosmo_corr`` also the inbuilt ``squareform`` and ``corr`` functions can be used, if available.
 
     .. code-block:: matlab
 
@@ -1665,8 +1681,8 @@ You can use the example below to correlate two dissimilarity matrices; these can
                  1 2 0 0];
 
         % convert to linear vectors
-        x_vec = squareform(x_dsm);
-        y_vec = squareform(y_dsm);
+        x_vec = cosmo_squareform(x_dsm);
+        y_vec = cosmo_squareform(y_dsm);
 
         % compute Spearman correlation between the matrices
         % ( - for non-Parametric Spearman correlations, use 'Spearman'.)
@@ -1674,6 +1690,147 @@ You can use the example below to correlate two dissimilarity matrices; these can
         r = cosmo_corr(x_vec(:), y_vec(:), 'Pearson')
 
 For analysis at the group level, compute for each participant the correlation between their behavioural ratings, then use a one-sample t-test against a difference of zero.
+
+Use the generalization measure with different durations for training and test set?
+----------------------------------------------------------------------------------
+'I would like to use the :ref:`cosmo_dim_generalization_measure` but with different time intervals for training and test set. For the training set I have 3 seconds of data per trial, but for the test set only 1 second. How can I run this analysis?'
+
+Please see the code below for an example. It is similar to the documentation of :ref:`cosmo_dim_generalization_measure`, except that in the preparation phase the :ref:`cosmo_dim_transpose`  step is done before the :ref:`cosmo_stack` step. This order is also necessary when using :ref:`cosmo_searchlight`.
+
+    .. code-block:: matlab
+
+        % Generalization over time
+
+        % Make some synthetic data
+        sz='big';
+        train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                               'nchunks',2,'seed',1);
+        test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                               'nchunks',3,'seed',2);
+
+        % select a smaller time period for the testing dataset
+        % here, only the time period between -0.15 and 0.05 seconds is selected
+        msk=cosmo_dim_match(test_ds, 'time', @(t) -0.15 <= t & t <= .05);
+        smaller_test_ds = cosmo_slice(test_ds, msk, 2);
+
+        % set chunks
+        train_ds.sa.chunks(:)=1;
+        smaller_test_ds.sa.chunks(:)=2;
+
+        % make time a sample dimension
+        dim_label='time';
+        train_ds_tr = cosmo_dim_transpose(train_ds, dim_label, 1);
+        smaller_test_ds_tr = cosmo_dim_transpose(smaller_test_ds, dim_label, 1);
+
+        % construct the dataset
+        ds_time=cosmo_stack({train_ds_tr, smaller_test_ds_tr});
+
+        %
+        % set measure and its arguments
+        measure_args=struct();
+        %
+        % use correlation measure
+        measure_args.measure=@cosmo_correlation_measure;
+        % dimension of interest is 'time'
+        measure_args.dimension=dim_label;
+        %
+        % run time-by-time generalization analysis
+        dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args,...
+                                                'progress',false);
+        %
+        % the output has train_time and test_time as sample dimensions
+        cosmo_disp(dgm_ds.a)
+
+
+Get the classifier weights after training a classifier?
+-------------------------------------------------------
+'Using ROI-based MVPA, I would like to know which voxels get a large weight to drve classification. How can I get these weights as output?' [Original question on Google Groups by Lina T., 2018-01-08]
+
+Getting the weights back is currently not supported, and there are no short-term plans to add this. Rationale: the searchlight does generally not work well together with the measure concept, as the measure must return a Nx1 .samples (column vector) dataset. So the only way to make this fit with feature weights is to return the weights, but this is problematic when different searchlight locations have a different number of features associated with them. But even when the number of features would match there is no clear correspondence for each row with a particular feature location. So it all becomes quite messy really.
+
+It is also questionable how useful or interpretable these weights are, see :cite:`HMK+14` :
+
+    'the interpretation of backward model [such as multivariate classifier] parameters can lead to wrong conclusions regarding the spatial or temporal origin of the neural signals of interest, since significant nonzero weights may also be observed at channels the activity of which is statistically independent of the brain process under study.'
+
+If you really want the classifier weights back, then you could write your own custom function, and maybe even a measure, if you want to use a searchlight.
+
+
+Get coordinates of voxels in a CoSMoMVPA fMRI dataset?
+------------------------------------------------------
+These can be obtained using :ref:`cosmo_vol_coordinates`.
+
+
+Compute representational similarity across chunks?
+--------------------------------------------------
+'I have collected data in an fMRI study with 15 targets for run 1 (``chunks=1``) and another (disjoint set of) 15 targets in run 2 (``chunks=2``). I would like to compute the similarity for all 255 (=15*15) targets, but not for targets within the same chunk. How can I achieve this?  [Original question on Google Groups by Lyam B., 2020-09-15]
+
+You could use the following code:
+
+    .. code-block:: matlab
+
+	function ds_result=my_across_chunks_dissimilarity_matrix_measure(ds,opt)
+	% compute dissimilarity across chunks
+	%
+	% ds_result=my_across_chunks_dissimilarity_matrix_measure(ds,opt)
+	%
+	% Input:
+	%   ds              dataset struct with two unique valus in ds.sa.chunks
+	%   opt             optional options to be passed to
+	%                   cosmo_dissimilarity_matrix_measure
+	%
+	% Output:
+	%   ds_result       output dataset with all similarities computed between
+	%                   samples with different values for chunks. Thus if the
+	%                   input dataset has A values for the first chunk and B
+	%                   for the second chunk, the output has A*B samples.
+	%     .sa           sample attributes indicating
+	%        .targets1  } target indices for the dissimilarity matrix, similar
+	%        .targets2  } as in cosmo_dissimilarity_matrix_measure
+	%        .t1         } the target (experimental condition) labels
+	%        .t2         }
+	%
+	% See also: cosmo_dissimilarity_matrix_measure
+
+	    if nargin<2
+		opt=struct();
+	    end
+
+	    dsm=cosmo_dissimilarity_matrix_measure(ds,opt);
+
+	    [chunk_idxs, unq_chunks]=cosmo_index_unique(ds.sa.chunks);
+
+	    if numel(unq_chunks) ~= 2
+		error('Expected two chunks');
+	    end
+
+	    % targets present in the two chunks
+	    ch_t1 = ds.sa.targets(chunk_idxs{1});
+	    ch_t2 = ds.sa.targets(chunk_idxs{2});
+
+	    % two vectors should be disjoint
+	    overlapping_msk=bsxfun(@eq,ch_t1,ch_t2');
+	    if any(overlapping_msk(:))
+		error('At least one target present in both chunks');
+	    end
+
+	    [unused,unq_t]=cosmo_index_unique(ds.sa.targets);
+
+	    % find relevant rows in dsm
+	    sa_t1 = unq_t(dsm.sa.targets1);
+	    sa_t2 = unq_t(dsm.sa.targets2);
+
+	    msk1 = cosmo_match(sa_t1,ch_t1) & cosmo_match(sa_t2,ch_t2);
+	    msk2 = cosmo_match(sa_t1,ch_t2) & cosmo_match(sa_t2,ch_t1);
+
+	    msk = msk1 | msk2;
+
+	    ds_result = cosmo_slice(dsm, msk, 1, false);
+	    ds_result.sa.t1 = unq_t(ds_result.sa.targets1);
+	    ds_result.sa.t2 = unq_t(ds_result.sa.targets2);
+
+
+
+
 
 
 .. include:: links.txt

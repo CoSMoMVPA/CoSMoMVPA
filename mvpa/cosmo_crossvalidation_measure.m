@@ -40,12 +40,12 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
 %   args.check_partitions  optional (default: true). If set to false then
 %                          partitions are not checked for being set
 %                          properly.
-%   args.normalization  optional, one of '{zscore,demean,scale_unit}{1,2}'
+%   args.normalization  optional, one of 'zscore','demean','scale_unit'
 %                       to normalize the data prior to classification using
 %                       zscoring, demeaning or scaling to [-1,1] along the
-%                       first or second dimension of ds. Normalization
-%                       parameters are estimated using the training data
-%                       and applied to the testing data.
+%                       first dimension of ds. Normalization parameters are
+%                       estimated using the training data and applied to
+%                       the testing data (for each feature separately).
 %     .pca_explained_count   optional, transform the data with PCA prior to
 %                            classification, and retain this number of
 %                            components
@@ -313,6 +313,7 @@ function [fold_pred,folds,fold_targets]=compute_fold_predictions(pred,...
     folds=cat(1,fold_cell{:});
     fold_targets=cat(1,target_cell{:});
 
+    2;
 
 
 function winner_pred=compute_winner_predictions(pred)

@@ -30,7 +30,7 @@ ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
 % Use either:
 %   - cosmo_split and cosmo_stack
 %   - cosmo_average_samples
-%   - (for advanced users) cosmo_fx
+%   - (advanced) cosmo_fx
 %
 % Assign the result to a variable 'ds_stim'
 % >@@>
@@ -54,6 +54,7 @@ ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
 %% Define a cluster neighborhood for this dataset and assign the result to
 % a variable 'cl_nh'.
 % hint: use cosmo_cluster_neighborhood
+
 % >@@>
 cl_nh=cosmo_cluster_neighborhood(ds_stim);
 % <@@<

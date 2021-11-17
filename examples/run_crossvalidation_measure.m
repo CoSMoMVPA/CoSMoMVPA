@@ -109,6 +109,7 @@ measure=@cosmo_crossvalidation_measure;
 %               classification accuracy)
 % (Below, in the for-loop, the field 'classifier' is set for each function
 %  handle in the cell 'classifiers')
+% Assign the struct to a variable named args.
 
 % >@@>
 args=struct();
@@ -157,7 +158,6 @@ for k=1:nclassifiers
     classifier_name=strrep(classifier_names{k},'_',' '); % no underscores
     desc=sprintf('%s: accuracy %.1f%%', classifier_name, accuracy*100);
     title(desc)
-
 
     classes = {'monkey','lemur','mallard','warbler','ladybug','lunamoth'};
     nclasses=numel(classes);

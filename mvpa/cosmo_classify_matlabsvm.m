@@ -20,9 +20,18 @@ function predicted=cosmo_classify_matlabsvm(samples_train, targets_train, sample
 %  - for a guide on svm classification, see
 %      http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 %    note that cosmo_crossvalidate and cosmo_crossvalidation_measure
-%    provide an option 'normalization' to perform data scaling
+%    provide an option 'normalization' to perform data scaling.
+%  - As of Matlab 2017a (maybe earlier), Matlab gives the warning that
+%      'svmtrain will be removed in a future release. Use fitcsvm instead.'
+%    however fitcsvm gives different results than svmtrain; as a result
+%    cosmo_classify_matlabcsvm gives different results than
+%    cosmo_classify_matlabsvm. In this function the warning message is
+% .  suppressed.
+%  - As of Matlab 2018a, this function cannot be used anymore. Use
+%    cosmo_classify_matlabcsvm instead.
 %
-% See also svmtrain, svmclassify, cosmo_classify_svm, cosmo_classify_libsvm
+% See also svmtrain, svmclassify, cosmo_classify_svm,
+%          cosmo_classify_libsvm, cosmo_classify_matlabcsvm
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

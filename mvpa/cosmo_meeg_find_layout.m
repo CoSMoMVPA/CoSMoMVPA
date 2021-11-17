@@ -48,12 +48,12 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
 %     %||   'COMNT'
 %     %||   'SCALE'   }@206x1
 %     cosmo_disp([pl_layout.pos pl_layout.width pl_layout.height])
-%     %|| [ -0.408     0.253    0.0358    0.0369        
-%     %||   -0.408     0.284    0.0358    0.0369        
-%     %||   -0.328     0.285    0.0358    0.0369        
-%     %||      :        :          :         :          
-%     %||    0.373   -0.0821    0.0358    0.0369        
-%     %||   -0.547      -0.5    0.0358    0.0369        
+%     %|| [ -0.408     0.253    0.0358    0.0369
+%     %||   -0.408     0.284    0.0358    0.0369
+%     %||   -0.328     0.285    0.0358    0.0369
+%     %||      :        :          :         :
+%     %||    0.373   -0.0821    0.0358    0.0369
+%     %||   -0.547      -0.5    0.0358    0.0369
 %     %||    0.547      -0.5    0.0358    0.0369 ]@206x4
 %     pl_layout.name
 %     %|| 'neuromag306planar.lay'
@@ -114,7 +114,7 @@ function layout=cosmo_meeg_find_layout(ds, varargin)
     opt=cosmo_structjoin(defaults, varargin);
 
     % get the sensor labels and channel types applicable to this dataset
-    chantype2senstype=get_dataset_senstypes(ds);
+    chantype2senstype=get_dataset_senstypes(ds,opt);
 
     % get the single channel type based on the input and available channels
     ds_chantype=get_base_chantype(chantype2senstype,opt);
@@ -182,9 +182,9 @@ function label=get_senstype_label(senstype)
     sc=cosmo_meeg_senstype_collection();
     label=sc.(senstype).label;
 
-function senstype_mapping=get_dataset_senstypes(ds)
+function senstype_mapping=get_dataset_senstypes(ds,opt)
     % helper function to get supported senstypes
-    [unused,senstype_mapping]=cosmo_meeg_chantype(ds);
+    [unused,senstype_mapping]=cosmo_meeg_chantype(ds,opt);
     keys=fieldnames(senstype_mapping);
 
     if cosmo_match({'meg_planar'},keys)

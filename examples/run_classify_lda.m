@@ -77,8 +77,8 @@ test_pred=cosmo_classify_lda(train_samples,train_targets,...
                                     test_samples);
 % <@@<
 
+% Assign the real targets of the odd runs to a variable 'test_targets'
 % >@@>
-% Assign the real tagets of the odd runs to a variable 'test_targets'
 test_targets=ds_odd_birds.sa.targets;
 % <@@<
 

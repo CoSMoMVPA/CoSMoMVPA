@@ -53,7 +53,7 @@ A single classification step can be visualized as follows (more advanced cross-v
 
 .. figure:: _static/single_classification.png
 
-    *Illustration of (single-fold) classification*. A dataset (left) is split in a train dataset (top dataset) and a test set (bottom dataset), which must have no chunks in common. For training, a classifier (indicated by *f*) takes ``.samples`` and ``.sa.targets`` from the train dataset (horizontal arrow into *f*) and predicts, for the ``.samples`` in the test set (horizontal arrow into *f*), the targets of the test set (U-turn arrow). Classification accuracy can be assessed by computing how many samples in the test set were predicted correctly.
+    *Illustration of (single-fold) classification*. A dataset (left) is split in a train dataset (top dataset) and a test set (bottom dataset), which must have no chunks in common. For training, a classifier (indicated by *f*) takes ``.samples`` and ``.sa.targets`` from the train dataset (horizontal arrow into *f*) and predicts, for the ``.samples`` in the test set (vertical arrow into *f*), the targets of the test set (U-turn arrow). Classification accuracy can be assessed by computing how many samples in the test set were predicted correctly.
 
 Single subject, single fold split-half classification
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
