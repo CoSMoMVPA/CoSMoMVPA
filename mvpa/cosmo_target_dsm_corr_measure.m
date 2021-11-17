@@ -164,6 +164,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     params=cosmo_structjoin('type','Pearson',...
                             'metric','correlation',...
                             'center_data',false,...
+                            'whiten_data',false,...
                             varargin);
 
     check_input(ds);
@@ -175,6 +176,10 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     samples=ds.samples;
     if params.center_data
         samples=bsxfun(@minus,samples,mean(samples,1));
+    end
+    
+    if params.whiten_data && isfield(ds.fa, 'res')
+        samples = samples*whitener_lw(ds.fa.res);
     end
 
     samples_pdist = cosmo_pdist(samples, params.metric)';
