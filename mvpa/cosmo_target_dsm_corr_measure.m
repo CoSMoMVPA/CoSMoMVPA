@@ -219,12 +219,16 @@ function check_output(input_ds,output_ds_sa)
 
 
 function ds_sa=correlation_dsm(samples_pdist,params)
-    npairs_dataset=numel(samples_pdist);
+    persistent target_dsm_vec target_msk
 
+    npairs_dataset=numel(samples_pdist);
+    
     % get target dsm in vector form
-    [target_dsm_vec,target_msk]=get_dsm_vec_from_struct(params,...
-                                                'target_dsm',...
-                                                npairs_dataset);
+    if isempty(target_dsm_vec)
+        [target_dsm_vec,target_msk]=get_dsm_vec_from_struct(params,...
+                                                      'target_dsm',...
+                                                      npairs_dataset);
+    end
 
     if ~isempty(target_msk)
         samples_pdist=samples_pdist(target_msk);
@@ -260,10 +264,10 @@ function ds_sa=correlation_dsm(samples_pdist,params)
 
     % store results
     ds_sa=struct();
-    ds_sa.samples=rho;
-    ds_sa.sa.labels={'rho'};
-    ds_sa.sa.metric={params.metric};
-    ds_sa.sa.type={params.type};
+    ds_sa.samples=rho(:);
+    ds_sa.sa.labels=repmat({'rho'},[numel(rho) 1]);
+    ds_sa.sa.metric=repmat({params.metric},[numel(rho) 1]);
+    ds_sa.sa.type=repmat({params.type},[numel(rho) 1]);
 
 
 function ds_sa=linear_regression_dsm(samples_pdist, params)
@@ -372,7 +376,15 @@ function [dsm_vec,msk]=get_dsm_vec_from_struct(params,name,npairs_dataset)
 function [dsm_vec,msk]=get_dsm_vec(dsm,npairs_dataset,name)
     % helper function to get dsm in column vector form
     if ~isnumeric(dsm)
-        error('dsm inputs must be numeric, found %s', class(dsm));
+        %error('dsm inputs must be numeric, found %s', class(dsm));
+        for k = 1:numel(dsm)
+          [dsm_vec(:,k), tmp] = get_dsm_vec(dsm{k},npairs_dataset,name);
+          if ~isempty(tmp)
+            error('nan values in the model are not supported here');
+          end
+        end
+        msk = true(npairs_dataset, 1);
+        return;
     end
 
     sz=size(dsm);
