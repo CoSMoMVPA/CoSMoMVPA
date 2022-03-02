@@ -48,7 +48,8 @@ function ds_z=cosmo_montecarlo_cluster_stat(ds,nbrhood,varargin)
 %   'cluster_stat',s    (optional) statistic for clusters, one of 'tfce'
 %                       'max', 'maxsum', 'maxsize'. Default: 'tfce'
 %                       (Threshold-Free Cluster Enhancement; see
-%                       References)
+%                       References). For more details on the other options,
+%                       see the help of cosmo_measure_clusters.
 %   'dh',dh             (optional) Threshold step (only if cluster_stat is
 %                       'tfce'). The default value of dh=0.1 should be fine
 %                       in most (if not all) cases.
