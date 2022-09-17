@@ -22,5 +22,3 @@ git repository: http://github.com/CoSMoMVPA
 
 
 
-
-
