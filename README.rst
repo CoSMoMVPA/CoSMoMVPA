@@ -21,4 +21,3 @@ Website: http://www.cosmomvpa.org
 git repository: http://github.com/CoSMoMVPA
 
 
-
