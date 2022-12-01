@@ -21,15 +21,18 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
 %                  ds, one of 'Pearson' (default), 'Spearman', or
 %                  'Kendall'. If the 'regress_dsm' option is used, then the
 %                  specified correlation type is used for the partial
-%                  correlaton computation.
+%                  correlaton computation, and a Pearson correlation
+%                  is returned on the residuals (that is, the
+%                  remaining dissimilarities after controlling for those
+%                  in regress_dsm).
 %     .regress_dsm (optional) target dissimilarity matrix or vector (as
 %                  .target_dsm), or a cell with matrices or vectors, that
 %                  should be regressed out. If this option is provided then
-%                  the output is the partial correlation between the
-%                  pairwise distances between samples in ds and target_dsm,
-%                  after controlling for the effect of the matrix
-%                  (or matrices) in regress_dsm. (Using this option yields
-%                  similar behaviour as the Matlab function
+%                  the output is the partial (Pearson) correlation between
+%                  the pairwise distances between samples in ds and
+%                  target_dsm, after controlling for the effect of the
+%                  matrix (or matrices) in regress_dsm. (Using this option
+%                  yields similar behaviour as the Matlab function
 %                  'partial_corr').
 %                  When using this option, the 'type' option cannot be
 %                  set to 'Kendall'.
