@@ -246,8 +246,9 @@ function ds_sa=correlation_dsm(samples_pdist,params)
                                                 target_dsm_vec,...
                                                 regress_dsm_mat,...
                                                 params.type);
-        % regressed out samples are already based on Spearman correlations,
-        % so use Pearson for the final correlation computation
+        % regressed out samples are either based on Pearson or Spearman
+        % correlation; Pearson correlations are computed for the final
+        % correlation computation
         corr_type='Pearson';
     else
         corr_type=params.type;
