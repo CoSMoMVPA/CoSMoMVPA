@@ -32,12 +32,12 @@ def get_absolute_root_dir():
 
     max_levels=30;
 
-    for k in xrange(max_levels):
+    for k in range(max_levels):
         pth_parent=parent_dir(pth)
-        print pth, pth_parent
+        print(pth, pth_parent)
 
         contents=glob.glob(join(pth_parent,'*'))
-        contents_rel=map(basename, contents)
+        contents_rel=list(map(basename, contents))
 
         if set.issubset(set(cosmo_directories), set(contents_rel)):
             return pth
@@ -105,7 +105,7 @@ def matlab2rst(data, output=None):
         raise ValueError('%s\n\n: no end of skeleton', data)
 
     header=['.. code-block:: matlab','']
-    return '\n'.join(header + map(add_indent, res))
+    return '\n'.join(header + list(map(add_indent, res)))
 
 def remove_trailing_percent(data):
     r=[]
@@ -124,7 +124,7 @@ def matlab2parts(data):
     '''Converts data to tuple (function sepc, first doc line, other doc lines, body)'''
     lines=data.split('\n')
 
-    parts=[[] for i in xrange(4)]
+    parts=[[] for i in range(4)]
     stage=0
     for i, line in enumerate(lines):
         line=line.strip()
@@ -290,7 +290,7 @@ class RSTModRef(object):
         return ':ref:`%s`' % self.name
 
     def widths(self):
-        return map(len,(self.ref_name(),self.desc))
+        return list(map(len,(self.ref_name(),self.desc)))
 
     def to_lines(self, widths):
         assert(len(widths)==2)
@@ -553,7 +553,7 @@ for output in ('hdr','skl',None):
         base_names=[]
         rebuild_toc=False
 
-        print ("matlab2rst %s %s: " % (rst_type.prefix, output or '')),
+        print(("matlab2rst %s %s: " % (rst_type.prefix, output or '')), end=' ')
         for fn in fns:
             [p,b]=base_name(fn)
 
@@ -645,7 +645,7 @@ for output in ('hdr','skl',None):
 
             sys.stdout.write('<TOC>')
 
-        print
+        print()
 
 
 

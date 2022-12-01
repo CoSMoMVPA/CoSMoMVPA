@@ -36,13 +36,13 @@ def build_git_log(log_fn=log_fn, since=git_since):
     if git_log_out_of_date(log_fn=log_fn):
         cmd='git log --since="%s" --full-history --stat > %s' % (since, log_fn)
 
-        print ('rebuilding git log file: commits were '
-                        'made since last update . . .'),
+        print(('rebuilding git log file: commits were '
+                        'made since last update . . .'), end=' ')
 
         subprocess.check_call(cmd, shell=True)
-        print ' done.'
+        print(' done.')
     else:
-        print 'git log file is up-to-date'
+        print('git log file is up-to-date')
 
 
 def git_log_out_of_date(log_fn=log_fn):
@@ -51,7 +51,7 @@ def git_log_out_of_date(log_fn=log_fn):
         return True
 
     cmd='git log -1 --pretty=format:"%ad" --date=local'
-    last_commit_str=subprocess.check_output(cmd,shell=True)
+    last_commit_str=subprocess.check_output(cmd,shell=True).decode('UTF-8')
     last_commit=datetime.datetime.strptime(last_commit_str,'%c')
 
     log_changed=datetime.datetime.fromtimestamp(os.path.getmtime(log_fn))
@@ -74,7 +74,7 @@ def get_summary(lines, tag2full=tag2full):
     tag_counter=dict()
 
     for line in lines:
-        for tag, full in tag2full.iteritems():
+        for tag, full in tag2full.items():
             if line_has_tag(line, tag):
                 if not tag in tag_counter:
                     tag_counter[tag]=0
@@ -288,7 +288,7 @@ if __name__=='__main__':
     ack=get_ack(log_lines)
 
 
-    print "Building git log summary . . .",
+    print("Building git log summary . . .", end=' ')
     with open(summary_fn,'w') as f:
         f.write(as_title('Changes since %s' % git_since, '='))
         f.write('.. contents::\n    :local:\n    :depth: 1\n\n')
@@ -305,7 +305,7 @@ if __name__=='__main__':
             c=CommitLog.from_lines(log_lines)
             f.write(element(header[0].upper() + header[1:], c.rst_str(tag)))
 
-    print ' done.'
+    print(' done.')
 
 
 

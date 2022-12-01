@@ -25,7 +25,7 @@ class Image(object):
         image_ref = self.get_image_ref()
 
         if image_ref is None:
-            print('Not found: image %s (# %d)' % (self.prefix, self.index))
+            print(('Not found: image %s (# %d)' % (self.prefix, self.index)))
 
         rst = '.. |%s| image:: %s\n    :target: %s\n    :scale: %d%%\n' % (
             self.get_image_link(), image_ref,
@@ -112,7 +112,7 @@ class Cell(object):
         return Cell(lines)
 
     def transpose(self):
-        return Cell(map(lambda x: ''.join(x), zip(*self.lines)))
+        return Cell([''.join(x) for x in zip(*self.lines)])
 
     def add_vertical(self, other):
         self_tr = self.transpose()
@@ -138,7 +138,7 @@ class Cell(object):
         n_rows = int(math.ceil(float(n_cells) / n_columns))
 
         n_missing = n_rows * n_columns - n_cells
-        rect_cells = cells + [Cell.from_str(' ') for _ in xrange(n_missing)]
+        rect_cells = cells + [Cell.from_str(' ') for _ in range(n_missing)]
 
         max_height = max(cell.height for cell in cells)
         max_width = max(cell.width for cell in cells)
@@ -156,7 +156,7 @@ class Cell(object):
         hor_edge = hor.add_horizontal(edge)
         edge_hor_edge = edge.add_horizontal(hor_edge)
 
-        rows = [filled_cells[i:(i + n_columns)] for i in xrange(0, n_cells, n_columns)]
+        rows = [filled_cells[i:(i + n_columns)] for i in range(0, n_cells, n_columns)]
 
         cell_table = cls([])
         for i, row in enumerate(rows):
@@ -192,7 +192,7 @@ class ImageCollection(object):
     @classmethod
     def from_dict(cls, demos):
         c = cls()
-        for label, (prefix, index) in demos.iteritems():
+        for label, (prefix, index) in demos.items():
             img = Image(label, prefix, index)
             c.append(img)
 
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     else:
         msg = "Found %d elements for gallery " % n_images
 
-    print msg
+    print(msg)
 
     c.write()
 
