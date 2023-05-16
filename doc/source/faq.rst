@@ -179,11 +179,13 @@ Does the LDA (linear discriminant analysis) classifier use shrinkage / normaliza
 -------------------------------------------------------------------------------------
 Yes, the LDA classifier (:ref:`cosmo_classify_lda`) uses shrinkage / normalization. This classifier was already used in  :cite:`OWD+11`, where we wrote:
 
-'Because typically the number of voxels in selected regions was larger than the number of β-estimates from the GLM, the estimate of the covariance matrix is rank deficient. We therefore regularized the matrix by adding the identity matrix scaled by one percent of the mean of the diagonal elements.'
+'Because typically the number of voxels in selected regions was larger than the number of beta-estimates from the GLM, the estimate of the covariance matrix is rank deficient. We therefore regularized the matrix by adding the identity matrix scaled by one percent of the mean of the diagonal elements.'
 
 Note that the regularization value of one percent is a parameter which can be adjusted in (:ref:`cosmo_classify_lda`).
 
 At some point some effort was put in supporting a fancier shrinkage method (:cite:`LW04`), but this implementation for CoSMoMVPA was not completed. Currently it has low priority as the currently used regularisation seems to work quite well, but Pull Requests with such a feature will definitely be considered.
+
+
 
 
 
@@ -570,7 +572,7 @@ For second level (group analysis), :ref:`cosmo_montecarlo_cluster_stat` provides
 
 There are three *components* in this, and they can be crossed arbitrarily:
 
-    1) clustering method: either ‘standard’ fixed-uncorrected thresholding, or using Threshold-Free Cluster Enhancement (TFCE). The latter is the default in CoSMoMVPA, as it has been proposed it has several advantages (Nichols & Smith, 2009, Neuroimage), including:
+    1) clustering method: either ???standard??? fixed-uncorrected thresholding, or using Threshold-Free Cluster Enhancement (TFCE). The latter is the default in CoSMoMVPA, as it has been proposed it has several advantages (Nichols & Smith, 2009, Neuroimage), including:
         - "TFCE gives generally better sensitivity than other methods over a wide range of test signal shapes and SNR values".
         - avoids "the need to define the initial cluster-forming threshold (e.g., threshold the raw t-statistic image at t>2.5)".
         - avoids the issue that "initial hard thresholding introduces instability in the overall processing chain; small variations in the data around the threshold level can have a large effect on the final output."
@@ -1828,6 +1830,130 @@ You could use the following code:
 	    ds_result.sa.t1 = unq_t(ds_result.sa.targets1);
 	    ds_result.sa.t2 = unq_t(ds_result.sa.targets2);
 
+
+
+Run group analysis on time generalization results?
+--------------------------------------------------
+'I have run, for each participant, `cosmo_dim_generalization_measure`. Now I would like to run group analysis to see if there are significant clusters. How can I do that?'
+
+Consider the following example, using synthetic data:
+
+    .. code-block:: matlab
+
+        %% generate synthetic data for this example
+        sigma=0.1; % weak signal
+        n=20; % number of participants
+
+        dgm_ds_cell=cell(n,1);
+        for k=1:n
+            sz='huge';
+            train_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                                   'nchunks',2,'seed',k*2-1,...
+                                                   'sigma',sigma);
+            test_ds=cosmo_synthetic_dataset('type','timelock','size',sz,...
+                                                   'nchunks',3,'seed',k*2,...
+                                                   'sigma',sigma);
+
+
+            train_ds_time=cosmo_dim_transpose(train_ds,'time',1);
+            test_ds_time=cosmo_dim_transpose(test_ds,'time',1);
+
+            % set chunks
+            train_ds_time.sa.chunks(:)=1;
+            test_ds_time.sa.chunks(:)=2;
+            %
+            % construct the dataset
+            ds_time=cosmo_stack({train_ds_time, test_ds_time});
+
+            % only to make this example run fast, most channels are eliminated
+            % (there is no other reason to do this step)
+            ds_time=cosmo_slice(ds_time,ds_time.fa.chan<=20,2);
+            ds_time=cosmo_dim_prune(ds_time);
+
+            % set measure and its arguments
+            measure_args=struct();
+            %
+            % use correlation measure
+            measure_args.measure=@cosmo_correlation_measure;
+            % dimension of interest is 'time'
+            measure_args.dimension='time';
+            %
+            % run time-by-time generalization analysis
+            dgm_ds=cosmo_dim_generalization_measure(ds_time,measure_args,...
+                                                    'progress',false);
+            % put result from first-level analysis for k-th participants in ds_cell
+            dgm_ds_cell{k}=dgm_ds;
+        end
+
+        %%
+        % We have now the results from cosmo_dim_generalization_measure in
+        % dgm_ds_cell. The next step is to change the dimensions so that
+        % the dimensions become feature dimensions. (this makes it possible
+        % to cluster the data.)
+        group_cell=cell(n,1);
+        for k=1:n
+            dgm_ds=dgm_ds_cell{k};
+
+            % make train_time and test_time a feature dimension
+            ds=cosmo_dim_transpose(dgm_ds,{'train_time', 'test_time' },2);
+
+            % for one-sample t-test
+            ds.sa.targets=1;
+
+            % each participant is independent
+            ds.sa.chunks=k;
+
+            group_cell{k}=ds;
+        end
+
+        group_ds=cosmo_stack(group_cell);
+
+        %%
+        % We have now the results from participants in the required data structure,
+        % where in group_ds.samples: each row represents a participant,
+        % each column represents a combination of train and test time.
+
+        % define the clustering neighborhood. By default, features next to each
+        % other in time (train time or test time) are considered neighbors.
+        nbrhood=cosmo_cluster_neighborhood(group_ds);
+
+        % define clusterintg options.
+        opt=struct();
+        opt.cluster_stat='tfce';  % Threshold-Free Cluster Enhancement;
+                                  % this is a (very reasonable) default
+
+        opt.niter=500;          % this is way too small except for testing;
+                                % should usually be >=1000;
+                                % better is >=10,000
+
+        opt.h0_mean=0;          % test against mean of zero. For accuracies from
+                                % M balanced classes, use 1/M. For split-half
+                                % correlations, use 0.
+
+
+        % run multiple comparison correction
+        ds_result=cosmo_montecarlo_cluster_stat(group_ds, nbrhood, opt);
+
+        %%
+        % for easier unflattenening, the time dimensions are moved back
+        % from feature to sample dimensions
+        ds_result_time = cosmo_dim_transpose(ds_result,...
+                                            { 'train_time', 'test_time' });
+
+        % flatten into a 2D array
+        [arr,dim_labels,dim_values]=cosmo_unflatten(ds_result_time,1);
+
+        % plot the results
+        imagesc(arr);
+        colorbar();
+
+        ytick=1:numel(dim_values{1});
+        ylabel(strrep(dim_labels{1},'_',' '));
+        set(gca,'Ytick',ytick,'YTickLabel',dim_values{1}(ytick));
+
+        xtick=1:numel(dim_values{2});
+        xlabel(strrep(dim_labels{2},'_',' '));
+        set(gca,'Xtick',xtick,'XTickLabel',dim_values{2}(xtick));
 
 
 
