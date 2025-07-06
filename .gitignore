@@ -2,6 +2,8 @@
 *.sw?
 *.css
 *.m~
+*.bak
+*.m_tmp
 data
 datadb
 datadb.zip

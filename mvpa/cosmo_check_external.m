@@ -556,6 +556,12 @@ function externals=get_externals_helper()
     externals.octave_pkg_statistics.url=['http://http://octave.'...
                                         'sourceforge.net/statistics/'];
 
+    externals.octave_pkg_statistics_libsvm = externals.libsvm;
+    externals.octave_pkg_statistics_libsvm.is_present = @()...
+                        externals.octave_pkg_statistics.is_present() && ...
+                        has_octave_statistics_svmtrain();
+
+
     externals.mocov.is_present=@() has('mocov');
     externals.mocov.is_recent=yes;
     externals.mocov.label=['Matlab/Octave MOcov '...
@@ -613,10 +619,32 @@ function tf=same_path(args)
     pths=cellfun(@(x)fileparts(which(x)),args,'UniformOutput',false);
     tf=all(cellfun(@(x)isequal(x,pths{1}),pths(2:end)));
 
+function tf=has_octave_statistics_svmtrain()
+    % Check for presence of svmtran and svmpredict in the octave
+    % statistics toolbox. Unfortunately calling these functions
+    % in the libsvm-way may crash Octave.
+    svm_root=fileparts(fileparts(noerror_which('svmtrain')));
+    ttest_root=fileparts(noerror_which('ttest'));
+
+    tf=has_octave_package('statistics') && ...
+            ~isempty(svm_root) && ...
+            isequal(ttest_root, svm_root) && ...
+            isequal(fileparts(noerror_which('svmtrain')),...
+                    fileparts(noerror_which('svmpredict')));
 
 function version=get_libsvm_version()
+    if has_octave_statistics_svmtrain()
+        version=325; % >=318
+        return
+    end
+
     svm_root=fileparts(fileparts(noerror_which('svmpredict')));
     svm_h_fn=fullfile(svm_root,'svm.h');
+
+    if ~exist(svm_h_fn, 'file')
+        error('File not found %s; cannot determine libsvm version',...
+                                                            svm_h_fn);
+    end
 
     fid=fopen(svm_h_fn);
 

@@ -34,7 +34,7 @@ function test_stat_correspondence
 
 
     for k=1:nf
-        if is_matlab
+        if is_matlab || isempty(which('anova'))
             [p(k),tab]=anova1(ds.samples(:,k), ds.sa.targets, 'off');
             f(k)=tab{2,5};
             df=[tab{2:3,3}];

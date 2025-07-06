@@ -232,14 +232,7 @@ function test_meeg_baseline_correct_illegal_inputs
     ds=cosmo_synthetic_dataset('type','timefreq','size','tiny');
 
     if cosmo_wtf('is_matlab')
-        v=cosmo_wtf('version');
-        is_prior_to_2012b=str2num(v(1))<=7;
-
-        if is_prior_to_2012b
-            id_missing_arg='MATLAB:inputArgUndefined';
-        else
-            id_missing_arg='MATLAB:minrhs';
-        end
+        id_missing_arg={'MATLAB:inputArgUndefined','MATLAB:minrhs'};
     else
         id_missing_arg='Octave:undefined-function';
     end
