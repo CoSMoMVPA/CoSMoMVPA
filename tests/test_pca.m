@@ -31,6 +31,11 @@ function [pca_samples,coef,mu,expl]=helper_matlab_pca_wrapper(samples,...
     if isnan(keep_count)
         args={};
     else
+        if cosmo_wtf('is_octave') && keep_count <= size(samples,2)
+            % deal with recent (as of 2025) change in behaviour of Octave's
+            % pca function
+            keep_count=min([size(samples,1)-1, size(samples,2), keep_count]);
+        end
         args={'NumComponents',keep_count};
     end
 
