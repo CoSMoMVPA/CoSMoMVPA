@@ -13,7 +13,7 @@ Then slice the datasdet again into odd and even runs.  Train and test a
 Naive bayes classifier (:ref:`cosmo_classify_naive_bayes`) first training on the even-runs data and testing on the
 odds, then train on the odds and test on the evens.
 
-Check your answers here: :ref:`run_classify_naive_bayes` / :pb:`classify_naive_bayes`
+Check your answers here: :ref:`run_classify_naive_bayes` / :pb: classify_naive_bayes
 
 What is the accuracy for monkey versus ladybug? Monkey versus lemur?
 

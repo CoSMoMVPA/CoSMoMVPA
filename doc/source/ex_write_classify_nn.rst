@@ -28,5 +28,5 @@ Advanced exercise: write a k-nearest neighbor classifier that considers the near
 
 
 
-:pb:`classify_naive_bayes`
+:pb: classify_naive_bayes
 

@@ -76,7 +76,7 @@ will need to use matlab's subplot function for this.
 
 Hint: :ref:`run_rsa_visualize_skl`.
 
-Solution: :ref:`run_rsa_visualize` / :pb:`run_rsa_visualize`
+Solution: :ref:`run_rsa_visualize` / :pb: run_rsa_visualize
 
 
 Centering the data

@@ -41,7 +41,7 @@ values on the diagonal and those off the diagonal. If there is no category infor
 
 Hint: :ref:`run_splithalf_correlations_single_sub_skl`
 
-Solution: :ref:`run_splithalf_correlations_single_sub` / :pb:`splithalf_correlations_single_sub`
+Solution: :ref:`run_splithalf_correlations_single_sub` / :pb: splithalf_correlations_single_sub
 
 
 Part 2 (group study)
@@ -50,7 +50,7 @@ As in the :ref:`previous exercise <ex_single_subject_correlations>`, compute the
 
 Hint: :ref:`run_splithalf_correlations_skl`
 
-Solution: :ref:`run_splithalf_correlations` / :pb:`splithalf_correlations`
+Solution: :ref:`run_splithalf_correlations` / :pb: splithalf_correlations
 
 Advanced exercise: plot an image of the 6x6 correlation matrix averaged over participants.
 

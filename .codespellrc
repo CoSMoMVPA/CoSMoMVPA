@@ -1,0 +1,3 @@
+[codespell]
+skip = .git,*.pdf,*.svg, ./doc/build, ./external
+ignore-words-list = fo,te,whos,nd

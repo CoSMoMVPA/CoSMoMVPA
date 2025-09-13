@@ -19,8 +19,6 @@ For the impatient
 
 .. include:: quick_download.txt
 
-.. include:: verify_exercise_setup.txt
-
 For the patient
 +++++++++++++++
 

@@ -21,7 +21,7 @@ Then, for each radius from 2 to 6 in steps of .5, plot the indices and show how 
 
 Hint: :ref:`cosmo_sphere_offsets_skl` / :ref:`run_sphere_offsets_skl`
 
-Solution: :ref:`cosmo_sphere_offsets` / :ref:`run_sphere_offsets` / :pb:`sphere_offsets`
+Solution: :ref:`cosmo_sphere_offsets` / :ref:`run_sphere_offsets` / :pb: sphere_offsets
 
 Using the sphere offsets for voxel selection
 ++++++++++++++++++++++++++++++++++++++++++++

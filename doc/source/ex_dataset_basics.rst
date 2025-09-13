@@ -36,7 +36,7 @@ Run the code and a nifti file will be generated. You can visualize this using MR
 
 Hint: :ref:`run_fmri_correlation_searchlight_trivial_skl`
 
-Solution: :ref:`run_fmri_correlation_searchlight_trivial_skl` / :pb:`fmri_correlation_searchlight_trivial`
+Solution: :ref:`run_fmri_correlation_searchlight_trivial_skl` / :pb: fmri_correlation_searchlight_trivial
 
 
 
@@ -62,7 +62,7 @@ Advanced exercise: set all voxels around a center voxel at ``i=150,j=100,k=50`` 
 
 Hint: :ref:`run_anatomical_dataset_basics_skl`
 
-Solution: :ref:`run_anatomical_dataset_basics` / :pb:`anatomical_dataset_basics`
+Solution: :ref:`run_anatomical_dataset_basics` / :pb: anatomical_dataset_basics
 
 
 Loading datasets with a mask
@@ -98,7 +98,7 @@ Advanced exercise: using :ref:`cosmo_slice`, can you show the same figure as in 
 
 Hint: :ref:`run_dataset_basics_skl`
 
-Solution: :ref:`run_dataset_basics` / :pb:`dataset_basics`
+Solution: :ref:`run_dataset_basics` / :pb: dataset_basics
 
 Operations on datasets
 ++++++++++++++++++++++
@@ -127,7 +127,7 @@ Optional exercise: use a whole-brain mask.
 
 Hint: :ref:`run_operations_on_datasets_skl`
 
-Solution: :ref:`run_operations_on_datasets` / :pb:`operations_on_datasets`
+Solution: :ref:`run_operations_on_datasets` / :pb: operations_on_datasets
 
 .. include:: links.txt
 
