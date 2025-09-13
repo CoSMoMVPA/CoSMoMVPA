@@ -42,7 +42,7 @@ function ds=cosmo_dim_prune(ds, varargin)
 %     %
 %     % For the same MEEG dataset, get a selection of time points between 0
 %     % and .3 seconds. A function handle is used to select the timepoints
-%     selector=@(x) 0<=x & x<=.3; % use element-wise logical-and
+%     selector=@(x) 0<=x & x<=.301; % use element-wise logical-and
 %     msk=cosmo_dim_match(ds,'time',selector);
 %     ds_sel=cosmo_slice(ds,msk,2);
 %     ds_pruned=cosmo_dim_prune(ds_sel);

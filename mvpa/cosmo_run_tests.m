@@ -9,7 +9,7 @@ function did_pass=cosmo_run_tests(varargin)
 %                     output is written to the terminal window)
 %   'file.m'          run tests in 'file.m'
 %   '-no_doc_test'    skip doctest
-%   '-no_unit)test'   skip unittest
+%   '-no_unit_test'   skip unittest
 %
 % Examples:
 %   % run tests with defaults
@@ -155,7 +155,9 @@ function [opt,test_locations,moxunit_args]=get_opt(varargin)
                 if is_option
                     moxunit_args{k}=arg;
 
-                    has_value=~isempty(strmatch(arg,is_key_value_arg,'exact'));
+                    has_value=any(cellfun(@numel,...
+                                strfind(is_key_value_arg,arg)));
+
                     if has_value
                         if k==n_args
                             error('Missing value after key ''%s''',arg);

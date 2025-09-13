@@ -34,7 +34,7 @@ function test_stat_correspondence
 
 
     for k=1:nf
-        if is_matlab
+        if is_matlab || isempty(which('anova'))
             [p(k),tab]=anova1(ds.samples(:,k), ds.sa.targets, 'off');
             f(k)=tab{2,5};
             df=[tab{2:3,3}];
@@ -393,6 +393,26 @@ function test_stat_missing_values()
     end
 
 
+function test_stat_extreme_values()
+    base_ds=cosmo_synthetic_dataset('ntargets',1,...
+                                'nchunks',20,...
+                                'size','normal');
+
+    for signal_sign=[-1, 1]
+        magnitude=10;
+        ds=base_ds;
+        ds.samples=randn(size(ds.samples))+signal_sign*magnitude;
+
+        stat_ds = cosmo_stat(ds, 't');
+        tz = stat_ds.samples;
+        assertTrue(all(tz * signal_sign > 0));
+
+        ds = cosmo_stat(ds, 't', 'z');
+        zs = ds.samples;
+        assertTrue(all(isinf(zs)));
+        assertTrue(all(zs * signal_sign > 0));
+    end
+
 function test_stat_regression()
 % using pre-generated data
     ds=cosmo_synthetic_dataset('nchunks',6,'ntargets',4,'sigma',0);
@@ -435,8 +455,8 @@ function test_stat_regression()
             ds_sel.sa.chunks(ds_sel.sa.chunks==2)=1;
             assertExceptionThrown(@()cosmo_stat(ds_sel,args{:}),'');
         end
-
     end
+
 
 
 function params=get_stat_regression_params()

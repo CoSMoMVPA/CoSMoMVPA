@@ -31,6 +31,21 @@ function [pca_samples,coef,mu,expl]=helper_matlab_pca_wrapper(samples,...
     if isnan(keep_count)
         args={};
     else
+        if cosmo_wtf('is_octave') && keep_count <= size(samples,2)
+            % deal with recent (as of 2025) change in behaviour of Octave's
+            % pca function
+            n_rows = size(samples,1);
+            is_row_vector = n_rows==1;
+
+            upper = n_rows;
+            if ~is_row_vector
+                upper = upper -1;
+            end
+
+            if keep_count > upper
+                keep_count = upper;
+            end
+        end
         args={'NumComponents',keep_count};
     end
 
@@ -38,13 +53,9 @@ function [pca_samples,coef,mu,expl]=helper_matlab_pca_wrapper(samples,...
     expl=expl';
 
 
-
 function test_pca_more_samples_than_features
     nsamples=ceil(rand()*10)+10;
     nfeatures=nsamples+10;
-
-    nfeatures=5;
-    nsamples=2;
 
     helper_test_pca_correspondence(nsamples,nfeatures)
 
@@ -66,14 +77,11 @@ function test_pca_row_vector
 
     helper_test_pca_correspondence(nsamples,nfeatures)
 
-
 function test_pca_near_square_samples
     nfeatures=ceil(rand()*10)+10;
-    for nsamples=nfeatures+(-1:1);
+    for nsamples=nfeatures+(-1:1)
         helper_test_pca_correspondence(nsamples,nfeatures)
     end
-
-
 
 function test_pca_too_many_components
     nsamples=ceil(rand()*10)+10;
@@ -195,18 +203,28 @@ function helper_test_pca_correspondence_nkeep(nsamples,nfeatures,nkeep)
     catch
         % cosmo pca should also throw error
         assertExceptionThrown(@()helper_cosmo_pca_wrapper(x,nkeep),'');
+
+        % all good, we are done, leave helper
         return
     end
 
     % no error, verify that output match
     [p2,c2,m2,e2]=helper_cosmo_pca_wrapper(x,nkeep);
 
-    tolerance_arg={'relative',1e-5};
-    assertElementsAlmostEqual(p1,p2,tolerance_arg{:});
-    assertElementsAlmostEqual(c1,c2,tolerance_arg{:});
-    assertElementsAlmostEqual(m1,m2,tolerance_arg{:});
-    assertElementsAlmostEqual(e1,e2,tolerance_arg{:});
-
+    is_row_vector = nsamples==1;
+    if is_row_vector
+        % 2025: deal with Octave's recent pca implementation
+        % which seems to behave special for row vectors
+        assert(isempty(p2));
+        assert(isempty(c2));
+        assert(isempty(e2));
+    else
+        tolerance_arg={'relative',1e-5};
+        assertElementsAlmostEqual(p1,p2,tolerance_arg{:});
+        assertElementsAlmostEqual(c1,c2,tolerance_arg{:});
+        assertElementsAlmostEqual(m1,m2,tolerance_arg{:});
+        assertElementsAlmostEqual(e1,e2,tolerance_arg{:});
+    end
 
 function test_pca_retain_is_row_vector()
     nsamples=ceil(10+rand()*10);

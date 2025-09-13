@@ -460,8 +460,12 @@ function cdf_stat=apply_cdf_wrapper_different_dfs(stat_name,stat,df_struct)
 
         col_stat=stat(cols);
         msk=~isnan(col_stat);
+        ps=cdf_wrapper(stat_name,col_stat(msk),df_cell{:});
+        % In Octave, extreme statistics can lead to negative p values
+        ps(ps<0)=0;
+        ps(ps>1)=1;
 
-        cdf_stat(cols(msk))=cdf_wrapper(stat_name,col_stat(msk),df_cell{:});
+        cdf_stat(cols(msk))=ps;
     end
 
 function y=cdf_wrapper(name, x, df1, df2)

@@ -17,10 +17,11 @@ function test_parallel_get_nproc_available_matlab_ge2013b()
         return;
     end
 
-    has_parallel_toolbox=cosmo_check_external('@distcomp',false) && ...
+    has_parallel_toolbox=any(cosmo_check_external(...
+                                    {'@distcomp','@parallel'},false))&& ...
                                 ~isempty(which('gcp'));
 
-    aeq=@(expeced_output,varargin)assertEqual(expeced_output,...
+    aeq=@(expected_output,varargin)assertEqual(expected_output,...
                     cosmo_parallel_get_nproc_available(varargin{:}));
 
     warning_state=cosmo_warning();
@@ -53,7 +54,7 @@ function test_parallel_get_nproc_available_matlab_ge2013b()
 
 function tf=version_lt2013b()
     v_num=cosmo_wtf('version_number');
-    tf=v_num(1)<8 || v_num(2)<2;
+    tf=v_num(1)<8 || (v_num(1) == 8 && v_num(2)<2);
 
 function test_parallel_get_nproc_available_matlab_lt2013b()
     if ~cosmo_wtf('is_matlab') || ...
@@ -66,7 +67,7 @@ function test_parallel_get_nproc_available_matlab_lt2013b()
                                 ~isempty(which('matlabpool'));
 
 
-    aeq=@(expeced_output,varargin)assertEqual(expeced_output,...
+    aeq=@(expected_output,varargin)assertEqual(expected_output,...
                     cosmo_parallel_get_nproc_available(varargin{:}));
 
     warning_state=cosmo_warning();

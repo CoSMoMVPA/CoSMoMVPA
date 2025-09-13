@@ -50,7 +50,7 @@ function check_input(x)
 
     if ~(islogical(x) || isnumeric(x))
         error(['Unsupported data type ''%s''; only numeric '...
-                'and logical arrays are supported']', class(x));
+                'and logical arrays are supported'], class(x));
     end
 
 

@@ -29,7 +29,7 @@ function test_cosmo_notify_test_skipped_basics()
 
     db=dbstack();
 
-    if is_moxunit(db);
+    if is_moxunit(db)
         try
             moxunit_throw_test_skipped_exception('foo');
         catch
@@ -58,7 +58,7 @@ function assert_has_substrings(haystack,needle)
     n=numel(haystack);
     assertEqual(n,numel(needle));
     for k=1:n
-        assert(~isempty(findstr(haystack{k},needle{k})));
+        assert(any(strfind(haystack{k},needle{k})));
     end
 
 

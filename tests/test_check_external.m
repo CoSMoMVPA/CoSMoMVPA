@@ -28,7 +28,7 @@ function test_check_external_nifti()
 
     % test list
     externals=cosmo_check_external('-list');
-    assert(~isempty(strmatch('nifti',externals,'exact')));
+    assert(any(cellfun(@numel,strfind(externals,'nifti'))));
 
     % test tic/toc
     cosmo_check_external('-tic');
@@ -36,15 +36,15 @@ function test_check_external_nifti()
 
     % must cite CoSMoMVPA, but not NIFTI
     c=cosmo_check_external('-cite');
-    assert(~isempty(findstr(c,'N. N. Oosterhof')));
-    assert(~isempty(findstr(c,'CoSMoMVPA')));
-    assert(isempty(findstr(c,'NIFTI toolbox')));
+    assert(~isempty(strfind(c,'N. N. Oosterhof')));
+    assert(~isempty(strfind(c,'CoSMoMVPA')));
+    assert(isempty(strfind(c,'NIFTI toolbox')));
 
     % after checking for nifti it must be present
     cosmo_check_external('nifti');
     assertEqual(cosmo_check_external('-toc'),{'nifti'});
     c=cosmo_check_external('-cite');
-    assert(~isempty(findstr(c,'NIFTI toolbox')));
+    assert(~isempty(strfind(c,'NIFTI toolbox')));
 
     % removing nifti from the path makes it absent
     rmpath(fileparts(which('load_nii')));
