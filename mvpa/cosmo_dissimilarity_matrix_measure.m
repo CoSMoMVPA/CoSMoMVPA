@@ -186,27 +186,27 @@ function ds_dsm = cosmo_dissimilarity_matrix_measure(ds, varargin)
 %     ds_avg=cosmo_fx(ds,@(x)mean(x,1),'targets');
 %     ds_dsm=cosmo_dissimilarity_matrix_measure(ds_avg);
 %     cosmo_disp(ds_dsm);
-%     ||.sa
-%||  .targets1
-%||    [ 2
-%||      3
-%||      3 ]
-%||  .targets2
-%||    [ 1
-%||      1
-%||      2 ]
-%||.a
-%||  .sdim
-%||    .labels
-%||      { 'targets1'  'targets2' }
-%||    .values
-%||      { [ 1    [ 1
-%||          2      2
-%||          3 ]    3 ] }
-%||.samples
-%||  [  1.68
-%||     1.71
-%||    0.711 ]
+%     || .sa
+%     ||  .targets1
+%     ||    [ 2
+%     ||      3
+%     ||      3 ]
+%     ||  .targets2
+%     ||    [ 1
+%     ||      1
+%     ||      2 ]
+%     ||.a
+%     ||  .sdim
+%     ||    .labels
+%     ||      { 'targets1'  'targets2' }
+%     ||    .values
+%     ||      { [ 1    [ 1
+%     ||          2      2
+%     ||          3 ]    3 ] }
+%     ||.samples
+%     ||  [  1.68
+%     ||     1.71
+%     ||    0.711 ]
 %
 % Notes:
 %   - it is recommended to set the 'center_data' to true when using
