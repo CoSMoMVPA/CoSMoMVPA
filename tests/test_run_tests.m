@@ -13,14 +13,14 @@ function test_run_tests_passing
     test_content='assert(true);';
     [result,output]=helper_test_make_and_run(test_content);
     assertTrue(result);
-    assert(~isempty(findstr('OK',output)));
+    assert(~isempty(strfind(output,'OK')));
 
 
 function test_run_tests_failing
     test_content='assert(false);';
     [result,output]=helper_test_make_and_run(test_content);
     assertFalse(result);
-    assert(~isempty(findstr('FAILED',output)));
+    assert(~isempty(strfind(output,'FAILED')));
 
 function test_run_tests_no_file_found_absolute_path()
     if skip_test_if_octave_package_io_2_4_2_or_later()
