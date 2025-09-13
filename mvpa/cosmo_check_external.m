@@ -450,8 +450,8 @@ function externals=get_externals_helper()
 
     externals.gifti.is_present=@() has('gifti');
     externals.gifti.is_recent=yes;
-    externals.gifti.label='GIfTI library for matlab';
-    externals.gifti.url='www.artefact.tk/software/matlab/gifti';
+    externals.gifti.label='MATLAB/Octave GIfTI Library';
+    externals.gifti.url='https://github.com/gllmflndn/gifti';
     externals.gifti.authors={'G. Flandin'};
 
     externals.xunit.is_present=@() has('runtests') && ...

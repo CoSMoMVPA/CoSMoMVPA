@@ -5,9 +5,11 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %
 % Inputs:
 %   filename          filename of surface data to be loaded. Currently
-%                     supported are '.niml.dset' (AFNI/SUMA NIML) and
-%                     'smp' (BrainVoyager surface maps). Also supported are
-%                     structs as provied by afni_niml_readsimple or xff
+%                     supported are '.niml.dset' (AFNI/SUMA NIML),
+%                     'smp' (BrainVoyager surface maps), and 'gii' (GIFTI).
+%                     Also supported are structs as provided by
+%                     afni_niml_readsimple, or objects provided by xff or
+%                     the MATLAB/Octave GIfTI Library.
 %   'targets', t      Px1 targets for P samples; these will be stored in
 %                     the output as ds.sa.targets
 %   'chunks', c       Px1 chunks for P samples; these will be stored in the
@@ -62,6 +64,8 @@ function ds=cosmo_surface_dataset(fn, varargin)
 %     toolbox, available from: http://neuroelf.net
 %   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
 %     Matlab toolbox, available from: http://afni.nimh.nih.gov/afni/matlab/
+%   - for GIFTI files (.gii) it requires the  MATLAB/Octave GIfTI Library,
+%     available from https://github.com/gllmflndn/gifti
 %
 % See also: cosmo_map2surface
 %

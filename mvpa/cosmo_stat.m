@@ -12,12 +12,23 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %                     't' : one-sample t-test against zero (nclasses==1),
 %                           or paired t-test (nclasses==2)
 %                     't2': two-sample t-test with equal variance,
-%                           (nclasses==2) contrasting samples with unq(1)
-%                           minus unq(2) where unq=unique(ds.sa.targets)
+%                           (nclasses==2)
 %                     'F' : one-way ANOVA or repeated measures ANOVA
 %                           (nclasses>=2)
-%                     [*] nclasses is the number of unique values in
-%                         ds.sa.targets
+%                     [*]  nclasses is the number of unique values in
+%                          ds.sa.targets
+%                     [**] if nclasses==2, the constrast of unq(1) minus
+%                          unq(2) is returned, where
+%                            unq=unique(ds.sa.targets);
+%                          Because unique returns the results in sorted
+%                          order from small to large, this means that
+%                          the contrast is computed of the smaller value
+%                          of targets minus the larger. This may be somewhat
+%                          confusing, in the sense that the output statistics
+%                          (t- or z-score) gives a positive value if samples
+%                          associated with the lower .sa.targets value have a
+%                          higher mean than those associated with the
+%                          higher .sa.targets value.
 %   output_stat_name  (optional) 'left', 'right', 'both', 'z', 'p', or
 %                      the empty string '' (default).
 %                     - 'left', 'right', and 'both' return a p-value with
@@ -146,6 +157,8 @@ function stat_ds=cosmo_stat(ds, stat_name, output_stat_name)
 %  - If output_stat_name is not provided or empty, then this function runs
 %    considerably faster than the builtin matlab functions
 %    (ttest, ttest2, or anova1).
+%  - In the case of two classes, the sign of the result may seem counter-
+%    intuitive (see the [**]) comment above).
 %  - When output_stat_name=='p' then the p-values returned are the same as
 %    the builtin matlab functions anova1, ttest, and ttest2 with the
 %    default tails.
