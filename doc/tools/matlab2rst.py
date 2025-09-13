@@ -287,7 +287,6 @@ class RSTModRef(object):
         self.desc=desc
 
     def ref_name(self):
-        ###return ':ref:`%s`' % self.name
         return ':ref:`%s` ' % self.name
 
     def widths(self):
@@ -581,7 +580,6 @@ for output in ('hdr','skl',None):
                 pb_fn=join(pb_path,b+'.html')
                 if is_newer(fn, pb_fn):
                     remake_rst=True
-                ### include_pb=':%s_up:`%s`\n\n' % (rst_type.prefix,b)
                 include_pb=':%s_up: %s \n\n' % (rst_type.prefix,b)
             else:
                 include_pb=''
@@ -638,7 +636,6 @@ for output in ('hdr','skl',None):
                         'contents::\n    :local:\n    :depth: 1\n\n') % (
                         include_base_name, title, '='*len(title))
 
-                ###body='\n'.join(['%s\n%s\n\n :demo:`%s`\n\n.. include:: %s\n\n\n' % (
                 body='\n'.join(['%s\n%s\n\n :demo: %s\n\n.. include:: %s\n\n\n' % (
                             b,'+'*len(b),b,join(output_mat_rel,b)+'.txt')
                                     for b,_ in base_names])
