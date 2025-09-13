@@ -32,7 +32,7 @@ Then, using  :ref:`cosmo_correlation_measure` and the :ref:`cosmo_searchlight` f
 
 Hint: :ref:`run_splithalf_correlations_searchlight_skl`
 
-Solution: :ref:`run_splithalf_correlations_searchlight` / :pb:`splithalf_correlations_searchlight`
+Solution: :ref:`run_splithalf_correlations_searchlight` / :pb: splithalf_correlations_searchlight
 
 *Part 2 is optional; it is used to illustrate that a whole-brain searchlight can be applied with different measures*.
 
@@ -47,7 +47,7 @@ Use :ref:`cosmo_oddeven_partitioner` to define a cross-validation scheme, and us
 
 Hint: :ref:`run_crossvalidation_searchlight_skl`
 
-Solution: :ref:`run_crossvalidation_searchlight` / :pb:`crossvalidation_searchlight`
+Solution: :ref:`run_crossvalidation_searchlight` / :pb: crossvalidation_searchlight
 
 .. include:: links.txt
 

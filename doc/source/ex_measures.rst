@@ -56,7 +56,7 @@ Then compute the correlation information for each subject, and perform a t-test 
 
 Template: :ref:`run_correlation_measure_skl`
 
-Check your answers here: :ref:`run_correlation_measure` / :pb:`correlation_measure`
+Check your answers here: :ref:`run_correlation_measure` / :pb: correlation_measure
 
 .. _`ex_measures_crossvalidation`:
 
@@ -71,7 +71,7 @@ Then compute confusion matrices using different classifiers, such as :ref:`cosmo
 
 Template: :ref:`run_crossvalidation_measure_skl`
 
-Check your answers here: :ref:`run_crossvalidation_measure` / :pb:`crossvalidation_measure`
+Check your answers here: :ref:`run_crossvalidation_measure` / :pb: crossvalidation_measure
 
 .. include:: links.txt
 

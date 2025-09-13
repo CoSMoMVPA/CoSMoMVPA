@@ -33,7 +33,7 @@ Prerequisites
     * :ref:`CoSMoMVPA source code and tutorial data <get_code_and_example_data>`.
     * It is recommended, prior to the course, to:
 
-        + read the CoSMoMVPA manuscript (:doi:`10.1101/047118`, citation :cite:`OCH16`).
+        + read the CoSMoMVPA manuscript (:doi: 10.1101/047118, citation :cite:`OCH16`).
         + have the most recent CoSMoMVPA code (see :ref:`download`).
         + have a recent version of the :ref:`tutorial data <get_tutorial_data>`.
         + have set paths properly in ``.cosmomvpa.cfg`` (described :ref:`here <set_cosmovmpa_cfg>`)

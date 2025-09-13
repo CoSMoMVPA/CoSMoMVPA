@@ -90,7 +90,7 @@ Part 3:
 
 Template: :ref:`run_classify_lda_skl`
 
-Check your answers here: :ref:`run_classify_lda` / :pb:`classify_lda`
+Check your answers here: :ref:`run_classify_lda` / :pb: classify_lda
 
 
 
