@@ -76,7 +76,7 @@ function [y_in_x, x_in_y] = cosmo_overlap(xs, ys)
     unq_start_end_pos = [find(msk); 1 + numel(msk)];
 
     for j = 1:nunq
-        % more readible, but slower:
+        % more readable, but slower:
         %    start_pos=unq_start_end_pos(j);
         %    end_pos=unq_start_end_pos(j+1)-1;
         %    if i_sorted(start_pos)>xs_pos_last [...]

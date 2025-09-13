@@ -59,7 +59,7 @@ function [indices_cell, ds_intersect_cell] = cosmo_mask_dim_intersect(ds_cell, d
     %     %||   .k               .k
     %     %||     [ 1 1 1 ]        [ 1 1 1 ] }
     %     %
-    %     % because the feature attribtues match, they can now be stacked
+    %     % because the feature attributes match, they can now be stacked
     %     result=cosmo_stack(ds_int_cell,1);
     %     disp(size(result.samples))
     %     %|| [12,3]

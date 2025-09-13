@@ -48,7 +48,7 @@ function test_phase_stat_basics
                     extreme_tail_is_nan = false;
 
                 case ''
-                    % deafults,ok
+                    % defaults,ok
 
                 otherwise
                     assert(false);

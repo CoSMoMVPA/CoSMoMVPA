@@ -113,7 +113,7 @@ function helper_write_read_config(include_path_settings, config)
 
     w = cosmo_warning();
     if include_path_settings
-        % no warnign shown
+        % no warning shown
         assert(isempty(w.shown_warnings));
     else
         % warning must have been shown if not include path settings

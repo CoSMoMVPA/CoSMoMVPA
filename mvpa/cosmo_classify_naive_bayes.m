@@ -70,7 +70,7 @@ function predicted = test(model, samples_test)
 
         % being 'naive' we assume independence - so take the product of the
         % p values. (for better precision we take the log of the
-        % probablities and sum them)
+        % probabilities and sum them)
         log_test_prob = sum(log_ps, 2) + log_class_probs;
 
         % find the one with the highest probability

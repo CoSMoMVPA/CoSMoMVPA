@@ -17,7 +17,7 @@ function stat_ds = cosmo_stat(ds, stat_name, output_stat_name)
     %                           (nclasses>=2)
     %                     [*]  nclasses is the number of unique values in
     %                          ds.sa.targets
-    %                     [**] if nclasses==2, the constrast of unq(1) minus
+    %                     [**] if nclasses==2, the contrast of unq(1) minus
     %                          unq(2) is returned, where
     %                            unq=unique(ds.sa.targets);
     %                          Because unique returns the results in sorted
@@ -179,7 +179,7 @@ function stat_ds = cosmo_stat(ds, stat_name, output_stat_name)
     %    t-statistic with df=9, but those with two missing values (NaN values)
     %    are based on the t-statistic with df=7. A use case is computing fMRI
     %    group statistics where overlap across brains is not perfect at the
-    %    voxel-by-voxel level, in as imilar approach as AFNI's 3dttest++ with
+    %    voxel-by-voxel level, in as similar approach as AFNI's 3dttest++ with
     %    the '-toz' option.
     %  - This function computes feature-wise statistics that are not corrected
     %    for multiple comparisons. To correct for multiple comparisons, see
@@ -270,7 +270,7 @@ function [stat, df_struct, stat_label] = apply_stat_func(stat_func, ...
 
     % using the indicator matrix, split up the samples in blocks so that
     % in each block, the same rows in samples are NaN. Each block is
-    % processed seperately in the 'for' loop below.
+    % processed separately in the 'for' loop below.
 
     [indices, zeroed_unq] = cosmo_index_unique(zeroed_samples');
 
@@ -725,10 +725,10 @@ function [samples, targets, chunks, type] = get_descriptors(ds)
     samples = ds.samples;
 
     % unique targets
-    [unused, unusued, targets] = unique(ds.sa.targets);
+    [unused, unused, targets] = unique(ds.sa.targets);
 
     % unique chunks
-    [unq_chunks, unusued, chunks] = unique(ds.sa.chunks);
+    [unq_chunks, unused, chunks] = unique(ds.sa.chunks);
     nc = max(chunks);
 
     if isequal(sort(ds.sa.chunks), unq_chunks)

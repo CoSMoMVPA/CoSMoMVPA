@@ -296,7 +296,7 @@ function img_formats = get_img_formats()
     % define which formats are supports
     % .exts indicates the extensions
     % .matcher says whether a struct is of the type
-    % .reader should read a filaname and return a struct
+    % .reader should read a filename and return a struct
     % .externals are fed to cosmo_check_externals
     img_formats = struct();
 

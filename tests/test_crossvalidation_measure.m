@@ -258,7 +258,7 @@ function test_balanced_accuracy()
         end
 
         if any(h_t ~= nclasses) && any(h_c ~= nchunks)
-            % inbalance
+            % imbalance
             break
         end
     end

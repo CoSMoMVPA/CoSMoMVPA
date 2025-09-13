@@ -64,7 +64,7 @@ function [winners, classes] = cosmo_winner_indices(pred)
     winners = NaN(nsamples, 1);
 
     if nfeatures == 1
-        % single prediction, handle seperately
+        % single prediction, handle separately
         [classes, unused, pred_idxs] = unique(pred(pred_msk));
         winners(pred_msk) = pred_idxs;
         return

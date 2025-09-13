@@ -28,7 +28,7 @@ function clusters = cosmo_clusterize(sample, nbrhood_mat)
     %     % with three clusters:
     %     % - linear index 1         (matrix element (1,1)) with element -1
     %     % - linear index 4         (matrix element (2,1)) with element 3
-    %     % - linear indices 3 and 6 (matrix elments (:,3)) with element -1
+    %     % - linear indices 3 and 6 (matrix elements (:,3)) with element -1
     %     % Note that elements with indices:
     %     % - 1 and 4 are not neighbors because they have different values
     %     % - 1 and 3 are not neighbors because they are not connected, as the
@@ -53,7 +53,7 @@ function clusters = cosmo_clusterize(sample, nbrhood_mat)
     %     * features j and k are connected.
     %     Features j and k are connected if:
     %     * j==k, or
-    %     % j and k are neigbors, or
+    %     % j and k are neighbors, or
     %     * there is a feature m, so that j and m are connected, and m and k
     %       are connected
     %   - Values of zero and NaN in ds are ignored for clusters.

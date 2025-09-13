@@ -8,7 +8,7 @@ function [offsets, distances] = cosmo_sphere_offsets(radius)
     %
     % Output
     %  offsets     Px3 sub indices relative to the origin (0,0,0).
-    %              offsets(p,:)=[i, j, k] means that the euclidian distance
+    %              offsets(p,:)=[i, j, k] means that the euclidean distance
     %              between points at (i,j,k) and the origin is less than or
     %              or equal to radius
     %  distances   Px1 distances from the origin (in voxel units).

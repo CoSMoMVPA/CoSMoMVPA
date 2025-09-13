@@ -36,7 +36,7 @@ function files = cosmo_dir(varargin)
     %
     %  % Assuming that the directory 'my_file' does not exist, return
     %  % either a struct with a single entry (if a file named 'my_file'
-    %  % exists), or an emtpy struct (if no such file exists)
+    %  % exists), or an empty struct (if no such file exists)
     %  d=cosmo_dir('my_file');%
     %
     %  % list recursively all files in the current directory for which the name
@@ -117,7 +117,7 @@ function res = find_files_recursively(root_dir, file_re)
         d_k = d(k);
         fn = d_k.name;
 
-        % do not return current and parent directorys
+        % do not return current and parent directories
         ignore_fn = strcmp(fn, '.') || strcmp(fn, '..');
 
         if ~ignore_fn

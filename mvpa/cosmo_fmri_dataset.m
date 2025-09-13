@@ -769,7 +769,7 @@ function img_formats = get_img_formats()
     % - if .data_reader is absent, then .header_reader must return a
     %   header that contains the data and which can be converter by
     %   .data_converter.
-    % - if .convert_volume is not present, then the output frmo
+    % - if .convert_volume is not present, then the output from
     %   .data_converter is assumed to return a COSMoMVPA dataset struct
     %   (instead of 4D data)
     img_formats = struct();
@@ -1006,7 +1006,7 @@ function [mx, nifti_form] = nifti_matrix_from_auto(hdr)
             error(['the affine matrices mapping voxel-to-world '...
                    'coordinates according to the sform and qform '...
                    'in the NIfTI header differ '...
-                   'by %d, exceeding the treshold %d.\n\n'...
+                   'by %d, exceeding the threshold %d.\n\n'...
                    'The sform matrix is:\n\n%s\n\n', ...
                    'The qform matrix is:\n\n%s\n\n'...
                    'To resolve this, set the ''nifti_form'' '...
@@ -1318,7 +1318,7 @@ function mat = neuroelf_bvcoordconv_wrapper(varargin)
     % helper functions that deals with both new neuroelf (version 1.0)
     % and older versions.
     % the old version provides a 'bvcoordconv' .m file
-    % the new version privides this function in the neuroelf class
+    % the new version provides this function in the neuroelf class
     has_bvcoordconv = ~isempty(which('bvcoordconv'));
 
     % set function handle

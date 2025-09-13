@@ -24,7 +24,7 @@ function bal_partitions = cosmo_balance_partitions(partitions, ds, varargin)
     %                     causes this function to give different results upon
     %                     subsequent calls with identical inputs - use sd=0.
     %
-    % Ouput:
+    % Output:
     %   bpartitions       similar struct as input partitions, except that
     %                     - each field is a 1x(N*nsets) cell
     %                     - each unique target is represented about equally often
@@ -103,10 +103,10 @@ function bal_partitions = cosmo_balance_partitions(partitions, ds, varargin)
     %     class A and 25% samples of class B, but the data does not contain
     %     any information that allows for discrimination between the classes.
     %     A classifier trained on a subset may always predict the class that
-    %     occured most often in the training set, which is class A. If the test
+    %     occurred most often in the training set, which is class A. If the test
     %     set also contains 75% of class A, then classification accuracy would
     %     be 75%, which is higher than 1/2 (with 2 the number of classes).
-    %   * Balancing the training set only would accomodate this issue, but it
+    %   * Balancing the training set only would accommodate this issue, but it
     %     may still be the case that a classifier consistently predicts one
     %     class more often than other classes. While this may be unbiased with
     %      respect to predictions of one particular class over many dataset
@@ -191,7 +191,7 @@ function tr_folds_out = sample_indices(target_idx, fold_class_pos, ...
     tr_folds_out_indices = sample_class_pos(fold_class_pos, ...
                                             nfolds_out, params);
 
-    % assing training indices
+    % assign training indices
     tr_folds_out = cell(1, nfolds_out);
     for k = 1:nfolds_out
         tr_folds_out{k} = target_idx(tr_folds_out_indices{k});
@@ -231,7 +231,7 @@ function folds = sample_class_pos(class_pos, nfolds, params)
     uniform_random_all = cosmo_rand(nsamples, 1, 'seed', params.seed);
     idxs = cell(nfolds, nclasses);
 
-    % process each fold seperately
+    % process each fold separately
     for k = 1:nclasses
         uniform_random_pos = (boundaries(k) + 1):boundaries(k + 1);
         [foo, i] = sort(uniform_random_all(uniform_random_pos));

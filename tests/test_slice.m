@@ -134,7 +134,7 @@ function test_slice_datasets()
         % samples should match
         assertEqual(d.samples, cosmo_slice(ds.samples, slice_arg, slice_dim));
 
-        % dataset attribues should match
+        % dataset attributes should match
         assertEqual(d.a, ds.a);
 
         % test .sa and .fa

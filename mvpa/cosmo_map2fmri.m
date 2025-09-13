@@ -307,7 +307,7 @@ function mat = neuroelf_bvcoordconv_wrapper(varargin)
     % helper functions that deals with both new neuroelf (version 1.0)
     % and older versions.
     % the old version provides a 'bvcoordconv' .m file
-    % the new version privides this function in the neuroelf class
+    % the new version provides this function in the neuroelf class
     has_bvcoordconv = ~isempty(which('bvcoordconv'));
 
     % set function handle
@@ -499,7 +499,7 @@ function afni_info = new_afni(ds)
     origin = mat(idxs, :) * [1 1 1 1]' .* lpi2rai(idxs)';
 
     % set orientation code.
-    % thse are neither RAI or LPI, but RPI (when ordered logically)
+    % these are neither RAI or LPI, but RPI (when ordered logically)
     % No idea why Bob Cox made that decision.
     lpi2orient = [-1 1 1];
     offset = (1 - sign(m) .* lpi2orient(idxs)) / 2;
@@ -524,7 +524,7 @@ function afni_info = new_afni(ds)
     end
     xform_code = cosmo_fmri_convert_xform('afni', xform);
 
-    brik_view = xform_code; % default to +orig, but overriden by writer
+    brik_view = xform_code; % default to +orig, but overridden by writer
 
     afni_info = struct();
     afni_info.SCENE_DATA = [brik_view, brik_func, brik_type];

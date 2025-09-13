@@ -16,7 +16,7 @@ function [pca_ds, pca_params] = cosmo_map_pca(ds, varargin)
     %                               variance (value between 0 and 1, where 1
     %                               retains all components)
     %   'max_feature_count',mx      Raise an error if Q>mx (default: mx=1000).
-    %                               This protects against possible comutations
+    %                               This protects against possible computations
     %                               that require much memory and/or time when
     %                               computing singular value decompositions
     %
@@ -26,7 +26,7 @@ function [pca_ds, pca_params] = cosmo_map_pca(ds, varargin)
     %                               If the input was a numeric array, then
     %                               pca_ds is numeric as well
     %   params                      estimated parameters for pca. These can be
-    %                               re-used for a second pca step of an
+    %                               reused for a second pca step of an
     %                               independent dataset. For example,
     %                               parameters can be estimated from a
     %                               training dataset and then applied to a
@@ -166,7 +166,7 @@ function [full_samples, pca_params] = pca_estimate(samples, opt)
         nretain = find(cum_explained > pca_explained_ratio * 100, 1, 'first');
 
         if isempty(nretain)
-            % deal wtih rounding error
+            % deal with rounding error
             assert(100 - cum_explained(end) < 1e-4);
             nretain = ndim;
         end

@@ -46,7 +46,7 @@ function [map_x2y, map_y2x] = cosmo_align(x, y)
 
     if ~isequal(nxi, nyi)
         error(['the two inputs do have matching elements '...
-               'but their number of occurences is not matched']);
+               'but their number of occurrences is not matched']);
     elseif any(cellfun(@numel, xi) > 1)
         error('combinations of elements are non-unique');
     end

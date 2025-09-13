@@ -107,7 +107,7 @@ function ds_sa = cosmo_target_dsm_corr_measure(ds, varargin)
     %     %||   .type
     %     %||     { 'Pearson' }
     %     %
-    %     % do not consider classses 3 and 5
+    %     % do not consider classes 3 and 5
     %     target_dsm([3,5],:)=NaN;
     %     target_dsm(:,[3,5])=NaN;
     %     target_dsm(3,3)=0;
@@ -352,7 +352,7 @@ function [dsm_mat, common_msk] = get_dsm_mat_from_vector_or_cell(dsm_cell, ...
     end
 
 function [dsm_vec, msk] = get_dsm_vec_from_struct(params, name, npairs_dataset)
-    % helper funciton to get dsm in vector form
+    % helper function to get dsm in vector form
     if ~isfield(params, name)
         error('Missing parameter ''%s''', name);
     end

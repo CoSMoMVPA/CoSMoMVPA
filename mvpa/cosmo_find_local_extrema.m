@@ -163,7 +163,7 @@ function [feature_ids, scores] = cosmo_find_local_extrema(ds, nbrhood, varargin)
         around_ids = nbrhood.neighbors{id};
 
         if any(cosmo_match(feature_ids(1:counter), around_ids))
-            % in the unlikely case of an assymetric neighborhood, where
+            % in the unlikely case of an asymmetric neighborhood, where
             % a previous id did not have the current id as a neighbor but
             % the current id has a previous id as neighbor, still skip the
             % current feature id

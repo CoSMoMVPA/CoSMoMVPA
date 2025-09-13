@@ -1,5 +1,5 @@
 function partitions = cosmo_nchoosek_partitioner(chunks_or_ds, k, varargin)
-    % partitions for into nchoosek(n,k) parititions with optional grouping schemas.
+    % partitions for into nchoosek(n,k) partitions with optional grouping schemas.
     %
     % partitions=cosmo_nchoosek_partitioner(chunks, k, group_values1, test_group_by1,...)
     %
@@ -464,7 +464,7 @@ function partitions = group_by(partitions, group_values, test_group_by)
     partitions.test_indices = cat(2, test_indices{:});
 
 function partitions = nchoosek_partitioner(chunks, k)
-    % straightfoward partitioner
+    % straightforward partitioner
 
     [unq, unused, chunk_indices] = unique(chunks);
     nchunks = numel(unq);

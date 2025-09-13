@@ -196,7 +196,7 @@ function ds_z = cosmo_montecarlo_cluster_stat(ds, nbrhood, varargin)
     %     correlation differences (if maps were obtained using a searchlight
     %     with cosmo_correlation_measure), or against a mean of 1/C (if maps
     %     were obtained using a searchlight with classification analysis
-    %     with C classes, with each class occuring equally often in the
+    %     with C classes, with each class occurring equally often in the
     %     training set).
     %   - The permutations used with the 'h0_mean' option involve randomly
     %     flipping the sign of samples (over all features) after subtracting
@@ -216,8 +216,8 @@ function ds_z = cosmo_montecarlo_cluster_stat(ds, nbrhood, varargin)
     %     threshold can be applied to see which features (e.g. voxels or nodes)
     %     survive a particular cluster-corrected significance threshold.
     %   - Versions of this function from before 23 November 2016 incorrectly
-    %     producted z-scores corresponding to one-tailed, rather than
-    %     two-tailed, probablity values.
+    %     produced z-scores corresponding to one-tailed, rather than
+    %     two-tailed, probability values.
     %   - p-values are computed by dividing as (r+1) / (niter+1), with r the
     %     number of times that the original data as less then the null
     %     distributions. This follows the recommendation of North et al (2002).
@@ -338,7 +338,7 @@ function ds_z = cosmo_montecarlo_cluster_stat(ds, nbrhood, varargin)
 
     % Run process for each worker in parallel
     % Note that when using nproc=1, cosmo_parcellfun does actually not
-    % use any parallellization; the result is a cell with a single element.
+    % use any parallelization; the result is a cell with a single element.
     result_cell = cosmo_parcellfun(nproc_used, ...
                                    @run_with_worker, ...
                                    worker_opt_cell, ...
@@ -539,7 +539,7 @@ function preproc_func = get_preproc_func(ds, opt)
                 infix = 'the .samples field has a single row';
             else
                 infix = ['the targets and chunks '...
-                         'specify an indepenent design with one '...
+                         'specify an independent design with one '...
                          'unique target'];
             end
 
@@ -560,7 +560,7 @@ function preproc_func = get_preproc_func(ds, opt)
         if has_h0_mean
             error(['The option ''h0_mean'' is not allowed for this '...
                    'dataset, because the targets and chunks do not '...
-                   'specify a design with indepedent samples and one '...
+                   'specify a design with independent samples and one '...
                    'unique target']);
         else
 

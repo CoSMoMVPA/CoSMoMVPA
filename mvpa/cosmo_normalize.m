@@ -22,7 +22,7 @@ function [ds, params] = cosmo_normalize(ds, params, dim)
     %                 normalized. If the input was a numeric array then ds_norm
     %                 is a numeric array as well.
     %   params        estimated parameters for normalization. These can be
-    %                 re-used for a second normalization step of an independant
+    %                 reused for a second normalization step of an independent
     %                 dataset. For example, parameters can be estimated from a
     %                 training dataset and then applied to a testing dataset
     %

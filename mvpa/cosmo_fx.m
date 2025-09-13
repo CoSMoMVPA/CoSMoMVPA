@@ -15,7 +15,7 @@ function f_ds = cosmo_fx(ds, f, split_by, dim, check)
     %
     % Returns:
     %    f_ds       dataset struct where the samples are the result of applying
-    %               f to the samples of each unique combiniation of attributes
+    %               f to the samples of each unique combination of attributes
     %               in split_by
     %
     % Example:

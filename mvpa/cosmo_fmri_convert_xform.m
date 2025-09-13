@@ -13,7 +13,7 @@ function tr_xform = cosmo_fmri_convert_xform(fmt, xform)
     %                       'scanner_anat','aligned_anat','talairach',
     %                       'mni_152', 'unknown'
     %                    - a number, in which case it must be the view type for
-    %                       nii (sform or qform) or afni (the first elment of
+    %                       nii (sform or qform) or afni (the first element of
     %                       SCENE_TYPE). Any number in bv corresponds with
     %                       'unknown'.
     %
@@ -85,7 +85,7 @@ function tr_xform = cosmo_fmri_convert_xform(fmt, xform)
     %     % treat as talairach
     %     cosmo_fmri_convert_xform('afni','mni_152')
     %     %|| 2
-    %     % unkown
+    %     % unknown
     %     cosmo_fmri_convert_xform('afni','unknown')
     %     %|| 0
     %

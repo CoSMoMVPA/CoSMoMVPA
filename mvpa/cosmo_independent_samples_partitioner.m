@@ -160,7 +160,7 @@ function partitions = cosmo_independent_samples_partitioner(ds, varargin)
     % If the target fold count is near this number F, then randomly
     % generating folds until enough folds are generated will take a long
     % time, because many folds will be duplicates of existing ones. In such
-    % a scenerio it is more efficient to generate all possible folds first,
+    % a scenario it is more efficient to generate all possible folds first,
     % then select the required number of folds randomly
 
     fold_enumerate_ratio = .1;

@@ -184,7 +184,7 @@ function neighbors = cosmo_meeg_chan_neighbors(ds, varargin)
     %     % As above, but now use both the axial and planar channels with
     %     % center labels for the planar channels from the combined_planar set.
     %     % Here the axial center channels have 4 axial neighbors each, while
-    %     % the planar_combined channels have 8 planar (uncombined) neigbors
+    %     % the planar_combined channels have 8 planar (uncombined) neighbors
     %     % each.
     %     ds=cosmo_synthetic_dataset('type','meeg','size','big');
     %     nbrs=cosmo_meeg_chan_neighbors(ds,...

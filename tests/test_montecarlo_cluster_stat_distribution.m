@@ -34,7 +34,7 @@ function test_mccs_uniformity_slow()
     max_attempts = 8;
     grow_niter = 1.2;
 
-    % benchmark values obtained by runnning
+    % benchmark values obtained by running
     % helper_mccs_get_correlation_with_uniform multiple times with
     % 'correct' monte carlo custer stat function.
     uniform_c_mu = .985;

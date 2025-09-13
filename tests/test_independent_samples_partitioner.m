@@ -129,7 +129,7 @@ function p = helper_test_independent_samples_partitioner(nclasses, ...
         end
     else
         if isfield(opt, 'fold_count')
-            % given by calling funciton
+            % given by calling function
             fold_count = opt.fold_count;
         else
             % use all folds available
@@ -271,7 +271,7 @@ function test_independent_samples_partitioner_mismatch_exceptions
     % missing target
     aet_targets({[3 3 3], [4 4]}, opt);
 
-    % not enought targets in one class
+    % not enough targets in one class
     aet_targets({[3 3 3], [2 2 1]}, opt);
 
     opt.test_count = 3;

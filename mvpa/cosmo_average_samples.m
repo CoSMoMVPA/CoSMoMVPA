@@ -93,7 +93,7 @@ function ds_avg = cosmo_average_samples(ds, varargin)
     %    and targets, then some samples may not be used to compute averages,
     %    as the least number of samples across combinations is used to set
     %  - As illustration, consider a dataset with the following number of
-    %    samples for each unique targets and chunks combiniation
+    %    samples for each unique targets and chunks combination
     %
     %    .sa.chunks     .sa.targets         number of samples
     %    ----------     -----------         -----------------

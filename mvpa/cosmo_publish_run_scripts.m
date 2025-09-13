@@ -20,7 +20,7 @@ function is_ok = cosmo_publish_run_scripts(varargin)
     %  - whether an output file is out of date is first determined using
     %    git: if git shows no changes to the last commit of the input file
     %    then it is assumed it is not out of date. If the input file has
-    %    been changed since the last commit (or never been comitted), then
+    %    been changed since the last commit (or never been committed), then
     %    the modification date is used to determine whether it is out of date.
     %  - requirements
     %    * a Unix-like system

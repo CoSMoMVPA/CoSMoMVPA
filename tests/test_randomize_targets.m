@@ -17,7 +17,7 @@ function test_randomize_targets_basics()
     assertEqual(sort(perm1), (1:size(ds.samples, 1))');
 
     x2 = cosmo_randomize_targets(ds);
-    assert(any(x1 ~= x2)); % probablity of failing less than 1e-13
+    assert(any(x1 ~= x2)); % probability of failing less than 1e-13
     assert(any(x1 ~= ds.sa.targets));
 
     ds_small = cosmo_slice(ds, 1:8);

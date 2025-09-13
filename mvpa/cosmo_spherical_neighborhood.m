@@ -408,7 +408,7 @@ function lin = fast_sub2ind(sz, i, j, k)
     lin = sz(1) * (sz(2) * (k - 1) + (j - 1)) + i;
 
 function pos = boundary_at_approx(ids, distances, voxel_count)
-    % pseudo-random selection of approximatly voxel_count elements
+    % pseudo-random selection of approximately voxel_count elements
     if voxel_count <= 0
         pos = 0;
         return

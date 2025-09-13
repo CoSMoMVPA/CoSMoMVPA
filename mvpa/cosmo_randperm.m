@@ -8,7 +8,7 @@ function rp = cosmo_randperm(n, varargin)
     %   count                   (optional) number of elements to return; count
     %                           must not be larger than n.
     %                           Default: count=n
-    %   'seed',seed             (optional) use seed for determistic
+    %   'seed',seed             (optional) use seed for deterministic
     %                           pseudo-random number generation. If provided
     %                           then subsequent calls to this function with the
     %                           same input arguments will always give the same

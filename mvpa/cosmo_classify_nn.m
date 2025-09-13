@@ -45,7 +45,7 @@ function predicted = cosmo_classify_nn(samples_train, targets_train, samples_tes
     for k = 1:ntest
         % for each sample in the test set:
         %
-        % - compute its squared euclidian distance to each sample in
+        % - compute its squared euclidean distance to each sample in
         %   the train set, and store this in a vector
         %   squared_distances (which must have size ntrain x 1).
         %   For two vectors a=[a_1, a_2, ..., a_N] and b=[b_1, b_2, ..., b_N],

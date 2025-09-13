@@ -28,7 +28,7 @@ function predicted = cosmo_classify_svm(samples_train, targets_train, samples_te
     %  - Matlab's SVM classifier is rather slow, especially for multi-class
     %    data (more than two classes). When classification takes a long time,
     %    consider using libsvm.
-    %  - In both implemenations, by default the data is scaled.
+    %  - In both implementations, by default the data is scaled.
     %    Note that cosmo_crossvalidate and cosmo_crossvalidation_measure
     %    provide an option 'normalization' to perform data scaling.
     %
@@ -86,8 +86,8 @@ function predicted = cosmo_classify_svm(samples_train, targets_train, samples_te
         cached_classifier_name = svm_name;
     end
 
-    % ensure that the classifer func is not stored in this function if an error
-    % occurs. After sucessful classifcation the classifier_func is restored.
+    % ensure that the classifier func is not stored in this function if an error
+    % occurs. After successful classification the classifier_func is restored.
     cached_classifier_func = [];
 
     predicted = classifier_func(samples_train, targets_train, samples_test, opt);

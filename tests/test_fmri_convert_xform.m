@@ -54,7 +54,7 @@ function test_fmri_convert_xform_basics
     aeq(2, 'afni', 'talairach');
     % treat as talairach
     aeq(2, 'afni', 'mni_152');
-    % unkown
+    % unknown
     aeq(0, 'afni', 'unknown');
 
     % - BV

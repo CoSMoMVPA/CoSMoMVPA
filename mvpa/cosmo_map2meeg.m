@@ -6,7 +6,7 @@ function hdr = cosmo_map2meeg(ds, fn)
     % Inputs:
     %    ds               dataset struct with field .samples with MEEG data
     %    fn               output filename or extension. If a filename,
-    %                     the following extentions are supported:
+    %                     the following extensions are supported:
     %                       .mat :        FieldTrip time-locked or
     %                                     time-frequency  data at  either the
     %                                     sensor or source level.
@@ -154,7 +154,7 @@ function write_eeglab_txt(fn, hdr)
     [ntrial, nchan, ntime] = size(data);
     arr = zeros(ntrial * ntime, nchan + 1);
 
-    % set time dimension - and convert seconds to miliseconds
+    % set time dimension - and convert seconds to milliseconds
     arr(:, 1) = repmat(hdr.time(:) * 1000, ntrial, 1);
     arr(:, 2:end) = reshape(shiftdim(data, 2), ntime * ntrial, nchan);
 

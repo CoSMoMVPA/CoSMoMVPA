@@ -298,7 +298,7 @@ function s = url2str(url)
     end
 
 function w = noerror_which(varargin)
-    % Octave raises an expection when 'which' is called and a mex-file of
+    % Octave raises an exception when 'which' is called and a mex-file of
     % incompatible architecture is found
     w = '';
     try
@@ -569,7 +569,7 @@ function externals = get_externals_helper()
 function tf = is_matlab_prior_2018a()
     this_version = cosmo_wtf('version_number');
 
-    matlab_pivot = [9, 4]; % verison 2018a
+    matlab_pivot = [9, 4]; % version 2018a
     n_elem = numel(matlab_pivot);
 
     delta = this_version(1:n_elem) - matlab_pivot;

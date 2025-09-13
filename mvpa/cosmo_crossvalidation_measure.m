@@ -88,7 +88,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
     %
     %     % let the measure return predictions instead of accuracy,
     %     % and use take-1-chunks out for testing crossvalidation;
-    %     % use LDA classifer and let targets be in range 7..9
+    %     % use LDA classifier and let targets be in range 7..9
     %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4,'target1',7);
     %     opt=struct();
     %     opt.partitions=cosmo_nchoosek_partitioner(ds,1);
@@ -168,7 +168,7 @@ function ds_sa = cosmo_crossvalidation_measure(ds, varargin)
     %     % sample.
     %     ds=cosmo_synthetic_dataset('ntargets',3,'nchunks',4,'target1',7);
     %     opt=struct();
-    %     % use take-two-chunks-for-testing crossvalidation, resuling in
+    %     % use take-two-chunks-for-testing crossvalidation, resulting in
     %     % nchoosek(4,2)=6 folds
     %     opt.partitions=cosmo_nchoosek_partitioner(ds,2);
     %     cosmo_disp(opt.partitions);

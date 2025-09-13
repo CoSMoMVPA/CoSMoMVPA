@@ -1,5 +1,5 @@
 function msk = cosmo_match(haystack, needle, varargin)
-    % returns a mask indicating matching occurences in two arrays or cells
+    % returns a mask indicating matching occurrences in two arrays or cells
     % relative to the second array
     %
     % msk=cosmo_match(haystack1, needle1[, needle2, haystack2, ...])

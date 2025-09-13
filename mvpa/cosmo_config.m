@@ -1,8 +1,8 @@
 function [config, fn] = cosmo_config(fn, config)
-    % return a struc with configuration settings, or store such settings
+    % return a struct with configuration settings, or store such settings
     %
     % Usages:
-    % - get the configuation (either default, or what is in '.cosmomvpa.cfg'):
+    % - get the configuration (either default, or what is in '.cosmomvpa.cfg'):
     %   >> config=cosmo_config();
     %
     % - read configuration from a specified file
@@ -286,7 +286,7 @@ function write_config(fn, config)
             % convert numeric to string
             v = sprintf('%d ', v);
         elseif ischar(v)
-            % no converstion
+            % no conversion
         else
             cosmo_warning('Skipping unsupported data type for key "%s"', ...
                           fn);

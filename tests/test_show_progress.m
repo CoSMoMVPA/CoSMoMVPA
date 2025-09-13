@@ -56,7 +56,7 @@ function assert_progress_equal(re, infix, varargin)
     result = evalc(expr);
 
     while true
-        % replace a backspace character and the preceeding character by
+        % replace a backspace character and the preceding character by
         % nothing
         idx = find(result == sprintf('\b'), 1);
         if isempty(idx)

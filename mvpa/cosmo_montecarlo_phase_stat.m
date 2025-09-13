@@ -100,7 +100,7 @@ function ds_stat = cosmo_montecarlo_phase_stat(ds, varargin)
     [nsamples, nfeatures] = size(ds.samples);
 
     % normalize dataset here. This is more efficient than letting
-    % cosmo_phase_stat normalize the data for each null dataset seperately.
+    % cosmo_phase_stat normalize the data for each null dataset separately.
     ds.samples = ds.samples ./ abs(ds.samples);
     phase_opt = struct();
     phase_opt.output = opt.output;
@@ -173,7 +173,7 @@ function z = compute_zscore_non_parametric(ds, stat_orig, phase_func, ...
     % compute z-score non-parametrically
     % number of times the original data is less than (leading to negative
     % values) or greater than (leading to positive values) the null data.
-    % Afer running all iterations, values in exceed_count range from
+    % After running all iterations, values in exceed_count range from
     % -opt.niter to +opt.niter.
     nfeatures = size(ds.samples, 2);
     exceed_count = zeros(1, nfeatures);

@@ -1,5 +1,5 @@
 function [split, nsplit] = cosmo_strsplit(string, delim, varargin)
-    % splits a string based on another delimeter string
+    % splits a string based on another delimiter string
     %
     % [split,n]=cosmo_strsplit(string[,delim,][pos1, delim2, pos2, delim2,...])
     %
@@ -10,7 +10,7 @@ function [split, nsplit] = cosmo_strsplit(string, delim, varargin)
     %                   example '\t', '\n' and '\\' represent a tab, newline
     %                   and backslash character, respectively.
     %                   If omitted or equal to [], then the string is split
-    %                   based on whitespaces occuring in string
+    %                   based on whitespaces occurring in string
     %
     %   pos             (optional) a single index indicating which split part
     %                   should be returned. If string is split in N elements,
@@ -19,20 +19,20 @@ function [split, nsplit] = cosmo_strsplit(string, delim, varargin)
     %                   last element is returned, and pos=-2 means that the
     %                   element before the last element is returned.
     %                   If omitted a cell with all parts are returned.
-    %   delim*          (optional) subsequent delimeters applied after applying
+    %   delim*          (optional) subsequent delimiters applied after applying
     %                   pos. It requires that the preceding pos has a single
     %                   value.
     %
     % Output:
     %   split           when the last argument is non-positional, split is a
     %                   cell with the string split by delim. When there are N
-    %                   non-overlapping occurences of delim in string, then
+    %                   non-overlapping occurrences of delim in string, then
     %                   split has N+1 elements, and the string
     %                   [delim split{1} delim split{2} ... split{N} delim]
     %                   is equal to string.
     %                   If the last argument is positional, then split is
     %                   a string with value split_{pos} where split_ is the
-    %                   result if pos where not the last arugment.
+    %                   result if pos where not the last argument.
     %   n               the number of elements in split, if split is a cell;
     %                   0 otherwise
     %

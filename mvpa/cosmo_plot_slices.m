@@ -9,7 +9,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     %               volume (sample) only.
     %  dim          dimension according to which slices are plotted
     %               (default: 3). Values between 1 and 3 allows using a
-    %               saggital, axial or coronal view; but the mapping between
+    %               sagittal, axial or coronal view; but the mapping between
     %               the 3 numbers and 3 views depends on the particular
     %               orientation of the data.
     %  slice_step   step between slices (default: 1). If negative then
@@ -46,7 +46,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     %    as this depends on the voxel-to-world transformation matrix, which is
     %    completely ignored in this function. Thus left-right and top-down
     %    swaps can occur. Different datasets may provide different views, for
-    %    example dim=1 may give a saggital view if the dataset comes from one
+    %    example dim=1 may give a sagittal view if the dataset comes from one
     %    program and an axial view if it comes from another program.
     %
     % #   For CoSMoMVPA's copyright information and license terms,   #
@@ -88,7 +88,7 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
     slice_idxs = slice_start:slice_step:slice_stop;
     nslices = numel(slice_idxs);
 
-    plot_ratio = .8; % ratio between number of rows and colums
+    plot_ratio = .8; % ratio between number of rows and columns
     nrows = ceil(sqrt(nslices) * plot_ratio);
     ncols = ceil(nslices / nrows);
 

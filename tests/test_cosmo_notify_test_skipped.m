@@ -42,7 +42,7 @@ function test_cosmo_notify_test_skipped_basics()
         caller = @(varargin)cosmo_notify_test_skipped(varargin{:});
     end
 
-    % one notificiation
+    % one notification
     reason1 = ['a' randstr()];
     caller(reason1);
     s = cosmo_notify_test_skipped();

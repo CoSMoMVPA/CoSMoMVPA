@@ -60,7 +60,7 @@ function samples = cosmo_sample_unique(k, n, count, varargin)
     visited = false((k + 1) * count, 1);
 
     first_non_visited_pos = 1;
-    in_bin = false(n, k); % re-use this for each column
+    in_bin = false(n, k); % reuse this for each column
     for col = 1:count
         % no elements added so far
         in_bin(:) = false;

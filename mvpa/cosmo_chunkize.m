@@ -59,7 +59,7 @@ function chunks = cosmo_chunkize(ds, nchunks_out)
     %     %||   2         4 ]@48x2
     %
     % Notes:
-    %  - This function is indended for MEEG datasets, or other datasets
+    %  - This function is intended for MEEG datasets, or other datasets
     %    where each trial can be assumed to be 'independant' of other trials.
     %  - To indicate independence between all trials in a dataset ds, use:
     %      ds.sa.chunks=(1:size(ds.samples,1))';

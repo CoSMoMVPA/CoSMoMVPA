@@ -17,7 +17,7 @@ function cosmo_disp(x, varargin)
     %     .precision   Numeric precision, indicating number of decimals after
     %                  the floating point
     %                  Default: 3
-    %     .strlen      Maximal string lenght, if a string is longer the
+    %     .strlen      Maximal string length, if a string is longer the
     %                  beginning and end are shown separated by ' ... '.
     %                  Default: 20
     %     .depth       Maximum recursion depth

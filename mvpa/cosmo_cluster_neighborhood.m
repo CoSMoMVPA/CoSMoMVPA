@@ -72,7 +72,7 @@ function nbrhood = cosmo_cluster_neighborhood(ds, varargin)
     %                          'size','normal',...
     %                          'sens','neuromag306_planar_combined+axial');
     %     nh_meg=cosmo_cluster_neighborhood(ds_meg,'progress',false);
-    %     % neighbors are seperate for axial channels (odd features)
+    %     % neighbors are separate for axial channels (odd features)
     %     % and planar_combined channels (even features)
     %     cosmo_disp(nh_meg.neighbors)
     %     %|| { [ 1         3         4         6 ]

@@ -631,7 +631,7 @@ function ds = read_eeglab(fn, opt)
     ds = convert_eeglab_struct(s, opt);
 
 function s = eeglab_load_with_trials(fn, trial_idx)
-    % can save memory by loaded each channel seperately
+    % can save memory by loaded each channel separately
     s_minimal = load(fn, '-mat', 'datatype');
     has_freq = helper_eeglab_get_freq_info(s_minimal);
 
@@ -930,7 +930,7 @@ function ds = read_eeglab_txt(fn, opt)
 
     %%%%%%%%%%%%%%%
     % flatten and make it a dataset
-    % (convert miliseconds to seconds along the way)
+    % (convert milliseconds to seconds along the way)
     dim_labels = {'chan'; 'time'};
     dim_values = {chan_labels(:)'; .001 * t_trial(:)'};
 

@@ -92,7 +92,7 @@ function senstypes = cosmo_meeg_senstype_collection()
     %   - this function requires FieldTrip, as it uses its collection of
     %     layouts
     %   - this function caches previously read layouts, for optimization
-    %     reasons. run "clear functions" to reset the cahce.
+    %     reasons. run "clear functions" to reset the cache.
     %
     % #   For CoSMoMVPA's copyright information and license terms,   #
     % #   see the COPYING file distributed with CoSMoMVPA.           #
@@ -538,7 +538,7 @@ function senstypes = check_siblings(senstypes)
                       key, ncol, label_size(2));
             end
 
-            % veryify that number of channel positions matches across
+            % verify that number of channel positions matches across
             % all siblings
             if ~isequal(first_size(1), label_size(1))
                 error(['size mismatch between %s and %s: number of '...

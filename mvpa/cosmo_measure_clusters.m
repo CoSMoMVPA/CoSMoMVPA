@@ -173,7 +173,7 @@ function cval = cosmo_measure_clusters(sample, nbrhood_mat, cluster_stat, vararg
 
         if has_inf
             % if output can contain infinity, break if all values are less
-            % than the threshold or inifity
+            % than the threshold or infinity
             if ~any(super_threshold_msk & ~infinity_msk)
                 % no features surive, clustering is completed
                 break
@@ -256,7 +256,7 @@ function feature_sizes = get_feature_sizes(sample, opt)
 
 function func = get_tfce_cluster_func(sizes, threshold_height, opt, defaults)
     % helper to get the cluster function for TFCE, using either supplied or
-    % default values for the E and H paramters
+    % default values for the E and H parameters
     persistent cached_opt
     persistent cached_defaults
     persistent cached_opt_all

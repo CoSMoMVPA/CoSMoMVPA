@@ -82,7 +82,7 @@ function [pca_samples, params] = cosmo_pca(samples, retain)
     end
 
     if ndim == 0
-        % seperate case for zero dimensions
+        % separate case for zero dimensions
         pca_samples = zeros(1, 0);
         coef = zeros(ncol, 0);
     else

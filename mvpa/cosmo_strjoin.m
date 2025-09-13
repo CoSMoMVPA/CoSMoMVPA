@@ -1,12 +1,12 @@
 function joined = cosmo_strjoin(strings, delim)
-    % joins strings using a delimeter string
+    % joins strings using a delimiter string
     %
     % joined=cosmo_strjoin(strings[, delim])
     %
     % Inputs:
     %   strings   1xP cell with strings to be joined. Each string should be a
     %             row vector of characters
-    %   delim     delimeter string, or a cell of strings. In the
+    %   delim     delimiter string, or a cell of strings. In the
     %             latter case delim should have P-1 elements. If omitted a
     %             single space character ' ' is used.
     %             delim can contain backslash-escaped characters that are

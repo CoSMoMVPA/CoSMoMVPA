@@ -25,7 +25,7 @@ function ds_stacked = cosmo_stack(ds_cell, varargin)
     %                informative error messages (if any). Use this option only
     %                if you are sure that the inputs have proper dimensions.
     %
-    % Ouput:
+    % Output:
     %   ds_stacked   Stacked dataset. If dim==1 [or dim==2] and the K-th
     %                dataset has .samples with size M_K x N_K, then it is
     %                required that all N_* [M_*] are the same, and the output
