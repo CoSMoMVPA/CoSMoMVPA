@@ -1,34 +1,34 @@
 function test_suite = test_dim_rename()
-% tests for cosmo_dim_rename
-%
-% #   For CoSMoMVPA's copyright information and license terms,   #
-% #   see the COPYING file distributed with CoSMoMVPA.           #
+    % tests for cosmo_dim_rename
+    %
+    % #   For CoSMoMVPA's copyright information and license terms,   #
+    % #   see the COPYING file distributed with CoSMoMVPA.           #
     try % assignment of 'localfunctions' is necessary in Matlab >= 2016
-        test_functions=localfunctions();
+        test_functions = localfunctions();
     catch % no problem; early Matlab versions can use initTestSuite fine
     end
-    initTestSuite
+    initTestSuite;
 
 function test_dim_rename_basics
-    ds=cosmo_synthetic_dataset();
+    ds = cosmo_synthetic_dataset();
 
     % simple rename
-    ds2=cosmo_dim_rename(ds,'j','jj');
-    assertEqual(ds2.a.fdim.labels{2},'jj');
-    assertEqual(ds2.a.fdim.values,ds.a.fdim.values);
-    assertEqual(ds2.samples,ds.samples);
-    assertEqual(ds2.sa,ds.sa);
+    ds2 = cosmo_dim_rename(ds, 'j', 'jj');
+    assertEqual(ds2.a.fdim.labels{2}, 'jj');
+    assertEqual(ds2.a.fdim.values, ds.a.fdim.values);
+    assertEqual(ds2.samples, ds.samples);
+    assertEqual(ds2.sa, ds.sa);
 
-    fa=ds.fa;
-    fa.jj=fa.j;
-    fa=rmfield(fa,'j');
-    assertEqual(ds2.fa,fa);
+    fa = ds.fa;
+    fa.jj = fa.j;
+    fa = rmfield(fa, 'j');
+    assertEqual(ds2.fa, fa);
 
     % if raise=false, input is same as output
-    ds3=cosmo_dim_rename(ds,'xxx','jj',false);
-    assertEqual(ds,ds3,ds);
+    ds3 = cosmo_dim_rename(ds, 'xxx', 'jj', false);
+    assertEqual(ds, ds3, ds);
 
-    aet=@(varargin)assertExceptionThrown(@()...
-                        cosmo_dim_rename(varargin{:}),'');
-    aet(ds,'xxx','jj');
-    aet(ds,'xxx','jj',true);
+    aet = @(varargin)assertExceptionThrown(@() ...
+                                           cosmo_dim_rename(varargin{:}), '');
+    aet(ds, 'xxx', 'jj');
+    aet(ds, 'xxx', 'jj', true);

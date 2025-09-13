@@ -1,147 +1,146 @@
-function s=cosmo_map2surface(ds, fn, varargin)
-% maps a dataset structure to AFNI/SUMA NIML dset or BV SMP file
-%
-% s=cosmo_map2surface(ds, output, ...)
-%
-% Inputs:
-%   ds                  dataset struct with surface-based data
-%   output              String, indicating either the output format or the
-%                       filename.
-%                       - If output starts with a '-', then it must be one
-%                         of:
-%                           '-niml_dset'    AFNI NIML
-%                           '-bv_smp'       BrainVoyager surface map
-%                           '-gii'          GIFTI
-%                       - otherwise it must be a string indicating a file
-%                         name, and end with one of
-%                           '.niml.dset'    AFNI NIML
-%                           '.smp'          BrainVoyager surface map
-%                           '.gii'          GIFTI
-%  'encoding', e        Optional encoding for AFNI NIML or GIFTI. Depending
-%                       on the output format, supported values for e are:
-%                       - NIML:  'ascii', 'binary',
-%                                'binary.lsbfirst', 'binary.msbfirst'
-%                         (the 'binary' option uses the machine's native
-%                         format with either the least or most significant
-%                         byte first)
-%                       - GIFTI: 'ASCII', 'Base64Binary',
-%                                'GZipBase64Binary'
-%                       The encoding argument is ignored for BrainVoyager
-%                       output.
-%  'format', f          Optional format to be used for output, if the
-%                       output argument empty; one of 'niml_dset', 'bv_smp'
-%                       or 'gii'.
-%
-% Output:
-%   s                   Structure containing the surface based data based
-%                       on the output format; either a struct with
-%                       NIML data, an xff object, or a GIFTI object.
-%
-% Examples:
-%     % (this example requires the AFNI Matlab toolbox)
-%     cosmo_skip_test_if_no_external('afni');
-%     %
-%     ds=cosmo_synthetic_dataset('type','surface');
-%     %
-%     % convert to AFNIML NIML format
-%     % (to store a file to disc, use a filename as the second argument)
-%     niml=cosmo_map2surface(ds,'-niml_dset');
-%     cosmo_disp(niml);
-%     %|| .node_indices
-%     %||   [ 0         1         2         3         4         5 ]
-%     %|| .data
-%     %||   [   2.03     0.584     -1.44    -0.518      1.19     -1.33
-%     %||     -0.892      1.84    -0.262      2.34    -0.204      2.72
-%     %||     -0.826      1.17     -1.92     0.441    -0.209     0.148
-%     %||       1.16    -0.848      3.09      1.86      1.76     0.502
-%     %||       1.16      3.49     -1.37     0.479    -0.955      3.41
-%     %||      -1.29    -0.199      1.73    0.0832     0.501     -0.48 ]
-%
-% Notes:
-%   - this function is intended for datasets with surface data, i.e. with
-%     one or more values associated with each surface node. It does not
-%     support anatomical surface meshes that contain node coordinates and
-%     faces. To read and write such anatomical meshes, consider the surfing
-%     toolbox, github.com/nno/surfing
-%   - To load surface datasets, use cosmo_surface_dataset
-%
-% Dependencies:
-%   - for Brainvoyager files (.smp), it requires the NeuroElf
-%     toolbox, available from: http://neuroelf.net
-%   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
-%     Matlab toolbox, available from: https://github.com/afni/AFNI
-%
-% See also: cosmo_surface_dataset
-%
-% #   For CoSMoMVPA's copyright information and license terms,   #
-% #   see the COPYING file distributed with CoSMoMVPA.           #
+function s = cosmo_map2surface(ds, fn, varargin)
+    % maps a dataset structure to AFNI/SUMA NIML dset or BV SMP file
+    %
+    % s=cosmo_map2surface(ds, output, ...)
+    %
+    % Inputs:
+    %   ds                  dataset struct with surface-based data
+    %   output              String, indicating either the output format or the
+    %                       filename.
+    %                       - If output starts with a '-', then it must be one
+    %                         of:
+    %                           '-niml_dset'    AFNI NIML
+    %                           '-bv_smp'       BrainVoyager surface map
+    %                           '-gii'          GIFTI
+    %                       - otherwise it must be a string indicating a file
+    %                         name, and end with one of
+    %                           '.niml.dset'    AFNI NIML
+    %                           '.smp'          BrainVoyager surface map
+    %                           '.gii'          GIFTI
+    %  'encoding', e        Optional encoding for AFNI NIML or GIFTI. Depending
+    %                       on the output format, supported values for e are:
+    %                       - NIML:  'ascii', 'binary',
+    %                                'binary.lsbfirst', 'binary.msbfirst'
+    %                         (the 'binary' option uses the machine's native
+    %                         format with either the least or most significant
+    %                         byte first)
+    %                       - GIFTI: 'ASCII', 'Base64Binary',
+    %                                'GZipBase64Binary'
+    %                       The encoding argument is ignored for BrainVoyager
+    %                       output.
+    %  'format', f          Optional format to be used for output, if the
+    %                       output argument empty; one of 'niml_dset', 'bv_smp'
+    %                       or 'gii'.
+    %
+    % Output:
+    %   s                   Structure containing the surface based data based
+    %                       on the output format; either a struct with
+    %                       NIML data, an xff object, or a GIFTI object.
+    %
+    % Examples:
+    %     % (this example requires the AFNI Matlab toolbox)
+    %     cosmo_skip_test_if_no_external('afni');
+    %     %
+    %     ds=cosmo_synthetic_dataset('type','surface');
+    %     %
+    %     % convert to AFNIML NIML format
+    %     % (to store a file to disc, use a filename as the second argument)
+    %     niml=cosmo_map2surface(ds,'-niml_dset');
+    %     cosmo_disp(niml);
+    %     %|| .node_indices
+    %     %||   [ 0         1         2         3         4         5 ]
+    %     %|| .data
+    %     %||   [   2.03     0.584     -1.44    -0.518      1.19     -1.33
+    %     %||     -0.892      1.84    -0.262      2.34    -0.204      2.72
+    %     %||     -0.826      1.17     -1.92     0.441    -0.209     0.148
+    %     %||       1.16    -0.848      3.09      1.86      1.76     0.502
+    %     %||       1.16      3.49     -1.37     0.479    -0.955      3.41
+    %     %||      -1.29    -0.199      1.73    0.0832     0.501     -0.48 ]
+    %
+    % Notes:
+    %   - this function is intended for datasets with surface data, i.e. with
+    %     one or more values associated with each surface node. It does not
+    %     support anatomical surface meshes that contain node coordinates and
+    %     faces. To read and write such anatomical meshes, consider the surfing
+    %     toolbox, github.com/nno/surfing
+    %   - To load surface datasets, use cosmo_surface_dataset
+    %
+    % Dependencies:
+    %   - for Brainvoyager files (.smp), it requires the NeuroElf
+    %     toolbox, available from: http://neuroelf.net
+    %   - for AFNI/SUMA NIML files (.niml.dset) it requires the AFNI
+    %     Matlab toolbox, available from: https://github.com/afni/AFNI
+    %
+    % See also: cosmo_surface_dataset
+    %
+    % #   For CoSMoMVPA's copyright information and license terms,   #
+    % #   see the COPYING file distributed with CoSMoMVPA.           #
 
     if ~ischar(fn)
         error('second argument must be a string');
     end
 
-    defaults=struct();
-    opt=cosmo_structjoin(defaults,varargin);
+    defaults = struct();
+    opt = cosmo_structjoin(defaults, varargin);
 
-    cosmo_check_dataset(ds,'surface');
+    cosmo_check_dataset(ds, 'surface');
 
-    formats=get_formats();
+    formats = get_formats();
 
-    sp=cosmo_strsplit(fn,'-');
-    save_to_file=~isempty(sp{1});
+    sp = cosmo_strsplit(fn, '-');
+    save_to_file = ~isempty(sp{1});
 
-    if isfield(opt,'format')
-        fmt=opt.format;
+    if isfield(opt, 'format')
+        fmt = opt.format;
     elseif save_to_file
-        fmt=get_format(formats, fn);
+        fmt = get_format(formats, fn);
     else
-        if numel(sp)~=2
+        if numel(sp) ~= 2
             error('expected -{FORMAT}');
         end
-        fmt=sp{2};
+        fmt = sp{2};
     end
 
-    if ~isfield(formats,fmt)
+    if ~isfield(formats, fmt)
         error('Unsupported format %s', fmt);
     end
 
-    format=formats.(fmt);
-    externals=format.externals;
+    format = formats.(fmt);
+    externals = format.externals;
     cosmo_check_external(externals);
 
+    builder = format.builder;
+    s = builder(ds);
 
-    builder=format.builder;
-    s=builder(ds);
-
-    if nargout==0
-        cleaner=onCleanup(get_cleaner(format,s));
+    if nargout == 0
+        cleaner = onCleanup(get_cleaner(format, s));
     end
 
     if save_to_file
-        writer=format.writer;
+        writer = format.writer;
         writer(fn, s, opt);
     end
 
-function f=get_cleaner(format,obj)
-    if isfield(format,'cleaner')
-        f=@()format.cleaner(obj);
+function f = get_cleaner(format, obj)
+    if isfield(format, 'cleaner')
+        f = @()format.cleaner(obj);
     else
-        f=@do_nothing;
+        f = @do_nothing;
     end
 
 function do_nothing()
     % do nothing
 
-function format=get_format(formats,fn)
-    endswith=@(s,e) isempty(cosmo_strsplit(s,e,-1));
+function format = get_format(formats, fn)
+    endswith = @(s, e) isempty(cosmo_strsplit(s, e, -1));
 
-    names=fieldnames(formats);
-    for k=1:numel(names)
-        name=names{k};
-        exts=formats.(name).exts;
-        for j=1:numel(exts)
-            if endswith(fn,exts{j})
-                format=name;
+    names = fieldnames(formats);
+    for k = 1:numel(names)
+        name = names{k};
+        exts = formats.(name).exts;
+        for j = 1:numel(exts)
+            if endswith(fn, exts{j})
+                format = name;
                 return
             end
         end
@@ -149,167 +148,155 @@ function format=get_format(formats,fn)
 
     error('Unsupported extension in %s', fn);
 
+function formats = get_formats()
+    formats = struct();
+    formats.niml_dset.exts = {'.niml.dset'};
+    formats.niml_dset.builder = @build_niml_dset;
+    formats.niml_dset.writer = @write_niml_dset;
+    formats.niml_dset.externals = {'afni'};
 
-function formats=get_formats()
-    formats=struct();
-    formats.niml_dset.exts={'.niml.dset'};
-    formats.niml_dset.builder=@build_niml_dset;
-    formats.niml_dset.writer=@write_niml_dset;
-    formats.niml_dset.externals={'afni'};
+    formats.bv_smp.exts = {'.smp'};
+    formats.bv_smp.builder = @build_bv_smp;
+    formats.bv_smp.writer = @write_bv_smp;
+    formats.bv_smp.cleaner = @(x)x.ClearObject();
+    formats.bv_smp.externals = {'neuroelf'};
 
-    formats.bv_smp.exts={'.smp'};
-    formats.bv_smp.builder=@build_bv_smp;
-    formats.bv_smp.writer=@write_bv_smp;
-    formats.bv_smp.cleaner=@(x)x.ClearObject();
-    formats.bv_smp.externals={'neuroelf'};
+    formats.gii.exts = {'.gii'};
+    formats.gii.builder = @build_gifti;
+    formats.gii.writer = @write_gifti;
+    formats.gii.externals = {'gifti'};
 
-    formats.gii.exts={'.gii'};
-    formats.gii.builder=@build_gifti;
-    formats.gii.writer=@write_gifti;
-    formats.gii.externals={'gifti'};
+    formats.pymvpa.exts = {};
+    formats.pymvpa.builder = @build_pymvpa;
+    formats.pymvpa.writer = @write_pymvpa_struct;
+    formats.pymvpa.externals = {};
 
-    formats.pymvpa.exts={};
-    formats.pymvpa.builder=@build_pymvpa;
-    formats.pymvpa.writer=@write_pymvpa_struct;
-    formats.pymvpa.externals={};
-
-
-function [data, node_indices]=get_surface_data_and_node_indices(ds)
-    [data, dim_labels, dim_values]=cosmo_unflatten(ds);
-    if ~isequal(dim_labels,{'node_indices'})
+function [data, node_indices] = get_surface_data_and_node_indices(ds)
+    [data, dim_labels, dim_values] = cosmo_unflatten(ds);
+    if ~isequal(dim_labels, {'node_indices'})
         error('.a.fdim.labels must be {''node_indices''}');
     end
 
-    node_indices=dim_values{1}(:)';
+    node_indices = dim_values{1}(:)';
 
-
-function p=build_pymvpa(ds)
-    p=ds;
+function p = build_pymvpa(ds)
+    p = ds;
 
     % remove samples field
-    p=rmfield(p,'samples');
+    p = rmfield(p, 'samples');
 
-    [data, node_indices]=get_surface_data_and_node_indices(ds);
-    p.samples=data;
+    [data, node_indices] = get_surface_data_and_node_indices(ds);
+    p.samples = data;
 
-    node_indices_base0=int64(node_indices-1);
-    p.fa.node_indices=node_indices_base0;
-    p.a=rmfield(p.a,'fdim');
+    node_indices_base0 = int64(node_indices - 1);
+    p.fa.node_indices = node_indices_base0;
+    p.a = rmfield(p.a, 'fdim');
 
+function write_pymvpa_struct(fn, m, opt)
+    save(fn, '-struct', 'm');
 
-function write_pymvpa_struct(fn,m,opt)
-    save(fn,'-struct','m');
+function g = build_gifti(ds)
+    s = struct();
 
+    [data, node_indices] = get_surface_data_and_node_indices(ds);
 
-function g=build_gifti(ds)
-    s=struct();
+    s.indices = node_indices(:);
+    s.cdata = data';
 
-    [data, node_indices]=get_surface_data_and_node_indices(ds);
+    g = gifti(s);
 
-    s.indices=node_indices(:);
-    s.cdata=data';
-
-    g=gifti(s);
-
-function write_gifti(fn,g,opt)
-    if isfield(opt,'encoding')
-        args={opt.encoding};
-    else
-        args={};
-    end
-
-    save(g,fn,args{:});
-
-
-
-
-function s=build_niml_dset(ds)
-    [data, node_indices]=get_surface_data_and_node_indices(ds);
-
-    s=struct();
-    s.node_indices=node_indices-1; % base 1 -> base 0
-    s.data=data';
-
-    if isfield(ds,'sa')
-        if isfield(ds.sa,'labels');
-            s.labels=ds.sa.labels;
-        end
-
-        if isfield(ds.sa,'stats');
-            s.stats=ds.sa.stats;
-        end
-    end
-
-function write_niml_dset(fn,s,opt)
+function write_gifti(fn, g, opt)
     if isfield(opt, 'encoding')
-        args={opt.encoding};
+        args = {opt.encoding};
     else
-        args={};
+        args = {};
+    end
+
+    save(g, fn, args{:});
+
+function s = build_niml_dset(ds)
+    [data, node_indices] = get_surface_data_and_node_indices(ds);
+
+    s = struct();
+    s.node_indices = node_indices - 1; % base 1 -> base 0
+    s.data = data';
+
+    if isfield(ds, 'sa')
+        if isfield(ds.sa, 'labels')
+            s.labels = ds.sa.labels;
+        end
+
+        if isfield(ds.sa, 'stats')
+            s.stats = ds.sa.stats;
+        end
+    end
+
+function write_niml_dset(fn, s, opt)
+    if isfield(opt, 'encoding')
+        args = {opt.encoding};
+    else
+        args = {};
     end
     afni_niml_writesimple(s, fn, args{:});
 
-
-function s=build_bv_smp(ds)
-    [nsamples,nfeatures]=size(ds.samples);
-    [data, node_indices]=get_surface_data_and_node_indices(ds);
-    if ~isequal(node_indices,1:nfeatures)
+function s = build_bv_smp(ds)
+    [nsamples, nfeatures] = size(ds.samples);
+    [data, node_indices] = get_surface_data_and_node_indices(ds);
+    if ~isequal(node_indices, 1:nfeatures)
         error(['BrainVoyager smp only support data with all node '...
-                'present and with .a.fdim.values{1}=1:N, where N '...
-                'is the number of nodes']);
+               'present and with .a.fdim.values{1}=1:N, where N '...
+               'is the number of nodes']);
     end
 
-    stats=cosmo_statcode(ds,'bv');
+    stats = cosmo_statcode(ds, 'bv');
 
-    maps=cell(1,nsamples);
-    for k=1:nsamples
-        t=xff('new:smp');
-        map=t.Map;
+    maps = cell(1, nsamples);
+    for k = 1:nsamples
+        t = xff('new:smp');
+        map = t.Map;
         t.ClearObject();
-        map.SMPData=data(k,:);
+        map.SMPData = data(k, :);
 
-        if k==1
+        if k == 1
             % store the number of features
             % note: unlike the niml_dset implementation, data is stored
             % for all nodes, even if some node indices did not have a value
             % originally
-            nfeatures=numel(map.SMPData);
+            nfeatures = numel(map.SMPData);
         end
 
-        if isfield(ds,'sa')
-            if isfield(ds.sa,'labels')
-                map.Name=ds.sa.labels{k};
+        if isfield(ds, 'sa')
+            if isfield(ds.sa, 'labels')
+                map.Name = ds.sa.labels{k};
             end
 
             if ~isempty(stats) && ~isempty(stats{k})
-                map=cosmo_structjoin(map, stats{k});
+                map = cosmo_structjoin(map, stats{k});
             end
         end
 
         if ~isempty(stats) && ~isempty(stats{k})
-            map=cosmo_structjoin(map, stats{k});
+            map = cosmo_structjoin(map, stats{k});
         end
 
-        map.BonferroniValue=nfeatures;
+        map.BonferroniValue = nfeatures;
 
-        maps{k}=map;
+        maps{k} = map;
     end
 
-    s=xff('new:smp');
-    s.Map=cat(2,maps{:});
-    s.NrOfMaps=nsamples;
-    s.NrOfVertices=nfeatures;
+    s = xff('new:smp');
+    s.Map = cat(2, maps{:});
+    s.NrOfMaps = nsamples;
+    s.NrOfVertices = nfeatures;
 
     neuroelf_bless_wrapper(s);
 
-function write_bv_smp(fn,s,opt)
+function write_bv_smp(fn, s, opt)
     s.SaveAs(fn);
 
-
-function result=neuroelf_bless_wrapper(arg)
+function result = neuroelf_bless_wrapper(arg)
     % deals with recent neuroelf (>v1.1), where bless is deprecated
-    s=warning('off','neuroelf:xff:deprecated');
-    resetter=onCleanup(@()warning(s));
+    s = warning('off', 'neuroelf:xff:deprecated');
+    resetter = onCleanup(@()warning(s));
 
-    result=bless(arg);
-
-
+    result = bless(arg);
