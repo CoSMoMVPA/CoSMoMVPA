@@ -1,110 +1,117 @@
 function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
-% Plots a set of slices from a dataset, nifti image, or 3D data array
-%
-% cosmo_plot_slices(data[, dim][, slice_step][, slice_start][, slice_stop])
-%
-% Inputs:
-%  data         an fmri dataset (e.g., from cosmo_fmri_dataset), or a 3D
-%               array with data. data should contain samples from a single
-%               volume (sample) only.
-%  dim          dimension according to which slices are plotted
-%               (default: 3). Values between 1 and 3 allows using a
-%               saggital, axial or coronal view; but the mapping between
-%               the 3 numbers and 3 views depends on the particular
-%               orientation of the data.
-%  slice_step   step between slices (default: 1). If negative then
-%               -slice_step indicates the number of slices
-%  slice_start  the index of the first slice to plot (default: 1).
-%  slice_stop   the index of the last slice to plot (default: the number of
-%               slices in the dim-th dimension).
-%
-% Examples:
-%    % plot an fMRI dataset struct with default options
-%    cosmo_plot_slices(ds)
-%
-%    % plot an fMRI dataset struct along the second spatial dimension
-%    cosmo_plot_slices(ds, 2)
-%
-%    % plot a random gaussian 3D array along the first dimension
-%    cosmo_plot_slices(randn([40,50,20]),1)
-%
-%    % plot an fMRI dataset struct along the default spatial dimension
-%    % every 5-th slice
-%    cosmo_plot_slices(ds, [], 5)
-%
-%    % plot an fMRI dataset struct along the third spatial dimension
-%    % with about 12 slices
-%    cosmo_plot_slices(ds, 3, -12)
-%
-%    % plot an fMRI dataset struct along the third spatial dimension
-%    % with about 12 slices, starting at slice 10 and stopping at slice 25
-%    cosmo_plot_slices(ds, 3, -12, 10, 25)
-%
-% Notes:
-%  - Using this function only really makes sense for fMRI-like data.
-%  - This function does not provide a consistent orientation for slices,
-%    as this depends on the voxel-to-world transformation matrix, which is
-%    completely ignored in this function. Thus left-right and top-down
-%    swaps can occur. Different datasets may provide different views, for
-%    example dim=1 may give a saggital view if the dataset comes from one
-%    program and an axial view if it comes from another program.
-%
-% #   For CoSMoMVPA's copyright information and license terms,   #
-% #   see the COPYING file distributed with CoSMoMVPA.           #
+    % Plots a set of slices from a dataset, nifti image, or 3D data array
+    %
+    % cosmo_plot_slices(data[, dim][, slice_step][, slice_start][, slice_stop])
+    %
+    % Inputs:
+    %  data         an fmri dataset (e.g., from cosmo_fmri_dataset), or a 3D
+    %               array with data. data should contain samples from a single
+    %               volume (sample) only.
+    %  dim          dimension according to which slices are plotted
+    %               (default: 3). Values between 1 and 3 allows using a
+    %               saggital, axial or coronal view; but the mapping between
+    %               the 3 numbers and 3 views depends on the particular
+    %               orientation of the data.
+    %  slice_step   step between slices (default: 1). If negative then
+    %               -slice_step indicates the number of slices
+    %  slice_start  the index of the first slice to plot (default: 1).
+    %  slice_stop   the index of the last slice to plot (default: the number of
+    %               slices in the dim-th dimension).
+    %
+    % Examples:
+    %    % plot an fMRI dataset struct with default options
+    %    cosmo_plot_slices(ds)
+    %
+    %    % plot an fMRI dataset struct along the second spatial dimension
+    %    cosmo_plot_slices(ds, 2)
+    %
+    %    % plot a random gaussian 3D array along the first dimension
+    %    cosmo_plot_slices(randn([40,50,20]),1)
+    %
+    %    % plot an fMRI dataset struct along the default spatial dimension
+    %    % every 5-th slice
+    %    cosmo_plot_slices(ds, [], 5)
+    %
+    %    % plot an fMRI dataset struct along the third spatial dimension
+    %    % with about 12 slices
+    %    cosmo_plot_slices(ds, 3, -12)
+    %
+    %    % plot an fMRI dataset struct along the third spatial dimension
+    %    % with about 12 slices, starting at slice 10 and stopping at slice 25
+    %    cosmo_plot_slices(ds, 3, -12, 10, 25)
+    %
+    % Notes:
+    %  - Using this function only really makes sense for fMRI-like data.
+    %  - This function does not provide a consistent orientation for slices,
+    %    as this depends on the voxel-to-world transformation matrix, which is
+    %    completely ignored in this function. Thus left-right and top-down
+    %    swaps can occur. Different datasets may provide different views, for
+    %    example dim=1 may give a saggital view if the dataset comes from one
+    %    program and an axial view if it comes from another program.
+    %
+    % #   For CoSMoMVPA's copyright information and license terms,   #
+    % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-    if nargin<2 || isempty(dim), dim=3; end
-    if nargin<3 || isempty(slice_step), slice_step=-20; end
-    if nargin<4 || isempty(slice_start), slice_start=1; end
-    if nargin<5 || isempty(slice_stop), slice_stop=[]; end % set later
+    if nargin < 2 || isempty(dim)
+        dim = 3;
+    end
+    if nargin < 3 || isempty(slice_step)
+        slice_step = -20;
+    end
+    if nargin < 4 || isempty(slice_start)
+        slice_start = 1;
+    end
+    if nargin < 5 || isempty(slice_stop)
+        slice_stop = [];
+    end % set later
 
-    data3D=get_data3D(data);
+    data3D = get_data3D(data);
 
     % get min and max values across the entire volume
-    data_lin=data3D(:);
-    mn=min(data_lin);
-    mx=max(data_lin);
+    data_lin = data3D(:);
+    mn = min(data_lin);
+    mx = max(data_lin);
 
     % shift it so that we can walk over the first dimension
-    data_sh=shiftdim(data3D, dim-1);
+    data_sh = shiftdim(data3D, dim - 1);
 
     if isempty(slice_stop)
-        slice_stop=size(data_sh,1);
+        slice_stop = size(data_sh, 1);
     end
 
-    if slice_step<0
-        nslices=-slice_step;
-        slice_step=ceil((slice_stop-slice_start+1)/nslices);
+    if slice_step < 0
+        nslices = -slice_step;
+        slice_step = ceil((slice_stop - slice_start + 1) / nslices);
     end
 
     % determine which slices to show
-    slice_idxs=slice_start:slice_step:slice_stop;
-    nslices=numel(slice_idxs);
+    slice_idxs = slice_start:slice_step:slice_stop;
+    nslices = numel(slice_idxs);
 
-    plot_ratio=.8; % ratio between number of rows and colums
-    nrows=ceil(sqrt(nslices)*plot_ratio);
-    ncols=ceil(nslices/nrows);
+    plot_ratio = .8; % ratio between number of rows and colums
+    nrows = ceil(sqrt(nslices) * plot_ratio);
+    ncols = ceil(nslices / nrows);
 
     % use header depending on dim
-    header_labels={'i','j','k'};
+    header_labels = {'i', 'j', 'k'};
 
     % order of slices and whether the slice should be transposed
-    xorder=[-1 -1 1];
-    yorder=[-1 1 -1];
-    do_transpose=[true false true];
+    xorder = [-1 -1 1];
+    yorder = [-1 1 -1];
+    do_transpose = [true false true];
 
+    for k = 1:nslices
+        slice_idx = slice_idxs(k);
+        slice = squeeze(data_sh(slice_idx, :, :));
 
-    for k=1:nslices
-        slice_idx=slice_idxs(k);
-        slice=squeeze(data_sh(slice_idx,:,:));
-
-        if xorder(dim)<0
-            slice=slice(end:-1:1,:);
+        if xorder(dim) < 0
+            slice = slice(end:-1:1, :);
         end
-        if yorder(dim)<0
-            slice=slice(:,end:-1:1);
+        if yorder(dim) < 0
+            slice = slice(:, end:-1:1);
         end
         if do_transpose(dim)
-            slice=slice';
+            slice = slice';
         end
 
         subplot(nrows, ncols, k);
@@ -112,32 +119,31 @@ function cosmo_plot_slices(data, dim, slice_step, slice_start, slice_stop)
         title(sprintf('%s = %d', header_labels{dim}, slice_idx));
     end
 
-
-function data3D=get_data3D(data)
+function data3D = get_data3D(data)
     if isstruct(data)
-        cosmo_check_dataset(data,'fmri');
-        data4D=cosmo_unflatten(data);
-        sz=size(data4D);
-        if sz(1)>1
+        cosmo_check_dataset(data, 'fmri');
+        data4D = cosmo_unflatten(data);
+        sz = size(data4D);
+        if sz(1) > 1
             error(['expected single volume data, but found %d '...
-                    'volumes. To select a single volume, use '...
-                    'cosmo_slice. For example, to show the %d-th '...
-                    'volume from a dataset struct ds, use:\n\n   '...
-                    'cosmo_plot_slices(cosmo_slice(ds,%d))\n'],...
-                    sz(1),sz(1),sz(1));
+                   'volumes. To select a single volume, use '...
+                   'cosmo_slice. For example, to show the %d-th '...
+                   'volume from a dataset struct ds, use:\n\n   '...
+                   'cosmo_plot_slices(cosmo_slice(ds,%d))\n'], ...
+                  sz(1), sz(1), sz(1));
         end
 
-        if numel(sz)>4
+        if numel(sz) > 4
             error('data must be 4D');
         end
 
-        data3D=reshape(data4D, sz(2:end));
+        data3D = reshape(data4D, sz(2:end));
     elseif isnumeric(data) || islogical(data)
-        ndim=numel(size(data));
-        if ndim>3
+        ndim = numel(size(data));
+        if ndim > 3
             error('expected 3D image - did you select a single volume?');
         end
-        data3D=data;
+        data3D = data;
     else
         error('illegal input: expected dataset or 3D array');
     end
