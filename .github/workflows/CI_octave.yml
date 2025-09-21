@@ -1,0 +1,67 @@
+---
+name: CI octave
+
+# - Installs
+#   - octave
+#   - MOxUnit
+#   - MOcov
+# - checks out CoSMoMVPA
+# - Runs tests
+# - If tests pass, uploads coverage to codecov
+
+# Controls when the action will run.
+# Triggers the workflow:
+#   - on push for the master branch
+#   - on pull request for all branches
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: ['*']
+
+# cancel previous runs on the same branch / PR
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    OCTFLAGS: --no-gui --no-window-system --silent
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Checkout repository
+            uses: actions/checkout@v4
+        -   name: Install Octave
+            run: |
+                sudo apt-get -y -qq update
+                sudo apt-get -y install \
+                  octave
+                make install
+                make -C MOcov install
+        -   name: Octave version
+            run: octave --version
+        -   name: Download MOxUnit
+            run: |
+                git clone https://github.com/MOxUnit/MOxUnit.git --depth 1
+                make -C MOxUnit install
+        -   name: Download MOcov
+            run: |
+                git clone https://github.com/MOcov/MOcov.git --depth 1
+                make -C MOcov install
+       -   name: Download MOdox
+            run: |
+                git clone https://github.com/MOcov/MOcov.git --depth 1
+                make -C MOcov install 
+        -   name: Run tests
+            run: octave $OCTFLAGS --eval "cd mvpa; cosmo_set_path; cosmo_run_tests  -verbose -with_coverage -cover mvpa -cover_xml_file coverage.xml; exit(double(~ans))"
+
+        -   name: Code coverage
+            uses: codecov/codecov-action@v5
+            with:
+                files: coverage.xml
+                flags: octave
+                name: codecov-octave
+                fail_ci_if_error: false
+                token: ${{ secrets.CODECOV_TOKEN }}
