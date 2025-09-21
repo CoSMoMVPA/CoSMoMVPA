@@ -264,7 +264,7 @@ gh-pages-repo:
 	git commit -m "DOC: automated build"; \
 	git branch -M main; \
 	git remote add origin https://github.com/CoSMoMVPA/$(GHPAGE).git; \
-	# git push -f -u origin main; \
+	git push -f -u origin main; \
 	echo "Done"
 
 
