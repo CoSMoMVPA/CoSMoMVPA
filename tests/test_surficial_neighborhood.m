@@ -266,7 +266,7 @@ function test_surficial_neighborhood_exceptions
 
     aet = @(varargin)assertExceptionThrown(@() ...
                                            cosmo_surficial_neighborhood(varargin{:}, ...
-                                                                      'progress', false), '');
+                                                                        'progress', false), '');
     aet(ds, {vertices, faces});
 
     % need surfaces

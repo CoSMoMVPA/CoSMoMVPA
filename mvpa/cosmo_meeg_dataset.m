@@ -196,7 +196,7 @@ function img_formats = get_supported_image_formats()
                         isempty(cosmo_strsplit(fn, ext, -1));
     ends_with_any = @(exts) @(fn) ischar(fn) && any( ...
                                                     cellfun(@(x)isempty( ...
-                                                                      cosmo_strsplit(fn, x, -1)), exts));
+                                                                        cosmo_strsplit(fn, x, -1)), exts));
 
     % eeglab txt files
     img_formats.eeglab_txt.file_matcher = ends_with('.txt');

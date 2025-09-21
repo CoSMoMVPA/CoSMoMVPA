@@ -115,7 +115,7 @@ Plan for the day
     * Write an abstraction of cross-validation as a "dataset measure"
 #. Representational Similarity Analysis
     * Viewing dissimilarity matrices
-    * Comparign dissimilarity matrices
+    * Comparing dissimilarity matrices
     * Write an abstraction "RSA dataset measure"
 #. Searchlight analysis
     * Implement a function to calculate sphere offsets for searchlight

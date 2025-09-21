@@ -22,7 +22,7 @@ Goals of this course
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*
-        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational simillarity matrix) that can be applied to both a single ROI or in a searchlight.
+        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational similarity matrix) that can be applied to both a single ROI or in a searchlight.
     * Make yourself an independent user, so that you can apply the techniques learnt here to your own datasets.
 
 Not covered in this course

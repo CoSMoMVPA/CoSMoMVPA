@@ -27,7 +27,7 @@ Repeat the process 1000 times, and plot a histogram of the classification accura
 
 Template: :ref:`run_bad_double_dipping_analysis_skl`
 
-Check your answers here: :ref:`run_bad_double_dipping_analysis` / :pb: bad_double_dipping_analysis
+Check your answers here: :ref:`run_bad_double_dipping_analysis` / :pb:`bad_double_dipping_analysis`
 
 
 

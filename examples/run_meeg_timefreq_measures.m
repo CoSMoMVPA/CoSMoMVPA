@@ -27,105 +27,101 @@
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-
 %% get timelock data in CoSMoMVPA format
 
 % set configuration
-config=cosmo_config();
-data_path=fullfile(config.tutorial_data_path,'meg_20hz');
+config = cosmo_config();
+data_path = fullfile(config.tutorial_data_path, 'meg_20hz');
 
 % show dataset information
-readme_fn=fullfile(data_path,'README');
+readme_fn = fullfile(data_path, 'README');
 cosmo_type(readme_fn);
 
 % reset citation list
 cosmo_check_external('-tic');
 
 % load data
-data_fn=fullfile(data_path,'subj102_B01_20Hz_timefreq.mat');
-data_tf=load(data_fn);
+data_fn = fullfile(data_path, 'subj102_B01_20Hz_timefreq.mat');
+data_tf = load(data_fn);
 
 % convert to cosmomvpa struct
-ds=cosmo_meeg_dataset(data_tf);
+ds = cosmo_meeg_dataset(data_tf);
 
 % set the target (trial condition)
 % here, 1=pre-stimulus, 2=peri-stimulus
-ds.sa.targets=ds.sa.trialinfo(:,1);
+ds.sa.targets = ds.sa.trialinfo(:, 1);
 
 % set the chunks (independent measurements)
 % in this dataset, the first half of the samples (in order)
 % are the post-trials;
 % the second half the pre-trials
-ds.sa.chunks=[(1:145) (1:145)]';
+ds.sa.chunks = [(1:145) (1:145)]';
 
 % just to check everything is ok
 cosmo_check_dataset(ds);
 
 % get rid of features with at least one NaN value across samples
-fa_nan_mask=sum(isnan(ds.samples),1)>0;
+fa_nan_mask = sum(isnan(ds.samples), 1) > 0;
 fprintf('%d / %d features have NaN\n', ...
-            sum(fa_nan_mask), numel(fa_nan_mask));
-ds=cosmo_slice(ds, ~fa_nan_mask, 2);
-
-
+        sum(fa_nan_mask), numel(fa_nan_mask));
+ds = cosmo_slice(ds, ~fa_nan_mask, 2);
 
 % Define a channel neighborhood uses meg_combined_from_planar, which means
 % that input are planar channels but the output has
 % combined-planar channels. Note that with EEG data there is no need to set
 % the chan_type, as there is only a single type.
-chan_type='meg_combined_from_planar';
-chan_count=10;        % use 10 channel locations (relative to the combined
-                      % planar channels)
-                      % as we use meg_combined_from_planar there are
-                      % 20 channels in each searchlight because
-                      % gradiometers are paired
+chan_type = 'meg_combined_from_planar';
+chan_count = 10;        % use 10 channel locations (relative to the combined
+% planar channels)
+% as we use meg_combined_from_planar there are
+% 20 channels in each searchlight because
+% gradiometers are paired
 
 % Use cosmo_meeg_chan_neighborhood to define a channel neighborhood,
 % with 'count' set to chan_count, and 'chantype' set to chan_type.
 % Assign the result to chan_nbrhood. How many searchlight centers are in
 % the neighborhood?
 % >@@>
-chan_nbrhood=cosmo_meeg_chan_neighborhood(ds, 'count', chan_count, ...
-                                              'chantype', chan_type);
-fprintf('There are %d channel neighborhood centers\n',...
-            numel(chan_nbrhood.neighbors));
+chan_nbrhood = cosmo_meeg_chan_neighborhood(ds, 'count', chan_count, ...
+                                            'chantype', chan_type);
+fprintf('There are %d channel neighborhood centers\n', ...
+        numel(chan_nbrhood.neighbors));
 % <@@<
 
 % Define the frequency neighborhood using 9 time bins
-freq_radius=0; % 4*2+1=9 freq bins
+freq_radius = 0; % 4*2+1=9 freq bins
 
 % >@@>
 % Use cosmo_interval_neighborhood to define the frequency neighborhood.
 % Assign the result to a variable 'freq_nbrhood'
 % How many searchlight centers are in the neighborhood?
-freq_nbrhood=cosmo_interval_neighborhood(ds,'freq',...
-                                            'radius',freq_radius);
-fprintf('There are %d frequency neighborhood centers\n',...
-            numel(freq_nbrhood.neighbors));
+freq_nbrhood = cosmo_interval_neighborhood(ds, 'freq', ...
+                                           'radius', freq_radius);
+fprintf('There are %d frequency neighborhood centers\n', ...
+        numel(freq_nbrhood.neighbors));
 % <@@<
 
 % Define the temporal neighborhood using 5 time bins
 
-time_radius=2; % 2*2+1=5 time bines
+time_radius = 2; % 2*2+1=5 time bines
 % Use cosmo_interval_neighborhood to define the temporal neighborhood.
 % Assign the result to a variable 'time_nbrhood'
 % How many searchlight centers are in the neighborhood?
 % >@@>
-time_nbrhood=cosmo_interval_neighborhood(ds,'time',...
-                                            'radius',time_radius);
-fprintf('There are %d temporal neighborhood centers\n',...
-            numel(time_nbrhood.neighbors));
+time_nbrhood = cosmo_interval_neighborhood(ds, 'time', ...
+                                           'radius', time_radius);
+fprintf('There are %d temporal neighborhood centers\n', ...
+        numel(time_nbrhood.neighbors));
 
 % <@@<
-
 
 % cross the three neighborhoods to get a chan-freq-time neighborhood,
 % using cosmo_cross_neighborhood
 % How many searchlight centers are in the crossed neighborhood?
 
 % >@@>
-nbrhood=cosmo_cross_neighborhood(ds,{chan_nbrhood,...
-                                        freq_nbrhood,...
+nbrhood = cosmo_cross_neighborhood(ds, {chan_nbrhood, ...
+                                        freq_nbrhood, ...
                                         time_nbrhood});
 % <@@<
 
@@ -134,36 +130,36 @@ nbrhood=cosmo_cross_neighborhood(ds,{chan_nbrhood,...
 % average and standard deviation
 
 % >@@>
-nbrhood_nfeatures=cellfun(@numel,nbrhood.neighbors);
+nbrhood_nfeatures = cellfun(@numel, nbrhood.neighbors);
 fprintf('Features have on average %.1f +/- %.1f neighbors\n', ...
-            mean(nbrhood_nfeatures), std(nbrhood_nfeatures));
+        mean(nbrhood_nfeatures), std(nbrhood_nfeatures));
 % <@@<
 
 % divide .sa.chunks in ds into four chunks using cosmo_chunkize
 
 % >@@>
-nfolds=4;
-ds.sa.chunks=cosmo_chunkize(ds,nfolds);
+nfolds = 4;
+ds.sa.chunks = cosmo_chunkize(ds, nfolds);
 % <@@<
 
 % Define partitions using cosmo_nfold_partitioner, and use
 % cosmo_balance_partitions afterwards. Assign the result to a variable
 % 'partitions'
 % >@@>
-partitions=cosmo_nfold_partitioner(ds);
-partitions=cosmo_balance_partitions(partitions,ds);
+partitions = cosmo_nfold_partitioner(ds);
+partitions = cosmo_balance_partitions(partitions, ds);
 % <@@<
 
 % Set the measure arguments
-measure_args=struct();
-measure_args.partitions=partitions;
+measure_args = struct();
+measure_args.partitions = partitions;
 
 %% run searchlight
 
 % only keep features with at least 10 neighbors
 % (some have zero neighbors - in particular, those with low frequencies
 % early or late in time)
-center_ids=find(nbrhood_nfeatures>10);
+center_ids = find(nbrhood_nfeatures > 10);
 
 % instead of using the cosmo_searchlight function, use the faster
 % cosmo_naive_bayes_classifier_searchlight.
@@ -172,34 +168,33 @@ center_ids=find(nbrhood_nfeatures>10);
 % to avoid computing results for features without neighbors.
 
 % It may take a while before results for the first fold are computed
-result_ds=cosmo_naive_bayes_classifier_searchlight(ds,...
-                                        nbrhood,measure_args,...
-                                        'center_ids',center_ids);
+result_ds = cosmo_naive_bayes_classifier_searchlight(ds, ...
+                                                     nbrhood, measure_args, ...
+                                                     'center_ids', center_ids);
 %% visualize results
 
 % deduce layout from output
-layout=cosmo_meeg_find_layout(result_ds);
+layout = cosmo_meeg_find_layout(result_ds);
 fprintf('The output uses layout %s\n', layout.name);
 
 % map to FT struct for visualization
-tf_map=cosmo_map2meeg(result_ds);
+tf_map = cosmo_map2meeg(result_ds);
 
 % show figure
-figure()
+figure();
 cfg = [];
 if cosmo_wtf('is_octave')
     % GNU Octave does not show data when labels are shown
-    cfg.interactive='no';
-    cfg.showlabels='no';
+    cfg.interactive = 'no';
+    cfg.showlabels = 'no';
 else
     % Matlab supports interactive viewing and labels
     cfg.interactive = 'yes';
     cfg.showlabels = 'yes';
 end
-cfg.zlim=[0 1];
+cfg.zlim = [0 1];
 cfg.layout       = layout;
 ft_multiplotTFR(cfg, tf_map);
 
 % Show citation information
 cosmo_check_external('-cite');
-

@@ -15,8 +15,8 @@
 
 %% Set the datapath
 %
-config=cosmo_config();
-data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+config = cosmo_config();
+data_path = fullfile(config.tutorial_data_path, 'ak6', 's01');
 
 %% Compute number of voxels in each mask
 % Hints:
@@ -38,12 +38,12 @@ mask_fn = fullfile(data_path, 'brain_mask.nii');
 
 % Load the dataset and store in struct 'ds'
 % >@@>
-ds=cosmo_fmri_dataset(mask_fn);
+ds = cosmo_fmri_dataset(mask_fn);
 % <@@<
 
 % Compute number of features that are greater than zero
 % hint: use ds.samples
-nfeatures=sum(ds.samples>0);
+nfeatures = sum(ds.samples > 0);
 
 fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
 % <@@<
@@ -51,14 +51,14 @@ fprintf('There are %d voxels in the whole brain mask\n', nfeatures);
 % Now do the same with the EV and VT masks.
 % >@@>
 mask_fn = fullfile(data_path, 'vt_mask.nii');
-ds=cosmo_fmri_dataset(mask_fn);
-nfeatures=sum(ds.samples>0);
+ds = cosmo_fmri_dataset(mask_fn);
+nfeatures = sum(ds.samples > 0);
 
 fprintf('There are %d voxels in the ventral-temporal mask\n', nfeatures);
 
 mask_fn = fullfile(data_path, 'ev_mask.nii');
-ds=cosmo_fmri_dataset(mask_fn);
-nfeatures=sum(ds.samples>0);
+ds = cosmo_fmri_dataset(mask_fn);
+nfeatures = sum(ds.samples > 0);
 fprintf('There are %d voxels in the early-visual brain mask\n', nfeatures);
 
 % <@@<
@@ -69,11 +69,11 @@ fprintf('There are %d voxels in the early-visual brain mask\n', nfeatures);
 maskNames = {'brain_mask.nii', 'vt_mask.nii', 'ev_mask.nii'};
 data_fn = fullfile(data_path, 'glm_T_stats_perrun.nii');
 
-for iMask=1:numel(maskNames)
+for iMask = 1:numel(maskNames)
     % >@@>
-    mask_fn=fullfile(data_path, maskNames{iMask});
-    ds=cosmo_fmri_dataset(mask_fn);
-    nfeatures=sum(ds.samples>0);
+    mask_fn = fullfile(data_path, maskNames{iMask});
+    ds = cosmo_fmri_dataset(mask_fn);
+    nfeatures = sum(ds.samples > 0);
     fprintf('There are %6d voxels in the mask ''%s''\n', nfeatures, maskNames{iMask});
     % <@@<
 end

@@ -26,7 +26,7 @@ Exercise with fMRI data
 
 
 Note: Since data in the ak6 dataset is not in MNI space, we cannot do group analysis. This exercise therefore considers data from one subject using data in ten chunks corresponding to ten runs.
-However, the appraoch can also be used (in exactly the same way) for group analysis, where each chunk corresponds to one subject.
+However, the approach can also be used (in exactly the same way) for group analysis, where each chunk corresponds to one subject.
 
 In this exercise, load data from ten runs from the ``ak6`` datasets. Compute, for each chunk, the effect of stimulus presentation versus baseline. Then, using :ref:`cosmo_cluster_neighborhood` and :ref:`cosmo_montecarlo_cluster_stat`, compute a TFCE zscore map corrected for multiple comparisons.
 
@@ -34,7 +34,7 @@ Extra exercise: do the same analysis for primates versus insects.
 
 Template: :ref:`run_multiple_comparison_correction_skl`
 
-Check your answers here: :ref:`run_multiple_comparison_correction` / :pb: multiple_comparison_correction
+Check your answers here: :ref:`run_multiple_comparison_correction` / :pb:`multiple_comparison_correction`
 
 
 Exercise with time-generalization data
@@ -45,6 +45,6 @@ After splitting the data in ten parts, run the time generalization measure on ea
 
 Template: :ref:`run_meeg_time_generalization_mcc_skl`
 
-Check your answers here: :ref:`run_meeg_time_generalization_mcc` / :pb: run_meeg_time_generalization_mcc
+Check your answers here: :ref:`run_meeg_time_generalization_mcc` / :pb:`run_meeg_time_generalization_mcc`
 
 .. include:: links.txt

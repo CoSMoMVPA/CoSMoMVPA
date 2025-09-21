@@ -60,6 +60,6 @@ Because cross-validation is commonly used, CoSMoMVPA_ provides functions that de
 
 Template: :ref:`run_nfold_crossvalidate_skl`
 
-Check your answers here: :ref:`run_nfold_crossvalidate` / :pb: nfold_crossvalidate
+Check your answers here: :ref:`run_nfold_crossvalidate` / :pb:`nfold_crossvalidate`
 
 .. include:: links.txt

@@ -27,7 +27,7 @@ Use :ref:`cosmo_dim_generalization_measure` for the ``time`` dimension, together
 
 Template: :ref:`run_meeg_time_generalization_skl`
 
-Check your answers here: :ref:`run_meeg_time_generalization` / :pb: meeg_time_generalization
+Check your answers here: :ref:`run_meeg_time_generalization` / :pb:`meeg_time_generalization`
 
 .. include:: links.txt
 

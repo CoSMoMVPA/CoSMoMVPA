@@ -409,7 +409,7 @@ function Init(fig_title,dir_name),
 %
 % --------------------------------------------------------------------
 
-function update_dirlist;
+function update_dirlist
 
    filter_path = getappdata(gcf,'curr_dir');
    filter_pattern = getappdata(gcf,'FilterPattern');

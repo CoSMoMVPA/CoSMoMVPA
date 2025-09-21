@@ -38,7 +38,7 @@ Using the same data as above, define `chan` (channel) and `time` neighborhoods; 
 
 Hint: :ref:`run_meeg_timelock_measures_skl`
 
-Solution: :ref:`run_meeg_timelock_measures` / :pb: meeg_timelock_measures
+Solution: :ref:`run_meeg_timelock_measures` / :pb:`meeg_timelock_measures`
 
 
 Part 4: MEEG channel-time-frequency searchlight with Naive Bayes classifier
@@ -52,7 +52,7 @@ In the exercise presented here, we use a dataset with somatosensory stimulation 
 
 Hint: :ref:`run_meeg_timefreq_measures_skl`
 
-Solution: :ref:`run_meeg_timefreq_measures` / :pb: meeg_timefreq_measures
+Solution: :ref:`run_meeg_timefreq_measures` / :pb:`meeg_timefreq_measures`
 
 
 .. include:: links.txt

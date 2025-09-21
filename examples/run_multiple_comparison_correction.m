@@ -11,15 +11,15 @@
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
 %% Define data
-config=cosmo_config();
-data_path=fullfile(config.tutorial_data_path,'ak6','s01');
+config = cosmo_config();
+data_path = fullfile(config.tutorial_data_path, 'ak6', 's01');
 
-targets=repmat(1:6,1,10);
-chunks=floor(((1:60)-1)/6)+1;
+targets = repmat(1:6, 1, 10);
+chunks = floor(((1:60) - 1) / 6) + 1;
 
-ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
-                        'mask',fullfile(data_path, 'brain_mask.nii'), ...
-                                'targets',targets,'chunks',chunks);
+ds = cosmo_fmri_dataset(fullfile(data_path, 'glm_T_stats_perrun.nii'), ...
+                        'mask', fullfile(data_path, 'brain_mask.nii'), ...
+                        'targets', targets, 'chunks', chunks);
 
 % There are 10 chunks, for which the data is assumed to be independent.
 % Construct a dataset with 10 samples corresponding to each chunk, with
@@ -34,7 +34,7 @@ ds = cosmo_fmri_dataset(fullfile(data_path,'glm_T_stats_perrun.nii'),...
 %
 % Assign the result to a variable 'ds_stim'
 % >@@>
-ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
+ds_stim = cosmo_fx(ds, @(x)mean(x, 1), {'chunks'});
 
 % % alternative:
 %     ds_stim=ds;
@@ -56,21 +56,21 @@ ds_stim=cosmo_fx(ds,@(x)mean(x,1),{'chunks'});
 % hint: use cosmo_cluster_neighborhood
 
 % >@@>
-cl_nh=cosmo_cluster_neighborhood(ds_stim);
+cl_nh = cosmo_cluster_neighborhood(ds_stim);
 % <@@<
 
 % Show a plot with the sorted number of neighbors
 % for each voxel
 
 % >@@>
-n_neighbors_per_feature=cellfun(@numel,cl_nh.neighbors);
-plot(sort(n_neighbors_per_feature))
+n_neighbors_per_feature = cellfun(@numel, cl_nh.neighbors);
+plot(sort(n_neighbors_per_feature));
 % <@@<
 
 %% Run cosmo_montecarlo_cluster_stat
 
 % There is one condition per chunk; all targets are set to 1.
-% Thus the subsequent anaylsis is a one-sample t-test.
+% Thus the subsequent analysis is a one-sample t-test.
 % Note: if this was a group analysis, then each sample (row in ds.samples)
 % would contain data from one subject; each unique value in .sa.chunks
 % would correspond to one subject; and each unique value in .sa.targets
@@ -79,17 +79,17 @@ plot(sort(n_neighbors_per_feature))
 % Since this is a one-sample t-test against a mean of zero, we set this as
 % a (required) option
 
-opt=struct();
-opt.h0_mean=0;
+opt = struct();
+opt.h0_mean = 0;
 
 % set the number of iterations ('niter' option).
-% At least 10000 is adviced for publication-quality analyses; because that
+% At least 10000 is advised for publication-quality analyses; because that
 % takes quite a while to compute, here we use 200
 
 % >@@>
 % Note: for publication-quality analyses, niter=10000 or more is
 % recommended
-opt.niter=200;
+opt.niter = 200;
 % <@@<
 
 % using cosmo_montecarlo_cluster_stat, compute a map with z-scores
@@ -97,39 +97,38 @@ opt.niter=200;
 % comparisons. Store the result in a variable named 'tfce_z_ds_stim'
 
 % >@@>
-tfce_z_ds_stim=cosmo_montecarlo_cluster_stat(ds_stim,cl_nh,opt);
+tfce_z_ds_stim = cosmo_montecarlo_cluster_stat(ds_stim, cl_nh, opt);
 % <@@<
 cosmo_plot_slices(tfce_z_ds_stim);
 
 %% Using the same logic, run a two-sample t-test for primates versus bugs
 
 % >@@>
-primates_insects_mask=cosmo_match(ds.sa.targets,[1 2 5 6]);
-ds_primates_insects=cosmo_slice(ds, primates_insects_mask);
+primates_insects_mask = cosmo_match(ds.sa.targets, [1 2 5 6]);
+ds_primates_insects = cosmo_slice(ds, primates_insects_mask);
 
 % set primates=1, insects=2
-ds_primates_insects.sa.targets(cosmo_match(...
-                            ds_primates_insects.sa.targets,[1 2]))=1;
-ds_primates_insects.sa.targets(cosmo_match(...
-                            ds_primates_insects.sa.targets,[5 6]))=2;
+ds_primates_insects.sa.targets(cosmo_match( ...
+                                           ds_primates_insects.sa.targets, [1 2])) = 1;
+ds_primates_insects.sa.targets(cosmo_match( ...
+                                           ds_primates_insects.sa.targets, [5 6])) = 2;
 
 % compute average for each unique combination of targets and chunks
-ds_avg_primate_insects=cosmo_average_samples(ds_primates_insects);
+ds_avg_primate_insects = cosmo_average_samples(ds_primates_insects);
 
-cl_nh=cosmo_cluster_neighborhood(ds_avg_primate_insects);
+cl_nh = cosmo_cluster_neighborhood(ds_avg_primate_insects);
 
-
-opt=struct();
+opt = struct();
 
 % set the number of iterations.
-% At least 10000 is adviced for publication-quality analyses; because that
+% At least 10000 is advised for publication-quality analyses; because that
 % takes quite a while to compute, here we use 200
 
 % Note: for publication-quality analyses, niter=10000 or more is
 % recommended
-opt.niter=200;
+opt.niter = 200;
 
-tfce_z_ds_primate_vs_insects=cosmo_montecarlo_cluster_stat(...
-                                    ds_avg_primate_insects,cl_nh,opt);
+tfce_z_ds_primate_vs_insects = cosmo_montecarlo_cluster_stat( ...
+                                                             ds_avg_primate_insects, cl_nh, opt);
 % <@@<
 cosmo_plot_slices(tfce_z_ds_primate_vs_insects);

@@ -101,7 +101,8 @@ function assert_same_output_as_classifical_searchlight(ds, nh, opt)
 
 function test_naive_bayes_classifier_searchlight_exceptions
     aet = @(varargin)assertExceptionThrown(@() ...
-                                           cosmo_naive_bayes_classifier_searchlight(varargin{:}), '');
+                                           cosmo_naive_bayes_classifier_searchlight( ...
+                                                                                    varargin{:}), '');
 
     ds = cosmo_synthetic_dataset('size', 'small', 'nchunks', 4);
     nh = cosmo_spherical_neighborhood(ds, 'radius', 1, 'progress', false);

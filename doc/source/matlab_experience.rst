@@ -41,7 +41,7 @@ In addition, the *competent* user should be familiar with:
 
 Proficient user
 +++++++++++++++
-In addition, the *proficient* user should be familar with:
+In addition, the *proficient* user should be familiar with:
 
 - nested function handles and Currying.
 - ``bsxfun`` and ``cellfun``.

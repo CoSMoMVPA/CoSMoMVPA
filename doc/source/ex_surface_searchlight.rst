@@ -38,7 +38,7 @@ Define a surface-based neighborhood with approximately 100 voxels per searchligh
 
 Hint: :ref:`run_surface_searchlight_skl`
 
-Solution: :ref:`run_surface_searchlight` / :pb: surface_searchlight
+Solution: :ref:`run_surface_searchlight` / :pb:`surface_searchlight`
 
 
 .. include:: links.txt

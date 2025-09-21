@@ -457,7 +457,7 @@ function test_cluster_neighborhood_exceptions
     ds = cosmo_synthetic_dataset();
     aet = @(varargin)assertExceptionThrown( ...
                                            @()cosmo_cluster_neighborhood(varargin{:}, ...
-                                                                       'progress', false), '');
+                                                                         'progress', false), '');
 
     aet(ds, 'foo');
     aet(ds, 'fmri', -1);

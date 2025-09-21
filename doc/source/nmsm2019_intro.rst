@@ -32,7 +32,7 @@ Prerequisites
     * :ref:`CoSMoMVPA source code and tutorial data <get_code_and_example_data>`.
     * It is recommended, prior to the course, to:
 
-        + read the CoSMoMVPA manuscript (:doi: 10.1101/047118, citation :cite:`OCH16`).
+        + read the CoSMoMVPA manuscript (:doi:`10.1101/047118`, citation :cite:`OCH16`).
         + have the most recent CoSMoMVPA code (see :ref:`download`).
         + have a recent version of the :ref:`tutorial data <get_tutorial_data>`.
         + have set paths properly in ``.cosmomvpa.cfg`` (described :ref:`here <set_cosmovmpa_cfg>`)
@@ -46,7 +46,7 @@ Goals of this course
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
-        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational simillarity matrix) that can be applied to both a single ROI or in a searchlight.
+        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational similarity matrix) that can be applied to both a single ROI or in a searchlight.
     * Learn multiple-comparison approaches.
     * Make yourself an independent user, so that you can apply the techniques learnt here to your own datasets.
 

@@ -31,7 +31,7 @@ CoSMoMVPA changelog
         
         * :ref:`cosmo_meeg_dataset` and :ref:`cosmo_map2meeg` provide input/output support for EEGLAB datasets with study structure, and for FieldTrip datasets with "subj" as the first dimension in dimord.
 
-        * :ref:`cosmo_montecarlo_cluster_stat` and :ref:`cosmo_searchlight` support parallellization over multiple CPU cores/threads using the "nproc" parameter.
+        * :ref:`cosmo_montecarlo_cluster_stat` and :ref:`cosmo_searchlight` support parallelization over multiple CPU cores/threads using the "nproc" parameter.
 
         * New function :ref:`cosmo_independent_samples_partitioner` for MEEG datasets where samples can be assumed to be independent.
 
