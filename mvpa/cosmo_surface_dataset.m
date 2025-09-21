@@ -130,7 +130,7 @@ function [obj, fmt] = try_obj_from_file(fn)
 
     i = find_single_or_error(match, ...
                              @()sprintf('unknown extension for file %s', ...
-                                      fn));
+                                        fn));
     fmt = fmts{i};
     reader = fmt.reader;
     obj = reader(fn);
@@ -148,7 +148,7 @@ function [ds, fmt] = try_dataset_from_obj(obj)
     match = cellfun(@(f) f(obj), matcher_cell);
     i = find_single_or_error(match, ...
                              @()sprintf('unknown object of type %s', ...
-                                      class(obj)));
+                                        class(obj)));
 
     fmt = fmts{i};
     ds = build_dataset(obj, fmt);

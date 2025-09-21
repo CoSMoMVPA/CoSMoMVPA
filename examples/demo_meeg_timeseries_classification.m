@@ -27,65 +27,60 @@
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-
 %% get timelock data in CoSMoMVPA format
 
 % set configuration
-config=cosmo_config();
-data_path=fullfile(config.tutorial_data_path,'meg_20hz');
+config = cosmo_config();
+data_path = fullfile(config.tutorial_data_path, 'meg_20hz');
 
 % show dataset information
-readme_fn=fullfile(data_path,'README');
+readme_fn = fullfile(data_path, 'README');
 cosmo_type(readme_fn);
 
 % reset citation list
 cosmo_check_external('-tic');
 
 % load data
-data_fn=fullfile(data_path,'subj102_B01_20Hz_timelock.mat');
-data_tl=load(data_fn);
+data_fn = fullfile(data_path, 'subj102_B01_20Hz_timelock.mat');
+data_tl = load(data_fn);
 
 % convert to cosmomvpa struct
-ds_tl=cosmo_meeg_dataset(data_tl);
+ds_tl = cosmo_meeg_dataset(data_tl);
 
 % set the target (trial condition)
-ds_tl.sa.targets=ds_tl.sa.trialinfo(:,1); % 1=pre, 2=post
+ds_tl.sa.targets = ds_tl.sa.trialinfo(:, 1); % 1=pre, 2=post
 
 % set the chunks (independent measurements)
 % in this dataset, the first half of the samples (in order)
 % are the post-trials;
 % the second half the pre-trials
-ds_tl.sa.chunks=[(1:145) (1:145)]';
-
+ds_tl.sa.chunks = [(1:145) (1:145)]';
 
 % in addition give a label to each trial
-index2label={'pre','post'}; % 1=pre, 2=peri/post
-ds_tl.sa.labels=cellfun(@(x)index2label(x),num2cell(ds_tl.sa.targets));
+index2label = {'pre', 'post'}; % 1=pre, 2=peri/post
+ds_tl.sa.labels = cellfun(@(x)index2label(x), num2cell(ds_tl.sa.targets));
 
 % just to check everything is ok
 cosmo_check_dataset(ds_tl);
 
 %% Prepare MVPA
 % reset chunks: use four chunks
-nchunks=4;
-ds_tl.sa.chunks=cosmo_chunkize(ds_tl,nchunks);
+nchunks = 4;
+ds_tl.sa.chunks = cosmo_chunkize(ds_tl, nchunks);
 
 % do a take-one-fold out cross validation.
 % except when using a splithalf correlation measure it is important that
 % the partitions are *balanced*, i.e. each target (or class) is presented
 % equally often in each chunk
-partitions=cosmo_nchoosek_partitioner(ds_tl,1);
-partitions=cosmo_balance_partitions(partitions, ds_tl);
+partitions = cosmo_nchoosek_partitioner(ds_tl, 1);
+partitions = cosmo_balance_partitions(partitions, ds_tl);
 
-npartitions=numel(partitions);
+npartitions = numel(partitions);
 fprintf('There are %d partitions\n', numel(partitions.train_indices));
 fprintf('# train samples:%s\n', sprintf(' %d', cellfun(@numel, ...
-                                        partitions.train_indices)));
+                                                       partitions.train_indices)));
 fprintf('# test samples:%s\n', sprintf(' %d', cellfun(@numel, ...
-                                        partitions.test_indices)));
-
-
-
+                                                      partitions.test_indices)));
 
 %% Run time-series searchlight on magneto- and gradio-meters seperately
 
@@ -96,85 +91,83 @@ fprintf('# test samples:%s\n', sprintf(' %d', cellfun(@numel, ...
 % (Note: As of July 2015, there is no clear indication in the literature
 %  which approach is 'better'. These two approaches are used here to
 %  illustrate how they can be used with a searchlight).
-average_train_args_cell={{},...                                  % {  1
-                         {'average_train_count',5,...            %  { 2
-                                'average_train_resamplings',3}}; %  { 2
-n_average_train_args=numel(average_train_args_cell);
+average_train_args_cell = {{}, ...                                  % {  1
+                           {'average_train_count', 5, ...            %  { 2
+                            'average_train_resamplings', 3}}; %  { 2
+n_average_train_args = numel(average_train_args_cell);
 
 % compute and plot accuracies for magnetometers and gradiometers separately
-chantypes={'meg_axial','meg_planar'};
+chantypes = {'meg_axial', 'meg_planar'};
 
 % in the time searchlight analysis, select the time-point itself, the two
 % timepoints after it, and the two timepoints before it
-time_radius=2;
-nchantypes=numel(chantypes);
+time_radius = 2;
+nchantypes = numel(chantypes);
 
-ds_chantypes=cosmo_meeg_chantype(ds_tl);
-plot_counter=0;
-for j=1:n_average_train_args
+ds_chantypes = cosmo_meeg_chantype(ds_tl);
+plot_counter = 0;
+for j = 1:n_average_train_args
     % define the measure and its argument.
     % here a simple naive baysian classifier is used.
     % Alternative are @cosmo_classify_{svm,nn,lda}.
-    measure=@cosmo_crossvalidation_measure;
-    measure_args=struct();
-    measure_args.classifier=@cosmo_classify_naive_bayes;
-    measure_args.partitions=partitions;
+    measure = @cosmo_crossvalidation_measure;
+    measure_args = struct();
+    measure_args.classifier = @cosmo_classify_naive_bayes;
+    measure_args.partitions = partitions;
 
     % add the options to average samples to the measure arguments.
     % (if no averaging is desired, this step can be left out.)
-    average_train_args=average_train_args_cell{j};
-    measure_args=cosmo_structjoin(measure_args, average_train_args);
+    average_train_args = average_train_args_cell{j};
+    measure_args = cosmo_structjoin(measure_args, average_train_args);
 
-
-    for k=1:nchantypes
-        parent_type=chantypes{k};
+    for k = 1:nchantypes
+        parent_type = chantypes{k};
 
         % find feature indices of channels matching the parent_type
-        chantype_idxs=find(cosmo_match(ds_chantypes,parent_type));
+        chantype_idxs = find(cosmo_match(ds_chantypes, parent_type));
 
         % define mask with channels matching those feature indices
-        chan_msk=cosmo_match(ds_tl.fa.chan,chantype_idxs);
+        chan_msk = cosmo_match(ds_tl.fa.chan, chantype_idxs);
 
         % slice the dataset to select only the channels matching the channel
         % types
-        ds_tl_sel=cosmo_dim_slice(ds_tl, chan_msk, 2);
-        ds_tl_sel=cosmo_dim_prune(ds_tl_sel); % remove non-indexed channels
+        ds_tl_sel = cosmo_dim_slice(ds_tl, chan_msk, 2);
+        ds_tl_sel = cosmo_dim_prune(ds_tl_sel); % remove non-indexed channels
 
         % define neighborhood over time; for each time point the time
         % point itself is included, as well as the two time points before
         % and the two time points after it
-        nbrhood=cosmo_interval_neighborhood(ds_tl_sel,'time',...
-                                                'radius',time_radius);
+        nbrhood = cosmo_interval_neighborhood(ds_tl_sel, 'time', ...
+                                              'radius', time_radius);
 
         % run the searchlight using the measure, measure arguments, and
         % neighborhood defined above.
         % Note that while the input has both 'chan' and 'time' as feature
         % dimensions, the output only has 'time' as the feature dimension
-        sl_map=cosmo_searchlight(ds_tl_sel,nbrhood,measure,measure_args);
+        sl_map = cosmo_searchlight(ds_tl_sel, nbrhood, measure, measure_args);
         fprintf('The output has feature dimensions: %s\n', ...
-                        cosmo_strjoin(sl_map.a.fdim.labels,', '));
+                cosmo_strjoin(sl_map.a.fdim.labels, ', '));
 
-        plot_counter=plot_counter+1;
-        subplot(n_average_train_args,nchantypes,plot_counter);
+        plot_counter = plot_counter + 1;
+        subplot(n_average_train_args, nchantypes, plot_counter);
 
-        time_values=sl_map.a.fdim.values{1}; % first dim (channels got nuked)
-        plot(time_values,sl_map.samples);
+        time_values = sl_map.a.fdim.values{1}; % first dim (channels got nuked)
+        plot(time_values, sl_map.samples);
 
-        ylim([.4 .8])
-        xlim([min(time_values),max(time_values)]);
+        ylim([.4 .8]);
+        xlim([min(time_values), max(time_values)]);
         ylabel('classification accuracy (chance=.5)');
         xlabel('time');
 
         if isempty(average_train_args)
-            postfix=' no averaging';
+            postfix = ' no averaging';
         else
-            postfix=' with averaging';
+            postfix = ' with averaging';
         end
 
-        descr=sprintf('%s - %s', strrep(parent_type,'_',' '), postfix);
+        descr = sprintf('%s - %s', strrep(parent_type, '_', ' '), postfix);
         title(descr);
     end
 end
 % Show citation information
 cosmo_check_external('-cite');
-

@@ -365,8 +365,10 @@ function ds_z = cosmo_montecarlo_cluster_stat(ds, nbrhood, varargin)
     %     less_than_orig_count==niter/2
     %   and we want to set p=0.5 = 1-(niter/2+1)/(niter+1)
 
-    ps_two_tailed(pos_mask) = (niter - less_than_orig_count(1, pos_mask) + 1) * min_p_value;
-    ps_two_tailed(neg_mask) = 1 - (niter - less_than_orig_count(2, neg_mask) + 1) * min_p_value;
+    ps_two_tailed(pos_mask) = (niter - ...
+                               less_than_orig_count(1, pos_mask) + 1) * min_p_value;
+    ps_two_tailed(neg_mask) = 1 - (niter - ...
+                                   less_than_orig_count(2, neg_mask) + 1) * min_p_value;
 
     tiny = 1e-8;
     assert(all(ps_two_tailed + tiny >=  min_p_value));
@@ -459,7 +461,9 @@ function less_than_orig_count = run_with_worker(worker_opt)
                                   nworkers, progress_suffix);
                 end
                 prev_progress_msg = cosmo_show_progress(clock_start, ...
-                                                        iter / niter, msg, prev_progress_msg);
+                                                        iter / niter, ...
+                                                        msg, ...
+                                                        prev_progress_msg);
             else
                 iter_pos = max(iter, 1);
                 p_min = (iter_pos - max(less_than_orig_count, [], 2)) / iter_pos;
@@ -467,7 +471,9 @@ function less_than_orig_count = run_with_worker(worker_opt)
                 msg = sprintf('p = %.3f / %.3f [+/-%.3f] (left/right)', ...
                               p_min, p_range);
                 prev_progress_msg = cosmo_show_progress(clock_start, ...
-                                                        (iter + 1) / (niter + 1), msg, prev_progress_msg);
+                                                        (iter + 1) / (niter + 1), ...
+                                                        msg, ...
+                                                        prev_progress_msg);
             end
         end
     end

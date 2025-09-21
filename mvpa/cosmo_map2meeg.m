@@ -478,7 +478,7 @@ function ft = build_ft(ds, unused)
 
     dimord_labels = [samples_label; ...
                      cellfun(underscore2dash, dim_labels(:), ...
-                           'UniformOutput', false)];
+                             'UniformOutput', false)];
     if ~is_ds_source_struct(ds)
         ft.dimord = cosmo_strjoin(dimord_labels, '_');
     end

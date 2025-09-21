@@ -16,23 +16,22 @@
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #
 
-
 %% get timelock data in CoSMoMVPA format
 
 % set configuration
-config=cosmo_config();
-data_path=fullfile(config.tutorial_data_path,'meg_obj6');
+config = cosmo_config();
+data_path = fullfile(config.tutorial_data_path, 'meg_obj6');
 
 % show dataset information
-readme_fn=fullfile(data_path,'README');
+readme_fn = fullfile(data_path, 'README');
 cosmo_type(readme_fn);
 
 % reset citation list
 cosmo_check_external('-tic');
 
 % load preprocessed data
-data_fn=fullfile(data_path,'meg_obj6_s00.mat');
-data_tl=load(data_fn);
+data_fn = fullfile(data_path, 'meg_obj6_s00.mat');
+data_tl = load(data_fn);
 
 % Show data_tl
 % >@@>
@@ -43,7 +42,7 @@ cosmo_disp(data_tl);
 
 % convert to cosmomvpa struct, using cosmo_meeg_dataset
 % >@@>
-ds=cosmo_meeg_dataset(data_tl);
+ds = cosmo_meeg_dataset(data_tl);
 % <@@<
 
 % show the dataset
@@ -51,36 +50,34 @@ ds=cosmo_meeg_dataset(data_tl);
 cosmo_disp(ds);
 % <@@<
 
-
 %%
 
 % set the targets in ds.sa.targets (trial condition)
 % Hint: use the first column from ds.sa.trialinfo
 % >@@>
-ds.sa.targets=ds.sa.trialinfo(:,1); % 6 categories
+ds.sa.targets = ds.sa.trialinfo(:, 1); % 6 categories
 % <@@<
 
 % set the chunks in ds.sa.chunks (independent measurements)
 % all trials are here considered to be independent, so the chunks
 % must all have a different value
 % >@@>
-nsamples=size(ds.samples,1);
-ds.sa.chunks=(1:nsamples)';
+nsamples = size(ds.samples, 1);
+ds.sa.chunks = (1:nsamples)';
 % <@@<
 
 % in addition give a label to each trial
-index2label={'body','car','face','flower','insect','scene'};
-ds.sa.labels=cellfun(@(x)index2label(x),num2cell(ds.sa.targets));
+index2label = {'body', 'car', 'face', 'flower', 'insect', 'scene'};
+ds.sa.labels = cellfun(@(x)index2label(x), num2cell(ds.sa.targets));
 
 % just to check everything is ok
 cosmo_check_dataset(ds);
 
-
 %% Count number of channels, time points and trials
 % >@@>
-fprintf('There are %d channels, %d time points and %d trials\n',...
-        numel(unique(ds.fa.chan)),numel(unique(ds.fa.time)),...
-        size(ds.samples,1));
+fprintf('There are %d channels, %d time points and %d trials\n', ...
+        numel(unique(ds.fa.chan)), numel(unique(ds.fa.time)), ...
+        size(ds.samples, 1));
 % <@@<
 %%
 
@@ -95,38 +92,36 @@ fprintf('There are %d channels, %d time points and %d trials\n',...
 % from the face and scene categories
 
 % >@@>
-ds_face=cosmo_slice(ds,cosmo_match(ds.sa.labels,'face'));
-ds_scene=cosmo_slice(ds,cosmo_match(ds.sa.labels,'scene'));
+ds_face = cosmo_slice(ds, cosmo_match(ds.sa.labels, 'face'));
+ds_scene = cosmo_slice(ds, cosmo_match(ds.sa.labels, 'scene'));
 % <@@<
 
 % prepare dataset for output
-ds_faceVSscene=cosmo_slice(ds_face,1);
-ds_faceVSscene.sa=struct(); % destroy sample attributes
+ds_faceVSscene = cosmo_slice(ds_face, 1);
+ds_faceVSscene.sa = struct(); % destroy sample attributes
 
 % Compute difference between average of faces versus average of scenes;
 % store the result in the samples field of ds_faceVSscene
 % >@@>
-ds_faceVSscene.samples=mean(ds_face.samples)-mean(ds_scene.samples);
+ds_faceVSscene.samples = mean(ds_face.samples) - mean(ds_scene.samples);
 % <@@<
 
 % Convert ds_faceVSscene to a fieldtrip structure and convert
-ft_faceVSscene=cosmo_map2meeg(ds_faceVSscene);
+ft_faceVSscene = cosmo_map2meeg(ds_faceVSscene);
 %%
 % Use FieldTrip to visualize the face versus house contrast
-chantype='meg_axial';
-layout=cosmo_meeg_find_layout(ds_faceVSscene,'chantype',chantype);
+chantype = 'meg_axial';
+layout = cosmo_meeg_find_layout(ds_faceVSscene, 'chantype', chantype);
 
 figure();
-cfg=struct();
-cfg.interactive='yes';
-cfg.zlim=[-1 1];
-cfg.layout=layout;
+cfg = struct();
+cfg.interactive = 'yes';
+cfg.zlim = [-1 1];
+cfg.layout = layout;
 
 % show figure with plots for each sensor
 ft_multiplotER(cfg, ft_faceVSscene);
 %%
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Part 2: run searchlight over time
@@ -134,29 +129,29 @@ ft_multiplotER(cfg, ft_faceVSscene);
 
 % set MVPA parameters
 fprintf('The input has feature dimensions %s\n', ...
-                cosmo_strjoin(ds.a.fdim.labels,', '));
+        cosmo_strjoin(ds.a.fdim.labels, ', '));
 
 % only select relevant time period and sensors
-sensor_posterior_axial={'MEG1631', 'MEG1641', 'MEG1731', 'MEG1841', ...
-                        'MEG1911', 'MEG1921', 'MEG1941', 'MEG2231', ...
-                        'MEG2311', 'MEG2321', 'MEG2341', 'MEG2431', ...
-                        'MEG2441', 'MEG2511', 'MEG2531'};
+sensor_posterior_axial = {'MEG1631', 'MEG1641', 'MEG1731', 'MEG1841', ...
+                          'MEG1911', 'MEG1921', 'MEG1941', 'MEG2231', ...
+                          'MEG2311', 'MEG2321', 'MEG2341', 'MEG2431', ...
+                          'MEG2441', 'MEG2511', 'MEG2531'};
 
 % define the mask
-msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4,...
-                        'chan',sensor_posterior_axial);
+msk = cosmo_dim_match(ds, 'time', @(t) t >= -.1 & t <= .4, ...
+                      'chan', sensor_posterior_axial);
 
 % first slice the dataset, then use cosmo_dim_prune to avoid using
 % non-selected data. Assign the result to ds_sel
 %%%% >>> Your code here <<< %%%%
-ds_sel_orig=cosmo_slice(ds,msk,2);
+ds_sel_orig = cosmo_slice(ds, msk, 2);
 cosmo_disp(ds_sel_orig);
 
-ft_orig=cosmo_map2meeg(ds_sel_orig);
+ft_orig = cosmo_map2meeg(ds_sel_orig);
 %%
-ds_sel=cosmo_dim_prune(ds_sel_orig);
+ds_sel = cosmo_dim_prune(ds_sel_orig);
 cosmo_disp(ds_sel);
-ft_sel=cosmo_map2meeg(ds_sel);
+ft_sel = cosmo_map2meeg(ds_sel);
 
 %%
 
@@ -164,8 +159,8 @@ ft_sel=cosmo_map2meeg(ds_sel);
 % and assign to time_nbrhood.
 % Hint: use cosmo_interval_neighborhood,
 
-time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
-cosmo_disp(time_nbrhood)
+time_nbrhood = cosmo_interval_neighborhood(ds_sel, 'time', 'radius', 2);
+cosmo_disp(time_nbrhood);
 
 %%
 
@@ -173,19 +168,19 @@ cosmo_disp(time_nbrhood)
 
 % Define the measure to be cosmo_crossvalidation_measure,
 % and assign to measure
-measure=@cosmo_crossvalidation_measure;
+measure = @cosmo_crossvalidation_measure;
 
 %%%% >>> Your code here <<< %%%%
 
-%nsamples=numel(ds_sel.samples);
-%rp=cosmo_randperm(nsamples);
-%ds_sel.sa.targets=ds_sel.sa.targets(rp);
+% nsamples=numel(ds_sel.samples);
+% rp=cosmo_randperm(nsamples);
+% ds_sel.sa.targets=ds_sel.sa.targets(rp);
 
-partitions=cosmo_independent_samples_partitioner(ds_sel,...
-                                    'fold_count',5,...
-                                    'test_ratio',0.2);
+partitions = cosmo_independent_samples_partitioner(ds_sel, ...
+                                                   'fold_count', 5, ...
+                                                   'test_ratio', 0.2);
 
-cosmo_disp(partitions)
+cosmo_disp(partitions);
 %%
 % Define the partitioning scheme using
 % cosmo_independent_samples_partitioner, and assign to partitions.
@@ -196,117 +191,107 @@ cosmo_disp(partitions)
 %%%% >>> Your code here <<< %%%%
 
 % Use the LDA classifier and the partitions just defined,
-measure_args=struct();
-measure_args.partitions=partitions;
-measure_args.classifier=@cosmo_classify_lda;
+measure_args = struct();
+measure_args.partitions = partitions;
+measure_args.classifier = @cosmo_classify_lda;
 
+ds_sl = cosmo_searchlight(ds_sel, time_nbrhood, measure, measure_args);
 
-
-ds_sl=cosmo_searchlight(ds_sel,time_nbrhood,measure,measure_args);
-
-plot(ds_sl.a.fdim.values{1},ds_sl.samples)
+plot(ds_sl.a.fdim.values{1}, ds_sl.samples);
 xlabel('time');
 ylabel('classification accuracy');
-
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Part III: channel-time searchlight
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % select limited time period
-msk=cosmo_dim_match(ds,'time',@(t) t>=-.1 & t<=.4);
+msk = cosmo_dim_match(ds, 'time', @(t) t >= -.1 & t <= .4);
 
 % first slice the dataset using the mask and assign to 'ds_sel'
-ds_sel=cosmo_slice(ds,msk,2);
+ds_sel = cosmo_slice(ds, msk, 2);
 
 % Now use cosmo_dim_prune to avoid attempts to using
 % non-selected data in the searchlight
-ds_sel=cosmo_dim_prune(ds_sel);
+ds_sel = cosmo_dim_prune(ds_sel);
 
 % Set the seachlight parameters
-chan_count=10; % 10 center channels in each searchlight
-time_radius=2; % 2*2+1=5 time bins
-chan_type='meg_combined_from_planar';
+chan_count = 10; % 10 center channels in each searchlight
+time_radius = 2; % 2*2+1=5 time bins
+chan_type = 'meg_combined_from_planar';
 
 % define the neighborhood for each dimensions
 % First, set 'chan_nbrhood' using cosmo_meeg_chan_neighborhood,
 % and use the 'chantype' and 'count' parameters to set the channel type
 % and the number of sensors in each searchlight.
-chan_nbrhood=cosmo_meeg_chan_neighborhood(ds_sel,'chantype',chan_type,...
-                                    'count',chan_count);
-
+chan_nbrhood = cosmo_meeg_chan_neighborhood(ds_sel, 'chantype', chan_type, ...
+                                            'count', chan_count);
 
 cosmo_disp(chan_nbrhood);
 %%
-
 
 %%%% >>> Your code here <<< %%%%
 
 % Second, set 'time_nbrhood' using cosmo_interval_neighborhood,
 % using the 'time' dimension
 
-time_nbrhood=cosmo_interval_neighborhood(ds_sel,'time','radius',2);
+time_nbrhood = cosmo_interval_neighborhood(ds_sel, 'time', 'radius', 2);
 
 %%%% >>> Your code here <<< %%%%
 
 % cross neighborhoods for chan-time searchlight
 % Hint: use cosmo_cross_neighborhood, and use chan_nbrhood and time_nbrhood
 % (in that order) in a cell as the second argument
-nbrhood=cosmo_cross_neighborhood(ds_sel,{chan_nbrhood,time_nbrhood});
-
+nbrhood = cosmo_cross_neighborhood(ds_sel, {chan_nbrhood, time_nbrhood});
 
 %%%% >>> Your code here <<< %%%%
 
 % print how many neighbors features have on average
-nbrhood_nfeatures=cellfun(@numel,nbrhood.neighbors);
+nbrhood_nfeatures = cellfun(@numel, nbrhood.neighbors);
 fprintf('Features have on average %.1f +/- %.1f neighbors\n', ...
-            mean(nbrhood_nfeatures), std(nbrhood_nfeatures));
+        mean(nbrhood_nfeatures), std(nbrhood_nfeatures));
 
 %%
 
 % set the 'measure' variable to a function handle to the
 % split-half correlation measure
-measure=@cosmo_correlation_measure;
-
+measure = @cosmo_correlation_measure;
 
 % Define the partitioning scheme using
 % cosmo_independent_samples_partitioner.
 % Use 'fold_count',1 to use 1 folds,
 % and use 'test_ratio',.5 to use 50% of the data for testing (and 50% for
 % training) in the single fold.
-partitions=cosmo_independent_samples_partitioner(ds_sel,'fold_count',1,...
-                                            'test_ratio',0.5);
-
-
+partitions = cosmo_independent_samples_partitioner(ds_sel, 'fold_count', 1, ...
+                                                   'test_ratio', 0.5);
 
 %%%% >>> Your code here <<< %%%%
-measure_args=struct();
-measure_args.partitions=partitions;
-
+measure_args = struct();
+measure_args.partitions = partitions;
 
 %% run searchlight
 % run the searchlight using the parameters above, and assign the result
 % to a varibale 'ds_sl'
 
-ds_sl=cosmo_searchlight(ds_sel,nbrhood,measure,measure_args);
+ds_sl = cosmo_searchlight(ds_sel, nbrhood, measure, measure_args);
 
 %%%% >>> Your code here <<< %%%%
 
 %% visualize timeseries results
 
 % deduce layout from output
-layout=cosmo_meeg_find_layout(ds_sl);
+layout = cosmo_meeg_find_layout(ds_sl);
 fprintf('The output uses layout %s\n', layout.name);
 
 % map ds_sl to a FieldTrip structure. Assign the result to 'sl_ft'
-sl_ft=cosmo_map2meeg(ds_sl);
+sl_ft = cosmo_map2meeg(ds_sl);
 
 %%%% >>> Your code here <<< %%%%
 
 figure();
 cfg = [];
 cfg.interactive = 'yes';
-cfg.zlim=[-1 1];
+cfg.zlim = [-1 1];
 cfg.layout       = layout;
 
 % show figure with fisher-transformed correlations for each sensor
@@ -316,7 +301,7 @@ ft_multiplotER(cfg, sl_ft);
 % show figure with topology for 100 before to 400ms after stimulus onset
 % in bins of 50 ms
 figure();
-cfg.xlim=-0.1:0.05:0.4;
+cfg.xlim = -0.1:0.05:0.4;
 ft_topoplotER(cfg, sl_ft);
 
 %% Show citation information

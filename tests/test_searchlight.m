@@ -128,7 +128,7 @@ function test_searchlight_partial_classification
 function test_searchlight_exceptions
     aet = @(varargin)assertExceptionThrown(@() ...
                                            cosmo_searchlight(varargin{:}, ...
-                                                           'progress', 0), '');
+                                                             'progress', 0), '');
     ds = cosmo_synthetic_dataset();
     nh = cosmo_spherical_neighborhood(ds, 'radius', 1, 'progress', false);
     measure = @(x, opt)cosmo_structjoin('samples', mean(x.samples, 2));
