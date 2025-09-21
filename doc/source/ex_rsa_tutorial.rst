@@ -28,7 +28,7 @@ Compute the similarities in the ``ev`` and ``vt`` regions for participant ``s01`
 
 Hint: :ref:`run_rsa_visualize_skl`.
 
-Solution: :ref:`run_rsa_visualize` / :pb: rsa_visualize.
+Solution: :ref:`run_rsa_visualize` / :pb:`rsa_visualize`.
 
 
 
@@ -48,7 +48,7 @@ correlations between neural simiilarities and model/behavioral DSMs.
 
 Hint: :ref:`run_compare_dsm_skl`.
 
-Solution: :ref:`run_compare_dsm` / :pb: compare_dsm.
+Solution: :ref:`run_compare_dsm` / :pb:`compare_dsm`.
 
 Target dissimilarity matrix searchlight
 +++++++++++++++++++++++++++++++++++++++

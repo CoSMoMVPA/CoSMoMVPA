@@ -12,16 +12,21 @@ OCTAVE?=octave
 RSYNC=rsync -vrcu --progress
 SSH=ssh
 
+GHPAGE=cosmomvpa.github.io
 TESTDIR=$(CURDIR)/tests
 ROOTDIR=$(CURDIR)
 MVPADIR=$(ROOTDIR)/mvpa
 DOCDIR=$(CURDIR)/doc
+DOCSOURCEDIR=$(DOCDIR)/source
 DOCBUILDDIR=$(DOCDIR)/build
 HTMLDOCBUILDDIR=$(DOCBUILDDIR)/html
 WEBSITESTATIC=$(WEBSITEROOT)/_static
 DOCUMENTATION_HTML_PREFIX=CoSMoMVPA_documentation_html
 DOCARCHIVEDIR=$(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX)
 DOCUMENTATION_FILES_TO_ARCHIVE=AUTHOR copyright README.rst
+GHPAGESSOURCEDIR=$(DOCSOURCEDIR)/$(GHPAGE)
+GHPAGESBUILDDIR=$(DOCBUILDDIR)/$(GHPAGE)
+GHPAGESBUILDWORKFLOWDIR=$(GHPAGESBUILDDIR)/.github/workflows
 
 WEBSITEHOST=hostinger
 WEBSITEDIR=~/public_html
@@ -244,6 +249,23 @@ website-sync: website-html-sync
 	$(RSYNC) $(addprefix $(DOCBUILDDIR)/$(DOCUMENTATION_HTML_PREFIX),.zip .tar.gz) \
 				 $(WEBSITESTATIC)/
 
+gh-pages-repo:
+	@if [ ! -d "$(GHPAGESBUILDWORKFLOWDIR)" ]; then \
+                mkdir -p "$(GHPAGESBUILDWORKFLOWDIR)"; \
+        fi
+	echo "$(GHPAGESBUILDWORKFLOWDIR)"
+	rm -rf "$(GHPAGESBUILDDIR)/.git"
+	@$(RSYNC) --exclude 'CoSMoMVPA_documentation_html*' "$(HTMLDOCBUILDDIR)"/ "$(GHPAGESBUILDDIR)"
+	@$(RSYNC) "$(GHPAGESSOURCEDIR)"/ "$(GHPAGESBUILDDIR)"
+	cd "$(GHPAGESBUILDDIR)"; \
+	git init; \
+	git add *; \
+	git add $(GHPAGESBUILDWORKFLOWDIR)/*; \
+	git commit -m "DOC: automated build"; \
+	git branch -M main; \
+	git remote add origin https://github.com/CoSMoMVPA/$(GHPAGE).git; \
+	# git push -f -u origin main; \
+	echo "Done"
 
 
 website: website-content website-sync

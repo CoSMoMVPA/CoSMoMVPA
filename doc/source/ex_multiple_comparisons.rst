@@ -34,7 +34,7 @@ Extra exercise: do the same analysis for primates versus insects.
 
 Template: :ref:`run_multiple_comparison_correction_skl`
 
-Check your answers here: :ref:`run_multiple_comparison_correction` / :pb: multiple_comparison_correction
+Check your answers here: :ref:`run_multiple_comparison_correction` / :pb:`multiple_comparison_correction`
 
 
 Exercise with time-generalization data
@@ -45,6 +45,6 @@ After splitting the data in ten parts, run the time generalization measure on ea
 
 Template: :ref:`run_meeg_time_generalization_mcc_skl`
 
-Check your answers here: :ref:`run_meeg_time_generalization_mcc` / :pb: run_meeg_time_generalization_mcc
+Check your answers here: :ref:`run_meeg_time_generalization_mcc` / :pb:`run_meeg_time_generalization_mcc`
 
 .. include:: links.txt
