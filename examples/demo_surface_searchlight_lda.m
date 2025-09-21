@@ -200,7 +200,8 @@ for one_surf = [true, false]
         % - out2in is the mapping from output to input surface
         fprintf('Defining neighborhood with %s\n', desc);
         [nbrhood, vo, fo, out2in] = cosmo_surficial_neighborhood(ds, surf_def, ...
-                                                                 'count', feature_count);
+                                                                 'count', feature_count, ...
+                                                                 'metric', 'dijkstra');
 
         % print neighborhood
         fprintf('Searchlight neighborhood definition:\n');

@@ -62,7 +62,9 @@ vol_ds = cosmo_fmri_dataset(data_fn, 'targets', targets, 'chunks', chunks);
 radius = 0;
 surf_band_range = [-2 2]; % get voxel data within 2mm from surface
 surf_def = {vertices, faces, [-2 2]};
-nbrhood = cosmo_surficial_neighborhood(vol_ds, surf_def, 'radius', radius);
+nbrhood = cosmo_surficial_neighborhood(vol_ds, surf_def, ...
+                                       'radius', radius, ...
+                                       'metric', 'dijkstra');
 
 measure = @(x, opt) cosmo_structjoin('samples', mean(x.samples, 2), 'sa', x.sa);
 

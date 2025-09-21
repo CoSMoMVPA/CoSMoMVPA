@@ -228,7 +228,9 @@ surface_def = {pial_v, white_v, pial_f};
 % results) add as additional arguments: 'metric','dijkstra'
 
 % >@@>
-nbrhood = cosmo_surficial_neighborhood(ds, surface_def, 'count', 100);
+nbrhood = cosmo_surficial_neighborhood(ds, surface_def, ...
+                                       'count', 100, ...
+                                       'metric', 'dijkstra');
 % <@@<
 
 % visualize the neighborhood using cosmo_disp.

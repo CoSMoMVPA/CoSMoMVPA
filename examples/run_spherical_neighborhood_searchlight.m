@@ -43,7 +43,7 @@ ncenters = numel(center2neighbors); % should be equal to 'nfeatures'
 % (here we use cosmo_oddeven_partitioner; cosmo_nfold_partitioner would be
 % another possibility, with the advantage of using a larger training set,
 % but the disadvantage that it takes longer to run)
-partitions = cosmo_oddeven_partitioner(ds.sa.chunks);
+partitions = cosmo_oddeven_partitioner(ds);
 
 %% Allocate space for output
 ncenters = numel(center_ids);
@@ -93,6 +93,7 @@ end
 res_map = nbrhood;
 res_map = rmfield(res_map, {'neighbors', 'origin'});
 res_map.samples = accs;
+res_map.sa = struct();
 
 % little sanity check
 cosmo_check_dataset(ds);
