@@ -39,7 +39,6 @@ jobs:
                 sudo apt-get -y install \
                   octave
                 make install
-                make -C MOcov install
         -   name: Octave version
             run: octave --version
         -   name: Download MOxUnit
@@ -52,8 +51,8 @@ jobs:
                 make -C MOcov install
         -   name: Download MOdox
             run: |
-                git clone https://github.com/MOcov/MOcov.git --depth 1
-                make -C MOcov install 
+                git clone https://github.com/MOdox/MOdox.git --depth 1
+                make -C MOdox install 
         -   name: Run tests
             run: octave $OCTFLAGS --eval "cd mvpa; cosmo_set_path; cosmo_run_tests  -verbose -with_coverage -cover mvpa -cover_xml_file coverage.xml; exit(double(~ans))"
 
