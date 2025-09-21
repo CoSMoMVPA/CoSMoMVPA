@@ -53,6 +53,10 @@ jobs:
             run: |
                 git clone https://github.com/MOdox/MOdox.git --depth 1
                 make -C MOdox install 
+        -   name: Install Octave packages
+            run: |
+                pkg install -forge statistics
+                echo "pkg load statistics" >> ~/.octaverc        
         -   name: Run tests
             run: octave $OCTFLAGS --eval "cd mvpa; cosmo_set_path; cd ..; cosmo_run_tests  -verbose -with_coverage -cover mvpa -cover_xml_file coverage.xml; exit(double(~ans))"
 
