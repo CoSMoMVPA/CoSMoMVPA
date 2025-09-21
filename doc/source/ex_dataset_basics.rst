@@ -54,7 +54,7 @@ Use the function :ref:`cosmo_fmri_dataset` to load the nifti file of the brain o
 
 Make a histogram of all voxels, and a second histogram of the non-zero voxels of the brain. There are two 'bumps' - what do they represent?
 
-Display the dataset in saggital orientation.
+Display the dataset in sagittal orientation.
 
 Set anterior voxels to zero, and display the result.
 
@@ -84,7 +84,7 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 
     + The stimulus labels for each run of the fMRI study were monkey, lemur, mallard, warbler, ladybug, and lunamoth -- in that order. This dataset contains summary statistics (T statistics from the general linear model analysis, GLM) for each stimulus for each of ten runs. The runs are vertically stacked by run. For example, the first row contains the summary voxel-wise responses for monkey in run 1, the second row contains that for lemur in run 1, and the seventh row contains monkey from run 2, etc.
 
-    + Add samples atributes (dataset.sa) as follows.
+    + Add samples attributes (dataset.sa) as follows.
 
         * numeric labels for the targets,aka stimulus labels, in the samples attribute field dataset.sa.targets
         * add another sample attribute for the chunks, aka run labels, in the field dataset.sa.chunks.
@@ -94,7 +94,7 @@ Using the function in :ref:`cosmo_fmri_dataset` load the dataset for subject s01
 
 - Now use :ref:`cosmo_fmri_dataset`  with the ``mask``, ``targets`` and ``chunks`` parameters; set ``.sa.labels`` as before, and verify you get the same dataset structure as before.
 
-Advanced exercise: using :ref:`cosmo_slice`, can you show the same figure as in the advanved exercise above where all voxels around a center voxels were set to zero?
+Advanced exercise: using :ref:`cosmo_slice`, can you show the same figure as in the advanced exercise above where all voxels around a center voxels were set to zero?
 
 Hint: :ref:`run_dataset_basics_skl`
 

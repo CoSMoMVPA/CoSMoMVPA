@@ -198,7 +198,7 @@ cosmo_disp(full_output_alt2);
 % Note: this dataset has 10 chunks. The correlation measure will,
 % by default, *not* do a 'simple' odd-even partitioning, but instead will
 % use all possible splits of the 10 chunks in two groups of 5, yielding
-% nchoosek(10,5) = 10! / (5!*5!) = 252 splits. Correlation diffences are
+% nchoosek(10,5) = 10! / (5!*5!) = 252 splits. Correlation differences are
 % computed for each split and then averaged.
 % (to override this, you can specify a 'partitions' argument with, for
 % example, the output of cosmo_oddeven_partitioner(ds,'half') ).

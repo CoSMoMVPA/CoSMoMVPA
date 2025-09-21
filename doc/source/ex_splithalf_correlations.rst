@@ -16,13 +16,13 @@ Reading material
 Background
 ++++++++++
 This exercise the most simple and most popular type of MVPA, that was first reported in :cite:`HGF+01`.
-The intuition is to split the data in two halves (e.g. odd and even runs) and estimate the response for each category, voxel and half seperately. If an area represents categories in a distributed manner (over voxels), then correlations (over voxels) of matching categories may be higher than correlations of non-matching categories. If categories are not represented in such a way, one would expect no differences between correlations of matching and non-matching categories.
+The intuition is to split the data in two halves (e.g. odd and even runs) and estimate the response for each category, voxel and half separately. If an area represents categories in a distributed manner (over voxels), then correlations (over voxels) of matching categories may be higher than correlations of non-matching categories. If categories are not represented in such a way, one would expect no differences between correlations of matching and non-matching categories.
 
 Briefly, the procedure can be visualized as follows:
 
 .. figure:: _static/splithalf_correlation.png
 
-    *Illustration of split-half correlations*. For split-half correlations, two chunks are required (e.g. odd and even runs) with matching targets. If not done yet, the data is split in two chunks (top and bottom). Each pattern in one half is correlated with each pattern in the other half, yeilding an ``NxN`` correlation matrix (with ``N`` the number of targets). Values in this correlation matrix are weighted positively if they are on the diagonal (matching target across the two halves) and negatively otherswise, in a way that all weights together add to zero, yielding a weighted correlation matrix (bottom right). If the sum of all elements in this matrix is positive, this indicates that the patterns contain target-specific information.
+    *Illustration of split-half correlations*. For split-half correlations, two chunks are required (e.g. odd and even runs) with matching targets. If not done yet, the data is split in two chunks (top and bottom). Each pattern in one half is correlated with each pattern in the other half, yielding an ``NxN`` correlation matrix (with ``N`` the number of targets). Values in this correlation matrix are weighted positively if they are on the diagonal (matching target across the two halves) and negatively otherswise, in a way that all weights together add to zero, yielding a weighted correlation matrix (bottom right). If the sum of all elements in this matrix is positive, this indicates that the patterns contain target-specific information.
 
 
 Exercise

@@ -127,7 +127,7 @@ group_cell_tr = cell(size(group_cell));
 
 for k = 1:numel(group_cell)
     % take data from the k-th participant and store
-    % in a varibale ds_time_gen
+    % in a variable ds_time_gen
     ds_time_gen = group_cell{k};
 
     % change 'train_time' and 'test_time' from being sample dimensions

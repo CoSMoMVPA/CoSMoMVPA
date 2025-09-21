@@ -22,7 +22,7 @@ Goals of this course
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
-        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational simillarity matrix) that can be applied to both a single ROI or in a searchlight.
+        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational similarity matrix) that can be applied to both a single ROI or in a searchlight.
     * Make yourself an independent user, so that you can apply the techniques learnt here to your own datasets.
 
 Not covered in this course
@@ -108,13 +108,13 @@ We 10:00-12:00 General intro: Get your computer ready to run CoSMoMVPA and use t
 -------------- ---------------------------------------------------------------------------------------------------
 We 12:00-14:00 Lunch break
 -------------- ---------------------------------------------------------------------------------------------------
-We 14:00-17:00 Pratical exercises: Basic dataset operations
+We 14:00-17:00 Practical exercises: Basic dataset operations
 -------------- ---------------------------------------------------------------------------------------------------
 Th 10:00-13:00 Practical exercises: Correlation analysis, basic classification analysis
 -------------- ---------------------------------------------------------------------------------------------------
 Th 13:00-14:00 Lunch break
 -------------- ---------------------------------------------------------------------------------------------------
-Th 14:00-17:00 Pratical exercises: Classification with cross-validation, measures, neighborhoods
+Th 14:00-17:00 Practical exercises: Classification with cross-validation, measures, neighborhoods
 -------------- ---------------------------------------------------------------------------------------------------
 Th 18:00-??:00 Social dinner at Hugo's bar and grill, 72 High Street, Egham
 -------------- ---------------------------------------------------------------------------------------------------

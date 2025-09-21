@@ -1,7 +1,7 @@
 %% Permutation test example
 %
 % A simple example of running a permutation test to determine the
-% signifance of classification accuracies
+% significance of classification accuracies
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
 % #   see the COPYING file distributed with CoSMoMVPA.           #

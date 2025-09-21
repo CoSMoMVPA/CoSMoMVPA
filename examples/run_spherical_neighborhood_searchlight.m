@@ -41,7 +41,7 @@ ncenters = numel(center2neighbors); % should be equal to 'nfeatures'
 
 %% set up cross validation
 % (here we use cosmo_oddeven_partitioner; cosmo_nfold_partitioner would be
-% another possiblity, with the advantage of using a larger training set,
+% another possibility, with the advantage of using a larger training set,
 % but the disadvantage that it takes longer to run)
 partitions = cosmo_oddeven_partitioner(ds.sa.chunks);
 

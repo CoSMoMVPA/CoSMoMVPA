@@ -114,8 +114,8 @@ Contributing using git
 ++++++++++++++++++++++
 
 The git_ distributed version control system is used for code development. It has several advantages over just downloading the `zip archive`_:
-    + a distributed workflow: multiple people can work on the code simultaneously, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easly.
-    + keeping track of individual contributions. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but with some kind of tagging: every change is annotated (see below). This allows anyone to see what was changed, when this happended, and by who.
+    + a distributed workflow: multiple people can work on the code simultaneously, and almost always their changes can be merged without conflicts. In the unlikely event of merge conflicts (when multiple people have changed the same code), these conflicts are resolved easily.
+    + keeping track of individual contributions. Through git_ it is possible to see every change made, by anybody. It provides functionality similar to a time-machine, but with some kind of tagging: every change is annotated (see below). This allows anyone to see what was changed, when this happened, and by who.
     + code sharing on multiple computers: everyone has their own copy of the code, and can merge changes made by others.
     + maintaining multiple versions: through *branching* one can create multiple copies of the code, each which its own new features. This is very useful for new experimental features or bug-fixing without affecting the *prestine* master code. Once changes are considered ready for the master repository, they can be merged easily.
 
@@ -148,7 +148,7 @@ To get started with git_ and github_ to allow for code contributions to CoSMoMVP
 
         cd CoSMoMVPA
 
-    + tell git about the `offical` release, which we call ``upstream``::
+    + tell git about the `official` release, which we call ``upstream``::
 
         git remote add upstream https://github.com/CoSMoMVPA/CoSMoMVPA.git
 
@@ -192,7 +192,7 @@ There are many great resources on using git_ on the web; a detailed explanation 
 
 Notes on committing
 -------------------
-- Please review your changes before commiting them. Useful commands are ``git status`` and ``git diff``.
+- Please review your changes before committing them. Useful commands are ``git status`` and ``git diff``.
 - Do *not* use ``git -a``; instead manually add the (changes to) files individually. Preferably commits should be atomic, that is change just one feature.  For example if you changed a file at two places by (1) improving the documentation and (2) refactoring code used internally, then preferably you should make two commits. Using the tags below these could be ``DOC: ...`` and ``RF: ...``.
   - To add a new file ``my_new_file.m``, run::
 
@@ -273,7 +273,7 @@ Matlab code guidelines
 ^^^^^^^^^^^^^^^^^^^^^^
 The following are guidelines, intended to improve:
 
-+ consistency in code layout across contributers, so that the final result is more consistent.
++ consistency in code layout across contributors, so that the final result is more consistent.
 + readability, so that less time is spent in understanding how the code works or what it does.
 + performance, so that execution time or memory usage is reduced.
 
@@ -332,7 +332,7 @@ Try to keep line lengths limited to 75 characters, so that files can be viewed i
 Indentation is 4 spaces (no tabs)
 +++++++++++++++++++++++++++++++++
 
-Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. For consitency please use exactly four spaces for every indent level; no more, no less.
+Indentation should be used for `if-else-end`, `while` and `function` blocks. Expressions of the form ``if expr``, ``else``, ``elseif expr``, ``var=function(var)``, ``while expr``, and ``end`` should be on a single line, except for very short statements that either set a default value for an input argument or raise an exception. For consistency please use exactly four spaces for every indent level; no more, no less.
 
 If this guideline and the previous one do not give you enough room to express yourself, then most likely you are overcomplicating things; consider rewriting the code and/or use subfunctions.
 
@@ -799,7 +799,7 @@ In general, functions should not change the current working directory, the path,
     The above is bad, because:
 
         - the user may have added ``my_functions`` to the path themselves; after calling this function, it is removed from the path.
-        - the user may have set the warning state themselves to ``off``; this is undone after calling this funciton
+        - the user may have set the warning state themselves to ``off``; this is undone after calling this function
         - the current working directory and the path are not restored when execution is interrupted because of an error or a user interrupt (``ctrl+C``).
 
     **bad:**
@@ -968,7 +968,7 @@ Minimize using ``try`` and ``catch``
 The use ``try`` and ``catch`` statements is generally avoided; we aim to throw an exception when the input to a function is wrong. Consider that code for use in a Mars rover should never crash even in unexcepted circumstances, whereas in CoSMoMVPA_ the code is aimed at analysis of neuroscience data, where getting correct results is very important (and knowing that something is wrong is important too). Some current exceptions are:
 
     + :ref:`cosmo_publish_run_scripts`, that builds the Matlab_ output from the scripts in ``examples/``. We don't want that function to crash if any of the scripts it is publishing crashes.
-    + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail, as that is a likely scenarion. In that case, even though the error is caught initially, always a subsequent error is thrown.
+    + :ref:`cosmo_classify_libsvm` and :ref:`cosmo_classify_matlabsvm`, that check whether the required externals are present if they fail, as that is a likely scenario. In that case, even though the error is caught initially, always a subsequent error is thrown.
     + :ref:`cosmo_searchlight`, which if an error is thrown by the `measure` function handle, prefixes the error message with the feature id that caused the error, and then throws a new error.
 
 
@@ -1038,7 +1038,7 @@ Some general features that make tests good:
 
 - expected function mapping: whether output is expected for particular input. It is even better if input is generated randomly and properties of the expected output are tested.
 - code coverage: check whether different input arguments (for example different switches or options) results in different expected outputs. Code coverage estimates from `coveralls.io`_ or `MOcov`_ can be useful in guiding which code needs more testing. Although code coverage is not a goal in itself, as a rule of thumb we like ``80%`` coverage and are very happy with coverage above ``90%``.
-- raise exceptions when expcted: test whether wrong or illegal inputs raise an exception (through ``assertExceptionThrown``).
+- raise exceptions when expected: test whether wrong or illegal inputs raise an exception (through ``assertExceptionThrown``).
 - modular: test one particular function (for unit tests), or whether multiple functions work together as expected (integration test)
 - no data dependencies: tests that use data as input should generate this data themselves. The :ref:`cosmo_synthetic_dataset` function can generate data in various modalities and parameters. We aim to not include binary files for testing. For example, some of our input and output tests actually generate files in AFNI, NIFTI, GIFTI and BrainVoyager format.
 

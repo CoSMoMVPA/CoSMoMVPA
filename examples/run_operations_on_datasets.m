@@ -19,7 +19,7 @@ ds = cosmo_fmri_dataset(data_fn, 'mask', mask_fn);
 ds.sa.targets = repmat((1:6)', 10, 1);
 % <@@<
 
-% set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
+% set ds.sa.chunks (acquisition run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
 ds.sa.chunks = ceil((1:60)' / 6);
@@ -68,7 +68,7 @@ cosmo_disp(ds_targets13_alt);
 % sanity check showing they are the same
 assert(isequal(ds_targets13, ds_targets13_alt));
 
-% alterative using cosmo_match and the labels
+% alternative using cosmo_match and the labels
 labels_monkey_or_mallard = cosmo_match(ds.sa.labels, {'monkey', 'mallard'});
 ds_targets13_alt2 = cosmo_slice(ds, labels_monkey_or_mallard);
 cosmo_disp(ds_targets13_alt2);

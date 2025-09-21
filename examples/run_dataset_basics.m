@@ -32,7 +32,7 @@ ds.sa.targets = targets;
 % sanity check
 cosmo_check_dataset(ds);
 
-% set ds.sa.chunks (acquistion run number) to the 60x1 column vector:
+% set ds.sa.chunks (acquisition run number) to the 60x1 column vector:
 % [ 1 1 1 1 1 1 2 2 2 ... 10 10 ]'
 % >@@>
 chunks = zeros(60, 1);

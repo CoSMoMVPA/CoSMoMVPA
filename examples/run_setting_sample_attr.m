@@ -9,7 +9,7 @@
 % There are 10 runs with 6 volumes per run. The runs are vertically stacked one
 % above the other. The six volumes in each run correspond to the stimuli:
 % 'monkey','lemur','mallard','warbler','ladybug','lunamoth', in that order. Add
-% numeric targets labels (samples atribute) such that 1 corresponds to 'monkey',
+% numeric targets labels (samples attribute) such that 1 corresponds to 'monkey',
 % 2 corresponds to 'lemur', etc. Then add numeric chunks (another samples
 % attribute) so that 1 corresponds to run1, 2 corresponds to run2, etc.
 

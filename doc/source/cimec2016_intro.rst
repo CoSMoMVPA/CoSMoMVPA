@@ -31,7 +31,7 @@ Goals of the fMRI / MVPA part of the course
     * Learn how to use CoSMoMVPA to perform these analyses:
         - Understand the dataset structure to represent both the data itself (e.g. raw measurements or summary statistics) and its attributes (e.g. labels of conditions (*targets*), data acquisition run (*chunks*).
         - See how parts of the data can be selected using *slicing* and *splitting*, and combined using *stacking*.
-        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational simillarity matrix) that can be applied to both a single ROI or in a searchlight.
+        - Introduce *measures* that compute summaries of the data (such as correlation differences, classification accuracies, similarity to an *a prior* defined representational similarity matrix) that can be applied to both a single ROI or in a searchlight.
     * Make yourself an independent user, so that you can apply the techniques learnt here to your own datasets.
 
 
@@ -193,7 +193,7 @@ with the name (``karen``) and other information replaced by your details. Please
 
 Assignments must be your own work
 ---------------------------------
-Your solution will be rated not only on correctness and completeness of the implementation, but also on readibility and understandibility. Please indent your code, add comments where necessary, and use reasonable variable names. For details, see :ref:`matlab code guidelines`. You can include images or screenshots if that is asked in the exercise.
+Your solution will be rated not only on correctness and completeness of the implementation, but also on readability and understandibility. Please indent your code, add comments where necessary, and use reasonable variable names. For details, see :ref:`matlab code guidelines`. You can include images or screenshots if that is asked in the exercise.
 
 We attempt to assign interesting programs that will help you learn the topics discussed in the course, and grade the assignments quickly and fairly. If you need more clarification or help, please let us know - we will try to help. If you are unable to meet a deadline and need more time, please contact us and, most likely, an extension can probably be arranged if the cause for the delay seems reasonable.
 
@@ -299,11 +299,11 @@ Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
 Exercise 3 - deadline 23:59, 03 May 2016
 ----------------------------------------
-*update 30 April 2016: in version 0.1 of the dataset, ``common/brain_mask.nii`` had the value 1 for all voxels. The dataset has been updated to version 0.2. The mask is also available as a seperate `nifti mask file <haxby2001-mask_brain.nii>`_*
+*update 30 April 2016: in version 0.1 of the dataset, ``common/brain_mask.nii`` had the value 1 for all voxels. The dataset has been updated to version 0.2. The mask is also available as a separate `nifti mask file <haxby2001-mask_brain.nii>`_*
 
 Use the Haxby 2001 GLM dataset (see above) for the following analyses:
 
-- *Classification searchlight*. Use an LDA classifier with take-one-out crossvalidation to classify the 8 conditions for participant ``s01``. Use the common brain mask in ``common/mask_brain.nii`` and the data from ``s01/glm_t12-perrun_8cond-tstat.nii``; for the searchlight, use a spherical neighborhoood with approximately 100 voxels in each searchlight. Show a map with classification accuracies using :ref:`cosmo_plot_slices`.
+- *Classification searchlight*. Use an LDA classifier with take-one-out crossvalidation to classify the 8 conditions for participant ``s01``. Use the common brain mask in ``common/mask_brain.nii`` and the data from ``s01/glm_t12-perrun_8cond-tstat.nii``; for the searchlight, use a spherical neighborhood with approximately 100 voxels in each searchlight. Show a map with classification accuracies using :ref:`cosmo_plot_slices`.
 
   Suggested functions:
 
@@ -374,7 +374,7 @@ MEG Exercises - deadline 23:59, 15 June 2016
 
     - *Please send your solutions to Christoph Braun*
     - *You are asked to complete at least two of the three assignments below to pass the class; for a higher (and maximal) grade you will have to complete all three exercises*.
-    - *Hand in your commented code and the results of your analysis. Comment on and interprete your results. Present figures in your report and  mention possible difficulties in your report.*
+    - *Hand in your commented code and the results of your analysis. Comment on and interpret your results. Present figures in your report and  mention possible difficulties in your report.*
 
 
 #) Time-lock analysis
@@ -383,7 +383,7 @@ MEG Exercises - deadline 23:59, 15 June 2016
 
         #) Define trials with a prestimulus interval and a poststimulus interval of 2 s each.
         #) Lowpass filter the raw data with a cut-off frequency of 40 Hz.
-        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels. Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
+        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you decided to remove trials/channels. Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
         #) Do the time-locked analysis with respect to stimulus presentation for all the different conditions. Plot the evoked responses summarized across all channels for the different conditions. In particular, plot the different stimulation conditions in different subplots. In each subplot, the evoked responses for detected and not-detected stimuli.
         #) Plot the topography at different peak latencies. For the different stimuli
 
@@ -394,7 +394,7 @@ MEG Exercises - deadline 23:59, 15 June 2016
 
         #) Define trials with a prestimulus interval and a poststimulus interval of 2 s each.
         #) Lowpass filter the raw data with a cutoff frequency at 40 Hz.
-        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you deciced to remove trials/channels.
+        #) Reject trials and/or channels that show artifacts (use ft_rejectvisual). Comment what you see and how you decided to remove trials/channels.
         #) Although magnetometers show higher magnetic activity than gradiometers the amplitudes are lower because the magnetic flux is divided by the distance of the two gradiometer coils. Therefore gradiometer values are 25 times higher than magnetometer values. Using ft_visualreject, set cfg.magscale to 25.
         #) Perform two different analyses:  first a time-frequency analysis and then a spectral analysis. Focus on the baseline period.
         #) Compare detected stimuli versus not-detected stimuli. Since the number of trials is critical for the power make sure that you analyze the same number of trials for both conditions.
@@ -409,7 +409,7 @@ MEG Exercises - deadline 23:59, 15 June 2016
         #)	Localize either a condition of the timefrequency analysis or the timelock analysis.
         #)	Display results overlaid on to the subject's head.
 
-    Extra task in case you want to do a more challanging task
+    Extra task in case you want to do a more challenging task
 
         #)	Load the MRI file and coregister the anatomy to the functional data (either to the timelock-analysis or the timefrequency analysis).
         #)	Create a head model for the subject's MRI
@@ -437,11 +437,11 @@ FAQ
 
 - For assignment 3, all values in the common mask are 1. Is my file corrupt?
 
-    * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (30 April 2016), this has been corrected. As indicated above, the new mask can also be downloaded seperately.
+    * No, an earlier version of the dataset contained the wrong mask (sorry for that). In version 0.2 (30 April 2016), this has been corrected. As indicated above, the new mask can also be downloaded separately.
 
 - From the Haxby2001 glm dataset, when computing the average for each category in the ``glm_t12-perrun_8cond-tstat.nii`` file, I get different numbers than the values in ``glm_t12-average_8cond-tstat.nii``. How is this possible?
 
-    * The ``glm_t12-perrun_8cond-tstat.nii`` and ``glm_t12-average_8cond-tstat.nii`` both contain t-test statistics. The t-test statistics are however based on different residuals. In the ``perrun`` file, residuals are based on each run seperately; in the ``average`` file, residuals are based on all eight runs combined.
+    * The ``glm_t12-perrun_8cond-tstat.nii`` and ``glm_t12-average_8cond-tstat.nii`` both contain t-test statistics. The t-test statistics are however based on different residuals. In the ``perrun`` file, residuals are based on each run separately; in the ``average`` file, residuals are based on all eight runs combined.
 
 
 - In assignment 3, last part (between-subject reliability), I have an array with two elements, each a dataset corresponding to a subject:

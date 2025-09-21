@@ -168,7 +168,7 @@ for one_surf = [true, false]
         end
         fprintf('\n\n *** Starting analysis with %s *** \n\n\n', desc);
 
-        % define searchlight surface paramters for each type of analysis
+        % define searchlight surface parameters for each type of analysis
         if one_surf && lowres_output
 
             % single surface (Caret/BV) with lower-res output
@@ -302,7 +302,7 @@ for one_surf = [true, false]
 
         ncenters = numel(nbrhood.neighbors);
         for k = 1:ncenters
-            idxs = nbrhood.neighbors{k}; % feature indices in neigborhood
+            idxs = nbrhood.neighbors{k}; % feature indices in neighborhood
             vox_count_ds.samples(idxs) = vox_count_ds.samples(idxs) + 1;
         end
 

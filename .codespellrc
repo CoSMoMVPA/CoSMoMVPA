@@ -1,3 +1,3 @@
 [codespell]
-skip = .git,*.pdf,*.svg, ./doc/build, ./external
+skip = .git, *.pdf, *.svg, ./doc/build, ./external, ./doc/source/matlab, ./doc/sourc/_static/publish, ./COPYING
 ignore-words-list = fo,te,whos,nd

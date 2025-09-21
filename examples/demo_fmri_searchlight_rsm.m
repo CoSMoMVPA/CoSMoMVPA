@@ -66,7 +66,7 @@ cosmo_check_dataset(ds);
 fprintf('Dataset input:\n');
 cosmo_disp(ds);
 
-%% Define feature neighorhoods
+%% Define feature neighborhoods
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % For the searchlight, define neighborhood for each feature (voxel).

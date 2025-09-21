@@ -11,7 +11,7 @@
 #    a comment saying 'your code here' (postfix '_skl' for skeleton)
 # 3) the file with only the header (first line plus all lines up to
 #    the first line without comment (postfix '_hdr' for header)
-# It also generates seperate toc files for each version
+# It also generates separate toc files for each version
 #
 # Important: requires sphinx with recent
 #            underscore.js (1.3.1 works, 0.4.4 does not)

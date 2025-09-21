@@ -119,7 +119,7 @@ opt.niter = 250;
 opt.h0_mean = 0;
 
 % this example uses the data itself (with resampling) to obtain cluster
-% statistcs under the null hypothesis. This is (in this case) somewhat
+% statistics under the null hypothesis. This is (in this case) somewhat
 % conservative due to how the resampling is performed.
 % Alternatively, and for better estimates (at the cost of computational
 % cost), one can generate a set of (say, 50) datasets using permuted data
@@ -131,7 +131,7 @@ fprintf('Running multiple-comparison correction with these options:\n');
 cosmo_disp(opt);
 
 % Run TFCE-based cluster correction for multiple comparisons.
-% The output has z-scores for each node indicating the probablity to find
+% The output has z-scores for each node indicating the probability to find
 % the same, or higher, TFCE value under the null hypothesis
 tfce_ds = cosmo_montecarlo_cluster_stat(surf_ds, cluster_nbrhood, opt);
 

@@ -74,7 +74,7 @@ all_ds = cosmo_stack(ds_rsms);
 %% Run DISTATIS
 distatis = cosmo_distatis(all_ds);
 
-%% show comprimise distance matrix
+%% show compromise distance matrix
 [compromise_matrix, dim_labels, values] = cosmo_unflatten(distatis, 1);
 
 labels = {'monkey', 'lemur', 'mallard', 'warbler', 'ladybug', 'lunamoth'};

@@ -34,7 +34,7 @@ is an ``2x3`` array, and values in this array can be indexed as other (e.g. nume
 
         my_arr(:,3)
 
-returns the array in the third colum, that is the ``2x1`` column vector ``[true; false]``. Note that when showing a logical array, Matlab / Octave do not show ``false`` or ``true`` values, but ``0`` and ``1`` respectively. To see whether a variable ``a`` is a logical array, run ``whos a``.
+returns the array in the third column, that is the ``2x1`` column vector ``[true; false]``. Note that when showing a logical array, Matlab / Octave do not show ``false`` or ``true`` values, but ``0`` and ``1`` respectively. To see whether a variable ``a`` is a logical array, run ``whos a``.
 
 
 A logical array ``a`` can be used to index another array ``b``, where the result of indexing is an array ``c`` that contains the elements of ``b`` only where ``a`` is equal to ``true``. Thus, in this example

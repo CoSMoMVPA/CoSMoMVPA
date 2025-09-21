@@ -26,7 +26,7 @@ ds.sa.labels = repmat(labels, 1, 10)';
 idx = strcmp(ds.sa.labels, 'monkey') | strcmp(ds.sa.labels, 'mallard');
 
 %% Slice the dataset
-% Use sample attrubutes slicer to slice dataset
+% Use sample attributes slicer to slice dataset
 ds2 = cosmo_slice(ds, idx);
 
 % slice into odd and even runs using chunks attribute

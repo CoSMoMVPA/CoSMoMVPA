@@ -70,7 +70,7 @@ plot(sort(n_neighbors_per_feature));
 %% Run cosmo_montecarlo_cluster_stat
 
 % There is one condition per chunk; all targets are set to 1.
-% Thus the subsequent anaylsis is a one-sample t-test.
+% Thus the subsequent analysis is a one-sample t-test.
 % Note: if this was a group analysis, then each sample (row in ds.samples)
 % would contain data from one subject; each unique value in .sa.chunks
 % would correspond to one subject; and each unique value in .sa.targets
@@ -83,7 +83,7 @@ opt = struct();
 opt.h0_mean = 0;
 
 % set the number of iterations ('niter' option).
-% At least 10000 is adviced for publication-quality analyses; because that
+% At least 10000 is advised for publication-quality analyses; because that
 % takes quite a while to compute, here we use 200
 
 % >@@>
@@ -121,7 +121,7 @@ cl_nh = cosmo_cluster_neighborhood(ds_avg_primate_insects);
 opt = struct();
 
 % set the number of iterations.
-% At least 10000 is adviced for publication-quality analyses; because that
+% At least 10000 is advised for publication-quality analyses; because that
 % takes quite a while to compute, here we use 200
 
 % Note: for publication-quality analyses, niter=10000 or more is

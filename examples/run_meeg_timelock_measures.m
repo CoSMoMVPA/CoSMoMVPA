@@ -271,7 +271,7 @@ measure_args.partitions = partitions;
 
 %% run searchlight
 % run the searchlight using the parameters above, and assign the result
-% to a varibale 'ds_sl'
+% to a variable 'ds_sl'
 
 ds_sl = cosmo_searchlight(ds_sel, nbrhood, measure, measure_args);
 

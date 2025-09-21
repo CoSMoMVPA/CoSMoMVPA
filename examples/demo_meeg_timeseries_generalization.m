@@ -90,7 +90,7 @@ ds = cosmo_dim_prune(ds);
 nchunks = 2; % two chunks are required for this analysis
 ds.sa.chunks = cosmo_chunkize(ds, nchunks);
 
-%% time-by-time generalization on magneto- and gradio-meters seperately
+%% time-by-time generalization on magneto- and gradio-meters separately
 % compute and plot accuracies for magnetometers and gradiometers separately
 chan_types = {'meg_axial', 'meg_planar'};
 nchan_types = numel(chan_types);

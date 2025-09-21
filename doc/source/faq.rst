@@ -86,7 +86,7 @@ CoSMoMVPA_ provides:
 
     + proper Monte Carlo cluster-based :ref:`multiple comparison correction <cosmo_montecarlo_cluster_stat>` (:ref:`example <demo_surface_tfce>`), using either Threshold-Free Cluster Enhancement or traditional cluster-size based Monte Carlo simulations, in all the supported neighborhood spaces..
     + support for both the Matlab_ and GNU Octave_ platforms.
-    + various runnable :ref:`example scripts <contents_demo.rst>` and :ref:`exerices <rhul2016>`, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer persective).
+    + various runnable :ref:`example scripts <contents_demo.rst>` and :ref:`exerices <rhul2016>`, describing both on how to perform certain types of analyses (i.e., from a user perspective), and on how typical MVP analyses can be implemented (from a programmer perspective).
 
 
 What does CoSMoMVPA *not* provide?
@@ -122,7 +122,7 @@ What should I use as input for MVPA?
 
     * fMRI options:
 
-        - Apply the GLM for each run seperately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics.
+        - Apply the GLM for each run separately, with separate predictors for each condition. Each run is a chunk, and each experimental condition is a target. You can use either beta estimates or t-statistics.
         - Split the data in halves (even and odd) and apply the GLM to each of these (i.e. treat the experiment as consisting of two 'runs'). In this case there are two chunks, and the same number of unique targets as there are experimental conditions.
 
     * MEEG options:
@@ -172,7 +172,7 @@ TL;DR: it's much simpler and you don't lose much by enforcing balanced partition
 
 Longer version:the main reason for encouraging (almost enforcing) balanced partitions is a combination of simplicity and avoiding mistakes with 'above chance' classification.
 It is considerably simple when chance is 1/c, with c the number of classes; in particular, this simplifies second level (group) analysis and allows for a relatively quick Monte Carlo based multiple-comparison correction through sign-swapping (as implemented in :ref:`cosmo_montecarlo_cluster_stat`).
-In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can re-use the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
+In addition, most paradigms use quite balanced designs anyway, so you do not loose much trials by enforcing balancing. If not using all trials would be a concern, one can reuse the same samples multiple times in different cross-validation folds through cosmo_balance_partitions with the 'nrepeats' or 'nmin' arguments.
 
 
 Does the LDA (linear discriminant analysis) classifier use shrinkage / normalization?
@@ -556,7 +556,7 @@ Matlab also provides an SVM implementation in the ``stats`` (and possible other)
 
 Use surface-based mapping with a low-resolution output surface
 --------------------------------------------------------------
-The typical use case scenarion is using FreeSurfer_ pial and white matter surfaces that are resampled to standard topology using MapIcosahedron. Then, the high-resolution surfaces are used to define which voxels are associated with each searchlight, whereas the low-resolution surface is used as centers for the searchlight. The former aims to result in more precise selection of voxels; the latter in fewer centers, and thus reduced execution time for the searchlight.
+The typical use case scenario is using FreeSurfer_ pial and white matter surfaces that are resampled to standard topology using MapIcosahedron. Then, the high-resolution surfaces are used to define which voxels are associated with each searchlight, whereas the low-resolution surface is used as centers for the searchlight. The former aims to result in more precise selection of voxels; the latter in fewer centers, and thus reduced execution time for the searchlight.
 
 In this scenario, it is required that the vertices in low-resolution surface are a subset of the pair-wise averages of vertices in the high-resolution pial and white surfaces. A typical use case is using standard topologies from AFNI's MapIcosahedron, where the high resolution surfaces are constructed using X linear divisionsof the triangles of an icosahedron, the low-resolution surface is constructed with Y linear divisions, and Y<X and X is an integer multiple of Y.
 
@@ -842,7 +842,7 @@ It is also possible to define such a measure *inline*; for example, if the input
                                             'samples',mean(x.samples,2),...
                                             'sa',x.sa);
 
-        % compute average in each neighorhood location across features (voxels)
+        % compute average in each neighborhood location across features (voxels)
         ds_mean=cosmo_searchlight(ds,nh,my_averageing_measure);
 
 The line approach may be a bit slower than defining a separate function, but the speed difference is usually not substantial.
@@ -886,7 +886,7 @@ one might expect a vector of only zeros because of the identities `a==(a+b)-b` a
 
     .. code-block:: matlab
 
-        ans =
+        and =
 
            1.0e-15 *
 
@@ -975,7 +975,7 @@ Then, to compute the average for each time point and frequency bin:
 
     .. code-block:: matlab
 
-        % average for each time point and frequency bin seperately
+        % average for each time point and frequency bin separately
         other_dims={'time','freq'};
         feature_averager=@(x)mean(x,2);
         ds_avg=cosmo_fx(ds,feature_averager,other_dims,2);
@@ -1017,7 +1017,7 @@ Should I Fisher-transform correlation values?
 ---------------------------------------------
 'When using :ref:`cosmo_correlation_measure`, :ref:`cosmo_target_dsm_corr_measure`, or :ref:`cosmo_dissimilarity_matrix_measure`, should I transform the data, for example using Fisher transformation (``atanh``)?'
 
-Assuming you would like to do second-level (group) anaysis:
+Assuming you would like to do second-level (group) analysis:
 
 - :ref:`cosmo_correlation_measure`: the correlations are already Fisher transformed (the transformation can be changed and/or disabled using the ``post_corr_func`` option)
 - :ref:`cosmo_target_dsm_corr_measure`: correlation values are not Fisher transformed. You could consider applying ``atanh`` to the ``.samples`` output
@@ -1099,7 +1099,7 @@ You would have to decide how to form clusters, i.e. whether you want to make inf
         % then one cannot make inferences about a specific time point (i.e.
         % "the effect was significant at t=100ms"), only about a cluster (i.e
         % "the effect was significant in a cluster stretching between t=50 and
-        % t=150 ms"). If, on the ohter hand,
+        % t=150 ms"). If, on the other hand,
         %
         %   allow_clustering_over_time=false
         %
@@ -1119,7 +1119,7 @@ You would have to decide how to form clusters, i.e. whether you want to make inf
         % set clustering
         opt=struct();
         opt.h0_mean=0; % expected mean against which t-test is run
-        opt.niter=10000; % 10,000 is recommdended for publication-quality analyses
+        opt.niter=10000; % 10,000 is recommended for publication-quality analyses
 
         % run TFCE Monte Carlo multiple comparison correction
         % in the output map, z-scores above 1.65 (for one-tailed) or 1.96 (for
@@ -1208,7 +1208,7 @@ Classify different groups of participants (such as patients versus controls)?
         cl_nh=cosmo_cluster_neighborhood(result);
 
         %% compute TFCE map with z-scores
-        % z-scores above 1.65 are signficant at p=0.05 one-tailed.
+        % z-scores above 1.65 are significant at p=0.05 one-tailed.
 
         tfce_map-cosmo_montecarlo_cluster_stat(result,cl_nh,opt);
 
@@ -1216,7 +1216,7 @@ When running an MEEG searchlight, have the same channels in the output dataset a
 -------------------------------------------------------------------------------------------------------
 'When I run an MEEG searchlight over channels, the searchlight dataset map has more channels than the input dataset. Is this normal?'
 
-This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual particpants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
+This is quite possible because the :ref:`cosmo_meeg_chan_neighborhood` uses, by default, the layout that best fits the dataset. The output from the searchlight has then all channels from this layout, rather than only the channels from the input dataset. This is done so that in individual participants different channels can be removed in the preprocessing step, while group analysis on the output maps can be done on maps that have the same channels for all participants.
 
 If you want to use only the channels from the input dataset (say ``ds``) you can set the ``label`` option to 'dataset'. See the following example, where ``chan_nh`` has only channels from the input dataset.
 
@@ -1776,7 +1776,7 @@ You could use the following code:
 	% ds_result=my_across_chunks_dissimilarity_matrix_measure(ds,opt)
 	%
 	% Input:
-	%   ds              dataset struct with two unique valus in ds.sa.chunks
+	%   ds              dataset struct with two unique values in ds.sa.chunks
 	%   opt             optional options to be passed to
 	%                   cosmo_dissimilarity_matrix_measure
 	%

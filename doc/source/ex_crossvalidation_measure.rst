@@ -24,8 +24,8 @@ signature:
 This is useful for writing code that can be reused for different purposes. The
 cross-validation dataset measure function is written to work with any generic
 classifier, and returns the classification accuracy.
-This is done by passing a function handle to a classifer in the args struct
-input. For example, the function handle for the nearest neighbor classifer can
+This is done by passing a function handle to a classifier in the args struct
+input. For example, the function handle for the nearest neighbor classifier can
 be passed by the args struct by using the @function syntax:
 
 .. code-block:: matlab

@@ -17,7 +17,7 @@ Wrapper for two classes
 
 Matlab_ has an implementation of a support vector machine classifier that supports two classes. Its implementation uses
 two functions: ``svmtrain`` and ``svmclassify``. Have a look at these functions' signatures (``help svmtrain`` and ``help svmclassify``) and then write a wrapper that will have the same function signature as our
-generic classifer, but uses matlab's SVM inside.  Below is the signature and
+generic classifier, but uses matlab's SVM inside.  Below is the signature and
 function header for our new function.
 
 Test your solution using the first part of :ref:`run_classify_svm`

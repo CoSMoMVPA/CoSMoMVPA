@@ -42,7 +42,7 @@ ds_odd = cosmo_slice(ds, odd_msk);
 categories = {'mallard', 'warbler'};
 
 % select samples where .sa.labels match on of the categories
-% for the even and odd runs seperately. Slice the dataset twice and store
+% for the even and odd runs separately. Slice the dataset twice and store
 % the result in 'ds_even_birds' and 'ds_odd_birds'
 % (use cosmo_match with .sa.labels and categories to define a mask,
 % then cosmo_slice to select the data)

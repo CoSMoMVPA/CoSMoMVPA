@@ -58,7 +58,7 @@ for k = 1:nclassifiers
     % <@@<
 
     % sum the confusion matrix_folds alnog the third dimension to
-    % obtain a single 6 x 6 confusion matirx. Store the result
+    % obtain a single 6 x 6 confusion matrix. Store the result
     % in a variable named confusion_matrix
     % >@@>
     confusion_matrix = sum(confusion_matrix_folds, 3);

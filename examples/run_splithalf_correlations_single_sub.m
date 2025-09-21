@@ -96,7 +96,7 @@ title(subject_id);
 %
 % Under the null hypothesis one would expect no difference between the
 % average on the on- and off-diagonal, hence correlations weighted by the
-% contrast matrix has an expected mean of zero. A postive value for
+% contrast matrix has an expected mean of zero. A positive value for
 % the weighted correlations would indicate more similar patterns for
 % patterns in the same condition (across the two halves) than in different
 % conditions.

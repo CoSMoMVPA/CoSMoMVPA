@@ -5,7 +5,7 @@
 
 Define voxel selection for a searchlight
 ===========================================================
-In a searchlight (Kriegeskorte et al 2006) one computes a (spatially) locally contrained measure for each feature in a dataset.
+In a searchlight (Kriegeskorte et al 2006) one computes a (spatially) locally constrained measure for each feature in a dataset.
 
 An important building block for a searchlight is the voxel selection part: for each feature, decide which features are in its neighborhood. Typically the neighborhood is defined as a sphere of a certain radius.
 

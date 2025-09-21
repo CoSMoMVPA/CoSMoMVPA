@@ -31,8 +31,8 @@ ylabel('count');
 box off;
 % <@@<
 %% Plot slices
-% plot a sagital, coronal and axial slice
-% at voxel positions (80,150,80) using squeeze and tranpose ("'") where
+% plot a sagittal, coronal and axial slice
+% at voxel positions (80,150,80) using squeeze and transpose ("'") where
 % necessary.
 % (bonus points for axis labels and proper orientations, i.e. in the
 % sagittal view the front of the brain is on the left and the back

@@ -82,11 +82,11 @@ fprintf('# train samples:%s\n', sprintf(' %d', cellfun(@numel, ...
 fprintf('# test samples:%s\n', sprintf(' %d', cellfun(@numel, ...
                                                       partitions.test_indices)));
 
-%% Run time-series searchlight on magneto- and gradio-meters seperately
+%% Run time-series searchlight on magneto- and gradio-meters separately
 
 % try two different classification approaches:
 % 1) without averaging the samples in the train set
-% 2) by averaging 5 samples at the time in the train set, and re-using
+% 2) by averaging 5 samples at the time in the train set, and reusing
 %    every sample 3 times.
 % (Note: As of July 2015, there is no clear indication in the literature
 %  which approach is 'better'. These two approaches are used here to

@@ -101,7 +101,7 @@ measure = @cosmo_dim_generalization_measure;
 % Set measure arguments
 measure_args = struct();
 
-% Use the measure with the following arugments:
+% Use the measure with the following arguments:
 % - measure: @cosmo_crossvalidation_measure
 % - classifier: @cosmo_classify_lda
 % - dimension: 'time'

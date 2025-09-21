@@ -99,7 +99,7 @@ accomplish this by centering the data cloud on the origin of the space by
 removing the mean value across conditions at each voxel.
 
 See what happens to the correlation between two vectors marked with blue X and a
-red cross in the figure below. On the left the data cloud has an arbitray
+red cross in the figure below. On the left the data cloud has an arbitrary
 origin, and the vectors are almost perfectly correlated. After demeaning, they
 are negatively correlated.
 

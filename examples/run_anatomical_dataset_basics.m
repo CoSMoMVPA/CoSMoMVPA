@@ -1,5 +1,5 @@
 %% Anatomical dataset basics
-% In this example, load a brain as a CoSMoMVPA datset and visualize it
+% In this example, load a brain as a CoSMoMVPA dataset and visualize it
 % in matlab
 %
 % #   For CoSMoMVPA's copyright information and license terms,   #
@@ -46,7 +46,7 @@ xlabel('intensity');
 ylabel('count');
 % <@@<
 
-%% Using cosmo_plot_slices, show a saggital view of the dataset
+%% Using cosmo_plot_slices, show a sagittal view of the dataset
 % >@@>
 cosmo_plot_slices(ds);
 % <@@<

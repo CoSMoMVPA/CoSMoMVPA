@@ -26,8 +26,8 @@ nsplits = numel(splits);
 % allocate space for output
 outputs = cell(nsplits, 1);
 
-% treat each element in splits seperately, and subtract the mean for each
-% feature seperately
+% treat each element in splits separately, and subtract the mean for each
+% feature separately
 for k = 1:nsplits
     d = splits{k};
     % >@@>

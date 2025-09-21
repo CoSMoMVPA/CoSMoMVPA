@@ -36,7 +36,7 @@ Just the data in the sample-by-feature data matrix not sufficient to be able to 
 
 Sample attributes
 -----------------
-Sample attributes ontain information about each sample (and is the same across all features), and are stored in a field ``.sa``. Most MVPA requires at least the following two sample attributes:
+Sample attributes contain information about each sample (and is the same across all features), and are stored in a field ``.sa``. Most MVPA requires at least the following two sample attributes:
 
     * ``.sa.targets``: represent the class of each sample. In the fMRI example above, these would be the category of the stimulus (monkeys, lemurs, ladybugs or lunamoths). In CoSMoMVPA, these are represented numerically; for example, 1=monkey, 2=lemur, 3=ladybug, 4=lunamoth).
     * ``.sa.chunks``: samples with the same chunks represent a group of samples that is acquired 'independently' from samples in other chunks. Independently is hard to define precisely, but in fMRI it usually refers to a single run of acquisition. In the fMRI example above, there are 10 chunks, each with 4 samples. In a take-one-out cross-validation analysis, for example, one tests a classifier on the samples in one chunk after it has been trained on the samples in the remaining chunks.
@@ -56,13 +56,13 @@ Dataset attributes contain general information about the whole dataset.
 
     In fMRI these are typically:
 
-    * A ``.a.vol`` field containing information about the voxel-to-world mapping. This is required to map the spatial location of each voxel from `voxel coordinates` (integer indices) to `world coordinates` (metric units, typically milimeters). Currently this is stored in a 4x4 ``.a.vol.mat``  affine transformation matrix that follows the ``LPI`` (left-to-right, posterior-to-anterior, inferior-to-superior) convention (non-affine transformations are currently not supported).
+    * A ``.a.vol`` field containing information about the voxel-to-world mapping. This is required to map the spatial location of each voxel from `voxel coordinates` (integer indices) to `world coordinates` (metric units, typically millimeters). Currently this is stored in a 4x4 ``.a.vol.mat``  affine transformation matrix that follows the ``LPI`` (left-to-right, posterior-to-anterior, inferior-to-superior) convention (non-affine transformations are currently not supported).
     * The range of indices used in ``.fa.i``, ``.fa.j`` and ``.fa.k``, stored in ``.a.fdim.values``.
     * The names of the spatial feature attributes, stored in ``.a.fdim.labels``.
 
     In MEEG these are, for a dataset with data in time-frequency space:
 
-    * The names of the feature attribtues (``chan``, ``time``, and ``freq``), stored in ``.a.fdim.labels`` .
+    * The names of the feature attributes (``chan``, ``time``, and ``freq``), stored in ``.a.fdim.labels`` .
     * channel names are stored in the field ``.a.fdim.values{1}``, time-points in ``.a.fdim.values{2}``, and frequencies in ``.a.fdim.values{3}``. In such a dataset, the feature attribute ``.fa.chan``, ``.fa.time``, and ``.fa.freq``, contain integers that index the corresponding elements in ``.a.fdim.values``.
 
 .. _`cosmomvpa_targets`:
@@ -89,8 +89,8 @@ Independence is crucial here, because many core MVP analyses assess generalizabi
     * in an ``n``-fold cross-validation scheme, the data is split in ``n`` chunks. A typical application is cross-validated classification, where a classifier is tested on one chunk after being trained on the remaining chunks.
 
 Typical chunk assignments are:
-    * in fMRI studies: each run (period of continuous recording) gives rise to a single chunk. Putting samples in a single run in different chunks may violate the independency assumption because of the slow-ness of the BOLD response, unless samples are seperated by a considerable time interval.
-    * in MEEG studies: if trials can be assumed to be independent (which most people in MEEG studies seem to do), then chunks can be assigned randomly (or in a systematic order). This can be done pseudo-randomly using :ref:`cosmo_chunkize`. If the indendency assumption cannot be fullfilled then chunks should be assigned on a run-by-run basis.
+    * in fMRI studies: each run (period of continuous recording) gives rise to a single chunk. Putting samples in a single run in different chunks may violate the independency assumption because of the slow-ness of the BOLD response, unless samples are separated by a considerable time interval.
+    * in MEEG studies: if trials can be assumed to be independent (which most people in MEEG studies seem to do), then chunks can be assigned randomly (or in a systematic order). This can be done pseudo-randomly using :ref:`cosmo_chunkize`. If the indendency assumption cannot be fulfilled then chunks should be assigned on a run-by-run basis.
 
 As with *targets* above, *chunks* should be coded as integer values in a ``Px1`` vector, where ``P`` is the number of samples.
 
@@ -173,7 +173,7 @@ Dataset operations
 
 Slicing
 +++++++
-Slicing refers to selecting data in a dataset struct, either along the rows or columns. It is provided by the :ref:`cosmo_slice` function, which takes three arguments: the dataset ``ds``, indices or a mask indicating what ``to_select``, and a ``dim`` argument indicating whether to slice along rows or colums.
+Slicing refers to selecting data in a dataset struct, either along the rows or columns. It is provided by the :ref:`cosmo_slice` function, which takes three arguments: the dataset ``ds``, indices or a mask indicating what ``to_select``, and a ``dim`` argument indicating whether to slice along rows or columns.
 
 - Slicing samples (``dim=1``; this is the default value) means that the specified *rows* are selected, both in ``.samples`` and each field in ``.sa`` (such as ``.sa.targets`` and ``.sa.chunks``).
 
@@ -207,14 +207,14 @@ Related functions are:
     - :ref:`cosmo_stack` stacks dataset along the first or second dimension. In a way it is the inverse of ;ref:`cosmo_split`, but it can also be used to stack other sets of datasets. A typical use case is:
 
         * Use ``cosmo_slice`` or ``cosmo_split`` to select subsets of the data, for example based on each unique combination of ``.sa.chunks`` and/or ``.sa.targets``.
-        * Perform a certain operation on each subset ot the data, such as computing the mean (averaging) or subtracting the mean (normalization), and store the output for each subset
+        * Perform a certain operation on each subset to the data, such as computing the mean (averaging) or subtracting the mean (normalization), and store the output for each subset
         * Join the output of each subset using ``cosmo_stack``.
 
-        For example, this :ref:`code <run_demean>` uses ``cosmo_split`` and ``cosmo_stack`` to subtract the mean (across samples) for each unique chunk seperately.
+        For example, this :ref:`code <run_demean>` uses ``cosmo_split`` and ``cosmo_stack`` to subtract the mean (across samples) for each unique chunk separately.
 
 
 
-    - :ref:`cosmo_fx` splits the dataset using :ref:`cosmo_split`, applies a function to each element, and stacks the results. It can be used to average data for each value of ``.sa.targets`` seperately, for each unique value of ``.sa.chunks``, or for each unique combination of ``.sa.targets`` and ``.sa.chunks``.
+    - :ref:`cosmo_fx` splits the dataset using :ref:`cosmo_split`, applies a function to each element, and stacks the results. It can be used to average data for each value of ``.sa.targets`` separately, for each unique value of ``.sa.chunks``, or for each unique combination of ``.sa.targets`` and ``.sa.chunks``.
 
 .. figure:: _static/split_and_stack.png
 
@@ -261,7 +261,7 @@ A dataset measure is a function with the following signature:
 
         output = dataset_measure(dataset, args)
 
-where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight seperately. The output should be a ``struct`` with fields ``.samples`` (in column vector format) and optionally a field ``.sa`` - but no fields ``.fa`` and usually no field ``.a`` (except for a possible ``.a.sdim`` field, if the measure returns data in a dimensional format) .
+where ``dataset`` is a dataset of interest, and ``args`` are options specific for that measure. A measure can then be applied to either a dataset directly, or in combination with  a 'searchlight' where the measure is applied to each searchlight separately. The output should be a ``struct`` with fields ``.samples`` (in column vector format) and optionally a field ``.sa`` - but no fields ``.fa`` and usually no field ``.a`` (except for a possible ``.a.sdim`` field, if the measure returns data in a dimensional format) .
 
 For example, the following code defines a 'measure' that returns classification accuracy based ona support vector machine classifier that uses n-fold cross-validation. The measure is then used in a searchlight with a radius of 3 voxels; the input is an fMRI dataset ``ds`` with chunks and targets set, the output an fMRI dataset with one sample containing classification accuracies.
 
@@ -290,7 +290,7 @@ Examples of measures include:
 
 Neighborhood
 ^^^^^^^^^^^^
-The tradional (volume-based fMRI) searchlight was introduced :cite:`KGB06` as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.
+The traditional (volume-based fMRI) searchlight was introduced :cite:`KGB06` as a method to measure information content *locally* in the whole brain. In this approach, a sphere-shaped mask (usually with a radius of a few voxels) 'travels' through the brain, and at each location :ref:`measures <cosmomvpa_measure>` information content (such as correlation differences or classification accuracies). This process is done for each brain location, and the result assigned to the center voxel of each sphere. The result is an *information* (rather than univariate *activation*) map.
 
 CoSMoMVPA_ overloads the *searchlight* concept through a more versatile *neighborhood* concept. A neighborhood definition describes a mapping that associates with each feature in the *target* domain (for the output) a set of features in the *source* domain (from the input). Neighborhoods are used for searchlight analyses (:ref:`cosmo_searchlight`), where the concept of a traditional fMRI volumetric searchlight is generalized to other types of datasets as well. For example:
 
@@ -318,7 +318,7 @@ Neighborhood-related functions include:
 The :ref:`cosmo_cross_neighborhood` can *cross* different neighborhoods, which provides functionality for:
 
     - fMRI time-space searchlight, if multiple time points are associated with each trial condition; achieved by crossing a spherical or surficial neighborhood with an interval neighborhood (for the time dimension).
-    - MEEG time-space searchlight; achieved by crossing a an interval neighborhood (for the time dimension) with a channel or source MEEG neighorhood.
+    - MEEG time-space searchlight; achieved by crossing a an interval neighborhood (for the time dimension) with a channel or source MEEG neighborhood.
     - MEEG time-space-frequency searchlight: achieved by crossing two interval neighborhoods (for the time and frequency dimensions) with a third (channel or source MEEG) neighborhood (:cite:`LTO+14`).
 
 

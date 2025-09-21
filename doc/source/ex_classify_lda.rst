@@ -44,7 +44,7 @@ Classification performance can be assessed by considering how many predictions f
             * either predict all samples in the test set to belong to the same classes (e.g. the first one), or
             * predict a random class for each sample in the test set.
 
-        - In this case, if there are ``C`` classes (unique targets), which each class occuring equally often, then each sample in the test set has a chance of being predicted correctly of ``1/C`` (the chance level). For example, with four classes, each sample would be predicted correctly with a chance of 1/4, or 25%.
+        - In this case, if there are ``C`` classes (unique targets), which each class occurring equally often, then each sample in the test set has a chance of being predicted correctly of ``1/C`` (the chance level). For example, with four classes, each sample would be predicted correctly with a chance of 1/4, or 25%.
 
         - If a set of patterns an a region of interest actually contains information about the conditions (i.e, is an informative region), *and* the classifier is able to use this information, then classification performance would be above chance level.
         - If a group of participants all show classification accuracy above chance consistently, one can claim that the region of interest contains information about the the conditions. A simple one-sample t-test against chance level can be used to obtain a statistic and associated p-value.
