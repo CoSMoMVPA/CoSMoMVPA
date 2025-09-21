@@ -50,7 +50,7 @@ jobs:
             run: |
                 git clone https://github.com/MOcov/MOcov.git --depth 1
                 make -C MOcov install
-       -   name: Download MOdox
+       -    name: Download MOdox
             run: |
                 git clone https://github.com/MOcov/MOcov.git --depth 1
                 make -C MOcov install 
