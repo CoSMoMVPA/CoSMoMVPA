@@ -25,9 +25,9 @@ function [chantypes, senstype_mapping] = cosmo_meeg_chantype(ds, varargin)
     %     %|| { 'meg_axial'  'meg_planar' ... 'meg_planar' 'meg_planar' }@1x306
     %     cosmo_disp(senstypes,'strlen',inf);
     %     %|| .meg_axial
-    %     %||   'neuromag306alt_mag'
+    %     %||   'neuromag306_mag'
     %     %|| .meg_planar
-    %     %||   'neuromag306alt_planar'
+    %     %||   'neuromag306_planar'
     %     %
     %     % filter the dataset to only contain the planar channels:
     %     %

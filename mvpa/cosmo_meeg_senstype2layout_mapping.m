@@ -22,7 +22,7 @@ function senstype2layout = cosmo_meeg_senstype2layout_mapping(varargin)
     %     %
     %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
     %     % get layout for neuromag306 MEG planar (gradiometers)
-    %     layout=senstype2layout.neuromag306alt_planar;
+    %     layout=senstype2layout.neuromag306_planar;
     %     cosmo_disp(layout.label)
     %     %|| { 'MEG0113'
     %     %||   'MEG0112'
@@ -48,7 +48,7 @@ function senstype2layout = cosmo_meeg_senstype2layout_mapping(varargin)
     %     senstype2layout=cosmo_meeg_senstype2layout_mapping();
     %     % get layout for neuromag306 MEG combined planar
     %     % (combined gradiometers)
-    %     layout=senstype2layout.neuromag306alt_planar_combined;
+    %     layout=senstype2layout.neuromag306_planar_combined;
     %     cosmo_disp(layout.label)
     %     %|| { 'MEG0112+0113'
     %     %||   'MEG0122+0123'
