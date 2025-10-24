@@ -29,7 +29,7 @@ function senstypes = cosmo_meeg_senstype_collection()
     %     senstypes=cosmo_meeg_senstype_collection();
     %     %
     %     % show neuromag306 MEG magnetometers
-    %     cosmo_disp(senstypes.neuromag306alt_mag)
+    %     cosmo_disp(senstypes.neuromag306_mag)
     %     %|| .label
     %     %||   { 'MEG0111'
     %     %||     'MEG0121'
@@ -44,7 +44,7 @@ function senstypes = cosmo_meeg_senstype_collection()
     %     %||   'meg_axial'
     %     %
     %     % show neuromag306 MEG planar gradiometers
-    %     cosmo_disp(senstypes.neuromag306alt_planar)
+    %     cosmo_disp(senstypes.neuromag306_planar)
     %     %|| .label
     %     %||   { 'MEG0112'  'MEG0113'
     %     %||     'MEG0122'  'MEG0123'
@@ -59,7 +59,7 @@ function senstypes = cosmo_meeg_senstype_collection()
     %     %||   'meg_planar'
     %     %
     %     % show neuromag306 MEG combined planar gradiometers
-    %     cosmo_disp(senstypes.neuromag306alt_planar_combined)
+    %     cosmo_disp(senstypes.neuromag306_planar_combined)
     %     %|| .label
     %     %||   { 'MEG0112+0113'
     %     %||     'MEG0122+0123'
