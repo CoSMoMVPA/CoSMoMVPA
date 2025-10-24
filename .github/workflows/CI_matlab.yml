@@ -31,7 +31,7 @@ jobs:
         strategy:
             matrix:
                 # Note that some older versions (e.g R2020a, R2020b...) may not be available on all OS
-                matlab_version: [R2022a, R2022b, R2023a, R2023b]
+                matlab_version: [R2022a]
                 os: [ubuntu-latest, macos-latest, windows-latest]
             fail-fast: false # Don't cancel all jobs if one fails
 
@@ -46,9 +46,13 @@ jobs:
                 release: ${{ matrix.matlab_version }}
         -   name: Checkout repository
             uses: actions/checkout@v4
+        -   name: Show directory
+            run: |
+                 pwd
+                 ls -a
         -   name: Install CoSMoMVPA
             run: | 
-                make -C CoSMoMVPA install
+                make install
         -   name: Download MOxUnit
             run: |
                 git clone https://github.com/MOxUnit/MOxUnit.git --depth 1
