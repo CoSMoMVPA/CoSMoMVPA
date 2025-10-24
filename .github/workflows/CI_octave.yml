@@ -18,6 +18,7 @@ on:
         branches: [master]
     pull_request:
         branches: ['*']
+    workflow_dispatch:
 
 # cancel previous runs on the same branch / PR
 concurrency:
