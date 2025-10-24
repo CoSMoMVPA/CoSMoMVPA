@@ -20,6 +20,9 @@ function is_ok = cosmo_check_external(external, raise_)
     %                          'matlabcsvm'
     %                          'svm'       Either matlabsvm or libsvm
     %                          '@{name}'   Matlab toolbox {name}
+    %                                      (fails if on Octave)
+    %                          '!{name}'   Matlab toolbox {name}
+    %                                      (does not fail if on Octave)
     %                          It can also be '-list', '-tic', '-toc',' or
     %                          '-cite'; see below for their meaning.
     %   raise_                 if true (the default), an error is raised if the
@@ -138,6 +141,11 @@ function is_ok = cosmo_check_external(external, raise_)
     if external(1) == '@'
         toolbox_name = external(2:end);
         is_ok = check_matlab_toolbox(toolbox_name, raise_);
+    elseif external(1) == '#'
+        toolbox_name = external(2:end);
+        is_ok = ~cosmo_wtf('is_matlab') || ...
+                check_matlab_toolbox(toolbox_name, raise_);
+
     elseif external(1) == '!'
         command_name = external(2:end);
         is_ok = check_which(command_name, raise_);
@@ -395,8 +403,8 @@ function externals = get_externals_helper()
                                'Article ID 156869, 9 pages.', ...
                                'doi:10.1155/2011/156869'];
 
-    externals.eeglab.is_present = @() has('eeglab') ...
-                                       && has('pop_loadset');
+    externals.eeglab.is_present = @() has('eeglab') && ...
+                                       has('pop_loadset');
     externals.eeglab.is_recent = yes;
     externals.eeglab.label = 'EEGLAB toolbox';
     externals.eeglab.url = 'https://sccn.ucsd.edu/eeglab/';
