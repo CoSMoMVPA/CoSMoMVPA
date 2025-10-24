@@ -10,6 +10,9 @@ function test_suite = test_pdist
     initTestSuite;
 
 function test_pdist_()
+    % This wrapper requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     data = [1 4 3; 2 2 3; 4 2 0; 0 1 1];
 
     avae = @(x, y)assertVectorsAlmostEqual(x, y, 'relative', 1e-4);

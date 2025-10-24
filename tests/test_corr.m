@@ -41,6 +41,9 @@ function test_regression_spearman()
     assertElementsAlmostEqual(r, cosmo_corr(x, y, 'Spearman'));
 
 function test_corr_no_type
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     x = randn(10, 20);
     y = randn(10, 5);
 
@@ -57,6 +60,9 @@ function test_corr_with_type
                                    'does not support it']);
         return
     end
+
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
 
     x = randn(10, 20);
     y = randn(10, 5);

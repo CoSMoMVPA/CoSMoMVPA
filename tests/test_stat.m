@@ -116,18 +116,27 @@ function test_stat_correspondence
     assertExceptionThrown(@()cosmo_stat(ds, 't2'), '');
     assertExceptionThrown(@()cosmo_stat(ds, 't'), '');
 
-function test_stat_contrast()
+function [ds, bad_chunks] = get_stat_contrast_test_ds()
     ds = cosmo_synthetic_dataset('nchunks', 6, 'ntargets', 4, 'sigma', 0);
     ds.sa.contrast = zeros(size(ds.sa.targets));
     ds.sa.contrast(ds.sa.targets == 2) = 1;
     ds.sa.contrast(ds.sa.targets == 4) = -1;
-    chunks = ds.sa.chunks;
-    ds.sa.chunks = chunks * 6 + ds.sa.targets;
+    bad_chunks = ds.sa.chunks;
+    ds.sa.chunks = bad_chunks * 6 + ds.sa.targets;
+
+function test_stat_contrast()
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
+    ds = get_stat_contrast_test_ds();
 
     res = cosmo_stat(ds, 'F', 'z');
     assertElementsAlmostEqual(res.samples, ...
                               [0.2695 0.9675 -0.8770 -1.0542 0.9173 1.2814], ...
                               'absolute', 1e-4);
+
+function test_stat_contrast_exceptions()
+    [ds, bad_chunks] = get_stat_contrast_test_ds();
 
     % test exceptions
     aet = @(varargin)assertExceptionThrown(@() ...
@@ -144,7 +153,7 @@ function test_stat_contrast()
     aet(ds, 'F');
 
     % within subject F
-    ds.sa.chunks = chunks;
+    ds.sa.chunks = bad_chunks;
     aet(ds, 'F');
     aet(ds, 't');
     aet(ds, 't2');
@@ -186,6 +195,9 @@ function short_args = remove_keys_from_arguments(skip_count, keys, args)
     end
 
 function test_stat_no_division_by_zero_error()
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     [lastmsg, lastid] = lastwarn();
     cleaner = onCleanup(@()lastwarn(lastmsg, lastid));
     lastwarn('');
@@ -206,7 +218,7 @@ function test_stat_same_nan_fstat()
 function test_stat_exceptions()
     ds = cosmo_synthetic_dataset('ntargets', 3);
     aet = @(varargin)assertExceptionThrown(@() ...
-                                           cosmo_stat(varargin{:}), '');
+                                           cosmo_stat(varargin{:}));
     aet(ds, 'foo');
     aet(ds, 'F', 'foo');
     aet(ds, 't');
@@ -216,6 +228,9 @@ function test_stat_exceptions()
     aet(ds2, 't2');
 
 function test_stat_missing_values()
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     % assuming that cosmo_stat works well with no NaNs, try it
     % with some missing values
 
@@ -381,6 +396,9 @@ function test_stat_missing_values()
     end
 
 function test_stat_extreme_values()
+    % This test requires the tinv function
+    cosmo_skip_test_if_no_external('!tinv');
+
     base_ds = cosmo_synthetic_dataset('ntargets', 1, ...
                                       'nchunks', 20, ...
                                       'size', 'normal');
@@ -401,6 +419,9 @@ function test_stat_extreme_values()
     end
 
 function test_stat_regression()
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     % using pre-generated data
     ds = cosmo_synthetic_dataset('nchunks', 6, 'ntargets', 4, 'sigma', 0);
     ds = cosmo_slice(ds, [2 6], 2);

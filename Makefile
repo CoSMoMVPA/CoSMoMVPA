@@ -267,6 +267,7 @@ gh-pages-repo:
 	git push -f -u origin main; \
 	echo "Done"
 
+gh-pages: html gh-pages-repo
 
 website: website-content website-sync
 

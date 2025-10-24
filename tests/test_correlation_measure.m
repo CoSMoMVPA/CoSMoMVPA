@@ -10,6 +10,9 @@ function test_suite = test_correlation_measure
     initTestSuite;
 
 function test_correlation_measure_basis()
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     ds3 = cosmo_synthetic_dataset('nchunks', 3, 'ntargets', 4);
     ds = cosmo_slice(ds3, ds3.sa.chunks <= 2);
 
@@ -75,6 +78,8 @@ function test_correlation_measure_basis()
                 cosmo_correlation_measure(ds4_perm, opt));
 
 function test_correlation_measure_single_target
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
     for ntargets = 2:6
         ds = cosmo_synthetic_dataset('nchunks', 2, 'ntargets', ntargets);
         ds.samples = randn(size(ds.samples));

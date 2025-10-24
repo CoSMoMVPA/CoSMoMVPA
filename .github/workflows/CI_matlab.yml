@@ -1,0 +1,78 @@
+---
+name: CI matlab
+
+# - Installs
+#   - MATLAB github action
+#   - MOcov
+# - checks out MOXunit
+# - Runs tests
+# - If tests pass, uploads coverage to codecov
+
+# Controls when the action will run.
+# Triggers the workflow:
+#   - on push for the master branch
+#   - on pull request for all branches
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: ['*']
+    workflow_dispatch:
+
+# cancel previous runs on the same branch / PR
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+
+    tests:
+
+        strategy:
+            matrix:
+                # Note that some older versions (e.g R2020a, R2020b...) may not be available on all OS
+                matlab_version: [R2020b, R2022a, R2023b, R2025a]
+                os: [ubuntu-latest, macos-latest, windows-latest]
+            fail-fast: false # Don't cancel all jobs if one fails
+
+        runs-on: ${{ matrix.os }}
+
+        steps:
+        # use matlab-actions/setup-matlab to setup a specific version of MATLAB
+        # https://github.com/matlab-actions/setup-matlab
+        -   name: Install MATLAB
+            uses: matlab-actions/setup-matlab@v2
+            with:
+                release: ${{ matrix.matlab_version }}
+        -   name: Checkout repository
+            uses: actions/checkout@v4
+        -   name: Install CoSMoMVPA
+            uses: matlab-actions/run-command@v2
+            with:
+                command: cd('mvpa'); cosmo_set_path(); cd ..; savepath(); exit(0);
+
+        -   name: Download MOxUnit, MOcov, MOdox
+            run: |
+                git clone https://github.com/MOxUnit/MOxUnit.git --depth 1
+                git clone https://github.com/MOcov/MOcov.git --depth 1
+                git clone https://github.com/MOdox/MOdox.git --depth 1
+        -   name: Install MOxUnit, MOcov, MOdox
+            uses: matlab-actions/run-command@v2
+            with:
+                command: origin=pwd(); disp(pwd); dir; pp=[origin '/']; cd([pp 'MOxUnit/MOxUnit']); moxunit_set_path(); cd([pp 'MOcov/MOcov']); addpath(pwd); cd([pp 'MOdox/MOdox']); addpath(pwd); savepath(); disp('Path is now'); disp(path); cd(origin);
+       
+        # use matlab-actions/setup-matlab to run a matlab command
+        # https://github.com/matlab-actions/setup-matlab
+        -   name: Run tests
+            uses: matlab-actions/run-command@v2
+            with:
+                command: result=cosmo_run_tests('-verbose', '-cover', 'mvpa', '-with_coverage', '-cover_xml_file', 'coverage.xml'); exit(~result);
+
+        -   name: Code coverage
+            uses: codecov/codecov-action@v5
+            with:
+                files: coverage.xml
+                flags: ${{ matrix.os }}_matlab-${{ matrix.matlab_version }}
+                name: codecov-matlab
+                fail_ci_if_error: false
+                token: ${{ secrets.CODECOV_TOKEN }}

@@ -20,6 +20,8 @@ function is_ok = cosmo_check_external(external, raise_)
     %                          'matlabcsvm'
     %                          'svm'       Either matlabsvm or libsvm
     %                          '@{name}'   Matlab toolbox {name}
+    %                                      (fails if on Octave)
+    %                          '#stats'    Statistics functions
     %                          It can also be '-list', '-tic', '-toc',' or
     %                          '-cite'; see below for their meaning.
     %   raise_                 if true (the default), an error is raised if the
@@ -138,6 +140,23 @@ function is_ok = cosmo_check_external(external, raise_)
     if external(1) == '@'
         toolbox_name = external(2:end);
         is_ok = check_matlab_toolbox(toolbox_name, raise_);
+    elseif external(1) == '#'
+        % Special case for Continuous IntegrationI: On CI testing, the
+        % Matlab statistics  toolbox is not available. This means a lot of
+        % tests must be skipped.
+        %
+        % For now it is assumed this is not an issue on Octave, although
+        % the code *may* need to be adapted to better deal with cases where
+        % Octave does not have the statistics package installed.
+        toolbox_name = external(2:end);
+        if ~strcmp(toolbox_name, 'stats')
+            error('''#'' requires ''stats'' (CI Matlab case, FIXME?)');
+        end
+
+        is_ok = ~cosmo_wtf('is_matlab') || ...
+                (check_matlab_toolbox(toolbox_name, raise_) && ...
+                 ~isempty(which('fcdf')));
+
     elseif external(1) == '!'
         command_name = external(2:end);
         is_ok = check_which(command_name, raise_);
@@ -395,8 +414,8 @@ function externals = get_externals_helper()
                                'Article ID 156869, 9 pages.', ...
                                'doi:10.1155/2011/156869'];
 
-    externals.eeglab.is_present = @() has('eeglab') ...
-                                       && has('pop_loadset');
+    externals.eeglab.is_present = @() has('eeglab') && ...
+                                       has('pop_loadset');
     externals.eeglab.is_recent = yes;
     externals.eeglab.label = 'EEGLAB toolbox';
     externals.eeglab.url = 'https://sccn.ucsd.edu/eeglab/';

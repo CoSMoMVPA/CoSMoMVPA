@@ -13,12 +13,19 @@ function test_general_classifiers_strong_signal()
     % note: part of these checks are also implemented in
     % general_test_classifier (included below)
 
+    if cosmo_wtf('is_matlab')
+        csvm_external = '!fitcsvm';
+    else
+        non_existing_external = '!';
+        csvm_external = non_existing_external;
+    end
+
     cfy_cell = {{@cosmo_classify_lda, ''}, ...
                 {@cosmo_classify_nn, ''}, ...
                 {@cosmo_classify_naive_bayes, ''}, ...
                 {@cosmo_classify_libsvm, 'libsvm'}, ...
                 {@cosmo_classify_matlabsvm, 'matlabsvm'}, ...
-                {@cosmo_classify_matlabcsvm, 'matlabcsvm'}};
+                {@cosmo_classify_matlabcsvm, csvm_external}};
 
     n_cfy = numel(cfy_cell);
 
@@ -164,9 +171,10 @@ function test_classify_matlabcsvm
 
     cfy = @cosmo_classify_matlabcsvm;
     handle = get_predictor(cfy);
-    if ~cosmo_check_external('matlabcsvm', false)
+    if ~cosmo_check_external('matlabcsvm', false) || ...
+            ~cosmo_check_external('!fitcsvm', false)
         assert_throws_illegal_input_exceptions(cfy);
-        assertExceptionThrown(handle, '');
+        assertExceptionThrown(handle);
         notify_test_skipped('matlabcsvm');
         return
     end
