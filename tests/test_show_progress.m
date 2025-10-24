@@ -53,7 +53,8 @@ function assert_progress_equal(re, infix, varargin)
     %     end
     %     result=evalc([cmd 'cosmo_show_progress(varargin{:});']);
     expr = 'helper_print_infix_and_show_progress(infix,varargin{:})';
-    result = evalc(expr);
+    full_result = evalc(expr);
+    result = full_result;
 
     while true
         % replace a backspace character and the preceding character by
@@ -63,6 +64,10 @@ function assert_progress_equal(re, infix, varargin)
             break
         end
         result = result([1:(idx - 2), (idx + 1):end]);
+    end
+    if isempty(regexp(result, re, 'once'))
+        error('%s -> %s did not match re %s', ...
+              full_result, result, re);
     end
 
     assert(~isempty(regexp(result, re, 'once')));
