@@ -46,40 +46,25 @@ jobs:
                 release: ${{ matrix.matlab_version }}
         -   name: Checkout repository
             uses: actions/checkout@v4
-        -   name: Show directory
-            run: |
-                 pwd
-                 ls -a
         -   name: Install CoSMoMVPA
-            run: | 
-                make install
-        -   name: Download MOxUnit
+            uses: matlab-actions/run-command@v2
+            with:
+                command: cd('mvpa'); cosmo_set_path(); cd ..; savepath(); exit(0);
+
+        -   name: Download MOxUnit, MOcov, MOdox
             run: |
                 git clone https://github.com/MOxUnit/MOxUnit.git --depth 1
-                make -C MOxUnit install
-        -   name: Download MOcov
-            run: |
                 git clone https://github.com/MOcov/MOcov.git --depth 1
-                make -C MOcov install
-        -   name: Download MOdox
-            run: |
                 git clone https://github.com/MOdox/MOdox.git --depth 1
-                make -C MOdox install 
-        -   name: Install Octave packages
-            run: |
-                octave $OCTFLAGS --eval "pkg install -forge statistics"
-                echo "pkg load statistics" >> ~/.octaverc        
+        -   name: Install MOxUnit, MOcov, MOdox
+            uses: matlab-actions/run-command@v2
+            with:
+                command: origin=pwd(); pp=[origin '/../']; cd([pp 'MOxUnit/MOxUnit']); moxunit_set_path(); cd([pp 'MOcov/MOcov']); addpath(pwd); cd([pp 'MOdox/MOdox']); addpath(pwd); savepath(); disp('Path is now'); disp(path); cd(origin);
        
         # use matlab-actions/setup-matlab to run a matlab command
         # https://github.com/matlab-actions/setup-matlab
         -   name: Run tests
             uses: matlab-actions/run-command@v2
-
-            # This command will call the script run_tests_gh_ci.m that will:
-            # - set up moxunit
-            # - add MOcov to the path
-            # - run the tests
-            # - exit with the result
             with:
                 command: result=cosmo_run_tests('-verbose', '-cover', 'mvpa', '-with_coverage', '-cover_xml_file', 'coverage.xml'); exit(~result);
 
