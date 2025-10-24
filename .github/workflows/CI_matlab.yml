@@ -31,7 +31,7 @@ jobs:
         strategy:
             matrix:
                 # Note that some older versions (e.g R2020a, R2020b...) may not be available on all OS
-                matlab_version: [R2022a]
+                matlab_version: [R2020b, R2022a, R2023b, R2025a]
                 os: [ubuntu-latest, macos-latest, windows-latest]
             fail-fast: false # Don't cancel all jobs if one fails
 
