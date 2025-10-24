@@ -21,8 +21,7 @@ function is_ok = cosmo_check_external(external, raise_)
     %                          'svm'       Either matlabsvm or libsvm
     %                          '@{name}'   Matlab toolbox {name}
     %                                      (fails if on Octave)
-    %                          '#{name}'   Matlab toolbox {name}
-    %                                      (does not fail if on Octave)
+    %                          '#stats'    Statistics functions
     %                          It can also be '-list', '-tic', '-toc',' or
     %                          '-cite'; see below for their meaning.
     %   raise_                 if true (the default), an error is raised if the
@@ -142,12 +141,22 @@ function is_ok = cosmo_check_external(external, raise_)
         toolbox_name = external(2:end);
         is_ok = check_matlab_toolbox(toolbox_name, raise_);
     elseif external(1) == '#'
+        % Special case for Continuous IntegrationI: On CI testing, the
+        % Matlab statistics  toolbox is not available. This means a lot of
+        % tests must be skipped.
+        %
+        % For now it is assumed this is not an issue on Octave, although
+        % the code *may* need to be adapted to better deal with cases where
+        % Octave does not have the statistics package installed.
         toolbox_name = external(2:end);
-        is_ok = ~cosmo_wtf('is_matlab') || ...
-                check_matlab_toolbox(toolbox_name, raise_);
-        if strcmp(toolbox_name, 'stats')
-            is_ok = false;
+        if ~strcmp(toolbox_name, 'stats')
+            error('''#'' requires ''stats'' (CI Matlab case, FIXME?)');
         end
+
+        is_ok = ~cosmo_wtf('is_matlab') || ...
+                (check_matlab_toolbox(toolbox_name, raise_) && ...
+                 ~isempty(which('fcdf')));
+
     elseif external(1) == '!'
         command_name = external(2:end);
         is_ok = check_which(command_name, raise_);
