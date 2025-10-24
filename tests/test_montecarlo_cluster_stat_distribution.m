@@ -111,6 +111,9 @@ function ps = helper_mccs_get_pvalues(niter, show_progress)
     % output: correlation between expected uniform distribution of p values
     % and those obtained from monte_carl_cluster_stat
 
+    % This test requires statistics functions
+    cosmo_skip_test_if_no_external('#stats');
+
     niter_tfce = 25;
     nsubj = 10;
 

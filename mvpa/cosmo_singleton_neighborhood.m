@@ -16,6 +16,9 @@ function nh = cosmo_singleton_neighborhood(ds)
     %     % comparison correction using a clustering neighborhood defined
     %     % by cosmo_singleton_neighborhood with cosmo_montecarlo_cluster_stat
     %     %
+    %     % (This example requires statistics functions)
+    %     cosmo_skip_test_if_no_external('#stats');
+    %     %
     %     nsubjects=10;
     %     nrois=4;
     %     ds=struct();

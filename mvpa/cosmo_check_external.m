@@ -21,7 +21,7 @@ function is_ok = cosmo_check_external(external, raise_)
     %                          'svm'       Either matlabsvm or libsvm
     %                          '@{name}'   Matlab toolbox {name}
     %                                      (fails if on Octave)
-    %                          '!{name}'   Matlab toolbox {name}
+    %                          '#{name}'   Matlab toolbox {name}
     %                                      (does not fail if on Octave)
     %                          It can also be '-list', '-tic', '-toc',' or
     %                          '-cite'; see below for their meaning.
@@ -145,7 +145,9 @@ function is_ok = cosmo_check_external(external, raise_)
         toolbox_name = external(2:end);
         is_ok = ~cosmo_wtf('is_matlab') || ...
                 check_matlab_toolbox(toolbox_name, raise_);
-
+        if strcmp(toolbox_name, 'stats')
+            is_ok = false;
+        end
     elseif external(1) == '!'
         command_name = external(2:end);
         is_ok = check_which(command_name, raise_);
