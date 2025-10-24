@@ -4,6 +4,7 @@
 *.m~
 *.bak
 *.m_tmp
+*.asv
 data
 datadb
 datadb.zip
