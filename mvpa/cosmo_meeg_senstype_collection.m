@@ -138,6 +138,8 @@ function senstypes = get_senstypes()
 
 function sens_type_names = get_initial_sens_type_names()
     func_name = 'ft_senslabel';
+    ignore_names = {'yokogawa208'};
+
     if isempty(which(func_name))
         error('Cannot find ''%s'' in search path:\n  %s', ...
               func_name, cosmo_strjoin(cosmo_wtf('path'), '\n  '));
@@ -151,7 +153,8 @@ function sens_type_names = get_initial_sens_type_names()
     last = find(d == -1, 1);
 
     sens_types_cell = match(first:last);
-    sens_type_names = cellfun(@(x)x{:}, sens_types_cell);
+    sens_type_names = setdiff(cellfun(@(x)x{:}, sens_types_cell), ...
+                              ignore_names);
 
 function senstypes = get_initial_senstypes(sens_type_names)
     senstypes = struct();
