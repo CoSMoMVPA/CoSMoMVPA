@@ -59,7 +59,7 @@ jobs:
         -   name: Install MOxUnit, MOcov, MOdox
             uses: matlab-actions/run-command@v2
             with:
-                command: origin=pwd(); pp=[origin '/../']; cd([pp 'MOxUnit/MOxUnit']); moxunit_set_path(); cd([pp 'MOcov/MOcov']); addpath(pwd); cd([pp 'MOdox/MOdox']); addpath(pwd); savepath(); disp('Path is now'); disp(path); cd(origin);
+                command: origin=pwd(); disp(pwd); dir; pp=[origin '../../']; cd([pp 'MOxUnit/MOxUnit']); moxunit_set_path(); cd([pp 'MOcov/MOcov']); addpath(pwd); cd([pp 'MOdox/MOdox']); addpath(pwd); savepath(); disp('Path is now'); disp(path); cd(origin);
        
         # use matlab-actions/setup-matlab to run a matlab command
         # https://github.com/matlab-actions/setup-matlab
