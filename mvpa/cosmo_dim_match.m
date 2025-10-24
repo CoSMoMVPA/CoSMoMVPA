@@ -30,7 +30,6 @@ function msk = cosmo_dim_match(ds, varargin)
     %                     the intersection of the individual masks.
     %
     % Examples:
-    %
     %     % in an fMRI dataset, get all features with the first voxel dimension
     %     % between 5 and 10, inclusive
     %     ds=cosmo_synthetic_dataset('type','fmri','size','huge');
