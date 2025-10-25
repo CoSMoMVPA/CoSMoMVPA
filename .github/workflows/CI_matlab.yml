@@ -77,9 +77,7 @@ jobs:
                     savepath()
                     disp('Path is now')
                     disp(path)
-       
-        # use matlab-actions/setup-matlab to run a matlab command
-        # https://github.com/matlab-actions/setup-matlab
+
         -   name: Run tests
             uses: matlab-actions/run-command@v2
             with:
