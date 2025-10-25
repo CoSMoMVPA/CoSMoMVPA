@@ -62,13 +62,13 @@ Datasets
 ++++++++
 For most of the course we will be using the AK6 dataset and the MEG obj6 dataset (described below). Although these can be downloaded separately, it is recommended however to use the full tutorial dataset.
 
-Download link: `full tutorial data <datadb-v0.3.zip>`_.
+Download link: :datadb:`-`.
 
 AK6 dataset
 -----------
 This dataset is used for exercises shown on the website (with answers), and you can use it to learn MVPA. It contains preprocessed data for 8 subjects from :cite:`CGG+12`. In this experiment, participants were presented with categories of six animals: 2 primates: monkeys and lemurs; 2 birds: mallard ducks and yellow-throated warblers; and 2 bugs: ladybugs and luna moths.
 
-Download link: `tutorial data with AK6 data only <datadb-ak6-v0.3.zip>`_
+Download link: :datadb:`-ak6-`.
 
 .. image:: _static/fmri_design.png
     :width: 400px
@@ -116,7 +116,7 @@ This dataset is used for both the tutorial and for the assignments.
 
 It contains MEG data from a single participant viewing images of six categories; for details see the README file.
 
-Download link: `tutorial data with MEEG obj6 data only <datadb-meg_obj6-v0.3.zip>`_.
+Download link: :datadb:`-meg_obj6-`.
 
 
 

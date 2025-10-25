@@ -317,10 +317,7 @@ datadb_url = "https://github.com/CoSMoMVPA/CoSMoMVPA/releases/latest/download/"
 # datadb_url=''
 
 extlinks = {
-    "datadb": (
-        "https://github.com/CoSMoMVPA/CoSMoMVPA/releases/latest/download/%s",
-        "Tutorial data: %s ",
-    ),
+    "datadb": (datadb_url + "/datadb%sv0.3.zip", "tutorial data: datadb%sv0.3.zip"),
     "pb": ("_static/publish/run_%s.html", "Matlab output: run_%s"),
     "run_up": ("../_static/publish/%s.html", "Matlab output: %s"),
     "demo_up": ("../_static/publish/%s.html", "Matlab output: %s"),
