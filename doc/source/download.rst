@@ -100,18 +100,13 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
 
 * Get the tutorial data:
 
-    The full dataset is in the `tutorial data <datadb-v0.3.zip>`_ zip archive.
+    For the full dataset, including ``AK6``, MEEG ``obj-6``, and surface data, see  :datadb:`-`.
 
     For :ref:`labman2017`: the tutorial data should already be on your work station.
 
+    For  `PRNI 2016`_, we used fMRI ``AK6`` and MEEG ``obj-6``: only fMRI AK6 and MEEG obj6 data :datadb:`-ak6-meg_obj6`.
 
-    For  `PRNI 2016`_, we used fMRI ``AK6`` and MEEG ``obj-6``: `tutorial data with fMRI AK6 and MEEG obj6 data only <datadb-ak6-meg_obj6-v0.3.zip>`_.
-
-
-    For a minimal set of data (only fMRI AK6 data for the exercises), consider using  `tutorial data with AK6 data only <datadb-ak6-v0.3.zip>`_
-
-    Additional MEEG ``obj-6`` data, used for the exercises, is here: `MEG obj6 data <datadb-meg_obj6-v0.3.zip>`_.
-
+    For a minimal set of data (only fMRI AK6 data for the exercises), consider using :datadb:`-ak6-`.
 
     You can move the directory to another location on your file system, if desired.
 
@@ -147,7 +142,7 @@ The Matlab / Octave code (in ``mvpa/``) is required for analyses in CoSMoMVPA_; 
                   tutorial_data_path=/Users/karen/datasets/CoSMoMVPA/datadb/tutorial_data
                   output_data_path=/Users/karen/tmp/CoSMoMVPA_output
 
-      You can choose in which directory you would like to store the output for from running the examples and demonstrations; just make sture that the ``output_data_path`` directory exists. You can create a new directory for the output if you want.
+      You can choose in which directory you would like to store the output for from running the examples and demonstrations; just make sure that the ``output_data_path`` directory exists. You can create a new directory for the output if you want.
 
 .. _`test_local_setup`:
 
