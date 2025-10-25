@@ -51,7 +51,10 @@ jobs:
         -   name: Install CoSMoMVPA
             uses: matlab-actions/run-command@v2
             with:
-                command: cd('mvpa'); cosmo_set_path(); cd ..; savepath(); exit(0);
+                command: |
+                    cd('mvpa')
+                    cosmo_set_path()
+                    savepath()
 
         -   name: Download MOxUnit, MOcov, MOdox
             run: |
@@ -62,14 +65,25 @@ jobs:
         -   name: Install MOxUnit, MOcov, MOdox
             uses: matlab-actions/run-command@v2
             with:
-                command: origin=pwd(); disp(pwd); dir; pp=[origin '/']; cd([pp 'MOxUnit/MOxUnit']); moxunit_set_path(); cd([pp 'MOcov/MOcov']); addpath(pwd); cd([pp 'MOdox/MOdox']); addpath(pwd); savepath(); disp('Path is now'); disp(path); cd(origin);
-       
-        # use matlab-actions/setup-matlab to run a matlab command
-        # https://github.com/matlab-actions/setup-matlab
+                command: |
+                    origin=pwd()
+                    disp('Current working directory and contents:')
+                    disp(origin)
+                    dir
+                    prefix=[origin '/']
+                    cd([prefix 'MOxUnit/MOxUnit']); moxunit_set_path()
+                    cd([prefix 'MOcov/MOcov']); addpath(pwd)
+                    cd([prefix 'MOdox/MOdox']); addpath(pwd)
+                    savepath()
+                    disp('Path is now')
+                    disp(path)
+
         -   name: Run tests
             uses: matlab-actions/run-command@v2
             with:
-                command: result=cosmo_run_tests('-verbose', '-cover', 'mvpa', '-with_coverage', '-cover_xml_file', 'coverage.xml'); exit(~result);
+                command: |
+                    result=cosmo_run_tests('-verbose', '-cover', 'mvpa', '-with_coverage', '-cover_xml_file', 'coverage.xml')
+                    exit(~result);
 
         -   name: Code coverage
             uses: codecov/codecov-action@v5
